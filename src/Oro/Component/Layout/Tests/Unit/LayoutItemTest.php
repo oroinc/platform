@@ -8,14 +8,11 @@ use Oro\Component\Layout\RawLayoutBuilder;
 
 class LayoutItemTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RawLayoutBuilder */
-    private $rawLayoutBuilder;
+    private RawLayoutBuilder $rawLayoutBuilder;
 
-    /** @var LayoutContext */
-    private $context;
+    private LayoutContext $context;
 
-    /** @var LayoutItem */
-    private $item;
+    private LayoutItem $item;
 
     protected function setUp(): void
     {
@@ -28,23 +25,23 @@ class LayoutItemTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetContext()
+    public function testGetContext(): void
     {
-        $this->assertSame($this->context, $this->item->getContext());
+        self::assertSame($this->context, $this->item->getContext());
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $id    = 'test_id';
         $alias = 'test_alias';
 
         $this->item->initialize($id, $alias);
 
-        $this->assertEquals($id, $this->item->getId());
-        $this->assertEquals($alias, $this->item->getAlias());
+        self::assertEquals($id, $this->item->getId());
+        self::assertEquals($alias, $this->item->getAlias());
     }
 
-    public function testGetTypeName()
+    public function testGetTypeName(): void
     {
         $id        = 'test_id';
         $blockType = 'test_block_type';
@@ -53,10 +50,10 @@ class LayoutItemTest extends \PHPUnit\Framework\TestCase
 
         $this->item->initialize($id);
 
-        $this->assertEquals($blockType, $this->item->getTypeName());
+        self::assertEquals($blockType, $this->item->getTypeName());
     }
 
-    public function testGetOptions()
+    public function testGetOptions(): void
     {
         $id      = 'test_id';
         $options = ['foo' => 'bar'];
@@ -65,10 +62,10 @@ class LayoutItemTest extends \PHPUnit\Framework\TestCase
 
         $this->item->initialize($id);
 
-        $this->assertEquals($options, $this->item->getOptions());
+        self::assertEquals($options, $this->item->getOptions());
     }
 
-    public function testGetParentId()
+    public function testGetParentId(): void
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root')
@@ -76,6 +73,24 @@ class LayoutItemTest extends \PHPUnit\Framework\TestCase
 
         $this->item->initialize('header');
 
-        $this->assertEquals('root', $this->item->getParentId());
+        self::assertEquals('root', $this->item->getParentId());
+    }
+
+    public function testGetRootIdWhenIsEmpty(): void
+    {
+        $this->item->initialize('sample_id');
+
+        self::assertNull($this->item->getRootId());
+    }
+
+    public function testGetRootIdWhenNotEmpty(): void
+    {
+        $this->item->initialize('sample_id');
+
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root')
+            ->add('sample_id', 'root', 'text');
+
+        self::assertEquals('root', $this->item->getRootId());
     }
 }

@@ -3,10 +3,11 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\LayoutBundle\Cache\Extension\RenderCacheExtensionInterface;
-use Oro\Bundle\LayoutBundle\Cache\Metadata\CacheMetadataProvider;
+use Oro\Bundle\LayoutBundle\Cache\Metadata\CacheMetadataProviderInterface;
 use Oro\Bundle\LayoutBundle\Cache\Metadata\LayoutCacheMetadata;
 use Oro\Bundle\LayoutBundle\Cache\RenderCache;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\LayoutContext;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
@@ -16,22 +17,18 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RenderCacheTest extends TestCase
 {
-    /** @var TagAwareAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
+    private TagAwareAdapterInterface|\PHPUnit\Framework\MockObject\MockObject $cache;
 
-    /** @var CacheMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataProvider;
+    private CacheMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $metadataProvider;
 
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
+    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
 
-    /** @var RenderCache */
-    private $renderCache;
+    private RenderCache $renderCache;
 
     protected function setUp(): void
     {
         $this->cache = $this->createMock(TagAwareAdapterInterface::class);
-        $this->metadataProvider = $this->createMock(CacheMetadataProvider::class);
+        $this->metadataProvider = $this->createMock(CacheMetadataProviderInterface::class);
         $this->requestStack = new RequestStack();
 
         $this->renderCache = new RenderCache(
@@ -48,7 +45,7 @@ class RenderCacheTest extends TestCase
     public function testIsEnabled(string $httpMethod, bool $enabled): void
     {
         $this->requestStack->push(Request::create('', $httpMethod));
-        $this->assertEquals($enabled, $this->renderCache->isEnabled());
+        self::assertEquals($enabled, $this->renderCache->isEnabled());
     }
 
     public function isEnabledProvider(): array
@@ -65,52 +62,54 @@ class RenderCacheTest extends TestCase
     {
         $this->requestStack->push(Request::create('', 'GET'));
 
+        $context = new LayoutContext();
         $blockView = new BlockView();
         $blockView->vars['id'] = 'block_id';
         $layoutCacheMetadata = new LayoutCacheMetadata();
-        $this->metadataProvider->expects($this->exactly(3))
+        $this->metadataProvider->expects(self::exactly(3))
             ->method('getCacheMetadata')
-            ->with($blockView)
+            ->with($blockView, $context)
             ->willReturn($layoutCacheMetadata);
 
         $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects($this->once())
+        $cacheItem->expects(self::once())
             ->method('isHit')
             ->willReturn(true);
-        $cacheItem->expects($this->any())
+        $cacheItem->expects(self::any())
             ->method('getKey')
             ->willReturn('block_id');
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('getItem')
             ->willReturn($cacheItem);
 
-        $this->assertTrue($this->renderCache->isCached($blockView));
+        self::assertTrue($this->renderCache->isCached($blockView, $context));
         // fetch item after isCached must not trigger additional calls of the cache
-        $this->renderCache->getItem($blockView);
+        $this->renderCache->getItem($blockView, $context);
     }
 
     public function testGetItem(): void
     {
         $this->requestStack->push(Request::create('', 'GET'));
 
+        $context = new LayoutContext();
         $blockView = new BlockView();
         $blockView->vars['id'] = 'block_id';
         $layoutCacheMetadata = new LayoutCacheMetadata();
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getCacheMetadata')
             ->with($blockView)
             ->willReturn($layoutCacheMetadata);
 
         $cacheItem = $this->createMock(CacheItemInterface::class);
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('getItem')
             ->willReturn($cacheItem);
 
-        $this->assertSame(
+        self::assertSame(
             $cacheItem,
-            $this->renderCache->getItem($blockView)
+            $this->renderCache->getItem($blockView, $context)
         );
     }
 
@@ -118,26 +117,27 @@ class RenderCacheTest extends TestCase
     {
         $cacheItem = new CacheItem();
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('save')
             ->with($cacheItem)
             ->willReturn(true);
 
-        $this->assertTrue($this->renderCache->save($cacheItem));
+        self::assertTrue($this->renderCache->save($cacheItem));
     }
 
     public function testGetMetadata(): void
     {
+        $context = new LayoutContext();
         $blockView = new BlockView();
         $blockView->vars['id'] = 'block_id';
         $layoutCacheMetadata = new LayoutCacheMetadata();
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getCacheMetadata')
-            ->with($blockView)
+            ->with($blockView, $context)
             ->willReturn($layoutCacheMetadata);
-        $this->assertSame(
+        self::assertSame(
             $layoutCacheMetadata,
-            $this->renderCache->getMetadata($blockView)
+            $this->renderCache->getMetadata($blockView, $context)
         );
     }
 }

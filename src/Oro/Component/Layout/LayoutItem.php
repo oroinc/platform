@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Represents an item in a layout.
+ */
 final class LayoutItem implements LayoutItemInterface
 {
     /** @var ContextInterface */
@@ -74,6 +77,16 @@ final class LayoutItem implements LayoutItemInterface
     public function getParentId()
     {
         return $this->rawLayoutBuilder->getParentId($this->id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRootId(): ?string
+    {
+        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
+
+        return !$rawLayout->isEmpty() ? $rawLayout->getRootId() : null;
     }
 
     /**

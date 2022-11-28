@@ -11,7 +11,7 @@ services:
         class: 'Oro\Bundle\LayoutBundle\Provider\Image\ThemeImagePlaceholderProvider'
         abstract: true
         arguments:
-            - '@oro_layout.layout_context_holder'
+            - '@oro_layout.layout_context_stack'
             - '@oro_layout.theme_manager'
             - '@oro_attachment.imagine.provider.url'
 

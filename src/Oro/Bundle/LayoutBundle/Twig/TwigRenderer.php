@@ -7,6 +7,7 @@ use Oro\Bundle\LayoutBundle\Cache\PlaceholderRenderer;
 use Oro\Bundle\LayoutBundle\Cache\RenderCache;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
+use Oro\Component\Layout\LayoutContextStack;
 use Oro\Component\Layout\Renderer;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -29,6 +30,8 @@ class TwigRenderer extends Renderer implements TwigRendererInterface, LoggerAwar
      * Stores TWIG renderer engine in a clear state.
      */
     private TwigRendererEngineInterface $twigRendererEngine;
+
+    private LayoutContextStack $layoutContextStack;
 
     private RenderCache $renderCache;
 
@@ -55,11 +58,13 @@ class TwigRenderer extends Renderer implements TwigRendererInterface, LoggerAwar
 
     public function __construct(
         TwigRendererEngineInterface $engine,
+        LayoutContextStack $layoutContextStack,
         RenderCache $renderCache,
         PlaceholderRenderer $placeholderRenderer,
         Environment $environment
     ) {
         $this->twigRendererEngine = $engine;
+        $this->layoutContextStack = $layoutContextStack;
         $this->renderCache = $renderCache;
         $this->placeholderRenderer = $placeholderRenderer;
         $this->environment = $environment;
@@ -110,7 +115,8 @@ class TwigRenderer extends Renderer implements TwigRendererInterface, LoggerAwar
         array $variables = [],
         $renderParentBlock = false
     ) {
-        $metadata = $this->renderCache->getMetadata($view);
+        $context = $this->layoutContextStack->getCurrentContext();
+        $metadata = $context ? $this->renderCache->getMetadata($view, $context) : null;
         $blockId = $view->vars['id'];
 
         $isCacheable = $metadata && $this->renderCache->isEnabled();
@@ -122,7 +128,7 @@ class TwigRenderer extends Renderer implements TwigRendererInterface, LoggerAwar
             // INITIAL CALL
             $this->blockHierarchy[$blockId] = 0;
             $this->cachedBlockNestingLevel++;
-            $item = $this->renderCache->getItem($view);
+            $item = $this->renderCache->getItem($view, $context);
 
             if ($item->isHit()) {
                 $html = $item->get();

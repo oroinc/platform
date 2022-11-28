@@ -3,16 +3,16 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider\Image;
 
 use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProviderInterface;
-use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Bundle\LayoutBundle\Provider\Image\ThemeImagePlaceholderProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\LayoutContext;
+use Oro\Component\Layout\LayoutContextStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private LayoutContextHolder|\PHPUnit\Framework\MockObject\MockObject $contextHolder;
+    private LayoutContextStack|\PHPUnit\Framework\MockObject\MockObject $contextStack;
 
     private ThemeManager|\PHPUnit\Framework\MockObject\MockObject $themeManager;
 
@@ -22,12 +22,12 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->contextHolder = $this->createMock(LayoutContextHolder::class);
+        $this->contextStack = $this->createMock(LayoutContextStack::class);
         $this->themeManager = $this->createMock(ThemeManager::class);
         $this->imagineUrlProvider = $this->createMock(ImagineUrlProviderInterface::class);
 
         $this->provider = new ThemeImagePlaceholderProvider(
-            $this->contextHolder,
+            $this->contextStack,
             $this->themeManager,
             $this->imagineUrlProvider,
             'pl2'
@@ -44,8 +44,8 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->with('theme')
             ->willReturn($themeName);
 
-        $this->contextHolder->expects(self::once())
-            ->method('getContext')
+        $this->contextStack->expects(self::once())
+            ->method('getCurrentContext')
             ->willReturn($context);
 
         $theme = new Theme($themeName);
@@ -81,8 +81,8 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPathWithoutContext(): void
     {
-        $this->contextHolder->expects(self::once())
-            ->method('getContext')
+        $this->contextStack->expects(self::once())
+            ->method('getCurrentContext')
             ->willReturn(null);
 
         $this->themeManager->expects(self::never())
@@ -102,8 +102,8 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->with('theme')
             ->willReturn(null);
 
-        $this->contextHolder->expects(self::once())
-            ->method('getContext')
+        $this->contextStack->expects(self::once())
+            ->method('getCurrentContext')
             ->willReturn($context);
 
         $this->themeManager->expects(self::never())
@@ -125,8 +125,8 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->with('theme')
             ->willReturn($themeName);
 
-        $this->contextHolder->expects(self::once())
-            ->method('getContext')
+        $this->contextStack->expects(self::once())
+            ->method('getCurrentContext')
             ->willReturn($context);
 
         $theme = new Theme($themeName);

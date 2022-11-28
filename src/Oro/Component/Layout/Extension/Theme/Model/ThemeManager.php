@@ -155,4 +155,24 @@ class ThemeManager
 
         return $themes;
     }
+
+    /**
+     * Returns the theme hierarchy for the specified $themeName. Root theme is as first item.
+     *
+     * @param string $themeName
+     *
+     * @return Theme[]
+     */
+    public function getThemesHierarchy(string $themeName): array
+    {
+        $themesHierarchy = [];
+
+        do {
+            $theme = $this->getTheme($themeName);
+
+            $themesHierarchy[] = $theme;
+        } while ($themeName = $theme->getParentTheme());
+
+        return array_reverse($themesHierarchy);
+    }
 }

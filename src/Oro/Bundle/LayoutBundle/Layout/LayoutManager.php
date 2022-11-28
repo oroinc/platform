@@ -2,57 +2,32 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout;
 
-use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\LayoutManager as BaseLayoutManager;
 
+/**
+ * Main entry point for managing layouts.
+ */
 class LayoutManager extends BaseLayoutManager
 {
-    /** @var LayoutContextHolder */
-    protected $contextHolder;
-
-    /** @var LayoutDataCollector */
-    protected $layoutDataCollector;
-
-    public function __construct(
-        LayoutFactoryBuilderInterface $layoutFactoryBuilder,
-        LayoutContextHolder $contextHolder,
-        LayoutDataCollector $layoutDataCollector
-    ) {
-        parent::__construct($layoutFactoryBuilder);
-        $this->contextHolder = $contextHolder;
-        $this->layoutDataCollector = $layoutDataCollector;
-    }
-
-    /**
-     * @param ContextInterface $context
-     * @param string|null      $rootId
-     * @return Layout
-     */
-    public function getLayout(ContextInterface $context, $rootId = null)
+    public function getLayout(ContextInterface $context, ?string $rootId = null): Layout
     {
         $layoutBuilder = $this->getLayoutBuilder();
 
-        // TODO discuss adding root automatically
         $layoutBuilder->add('root', null, 'root');
 
-        $this->contextHolder->setContext($context);
-
-        $layout = $layoutBuilder->getLayout($context, $rootId);
-        $this->layoutDataCollector->setNotAppliedActions($layoutBuilder->getNotAppliedActions());
-
-        return $layout;
+        return $layoutBuilder->getLayout($context, $rootId);
     }
 
     /**
-     * @param array         $parameters
-     * @param null|string[] $vars
+     * @param array $parameters
+     * @param string[] $vars
+     *
      * @return string
      */
-    public function render(array $parameters, $vars = [])
+    public function render(array $parameters, array $vars = []): string
     {
         $layoutContext = new LayoutContext($parameters, $vars);
 

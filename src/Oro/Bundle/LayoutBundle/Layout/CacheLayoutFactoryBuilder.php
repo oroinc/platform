@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout;
 
-use Oro\Bundle\LayoutBundle\Cache\Metadata\CacheMetadataProvider;
+use Oro\Bundle\LayoutBundle\Cache\Metadata\CacheMetadataProviderInterface;
 use Oro\Bundle\LayoutBundle\Cache\RenderCache;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
+use Oro\Component\Layout\LayoutContextStack;
 use Oro\Component\Layout\LayoutFactoryBuilder;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Overrides base component's LayoutFactoryBuilder to override base component's LayoutFactory
@@ -14,36 +16,29 @@ use Oro\Component\Layout\LayoutFactoryBuilder;
  */
 class CacheLayoutFactoryBuilder extends LayoutFactoryBuilder
 {
-    /**
-     * @var ExpressionProcessor
-     */
-    private $expressionProcessor;
+    private LayoutContextStack $layoutContextStack;
 
-    /**
-     * @var BlockViewCache|null
-     */
-    private $blockViewCache;
+    private ExpressionProcessor $expressionProcessor;
 
-    /**
-     * @var RenderCache
-     */
-    private $renderCache;
+    private RenderCache $renderCache;
 
-    /**
-     * @var CacheMetadataProvider
-     */
-    private $cacheMetadataProvider;
+    private CacheMetadataProviderInterface $cacheMetadataProvider;
+
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
+        LayoutContextStack $layoutContextStack,
         ExpressionProcessor $expressionProcessor,
         RenderCache $renderCache,
-        CacheMetadataProvider $cacheMetadataProvider,
+        CacheMetadataProviderInterface $cacheMetadataProvider,
+        EventDispatcherInterface $eventDispatcher,
         BlockViewCache $blockViewCache = null
     ) {
+        $this->layoutContextStack = $layoutContextStack;
         $this->expressionProcessor = $expressionProcessor;
         $this->renderCache = $renderCache;
         $this->cacheMetadataProvider = $cacheMetadataProvider;
-        $this->blockViewCache = $blockViewCache;
+        $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct($expressionProcessor, $blockViewCache);
     }
@@ -57,8 +52,10 @@ class CacheLayoutFactoryBuilder extends LayoutFactoryBuilder
 
         return new CacheLayoutFactory(
             parent::getLayoutFactory(),
+            $this->layoutContextStack,
             $this->expressionProcessor,
             $this->renderCache,
+            $this->eventDispatcher,
             $this->getBlockViewCache()
         );
     }

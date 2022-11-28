@@ -1,10 +1,21 @@
 services:
     oro_layout.profiler.layout_data_collector:
         class: Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector
-        public: false
         arguments:
-            - '@oro_layout.layout_context_holder'
+            - '@oro_layout.data_collector.layout_name_provider'
             - '@oro_config.user'
+            - '@oro_layout.loader.path_provider'
             - '%kernel.debug%'
         tags:
             - { name: data_collector, template: '@OroLayout/Collector/layout.html.twig', id: layout, priority: 259 }
+            - { name: kernel.event_listener, event: Oro\Bundle\LayoutBundle\Event\LayoutBuildAfterEvent, method: onBuildAfter }
+
+    oro_layout.data_collector.layout_name_provider:
+        class: Oro\Bundle\LayoutBundle\DataCollector\DataCollectorLayoutNameProvider
+        arguments:
+            - !tagged_iterator oro_layout.data_collector.layout_name_provider
+
+    oro_layout.data_collector.layout_name_provider.basic:
+        class: Oro\Bundle\LayoutBundle\DataCollector\DataCollectorBasicLayoutNameProvider
+        tags:
+            - { name: oro_layout.data_collector.layout_name_provider, priority: -100 }

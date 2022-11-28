@@ -6,27 +6,20 @@ use Oro\Bundle\LayoutBundle\Cache\Metadata\CacheMetadataProvider;
 use Oro\Bundle\LayoutBundle\Cache\Metadata\CacheMetadataProviderInterface;
 use Oro\Bundle\LayoutBundle\Cache\Metadata\LayoutCacheMetadata;
 use Oro\Bundle\LayoutBundle\Exception\InvalidLayoutCacheMetadataException;
-use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\LayoutContext;
 use Psr\Log\LoggerInterface;
 
 class CacheMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CacheMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $defaultProvider;
+    private CacheMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $defaultProvider;
 
     /** @var CacheMetadataProviderInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
-    private $providers;
+    private array $providers;
 
-    /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var CacheMetadataProvider */
-    private $cacheMetadataProvider;
+    private CacheMetadataProvider $cacheMetadataProvider;
 
     protected function setUp(): void
     {
@@ -34,18 +27,11 @@ class CacheMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $provider1 = $this->createMock(CacheMetadataProviderInterface::class);
         $provider2 = $this->createMock(CacheMetadataProviderInterface::class);
         $this->providers = [$provider1, $provider2];
-        $this->context = $this->createMock(ContextInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-
-        $contextHolder = $this->createMock(LayoutContextHolder::class);
-        $contextHolder->expects($this->any())
-            ->method('getContext')
-            ->willReturn($this->context);
 
         $this->cacheMetadataProvider = new CacheMetadataProvider(
             $this->defaultProvider,
             $this->providers,
-            $contextHolder,
             $this->logger,
             false
         );
@@ -53,85 +39,96 @@ class CacheMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCacheMetadataNull(): void
     {
+        $context = new LayoutContext();
         $blockView = new BlockView();
         $blockView->vars['cache_key'] = 'cache key';
 
-        $metadata = $this->cacheMetadataProvider->getCacheMetadata($blockView);
-        $this->assertNull($metadata);
+        $metadata = $this->cacheMetadataProvider->getCacheMetadata($blockView, $context);
+        self::assertNull($metadata);
     }
 
     public function testGetCacheMetadataFromDefaultProvider(): void
     {
+        $context = new LayoutContext();
         $blockView = new BlockView();
         $blockView->vars['cache_key'] = 'cache key';
 
         $metadata = new LayoutCacheMetadata();
-        $this->defaultProvider->expects($this->once())
+        $this->defaultProvider->expects(self::once())
             ->method('getCacheMetadata')
+            ->with($blockView, $context)
             ->willReturn($metadata);
 
-        $this->assertSame($metadata, $this->cacheMetadataProvider->getCacheMetadata($blockView));
+        self::assertSame($metadata, $this->cacheMetadataProvider->getCacheMetadata($blockView, $context));
     }
 
     public function testGetCacheMetadataFromCustomProvider(): void
     {
+        $context = new LayoutContext();
         $blockView = new BlockView();
         $blockView->vars['cache_key'] = 'cache key';
 
         $metadata = new LayoutCacheMetadata();
-        $this->providers[1]->expects($this->once())
+        $this->providers[1]->expects(self::once())
             ->method('getCacheMetadata')
+            ->with($blockView, $context)
             ->willReturn($metadata);
 
-        $this->assertSame($metadata, $this->cacheMetadataProvider->getCacheMetadata($blockView));
+        self::assertSame($metadata, $this->cacheMetadataProvider->getCacheMetadata($blockView, $context));
     }
 
     public function testGetCacheMetadataException(): void
     {
+        $context = new LayoutContext();
         $blockView = new BlockView();
         $blockView->vars['id'] = 'blockID';
         $blockView->vars['cache_key'] = 'cache key';
 
         $exception = new InvalidLayoutCacheMetadataException('error message');
-        $this->defaultProvider->expects($this->once())
+        $this->defaultProvider->expects(self::once())
             ->method('getCacheMetadata')
+            ->with($blockView, $context)
             ->willThrowException($exception);
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with(
                 'Cannot cache the layout block "{id}", the cache metadata is invalid.',
                 ['id' => 'blockID', 'exception' => $exception]
             );
 
-        $this->assertNull($this->cacheMetadataProvider->getCacheMetadata($blockView));
+        self::assertNull($this->cacheMetadataProvider->getCacheMetadata($blockView, $context));
     }
 
     public function testGetCacheMetadataCached(): void
     {
+        $context = new LayoutContext();
         $blockView = new BlockView();
         $blockView->vars['cache_key'] = 'cache key';
         $metadata = new LayoutCacheMetadata();
 
-        $this->providers[0]->expects($this->once())
+        $this->providers[0]->expects(self::once())
             ->method('getCacheMetadata')
+            ->with($blockView, $context)
             ->willReturn($metadata);
 
-        $this->assertSame($metadata, $this->cacheMetadataProvider->getCacheMetadata($blockView));
-        $this->assertSame($metadata, $this->cacheMetadataProvider->getCacheMetadata($blockView));
+        self::assertSame($metadata, $this->cacheMetadataProvider->getCacheMetadata($blockView, $context));
+        self::assertSame($metadata, $this->cacheMetadataProvider->getCacheMetadata($blockView, $context));
     }
 
     public function testReset(): void
     {
+        $context = new LayoutContext();
         $blockView = new BlockView();
         $blockView->vars['cache_key'] = 'cache key';
 
-        $this->providers[0]->expects($this->exactly(2))
-            ->method('getCacheMetadata');
+        $this->providers[0]->expects(self::exactly(2))
+            ->method('getCacheMetadata')
+            ->with($blockView, $context);
 
-        $this->assertNull($this->cacheMetadataProvider->getCacheMetadata($blockView));
-        $this->assertNull($this->cacheMetadataProvider->getCacheMetadata($blockView));
+        self::assertNull($this->cacheMetadataProvider->getCacheMetadata($blockView, $context));
+        self::assertNull($this->cacheMetadataProvider->getCacheMetadata($blockView, $context));
         $this->cacheMetadataProvider->reset();
-        $this->assertNull($this->cacheMetadataProvider->getCacheMetadata($blockView));
+        self::assertNull($this->cacheMetadataProvider->getCacheMetadata($blockView, $context));
     }
 }
