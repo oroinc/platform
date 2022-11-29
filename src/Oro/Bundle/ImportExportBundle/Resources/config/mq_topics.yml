@@ -5,10 +5,10 @@ services:
 
     Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic:
         arguments:
-            - '%oro_importexport.export.size_of_batch%'
+            - '%oro_importexport.import.size_of_batch%'
     Oro\Bundle\ImportExportBundle\Async\Topic\ImportTopic:
         arguments:
-            - '%oro_importexport.export.size_of_batch%'
+            - '%oro_importexport.import.size_of_batch%'
     Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic: ~
     Oro\Bundle\ImportExportBundle\Async\Topic\ExportTopic: ~
     Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic: ~
