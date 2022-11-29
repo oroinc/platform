@@ -6,6 +6,9 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Import-Export strategy processing related event.
+ */
 class StrategyEvent extends Event
 {
     const PROCESS_BEFORE = 'oro_importexport.strategy.process_before';
@@ -17,7 +20,7 @@ class StrategyEvent extends Event
     protected $strategy;
 
     /**
-     * @var object
+     * @var object|null
      */
     protected $entity;
 
@@ -42,7 +45,7 @@ class StrategyEvent extends Event
     }
 
     /**
-     * @return object
+     * @return object|null
      */
     public function getEntity()
     {
@@ -50,7 +53,7 @@ class StrategyEvent extends Event
     }
 
     /**
-     * @param object $entity
+     * @param object|null $entity
      */
     public function setEntity($entity)
     {
