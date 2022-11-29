@@ -28,23 +28,21 @@ class EntityFieldFallbackValueHeadersListenerTest extends \PHPUnit\Framework\Tes
     {
         $event = new LoadEntityRulesAndBackendHeadersEvent(
             EntityFieldFallbackValue::class,
-            [['headerName' => 'headerTitle'], ['value' => 'value']],
-            [['someRule' => ['headerName' => 'headerTitle']], ['value' => ['value' => 'value']]],
+            [['value' => 'headerTitle'], ['value' => 'value']],
+            [['someRule' => ['value' => 'headerTitle']], ['value' => ['value' => 'value']]],
             ':',
             'full',
             true
         );
         $this->listener->afterLoadEntityRulesAndBackendHeaders($event);
         $this->assertSame([
-            ['headerName' => 'headerTitle'],
-            ['value' => 'value'],
-            ['value' => 'value', 'order' => 10005]
+            ['value' => 'headerTitle'],
+            ['value' => 'value']
         ], $event->getHeaders());
         $this->assertSame(
             [
-                ['someRule' => ['headerName' => 'headerTitle']],
-                ['value' => ['value' => 'value']],
-                'value' => ['value' => 'value', 'order' => 10005]
+                ['someRule' => ['value' => 'headerTitle']],
+                ['value' => ['value' => 'value']]
             ],
             $event->getRules()
         );
