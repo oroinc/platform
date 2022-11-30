@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\UpdateList;
 
-use Oro\Bundle\ApiBundle\Batch\Async\Topics;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListTopic;
 use Oro\Bundle\ApiBundle\Batch\ChunkSizeProvider;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\StartAsyncOperation;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -78,7 +78,7 @@ class StartAsyncOperationTest extends UpdateListProcessorTestCase
         $this->producer->expects(self::once())
             ->method('send')
             ->with(
-                Topics::UPDATE_LIST,
+                UpdateListTopic::getName(),
                 [
                     'operationId'           => $operationId,
                     'entityClass'           => $entityClass,

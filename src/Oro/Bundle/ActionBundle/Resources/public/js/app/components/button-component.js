@@ -65,6 +65,13 @@ define(function(require) {
         _getButtonManager: function($element) {
             if (!$element.data('button-manager')) {
                 const options = $element.data('options') || {};
+                const redirectUrl = $element.data('redirecturl');
+                if (redirectUrl) {
+                    _.extend(options, {
+                        redirectUrl: redirectUrl,
+                        redirectUrlOptions: $element.data('redirecturloptions') || {}
+                    });
+                }
 
                 this.buttonManager = new ButtonManager(options);
                 $element.data('button-manager', this.buttonManager);
@@ -79,6 +86,7 @@ define(function(require) {
             }
 
             this.$button.off();
+            this.$button.data('disposed', true);
 
             if (this.buttonManager && _.isFunction(this.buttonManager.dispose)) {
                 this.buttonManager.dispose();

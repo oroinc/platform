@@ -251,9 +251,8 @@
     }
 
     .filter-item {
-        // stylelint-disable-next-line declaration-no-important
-        display: $mobile-filter-item-display !important;
         margin: $mobile-filter-item-offset;
+        width: $mobile-filter-item-width;
 
         > .btn {
             height: 32px;
@@ -310,6 +309,31 @@
             @include safe-area-offset(padding, $mobile-filter-box-ui-dialog-content-inner-offset);
 
             height: $mobile-filter-box-ui-dialog-content-height;
+            position: $mobile-filter-box-ui-dialog-content-position;
+
+            .filter-criteria {
+                z-index: $mobile-filter-box-ui-dialog-content-z-index;
+
+                .btn-group.show {
+                    &::before {
+                        content: '';
+                        width: $mobile-filter-box-ui-dialog-content-filter-criteria-before-width;
+                        height: $mobile-filter-box-ui-dialog-content-filter-criteria-before-height;
+                        position: $mobile-filter-box-ui-dialog-content-filter-criteria-before-position;
+                        top: $mobile-filter-box-ui-dialog-content-filter-criteria-before-top;
+                        left: $mobile-filter-box-ui-dialog-content-filter-criteria-before-left;
+                        z-index: $mobile-filter-box-ui-dialog-content-z-index;
+                    }
+                }
+
+                // Fullscreen dropdown menu
+                .dropdown-menu {
+                    width: $mobile-filter-box-ui-dialog-content-filter-criteria-width;
+                    height: $mobile-filter-box-ui-dialog-content-filter-criteria-height;
+                    top: $mobile-filter-box-ui-dialog-content-filter-criteria-top;
+                    transform: $mobile-filter-box-ui-dialog-content-filter-criteria-transform;
+                }
+            }
         }
 
         .ui-dialog-buttonpane {
@@ -405,9 +429,12 @@
             }
 
             .filter-update {
-                display: $mobile-filter-update-display;
-                width: $mobile-filter-update-width;
                 margin: $mobile-filter-update-offset;
+
+                &:not(.filter-update-empty) {
+                    display: $mobile-filter-update-display;
+                    width: $mobile-filter-update-width;
+                }
             }
 
             .oro-action {

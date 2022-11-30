@@ -120,16 +120,24 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
     $(function() {
         let adjustHeight;
 
+        const determineContext = context => {
+            if (context instanceof $.Event || context instanceof Event) {
+                context = context.target;
+            }
+            if (context instanceof HTMLElement) {
+                return context;
+            }
+        };
         if (tools.isMobile()) {
-            adjustHeight = function() {
+            adjustHeight = context => {
                 mediator.execute({name: 'responsive-layout:update', silent: true});
-                mediator.trigger('layout:reposition');
+                mediator.trigger('layout:reposition', determineContext(context));
             };
         } else {
-            adjustHeight = function() {
+            adjustHeight = context => {
                 mediator.execute({name: 'responsive-layout:update', silent: true});
                 scrollspy.adjust();
-                mediator.trigger('layout:reposition');
+                mediator.trigger('layout:reposition', determineContext(context));
             };
         }
 

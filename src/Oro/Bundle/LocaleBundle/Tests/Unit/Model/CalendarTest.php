@@ -121,8 +121,8 @@ class CalendarTest extends TestCase
                 Calendar::WIDTH_WIDE,
                 'it_IT',
                 [
-                    1 => 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio',
-                    'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre',
+                    1 => 'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio',
+                    'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre',
                 ]
             ],
             'wide, id_ID' => [

@@ -20,6 +20,8 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -1869,5 +1871,63 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
         $extension = new OroApiExtension();
         $extension->load($configs, $container);
+    }
+
+    public function testDefaultBatchApiLockConfigurationForPostgreSqlDatabase(): void
+    {
+        $container = $this->getContainer();
+        $container->setParameter('database_driver', 'pdo_pgsql');
+        $container->setParameter('database_host', 'host');
+        $container->setParameter('database_port', '1234');
+        $container->setParameter('database_name', 'db');
+        $container->setParameter('database_user', 'usr');
+        $container->setParameter('database_password', 'pwd');
+
+        $extension = new OroApiExtension();
+        $extension->prepend($container);
+
+        $frameworkConfigs = $container->getExtensionConfig('framework');
+        self::assertEquals(
+            'pgsql+advisory://usr:pwd@127.0.0.1:1234/db?host=host',
+            $frameworkConfigs[0]['lock']['batch_api']
+        );
+    }
+
+    public function testDefaultBatchApiLockConfigurationForMySqlDatabase(): void
+    {
+        $container = $this->getContainer();
+        $container->setParameter('database_driver', 'pdo_mysql');
+        $container->setParameter('database_host', 'host');
+        $container->setParameter('database_port', '1234');
+        $container->setParameter('database_name', 'db');
+        $container->setParameter('database_user', 'usr');
+        $container->setParameter('database_password', 'pwd');
+
+        $extension = new OroApiExtension();
+        $extension->prepend($container);
+
+        $frameworkConfigs = $container->getExtensionConfig('framework');
+        self::assertEquals(
+            'mysql://usr:pwd@127.0.0.1:1234/db?host=host',
+            $frameworkConfigs[0]['lock']['batch_api']
+        );
+    }
+
+    public function testBatchApiLockConfigurationWhenItAlreadyExists(): void
+    {
+        $container = $this->getContainer();
+        $container->setParameter('database_driver', 'pdo_pgsql');
+        $container->setParameter('database_host', 'host');
+        $container->setParameter('database_port', '1234');
+        $container->setParameter('database_name', 'db');
+        $container->setParameter('database_user', 'usr');
+        $container->setParameter('database_password', 'pwd');
+        $container->prependExtensionConfig('framework', ['lock' => ['batch_api' => 'dsn']]);
+
+        $extension = new OroApiExtension();
+        $extension->prepend($container);
+
+        $frameworkConfigs = $container->getExtensionConfig('framework');
+        self::assertEquals('dsn', $frameworkConfigs[0]['lock']['batch_api']);
     }
 }

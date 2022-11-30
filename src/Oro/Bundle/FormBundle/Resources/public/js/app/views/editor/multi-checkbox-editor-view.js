@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    const $ = require('jquery');
     const SelectEditorView = require('./select-editor-view');
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
@@ -107,7 +108,12 @@ define(function(require) {
                     if (this.prestine) {
                         this.trigger('cancelAction');
                     }
-                }.bind(this)
+                }.bind(this),
+                refresh() {
+                    const widget = $(this).multiselect('widget');
+
+                    widget.inputWidget('seekAndCreate');
+                }
             }).multiselectfilter({
                 label: '',
                 placeholder: __('oro.form.inlineEditing.multi_checkbox_editor.filter.placeholder'),

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Batch;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\Persistence\ManagerRegistry;
-use Gaufrette\Util\Checksum;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Lock\Exception\ExceptionInterface;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * Provides a mechanism that synchronizes access to Batch API related files
@@ -13,25 +14,31 @@ use Gaufrette\Util\Checksum;
  */
 class FileLockManager
 {
-    private const CONTENT = '';
+    /** @var LockFactory */
+    private $lockFactory;
 
-    /** @var ManagerRegistry */
-    private $doctrine;
+    /** @var LoggerInterface */
+    private $logger;
 
-    /** @var string */
-    private $connectionName;
-
-    /** @var string|null */
-    private $contentChecksum;
+    /** @var array */
+    private array $locks = [];
 
     public function __construct(ManagerRegistry $doctrine, string $connectionName)
     {
-        $this->doctrine = $doctrine;
-        $this->connectionName = $connectionName;
+    }
+
+    public function setLockFactory(LockFactory $lockFactory)
+    {
+        $this->lockFactory = $lockFactory;
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
-     * Acquires a lock.
+     * Acquires the lock.
      * If the lock is acquired by someone else the call is blocked until the release of the lock
      * or until the number of lock attempts are exceeded the specified limit.
      *
@@ -43,57 +50,72 @@ class FileLockManager
      */
     public function acquireLock(string $lockFileName, int $attemptLimit = 50, int $waitBetweenAttempts = 100): bool
     {
-        if (null === $this->contentChecksum) {
-            $this->contentChecksum = Checksum::fromContent(self::CONTENT);
+        if (isset($this->locks[$lockFileName])) {
+            throw new \LogicException(sprintf('The lock for "%s" already acquired.', $lockFileName));
         }
 
-        $attempt = 0;
-        $connection = $this->getConnection();
-        while (!$this->tryToAcquireLock($connection, $lockFileName)) {
-            $attempt++;
-            if ($attempt >= $attemptLimit) {
-                return false;
+        $lock = null;
+        $attempt = 1;
+        while ($attempt <= $attemptLimit) {
+            $lock = $this->tryToAcquireLock($lockFileName, $attempt, $attemptLimit);
+            if (null !== $lock) {
+                break;
             }
+            $attempt++;
             usleep($waitBetweenAttempts * 1000);
         }
+        if (null !== $lock) {
+            $this->locks[$lockFileName] = $lock;
+        }
 
-        return true;
+        return null !== $lock;
     }
 
     /**
-     * Releases a lock.
+     * Releases the lock that was acquired by {@see acquireLock}.
      *
      * @param string $lockFileName The name of the lock file
      */
     public function releaseLock(string $lockFileName): void
     {
-        $this->getConnection()->delete(
-            'oro_api_async_data',
-            ['name' => $lockFileName]
-        );
-    }
-
-    private function tryToAcquireLock(Connection $connection, string $lockFileName): bool
-    {
-        try {
-            $connection->insert(
-                'oro_api_async_data',
-                [
-                    'name'       => $lockFileName,
-                    'content'    => self::CONTENT,
-                    'updated_at' => time(),
-                    'checksum'   => $this->contentChecksum
-                ]
-            );
-        } catch (UniqueConstraintViolationException $e) {
-            return false;
+        if (!isset($this->locks[$lockFileName])) {
+            return;
         }
 
-        return true;
+        /** @var LockInterface $lock */
+        $lock = $this->locks[$lockFileName];
+        unset($this->locks[$lockFileName]);
+        try {
+            $lock->release();
+        } catch (ExceptionInterface $e) {
+            $this->logger->error(
+                'Not possible to release the lock.',
+                ['lockFileName' => $lockFileName, 'exception' => $e]
+            );
+        }
     }
 
-    private function getConnection(): Connection
-    {
-        return $this->doctrine->getConnection($this->connectionName);
+    private function tryToAcquireLock(
+        string $lockFileName,
+        int $attempt,
+        int $attemptLimit
+    ): ?LockInterface {
+        $acquired = false;
+        $exception = null;
+        $lock = $this->lockFactory->createLock($lockFileName, null, false);
+        try {
+            $acquired = $lock->acquire();
+        } catch (ExceptionInterface $e) {
+            $exception = $e;
+        }
+        if (!$acquired) {
+            $context = ['lockFileName' => $lockFileName, 'attempt' => $attempt, 'maxAttempts' => $attemptLimit];
+            if (null !== $exception) {
+                $context['exception'] = $exception;
+            }
+            $this->logger->info('The lock cannot be acquired.', $context);
+        }
+
+        return $acquired ? $lock : null;
     }
 }

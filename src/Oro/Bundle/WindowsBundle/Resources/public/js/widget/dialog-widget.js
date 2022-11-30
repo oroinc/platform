@@ -14,6 +14,7 @@ define(function(require, exports, module) {
     const dialogManager = new DialogManager();
     require('jquery.dialog.extended');
 
+    const MOBILE_WIDTH = 320;
     const config = _.extend({
         type: 'dialog',
         limitTo: tools.isMobile() ? 'body' : '#container',
@@ -62,7 +63,7 @@ define(function(require, exports, module) {
             'widgetRender': 'onWidgetRender',
             'widgetReady': 'onContentUpdated',
             'page:request mediator': 'onPageChange',
-            'layout:reposition mediator': 'resetDialogPosition'
+            'layout:reposition mediator': 'onLayoutReposition'
         },
 
         $messengerContainer: null,
@@ -71,6 +72,13 @@ define(function(require, exports, module) {
          * @property {Object}
          */
         loadingBar: null,
+
+        dialogOptionsMap: {
+            minWidth: {
+                // Dialogs which have forms with wide fields like wysiwyg
+                expanded: tools.isMobile() ? MOBILE_WIDTH : 812
+            }
+        },
 
         /**
          * @inheritdoc
@@ -88,12 +96,14 @@ define(function(require, exports, module) {
             options = options || {};
             this.options = _.defaults(options, this.options);
 
-            const dialogOptions = options.dialogOptions = options.dialogOptions || {};
+            options.dialogOptions = options.dialogOptions || {};
+            const dialogOptions = this.doMapDialogOptions(options.dialogOptions);
+
             _.defaults(dialogOptions, {
                 title: options.title,
                 limitTo: this.options.limitTo,
                 // minimal width is adjusted to dialog shows typical form without horizontal scroll
-                minWidth: tools.isMobile() ? 320 : 604,
+                minWidth: tools.isMobile() ? MOBILE_WIDTH : 604,
                 minHeight: 150
             });
 
@@ -122,6 +132,30 @@ define(function(require, exports, module) {
             dialogManager.add(this);
 
             this.initializeWidget(options);
+        },
+
+        /**
+         * Substitutes dialog options
+         *
+         * @param {Object} dialogOptions
+         * @returns {Object}
+         */
+        doMapDialogOptions: function(dialogOptions) {
+            Object.entries(this.dialogOptionsMap).forEach(([key, value]) => {
+                const mapProperty = dialogOptions[key];
+
+                if (mapProperty === void 0) {
+                    return;
+                }
+
+                const mapValue = value[mapProperty];
+
+                if (mapValue !== void 0) {
+                    dialogOptions[key] = mapValue;
+                }
+            });
+
+            return dialogOptions;
         },
 
         onDragStop: function(event, ui) {
@@ -332,6 +366,19 @@ define(function(require, exports, module) {
             }
         },
 
+        /**
+         * @param {HTMLElement} [context]
+         */
+        onLayoutReposition(context) {
+            // there's no context of layout reposition (whole page is updated)
+            // or context of reposition is within dialog
+            const doReposition = context === void 0 || $.contains(this.widget.dialog('widget')[0], context);
+
+            if (doReposition) {
+                this.resetDialogPosition();
+            }
+        },
+
         _onAdoptedFormResetClick: function() {
             this.remove();
         },
@@ -457,8 +504,11 @@ define(function(require, exports, module) {
 
         _renderHandler: function() {
             this.resetDialogPosition();
-            this.widget.closest('.invisible').removeClass('invisible');
             this.trigger('widgetReady', this);
+            // Waiting a little bite while the dialog will be positioned correctly and its content rendered
+            _.delay(() => {
+                this.widget.dialog('widget').removeClass('invisible');
+            }, 50);
         },
 
         _initAdjustHeight: function(content) {
@@ -501,6 +551,7 @@ define(function(require, exports, module) {
             if (!tools.isMobile()) {
                 // on mobile devices without setting these properties modal dialogs cannot be scrolled
                 this.widget.find('.scrollable-container').each(function() {
+                    $(this).prop({prevScrollTop: $(this).scrollTop()});
                     $(this).css('max-height', '');
                 });
             }
@@ -519,6 +570,12 @@ define(function(require, exports, module) {
 
                     if (height) {
                         $el.css('max-height', height);
+
+                        const restoredScrollTop = $el.prop('prevScrollTop');
+
+                        if (restoredScrollTop) {
+                            $el.scrollTop(restoredScrollTop);
+                        }
                     }
                 });
             }
@@ -534,6 +591,7 @@ define(function(require, exports, module) {
                 // widget is not initialized -- where's nothing to position yet
                 return;
             }
+
             this._clearScrollableHeight();
 
             if (this.options.position) {

@@ -7,6 +7,7 @@ define(function(require) {
     const Backbone = require('backbone');
     const mediator = require('oroui/js/mediator');
     const scrollHelper = require('oroui/js/tools/scroll-helper');
+    const tools = require('oroui/js/tools');
 
     const FloatingHeaderPlugin = BasePlugin.extend({
         initialize: function(grid) {
@@ -250,9 +251,16 @@ define(function(require) {
                         this._ensureTHeadSizing();
                     }
                     requestAnimationFrame(() => {
+                        let top = visibleRect.top;
+
+                        // On the iOS device need to fix value from getBoundingClientRect()
+                        if (tools.isIOS()) {
+                            top += document.scrollingElement.scrollTop;
+                        }
+
                         this.domCache.thead.css({
                             // show only visible part
-                            top: visibleRect.top,
+                            top: top,
                             width: visibleRect.right - visibleRect.left,
                             height: Math.min(this.headerHeight, visibleRect.bottom - visibleRect.top),
 

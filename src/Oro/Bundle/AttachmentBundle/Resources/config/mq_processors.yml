@@ -1,0 +1,11 @@
+services:
+    _instanceof:
+        Oro\Component\MessageQueue\Client\TopicSubscriberInterface:
+            tags:
+                - { name: oro_message_queue.client.message_processor }
+
+    oro_attachment.async.image_file_removal_processor:
+        class: Oro\Bundle\AttachmentBundle\Async\ImageFileRemovalProcessor
+        arguments:
+            - '@oro_attachment.manager.image_file_removal'
+            - '@logger'

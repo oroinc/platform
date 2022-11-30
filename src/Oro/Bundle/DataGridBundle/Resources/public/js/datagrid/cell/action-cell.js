@@ -5,6 +5,7 @@ define(function(require, exports, module) {
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const Backgrid = require('backgrid');
+    const tools = require('oroui/js/tools');
     let config = require('module-config').default(module.id);
 
     config = _.extend({
@@ -81,7 +82,7 @@ define(function(require, exports, module) {
             '<% if (withIcons) { %>' +
                 '<li><ul class="launchers-list"></ul></li>' +
             '<% } else { %>' +
-                '<li class="well-small"><ul class="unstyled launchers-list"></ul></li>' +
+                '<li class="well-small"><ul class="list-unstyled launchers-list"></ul></li>' +
             '<% } %>'
         ),
 
@@ -90,7 +91,7 @@ define(function(require, exports, module) {
             '<% if (withIcons) { %>' +
                 '<ul class="nav nav--block nav-pills icons-holder launchers-list"></ul>' +
             '<% } else { %>' +
-                '<ul class="unstyled launchers-list"></ul>' +
+                '<ul class="list-unstyled launchers-list"></ul>' +
             '<% } %>'
         ),
 
@@ -103,8 +104,6 @@ define(function(require, exports, module) {
         events: {
             'click': '_showDropdown',
             'keydown .dropdown-menu': 'onKeydown',
-            'mouseover .dropdown-toggle': '_showDropdown',
-            'mouseleave .dropleft.show': '_hideDropdown',
             'click .dropdown-close .fa-close': '_hideDropdown'
         },
 
@@ -148,6 +147,20 @@ define(function(require, exports, module) {
             this.listenTo(this.model, 'change:action_configuration', this.onActionConfigChange);
 
             this.subviews.push(...this.actions);
+        },
+
+        /**
+         * @inheritdoc
+         */
+        delegateEvents(events) {
+            ActionCell.__super__.delegateEvents.call(this, events);
+
+            if (!tools.isTouchDevice()) {
+                this.$el.on(`mouseover${this.eventNamespace()}`, '.dropdown-toggle', this._showDropdown.bind(this));
+                this.$el.on(`mouseleave${this.eventNamespace()}`, '.dropleft.show', this._hideDropdown.bind(this));
+            }
+
+            return this;
         },
 
         /**

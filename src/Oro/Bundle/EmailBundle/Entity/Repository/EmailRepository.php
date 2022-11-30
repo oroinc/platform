@@ -356,6 +356,9 @@ class EmailRepository extends EntityRepository
         ];
     }
 
+    /**
+     * @deprecated
+     */
     public function getEmailsByEmailAddress(string $emailAddress): array
     {
         return $this->createQueryBuilder('e')
@@ -366,6 +369,22 @@ class EmailRepository extends EntityRepository
             ->setParameter('email', $emailAddress)
             ->getQuery()
             ->getResult();
+    }
+
+    public function getEmailUserIdsByEmailAddressQb(string $emailAddress): QueryBuilder
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('eu.id')
+            ->distinct()
+            ->from(EmailUser::class, 'eu')
+            ->join('eu.email', 'e')
+            ->join('e.recipients', 'r')
+            ->join('r.emailAddress', 'rea')
+            ->join('e.fromEmailAddress', 'fea')
+            ->where('fea.email = :email OR rea.email = :email')
+            ->setParameter('email', $emailAddress);
+
+        return $qb;
     }
 
     public function isEmailPublic(int $emailId): bool

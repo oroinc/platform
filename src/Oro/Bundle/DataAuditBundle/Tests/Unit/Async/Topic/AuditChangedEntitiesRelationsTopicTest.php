@@ -35,6 +35,9 @@ class AuditChangedEntitiesRelationsTopicTest extends AbstractTopicTestCase
                     'organization_id' => null,
                     'impersonation_id' => null,
                     'owner_description' => null,
+                    'entities_inserted' => [],
+                    'entities_updated' => [],
+                    'entities_deleted' => [],
                 ],
             ],
             'all options' => [
@@ -47,6 +50,9 @@ class AuditChangedEntitiesRelationsTopicTest extends AbstractTopicTestCase
                     'organization_id' => 11142,
                     'impersonation_id' => 11142,
                     'owner_description' => 'sample description',
+                    'entities_inserted' => ['sample_key' => 'sample_value'],
+                    'entities_updated' => ['sample_key' => 'sample_value'],
+                    'entities_deleted' => ['sample_key' => 'sample_value'],
                 ],
                 'expectedBody' => [
                     'timestamp' => $time,
@@ -57,6 +63,9 @@ class AuditChangedEntitiesRelationsTopicTest extends AbstractTopicTestCase
                     'organization_id' => 11142,
                     'impersonation_id' => 11142,
                     'owner_description' => 'sample description',
+                    'entities_inserted' => ['sample_key' => 'sample_value'],
+                    'entities_updated' => ['sample_key' => 'sample_value'],
+                    'entities_deleted' => ['sample_key' => 'sample_value'],
                 ],
             ],
             'options with alternative types' => [
@@ -77,6 +86,9 @@ class AuditChangedEntitiesRelationsTopicTest extends AbstractTopicTestCase
                     'impersonation_id' => '11142',
                     'user_class' => null,
                     'owner_description' => null,
+                    'entities_inserted' => [],
+                    'entities_updated' => [],
+                    'entities_deleted' => [],
                 ],
             ],
         ];

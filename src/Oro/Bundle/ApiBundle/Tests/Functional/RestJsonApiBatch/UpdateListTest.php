@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiBatch;
 
-use Oro\Bundle\ApiBundle\Batch\Async\Topics;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListTopic;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchError;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
@@ -114,7 +115,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         return self::getContainer()->get('oro_api.tests.batch_update_exception_controller');
     }
 
-    public function testTryToSendUpdateListRequestWhenGetActionIsDisabled()
+    public function testTryToSendUpdateListRequestWhenGetActionIsDisabled(): void
     {
         $this->appendEntityConfig(
             TestDepartment::class,
@@ -132,7 +133,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, DELETE');
     }
 
-    public function testTryToSendUpdateListRequestWhenBothCreateAndUpdateActionsAreDisabled()
+    public function testTryToSendUpdateListRequestWhenBothCreateAndUpdateActionsAreDisabled(): void
     {
         $this->appendEntityConfig(
             TestDepartment::class,
@@ -150,7 +151,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET, DELETE');
     }
 
-    public function testTryToSendUpdateListRequestWithoutCreatePermissionForAsyncOperationEntity()
+    public function testTryToSendUpdateListRequestWithoutCreatePermissionForAsyncOperationEntity(): void
     {
         $this->updateRolePermissions(
             'ROLE_ADMINISTRATOR',
@@ -171,7 +172,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         self::assertResponseStatusCodeEquals($response, Response::HTTP_FORBIDDEN);
     }
 
-    public function testTryToSendUpdateListRequestWithoutViewPermissionForAsyncOperationEntity()
+    public function testTryToSendUpdateListRequestWithoutViewPermissionForAsyncOperationEntity(): void
     {
         $this->updateRolePermissions(
             'ROLE_ADMINISTRATOR',
@@ -192,7 +193,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         self::assertResponseStatusCodeEquals($response, Response::HTTP_FORBIDDEN);
     }
 
-    public function testTryToProcessWhenLoadOfChunkDataFailed()
+    public function testTryToProcessWhenLoadOfChunkDataFailed(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -248,7 +249,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
-    public function testTryToProcessWhenFinalizationOfChunkFailed()
+    public function testTryToProcessWhenFinalizationOfChunkFailed(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -305,7 +306,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
-    public function testTryToProcessWhenExceptionOccurredBeforeFlushChunkData()
+    public function testTryToProcessWhenExceptionOccurredBeforeFlushChunkData(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -361,7 +362,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
-    public function testTryToProcessWhenExceptionOccurredAfterFlushChunkData()
+    public function testTryToProcessWhenExceptionOccurredAfterFlushChunkData(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -418,7 +419,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
-    public function testTryToProcessWhenExceptionOccurredBeforeSaveChunkErrors()
+    public function testTryToProcessWhenExceptionOccurredBeforeSaveChunkErrors(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -466,7 +467,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $this->assertAsyncOperationErrors([], $operationId);
     }
 
-    public function testTryToProcessWhenExceptionOccurredInNormalizeResultGroup()
+    public function testTryToProcessWhenExceptionOccurredInNormalizeResultGroup(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -493,7 +494,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $this->assertAsyncOperationErrors([], $operationId);
     }
 
-    public function testUpdateListRequest()
+    public function testUpdateListRequest(): void
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $data = [
@@ -551,9 +552,9 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         self::assertNotNull($dataFileContent, 'data file does not exist');
         self::assertEquals($data, self::jsonToArray($dataFileContent), 'data file content');
 
-        // check that the message was send to MQ
+        // check that the message was sent to MQ
         self::assertMessageSent(
-            Topics::UPDATE_LIST,
+            UpdateListTopic::getName(),
             [
                 'operationId'           => $operationId,
                 'entityClass'           => $operation->getEntityClass(),
@@ -566,7 +567,9 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
                     ->getIncludedDataChunkSize(TestDepartment::class)
             ]
         );
-        $message = $this->createMessage(self::getSentMessage(Topics::UPDATE_LIST));
+        $sentMessage = self::getSentMessage(UpdateListTopic::getName());
+        $messageBodyResolver = self::getContainer()->get('oro_message_queue.client.message_body_resolver');
+        $message = $this->createMessage($messageBodyResolver->resolveBody(UpdateListTopic::getName(), $sentMessage));
         self::clearMessageCollector();
 
         // check that the created asynchronous operation can be requested via REST API
@@ -593,7 +596,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
     /**
      * @dataProvider invalidDataProvider
      */
-    public function testUpdateListRequestWithInvalidData(string $data, string $error)
+    public function testUpdateListRequestWithInvalidData(string $data, string $error): void
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
@@ -634,9 +637,9 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         self::assertNotNull($dataFileContent, 'data file does not exist');
         self::assertEquals($data, $dataFileContent, 'data file content');
 
-        // check that the message was send to MQ
+        // check that the message was sent to MQ
         self::assertMessageSent(
-            Topics::UPDATE_LIST,
+            UpdateListTopic::getName(),
             [
                 'operationId'           => $operationId,
                 'entityClass'           => $operation->getEntityClass(),
@@ -649,7 +652,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
                     ->getIncludedDataChunkSize(TestDepartment::class)
             ]
         );
-        $message = $this->createMessage(self::getSentMessage(Topics::UPDATE_LIST));
+        $message = $this->createMessage(self::getSentMessage(UpdateListTopic::getName()));
         self::clearMessageCollector();
 
         // check that the created asynchronous operation can be requested via REST API
@@ -702,7 +705,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         ];
     }
 
-    public function testUpdateListRequestWithEmptyData()
+    public function testUpdateListRequestWithEmptyData(): void
     {
         $entityType = $this->getEntityType(TestDepartment::class);
 
@@ -718,10 +721,10 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
         self::assertFalse($response->headers->has('Content-Location'));
 
-        self::assertEmptyMessages(Topics::UPDATE_LIST);
+        self::assertEmptyMessages(UpdateListTopic::getName());
     }
 
-    public function testSplitDataFileContainsOnlyOnePart()
+    public function testSplitDataFileContainsOnlyOnePart(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -737,8 +740,8 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $message = $this->createUpdateListMessage($operation);
         $this->processUpdateListMessage($message);
 
-        self::assertMessagesCount(Topics::UPDATE_LIST_PROCESS_CHUNK, 1);
-        $sentMessages = self::getSentMessagesByTopic(Topics::UPDATE_LIST_PROCESS_CHUNK, true);
+        self::assertMessagesCount(UpdateListProcessChunkTopic::getName(), 1);
+        $sentMessages = self::getSentMessagesByTopic(UpdateListProcessChunkTopic::getName());
         self::assertArrayContains(
             [
                 [
@@ -765,7 +768,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         self::assertEquals(0.5, $job->getRootJob()->getJobProgress());
     }
 
-    public function testSplitDataFileContainsSeveralParts()
+    public function testSplitDataFileContainsSeveralParts(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -781,8 +784,8 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $message = $this->createUpdateListMessage($operation);
         $this->processUpdateListMessage($message);
 
-        self::assertMessagesCount(Topics::UPDATE_LIST_PROCESS_CHUNK, 2);
-        $sentMessages = self::getSentMessagesByTopic(Topics::UPDATE_LIST_PROCESS_CHUNK, true);
+        self::assertMessagesCount(UpdateListProcessChunkTopic::getName(), 2);
+        $sentMessages = self::getSentMessagesByTopic(UpdateListProcessChunkTopic::getName());
         self::assertArrayContains(
             [
                 [
@@ -828,7 +831,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         self::assertEquals(0.3333, $job1->getRootJob()->getJobProgress());
     }
 
-    public function testProcessChunkForCreateEntitiesWhenNoErrors()
+    public function testProcessChunkForCreateEntitiesWhenNoErrors(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -878,7 +881,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
-    public function testProcessChunkForUpdateEntitiesWhenNoErrors()
+    public function testProcessChunkForUpdateEntitiesWhenNoErrors(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -926,7 +929,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
-    public function testProcessChunkForCreateEntitiesWhenNoErrorsAndSeveralChunks()
+    public function testProcessChunkForCreateEntitiesWhenNoErrorsAndSeveralChunks(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -982,7 +985,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         self::assertEquals($expectedDepartmentNames, $this->getDepartmentNames($entities));
     }
 
-    public function testProcessChunkForAllActionsWhenNoErrors()
+    public function testProcessChunkForAllActionsWhenNoErrors(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -1035,7 +1038,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
-    public function testProcessChunkForAllActionsWhenNoErrorsAndWithHeaderSection()
+    public function testProcessChunkForAllActionsWhenNoErrorsAndWithHeaderSection(): void
     {
         $entityClass = TestDepartment::class;
         $entityType = $this->getEntityType($entityClass);
@@ -1089,7 +1092,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
-    public function testProcessChunkWithValidationErrors()
+    public function testProcessChunkWithValidationErrors(): void
     {
         $entityClass = TestDepartment::class;
         $this->appendEntityConfig(
@@ -1191,7 +1194,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessChunkWithUniqueIndexDatabaseException()
+    public function testProcessChunkWithUniqueIndexDatabaseException(): void
     {
         $this->markTestSkipped('Due to BAP-19673');
         $entityClass = TestDepartment::class;

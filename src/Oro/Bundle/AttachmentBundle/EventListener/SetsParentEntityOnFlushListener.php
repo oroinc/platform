@@ -14,6 +14,7 @@ use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
@@ -143,7 +144,9 @@ class SetsParentEntityOnFlushListener
      */
     private function processEntity($entity, EntityManager $entityManager, callable $callback): void
     {
-        $classMetadata = $entityManager->getClassMetadata(ClassUtils::getRealClass($entity));
+        $realClass = ClassUtils::getRealClass($entity);
+        $classMetadata = $entityManager->getClassMetadata($realClass);
+
         if (count($classMetadata->getIdentifier()) !== 1) {
             // Entity does not have id field or it is composite.
             return;
@@ -152,6 +155,18 @@ class SetsParentEntityOnFlushListener
         foreach ($classMetadata->getAssociationMappings() as $mapping) {
             if ($entity instanceof FileItem || !$this->isMetadataAcceptable($mapping)) {
                 continue;
+            }
+
+            if ($this->configManager->hasConfig($realClass, $mapping['fieldName'])) {
+                $fieldConfig = $this->configManager->getFieldConfig(
+                    'extend',
+                    $realClass,
+                    $mapping['fieldName']
+                );
+
+                if ($fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
+                    continue;
+                }
             }
 
             $fileEntities = $this->getFileFieldValue($entity, $mapping['fieldName'], $mapping['type']);

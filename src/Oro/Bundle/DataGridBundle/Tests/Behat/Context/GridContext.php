@@ -802,15 +802,17 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * Assert record position in grid
      * It is find record by text and assert its position
      * Example: Then Zyta Zywiec must be first record
      * Example: And John Doe must be first record
      *
-     * @Then /^(?P<content>[\w\d\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record$/
-     * @Then /^(?P<content>[\w\d\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record in "(?P<gridName>[^"]+)"$/
+     * @Then /^(?P<content>[\w\d\s\-\.,%]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record$/
+     * @Then /^(?P<content>[\w\d\s\-\.,%]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record in "(?P<gridName>[^"]+)"$/
      */
+    //@codingStandardsIgnoreEnd
     public function assertRowContent($content, $rowNumber, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
@@ -1360,6 +1362,28 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         /** @var MultipleChoice $filterItem */
         $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('MultipleChoice', $filterName);
         $filterItem->checkItemsInFilter($filterItems);
+    }
+
+    /**
+     * Check checkboxes in multiple select filter strictly (case-sensitive)
+     * Example: When I check "Active, Inactive" strictly in Activity Type filter
+     *
+     * @When /^(?:|I )check "(?P<filterItems>.+)" strictly in (?P<filterName>[\w\s]+) filter$/
+     * @When /^(?:|I )check "(?P<filterItems>.+)" strictly in (?P<filterName>[\w\s]+) filter in
+     * "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )check "(?P<filterItems>.+)" strictly in "(?P<filterName>.+)" filter$/
+     * @When /^(?:|I )check "(?P<filterItems>.+)" strictly in "(?P<filterName>.+)" filter in
+     * "(?P<filterGridName>[\w\s]+)"$/
+     *
+     * @param string $filterName
+     * @param string $filterItems
+     * @param string $filterGridName
+     */
+    public function iCheckCheckboxesStrictlyInFilter($filterName, $filterItems, $filterGridName = 'Grid')
+    {
+        /** @var MultipleChoice $filterItem */
+        $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('MultipleChoice', $filterName);
+        $filterItem->checkItemsInFilterStrict($filterItems);
     }
 
     //@codingStandardsIgnoreStart

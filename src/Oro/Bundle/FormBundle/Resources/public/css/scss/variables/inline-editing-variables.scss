@@ -42,6 +42,7 @@ $inline-editor-select2-drop-height: 45px !default;
 $inline-editor-text-editor-top: 0 !default;
 $inline-editor-text-editor-bottom: 0 !default;
 $inline-editor-inner-fields-height: 100% !default;
+$inline-editor-inner-textarea-max-height: max(100%, 150px) !default;
 $inline-editor-inner-outer-offset: 68px !default;
 $inline-editor-inner-textarea-offset: 11px $inline-editor-inner-outer-offset 11px 9px !default;
 

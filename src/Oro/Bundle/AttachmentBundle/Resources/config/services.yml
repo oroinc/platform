@@ -576,14 +576,6 @@ services:
             - '@oro_attachment.provider.image_file_names'
             - '@oro_attachment.media_cache_manager_registry'
 
-    oro_attachment.async.image_file_removal_processor:
-        class: Oro\Bundle\AttachmentBundle\Async\ImageFileRemovalProcessor
-        arguments:
-            - '@oro_attachment.manager.image_file_removal'
-            - '@logger'
-        tags:
-            - { name: oro_message_queue.client.message_processor }
-
     oro_attachment.layout.data_provider.file_applications:
         class: 'Oro\Bundle\AttachmentBundle\Layout\DataProvider\FileApplicationsDataProvider'
         arguments:

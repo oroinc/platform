@@ -110,6 +110,32 @@ class FieldConfigModelRepository extends EntityRepository
         return $attributes;
     }
 
+    public function getSortableOrFilterableAttributes(string $className, array $attributes = []): array
+    {
+        $queryBuilder = $this->getActiveAttributesByClassQueryBuilder($className);
+
+        $queryBuilder
+            ->leftJoin('f.indexedValues', 'so', 'WITH', 'so.code = :soCode AND so.value = :soValue')
+            ->setParameter('soCode', 'sortable')
+            ->setParameter('soValue', '1');
+
+        $queryBuilder
+            ->leftJoin('f.indexedValues', 'fi', 'WITH', 'fi.code = :fiCode AND fi.value = :fiValue')
+            ->setParameter('fiCode', 'filterable')
+            ->setParameter('fiValue', '1');
+
+        $queryBuilder
+            ->andWhere('so.value = :soValue OR fi.value = :fiValue');
+
+        if ($attributes) {
+            $queryBuilder
+                ->andWhere($queryBuilder->expr()->in('f.id', ':attributes'))
+                ->setParameter('attributes', $attributes);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     /**
      * @param array $ids
      * @return QueryBuilder

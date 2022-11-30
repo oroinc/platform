@@ -608,7 +608,7 @@ define(function(require, exports, module) {
 
         appendToContainer() {
             this.$el.prependTo(this.filterContainer);
-            this.trigger('visibility-change', true);
+            this.trigger('visibility-change', this.$el.is(':visible'));
         },
 
         /**
@@ -657,22 +657,11 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @returns {Number} count of selected filters
+         * @returns {Number} count of changed filters
          * @private
          */
         _calculateChangedFilters: function() {
-            return _.reduce(this.filters, function(memo, filter) {
-                const domVal = filter._readDOMValue();
-
-                const num = (filter.renderable &&
-                   !_.isEqual(filter.value, domVal) &&
-                   !_.isEqual(filter.emptyValue, domVal) &&
-                   !_.isUndefined(domVal.type) &&
-                   !_.isEmpty(domVal.value)
-                ) ? 1 : 0;
-
-                return memo + num;
-            }, 0);
+            return this.getChangedFilters().length;
         },
 
         /**

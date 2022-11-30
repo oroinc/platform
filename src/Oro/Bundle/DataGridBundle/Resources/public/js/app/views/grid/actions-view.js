@@ -14,6 +14,7 @@ define(function(require) {
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const BaseView = require('oroui/js/app/views/base/view');
+    const tools = require('oroui/js/tools');
 
     const ActionsView = BaseView.extend({
 
@@ -59,7 +60,7 @@ define(function(require) {
             '<% if (withIcons) { %>' +
                 '<li><ul class="launchers-list"></ul></li>' +
             '<% } else { %>' +
-                '<li class="well-small"><ul class="unstyled launchers-list"></ul></li>' +
+                '<li class="well-small"><ul class="list-unstyled launchers-list"></ul></li>' +
             '<% } %>'
         ),
 
@@ -68,7 +69,7 @@ define(function(require) {
             '<% if (withIcons) { %>' +
                 '<ul class="launchers-list"></ul>' +
             '<% } else { %>' +
-                '<ul class="unstyled launchers-list"></ul>' +
+                '<ul class="list-unstyled launchers-list"></ul>' +
             '<% } %>'
         ),
 
@@ -78,11 +79,18 @@ define(function(require) {
         ),
 
         /** @property */
-        events: {
-            'click': '_showDropdown',
-            'mouseover .dropdown-toggle': '_showDropdown',
-            'mouseleave .dropleft.show': '_hideDropdown',
-            'click .dropdown-close .fa-close': '_hideDropdown'
+        events: function() {
+            const events = {
+                'click': '_showDropdown',
+                'click .dropdown-close .fa-close': '_hideDropdown'
+            };
+
+            if (!tools.isTouchDevice()) {
+                events['mouseover .dropdown-toggle'] = '_showDropdown';
+                events['mouseleave .dropleft.show'] = '_hideDropdown';
+            }
+
+            return events;
         },
 
         /**

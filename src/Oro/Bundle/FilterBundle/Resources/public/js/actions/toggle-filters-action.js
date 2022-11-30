@@ -13,7 +13,10 @@ define(function(require) {
                 throw new TypeError('"datagrid" is required');
             }
 
-            this.listenTo(opts.datagrid, 'filterManager:connected', function() {
+            this.listenTo(opts.datagrid, 'filters:beforeRender', () => {
+                this.listenTo(this.datagrid.filterManager, 'visibility-change', this.onFilterManagerVisibilityChange);
+            });
+            this.listenTo(opts.datagrid, 'filterManager:connected', () => {
                 this.onFilterManagerModeChange(this.datagrid.filterManager.getViewMode());
                 this.listenTo(this.datagrid.filterManager, 'changeViewMode', this.onFilterManagerModeChange);
             });
@@ -43,11 +46,16 @@ define(function(require) {
                 this.toggleFilters(mode);
             }
 
-            if (this.launcherInstance) {
-                this.launcherInstance.$el.toggleClass('pressed', mode === FiltersManager.MANAGE_VIEW_MODE);
-            }
-
             mediator.trigger('layout:adjustHeight');
+        },
+
+        /**
+         * @param {boolean} filtersManagerIsVisible
+         */
+        onFilterManagerVisibilityChange(filtersManagerIsVisible) {
+            if (this.launcherInstance) {
+                this.launcherInstance.$el.toggleClass('pressed', filtersManagerIsVisible);
+            }
         }
     });
 

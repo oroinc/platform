@@ -258,8 +258,9 @@
     bottom: 0;
     right: $content-padding-small;
     line-height: 18px;
-    height: 18px;
-    margin: auto;
+    height: 28px;
+    margin: 4px auto 0;
+    padding: 5px 0;
 
     .showCc,
     .showBcc {

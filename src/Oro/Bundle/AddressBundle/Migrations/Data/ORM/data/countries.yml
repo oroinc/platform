@@ -371,6 +371,10 @@ AM:
         AM-VD:
             combinedCode: AM-VD
             code: VD
+AN:
+    iso2Code: AN
+    iso3Code: ANT
+    regions: {  }
 AO:
     iso2Code: AO
     iso3Code: AGO
@@ -568,6 +572,10 @@ AU:
         AU-WA:
             combinedCode: AU-WA
             code: WA
+AW:
+    iso2Code: AW
+    iso3Code: ABW
+    regions: {}
 AX:
     iso2Code: AX
     iso3Code: ALA
@@ -1519,6 +1527,10 @@ BL:
     iso2Code: BL
     iso3Code: BLM
     regions: {  }
+BM:
+    iso2Code: BM
+    iso3Code: BMU
+    regions: {  }
 BN:
     iso2Code: BN
     iso3Code: BRN
@@ -1956,39 +1968,81 @@ CD:
         CD-BC:
             combinedCode: CD-BC
             code: BC
-        CD-BN:
-            combinedCode: CD-BN
-            code: BN
+        CD-BU:
+            combinedCode: CD-BU
+            code: BU
         CD-EQ:
             combinedCode: CD-EQ
             code: EQ
-        CD-HC:
-            combinedCode: CD-HC
-            code: HC
-        CD-KA:
-            combinedCode: CD-KA
-            code: KA
+        CD-HK:
+            combinedCode: CD-HK
+            code: HK
+        CD-HL:
+            combinedCode: CD-HL
+            code: HL
+        CD-HU:
+            combinedCode: CD-HU
+            code: HU
+        CD-IT:
+            combinedCode: CD-IT
+            code: IT
+        CD-KC:
+            combinedCode: CD-KC
+            code: KC
         CD-KE:
             combinedCode: CD-KE
             code: KE
+        CD-KG:
+            combinedCode: CD-KG
+            code: KG
+        CD-KL:
+            combinedCode: CD-KL
+            code: KL
         CD-KN:
             combinedCode: CD-KN
             code: KN
-        CD-KW:
-            combinedCode: CD-KW
-            code: KW
+        CD-KS:
+            combinedCode: CD-KS
+            code: KS
+        CD-LO:
+            combinedCode: CD-LO
+            code: LO
+        CD-LU:
+            combinedCode: CD-LU
+            code: LU
         CD-MA:
             combinedCode: CD-MA
             code: MA
+        CD-MN:
+            combinedCode: CD-MN
+            code: MN
+        CD-MO:
+            combinedCode: CD-MO
+            code: MO
         CD-NK:
             combinedCode: CD-NK
             code: NK
-        CD-OR:
-            combinedCode: CD-OR
-            code: OR
+        CD-NU:
+            combinedCode: CD-NU
+            code: NU
+        CD-SA:
+            combinedCode: CD-SA
+            code: SA
         CD-SK:
             combinedCode: CD-SK
             code: SK
+        CD-SU:
+            combinedCode: CD-SU
+            code: SU
+        CD-TA:
+            combinedCode: CD-TA
+            code: TA
+        CD-TO:
+            combinedCode: CD-TO
+            code: TO
+        CD-TU:
+            combinedCode: CD-TU
+            code: TU
 CF:
     iso2Code: CF
     iso3Code: CAF
@@ -2167,63 +2221,52 @@ CI:
     iso2Code: CI
     iso3Code: CIV
     regions:
-        CI-01:
-            combinedCode: CI-01
-            code: '01'
-        CI-02:
-            combinedCode: CI-02
-            code: '02'
-        CI-03:
-            combinedCode: CI-03
-            code: '03'
-        CI-04:
-            combinedCode: CI-04
-            code: '04'
-        CI-05:
-            combinedCode: CI-05
-            code: '05'
-        CI-06:
-            combinedCode: CI-06
-            code: '06'
-        CI-07:
-            combinedCode: CI-07
-            code: '07'
-        CI-08:
-            combinedCode: CI-08
-            code: '08'
-        CI-09:
-            combinedCode: CI-09
-            code: '09'
-        CI-10:
-            combinedCode: CI-10
-            code: '10'
-        CI-11:
-            combinedCode: CI-11
-            code: '11'
-        CI-12:
-            combinedCode: CI-12
-            code: '12'
-        CI-13:
-            combinedCode: CI-13
-            code: '13'
-        CI-14:
-            combinedCode: CI-14
-            code: '14'
-        CI-15:
-            combinedCode: CI-15
-            code: '15'
-        CI-16:
-            combinedCode: CI-16
-            code: '16'
-        CI-17:
-            combinedCode: CI-17
-            code: '17'
-        CI-18:
-            combinedCode: CI-18
-            code: '18'
-        CI-19:
-            combinedCode: CI-19
-            code: '19'
+        CI-AB:
+            combinedCode: CI-AB
+            code: AB
+        CI-BS:
+            combinedCode: CI-BS
+            code: BS
+        CI-CM:
+            combinedCode: CI-CM
+            code: CM
+        CI-DN:
+            combinedCode: CI-DN
+            code: DN
+        CI-GD:
+            combinedCode: CI-GD
+            code: GD
+        CI-LC:
+            combinedCode: CI-LC
+            code: LC
+        CI-LG:
+            combinedCode: CI-LG
+            code: LG
+        CI-MG:
+            combinedCode: CI-MG
+            code: MG
+        CI-SM:
+            combinedCode: CI-SM
+            code: SM
+        CI-SV:
+            combinedCode: CI-SV
+            code: SV
+        CI-VB:
+            combinedCode: CI-VB
+            code: VB
+        CI-WR:
+            combinedCode: CI-WR
+            code: WR
+        CI-YM:
+            combinedCode: CI-YM
+            code: YM
+        CI-ZZ:
+            combinedCode: CI-ZZ
+            code: ZZ
+CK:
+    iso2Code: CK
+    iso3Code: COK
+    regions: {  }
 CL:
     iso2Code: CL
     iso3Code: CHL
@@ -2663,6 +2706,10 @@ CV:
         CV-TS:
             combinedCode: CV-TS
             code: TS
+CW:
+    iso2Code: CW
+    iso3Code: CUW
+    regions: {  }
 CY:
     iso2Code: CY
     iso3Code: CYP
@@ -3624,6 +3671,10 @@ FJ:
         FJ-W:
             combinedCode: FJ-W
             code: W
+FK:
+    iso2Code: FK
+    iso3Code: FLK
+    regions: {  }
 FM:
     iso2Code: FM
     iso3Code: FSM
@@ -3640,6 +3691,10 @@ FM:
         FM-YAP:
             combinedCode: FM-YAP
             code: YAP
+FO:
+    iso2Code: FO
+    iso3Code: FRO
+    regions: {  }
 FR:
     iso2Code: FR
     iso3Code: FRA
@@ -4845,6 +4900,10 @@ GE:
         GE-TB:
             combinedCode: GE-TB
             code: TB
+GF:
+    iso2Code: GF
+    iso3Code: GUF
+    regions: { }
 GG:
     iso2Code: GG
     iso3Code: GGY
@@ -5048,6 +5107,10 @@ GN:
         GN-YO:
             combinedCode: GN-YO
             code: YO
+GP:
+    iso2Code: GP
+    iso3Code: GLP
+    regions: {  }
 GQ:
     iso2Code: GQ
     iso3Code: GNQ
@@ -5348,6 +5411,10 @@ GT:
         GT-ZA:
             combinedCode: GT-ZA
             code: ZA
+GU:
+    iso2Code: GU
+    iso3Code: GUM
+    regions: {  }
 GW:
     iso2Code: GW
     iso3Code: GNB
@@ -5422,6 +5489,10 @@ GY:
         GY-UT:
             combinedCode: GY-UT
             code: UT
+HK:
+    iso2Code: HK
+    iso3Code: HKG
+    regions: {  }
 HN:
     iso2Code: HN
     iso3Code: HND
@@ -7185,6 +7256,10 @@ KW:
         KW-KU:
             combinedCode: KW-KU
             code: KU
+KY:
+    iso2Code: KY
+    iso3Code: CYM
+    regions: {  }
 KZ:
     iso2Code: KZ
     iso3Code: KAZ
@@ -7323,6 +7398,43 @@ LB:
         LB-NA:
             combinedCode: LB-NA
             code: NA
+LC:
+    iso2Code: LC
+    iso3Code: LCA
+    regions:
+        LC-01:
+            combinedCode: LC-01
+            code: '01'
+        LC-02:
+            combinedCode: LC-02
+            code: '02'
+        LC-03:
+            combinedCode: LC-03
+            code: '03'
+        LC-04:
+            combinedCode: LC-04
+            code: '04'
+        LC-05:
+            combinedCode: LC-05
+            code: '05'
+        LC-06:
+            combinedCode: LC-06
+            code: '06'
+        LC-07:
+            combinedCode: LC-07
+            code: '07'
+        LC-08:
+            combinedCode: LC-08
+            code: '08'
+        LC-10:
+            combinedCode: LC-10
+            code: '10'
+        LC-11:
+            combinedCode: LC-11
+            code: '11'
+        LC-12:
+            combinedCode: LC-12
+            code: '12'
 LI:
     iso2Code: LI
     iso3Code: LIE
@@ -7709,9 +7821,6 @@ LY:
         LY-JA:
             combinedCode: LY-JA
             code: JA
-        LY-JB:
-            combinedCode: LY-JB
-            code: JB
         LY-JG:
             combinedCode: LY-JG
             code: JG
@@ -8631,6 +8740,9 @@ MM:
         MM-17:
             combinedCode: MM-17
             code: '17'
+        MM-18:
+            combinedCode: MM-18
+            code: '18'
 MN:
     iso2Code: MN
     iso3Code: MNG
@@ -8704,6 +8816,14 @@ MN:
 MO:
     iso2Code: MO
     iso3Code: MAC
+    regions: {  }
+MP:
+    iso2Code: MP
+    iso3Code: MNP
+    regions: {  }
+MQ:
+    iso2Code: MQ
+    iso3Code: MTQ
     regions: {  }
 MR:
     iso2Code: MR
@@ -9404,6 +9524,10 @@ NA:
         NA-OW:
             combinedCode: NA-OW
             code: OW
+NC:
+    iso2Code: NC
+    iso3Code: NCL
+    regions: {  }
 NE:
     iso2Code: NE
     iso3Code: NER
@@ -10030,6 +10154,10 @@ PE:
         PE-UCA:
             combinedCode: PE-UCA
             code: UCA
+PF:
+    iso2Code: PF
+    iso3Code: PYF
+    regions: {  }
 PG:
     iso2Code: PG
     iso3Code: PNG
@@ -10466,6 +10594,10 @@ PL:
         PL-ZP:
             combinedCode: PL-ZP
             code: ZP
+PR:
+    iso2Code: PR
+    iso3Code: PRI
+    regions: {  }
 PS:
     iso2Code: PS
     iso3Code: PSE
@@ -10675,6 +10807,10 @@ QA:
         QA-WA:
             combinedCode: QA-WA
             code: WA
+RE:
+    iso2Code: RE
+    iso3Code: REU
+    regions: {  }
 RO:
     iso2Code: RO
     iso3Code: ROU
@@ -12149,9 +12285,9 @@ SK:
         SK-KI:
             combinedCode: SK-KI
             code: KI
-        SK-NJ:
-            combinedCode: SK-NJ
-            code: NJ
+        SK-NI:
+            combinedCode: SK-NI
+            code: NI
         SK-PV:
             combinedCode: SK-PV
             code: PV
@@ -12353,12 +12489,27 @@ ST:
     iso2Code: ST
     iso3Code: STP
     regions:
+        ST-01:
+            combinedCode: ST-01
+            code: '01'
+        ST-02:
+            combinedCode: ST-02
+            code: '02'
+        ST-03:
+            combinedCode: ST-03
+            code: '03'
+        ST-04:
+            combinedCode: ST-04
+            code: '04'
+        ST-05:
+            combinedCode: ST-05
+            code: '05'
+        ST-06:
+            combinedCode: ST-06
+            code: '06'
         ST-P:
             combinedCode: ST-P
             code: P
-        ST-S:
-            combinedCode: ST-S
-            code: S
 SV:
     iso2Code: SV
     iso3Code: SLV
@@ -12467,6 +12618,10 @@ SZ:
         SZ-SH:
             combinedCode: SZ-SH
             code: SH
+TC:
+    iso2Code: TC
+    iso3Code: TCA
+    regions: {  }
 TD:
     iso2Code: TD
     iso3Code: TCD
@@ -13822,24 +13977,6 @@ US:
     iso2Code: US
     iso3Code: USA
     regions:
-        US-AA:
-            combinedCode: US-AA
-            code: AA
-        US-AP:
-            combinedCode: US-AP
-            code: AP
-        US-AF:
-            combinedCode: US-AF
-            code: AF
-        US-AC:
-            combinedCode: US-AC
-            code: AC
-        US-AE:
-            combinedCode: US-AE
-            code: AE
-        US-AM:
-            combinedCode: US-AM
-            code: AM
         US-AK:
             combinedCode: US-AK
             code: AK
@@ -14219,6 +14356,14 @@ VE:
         VE-Z:
             combinedCode: VE-Z
             code: Z
+VG:
+    iso2Code: VG
+    iso3Code: VGB
+    regions: {  }
+VI:
+    iso2Code: VI
+    iso3Code: VIR
+    regions: {  }
 VN:
     iso2Code: VN
     iso3Code: VNM
@@ -14253,9 +14398,6 @@ VN:
         VN-14:
             combinedCode: VN-14
             code: '14'
-        VN-15:
-            combinedCode: VN-15
-            code: '15'
         VN-18:
             combinedCode: VN-18
             code: '18'
@@ -14337,9 +14479,6 @@ VN:
         VN-47:
             combinedCode: VN-47
             code: '47'
-        VN-48:
-            combinedCode: VN-48
-            code: '48'
         VN-49:
             combinedCode: VN-49
             code: '49'
@@ -14373,24 +14512,12 @@ VN:
         VN-59:
             combinedCode: VN-59
             code: '59'
-        VN-60:
-            combinedCode: VN-60
-            code: '60'
         VN-61:
             combinedCode: VN-61
             code: '61'
-        VN-62:
-            combinedCode: VN-62
-            code: '62'
         VN-63:
             combinedCode: VN-63
             code: '63'
-        VN-64:
-            combinedCode: VN-64
-            code: '64'
-        VN-65:
-            combinedCode: VN-65
-            code: '65'
         VN-66:
             combinedCode: VN-66
             code: '66'
@@ -14415,6 +14542,21 @@ VN:
         VN-73:
             combinedCode: VN-73
             code: '73'
+        VN-CT:
+            combinedCode: VN-CT
+            code: CT
+        VN-DN:
+            combinedCode: VN-DN
+            code: DN
+        VN-HN:
+            combinedCode: VN-HN
+            code: HN
+        VN-HP:
+            combinedCode: VN-HP
+            code: HP
+        VN-SG:
+            combinedCode: VN-SG
+            code: SG
 VU:
     iso2Code: VU
     iso3Code: VUT
@@ -14437,6 +14579,19 @@ VU:
         VU-TOB:
             combinedCode: VU-TOB
             code: TOB
+WF:
+    iso2Code: WF
+    iso3Code: WLF
+    regions:
+        WF-AL:
+            combinedCode: WF-AL
+            code: AL
+        WF-SG:
+            combinedCode: WF-SG
+            code: SG
+        WF-UV:
+            combinedCode: WF-UV
+            code: UV
 WS:
     iso2Code: WS
     iso3Code: WSM
@@ -14538,6 +14693,10 @@ YE:
         YE-TA:
             combinedCode: YE-TA
             code: TA
+YT:
+    iso2Code: YT
+    iso3Code: MYT
+    regions: {  }
 ZA:
     iso2Code: ZA
     iso3Code: ZAF

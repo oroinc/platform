@@ -203,9 +203,15 @@ define(function(require) {
          */
 
         _showLoading: function() {
-            this.subview('loadingMask', new LoadingMask({
+            let options = {
                 container: this._getLoadingElement()
-            }));
+            };
+
+            if (this.options.loadingProperties) {
+                options = Object.assign({}, options, this.options.loadingProperties);
+            }
+
+            this.subview('loadingMask', new LoadingMask(options));
             this.subview('loadingMask').show();
         },
 
@@ -891,7 +897,7 @@ define(function(require) {
         _triggerContentLoadEvents: function(content) {
             this.trigger('contentLoad', content, this);
             mediator.trigger('widget:contentLoad', this.widget);
-            mediator.trigger('layout:adjustHeight');
+            mediator.trigger('layout:adjustHeight', this.el);
         },
 
         /**

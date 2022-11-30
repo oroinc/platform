@@ -80,6 +80,10 @@
             width: auto;
             margin: 0 $address-box-margin-medium 0 $address-box-margin-small;
         }
+
+        .map-visual-container {
+            width: 100%;
+        }
     }
 
     .map-visual {
@@ -129,11 +133,6 @@
         .map-visual-frame {
             width: 100%;
             height: auto;
-        }
-
-        .map-visual-frame,
-        .map-visual {
-            max-height: 50vh;
         }
 
         .map-visual-frame {

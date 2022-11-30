@@ -1288,6 +1288,7 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButtonInModalWindow($button)
     {
+        /** @var NodeElement $modalWindow */
         $modalWindow = $this->spin(function () {
             return $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
         }, 5);
@@ -1315,8 +1316,9 @@ class OroMainContext extends MinkContext implements
         self::assertNotNull($modalWindow, 'There is no visible modal window on page at this moment');
         $function = <<<JS
 (function(){
-    var scrollableElement = jQuery('section.widget-content').parent();
-    scrollableElement.scrollTop(scrollableElement.height());
+    var contentElement = jQuery('section.widget-content');
+    var scrollableElement = contentElement.parent();
+    scrollableElement.scrollTop(contentElement.outerHeight());
 })()
 JS;
 
@@ -1350,6 +1352,38 @@ JS;
         /** @var MainMenu $mainMenu */
         $mainMenu = $this->createElement('MainMenu');
         $mainMenu->selectSideSubmenu($submenu);
+    }
+
+    /**
+     * Example: And I should see the following menu items:
+     *   | System/ User Management/ Login Attempts |
+     *
+     * @Then /^(?:|I )should see the following menu items:$/
+     */
+    public function iShouldSeeMenuItems(TableNode $table): void
+    {
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $paths = $table->getColumn(0);
+        foreach ($paths as $path) {
+            self::assertTrue($mainMenu->hasLink($path), sprintf('Cannot find the menu "%s"', $path));
+        }
+    }
+
+    /**
+     * Example: And I should not see the following menu items:
+     *   | System/ User Management/ Login Attempts |
+     *
+     * @Then /^(?:|I )should not see the following menu items:$/
+     */
+    public function iShouldNotSeeMenuItems(TableNode $table): void
+    {
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $paths = $table->getColumn(0);
+        foreach ($paths as $path) {
+            self::assertFalse($mainMenu->hasLink($path), sprintf('Not expected to see the menu "%s"', $path));
+        }
     }
 
     /**
@@ -2828,5 +2862,22 @@ JS;
     public function assertFieldContains($field, $value)
     {
         parent::assertFieldContains($field, $value);
+    }
+
+    /**
+     * Click on button or link if it is present on page
+     * Example: Given I click "Edit" if present
+     * Example: When I click "Save and Close" if present
+     *
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" if present$/
+     *
+     * @param string $button
+     * @throws \Behat\Mink\Exception\ElementNotFoundException
+     */
+    public function pressButtonIfPresent($button)
+    {
+        if ($this->isElementVisible($button)) {
+            $this->pressButton($button);
+        }
     }
 }

@@ -42,7 +42,7 @@ class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
 
         $this->manager->expects($this->once())
             ->method('getResizedImageUrl')
-            ->with($file, 100, 100)
+            ->with($file, 100, 100, '')
             ->willReturn('http://test.com/image.png');
         $this->assertEquals('<a href="http://test.com/image.png">test.png</a>', $this->formatter->format($file));
     }
@@ -55,10 +55,11 @@ class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
         $width = 20;
         $height = 30;
         $title = 'test title';
+        $format = 'sample-format';
 
         $this->manager->expects($this->once())
             ->method('getResizedImageUrl')
-            ->with($file, $width, $height)
+            ->with($file, $width, $height, $format)
             ->willReturn('http://test.com/image.png');
         $this->assertEquals(
             '<a href="http://test.com/image.png">test title</a>',
@@ -67,7 +68,8 @@ class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
                 [
                     'width' => $width,
                     'height' => $height,
-                    'title' => $title
+                    'title' => $title,
+                    'format' => $format,
                 ]
             )
         );

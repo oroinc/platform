@@ -1,0 +1,10 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.topic }
+
+    Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollectionsChunkTopic: ~
+    Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollectionsTopic: ~
+    Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseRelationsTopic: ~
+    Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesRelationsTopic: ~
+    Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesTopic: ~

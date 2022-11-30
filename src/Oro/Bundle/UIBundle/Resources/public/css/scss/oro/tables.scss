@@ -305,6 +305,8 @@
     .string-cell {
         ul.unstyled {
             margin-bottom: 0;
+
+            @include list-unstyled();
         }
     }
 

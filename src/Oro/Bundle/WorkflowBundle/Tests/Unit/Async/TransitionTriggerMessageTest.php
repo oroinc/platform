@@ -20,61 +20,24 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 TransitionTriggerMessage::TRANSITION_TRIGGER => $triggerId,
-                TransitionTriggerMessage::MAIN_ENTITY => $mainEntityId
+                TransitionTriggerMessage::MAIN_ENTITY => $mainEntityId,
             ],
             $this->getTransitionTriggerMessage($triggerId, $mainEntityId)->toArray()
         );
     }
 
-    /**
-     * @dataProvider createFromJsonExceptionProvider
-     */
-    public function testCreateFromJsonException(mixed $json, string $exceptionClass, string $expectedMessage)
-    {
-        $this->expectException($exceptionClass);
-        $this->expectExceptionMessage($expectedMessage);
-
-        TransitionTriggerMessage::createFromJson($json);
-    }
-
-    public function createFromJsonExceptionProvider(): array
-    {
-        return [
-            [
-                'json' => null,
-                'exceptionClass' => \InvalidArgumentException::class,
-                'expectedMessage' => 'Given json should not be empty'
-            ],
-            [
-                'json' => new \stdClass(),
-                'exceptionClass' => \InvalidArgumentException::class,
-                'expectedMessage' => 'Given json should not be empty'
-            ],
-            [
-                'json' => 'data',
-                'exceptionClass' => \JsonException::class,
-                'expectedMessage' => 'Syntax error'
-            ],
-            [
-                'json' => '',
-                'exceptionClass' => \InvalidArgumentException::class,
-                'expectedMessage' => 'Given json should not be empty'
-            ]
-        ];
-    }
-
-    public function testCreateFromJson()
+    public function testCreateFromArray()
     {
         $triggerId = 42;
         $mainEntityId = ['id' => 105];
 
         $this->assertEquals(
             $this->getTransitionTriggerMessage($triggerId, $mainEntityId),
-            TransitionTriggerMessage::createFromJson($this->getJson($triggerId, $mainEntityId))
+            TransitionTriggerMessage::createFromArray($this->getArray($triggerId, $mainEntityId))
         );
         $this->assertEquals(
             $this->getTransitionTriggerMessage(null, null),
-            TransitionTriggerMessage::createFromJson('{"test":"data"}')
+            TransitionTriggerMessage::createFromArray([])
         );
     }
 
@@ -86,17 +49,6 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             $this->getTransitionTriggerMessage($triggerId, $mainEntityId),
             TransitionTriggerMessage::create($this->getEventTrigger($triggerId), $mainEntityId)
-        );
-    }
-
-    public function testAccessors()
-    {
-        $this->assertPropertyAccessors(
-            $this->getTransitionTriggerMessage(null, null),
-            [
-                ['triggerId', 5, 0],
-                ['mainEntityId', ['id' => 105]]
-            ]
         );
     }
 
@@ -118,14 +70,11 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function getJson(int $triggerId, mixed $mainEntityId): string
+    private function getArray(int $triggerId, mixed $mainEntityId): array
     {
-        return sprintf(
-            '{"%s":%d,"%s":%s}',
-            TransitionTriggerMessage::TRANSITION_TRIGGER,
-            $triggerId,
-            TransitionTriggerMessage::MAIN_ENTITY,
-            json_encode($mainEntityId)
-        );
+        return [
+            TransitionTriggerMessage::TRANSITION_TRIGGER => $triggerId,
+            TransitionTriggerMessage::MAIN_ENTITY => $mainEntityId,
+        ];
     }
 }

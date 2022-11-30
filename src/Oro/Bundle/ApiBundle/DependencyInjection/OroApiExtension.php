@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigBag;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Component\ChainProcessor\Debug\TraceableActionProcessor;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -81,6 +82,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('processors.unhandled_error.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
+        $loader->load('mq_topics.yml');
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.yml');
@@ -143,6 +145,8 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $container->setParameter(self::REST_API_PREFIX_PARAMETER_NAME, $config[self::REST_API_PREFIX_CONFIG]);
         $container->setParameter(self::REST_API_PATTERN_PARAMETER_NAME, $config[self::REST_API_PATTERN_CONFIG]);
 
+        $this->configureBatchApiLock($container);
+
         if ($container instanceof ExtendedContainerBuilder) {
             $configs = $container->getExtensionConfig('fos_rest');
             foreach ($configs as $key => $config) {
@@ -170,6 +174,47 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
                 $container->prependExtensionConfig($name, $config);
             }
         }
+    }
+
+    private function configureBatchApiLock(ContainerBuilder $container): void
+    {
+        $isBatchApiLockConfigured = false;
+        $configs = $container->getExtensionConfig('framework');
+        foreach ($configs as $config) {
+            if (isset($config['lock']['batch_api'])) {
+                $isBatchApiLockConfigured = true;
+                break;
+            }
+        }
+        if (!$isBatchApiLockConfigured) {
+            $container->prependExtensionConfig(
+                'framework',
+                ['lock' => ['batch_api' => $this->getBatchApiLockDsn($container)]]
+            );
+        }
+    }
+
+    private function getBatchApiLockDsn(ContainerBuilder $container): string
+    {
+        /**
+         * The host is added via "host" query parameter to avoid 'Malformed parameter "url".' exception
+         * in {@see \Doctrine\DBAL\DriverManager::parseDatabaseUrl}
+         * when the host is a path to a unix socket like '/path/to/socket'.
+         */
+
+        $scheme = $container->getParameter('database_driver') === DatabaseDriverInterface::DRIVER_POSTGRESQL
+            ? 'pgsql+advisory'
+            : 'mysql';
+
+        return sprintf(
+            '%s://%s:%s@127.0.0.1:%s/%s?host=%s',
+            $scheme,
+            $container->getParameter('database_user'),
+            $container->getParameter('database_password'),
+            $container->getParameter('database_port'),
+            $container->getParameter('database_name'),
+            $container->getParameter('database_host')
+        );
     }
 
     private function configureTestEnvironment(ContainerBuilder $container): void

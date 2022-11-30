@@ -5,7 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Async;
 use Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager;
 use Oro\Bundle\ApiBundle\Batch\Async\ChunkFileClassifierInterface;
 use Oro\Bundle\ApiBundle\Batch\Async\ChunkFileClassifierRegistry;
-use Oro\Bundle\ApiBundle\Batch\Async\Topics;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListFinishTopic;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListMessageProcessor;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
@@ -27,9 +28,9 @@ use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -44,44 +45,31 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     private const SPLIT_FILE_TIMEOUT = 30000;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobRunner */
-    private $jobRunner;
+    private \PHPUnit\Framework\MockObject\MockObject|JobRunner $jobRunner;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobManagerInterface */
-    private $jobManager;
+    private \PHPUnit\Framework\MockObject\MockObject|JobManagerInterface $jobManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DependentJobService */
-    private $dependentJob;
+    private \PHPUnit\Framework\MockObject\MockObject|DependentJobService $dependentJob;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileSplitterRegistry */
-    private $splitterRegistry;
+    private \PHPUnit\Framework\MockObject\MockObject|FileSplitterRegistry $splitterRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ChunkFileClassifierRegistry */
-    private $chunkFileClassifierRegistry;
+    private \PHPUnit\Framework\MockObject\MockObject|ChunkFileClassifierRegistry $chunkFileClassifierRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|IncludeAccessorRegistry */
-    private $includeAccessorRegistry;
+    private \PHPUnit\Framework\MockObject\MockObject|IncludeAccessorRegistry $includeAccessorRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|IncludeMapManager */
-    private $includeMapManager;
+    private \PHPUnit\Framework\MockObject\MockObject|IncludeMapManager $includeMapManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
-    private $sourceDataFileManager;
+    private \PHPUnit\Framework\MockObject\MockObject|FileManager $sourceDataFileManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
-    private $fileManager;
+    private \PHPUnit\Framework\MockObject\MockObject|FileManager $fileManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager */
-    private $operationManager;
+    private \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager $operationManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper */
-    private $processingHelper;
+    private \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper $processingHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject|LoggerInterface $logger;
 
-    /** @var UpdateListMessageProcessor */
-    private $processor;
+    private UpdateListMessageProcessor $processor;
 
     protected function setUp(): void
     {
@@ -127,18 +115,14 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     private function getMessage(array $body, string $messageId = ''): MessageInterface
     {
-        $message = $this->createMock(MessageInterface::class);
-        $message->expects(self::once())
-            ->method('getBody')
-            ->willReturn(JSON::encode($body));
-        $message->expects(self::any())
-            ->method('getMessageId')
-            ->willReturn($messageId);
+        $message = new Message();
+        $message->setBody($body);
+        $message->setMessageId($messageId);
 
         return $message;
     }
 
-    private function expectGetSplitter(RequestType $requestType, ?FileSplitterInterface $splitter)
+    private function expectGetSplitter(RequestType $requestType, ?FileSplitterInterface $splitter): void
     {
         $this->splitterRegistry->expects(self::once())
             ->method('getSplitter')
@@ -146,7 +130,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($splitter);
     }
 
-    private function expectGetClassifier(RequestType $requestType, ?ChunkFileClassifierInterface $classifier)
+    private function expectGetClassifier(RequestType $requestType, ?ChunkFileClassifierInterface $classifier): void
     {
         $this->chunkFileClassifierRegistry->expects(self::once())
             ->method('getClassifier')
@@ -160,7 +144,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         string $fileName,
         int $chunkSize,
         array $chunkFiles
-    ) {
+    ): void {
         $initialChunkSize = 300;
         $initialChunkSizePerSection = ['included' => 400];
         $chunkSizePerSection = ['included' => 20];
@@ -191,7 +175,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         string $fileName,
         int $chunkSize,
         \Exception $exception
-    ) {
+    ): void {
         $initialChunkSize = 1000;
         $splitter->expects(self::once())
             ->method('getChunkSize')
@@ -208,7 +192,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willThrowException($exception);
     }
 
-    private function expectRunUniqueJob(string $messageId, int $operationId, Job $job)
+    private function expectRunUniqueJob(string $messageId, int $operationId, Job $job): void
     {
         $this->jobRunner->expects(self::once())
             ->method('runUnique')
@@ -220,7 +204,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    private function expectCreateDelayedJob(int $operationId, Job $job, int $jobId)
+    private function expectCreateDelayedJob(int $operationId, Job $job, int $jobId): void
     {
         $this->jobRunner->expects(self::once())
             ->method('createDelayed')
@@ -232,7 +216,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    private function expectSaveJob(int $operationId, array $jobData)
+    private function expectSaveJob(int $operationId, array $jobData): void
     {
         $this->jobManager->expects(self::once())
             ->method('saveJob')
@@ -256,28 +240,15 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         return $dependentJobContext;
     }
 
-    public function testGetSubscribedTopics()
+    public function testGetSubscribedTopics(): void
     {
         self::assertEquals(
-            [Topics::UPDATE_LIST],
+            [UpdateListTopic::getName()],
             UpdateListMessageProcessor::getSubscribedTopics()
         );
     }
 
-    public function testShouldRejectInvalidMessage()
-    {
-        $message = $this->getMessage(['key' => 'value']);
-
-        $this->logger->expects(self::once())
-            ->method('critical')
-            ->with('Got invalid message.');
-
-        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectIfSplitterNotFound()
+    public function testShouldRejectIfSplitterNotFound(): void
     {
         $operationId = 123;
         $requestType = ['testRequest'];
@@ -309,7 +280,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRejectIfClassifierNotFound()
+    public function testShouldRejectIfClassifierNotFound(): void
     {
         $operationId = 123;
         $requestType = ['testRequest'];
@@ -346,7 +317,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testSplitterThrowsParsingErrorFileSplitterException()
+    public function testSplitterThrowsParsingErrorFileSplitterException(): void
     {
         $operationId = 123;
         $requestType = ['testRequest'];
@@ -396,7 +367,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testSplitterThrowsFileSplitterException()
+    public function testSplitterThrowsFileSplitterException(): void
     {
         $operationId = 123;
         $requestType = ['testRequest'];
@@ -439,7 +410,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testSplitterThrowsUnexpectedException()
+    public function testSplitterThrowsUnexpectedException(): void
     {
         $operationId = 123;
         $requestType = ['testRequest'];
@@ -487,7 +458,10 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testProcessWhenSplitterCompletedWork()
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessWhenSplitterCompletedWork(): void
     {
         $messageId = 'testMassage';
         $operationId = 123;
@@ -503,7 +477,8 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'version'               => $version,
             'fileName'              => $fileName,
             'chunkSize'             => $chunkSize,
-            'includedDataChunkSize' => 20
+            'includedDataChunkSize' => 20,
+            'aggregateTime' => 0,
         ];
         $message = $this->getMessage($body, $messageId);
         $aggregateTime = 100;
@@ -552,7 +527,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
-                Topics::UPDATE_LIST_FINISH,
+                UpdateListFinishTopic::getName(),
                 [
                     'operationId' => $operationId,
                     'entityClass' => $entityClass,
@@ -590,7 +565,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessLastIteration()
+    public function testProcessLastIteration(): void
     {
         $messageId = 'testMassage';
         $operationId = 123;
@@ -669,7 +644,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
-                Topics::UPDATE_LIST_FINISH,
+                UpdateListFinishTopic::getName(),
                 [
                     'operationId' => $operationId,
                     'entityClass' => $entityClass,
@@ -713,7 +688,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testProcessNextIteration()
+    public function testProcessNextIteration(): void
     {
         $messageId = 'testMassage';
         $operationId = 123;
@@ -731,7 +706,8 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 'version'               => $version,
                 'fileName'              => $fileName,
                 'chunkSize'             => $chunkSize,
-                'includedDataChunkSize' => $includedDataChunkSize
+                'includedDataChunkSize' => $includedDataChunkSize,
+                'aggregateTime'         => 0,
             ],
             $messageId
         );
@@ -789,7 +765,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
-        self::assertMessageSent(Topics::UPDATE_LIST, [
+        self::assertMessageSent(UpdateListTopic::getName(), [
             'operationId'           => $operationId,
             'entityClass'           => $entityClass,
             'requestType'           => $requestType,
@@ -802,7 +778,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testProcessWhenPartialSplitterCompletedWork()
+    public function testProcessWhenPartialSplitterCompletedWork(): void
     {
         $messageId = 'testMassage';
         $operationId = 123;
@@ -818,7 +794,8 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 'version'               => '1.1',
                 'fileName'              => $fileName,
                 'chunkSize'             => $chunkSize,
-                'includedDataChunkSize' => 20
+                'includedDataChunkSize' => 20,
+                'aggregateTime'         => 0,
             ],
             $messageId
         );
@@ -863,13 +840,13 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
-        self::assertEmptyMessages(Topics::UPDATE_LIST);
+        self::assertEmptyMessages(UpdateListTopic::getName());
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessWithIncludedData()
+    public function testProcessWithIncludedData(): void
     {
         $messageId = 'testMassage';
         $operationId = 123;
@@ -885,7 +862,8 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'version'               => $version,
             'fileName'              => $fileName,
             'chunkSize'             => $chunkSize,
-            'includedDataChunkSize' => 20
+            'includedDataChunkSize' => 20,
+            'aggregateTime'         => 0,
         ];
         $message = $this->getMessage($body, $messageId);
         $aggregateTime = 100;
@@ -935,7 +913,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
-                Topics::UPDATE_LIST_FINISH,
+                UpdateListFinishTopic::getName(),
                 [
                     'operationId' => $operationId,
                     'entityClass' => $entityClass,
@@ -981,7 +959,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldRejectIfIncludeAccessorNotFound()
+    public function testShouldRejectIfIncludeAccessorNotFound(): void
     {
         $messageId = 'testMassage';
         $operationId = 123;

@@ -25,6 +25,7 @@ class AttachmentManager
     public const SMALL_IMAGE_HEIGHT = 32;
     public const THUMBNAIL_WIDTH = 110;
     public const THUMBNAIL_HEIGHT = 80;
+    public const DEFAULT_FORMAT = '';
 
     private FileUrlProviderInterface $fileUrlProvider;
 

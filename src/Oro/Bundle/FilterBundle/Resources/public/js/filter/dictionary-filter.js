@@ -110,6 +110,38 @@ define(function(require) {
             DictionaryFilter.__super__.initialize.call(this, options);
         },
 
+        _toggleSelect2Element: function() {
+            const container = this.$(this.criteriaSelector);
+            const type = container.find(this.criteriaValueSelectors.type).val();
+            const select2element = this.$el.find(this.elementSelector);
+
+            if (this.isEmptyType(type)) {
+                // see original _handleEmptyFilter
+                select2element.hide();
+                select2element.inputWidget('val', '');
+            } else {
+                select2element.show();
+            }
+        },
+
+        /**
+         * @inheritdoc
+         */
+        _updateValueFieldVisibility: function() {
+            this._toggleSelect2Element();
+            return DictionaryFilter.__super__._updateValueFieldVisibility.call(this);
+        },
+
+        /**
+         * Handle empty filter selection
+         *
+         * @protected
+         */
+        _handleEmptyFilter: function() {
+            this._toggleSelect2Element();
+            return DictionaryFilter.__super__._handleEmptyFilter.call(this);
+        },
+
         /**
          * @inheritdoc
          */
@@ -196,6 +228,7 @@ define(function(require) {
             this.applySelect2();
             this._updateCriteriaHint();
             this._updateDOMValue();
+            this._handleEmptyFilter();
             this.renderDeferred.resolve();
             this.trigger('update');
         },

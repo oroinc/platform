@@ -20,20 +20,11 @@ class Renderer implements FormRendererInterface
      */
     protected $engine;
 
-    /**
-     * @var array
-     */
-    private $blockNameHierarchyMap = [];
+    protected array $blockNameHierarchyMap = [];
 
-    /**
-     * @var array
-     */
-    private $hierarchyLevelMap = [];
+    protected array $hierarchyLevelMap = [];
 
-    /**
-     * @var array
-     */
-    private $variableStack = [];
+    protected array $variableStack = [];
 
     public function __construct(FormRendererEngineInterface $engine)
     {

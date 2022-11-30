@@ -33,17 +33,23 @@ class EmailRepositoryTest extends WebTestCase
         self::assertEquals($email->getMessageId(), $this->getRepository()->findMessageIdByEmailId($email->getId()));
     }
 
-    public function testGetEmailsByEmailAddressByFromAddress(): void
+    public function testGetEmailUserIdsByEmailAddressQbByFromAddress(): void
     {
         $userEmailAddress = $this->getReference('simple_user')->getEmail();
-        $emails = $this->getRepository()->getEmailsByEmailAddress($userEmailAddress);
-        self::assertCount(10, $emails);
+        $emailUsers = $this->getRepository()
+            ->getEmailUserIdsByEmailAddressQb($userEmailAddress)
+            ->getQuery()
+            ->getArrayResult();
+        self::assertCount(10, $emailUsers);
     }
 
-    public function testGetEmailsByEmailAddressByCcAddress(): void
+    public function testGetEmailUserIdsByEmailAddressQbByCcAddress(): void
     {
-        $emails = $this->getRepository()->getEmailsByEmailAddress('cc1@example.com');
-        self::assertCount(1, $emails);
+        $emailUsers = $this->getRepository()
+            ->getEmailUserIdsByEmailAddressQb('cc1@example.com')
+            ->getQuery()
+            ->getArrayResult();
+        self::assertCount(1, $emailUsers);
     }
 
     public function testIsEmailPublicForPublicEmail(): void

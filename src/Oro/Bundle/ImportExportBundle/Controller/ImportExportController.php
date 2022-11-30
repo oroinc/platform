@@ -34,6 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -102,25 +103,26 @@ class ImportExportController extends AbstractController
     public function importValidateExportTemplateFormAction(Request $request)
     {
         $configAlias = $request->get('alias');
-
         if (!$configAlias) {
             throw new BadRequestHttpException('Alias should be provided in request');
         }
 
         $isValidate = $request->request->getBoolean('isValidateJob', false);
-
         $entityName = $request->get('entity');
-
         $configurationsByAlias = $this->getImportConfigurations($configAlias);
-
         $configsWithForm = [];
-
         $importForm = null;
+        $aclChecker = $this->get('security.authorization_checker');
+        $entityVisibility = [];
 
         foreach ($configurationsByAlias as $configuration) {
-            $form = $this->getImportForm($configuration->getEntityClass());
+            $className = $configuration->getEntityClass();
+            $oid = new ObjectIdentity('entity', $className);
+            $entityVisibility[$className] = $aclChecker->isGranted('CREATE', $oid)
+                || $aclChecker->isGranted('EDIT', $oid);
+            $form = $this->getImportForm($className);
 
-            if ($configuration->getEntityClass() === $entityName) {
+            if ($className === $entityName) {
                 $importForm = $form;
             }
 
@@ -153,7 +155,8 @@ class ImportExportController extends AbstractController
             'options' => $this->getOptionsFromRequest($request),
             'alias' => $configAlias,
             'configsWithForm' => $configsWithForm,
-            'chosenEntityName' => $entityName
+            'chosenEntityName' => $entityName,
+            'entityVisibility' => $entityVisibility
         ];
     }
 
@@ -180,7 +183,7 @@ class ImportExportController extends AbstractController
      *
      * @param Request $request
      *
-     * @return array
+     * @return array|Response
      */
     public function importValidateFormAction(Request $request)
     {

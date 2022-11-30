@@ -18,6 +18,8 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
 
     private ApplicationState $applicationState;
 
+    private TranslationStrategyInterface $strategy;
+
     /**
      * @param LanguageProvider $languageProvider
      * @param ApplicationState $applicationState
@@ -26,6 +28,11 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
     {
         $this->languageProvider = $languageProvider;
         $this->applicationState = $applicationState;
+    }
+
+    public function setStrategy(TranslationStrategyInterface $strategy): void
+    {
+        $this->strategy = $strategy;
     }
 
     /**
@@ -51,9 +58,15 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
     {
         // default strategy has only one fallback to default locale
         if ($this->applicationState->isInstalled()) {
-            $locales = [];
-            foreach ($this->languageProvider->getAvailableLanguageCodes() as $code) {
-                $locales[Configuration::DEFAULT_LOCALE][$code] = [];
+            $locales = $this->strategy->getLocaleFallbacks();
+            $nestedDefaultLocale = $locales[Configuration::DEFAULT_LOCALE][Configuration::DEFAULT_LOCALE] ?? [];
+            if ($nestedDefaultLocale) {
+                unset($locales[Configuration::DEFAULT_LOCALE][Configuration::DEFAULT_LOCALE]);
+                $locales[Configuration::DEFAULT_LOCALE] = array_merge(
+                    [Configuration::DEFAULT_LOCALE => []],
+                    $nestedDefaultLocale,
+                    $locales[Configuration::DEFAULT_LOCALE]
+                );
             }
         } else {
             $locales = [

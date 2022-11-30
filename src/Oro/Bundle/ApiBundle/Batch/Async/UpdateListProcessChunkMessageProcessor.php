@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\Async;
 
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic;
 use Oro\Bundle\ApiBundle\Batch\Encoder\DataEncoderRegistry;
 use Oro\Bundle\ApiBundle\Batch\FileLockManager;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
@@ -16,10 +17,10 @@ use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -54,6 +55,9 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var JobManagerInterface */
+    private $jobManager;
+
     public function __construct(
         JobRunner $jobRunner,
         FileManager $fileManager,
@@ -76,12 +80,17 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         $this->logger = $logger;
     }
 
+    public function setJobManager(JobManagerInterface $jobManager): void
+    {
+        $this->jobManager = $jobManager;
+    }
+
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::UPDATE_LIST_PROCESS_CHUNK];
+        return [UpdateListProcessChunkTopic::getName()];
     }
 
     /**
@@ -90,33 +99,18 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $startTimestamp = microtime(true);
-        $body = JSON::decode($message->getBody());
-        if (!isset(
-            $body['operationId'],
-            $body['entityClass'],
-            $body['requestType'],
-            $body['version'],
-            $body['jobId'],
-            $body['fileName'],
-            $body['fileIndex'],
-            $body['firstRecordOffset'],
-            $body['sectionName']
-        )) {
-            $this->logger->critical('Got invalid message.');
-
-            return self::REJECT;
-        }
+        $messageBody = $message->getBody();
 
         $deleteChunkFile = true;
         $result = $this->jobRunner->runDelayed(
-            $body['jobId'],
-            function (JobRunner $jobRunner, Job $job) use ($body, $startTimestamp, &$deleteChunkFile) {
-                return $this->processJob($jobRunner, $job, $body, $startTimestamp, $deleteChunkFile);
+            $messageBody['jobId'],
+            function (JobRunner $jobRunner, Job $job) use ($messageBody, $startTimestamp, &$deleteChunkFile) {
+                return $this->processJob($jobRunner, $job, $messageBody, $startTimestamp, $deleteChunkFile);
             }
         );
 
         if ($deleteChunkFile) {
-            $this->processingHelper->safeDeleteFile($body['fileName']);
+            $this->processingHelper->safeDeleteFile($messageBody['fileName']);
         }
 
         return $result ? self::ACK : self::REJECT;
@@ -154,7 +148,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         $response = $this->handler->handle($request);
 
         $jobData = $job->getData();
-        if ($body['extra_chunk'] ?? false) {
+        if ($body['extra_chunk']) {
             $jobData['extra_chunk'] = true;
         }
         $previousAggregateTime = $jobData['summary']['aggregateTime'] ?? 0;
@@ -172,8 +166,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         $job->setData($jobData);
 
         if ($response->isRetryAgain()) {
-            $this->logger->info(sprintf('The retry requested. Reason: %s', $response->getRetryReason()));
-            $retryResult = $this->retryChunk($jobRunner, $job, $body, $chunkFile);
+            $retryResult = $this->retryChunk($jobRunner, $job, $body, $chunkFile, $response->getRetryReason());
             if ($retryResult) {
                 $deleteChunkFile = false;
             }
@@ -218,8 +211,11 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         JobRunner $jobRunner,
         Job $job,
         array $body,
-        ChunkFile $chunkFile
+        ChunkFile $chunkFile,
+        string $retryReason
     ): bool {
+        $this->logger->info(sprintf('The retry requested. Reason: %s', $retryReason));
+
         $chunkCount = $this->updateChunkCount($body['operationId'], 1);
         if (null === $chunkCount) {
             return false;
@@ -227,12 +223,17 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
 
         $jobRunner->createDelayed(
             $this->getRetryChunkJobName($job->getName()),
-            function (JobRunner $jobRunner, Job $job) use ($body, $chunkFile) {
+            function (JobRunner $jobRunner, Job $job) use ($body, $chunkFile, $retryReason) {
+                $jobData = $job->getData();
+                $jobData['retryReason'] = $retryReason;
+                $job->setData($jobData);
+                $this->jobManager->saveJob($job);
+
                 $this->processingHelper->sendProcessChunkMessage(
                     $body,
                     $job,
                     $chunkFile,
-                    $body['extra_chunk'] ?? false
+                    $body['extra_chunk']
                 );
 
                 return true;
@@ -336,13 +337,9 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
             return null;
         }
 
-        $chunkCount = null;
         try {
-            $data = JsonUtil::decode($this->fileManager->getFileContent($infoFileName));
-            $chunkCount = $data['chunkCount'] + $numberOfNewChunks;
-            $data['chunkCount'] = $chunkCount;
-            $this->fileManager->writeToStorage(JsonUtil::encode($data), $infoFileName);
-        } catch (\Exception $e) {
+            $chunkCount = $this->writeChunkCount($infoFileName, $numberOfNewChunks);
+        } catch (\Throwable $e) {
             $chunkCount = null;
             $this->logger->error(
                 sprintf('Cannot update the chunk count. Reason: Failed to update the info file "%s".', $infoFileName),
@@ -351,6 +348,16 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         } finally {
             $this->fileLockManager->releaseLock($lockFileName);
         }
+
+        return $chunkCount;
+    }
+
+    private function writeChunkCount(string $infoFileName, int $numberOfNewChunks): int
+    {
+        $data = JsonUtil::decode($this->fileManager->getFileContent($infoFileName));
+        $chunkCount = $data['chunkCount'] + $numberOfNewChunks;
+        $data['chunkCount'] = $chunkCount;
+        $this->fileManager->writeToStorage(JsonUtil::encode($data), $infoFileName);
 
         return $chunkCount;
     }

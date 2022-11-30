@@ -7,7 +7,10 @@ use Oro\Bundle\LayoutBundle\Cache\PlaceholderRenderer;
 use Oro\Bundle\LayoutBundle\Cache\RenderCache;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
+use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 use Oro\Component\Layout\Renderer;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Form\FormView;
@@ -17,41 +20,44 @@ use Twig\Environment;
  * Heavily inspired by TwigRenderer class.
  * Layout blocks caching is provided.
  *
- * @see \Symfony\Bridge\Twig\Form\TwigRenderer
+ * @see \Symfony\Component\Form\FormRenderer
  */
-class TwigRenderer extends Renderer implements TwigRendererInterface
+class TwigRenderer extends Renderer implements TwigRendererInterface, LoggerAwareInterface
 {
-    /**
-     * @var array
-     */
-    private $blockHierarchy = [];
+    use LoggerAwareTrait;
 
     /**
-     * Used to determine when we need to render a placeholder.
-     *
-     * @var int
+     * Stores TWIG renderer engine in a clear state.
      */
-    private $cachedBlockNestingLevel = 0;
+    private TwigRendererEngineInterface $twigRendererEngine;
+
+    private RenderCache $renderCache;
+
+    private PlaceholderRenderer $placeholderRenderer;
+
+    private ?Environment $environment = null;
 
     /**
-     * @var TwigRendererEngineInterface
+     * @var FormRendererEngineInterface
      */
     protected $engine;
 
-    /**
-     * @var RenderCache
-     */
-    private $renderCache;
+    protected array $blockHierarchy = [];
 
     /**
-     * @var PlaceholderRenderer
+     * Used to determine when we need to render a placeholder.
      */
-    private $placeholderRenderer;
+    protected int $cachedBlockNestingLevel = 0;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    protected array $blockHierarchyByEnv = [];
+
+    protected array $blockNameHierarchyMapByEnv = [];
+
+    protected array $hierarchyLevelMapByEnv = [];
+
+    protected array $variableStackByEnv = [];
+
+    protected array $engineByEnv = [];
 
     public function __construct(
         TwigRendererEngineInterface $engine,
@@ -59,19 +65,40 @@ class TwigRenderer extends Renderer implements TwigRendererInterface
         PlaceholderRenderer $placeholderRenderer,
         LoggerInterface $logger
     ) {
+        $this->twigRendererEngine = $engine;
         $this->renderCache = $renderCache;
         $this->placeholderRenderer = $placeholderRenderer;
         $this->logger = $logger;
 
-        parent::__construct($engine);
+        parent::__construct(clone $engine);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * Switches from the locally cached data and TWIG renderer engine associated with current environment to the
+     * corresponding data and TWIG renderer engine of the new $environment.
      */
     public function setEnvironment(Environment $environment)
     {
+        // Stores current local cache and TWIG renderer engine.
+        $currentEnv = $this->environment ? spl_object_hash($this->environment) : null;
+        $this->blockHierarchyByEnv[$currentEnv] = $this->blockHierarchy;
+        $this->blockNameHierarchyMapByEnv[$currentEnv] = $this->blockNameHierarchyMap;
+        $this->hierarchyLevelMapByEnv[$currentEnv] = $this->hierarchyLevelMap;
+        $this->variableStackByEnv[$currentEnv] = $this->variableStack;
+        $this->engineByEnv[$currentEnv] = $this->engine;
+
+        // Switches to the new local cache and TWIG renderer engine.
+        $newEnv = spl_object_hash($environment);
+        $this->blockHierarchy = $this->blockHierarchyByEnv[$newEnv] ?? [];
+        $this->blockNameHierarchyMap = $this->blockNameHierarchyMapByEnv[$newEnv] ?? [];
+        $this->hierarchyLevelMap = $this->hierarchyLevelMapByEnv[$newEnv] ?? [];
+        $this->variableStack = $this->variableStackByEnv[$newEnv] ?? [];
+        $this->engine = $this->engineByEnv[$newEnv] ?? clone $this->twigRendererEngine;
         $this->engine->setEnvironment($environment);
+
+        $this->environment = $environment;
 
         return $this;
     }
@@ -123,7 +150,6 @@ class TwigRenderer extends Renderer implements TwigRendererInterface
 
         return $html;
     }
-
 
     private function saveCacheItem(CacheItem $item, string $html, LayoutCacheMetadata $metadata): void
     {

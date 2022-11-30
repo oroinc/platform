@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Languages;
 use Symfony\Component\Intl\Locales;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -35,8 +36,29 @@ class LanguageCodeFormatter
         }
 
         $lang = $this->localeSettings->getLanguage();
+        try {
+            return $this->postProcessLanguageName(Languages::getName($code, $lang), $code);
+        } catch (MissingResourceException $e) {
+            return $code;
+        }
+    }
 
-        return Languages::exists($code) ? Languages::getName($code, $lang) : $code;
+    /**
+     * If its custom language code we should append custom code suffix
+     *
+     * en_plastimo    -> English Plastimo
+     * en_CA_plastimo -> Canadian English Plastimo
+     */
+    private function postProcessLanguageName(string $languageName, string $code): string
+    {
+        $codePieces = explode('_', $code);
+        $diff = \count($codePieces) - \count(explode(' ', $languageName));
+
+        if ($diff > 0) {
+            $languageName .= ' '.ucwords(implode(' ', array_slice($codePieces, -$diff)));
+        }
+
+        return $languageName;
     }
 
     /**
@@ -51,6 +73,36 @@ class LanguageCodeFormatter
 
         $lang = $this->localeSettings->getLanguage();
 
-        return Locales::exists($code) ? Locales::getName($code, $lang) : $code;
+        return Locales::exists($code) ?
+            Locales::getName($code, $lang) :
+            $this->formatNotExistsLocaleCode($code, $lang);
+    }
+
+    /**
+     * Format partially intl supported locale to the human readable format
+     *
+     * en_plastimo => English Plastimo
+     * en_CA_plastimo => English (Canada) Plastimo
+     */
+    private function formatNotExistsLocaleCode(string $code, string $lang): string
+    {
+        $pieces = explode('_', $code);
+        $piecesAmount = \count($pieces);
+
+        if (1 === $piecesAmount) {
+            return $code;
+        }
+
+        if ($piecesAmount > 1) {
+            for ($i = $piecesAmount - 1; $i > 0; --$i) {
+                $partialCode = implode('_', array_slice($pieces, 0, $i));
+                if (Locales::exists($partialCode)) {
+                    return Locales::getName($partialCode, $lang)
+                        . ' ' . ucwords(implode(' ', array_slice($pieces, $i)));
+                }
+            }
+        }
+
+        return $code;
     }
 }

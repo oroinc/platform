@@ -3,22 +3,24 @@
 namespace Oro\Bundle\WorkflowBundle\Async;
 
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
-use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Transition trigger message DTO.
+ */
 class TransitionTriggerMessage
 {
-    const TRANSITION_TRIGGER = 'transitionTrigger';
-    const MAIN_ENTITY = 'mainEntity';
+    public const TRANSITION_TRIGGER = 'transitionTrigger';
+    public const MAIN_ENTITY = 'mainEntity';
 
     /** @var int */
     protected $triggerId;
 
-    /** @var mixed */
+    /** @var array|string|int|null */
     protected $mainEntityId;
 
     /**
      * @param int $triggerId
-     * @param mixed $mainEntityId
+     * @param array|string|int|null $mainEntityId
      */
     protected function __construct($triggerId, $mainEntityId)
     {
@@ -28,12 +30,17 @@ class TransitionTriggerMessage
 
     /**
      * @param BaseTransitionTrigger $trigger
-     * @param mixed $mainEntityId
+     * @param array|string|int|null $mainEntityId
      * @return static
      */
     public static function create(BaseTransitionTrigger $trigger, $mainEntityId = null)
     {
         return new static($trigger->getId(), $mainEntityId);
+    }
+
+    public static function createFromArray(array $data): static
+    {
+        return new static($data[self::TRANSITION_TRIGGER] ?? null, $data[self::MAIN_ENTITY] ?? null);
     }
 
     /**
@@ -60,7 +67,7 @@ class TransitionTriggerMessage
     }
 
     /**
-     * @return mixed
+     * @return array|string|int|null
      */
     public function getMainEntityId()
     {
@@ -68,7 +75,7 @@ class TransitionTriggerMessage
     }
 
     /**
-     * {@inheritdoc}
+     * return array
      */
     public function toArray()
     {
