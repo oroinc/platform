@@ -30,6 +30,11 @@ class OroTestFrameworkBundleInstaller implements
 {
     use ScopeExtensionAwareTrait;
 
+    public const ENUM_FIELD_NAME = 'testEnumField';
+    public const ENUM_FIELD_CODE = 'test_enum_code';
+    public const MULTIENUM_FIELD_NAME = 'testMultienumField';
+    public const MULTIENUM_FIELD_CODE = 'test_multienum_code';
+
     /** @var ActivityExtension */
     protected $activityExtension;
 
@@ -446,6 +451,36 @@ class OroTestFrameworkBundleInstaller implements
             'biO2MNDOwner',
             'name',
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        );
+        // enum field
+        $this->extendExtension->addEnumField(
+            $schema,
+            $table1,
+            self::ENUM_FIELD_NAME,
+            self::ENUM_FIELD_CODE,
+            false,
+            false,
+            [
+                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
+                'entity' => ['label' => 'extend.entity.test.test_enum_field'],
+                'attribute' => ['is_attribute' => true, 'searchable' => true, 'filterable' => true],
+                'importexport' => ['excluded' => true]
+            ]
+        );
+        // multi-enum field
+        $this->extendExtension->addEnumField(
+            $schema,
+            $table1,
+            self::MULTIENUM_FIELD_NAME,
+            self::MULTIENUM_FIELD_CODE,
+            true,
+            false,
+            [
+                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
+                'entity' => ['label' => 'extend.entity.test.test_multienum_field'],
+                'attribute' => ['is_attribute' => true, 'searchable' => true, 'filterable' => true],
+                'importexport' => ['excluded' => true]
+            ]
         );
     }
 

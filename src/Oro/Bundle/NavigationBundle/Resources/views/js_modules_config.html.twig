@@ -1,7 +1,7 @@
 {% if app.debug %}
     {% set routes = path('oro_navigation_js_routing_js', {_format: 'json'}) %}
 {% else %}
-    {% set routes = asset('media/js/' ~ data.js_routing_filename_prefix ~ 'routes.json') %}
+    {% set routes = asset('media/js/' ~ data.js_routing_filename_prefix ~ 'routes.json', 'routing') %}
 {% endif %}
 {% import '@OroAsset/Asset.html.twig' as Asset %}
 {{ Asset.js_modules_config({
