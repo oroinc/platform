@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -32,8 +34,6 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
      */
     public function execute(LoggerInterface $logger)
     {
-        $enumClass = null;
-
         $sql = 'SELECT f.id, f.data
             FROM oro_entity_config_field as f
             INNER JOIN oro_entity_config as e ON f.entity_id = e.id
@@ -43,9 +43,13 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
 
         $fieldRow = $this->connection->fetchAssoc($sql, [$this->entityClass, $this->enumField]);
 
-        if ($fieldRow) {
-            $enumClass = $this->deleteEnumData($logger, $fieldRow['id'], $fieldRow['data']);
+        if (!$fieldRow) {
+            $logger->info("Enum field '{$this->enumField}' from Entity '{$this->entityClass}' is not found");
+
+            return;
         }
+
+        $enumClass = $this->deleteEnumData($logger, $fieldRow['id'], $fieldRow['data']);
 
         if ($enumClass) {
             $sql = 'SELECT e.data FROM oro_entity_config as e WHERE e.class_name = ? LIMIT 1';
@@ -61,6 +65,9 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
      * @param string $id
      * @param string $data
      * @return null|string
+     * @throws DBALException
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function deleteEnumData(LoggerInterface $logger, $id, $data)
     {
@@ -96,12 +103,19 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
      * @param LoggerInterface $logger
      * @param string $enumClass
      * @param string $data
+     * @throws DBALException
+     * @throws Exception
      */
     protected function updateEntityData(LoggerInterface $logger, $enumClass, $data)
     {
         $data = $data ? $this->connection->convertToPHPValue($data, Types::ARRAY) : [];
 
         $extendKey = sprintf('manyToOne|%s|%s|%s', $this->entityClass, $enumClass, $this->enumField);
+        if (isset($data['extend']['relation'][$extendKey])) {
+            unset($data['extend']['relation'][$extendKey]);
+        }
+        // for Multi-Enum field type.
+        $extendKey = sprintf('manyToMany|%s|%s|%s', $this->entityClass, $enumClass, $this->enumField);
         if (isset($data['extend']['relation'][$extendKey])) {
             unset($data['extend']['relation'][$extendKey]);
         }
@@ -119,7 +133,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException|Exception
      */
     protected function executeQuery(LoggerInterface $logger, $sql, array $parameters = [])
     {
