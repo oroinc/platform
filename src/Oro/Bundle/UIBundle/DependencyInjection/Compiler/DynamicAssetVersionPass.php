@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\UIBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\UIBundle\Asset\RuntimeAssetVersionStrategy;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * This compiler pass can be used to set the dynamic version strategy for an asset package.
+ * This compiler pass can be used to set the runtime version strategy for an asset package.
  */
 class DynamicAssetVersionPass implements CompilerPassInterface
 {
-    const ASSET_VERSION_SERVICE_TEMPLATE = 'assets._version_%s';
-    const ASSET_VERSION_SERVICE_CLASS    = 'Oro\Bundle\UIBundle\Asset\DynamicAssetVersionStrategy';
-    const ASSET_VERSION_MANAGER_SERVICE  = 'oro_ui.dynamic_asset_version_manager';
+    const ASSET_VERSION_SERVICE_TEMPLATE = 'assets._package_%s';
 
     /** @var string */
     protected $packageName;
@@ -35,19 +34,11 @@ class DynamicAssetVersionPass implements CompilerPassInterface
         if (!$container->hasDefinition($assetVersionServiceId)) {
             return;
         }
-        if (!$container->hasDefinition(self::ASSET_VERSION_MANAGER_SERVICE)) {
-            return;
-        }
+        $package = $container->getDefinition($assetVersionServiceId);
 
-        $assetVersionDef = $container->getDefinition($assetVersionServiceId);
-        $assetVersionDef->setClass(self::ASSET_VERSION_SERVICE_CLASS);
-        $assetVersionDef->addMethodCall(
-            'setAssetVersionManager',
-            [new Reference(self::ASSET_VERSION_MANAGER_SERVICE)]
-        );
-        $assetVersionDef->addMethodCall(
-            'setAssetPackageName',
-            [$this->packageName]
-        );
+        $version = new ChildDefinition(RuntimeAssetVersionStrategy::class);
+        $version->setArgument('$packageName', $this->packageName);
+
+        $package->replaceArgument(1, $version);
     }
 }

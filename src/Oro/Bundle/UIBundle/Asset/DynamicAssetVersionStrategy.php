@@ -6,6 +6,7 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 /**
  * Allows to change the version of an asset package at runtime.
+ * @deprecated This class will be removed in 5.1, Use Oro\Bundle\UIBundle\Asset\RuntimeAssetVersionStrategy instead.
  */
 class DynamicAssetVersionStrategy implements VersionStrategyInterface
 {

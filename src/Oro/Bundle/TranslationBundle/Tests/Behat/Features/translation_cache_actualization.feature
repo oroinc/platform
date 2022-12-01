@@ -24,3 +24,15 @@ Feature: Translation cache actualization
     And I click "Update Cache"
     Then I should see oro.notification.massnotification.entity_plural_label in grid with following data:
       | Translated Value | Maintenance Notifications |
+
+  Scenario: JS translations editing for key oro.datagrid.gridView.actions
+    Given I go to System/User Management/Users
+    Then I should see "Options"
+    Then I go to System/Localization/Translations
+    And I filter Key as is equal to "oro.datagrid.gridView.actions"
+    And I edit first record from grid:
+      | Translated Value |  OptionsTranslatedValue |
+    And I click "Update Cache"
+    And I reload the page
+    And I go to System/User Management/Users
+    Then I should see "OptionsTranslatedValue"

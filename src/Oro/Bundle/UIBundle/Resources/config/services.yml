@@ -383,3 +383,11 @@ services:
             - '@url_helper'
             - '@request_stack'
             - '@?request_context'
+
+
+    Oro\Bundle\UIBundle\Asset\RuntimeAssetVersionStrategy:
+        abstract: true
+        arguments:
+            - !abstract 'package name provided by DynamicAssetVersionPass'
+            - '@Oro\Bundle\AssetBundle\VersionStrategy\BuildVersionStrategy'
+            - '@oro_ui.dynamic_asset_version_manager'
