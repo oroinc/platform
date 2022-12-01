@@ -7,6 +7,9 @@ oro_behat_extension:
     ActiveImportFileField:
       selector: ".import-widget-content .tab-pane.active input[id^='oro_importexport_import_file']"
 
+    ActiveImportStrategyField:
+      selector: ".import-widget-content .tab-pane.active select[id^='oro_importexport_import_processorAlias']"
+
     ActiveExportTemplateButton:
       selector: ".import-widget-content .tab-pane.active .export-tmpl-btn"
 

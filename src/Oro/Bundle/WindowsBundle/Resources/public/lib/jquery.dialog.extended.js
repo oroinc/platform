@@ -109,9 +109,6 @@ define(function (require) {
             // remove custom handler
             $(document).off('keydown.dialog', this._onBackspacePress);
             $(window).off('resize.dialog', this._windowResizeHandler);
-
-            // @TODO: Remove this fix when Apple fix caret placement bug
-            this.iOScaretFixer(false);
         },
 
         _makeDraggable: function() {
@@ -120,41 +117,11 @@ define(function (require) {
                 this.options.limitTo === 'viewport' ? 'window': this._limitTo());
         },
 
-        open: function() {
-            this._super();
-
-            // @TODO: Remove this fix when Apple fix caret placement bug
-            this.iOScaretFixer(true);
-        },
-
         close: function() {
             $(window).off('.dialog');
             this._removeMinimizedEl();
 
             this._super();
-
-            // @TODO: Remove this fix when Apple fix caret placement bug
-            this.iOScaretFixer(false);
-        },
-
-        /**
-         * Fix iOS11 bug when the caret is placed outside the input field
-         * @TODO: Remove this fix when Apple fix caret placement bug
-         * @param enabled
-         */
-        iOScaretFixer: function(enabled) {
-            if (_.isMobile() && tools.isIOS()) {
-                if (enabled) {
-                    this.scrollTopPosition = $(document).scrollTop();
-                } else {
-                    if (this.scrollTopPosition) {
-                        $(document).scrollTop(this.scrollTopPosition);
-                    }
-                }
-
-                $('body').toggleClass('iosBugFixCaret', enabled)
-                    .css('top', enabled ? -this.scrollTopPosition : '');
-            }
         },
 
         actionsContainer: function() {
