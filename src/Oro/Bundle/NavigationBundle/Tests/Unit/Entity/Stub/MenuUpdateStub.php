@@ -12,11 +12,9 @@ class MenuUpdateStub implements MenuUpdateInterface
 {
     use MenuUpdateTrait;
 
-    /** @var array */
-    protected $extras = [];
+    protected array $extras = [];
 
-    /** @var array */
-    private $linkAttributes = [];
+    private array $linkAttributes = [];
 
     /**
      * MenuUpdateStub constructor.
@@ -30,24 +28,19 @@ class MenuUpdateStub implements MenuUpdateInterface
     /**
      * {@inheritdoc}
      */
-    public function getExtras()
+    public function getExtras(): array
     {
         return $this->extras;
     }
 
-    /**
-     * @param array $extras
-     *
-     * @return MenuUpdateStub
-     */
-    public function setExtras(array $extras)
+    public function setExtras(array $extras): self
     {
         $this->extras = $extras;
 
         return $this;
     }
 
-    public function setImage($value)
+    public function setImage($value): self
     {
         $this->image = $value;
 
@@ -58,7 +51,7 @@ class MenuUpdateStub implements MenuUpdateInterface
      * @param string $value
      * @return $this
      */
-    public function setDefaultTitle($value)
+    public function setDefaultTitle($value): self
     {
         return $this->setDefaultFallbackValue($this->titles, $value);
     }
@@ -67,7 +60,7 @@ class MenuUpdateStub implements MenuUpdateInterface
      * @param Localization|null $localization
      * @return LocalizedFallbackValue|null
      */
-    public function getTitle(\Oro\Bundle\LocaleBundle\Entity\Localization $localization = null)
+    public function getTitle(Localization $localization = null)
     {
         return $this->getFallbackValue($this->titles, $localization);
     }
@@ -76,7 +69,7 @@ class MenuUpdateStub implements MenuUpdateInterface
      * @param Localization|null $localization
      * @return LocalizedFallbackValue|null
      */
-    public function getDescription(\Oro\Bundle\LocaleBundle\Entity\Localization $localization = null)
+    public function getDescription(Localization $localization = null)
     {
         return $this->getFallbackValue($this->descriptions, $localization);
     }
