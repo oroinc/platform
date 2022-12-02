@@ -150,6 +150,11 @@ define(function(require) {
     };
     Popper.Defaults.onDestroy = () => {};
     Popper.prototype.destroy = _.wrap(Popper.prototype.destroy, function(original, ...rest) {
+        // Popper element is already removed from the DOM
+        // See: https://github.com/floating-ui/floating-ui/blob/v1.16.1/dist/popper.js#L931-L933
+        if (this.options.removeOnDestroy && !document.contains(this.popper)) {
+            this.options.removeOnDestroy = false;
+        }
         this.options.onDestroy(this);
         return original.apply(this, rest);
     });

@@ -24,6 +24,15 @@ define(function(require) {
             StringCell.__super__.constructor.call(this, options);
         },
 
+        _attributes() {
+            const attrs = {};
+
+            if (this.isEditableColumn()) {
+                attrs['data-blank-content'] = null;
+            }
+            return attrs;
+        },
+
         /**
          * @inheritdoc
          */
