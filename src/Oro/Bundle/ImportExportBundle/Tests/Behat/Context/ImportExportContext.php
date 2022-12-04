@@ -735,6 +735,21 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
+     * @When /^(?:|I )import file with strategy "(?P<strategy>([\w\s\.]+))"$/
+     */
+    public function iImportFileWithStrategy($strategy)
+    {
+        $importSubmitButton = $this->openImportModalAndReturnImportSubmitButton();
+        $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
+
+        $option = 'oro_contact.'.\mb_strtolower(str_replace(' ', '_', $strategy));
+        $this->createElement('ActiveImportStrategyField')->selectOption($option);
+
+        $importSubmitButton->press();
+        $this->getDriver()->waitForAjax(240000); // wait max 4 minutes
+    }
+
+    /**
      * Expect that it will show errors
      *
      * @When /^(?:|I )try import file$/
