@@ -35,6 +35,7 @@
 
                     {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
 
+                    {% if entityVisibility[config.entityClass] is not empty %}
                     <li class="nav-item">
                         <a id="importExport{{ shortEntityName ~ tabId }}-tab"
                            href="#importExport{{ shortEntityName ~ tabId }}"
@@ -45,6 +46,7 @@
                            role="tab"
                         >{{ entityLabel }}</a>
                     </li>
+                    {% endif %}
                 {% endfor %}
             </ul>
         </div>
@@ -54,13 +56,18 @@
     <div class="tab-content">
     {% endif %}
 
+        {% set isShown = false %}
         {% for configWithForm in configsWithForm %}
             {% set config = configWithForm.configuration %}
             {% set form = configWithForm.form.createView() %}
             {% set shortEntityName = config.entityClass|basename %}
-            {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
+            {% set isActiveEntity = (entityVisibility[config.entityClass] is not empty and ((chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and isShown == false))) %}
+            {% if isActiveEntity %}
+                {% set isShown = true %}
+            {% endif %}
             {% set strategyTooltip = config.importStrategyTooltip ? config.importStrategyTooltip : 'oro.importexport.import.strategy.tooltip' %}
 
+            {% if entityVisibility[config.entityClass] is not empty %}
             <div id="importExport{{ shortEntityName ~ tabId }}"
                  class="tab-pane{% if isActiveEntity %} active{% endif %}"
                  role="tabpanel"
@@ -170,6 +177,7 @@
                     {{ oro_form_js_validation(form) }}
                 </div>
             </div>
+            {% endif %}
         {% endfor %}
 
     {% if configsWithForm|length > 1 %}

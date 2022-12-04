@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\ImportExport\EventListener;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
+use Oro\Bundle\ImportExportBundle\EventListener\ImportExportHeaderModifier;
 
 /**
  * Adds "uri" rule and header for File after normalization.
@@ -18,12 +19,7 @@ class FileHeadersListener
             return;
         }
 
-        $headers = array_column($event->getHeaders(), 'value');
-        if (!in_array('uri', $headers, false)) {
-            $event->addHeader(['value' => 'uri', 'order' => 20]);
-            $event->setRule('URI', ['value' => 'uri', 'order' => 20]);
-        }
-
+        ImportExportHeaderModifier::addHeader($event, 'uri', 'URI');
         $event->setRule('UUID', ['value' => 'uuid', 'order' => 30]);
     }
 }

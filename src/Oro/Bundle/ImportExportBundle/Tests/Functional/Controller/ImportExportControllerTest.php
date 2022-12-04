@@ -320,7 +320,8 @@ class ImportExportControllerTest extends WebTestCase
                 'options' => [],
                 'alias' => 'oro_test',
                 'configsWithForm' => [],
-                'chosenEntityName' => \stdClass::class
+                'chosenEntityName' => \stdClass::class,
+                'entityVisibility' => []
             ],
             $controller->importValidateExportTemplateFormAction(
                 new Request(['alias' => 'oro_test', 'entity' => \stdClass::class])
@@ -358,7 +359,10 @@ class ImportExportControllerTest extends WebTestCase
                         ])
                     ]
                 ],
-                'chosenEntityName' => \stdClass::class
+                'chosenEntityName' => \stdClass::class,
+                'entityVisibility' => [
+                    'stdClass' => true
+                ]
             ],
             $controller->importValidateExportTemplateFormAction(
                 new Request(['alias' => 'oro_test', 'entity' => \stdClass::class])
