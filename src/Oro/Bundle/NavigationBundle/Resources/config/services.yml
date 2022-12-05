@@ -364,13 +364,19 @@ services:
     Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface:
         alias: oro_navigation.chain_breadcrumb_manager
 
-    oro_navigation.menu_update.builder.menu_default_visibility:
-        class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
+    oro_navigation.menu.menu_update_builder:
+        class: Oro\Bundle\NavigationBundle\Menu\MenuUpdateBuilder
         arguments:
-            - '@oro_locale.helper.default_locale_localization'
             - '@oro_navigation.provider.menu_update_provider'
+            - '@oro_navigation.menu_update_applier'
+            - '@event_dispatcher'
         tags:
             - { name: oro_menu.builder, priority: 100 }
+
+    oro_navigation.menu_update_applier:
+        class: Oro\Bundle\NavigationBundle\MenuUpdateApplier\MenuUpdateApplier
+        arguments:
+            - '@oro_locale.helper.default_locale_localization'
 
     oro_navigation.manager.menu_update:
         class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
@@ -384,7 +390,6 @@ services:
 
     oro_navigation.menu_manipulator:
         class: Knp\Menu\Util\MenuManipulator
-        public: false
 
     oro_navigation.extension.datasource.menu:
         class: Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource
@@ -431,7 +436,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator
         arguments:
             - '@oro_menu.builder_chain'
-            - '@oro_locale.helper.localization'
+            - '@oro_navigation.menu_update_applier'
         tags:
             - { name: validator.constraint_validator }
 
@@ -539,3 +544,13 @@ services:
             - '@router'
         tags:
             - { name: oro_featuretogle.feature, feature: email }
+
+    oro_navigation.menu.hide_empty_items_builder:
+        class: Oro\Bundle\NavigationBundle\Menu\HideEmptyItemsBuilder
+        tags:
+            - { name: oro_menu.builder, priority: 270 }
+
+    oro_navigation.menu.divider_builder:
+        class: Oro\Bundle\NavigationBundle\Menu\DividerBuilder
+        tags:
+            - { name: oro_menu.builder, priority: 270 }

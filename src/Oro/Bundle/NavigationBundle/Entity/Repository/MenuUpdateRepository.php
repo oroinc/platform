@@ -43,16 +43,16 @@ class MenuUpdateRepository extends ServiceEntityRepository
         $scopeIds = array_reverse($scopeIds);
 
         $qb = $this->createQueryBuilder('u');
-        $qb->select('u')
+        $query = $qb->select('u')
             ->where($qb->expr()->eq('u.menu', ':menuName'))
             ->andWhere($qb->expr()->eq('u.scope', ':scope'))
             ->orderBy('u.id')
-            ->setParameter('menuName', $menuName, Types::STRING);
+            ->setParameter('menuName', $menuName, Types::STRING)
+            ->getQuery();
 
         foreach ($scopeIds as $scopeId) {
-            $menuUpdates[] = $qb
+            $menuUpdates[] = $query
                 ->setParameter('scope', $scopeId, Types::INTEGER)
-                ->getQuery()
                 ->getResult();
         }
 

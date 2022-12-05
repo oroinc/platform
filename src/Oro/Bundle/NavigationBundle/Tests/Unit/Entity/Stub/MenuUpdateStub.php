@@ -16,11 +16,12 @@ class MenuUpdateStub implements MenuUpdateInterface
 
     private array $linkAttributes = [];
 
-    /**
-     * MenuUpdateStub constructor.
-     */
-    public function __construct()
+    public function __construct(?int $id = null)
     {
+        if ($id !== null) {
+            $this->id = $id;
+        }
+
         $this->titles = new ArrayCollection();
         $this->descriptions = new ArrayCollection();
     }

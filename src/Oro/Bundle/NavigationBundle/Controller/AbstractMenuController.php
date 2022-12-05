@@ -206,10 +206,7 @@ abstract class AbstractMenuController extends AbstractController
         array $context,
         ItemInterface $menu
     ): array|RedirectResponse {
-        $menuItem = null;
-        if (!$menuUpdate->isCustom()) {
-            $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
-        }
+        $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
 
         $form = $this->createForm(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem]);
 

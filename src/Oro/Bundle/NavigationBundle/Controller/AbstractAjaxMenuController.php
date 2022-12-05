@@ -17,7 +17,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -83,7 +82,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
             ]
         );
         $errors = $this->getValidator()->validate($menuUpdate);
-        if (count($errors)) {
+        if ($errors->count()) {
             return new JsonResponse([
                 'message' => $this->getValidationErrorMessage($errors)
             ], Response::HTTP_BAD_REQUEST);
@@ -312,10 +311,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
         }
     }
 
-    /**
-     * @return MenuUpdateManager
-     */
-    protected function getMenuUpdateManager()
+    protected function getMenuUpdateManager(): MenuUpdateManager
     {
         return $this->get(MenuUpdateManager::class);
     }
@@ -325,19 +321,14 @@ abstract class AbstractAjaxMenuController extends AbstractController
         return $this->get(ScopeManager::class);
     }
 
-    private function getValidationErrorMessage(ConstraintViolationList $errors): string
+    private function getValidationErrorMessage(ConstraintViolationList $constraintViolationList): string
     {
-        $translator = $this->get(TranslatorInterface::class);
-        if ($errors->count()) {
-            $errorArr = $errors->getIterator()->getArrayCopy();
-            $returnMessages = array_map(function (ConstraintViolationInterface $violation) use ($translator) {
-                return $translator->trans($violation->getMessageTemplate(), $violation->getParameters());
-            }, $errorArr);
-
-            return implode("\n", $returnMessages);
+        $returnMessages = [];
+        foreach ($constraintViolationList as $violation) {
+            $returnMessages[] = $violation->getMessage();
         }
 
-        return $translator->trans('oro.navigation.menuupdate.validation_error_message');
+        return implode("\n", $returnMessages);
     }
 
     private function getScopeNormalizer(): ContextNormalizer
@@ -345,10 +336,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
         return $this->get(ContextNormalizer::class);
     }
 
-    /**
-     * @return mixed
-     */
-    private function getValidator()
+    private function getValidator(): ValidatorInterface
     {
         return $this->get(ValidatorInterface::class);
     }
