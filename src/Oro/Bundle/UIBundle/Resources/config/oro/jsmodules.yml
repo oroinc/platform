@@ -1,6 +1,6 @@
 aliases:
     asap$: asap/asap
-    autolinker$: autolinker/dist/Autolinker
+    autolinker$: autolinker/dist/autolinker
     backbone$: backbone/backbone
     base64$: oroui/js/extend/base64
     bootstrap$: oroui/js/bootstrap
