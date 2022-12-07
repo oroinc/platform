@@ -169,10 +169,10 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
             $options
         );
 
-        $event = new ExportPreGetIds($queryBuilder, $options);
+        $event = new ExportPreGetIds($queryBuilder, $options + ['entityName' => $entityName]);
         $this->dispatcher->dispatch($event, Events::BEFORE_EXPORT_GET_IDS);
 
-        $organization = isset($options['organization']) ? $options['organization'] : null;
+        $organization = $options['organization'] ?? null;
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
         $this->applyAcl($queryBuilder);
         $result = $queryBuilder->getQuery()->getResult(AbstractQuery::HYDRATE_ARRAY);
