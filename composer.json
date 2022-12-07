@@ -173,7 +173,7 @@
     "prefer-stable": true,
     "extra": {
         "npm": {
-            "moment": "2.28.*",
+            "moment": "2.29.*",
             "moment-timezone": "0.5.*",
             "jstree": "3.3.*",
             "jquery.cookie": "1.4.1",
@@ -190,7 +190,7 @@
             "Base64": "1.0.*",
             "flotr2": "0.1.0",
             "bean": "1.0.6",
-            "jquery-validation": "1.19.3",
+            "jquery-validation": "1.19.5",
             "backgrid": "0.3.7",
             "numeral": "2.0.6",
             "jquery-form": "4.2.1",
@@ -216,7 +216,7 @@
             "@oroinc/backbone.pageable": "1.2.3-oro1",
             "@oroinc/jquery.nicescroll": "3.6.6",
             "@babel/runtime": "^7.16.3",
-            "core-js": "^3.19.1",
+            "core-js": "3.26.*",
             "whatwg-fetch": "3.1.*"
         },
         "symfony": {
