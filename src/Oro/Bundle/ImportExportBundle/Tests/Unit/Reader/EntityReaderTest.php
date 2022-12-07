@@ -392,7 +392,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
     public function testGetIds()
     {
         $entityName = 'entityName';
-        $options = [];
+        $options = ['entityName' => $entityName];
         $result = [1, 2, 3];
 
         $classMetadata = $this->createMock(ClassMetadata::class);
