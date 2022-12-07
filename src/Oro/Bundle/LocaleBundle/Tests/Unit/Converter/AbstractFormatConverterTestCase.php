@@ -13,6 +13,7 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
     const LOCALE_RU = 'ru';
     const LOCALE_AR = 'ar';
     const LOCALE_PT_BR = 'pt_BR';
+    const LOCALE_ZH_CN = 'zh_CN';
 
     /**
      * @var DateTimeFormatConverterInterface
@@ -72,6 +73,11 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
         [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_PT_BR, null, 'HH:mm:ss'],
         [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_PT_BR, null, 'HH:mm'],
         [\IntlDateFormatter::NONE, null, self::LOCALE_PT_BR, null, 'HH:mm:ss'],
+        [null, null, self::LOCALE_ZH_CN, null, 'y年M月d日 HH:mm'],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_ZH_CN, null, "y年M月d日 HH:mm:ss"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_ZH_CN, null, "y年M月d日"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_ZH_CN, null, "y年M月d日 HH:mm"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_ZH_CN, null, "y年M月d日"],
     ];
 
     protected function setUp(): void

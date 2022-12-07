@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
@@ -154,7 +155,11 @@ class ConstraintsProvider implements ConstraintsProviderInterface
     protected function resolveValidationGroups($groups, FormInterface $form)
     {
         if (!is_string($groups) && is_callable($groups)) {
-            $groups = call_user_func($groups, $form);
+            $groups = $groups($form);
+        }
+
+        if ($groups instanceof GroupSequence) {
+            $groups = (array) $groups->groups;
         }
 
         return (array) $groups;

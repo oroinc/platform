@@ -29,6 +29,48 @@ class MultipleChoice extends AbstractGridFilterItem
     }
 
     /**
+     * @param string $filterItems
+     */
+    public function checkItemsInFilter($filterItems)
+    {
+        $filterItems = array_map('trim', explode(',', $filterItems));
+
+        $this->checkItems($filterItems);
+    }
+
+    /**
+     * @param string $filterItems
+     */
+    public function checkItemsInFilterStrict($filterItems)
+    {
+        $filterItems = array_map('trim', explode(',', $filterItems));
+
+        $this->checkItemsStrict($filterItems);
+    }
+
+    /**
+     * @param array $values Array of checkbox labels(case-sensitive) for check/uncheck
+     */
+    public function checkItemsStrict(array $values)
+    {
+        $this->open();
+        $widget = $this->getWidget();
+        $inputs = $widget->findAll('css', 'li > label');
+
+        foreach ($values as $value) {
+            $item = $this->findElementByTextStrict($inputs, $value);
+
+            self::assertNotNull($item, sprintf('Could not find checkbox with "%s" text', $value));
+
+            $item->click();
+            $this->getDriver()->waitForAjax();
+        }
+
+        // Hide dropdown menu, because of #oro-dropdown-mask cover all page
+        $this->close();
+    }
+
+    /**
      * @param string $value checkbox label to verify
      * @return bool
      */
@@ -45,16 +87,6 @@ class MultipleChoice extends AbstractGridFilterItem
         $this->close();
 
         return $isChecked;
-    }
-
-    /**
-     * @param string $filterItems
-     */
-    public function checkItemsInFilter($filterItems)
-    {
-        $filterItems = array_map('trim', explode(',', $filterItems));
-
-        $this->checkItems($filterItems);
     }
 
     /**
@@ -90,6 +122,26 @@ class MultipleChoice extends AbstractGridFilterItem
         /** @var NodeElement $input */
         foreach ($items as $input) {
             if (stripos($input->getText(), $text) !== false) {
+                return $input;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find element by text (case-sensitive)
+     *
+     * @param NodeElement[] $items
+     * @param string $text Searched text in elements
+     *
+     * @return NodeElement|null
+     */
+    protected function findElementByTextStrict($items, $text)
+    {
+        /** @var NodeElement $input */
+        foreach ($items as $input) {
+            if (strpos($input->getText(), $text) !== false) {
                 return $input;
             }
         }

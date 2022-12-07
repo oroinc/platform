@@ -127,7 +127,11 @@ define(function(require) {
                     this.doRedirect(options.url);
                 }
             } else if (this.options.redirectUrl) {
-                this.doRedirect(this.options.redirectUrl);
+                const {redirectUrlOptions: redirectOptions = {redirect: true}} = this.options;
+                if (redirectOptions.newTab === true) {
+                    redirectOptions.target = '_blank';
+                }
+                this.doRedirect(this.options.redirectUrl, redirectOptions);
             } else {
                 mediator.execute('showLoading');
                 if (this.isTokenProtected()) {

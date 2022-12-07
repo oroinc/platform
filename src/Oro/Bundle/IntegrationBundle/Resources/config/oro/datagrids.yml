@@ -61,8 +61,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                oro.integration.integration.enabled.inactive.label: 0
-                                oro.integration.integration.enabled.active.label: 1
+                                oro.integration.integration.enabled.inactive.label: 'false'
+                                oro.integration.integration.enabled.active.label: 'true'
         actions:
             update:
                 type:         navigate

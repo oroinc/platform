@@ -307,8 +307,9 @@ define(function(require, exports, module) {
          * Process server error response and shows messages on the form elements
          *
          * @param {Object} errors
+         * @param {string?} namePrefix
          */
-        showBackendErrors: function(errors) {
+        showBackendErrors: function(errors, namePrefix) {
             let result = {};
 
             /**
@@ -342,8 +343,8 @@ define(function(require, exports, module) {
                         // skip 'children' level
                         parseBackendErrors(item, path);
                     } else {
-                        _path = path ? (path + '[' + name + ']') : name;
-                        if (_.isEqual(_.keys(item), ['errors']) && _.isArray(item.errors)) {
+                        _path = path ? `${path}[${name}]` : namePrefix ? `${namePrefix}[${name}]` : name;
+                        if ('errors' in item && _.isArray(item.errors)) {
                             // only first error to show
                             result[_path] = item.errors[0];
                         } else if (_.isObject(item)) {
@@ -703,6 +704,7 @@ define(function(require, exports, module) {
         'oroform/js/validator/datetime',
         'oroform/js/validator/email',
         'oroform/js/validator/length',
+        'oroform/js/validator/not-blank-group',
         'oroform/js/validator/notblank',
         'oroform/js/validator/notnull',
         'oroform/js/validator/number',

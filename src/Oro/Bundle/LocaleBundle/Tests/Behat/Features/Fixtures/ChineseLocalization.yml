@@ -1,0 +1,17 @@
+Oro\Bundle\TranslationBundle\Entity\Language:
+    chinese_lang:
+        code: 'zh_CN'
+        enabled: true
+        organization: '@organization'
+        owner: '@admin'
+
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    title_localization_chinese:
+        string: 'Chinese (China)'
+
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    localization_chinese:
+        name: 'Chinese (China)'
+        language: '@chinese_lang'
+        formattingCode: 'zh_CN'
+        titles: ['@title_localization_chinese']
