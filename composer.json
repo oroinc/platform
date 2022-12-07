@@ -188,7 +188,7 @@
             "Base64": "1.1.0",
             "flotr2": "0.1.0",
             "bean": "1.0.15",
-            "jquery-validation": "1.19.3",
+            "jquery-validation": "1.19.5",
             "backgrid": "0.3.8",
             "numeral": "2.0.6",
             "jquery-form": "4.3.0",
@@ -214,7 +214,7 @@
             "@oroinc/backbone.pageable": "1.2.3-oro1",
             "@oroinc/jquery.nicescroll": "3.6.6",
             "@babel/runtime": "^7.16.3",
-            "core-js": "3.19.*"
+            "core-js": "3.26.*"
         },
         "symfony": {
             "require": "~5.4.0"
