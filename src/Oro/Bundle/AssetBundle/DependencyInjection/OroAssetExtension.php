@@ -19,7 +19,7 @@ class OroAssetExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
-        $container->setParameter('oro_asset.disable_babel', $config['disable_babel']);
+        $container->setParameter('oro_asset.with_babel', $config['with_babel']);
         $container->setParameter('oro_asset.nodejs_path', $config['nodejs_path']);
         $container->setParameter('oro_asset.npm_path', $config['npm_path']);
         $container->setParameter('oro_asset.build_timeout', $config['build_timeout']);

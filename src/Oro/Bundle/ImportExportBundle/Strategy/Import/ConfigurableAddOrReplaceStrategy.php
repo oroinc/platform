@@ -162,8 +162,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             }
 
             $identityValues = $this->combineIdentityValues($entity, $entityClass, $searchContext);
-            $existingEntity = $this->newEntitiesHelper
-                ->storeNewEntity($entity, $identityValues, self::STRATEGY_CONTEXT);
+            $existingEntity = $this->storeNewEntity($entity, $identityValues);
             $this->databaseHelper->resetIdentifier($entity);
 
             if (!$this->isPermissionGrantedForEntity('CREATE', 'entity:' . $entityClass, $entityClass)) {
@@ -180,6 +179,11 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         }
 
         return $entity;
+    }
+
+    protected function storeNewEntity(object $entity, array $identityValues = null): ?object
+    {
+        return $this->newEntitiesHelper->storeNewEntity($entity, $identityValues, self::STRATEGY_CONTEXT);
     }
 
     /**
