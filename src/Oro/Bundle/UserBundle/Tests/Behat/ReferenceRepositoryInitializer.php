@@ -4,6 +4,9 @@ namespace Oro\Bundle\UserBundle\Tests\Behat;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ReferenceRepositoryInitializerInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
@@ -60,5 +63,15 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
                 'domain' => 'messages'
             ])
         );
+
+        $className = ExtendHelper::buildEnumValueClassName('auth_status');
+
+        /** @var EntityRepository $repository */
+        $repository = $doctrine->getManager()->getRepository($className);
+
+        /** @var AbstractEnumValue $status */
+        foreach ($repository->findAll() as $status) {
+            $referenceRepository->set('user_auth_status_' . $status->getId(), $status);
+        }
     }
 }
