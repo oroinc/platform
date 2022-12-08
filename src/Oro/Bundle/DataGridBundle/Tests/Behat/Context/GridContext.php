@@ -1816,6 +1816,26 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function clickViewList($gridName = null)
     {
+        $list = $this->getViewList($gridName);
+        $list->press();
+    }
+
+    /**
+     * Click on item in grid view list.
+     * Example: Given I click on "Some view" in grid view list
+     *
+     * @Given I click on :title in grid view list
+     * @Given I click on :title in grid view list in "(?P<gridName>[^"]+)"
+     */
+    public function clickLinkInViewList(string $title, string $gridName = null)
+    {
+        $list = $this->getViewList($gridName);
+        $list->press();
+        $list->clickLink($title);
+    }
+
+    private function getViewList(string $gridName = null): Element
+    {
         if ($gridName === null) {
             $list = $this->elementFactory->createElement('GridViewList');
         } else {
@@ -1823,7 +1843,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $list = $grid->getElement($grid->getMappedChildElementName('GridViewList'));
         }
         self::assertTrue($list->isValid(), 'Grid view list not found on the page');
-        $list->press();
+
+        return $list;
     }
 
     /**
