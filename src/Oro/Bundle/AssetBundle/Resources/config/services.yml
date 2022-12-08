@@ -23,7 +23,7 @@ services:
             - '%oro_asset.npm_path%'
             - '%oro_asset.build_timeout%'
             - '%oro_asset.npm_install_timeout%'
-            - '%oro_asset.disable_babel%'
+            - '%oro_asset.with_babel%'
         tags:
             - { name: console.command, command: 'oro:assets:build' }
 
