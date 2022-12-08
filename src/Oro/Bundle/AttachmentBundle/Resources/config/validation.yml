@@ -28,3 +28,7 @@ Oro\Bundle\AttachmentBundle\Entity\File:
         externalUrl:
             - Length:
                   max: 1024
+        originalFilename:
+            - Oro\Bundle\AttachmentBundle\Validator\Constraints\FilenameWithoutPath: ~
+            - Length:
+                  max: 255
