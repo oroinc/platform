@@ -197,6 +197,11 @@ class ChannelRepository extends ServiceEntityRepository
         ]);
     }
 
+    public function findActiveByType($type): array
+    {
+        return $this->findBy(['type' => $type, 'enabled' => true]);
+    }
+
     /**
      * @param string    $type
      * @param Channel[]|int[] $excludedChannels
