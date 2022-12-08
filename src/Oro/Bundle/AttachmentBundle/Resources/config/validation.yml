@@ -21,3 +21,7 @@ Oro\Bundle\AttachmentBundle\Entity\File:
         uuid:
             - Uuid:
                 groups: ['Default', 'import_field_type']
+        originalFilename:
+            - Oro\Bundle\AttachmentBundle\Validator\Constraints\FilenameWithoutPath: ~
+            - Length:
+                  max: 255
