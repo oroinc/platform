@@ -45,7 +45,7 @@ function loadModules(modules, callback, context) {
         processModules = loadedModules => {
             // maps loaded modules into original object
             Object.keys(modules)
-                .forEach((formalName, index) => modules[formalName] = loadedModules[index]);
+                .forEach((formalName, index) => modules[formalName] = loadedModules[index] || modules[formalName]);
             return modules;
         };
     }

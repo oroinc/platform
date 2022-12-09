@@ -1,15 +1,17 @@
-define(['underscore', 'backbone'], function(_, Backbone) {
+define(function(require) {
     'use strict';
+
+    const Backbone = require('backbone');
 
     function CellEventList(columns) {
         this.columns = columns;
 
         // listener will be removed with columns instance
         // no need to dispose this class
-        columns.on('change:renderable add remove reset change:columnEventList', function() {
+        columns.on('change:renderable add remove reset change:columnEventList', () => {
             delete this.cachedEventList;
             this.trigger('change');
-        }, this);
+        });
     }
 
     CellEventList.prototype = {
@@ -21,7 +23,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
                         return;
                     }
                     const Cell = column.get('cell');
-                    if (Cell.prototype.delegatedEventBinding && !_.isFunction(Cell.prototype.events)) {
+                    if (Cell.prototype.delegatedEventBinding && typeof Cell.prototype.events !== 'function') {
                         const events = Cell.prototype.events;
                         // prevent CS error 'cause we must completely repeat Backbone behaviour
                         // eslint-disable-next-line guard-for-in
@@ -38,7 +40,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
         }
     };
 
-    _.extend(CellEventList.prototype, Backbone.Events);
+    Object.assign(CellEventList.prototype, Backbone.Events);
 
     return CellEventList;
 });
