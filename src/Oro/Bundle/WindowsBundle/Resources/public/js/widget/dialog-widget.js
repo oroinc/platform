@@ -507,7 +507,9 @@ define(function(require, exports, module) {
             this.trigger('widgetReady', this);
             // Waiting a little bite while the dialog will be positioned correctly and its content rendered
             _.delay(() => {
-                this.widget.dialog('widget').removeClass('invisible');
+                if (!this.disposed) {
+                    this.widget.dialog('widget').removeClass('invisible');
+                }
             }, 50);
         },
 
