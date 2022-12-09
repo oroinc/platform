@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const Backgrid = require('backgrid');
-    const CellEventList = require('./cell-event-list');
+    const CellEventList = require('orodatagrid/js/datagrid/cell-event-list');
 
     const GridColumns = Backgrid.Columns.extend({
         comparator: 'order',
