@@ -34,23 +34,34 @@ class MenuUpdateHelper
 
     /**
      * @param MenuUpdateInterface $entity
-     * @param string              $value
-     * @param string              $name
-     * @param string              $type
+     * @param string|null $value
+     * @param string $name
+     * @param string $type
+     * @param bool $translateDisabled
      *
      * @return MenuUpdateHelper
      */
-    public function applyLocalizedFallbackValue(MenuUpdateInterface $entity, $value, $name, $type)
-    {
+    public function applyLocalizedFallbackValue(
+        MenuUpdateInterface $entity,
+        ?string $value,
+        string $name,
+        string $type,
+        bool $translateDisabled = false
+    ) {
         $values = $this->getPropertyAccessor()->getValue($entity, $name . 's');
         if ($values instanceof Collection && $values->count() <= 0) {
-            // Default translation for menu must always has value for English locale, because out of the box app has
+            $value = (string) $value;
+            $doTranslation = !$translateDisabled && $value !== '';
+
+            // Default translation for menu must always have value for English locale, because out of the box app has
             // translations only for English language.
-            $defaultValue = $this->translator->trans((string) $value, [], null, Configuration::DEFAULT_LOCALE);
+            $defaultValue = $doTranslation
+                ? $this->translator->trans($value, [], null, Configuration::DEFAULT_LOCALE)
+                : $value;
             $this->getPropertyAccessor()->setValue($entity, 'default_' . $name, $defaultValue);
             foreach ($this->localizationHelper->getLocalizations() as $localization) {
                 $locale = $localization->getLanguageCode();
-                $translatedValue = $this->translator->trans((string) $value, [], null, $locale);
+                $translatedValue = $doTranslation ? $this->translator->trans($value, [], null, $locale) : $value;
                 $fallbackValue = new LocalizedFallbackValue();
                 $fallbackValue->setLocalization($localization);
 

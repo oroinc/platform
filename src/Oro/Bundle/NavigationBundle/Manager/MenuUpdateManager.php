@@ -23,9 +23,13 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 class MenuUpdateManager
 {
     private ManagerRegistry $doctrine;
+
     private MenuUpdateHelper $menuUpdateHelper;
+
     private PropertyAccessorInterface $propertyAccessor;
+
     private string $entityClass;
+
     private string $scopeType;
 
     public function __construct(
@@ -99,7 +103,9 @@ class MenuUpdateManager
         $this->setMenuUpdateFieldValue($update, 'key', $item->getName());
         $this->setMenuUpdateFieldValue($update, 'uri', $item->getUri());
 
-        $this->menuUpdateHelper->applyLocalizedFallbackValue($update, $item->getLabel(), 'title', 'string');
+        $translateDisabled = $item->getExtra('translate_disabled', false);
+        $this->menuUpdateHelper
+            ->applyLocalizedFallbackValue($update, $item->getLabel(), 'title', 'string', $translateDisabled);
 
         if ($update->getTitles()->count() <= 0) {
             $this->setMenuUpdateFieldValue($update, 'defaultTitle', $item->getLabel());
@@ -116,7 +122,8 @@ class MenuUpdateManager
 
         foreach ($item->getExtras() as $key => $value) {
             if ($key === 'description') {
-                $this->menuUpdateHelper->applyLocalizedFallbackValue($update, $item->getExtra($key), $key, 'text');
+                $this->menuUpdateHelper
+                    ->applyLocalizedFallbackValue($update, $item->getExtra($key), $key, 'text', $translateDisabled);
                 continue;
             }
 

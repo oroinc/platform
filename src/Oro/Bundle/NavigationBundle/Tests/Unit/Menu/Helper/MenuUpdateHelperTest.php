@@ -14,14 +14,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationHelper;
+    private LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper;
 
-    /** @var MenuUpdateHelper */
-    private $helper;
+    private MenuUpdateHelper $helper;
 
     protected function setUp(): void
     {
@@ -39,11 +36,11 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
         return $language;
     }
 
-    public function testApplyLocalizedFallbackValue()
+    public function testApplyLocalizedFallbackValue(): void
     {
         $update = new MenuUpdateStub();
 
-        $this->translator->expects($this->exactly(3))
+        $this->translator->expects(self::exactly(3))
             ->method('trans')
             ->willReturnMap([
                 ['test.title', [], null, 'en', 'EN Test Title'],
@@ -56,7 +53,7 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
         $deLocalization = new Localization();
         $deLocalization->setLanguage($this->getLanguage('de'));
 
-        $this->localizationHelper->expects($this->once())
+        $this->localizationHelper->expects(self::once())
             ->method('getLocalizations')
             ->willReturn([$enLocalization, $deLocalization]);
 
@@ -75,31 +72,101 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
         $result->addTitle($enFallbackValue);
         $result->addTitle($deFallbackValue);
 
-        $this->assertEquals($result, $update);
+        self::assertEquals($result, $update);
     }
 
-    public function testApplyLocalizedFallbackValueWithExistedFallbackValue()
+    public function testApplyLocalizedFallbackValueWhenEmptyValue(): void
+    {
+        $update = new MenuUpdateStub();
+
+        $this->translator->expects(self::never())
+            ->method('trans');
+
+        $enLocalization = new Localization();
+        $enLocalization->setLanguage($this->getLanguage('en'));
+
+        $deLocalization = new Localization();
+        $deLocalization->setLanguage($this->getLanguage('de'));
+
+        $this->localizationHelper->expects(self::once())
+            ->method('getLocalizations')
+            ->willReturn([$enLocalization, $deLocalization]);
+
+        $this->helper->applyLocalizedFallbackValue($update, '', 'title', 'string');
+
+        $deFallbackValue = new LocalizedFallbackValue();
+        $deFallbackValue->setLocalization($deLocalization);
+        $deFallbackValue->setFallback(FallbackType::SYSTEM);
+
+        $enFallbackValue = new LocalizedFallbackValue();
+        $enFallbackValue->setLocalization($enLocalization);
+        $enFallbackValue->setFallback(FallbackType::SYSTEM);
+
+        $result = new MenuUpdateStub();
+        $result->setDefaultTitle('');
+        $result->addTitle($enFallbackValue);
+        $result->addTitle($deFallbackValue);
+
+        self::assertEquals($result, $update);
+    }
+
+    public function testApplyLocalizedFallbackValueWhenTranslateDisabled(): void
+    {
+        $update = new MenuUpdateStub();
+
+        $this->translator->expects(self::never())
+            ->method('trans');
+
+        $enLocalization = new Localization();
+        $enLocalization->setLanguage($this->getLanguage('en'));
+
+        $deLocalization = new Localization();
+        $deLocalization->setLanguage($this->getLanguage('de'));
+
+        $this->localizationHelper->expects(self::once())
+            ->method('getLocalizations')
+            ->willReturn([$enLocalization, $deLocalization]);
+
+        $this->helper->applyLocalizedFallbackValue($update, 'Test Title', 'title', 'string', true);
+
+        $deFallbackValue = new LocalizedFallbackValue();
+        $deFallbackValue->setLocalization($deLocalization);
+        $deFallbackValue->setFallback(FallbackType::SYSTEM);
+
+        $enFallbackValue = new LocalizedFallbackValue();
+        $enFallbackValue->setLocalization($enLocalization);
+        $enFallbackValue->setFallback(FallbackType::SYSTEM);
+
+        $result = new MenuUpdateStub();
+        $result->setDefaultTitle('Test Title');
+        $result->addTitle($enFallbackValue);
+        $result->addTitle($deFallbackValue);
+
+        self::assertEquals($result, $update);
+    }
+
+    public function testApplyLocalizedFallbackValueWithExistedFallbackValue(): void
     {
         $update = new MenuUpdateStub();
         $update->setDefaultTitle('Test Title');
 
-        $this->translator->expects($this->never())
+        $this->translator->expects(self::never())
             ->method('trans');
 
-        $this->localizationHelper->expects($this->never())
+        $this->localizationHelper->expects(self::never())
             ->method('getLocalizations');
 
         $this->helper->applyLocalizedFallbackValue($update, 'test.title', 'title', 'string');
     }
 
-    public function testApplyLocalizedFallbackValueWithUndefinedName()
+    public function testApplyLocalizedFallbackValueWithUndefinedName(): void
     {
         $update = new MenuUpdateStub();
 
-        $this->translator->expects($this->never())
+        $this->translator->expects(self::never())
             ->method('trans');
 
-        $this->localizationHelper->expects($this->never())
+        $this->localizationHelper->expects(self::never())
             ->method('getLocalizations');
 
         $message = 'Can\'t get a way to read the property "undefined_names" in class "' . MenuUpdateStub::class . '".';
