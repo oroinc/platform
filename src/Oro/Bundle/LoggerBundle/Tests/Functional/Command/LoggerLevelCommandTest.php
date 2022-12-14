@@ -22,7 +22,7 @@ class LoggerLevelCommandTest extends WebTestCase
     public function testRunCommandToUpdateUserScope()
     {
         $configUser = self::getConfigManager('user');
-        $params = ['debug', '10 days', '--user=admin@example.com'];
+        $params = ['debug', '10 minutes', '--user=admin@example.com'];
         $result = $this->runCommand('oro:logger:level', $params);
         $expectedContent = "Log level for user 'admin@example.com' is successfully set to 'debug' till";
 
@@ -51,7 +51,7 @@ class LoggerLevelCommandTest extends WebTestCase
     public function testRunCommandToUpdateGlobalScope()
     {
         $configGlobal = self::getConfigManager();
-        $params = ['warning', '15 days'];
+        $params = ['warning', '15 minutes'];
         $result = $this->runCommand('oro:logger:level', $params);
         $expectedContent = "Log level for global scope is set to 'warning' till";
 
@@ -92,7 +92,7 @@ class LoggerLevelCommandTest extends WebTestCase
             ],
             'should show failed config update with wrong level argument' => [
                 '$expectedContent' => "Wrong 'wrong_level' value for 'level' argument",
-                '$params'          => ['wrong_level', '15 days'],
+                '$params'          => ['wrong_level', '15 minutes'],
             ],
             'should show failed config update with wrong disable-after argument' => [
                 '$expectedContent' => "Value '15' for 'disable-after' argument should be valid date interval",
@@ -100,7 +100,7 @@ class LoggerLevelCommandTest extends WebTestCase
             ],
             'should show failed config update for non existing user' => [
                 '$expectedContent' => "User with email 'nonexist@user.com' not exists.",
-                '$params'          => ['debug', '15 days', '--user=nonexist@user.com'],
+                '$params'          => ['debug', '15 minutes', '--user=nonexist@user.com'],
             ],
         ];
     }
@@ -110,5 +110,14 @@ class LoggerLevelCommandTest extends WebTestCase
         $result = $this->runCommand('oro:logger:level', ['--help']);
 
         self::assertStringContainsString('Usage: oro:logger:level [options] [--] <level> <disable-after>', $result);
+    }
+
+    public function testRunCommandWithOverIntervalLimit()
+    {
+        $params = ['debug', '61 minutes', '--user=admin@example.com'];
+        $result = $this->runCommand('oro:logger:level', $params);
+        $expectedContent = "Value 'disable-after' should be less than an hour";
+
+        self::assertStringContainsString($expectedContent, $result);
     }
 }
