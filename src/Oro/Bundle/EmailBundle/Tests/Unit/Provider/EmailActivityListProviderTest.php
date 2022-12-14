@@ -112,7 +112,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $email->setFromEmailAddress($fromEmailAddress);
         $email->addEmailUser($emailUser);
 
-        $activityListMock = $this->createMock(ActivityList::class);
+        $activityList = $this->createMock(ActivityList::class);
         $repository = $this->createMock(ObjectRepository::class);
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepositoryForClass')
@@ -121,7 +121,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
             ->method('findBy')
             ->willReturn($owners);
 
-        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($email, $activityListMock);
+        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($email, $activityList);
 
         $this->assertCount(1, $activityOwnerArray);
         $owner = reset($activityOwnerArray);
@@ -147,7 +147,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $email->setFromEmailAddress($fromEmailAddress);
         $email->addEmailUser($emailUser);
 
-        $activityListMock = $this->createMock(ActivityList::class);
+        $activityList = $this->createMock(ActivityList::class);
         $repository = $this->createMock(ObjectRepository::class);
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepositoryForClass')
@@ -156,7 +156,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
             ->method('findBy')
             ->willReturn([$emailUser]);
 
-        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($email, $activityListMock);
+        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($email, $activityList);
 
         $this->assertCount(0, $activityOwnerArray);
     }
@@ -182,7 +182,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $email->setFromEmailAddress($fromEmailAddress);
         $email->addEmailUser($emailUser);
 
-        $activityListMock = $this->createMock(ActivityList::class);
+        $activityList = $this->createMock(ActivityList::class);
         $repository = $this->createMock(ObjectRepository::class);
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepositoryForClass')
@@ -198,7 +198,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
             ])
             ->willReturn([$emailUser]);
 
-        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($email, $activityListMock);
+        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($email, $activityList);
 
         $this->assertCount(1, $activityOwnerArray);
         $owner = reset($activityOwnerArray);
@@ -213,15 +213,14 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $this->emailActivityListProvider->setFeatureChecker($this->featureChecker);
         $this->emailActivityListProvider->addFeature('email');
 
-        $mock = $this->getMockBuilder(FeatureCheckerHolderTrait::class)
+        $featureCheckerHolder = $this->getMockBuilder(FeatureCheckerHolderTrait::class)
             ->onlyMethods(['isFeaturesEnabled'])
             ->getMockForTrait();
-
-        $mock->expects($this->any())
+        $featureCheckerHolder->expects($this->any())
             ->method('isFeaturesEnabled')
             ->willReturn(true);
 
-        $this->assertTrue($mock->isFeaturesEnabled());
+        $this->assertTrue($featureCheckerHolder->isFeaturesEnabled());
     }
 
     /**

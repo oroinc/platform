@@ -51,6 +51,12 @@ define(function(require) {
             return NumberInputWidgetView.__super__.disposeWidget.call(this);
         },
 
+        refresh: function() {
+            this._setPrecision();
+            this._setLimitDecimals();
+            this._setAttr();
+        },
+
         _setPrecision: function() {
             const precision = this.$el.data('precision');
             this.precision = _.isUndefined(precision) ? null : precision;
@@ -66,7 +72,7 @@ define(function(require) {
 
             /**
              * Precision could be null in two cases:
-             * 1. Field is supposed to be integer so we should not change number type to text in this case
+             * 1. Field is supposed to be integer, so we should not change number type to text in this case
              * 2. Precision was not set, yet in this case we should not change input type before
              * the correct precision will be set to not trigger: _normalizeNumberFieldValue
              */

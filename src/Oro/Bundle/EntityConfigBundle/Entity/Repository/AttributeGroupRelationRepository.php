@@ -120,6 +120,25 @@ class AttributeGroupRelationRepository extends EntityRepository
             ->getResult();
     }
 
+    public function getAttributesIdsByFamilies(array $families = []): array
+    {
+        $queryBuilder = $this->createQueryBuilder('attributeGroupRelation');
+
+        $queryBuilder
+            ->select('DISTINCT(attributeGroupRelation.entityConfigFieldId)')
+            ->innerJoin('attributeGroupRelation.attributeGroup', 'attributeGroup');
+        if ($families) {
+            $queryBuilder
+                ->where($queryBuilder->expr()->in('attributeGroup.attributeFamily', ':families'))
+                ->setParameter('families', $families);
+        } else {
+            $queryBuilder->where($queryBuilder->expr()->isNotNull('attributeGroup.attributeFamily'));
+        }
+
+
+        return $queryBuilder->getQuery()->getSingleColumnResult();
+    }
+
     /**
      * @param array|int[] $familyIds
      * @return array

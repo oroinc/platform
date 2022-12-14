@@ -37,11 +37,6 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
         $this->loaderResolver = new LoaderResolver([new YamlFileLoader(new FileLocator())]);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->kernel, $this->routeOptionsResolver, $this->eventDispatcher);
-    }
-
     public function testSupportsFailed(): void
     {
         self::assertFalse($this->getLoader()->supports(null, 'not_supported'));

@@ -15,7 +15,7 @@ class FileControllerTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient([], static::generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
 
         $this->loadFixtures([LoadFileData::class, LoadImageData::class]);
     }

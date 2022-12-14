@@ -17,9 +17,9 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('oro_asset');
         $treeBuilder->getRootNode()
             ->children()
-                ->booleanNode('disable_babel')
-                    ->info('Permanently disable Babel')
-                    ->defaultTrue()
+                ->booleanNode('with_babel')
+                    ->info('Permanently enable Babel')
+                    ->defaultFalse()
                 ->end()
                 ->scalarNode('nodejs_path')
                     ->info('Path to NodeJs executable')

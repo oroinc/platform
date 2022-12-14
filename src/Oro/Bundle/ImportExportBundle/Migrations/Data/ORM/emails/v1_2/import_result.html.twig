@@ -1,0 +1,30 @@
+@name = import_result
+@subject = Result of importing file {{ data['fileName'] }}
+@isSystem = 1
+@isEditable = 1
+{% apply spaceless %}
+<style>
+    @media (max-width: 480pt) {
+        .wrapper{
+            width: 100% !important;
+        }
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+<div class="wrapper">
+    <p>Import of the {{ data['fileName'] }} was completed.</p>
+    <p>
+        Errors: {{ data['errors'] }}
+        processed: {{ data['process'] }},
+        read: {{ data['read'] }},
+        added: {{ data['add'] }},
+        updated: {{ data['update'] }},
+        replaced: {{ data['replace'] }}
+    </p>
+    {% if data['hasError'] %}
+        <a href="{{ data['downloadLogUrl'] }}">Error log</a>
+    {% endif %}
+</div>
+{% endapply %}

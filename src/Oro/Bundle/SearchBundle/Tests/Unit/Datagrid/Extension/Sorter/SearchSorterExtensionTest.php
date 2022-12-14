@@ -47,18 +47,17 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
             ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
-        $mockQuery = $this->createMock(SearchQueryInterface::class);
+        $query = $this->createMock(SearchQueryInterface::class);
 
-        $mockDatasource = $this->createMock(SearchDatasource::class);
-
-        $mockDatasource->expects($this->once())
+        $datasource = $this->createMock(SearchDatasource::class);
+        $datasource->expects($this->once())
             ->method('getSearchQuery')
-            ->willReturn($mockQuery);
+            ->willReturn($query);
 
-        $mockParameterBag = $this->createMock(ParameterBag::class);
-        $this->extension->setParameters($mockParameterBag);
+        $parameterBag = $this->createMock(ParameterBag::class);
+        $this->extension->setParameters($parameterBag);
 
-        $this->extension->visitDatasource($config, $mockDatasource);
+        $this->extension->visitDatasource($config, $datasource);
     }
 
     public function visitDatasourceWithValidTypeProvider(): array
@@ -95,11 +94,11 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
             ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
-        $mockDatasource = $this->createMock(SearchDatasource::class);
-        $mockParameterBag = $this->createMock(ParameterBag::class);
+        $datasource = $this->createMock(SearchDatasource::class);
+        $parameterBag = $this->createMock(ParameterBag::class);
 
-        $this->extension->setParameters($mockParameterBag);
-        $this->extension->visitDatasource($config, $mockDatasource);
+        $this->extension->setParameters($parameterBag);
+        $this->extension->visitDatasource($config, $datasource);
     }
 
     public function testVisitDatasourceWithDefaultSorterAndDefaultSortingIsNotDisabled()
@@ -123,17 +122,17 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
             ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
-        $mockQuery = $this->createMock(SearchQueryInterface::class);
+        $query = $this->createMock(SearchQueryInterface::class);
 
-        $mockDatasource = $this->createMock(SearchDatasource::class);
-        $mockDatasource->expects($this->once())
+        $datasource = $this->createMock(SearchDatasource::class);
+        $datasource->expects($this->once())
             ->method('getSearchQuery')
-            ->willReturn($mockQuery);
+            ->willReturn($query);
 
-        $mockParameterBag = $this->createMock(ParameterBag::class);
-        $this->extension->setParameters($mockParameterBag);
+        $parameterBag = $this->createMock(ParameterBag::class);
+        $this->extension->setParameters($parameterBag);
 
-        $this->extension->visitDatasource($config, $mockDatasource);
+        $this->extension->visitDatasource($config, $datasource);
     }
 
     public function testVisitDatasourceWithNoDefaultSorterAndDisableDefaultSorting()
@@ -155,15 +154,15 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
             ],
         ]);
 
-        $mockDatasource = $this->createMock(SearchDatasource::class);
-        $mockDatasource->expects($this->never())
+        $datasource = $this->createMock(SearchDatasource::class);
+        $datasource->expects($this->never())
             ->method('getSearchQuery')
             ->willReturn($this->createMock(SearchQueryInterface::class));
 
-        $mockParameterBag = $this->createMock(ParameterBag::class);
+        $parameterBag = $this->createMock(ParameterBag::class);
 
-        $this->extension->setParameters($mockParameterBag);
-        $this->extension->visitDatasource($config, $mockDatasource);
+        $this->extension->setParameters($parameterBag);
+        $this->extension->visitDatasource($config, $datasource);
     }
 
     public function testVisitDatasourceWithDefaultSorterAndDisableDefaultSorting()
@@ -188,14 +187,14 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
             ],
         ]);
 
-        $mockDatasource = $this->createMock(SearchDatasource::class);
-        $mockDatasource->expects($this->never())
+        $datasource = $this->createMock(SearchDatasource::class);
+        $datasource->expects($this->never())
             ->method('getSearchQuery')
             ->willReturn($this->createMock(SearchQueryInterface::class));
 
-        $mockParameterBag = $this->createMock(ParameterBag::class);
+        $parameterBag = $this->createMock(ParameterBag::class);
 
-        $this->extension->setParameters($mockParameterBag);
-        $this->extension->visitDatasource($config, $mockDatasource);
+        $this->extension->setParameters($parameterBag);
+        $this->extension->visitDatasource($config, $datasource);
     }
 }

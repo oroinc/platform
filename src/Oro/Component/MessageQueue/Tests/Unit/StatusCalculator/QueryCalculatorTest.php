@@ -10,15 +10,12 @@ use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
 
 class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var QueryCalculator */
-    private $queryCalculator;
-
     /** @var JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $jobRepository;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var QueryCalculator */
+    private $queryCalculator;
+
     protected function setUp(): void
     {
         $this->jobRepository = $this->createMock(JobRepositoryInterface::class);
@@ -34,17 +31,8 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
             ->with($entityClass)
             ->willReturn($manager);
 
-        $jobStatusChecker = new JobStatusChecker();
         $this->queryCalculator = new QueryCalculator($doctrine, $entityClass);
-        $this->queryCalculator->setJobStatusChecker($jobStatusChecker);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset($this->queryCalculator);
+        $this->queryCalculator->setJobStatusChecker(new JobStatusChecker());
     }
 
     public function calculateProgressProvider(): array

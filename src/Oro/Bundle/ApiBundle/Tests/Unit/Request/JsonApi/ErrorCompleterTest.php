@@ -307,6 +307,26 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
+    public function testCompleteErrorForCompositeField()
+    {
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadata->setIdentifierFieldNames(['id']);
+        $firstNameField = new FieldMetadata();
+        $firstNameField->setName('field');
+        $metadata->addField($firstNameField);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('field.property'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/attributes/field/property'));
+
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
+    }
+
     public function testCompleteErrorForToOneAssociation()
     {
         $metadata = new EntityMetadata('Test\Entity');
@@ -531,6 +551,25 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         $expectedError = new Error();
         $expectedError->setDetail('test detail');
         $expectedError->setSource(ErrorSource::createByPointer('/meta/firstName'));
+
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForCompositeFieldOfEntityWithoutIdentifierFields()
+    {
+        $metadata = new EntityMetadata('Test\Entity');
+        $firstNameField = new FieldMetadata();
+        $firstNameField->setName('field');
+        $metadata->addField($firstNameField);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('field.property'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/meta/field/property'));
 
         $this->errorCompleter->complete($error, $this->requestType, $metadata);
         self::assertEquals($expectedError, $error);

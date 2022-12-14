@@ -27,8 +27,8 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
     {
         $cronExpression = '* * * * *';
 
-        $processDefinitionMock = $this->createMock(ProcessDefinition::class);
-        $processDefinitionMock->expects($this->once())
+        $processDefinition = $this->createMock(ProcessDefinition::class);
+        $processDefinition->expects($this->once())
             ->method('getName')
             ->willReturn('process-definition-name');
 
@@ -40,7 +40,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
         //create arguments
         $trigger->expects($this->once())
             ->method('getDefinition')
-            ->willReturn($processDefinitionMock);
+            ->willReturn($processDefinition);
         $trigger->expects($this->once())
             ->method('getId')
             ->willReturn(100500);
@@ -56,34 +56,33 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveSchedule()
     {
-        $mockTrigger = $this->createMock(ProcessTrigger::class);
-
-        $mockProcessDefinition = $this->createMock(ProcessDefinition::class);
-        $mockProcessDefinition->expects($this->once())
+        $processDefinition = $this->createMock(ProcessDefinition::class);
+        $processDefinition->expects($this->once())
             ->method('getName')
             ->willReturn('process_name');
 
-        $mockTrigger->expects($this->exactly(2))
+        $trigger = $this->createMock(ProcessTrigger::class);
+        $trigger->expects($this->exactly(2))
             ->method('getCron')
             ->willReturn('* * * * *');
-        $mockTrigger->expects($this->once())
+        $trigger->expects($this->once())
             ->method('getId')
             ->willReturn(42);
-        $mockTrigger->expects($this->once())
+        $trigger->expects($this->once())
             ->method('getDefinition')
-            ->willReturn($mockProcessDefinition);
+            ->willReturn($processDefinition);
 
         $this->deferredScheduler->expects($this->once())
             ->method('removeSchedule')
             ->with('oro:process:handle-trigger', ['--name=process_name', '--id=42'], '* * * * *');
 
-        $this->processCronScheduler->removeSchedule($mockTrigger);
+        $this->processCronScheduler->removeSchedule($trigger);
     }
 
     public function testRemoveException()
     {
-        $mockTrigger = $this->createMock(ProcessTrigger::class);
-        $mockTrigger->expects($this->once())
+        $trigger = $this->createMock(ProcessTrigger::class);
+        $trigger->expects($this->once())
             ->method('getCron')
             ->willReturn(null);
 
@@ -92,7 +91,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
             'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler supports only cron schedule triggers.'
         );
 
-        $this->processCronScheduler->removeSchedule($mockTrigger);
+        $this->processCronScheduler->removeSchedule($trigger);
     }
 
     public function testAddException()

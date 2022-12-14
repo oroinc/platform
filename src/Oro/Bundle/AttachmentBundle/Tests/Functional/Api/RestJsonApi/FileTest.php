@@ -78,10 +78,7 @@ class FileTest extends RestJsonApiTestCase
                 ]
             ]
         ];
-        $response = $this->post(
-            ['entity' => 'files'],
-            $data
-        );
+        $response = $this->post(['entity' => 'files'], $data);
 
         $expectedData = $data;
         $expectedData['data']['relationships']['owner']['data'] = [
@@ -134,6 +131,130 @@ class FileTest extends RestJsonApiTestCase
                 ]
             ],
             $response
+        );
+    }
+
+    public function testTryToCreateWithoutOriginalFilename(): void
+    {
+        $data = [
+            'data' => [
+                'type'          => 'files',
+                'attributes'    => [
+                    'mimeType'         => 'image/png',
+                    'fileSize'         => 95,
+                    'content'          => self::$blankFileContent,
+                    'parentFieldName'  => 'avatar'
+                ],
+                'relationships' => [
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                    ]
+                ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'files'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'form constraint',
+                'detail' => 'The "content" field should be specified together with "originalFilename" field.'
+            ],
+            $response,
+        );
+    }
+
+    public function testTryToCreateWithPathInOriginalFilename(): void
+    {
+        $data = [
+            'data' => [
+                'type'          => 'files',
+                'attributes'    => [
+                    'mimeType'         => 'image/png',
+                    'originalFilename' => '/path/blank.png',
+                    'fileSize'         => 95,
+                    'content'          => self::$blankFileContent,
+                    'parentFieldName'  => 'avatar'
+                ],
+                'relationships' => [
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                    ]
+                ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'files'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filename without path constraint',
+                'detail' => 'The file name should not have a path.',
+                'source' => ['pointer' => '/data/attributes/originalFilename']
+            ],
+            $response,
+        );
+    }
+
+    public function testTryToCreateWithExtraLongOriginalFilename(): void
+    {
+        $data = [
+            'data' => [
+                'type'          => 'files',
+                'attributes'    => [
+                    'mimeType'         => 'image/png',
+                    'originalFilename' => 'Fuscebibendumleointemporhendreritmaurisestsemperodiovestibulumconguearcuera'
+                        . 'tegeterateraesentacorcjustojrcivariusnatoquepenatibusetmagnisdisparturientmontesFuscebibend'
+                        . 'umleointemporhendreritmaurisestsemperodiovestibulumconguearcuerategeterateraesentacorcjusto'
+                        . 'jrcivariusnatoquepenatibusetmagnisdisparturientmontes.png',
+                    'fileSize'         => 95,
+                    'content'          => self::$blankFileContent,
+                    'parentFieldName'  => 'avatar'
+                ],
+                'relationships' => [
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                    ]
+                ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'files'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'length constraint',
+                'detail' => 'This value is too long. It should have 255 characters or less.',
+                'source' => ['pointer' => '/data/attributes/originalFilename']
+            ],
+            $response,
+        );
+    }
+
+    public function testTryToCreateWithInvalidContent(): void
+    {
+        $data = [
+            'data' => [
+                'type'          => 'files',
+                'attributes'    => [
+                    'mimeType'         => 'image/png',
+                    'originalFilename' => 'blank.png',
+                    'fileSize'         => 95,
+                    'content'          => '0',
+                    'parentFieldName'  => 'avatar'
+                ],
+                'relationships' => [
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                    ]
+                ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'files'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'form constraint',
+                'detail' => 'Cannot decode content encoded with MIME base64.'
+            ],
+            $response,
         );
     }
 

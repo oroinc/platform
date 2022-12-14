@@ -33,9 +33,7 @@ class ReportChartTypeTest extends FormIntegrationTestCase
         $configProvider->expects($this->never())
             ->method('getChartConfig');
 
-        $mock = $this->createMock(ChartTypeEventListener::class);
-
-        $eventListener = new MutableFormEventSubscriber($mock);
+        $eventListener = new MutableFormEventSubscriber($this->createMock(ChartTypeEventListener::class));
 
         $childType = new ChartType($configProvider);
         $childType->setEventListener($eventListener);

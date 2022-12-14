@@ -193,7 +193,7 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
 
         $cache = $this->createMock(CacheItemPoolInterface::class);
         $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cache->expects(static::once())
+        $cache->expects(self::once())
             ->method('getItem')
             ->with($alias)
             ->willReturn($cacheItem);

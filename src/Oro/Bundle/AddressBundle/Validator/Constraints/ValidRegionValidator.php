@@ -28,7 +28,7 @@ class ValidRegionValidator extends ConstraintValidator
 
         $country = $entity->getCountry();
         $region = $entity->getRegion();
-        if (null !== $country && null !== $region && !$country->getRegions()->contains($region)) {
+        if (null !== $country && null !== $region && !$country->getRegions()?->contains($region)) {
             // prevent setting for example region Berlin to country Romania
             $this->context->addViolation(
                 $constraint->message,

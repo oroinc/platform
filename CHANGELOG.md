@@ -6,6 +6,17 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### AssetBundle
+* Changed configuration option `disable_babel` (`true` by default) to `with_babel` (`false` by default).
+
+## 5.1.0-beta.2 (2022-11-30)
+[Show detailed list of changes](incompatibilities-5-1-beta-2.md)
+
+## 5.1.0-beta.1 (2022-09-30)
+[Show detailed list of changes](incompatibilities-5-1-beta-1.md)
+
+### Changed
+
 #### UIBundle
 
 The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` were removed, use the `bootstrap-collapse` instead.

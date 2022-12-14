@@ -19,16 +19,16 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
     private const ACTION_GROUP_NAME = 'test_action_group';
 
     /** @var ActionGroupRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $mockActionGroupRegistry;
+    private $actionGroupRegistry;
 
     /** @var RunActionGroup */
     private $actionGroup;
 
     protected function setUp(): void
     {
-        $this->mockActionGroupRegistry = $this->createMock(ActionGroupRegistry::class);
+        $this->actionGroupRegistry = $this->createMock(ActionGroupRegistry::class);
 
-        $this->actionGroup = new RunActionGroup($this->mockActionGroupRegistry, new ContextAccessor());
+        $this->actionGroup = new RunActionGroup($this->actionGroupRegistry, new ContextAccessor());
         $this->actionGroup->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
@@ -54,7 +54,7 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
             RunActionGroup::OPTION_RESULT => new PropertyPath('path')
         ];
 
-        $this->mockActionGroupRegistry->expects(self::once())
+        $this->actionGroupRegistry->expects(self::once())
             ->method('getNames')
             ->willReturn([self::ACTION_GROUP_NAME]);
 
@@ -71,7 +71,7 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
         $this->expectException($exception);
         $this->expectExceptionMessage($exceptionMessage);
 
-        $this->mockActionGroupRegistry->expects($this->once())
+        $this->actionGroupRegistry->expects($this->once())
             ->method('getNames')
             ->willReturn([self::ACTION_GROUP_NAME]);
 
@@ -80,8 +80,6 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
 
     public function initializeExceptionDataProvider(): array
     {
-        $mockGroup = $this->createMock(ActionGroup::class);
-
         return [
             'no action group name' => [
                 'inputData' => [],
@@ -110,7 +108,7 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
                     'is expected to be of type "array", but is of type "string".',
                     RunActionGroup::OPTION_PARAMETERS_MAP
                 ),
-                $mockGroup
+                $this->createMock(ActionGroup::class)
             ],
             'bad attribute' => [
                 'inputData' => [
@@ -147,23 +145,23 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
     ) {
         $data = new ActionData($context);
 
-        $mockActionGroup = $this->createMock(ActionGroup::class);
+        $actionGroup = $this->createMock(ActionGroup::class);
+        $actionGroup->expects(self::once())
+            ->method('execute')
+            ->with($arguments)
+            ->willReturn($returnVal);
+
 
         //during initialize
-        $this->mockActionGroupRegistry->expects(self::once())
+        $this->actionGroupRegistry->expects(self::once())
             ->method('getNames')
             ->willReturn([self::ACTION_GROUP_NAME]);
 
         //during execute
-        $this->mockActionGroupRegistry->expects(self::once())
+        $this->actionGroupRegistry->expects(self::once())
             ->method('get')
             ->with(self::ACTION_GROUP_NAME)
-            ->willReturn($mockActionGroup);
-
-        $mockActionGroup->expects(self::once())
-            ->method('execute')
-            ->with($arguments)
-            ->willReturn($returnVal);
+            ->willReturn($actionGroup);
 
         $this->actionGroup->initialize($options);
         $this->actionGroup->execute($data);

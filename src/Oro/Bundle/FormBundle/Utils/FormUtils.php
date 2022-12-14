@@ -145,4 +145,20 @@ class FormUtils
             array_walk($newTransformers, [$builder, 'addViewTransformer']);
         }
     }
+
+    public static function removeListenerByClassName(
+        FormBuilderInterface $builder,
+        string $listenerClassName,
+        array $events
+    ): void {
+        $eventDispatcher = $builder->getEventDispatcher();
+
+        foreach ($events as $eventName) {
+            foreach ($eventDispatcher->getListeners($eventName) as $listener) {
+                if (is_array($listener) && isset($listener[0]) && is_a($listener[0], $listenerClassName)) {
+                    $eventDispatcher->removeListener($eventName, $listener);
+                }
+            }
+        }
+    }
 }

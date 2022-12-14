@@ -17,7 +17,7 @@
         <% iconClass = _.filter(choices, function(choice) {return choice.icon !== false}).length ? ' has-icons' : '' %>
         <div class="grid-views-dropdown dropdown-menu<%-iconClass %>" aria-labelledby="<%- gridViewTogglerId %>">
             <% _.each(choices, function (choice) { %>
-                <a class="grid-views-item dropdown-item" href="#" role="button" data-value="<%- choice.value %>">
+                <a class="grid-views-item dropdown-item" title="<%- choice.label %>" href="#" role="button" data-value="<%- choice.value %>">
                     <% if (choice.icon) { %>
                         <span class="grid-views-choice-icon <%- choice.icon %>" aria-hidden="true"></span>
                     <% } %>

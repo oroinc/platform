@@ -463,7 +463,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(
                 ['inProcess', AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS],
                 ['inProcessForce', AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS_FORCE],
-                ['isSyncEnabled', false],
+                ['isSyncEnabled', true],
                 ['success', AbstractEmailSynchronizer::SYNC_CODE_SUCCESS],
                 ['isActive', true],
                 ['now', $now],

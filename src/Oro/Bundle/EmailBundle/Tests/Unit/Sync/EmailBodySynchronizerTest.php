@@ -27,6 +27,9 @@ use Oro\Component\Testing\ReflectionUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -663,5 +666,55 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
 
         $this->synchronizer->syncOneEmailBody($email);
+    }
+
+    public function testSyncWithAlreadyDeletedEmail(): void
+    {
+        $email = new TestEmailEntity(500);
+
+        $repo = $this->createMock(EmailRepository::class);
+        $this->doctrine->expects(self::exactly(2))
+            ->method('getRepository')
+            ->willReturn($repo);
+        $runCount = 0;
+        $repo->expects($this->exactly(2))
+            ->method('getEmailIdsWithoutBody')
+            ->willReturnCallback(function () use (&$runCount, $email) {
+                $runCount++;
+                return $runCount === 1 ? [$email->getId()] : [];
+            });
+
+        $loader = $this->createMock(EmailBodyLoaderInterface::class);
+
+        $this->selector->expects(self::never())
+            ->method('select');
+        $loader->expects(self::never())
+            ->method('loadEmailBody');
+
+        $this->em->expects(self::exactly(2))
+            ->method('isOpen')
+            ->willReturn(true);
+        $this->em->expects(self::never())
+            ->method('flush');
+        $this->em->expects(self::once())
+            ->method('clear');
+        $this->em->expects(self::once())
+            ->method('find')
+            ->with(Email::class, 500)
+            ->willReturn(null);
+        $this->logger->expects(self::never())
+            ->method('notice');
+        $this->logger->expects(self::exactly(2))
+            ->method('info');
+        $this->logger->expects(self::never())
+            ->method('warning');
+        $this->notificationAlertManager->expects(self::never())
+            ->method('addNotificationAlert');
+        $this->notificationAlertManager->expects(self::never())
+            ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization');
+        $this->notificationAlertManager->expects(self::never())
+            ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
+
+        $this->synchronizer->sync();
     }
 }

@@ -13,7 +13,7 @@ class RelationshipsTest extends RestJsonApiTestCase
 {
     public function testRelationship()
     {
-        $this->runForSubresources(function (string $entityClass, string $associationName, ApiSubresource$subresource) {
+        $this->runForSubresources(function (string $entityClass, string $associationName, ApiSubresource $subresource) {
             $entityId = $this->findEntityId($entityClass);
             if (null === $entityId) {
                 return;

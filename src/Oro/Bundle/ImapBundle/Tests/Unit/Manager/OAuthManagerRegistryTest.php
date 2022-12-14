@@ -13,12 +13,12 @@ class OAuthManagerRegistryTest extends \PHPUnit\Framework\TestCase
     private function getMockedManagers(): array
     {
         return array_map(function (string $type) {
-            $mock = $this->createMock(OAuthManagerInterface::class);
-            $mock->expects($this->any())
+            $oauthManager = $this->createMock(OAuthManagerInterface::class);
+            $oauthManager->expects($this->any())
                 ->method('getType')
                 ->willReturn($type);
 
-            return $mock;
+            return $oauthManager;
         }, ['manager_1', 'manager_2', 'manager_3']);
     }
 
