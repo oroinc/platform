@@ -40,10 +40,10 @@ class LoggerLevelCommand extends Command
     ];
 
     public function __construct(
-        ConfigManager $globalConfigManager,
-        ConfigManager $userConfigManager,
+        ConfigManager  $globalConfigManager,
+        ConfigManager  $userConfigManager,
         CacheInterface $cache,
-        UserManager $userManager
+        UserManager    $userManager
     ) {
         parent::__construct();
 
@@ -76,8 +76,7 @@ scope of a specific user (the global configuration is changed otherwise):
 
 HELP
             )
-            ->addUsage('--user=<user-email> <level> <disable-after>')
-        ;
+            ->addUsage('--user=<user-email> <level> <disable-after>');
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -156,6 +155,14 @@ HELP
         if ($disableAfter <= $now) {
             throw new \InvalidArgumentException(
                 \sprintf("Value '%s' for '%s' argument should be valid date interval", $value, 'disable-after')
+            );
+        }
+
+        $afterHour = clone $now;
+        $afterHour->add(new \DateInterval('PT1H'));
+        if ($disableAfter > $afterHour) {
+            throw new \InvalidArgumentException(
+                \sprintf("Value '%s' should be less than an hour", 'disable-after')
             );
         }
 
