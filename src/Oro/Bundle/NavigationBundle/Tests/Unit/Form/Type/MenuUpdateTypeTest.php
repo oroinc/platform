@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Knp\Menu\ItemInterface;
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\OroIconTypeStub;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
@@ -12,6 +11,7 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionTypeStub;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
+use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
 use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\NotDangerousProtocolValidator;
@@ -21,14 +21,13 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class MenuUpdateTypeTest extends FormIntegrationTestCase
 {
+    use MenuItemTestTrait;
+
     private const TEST_TITLE = 'Test Title';
     private const TEST_DESCRIPTION = 'Test Description';
     private const TEST_URI = 'http://test_uri';
     private const TEST_ACL_RESOURCE_ID = 'test_acl_resource_id';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getExtensions(): array
     {
         $registry = $this->createMock(ManagerRegistry::class);
@@ -44,7 +43,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
                 ],
                 []
             ),
-            $this->getValidatorExtension(true)
+            $this->getValidatorExtension(true),
         ];
     }
 
@@ -67,28 +66,29 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         return [
             MaxNestedLevelValidator::class => $this->createMock(MaxNestedLevelValidator::class),
             'oro_security.validator.constraints.not_dangerous_protocol' =>
-                new NotDangerousProtocolValidator($uriSecurityHelper)
+                new NotDangerousProtocolValidator($uriSecurityHelper),
         ];
     }
 
     public function testSubmitValid()
     {
         $menuUpdate = new MenuUpdate();
-        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate);
+        $menu = $this->createItem('sample_menu');
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate, ['menu' => $menu]);
 
         $form->submit(
             [
                 'titles' => [
                     'values' => [
-                        'default' => self::TEST_TITLE
-                    ]
+                        'default' => self::TEST_TITLE,
+                    ],
                 ],
                 'descriptions' => [
                     'values' => [
-                        'default' => self::TEST_DESCRIPTION
-                    ]
+                        'default' => self::TEST_DESCRIPTION,
+                    ],
                 ],
-                'icon'=> 'fa-anchor',
+                'icon' => 'fa-anchor',
             ]
         );
 
@@ -111,17 +111,18 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     {
         $menuUpdate = new MenuUpdate();
         $menuUpdate->setCustom(true);
+        $menu = $this->createItem('sample_menu');
 
-        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate);
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate, ['menu' => $menu]);
 
         $form->submit(
             [
                 'titles' => [
                     'values' => [
-                        'default' => self::TEST_TITLE
-                    ]
+                        'default' => self::TEST_TITLE,
+                    ],
                 ],
-                'uri' => self::TEST_URI
+                'uri' => self::TEST_URI,
             ]
         );
 
@@ -140,7 +141,8 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     public function testSubmitEmptyTitle()
     {
         $menuUpdate = new MenuUpdate();
-        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate);
+        $menu = $this->createItem('sample_menu');
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate, ['menu' => $menu]);
 
         $form->submit([]);
 
@@ -157,14 +159,15 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     {
         $menuUpdate = new MenuUpdate();
         $menuUpdate->setCustom(true);
-        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate);
+        $menu = $this->createItem('sample_menu');
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate, ['menu' => $menu]);
 
         $form->submit(
             [
                 'titles' => [
                     'values' => [
-                        'default' => self::TEST_TITLE
-                    ]
+                        'default' => self::TEST_TITLE,
+                    ],
                 ],
             ]
         );
@@ -183,13 +186,11 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     public function testAclResourceIdShouldExist()
     {
         $menuUpdate = new MenuUpdate();
-        $menuItem = $this->createMock(ItemInterface::class);
-        $menuItem->expects($this->any())
-            ->method('getExtra')
-            ->with('acl_resource_id')
-            ->willReturn(self::TEST_ACL_RESOURCE_ID);
+        $menu = $this->createItem('sample_menu');
+        $menuItem = $this->createItem('item_1')
+            ->setExtra('acl_resource_id', self::TEST_ACL_RESOURCE_ID);
 
-        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem]);
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem, 'menu' => $menu]);
 
         $expected = new MenuUpdate();
         $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
@@ -207,14 +208,15 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     {
         $menuUpdate = new MenuUpdate();
         $menuUpdate->setCustom(true);
-        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate);
+        $menu = $this->createItem('sample_menu');
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate, ['menu' => $menu]);
 
         $form->submit(
             [
                 'titles' => [
                     'values' => [
-                        'default' => self::TEST_TITLE
-                    ]
+                        'default' => self::TEST_TITLE,
+                    ],
                 ],
                 'uri' => $uri,
             ]

@@ -16,22 +16,18 @@ class MenuUpdatesApplyResult
 
     private array $appliedMenuUpdates;
 
-    private array $notAppliedMenuUpdates;
-
-    private array $orphanMenuUpdates;
+    private array $lostMenuUpdates;
 
     public function __construct(
         ItemInterface $menu,
         array $allMenuUpdates,
         array $appliedMenuUpdates,
-        array $notAppliedMenuUpdates,
-        array $orphanMenuUpdates
+        array $lostMenuUpdates
     ) {
         $this->menu = $menu;
         $this->allMenuUpdates = $allMenuUpdates;
         $this->appliedMenuUpdates = $appliedMenuUpdates;
-        $this->notAppliedMenuUpdates = $notAppliedMenuUpdates;
-        $this->orphanMenuUpdates = $orphanMenuUpdates;
+        $this->lostMenuUpdates = $lostMenuUpdates;
     }
 
     /**
@@ -61,25 +57,12 @@ class MenuUpdatesApplyResult
     }
 
     /**
-     * Returns non-applied menu updates as the corresponding menu items with MenuUpdate::$key name
-     * do not exist.
+     * Returns menu updates whose target or parent menu items do not exist.
      *
      * @return array<int,MenuUpdateInterface> List of MenuUpdateInterface objects indexed by menu update ID.
      */
-    public function getNotAppliedMenuUpdates(): array
+    public function getLostMenuUpdates(): array
     {
-        return $this->notAppliedMenuUpdates;
-    }
-
-    /**
-     * Returns applied menu updates that created menu items inside the root menu item
-     * instead of their corresponding parent menu items as the parent menu items with MenuUpdate::$parentKey name
-     * do not exist.
-     *
-     * @return array<int,MenuUpdateInterface> List of MenuUpdateInterface objects indexed by menu update ID.
-     */
-    public function getOrphanMenuUpdates(): array
-    {
-        return $this->orphanMenuUpdates;
+        return $this->lostMenuUpdates;
     }
 }

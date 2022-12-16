@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Utils;
 
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Iterator\RecursiveItemIterator;
+use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 /**
@@ -62,5 +63,14 @@ class MenuUpdateUtils
     public static function generateKey(string $menuName, Scope $scope): string
     {
         return $menuName . '_' . $scope->getId();
+    }
+
+    public static function getAllowedNestingLevel(ItemInterface $menuItem): int
+    {
+        $menu = $menuItem->getRoot();
+        $menuMaxNestingLevel = (int)$menu->getExtra(ConfigurationBuilder::MAX_NESTING_LEVEL, 0);
+        $level = count(LostItemsManipulator::getParents($menuItem));
+
+        return max(0, $menuMaxNestingLevel - $level);
     }
 }

@@ -169,7 +169,7 @@ abstract class AbstractMenuController extends AbstractController
             );
 
             foreach ($updates as $update) {
-                $errors = $this->get(ValidatorInterface::class)->validate($update);
+                $errors = $this->get(ValidatorInterface::class)->validate($update, null, ['Move']);
                 if (count($errors)) {
                     $form->addError(new FormError(
                         $this->get(TranslatorInterface::class)
@@ -208,7 +208,7 @@ abstract class AbstractMenuController extends AbstractController
     ): array|RedirectResponse {
         $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
 
-        $form = $this->createForm(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem]);
+        $form = $this->createForm(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem, 'menu' => $menu]);
 
         $response = $this->get(UpdateHandlerFacade::class)->update(
             $menuUpdate,
@@ -221,6 +221,7 @@ abstract class AbstractMenuController extends AbstractController
             $response['menuName'] = $menu->getName();
             $response['tree'] = $this->createMenuTree($menu);
             $response['menuItem'] = $menuItem;
+            $response['menu'] = $menu;
             $response = array_merge($response, $context);
         } else {
             $this->dispatchMenuUpdateChangeEvent($menu->getName(), $context);

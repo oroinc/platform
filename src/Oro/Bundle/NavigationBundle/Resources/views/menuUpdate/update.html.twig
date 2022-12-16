@@ -163,7 +163,7 @@
         'onSelectRoute' : routePrefix ~ 'update',
         'onMoveRoute' : routePrefix ~ 'ajax_move',
         'successMessage': movedMessage|default('oro.navigation.menuupdate.moved_success_message'),
-        'maxDepth': menuItem.root.extras.max_nesting_level|default(3),
+        'maxDepth': menu.extras.max_nesting_level|default(3),
     } %}
 
     <div class="sidebar-container">

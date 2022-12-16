@@ -214,7 +214,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
             $position
         );
         foreach ($updates as $update) {
-            $errors = $this->getValidator()->validate($update);
+            $errors = $this->getValidator()->validate($update, null, ['Move']);
 
             if (count($errors)) {
                 return new JsonResponse([

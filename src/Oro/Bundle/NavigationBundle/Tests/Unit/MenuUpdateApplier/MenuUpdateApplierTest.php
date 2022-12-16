@@ -9,6 +9,7 @@ use Oro\Bundle\NavigationBundle\MenuUpdateApplier\MenuUpdateApplier;
 use Oro\Bundle\NavigationBundle\MenuUpdateApplier\Model\MenuUpdatesApplyResult;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
+use Oro\Bundle\NavigationBundle\Utils\LostItemsManipulator;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -54,11 +55,13 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $expectedItem->setUri('URI');
         $expectedItem->setLabel('sample title');
         $expectedItem->setExtra('description', 'sample description');
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, false);
         $expectedItem->setLinkAttribute('testAttribute', 'testValue');
 
         self::assertEquals($expectedItem, $item);
         self::assertEquals(
-            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], [], []),
+            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], []),
             $menuUpdatesApplyResult
         );
     }
@@ -82,10 +85,12 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $expectedItem = $this->createItem('item-1-1-1');
         $expectedItem->setParent($menu->getChild('item-2'));
         $expectedItem->setDisplay(false);
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, false);
 
         self::assertEquals($expectedItem, $item);
         self::assertEquals(
-            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], [], []),
+            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], []),
             $menuUpdatesApplyResult
         );
     }
@@ -110,10 +115,12 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $expectedItem = $this->createItem('item-1-1-1');
         $expectedItem->setParent($menu->getChild('item-2'));
         $expectedItem->setLabel('Sample original label');
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, false);
 
         self::assertEquals($expectedItem, $item);
         self::assertEquals(
-            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], [], []),
+            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], []),
             $menuUpdatesApplyResult
         );
     }
@@ -138,10 +145,12 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $expectedItem = $this->createItem('item-1-1-1');
         $expectedItem->setParent($menu->getChild('item-2'));
         $expectedItem->setExtra('description', 'Sample original description');
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, false);
 
         self::assertEquals($expectedItem, $item);
         self::assertEquals(
-            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], [], []),
+            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], []),
             $menuUpdatesApplyResult
         );
     }
@@ -167,10 +176,12 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $expectedItem = $this->createItem('item-1-1-1');
         $expectedItem->setParent($menu->getChild('item-2'));
         $expectedItem->setExtra('description', 'Sample original description');
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, false);
 
         self::assertEquals($expectedItem, $item);
         self::assertEquals(
-            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], [], []),
+            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], []),
             $menuUpdatesApplyResult
         );
     }
@@ -186,10 +197,20 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
 
         $menuUpdatesApplyResult = $this->applier->applyMenuUpdates($menu, [$menuUpdate]);
 
+        $lostItemsContainer = LostItemsManipulator::getLostItemsContainer($menu, false);
+        self::assertNotNull($lostItemsContainer);
+
+        $expectedItem = $this->createItem('item-1-1-1-1');
+        $expectedItem->setUri('URI');
+        $expectedItem->setParent($lostItemsContainer);
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, false);
+
         self::assertNull($menu->getChild('item-2')->getChild('item-1-1-1-1'));
+        self::assertEquals($expectedItem, $lostItemsContainer->getChild('item-1-1-1-1'));
 
         self::assertEquals(
-            new MenuUpdatesApplyResult($menu, [$menuUpdate], [], [$menuUpdate->getId() => $menuUpdate], []),
+            new MenuUpdatesApplyResult($menu, [$menuUpdate], [], [$menuUpdate->getId() => $menuUpdate]),
             $menuUpdatesApplyResult
         );
     }
@@ -209,11 +230,13 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $expectedItem = $this->createItem('item-1-1-1-1');
         $expectedItem->setParent($menu->getChild('item-2'));
         $expectedItem->setUri('URI');
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, true);
 
         self::assertEquals($expectedItem, $menu->getChild('item-2')->getChild('item-1-1-1-1'));
 
         self::assertEquals(
-            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], [], []),
+            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], []),
             $menuUpdatesApplyResult
         );
     }
@@ -235,11 +258,13 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $expectedItem->setParent($menu->getChild('item-1'));
         $expectedItem->setUri('URI');
         $expectedItem->setExtras(['sample_key' => 'sample_value']);
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, true);
 
         self::assertEquals($expectedItem, $menu->getChild('item-1')->getChild('new'));
 
         self::assertEquals(
-            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], [], []),
+            new MenuUpdatesApplyResult($menu, [$menuUpdate], [$menuUpdate->getId() => $menuUpdate], []),
             $menuUpdatesApplyResult
         );
     }
@@ -256,18 +281,23 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
 
         $menuUpdatesApplyResult = $this->applier->applyMenuUpdates($menu, [$menuUpdate]);
 
-        $expectedItem = $this->createItem('item-1-1-1-1');
-        $expectedItem->setParent($menu);
-        $expectedItem->setUri('URI');
+        $lostItemsContainer = LostItemsManipulator::getLostItemsContainer($menu, false);
+        self::assertNotNull($lostItemsContainer);
 
-        self::assertEquals($expectedItem, $menu->getChild('item-1-1-1-1'));
+        $expectedItem = $this->createItem('item-1-1-1-1');
+        $expectedItem->setParent($lostItemsContainer);
+        $expectedItem->setUri('URI');
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, true);
+
+        self::assertNull($menu->getChild('item-1-1-1-1'));
+        self::assertEquals($expectedItem, LostItemsManipulator::getLostItemsContainer($menu)->getChild('item-1-1-1-1'));
 
         self::assertEquals(
             new MenuUpdatesApplyResult(
                 $menu,
                 [$menuUpdate],
                 [$menuUpdate->getId() => $menuUpdate],
-                [],
                 [$menuUpdate->getId() => $menuUpdate]
             ),
             $menuUpdatesApplyResult
@@ -292,7 +322,11 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
 
         $expectedItem = $this->createItem($menuUpdate1->getKey());
         $expectedItem->setParent($menu->getChild($menuUpdate1->getParentKey()));
-        $expectedItem->addChild($menuUpdate2->getKey());
+        $expectedItem->addChild($menuUpdate2->getKey())
+            ->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate2->getParentKey())
+            ->setExtra(MenuUpdateApplier::IS_CUSTOM, true);
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate1->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, true);
 
         self::assertEquals(
             $expectedItem,
@@ -304,7 +338,6 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
                 $menu,
                 [$menuUpdate1, $menuUpdate2],
                 [$menuUpdate1->getId() => $menuUpdate1, $menuUpdate2->getId() => $menuUpdate2],
-                [],
                 []
             ),
             $menuUpdatesApplyResult
@@ -329,7 +362,11 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
 
         $expectedItem = $this->createItem($menuUpdate2->getKey());
         $expectedItem->setParent($menu->getChild($menuUpdate2->getParentKey()));
-        $expectedItem->addChild($menuUpdate1->getKey());
+        $expectedItem->addChild($menuUpdate1->getKey())
+            ->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate1->getParentKey())
+            ->setExtra(MenuUpdateApplier::IS_CUSTOM, true);
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate2->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, true);
 
         self::assertEquals(
             $expectedItem,
@@ -369,6 +406,8 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $expectedItem = $this->createItem($menuUpdate2->getKey());
         $expectedItem->setParent($menu->getChild($menuUpdate2->getParentKey()));
         $expectedItem->setLabel('Sample updated title');
+        $expectedItem->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuUpdate2->getParentKey());
+        $expectedItem->setExtra(MenuUpdateApplier::IS_CUSTOM, true);
 
         self::assertEquals(
             $expectedItem,
@@ -380,7 +419,6 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
                 $menu,
                 [$menuUpdate1, $menuUpdate2],
                 [$menuUpdate1->getId() => $menuUpdate1, $menuUpdate2->getId() => $menuUpdate2],
-                [],
                 []
             ),
             $menuUpdatesApplyResult
