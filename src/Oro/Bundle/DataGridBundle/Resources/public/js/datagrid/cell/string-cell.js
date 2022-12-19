@@ -36,7 +36,7 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        render: function() {
+        render() {
             const render = StringCell.__super__.render.call(this);
 
             this._computeLongValueClassName();
@@ -62,8 +62,8 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        enterEditMode: function() {
-            if (this.isEditableColumn()) {
+        enterEditMode() {
+            if (this.isEditableColumn() && !this.currentEditor) {
                 StringCell.__super__.enterEditMode.call(this);
             }
         },
@@ -71,7 +71,7 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        exitEditMode: function() {
+        exitEditMode() {
             if (!this.isEditableColumn()) {
                 StringCell.__super__.exitEditMode.call(this);
             }
