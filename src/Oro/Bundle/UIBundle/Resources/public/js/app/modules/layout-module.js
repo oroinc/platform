@@ -15,3 +15,7 @@ mediator.setHandler('layout:scrollbarWidth', layout.scrollbarWidth, layout);
 mediator.setHandler('layout:adjustLabelsWidth', layout.adjustLabelsWidth, layout);
 mediator.on('page:beforeChange', layout.pageRendering, layout);
 mediator.on('page:afterChange', layout.pageRendered, layout);
+
+if (document) {
+    document.body.style.setProperty('--system-scroll-width', `${layout.scrollbarWidth()}px`);
+}
