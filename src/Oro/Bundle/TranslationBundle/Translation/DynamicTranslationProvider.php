@@ -74,11 +74,13 @@ class DynamicTranslationProvider implements DynamicTranslationProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function warmUp(string $locale): void
+    public function warmUp(array $locales): void
     {
-        $this->cache->delete([$locale]);
-        unset($this->translations[$locale]);
-        $this->loadTranslations([$locale]);
+        $this->cache->delete($locales);
+        foreach ($locales as $locale) {
+            unset($this->translations[$locale]);
+        }
+        $this->loadTranslations($locales);
     }
 
     public function onClearCache(InvalidateDynamicTranslationCacheEvent $event): void

@@ -12,8 +12,9 @@ Oro\Bundle\ReportBundle\Entity\Report:
   report:
     name: Common Report
     type: '@reportType'
+    organization: '@organization'
     entity: 'Oro\\Bundle\\OrganizationBundle\\Entity\\Organization'
-    definition: abcd
+    definition: <('{"columns":[{"name":"id","label":"Id","func":"","sorting":""}],"grouping_columns":[]}')>
 
 Oro\Bundle\OrganizationBundle\Entity\Organization:
   commonOrganization:

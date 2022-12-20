@@ -15,6 +15,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Abstract class for dashboard fixtures.
+ */
 abstract class AbstractDashboardFixture extends AbstractFixture implements ContainerAwareInterface
 {
     /**
@@ -44,6 +47,7 @@ abstract class AbstractDashboardFixture extends AbstractFixture implements Conta
         $dashboard = $this->getDashboardManager()
             ->createDashboardModel()
             ->setName($dashboardName)
+            ->setLabel($dashboardName)
             ->setOwner($adminUser)
             ->setOrganization($adminUser->getOrganization());
 

@@ -8,6 +8,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Localization value validator.
+ */
 class LocalizationValidator extends ConstraintValidator
 {
     /**
@@ -29,9 +32,8 @@ class LocalizationValidator extends ConstraintValidator
         if (!$parentLocalization) {
             return;
         }
-        if ($localization->getId() === $parentLocalization->getId() ||
-            $this->localizationExists($parentLocalization, $localization)
-        ) {
+        if ((null !== $localization->getId() && $localization->getId() === $parentLocalization->getId())
+            || $this->localizationExists($parentLocalization, $localization)) {
             $this->context->buildViolation($constraint->messageCircularReference)
                 ->atPath('parentLocalization')
                 ->addViolation();
