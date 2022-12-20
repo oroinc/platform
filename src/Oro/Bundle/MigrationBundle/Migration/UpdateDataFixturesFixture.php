@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\FixtureInterface;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
@@ -85,7 +85,7 @@ class UpdateDataFixturesFixture extends AbstractFixture
         $manager->flush();
     }
 
-    private function checkEntityManagerOpen(EntityManager $manager): void
+    private function checkEntityManagerOpen(EntityManagerInterface $manager): void
     {
         if (!$manager->isOpen()) {
             throw new \RuntimeException('EntityManager is closed');

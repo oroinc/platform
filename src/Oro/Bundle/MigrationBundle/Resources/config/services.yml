@@ -10,7 +10,7 @@ services:
             - '@service_container'
             - !service
                 class: Symfony\Component\DependencyInjection\ServiceLocator
-                arguments: [[]]
+                arguments: [ [ ] ]
 
     oro_migration.data_fixtures.loader:
         class: Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader
@@ -23,7 +23,7 @@ services:
     oro_migration.data_fixtures.executor:
         class: Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutor
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@oro_migration.data_fixture.entity_manager'
             - '@event_dispatcher'
 
     oro_migration.migrations.loader:
@@ -96,3 +96,10 @@ services:
 
     oro_migration.locator.fixture_path_locator:
         class: Oro\Bundle\MigrationBundle\Locator\FixturePathLocator
+
+    oro_migration.data_fixture.entity_manager:
+        class: Oro\Bundle\MigrationBundle\Doctrine\ORM\Decorator\DataFixtureEntityManager
+        public: true
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@validator'
