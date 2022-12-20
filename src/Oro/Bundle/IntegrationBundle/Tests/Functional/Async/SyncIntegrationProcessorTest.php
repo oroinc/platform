@@ -62,4 +62,28 @@ class SyncIntegrationProcessorTest extends WebTestCase
         self::assertEquals(TestConnector::TYPE, $status->getConnector());
         self::assertStringContainsString('Can\'t find job "integration_test_import"', $status->getMessage());
     }
+
+    public function testIntegrationTokenCreationAfterRunProcess(): void
+    {
+        /** @var Channel $integration */
+        $integration = $this->getReference('oro_integration:foo_integration');
+        self::assertEmpty($integration->getStatuses()->toArray());
+
+        $message = new Message();
+        $message->setMessageId(UUIDGenerator::v4());
+        $message->setBody([
+            'integration_id' => $integration->getId(),
+            'connector' => null,
+            'connector_parameters' => [],
+            'transport_batch_size' => 100,
+        ]);
+        self::assertNull(self::getContainer()->get('security.token_storage')->getToken());
+
+        $this->processor->process($message, $this->createMock(SessionInterface::class));
+
+        self::assertEquals(
+            $integration->getOrganization(),
+            self::getContainer()->get('security.token_storage')->getToken()->getOrganization()
+        );
+    }
 }
