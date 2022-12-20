@@ -85,6 +85,8 @@
                 padding: $oro-datagrid-select-container-offset;
                 height: $oro-datagrid-select-container-height;
                 border-radius: $oro-datagrid-select-container-border-radius;
+                // to reset fixed width defined for a control inside .form-horizontal
+                width: $select2-container-width;
             }
 
             .select2-arrow {
@@ -214,5 +216,36 @@
         .inline-editor-edit-action {
             display: none;
         }
+    }
+}
+
+.grid-container {
+    position: relative;
+    // to stretch width to the size of its content,
+    // gets wider than parent element, if it has horizontal scroll
+    display: inline-block;
+    min-width: 100%;
+
+    .grid-editor-boundary {
+        position: absolute;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: -$oro-datagrid-editable-inner-offset;
+        pointer-events: none;
+
+        &.text-editor-offset {
+            right: $inline-editor-inner-outer-offset;
+        }
+
+        &.tags-select-editor-offset {
+            right: 0;
+        }
+    }
+}
+
+.scrollbar-is-visible {
+    .grid-editor-boundary {
+        margin-right: var(--system-scroll-width, 0);
     }
 }
