@@ -96,9 +96,9 @@ class BuilderChainProvider implements MenuProviderInterface
     {
         if ($menu->hasChildren() && $menu->getDisplayChildren()) {
             $orderedChildren = [];
-            $unorderedChildren = [];
             $hasOrdering = false;
             $children = $menu->getChildren();
+            $index = 0;
             foreach ($children as $child) {
                 if ($child->hasChildren() && $child->getDisplayChildren()) {
                     $this->sort($child);
@@ -108,12 +108,12 @@ class BuilderChainProvider implements MenuProviderInterface
                     $orderedChildren[$child->getName()] = (int) $position;
                     $hasOrdering = true;
                 } else {
-                    $unorderedChildren[] = $child->getName();
+                    $orderedChildren[$child->getName()] = $index ++;
                 }
             }
             if ($hasOrdering) {
                 asort($orderedChildren);
-                $menu->reorderChildren(array_merge(array_keys($orderedChildren), $unorderedChildren));
+                $menu->reorderChildren(array_keys($orderedChildren));
             }
         }
     }
