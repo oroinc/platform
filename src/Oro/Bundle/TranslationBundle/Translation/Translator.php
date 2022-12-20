@@ -314,7 +314,7 @@ class Translator extends BaseTranslator
         foreach ($locales as $locale) {
             $this->newTranslator($locale, $options)->loadCatalogues();
         }
-
+        $this->dynamicTranslationProvider->warmUp($locales);
         $this->moveCatalogueFiles($options['cache_dir'], $cacheDir);
     }
 
@@ -343,8 +343,6 @@ class Translator extends BaseTranslator
         } finally {
             $this->enableDumpCatalogue = false;
         }
-        $this->dynamicTranslationProvider->warmUp($locale);
-
         $sanitizationErrors = $this->sanitizationErrorCollection->all();
         foreach ($sanitizationErrors as $sanitizationError) {
             $this->logger->warning('Unsafe translation message found', ['error' => $sanitizationError]);
