@@ -180,7 +180,7 @@
             "crypto-js": "4.1.1",
             "jquery-mousewheel": "3.1.13",
             "jquery-numeric": "1.5.0",
-            "tinymce": "5.10.*",
+            "tinymce": "6.3.*",
             "timepicker": "1.13.18",
             "datepair.js": "0.4.*",
             "jquery-ui-multiselect-widget": "2.0.1",

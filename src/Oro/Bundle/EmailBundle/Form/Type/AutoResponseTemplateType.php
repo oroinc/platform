@@ -194,9 +194,8 @@ class AutoResponseTemplateType extends AbstractType
 
         return [
             'valid_elements' => null, //all elements are valid
-            'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullpage']),
+            'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullscreen']),
             'relative_urls' => false,
-            'forced_root_block' => '',
             'entity_encoding' => 'raw',
         ];
     }
