@@ -22,6 +22,9 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
     /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $contextRegistry;
 
+    /** @var DoctrineClearWriter|\PHPUnit\Framework\MockObject\MockObject */
+    private $clearWriter;
+
     /** @var XlsxFileWriter */
     private $writer;
 
@@ -29,8 +32,10 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
     {
         $this->getTempDir('XlsxFileWriterTest');
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
+        $this->clearWriter = $this->createMock(DoctrineClearWriter::class);
 
         $this->writer = new XlsxFileWriter($this->contextRegistry);
+        $this->writer->setClearWriter($this->clearWriter);
     }
 
     protected function tearDown(): void
@@ -147,13 +152,10 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
     {
         $stepExecution = $this->getStepExecution($options);
         $this->writer->setStepExecution($stepExecution);
-
-        $clearWriter = $this->createMock(DoctrineClearWriter::class);
-        $clearWriter->expects(self::once())
+        $this->clearWriter->expects(self::once())
             ->method('write')
             ->with($data);
 
-        $this->writer->setClearWriter($clearWriter);
         $this->writer->write($data);
         $this->writer->close();
 

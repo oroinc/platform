@@ -63,6 +63,7 @@ class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInt
      */
     public function setStepExecution(StepExecution $stepExecution)
     {
+        $this->clearWriter?->setStepExecution($stepExecution);
         $context = $this->contextRegistry->getByStepExecution($stepExecution);
         $this->setImportExportContext($context);
     }

@@ -52,6 +52,8 @@ services:
         class: Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter
         arguments:
             - '@doctrine'
+        calls:
+            - ['setContextRegistry', ['@oro_importexport.context_registry']]
         tags:
             - { name: oro_importexport.writer, alias: doctrine_clear }
 
