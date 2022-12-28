@@ -4,6 +4,12 @@ The current file describes significant changes in the code that may affect the u
 
 ## UNRELEASED
 
+### Added
+
+#### SearchBundle
+* Search query aggregations now can have parameters added via fourth parameter of the `addAggregate` method
+* Added possibility to set maximum number of results for the count search aggregation
+
 ### Changed
 
 #### AssetBundle

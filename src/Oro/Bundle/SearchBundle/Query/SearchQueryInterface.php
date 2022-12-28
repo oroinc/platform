@@ -170,14 +170,15 @@ interface SearchQueryInterface
      * @param string $name Name of the aggregating
      * @param string $field Fields that should be used to perform aggregating
      * @param string $function Applied aggregating function
+     * @param array $parameters Additional aggregation parameters
      * @return SearchQueryInterface
      */
-    public function addAggregate($name, $field, $function);
+    public function addAggregate($name, $field, $function, array $parameters = []);
 
     /**
      * Return list of all applied aggregating operations
      *
-     * @return array ['<name>' => ['field' => <field>, 'function' => '<function>']]
+     * @return array ['<name>' => ['field' => <field>, 'function' => '<function>', 'parameters' => <params>]]
      */
     public function getAggregations();
 }
