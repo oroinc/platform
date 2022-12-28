@@ -242,10 +242,12 @@ class QueryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals([], $query->getAggregations());
 
-        $query->addAggregate('test_name', 'test_field', 'test_function');
+        $query->addAggregate('test_name', 'test_field', 'test_function', ['test' => 'parameter']);
 
         $this->assertEquals(
-            ['test_name' => ['field' => 'test_field', 'function' => 'test_function']],
+            ['test_name' =>
+                ['field' => 'test_field', 'function' => 'test_function', 'parameters' => ['test' => 'parameter']]
+            ],
             $query->getAggregations()
         );
     }

@@ -243,9 +243,9 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     /**
      * {@inheritdoc}
      */
-    public function addAggregate($name, $field, $function)
+    public function addAggregate($name, $field, $function, array $parameters = [])
     {
-        $this->query->addAggregate($name, $field, $function);
+        $this->query->addAggregate($name, $field, $function, $parameters);
 
         return $this;
     }
