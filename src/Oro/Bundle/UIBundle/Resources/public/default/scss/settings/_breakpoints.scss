@@ -28,7 +28,9 @@ $oro-breakpoints: (
     'product-datagrid-toolbar-narrow':
         '(max-width: 1280px)',
     'popup-gallery-tablet':
-        '(max-height: 730px), (max-width: #{$breakpoint-tablet-small})'
+        '(max-height: 730px), (max-width: #{$breakpoint-tablet-small})',
+    'mega-menu-wide':
+        '(min-width: #{$breakpoint-mobile-big + 1})'
 );
 
 // Variable for extend native breakpoints is empty by default;
