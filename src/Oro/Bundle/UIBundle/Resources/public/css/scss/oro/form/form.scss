@@ -281,6 +281,8 @@ select[multiple] {
             border-color: $add-on-disabled-border-color;
             background-color: $add-on-disabled-background-color;
             color: $add-on-disabled-color;
+            // color, background and border are already matching to a disabled control, no need for extra opacity
+            opacity: 1;
         }
     }
 
