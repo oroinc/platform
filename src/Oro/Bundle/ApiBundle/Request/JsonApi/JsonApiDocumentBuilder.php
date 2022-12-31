@@ -65,6 +65,24 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
+    public function setDataObject($object, RequestType $requestType, EntityMetadata $metadata = null): void
+    {
+        parent::setDataObject($object, $requestType, $metadata);
+        $this->removeRelatedObjectsThatDuplicatePrimaryObjects(false);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDataCollection($collection, RequestType $requestType, EntityMetadata $metadata = null): void
+    {
+        parent::setDataCollection($collection, $requestType, $metadata);
+        $this->removeRelatedObjectsThatDuplicatePrimaryObjects(true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function convertCollectionToArray(
         $collection,
         RequestType $requestType,
@@ -499,5 +517,34 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         }
 
         return [self::HREF => $href, self::META => $properties];
+    }
+
+    private function removeRelatedObjectsThatDuplicatePrimaryObjects(bool $collection): void
+    {
+        if (empty($this->result[self::INCLUDED])) {
+            return;
+        }
+
+        $primaryEntities = [];
+        if ($collection) {
+            foreach ($this->result[self::DATA] as $item) {
+                $primaryEntities[$item[self::TYPE]][$item[self::ID]] = true;
+            }
+        } else {
+            $item = $this->result[self::DATA];
+            $primaryEntities[$item[self::TYPE]][$item[self::ID]] = true;
+        }
+        $toRemoveKeys = [];
+        foreach ($this->result[self::INCLUDED] as $key => $item) {
+            if (isset($primaryEntities[$item[self::TYPE]][$item[self::ID]])) {
+                $toRemoveKeys[] = $key;
+            }
+        }
+        if ($toRemoveKeys) {
+            foreach ($toRemoveKeys as $key) {
+                unset($this->result[self::INCLUDED][$key]);
+            }
+            $this->result[self::INCLUDED] = array_values($this->result[self::INCLUDED]);
+        }
     }
 }
