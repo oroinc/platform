@@ -486,7 +486,7 @@ class EntitySerializer
     protected function isAssociation($fieldName, EntityMetadata $entityMetadata, FieldConfig $fieldConfig = null)
     {
         return
-            $entityMetadata->isAssociation($fieldName)
+            ('_' !== $fieldName && $entityMetadata->isAssociation($fieldName))
             || (null !== $fieldConfig && null !== $fieldConfig->getTargetEntity());
     }
 
@@ -994,8 +994,9 @@ class EntitySerializer
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
         $fields = $this->fieldAccessor->getFields($entityClass, $config);
         foreach ($fields as $field) {
-            $propertyPath = $this->configAccessor->getPropertyPath($field, $config->getField($field));
-            if ($entityMetadata->isAssociation($propertyPath)) {
+            $fieldConfig = $config->getField($field);
+            $property = $this->configAccessor->getPropertyPath($field, $fieldConfig);
+            if ($this->isAssociation($property, $entityMetadata, $fieldConfig)) {
                 return true;
             }
         }
