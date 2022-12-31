@@ -34,6 +34,19 @@ class ConfigUtil
     public const CLASS_NAME = '__class__';
 
     /**
+     * You can use this constant as a property path for computed field
+     * to avoid collisions with existing getters.
+     * Example of usage:
+     *  'fields' => [
+     *      'primaryPhone' => ['property_path' => '_']
+     *  ]
+     * In this example a value of primaryPhone will not be loaded
+     * even if an entity has getPrimaryPhone method.
+     * Also such field will be marked as not mapped for Symfony forms.
+     */
+    public const IGNORE_PROPERTY_PATH = '_';
+
+    /**
      * a key of a record contains an additional information about a collection,
      * e.g. "has_more" flag indicates whether a collection has more records than it was requested.
      */

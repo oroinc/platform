@@ -41,19 +41,6 @@ class ConfigUtil extends BaseConfigUtil
     /** a flag indicates whether an entity configuration should be merged with a configuration of a parent entity */
     public const INHERIT = 'inherit';
 
-    /**
-     * You can use this constant as a property path for computed field
-     * to avoid collisions with existing getters.
-     * Example of usage:
-     *  'fields' => [
-     *      'primaryPhone' => ['property_path' => '_']
-     *  ]
-     * In this example a value of primaryPhone will not be loaded
-     * even if an entity has getPrimaryPhone method.
-     * Also such field will be marked as not mapped for Symfony forms.
-     */
-    public const IGNORE_PROPERTY_PATH = '_';
-
     /** a short, human-readable description of API resource, sub-resource, field, etc. */
     public const DESCRIPTION = 'description';
 
