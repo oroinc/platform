@@ -10,8 +10,7 @@ use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\TestEntity;
  */
 class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityDataAccessor */
-    protected $entityDataAccessor;
+    private EntityDataAccessor $entityDataAccessor;
 
     protected function setUp(): void
     {
@@ -54,7 +53,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider accessibleFieldsProvider
      */
-    public function testHasGetterForAccessibleField($fieldName)
+    public function testHasGetterForAccessibleField(string $fieldName): void
     {
         self::assertTrue($this->entityDataAccessor->hasGetter(TestEntity::class, $fieldName));
     }
@@ -62,7 +61,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider notAccessibleFieldsProvider
      */
-    public function testHasGetterForNotAccessibleField($fieldName)
+    public function testHasGetterForNotAccessibleField(string $fieldName): void
     {
         self::assertFalse($this->entityDataAccessor->hasGetter(TestEntity::class, $fieldName));
     }
@@ -70,7 +69,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider accessibleFieldsProvider
      */
-    public function testGetValueForAccessibleField($fieldName)
+    public function testGetValueForAccessibleField(string $fieldName): void
     {
         $entity = new TestEntity('test');
         self::assertEquals('test', $this->entityDataAccessor->getValue($entity, $fieldName));
@@ -79,7 +78,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider notAccessibleFieldsProvider
      */
-    public function testGetValueForNotAccessibleField($fieldName)
+    public function testGetValueForNotAccessibleField(string $fieldName): void
     {
         $this->expectException(\RuntimeException::class);
         $entity = new TestEntity('test');
@@ -89,7 +88,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider accessibleFieldsProvider
      */
-    public function testTryGetValueForAccessibleField($fieldName)
+    public function testTryGetValueForAccessibleField(string $fieldName): void
     {
         $entity = new TestEntity('test');
         $value = 'prev';
@@ -100,7 +99,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider notAccessibleFieldsProvider
      */
-    public function testTryGetValueForNotAccessibleField($fieldName)
+    public function testTryGetValueForNotAccessibleField(string $fieldName): void
     {
         $entity = new TestEntity('test');
         $value = 'prev';
@@ -108,20 +107,20 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('prev', $value);
     }
 
-    public function testGetValueForAccessibleArrayElement()
+    public function testGetValueForAccessibleArrayElement(): void
     {
         $entity = ['someName' => 'test'];
         self::assertEquals('test', $this->entityDataAccessor->getValue($entity, 'someName'));
     }
 
-    public function testGetValueForNotAccessibleArrayElement()
+    public function testGetValueForNotAccessibleArrayElement(): void
     {
         $this->expectException(\RuntimeException::class);
         $entity = ['someName' => 'test'];
         $this->entityDataAccessor->getValue($entity, 'notExistingName');
     }
 
-    public function testTryGetValueForAccessibleArrayElement()
+    public function testTryGetValueForAccessibleArrayElement(): void
     {
         $entity = ['someName' => 'test'];
         $value = 'prev';
@@ -129,7 +128,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $value);
     }
 
-    public function testTryGetValueForNotAccessibleArrayElement()
+    public function testTryGetValueForNotAccessibleArrayElement(): void
     {
         $entity = ['someName' => 'test'];
         $value = 'prev';

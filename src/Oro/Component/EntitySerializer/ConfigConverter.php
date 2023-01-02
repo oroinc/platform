@@ -9,14 +9,7 @@ namespace Oro\Component\EntitySerializer;
  */
 class ConfigConverter
 {
-    /**
-     * Converts normalized configuration of the EntityConfig object.
-     *
-     * @param array $config
-     *
-     * @return EntityConfig
-     */
-    public function convertConfig(array $config)
+    public function convertConfig(array $config): EntityConfig
     {
         $result = new InternalEntityConfig();
         $this->buildEntityConfig($result, $config);
@@ -24,7 +17,7 @@ class ConfigConverter
         return $result;
     }
 
-    protected function buildEntityConfig(EntityConfig $result, array $config)
+    protected function buildEntityConfig(EntityConfig $result, array $config): void
     {
         $this->setExclusionPolicy($result, $config);
         $this->setPartialLoad($result, $config);
@@ -48,7 +41,7 @@ class ConfigConverter
         }
     }
 
-    protected function buildFieldConfig(FieldConfig $result, array $config)
+    protected function buildFieldConfig(FieldConfig $result, array $config): void
     {
         $this->setPropertyPath($result, $config);
         $this->setExcluded($result, $config);
@@ -65,7 +58,7 @@ class ConfigConverter
         $this->setCollapseField($result, $config);
     }
 
-    protected function setExclusionPolicy(EntityConfig $result, array $config)
+    protected function setExclusionPolicy(EntityConfig $result, array $config): void
     {
         if (!empty($config[ConfigUtil::EXCLUSION_POLICY])
             && ConfigUtil::EXCLUSION_POLICY_NONE !== $config[ConfigUtil::EXCLUSION_POLICY]
@@ -74,7 +67,7 @@ class ConfigConverter
         }
     }
 
-    protected function setPartialLoad(EntityConfig $result, array $config)
+    protected function setPartialLoad(EntityConfig $result, array $config): void
     {
         if (\array_key_exists(ConfigUtil::DISABLE_PARTIAL_LOAD, $config)
             && $config[ConfigUtil::DISABLE_PARTIAL_LOAD]
@@ -83,7 +76,7 @@ class ConfigConverter
         }
     }
 
-    protected function setHints(EntityConfig $result, array $config)
+    protected function setHints(EntityConfig $result, array $config): void
     {
         if (!empty($config[ConfigUtil::HINTS])) {
             foreach ($config[ConfigUtil::HINTS] as $hint) {
@@ -96,21 +89,21 @@ class ConfigConverter
         }
     }
 
-    protected function setInnerJoinAssociations(EntityConfig $result, array $config)
+    protected function setInnerJoinAssociations(EntityConfig $result, array $config): void
     {
         if (!empty($config[ConfigUtil::INNER_JOIN_ASSOCIATIONS])) {
             $result->setInnerJoinAssociations($config[ConfigUtil::INNER_JOIN_ASSOCIATIONS]);
         }
     }
 
-    protected function setOrderBy(EntityConfig $result, array $config)
+    protected function setOrderBy(EntityConfig $result, array $config): void
     {
         if (!empty($config[ConfigUtil::ORDER_BY])) {
             $result->setOrderBy($config[ConfigUtil::ORDER_BY]);
         }
     }
 
-    protected function setMaxResults(EntityConfig $result, array $config)
+    protected function setMaxResults(EntityConfig $result, array $config): void
     {
         if (\array_key_exists(ConfigUtil::MAX_RESULTS, $config)
             && null !== $config[ConfigUtil::MAX_RESULTS]
@@ -119,7 +112,7 @@ class ConfigConverter
         }
     }
 
-    protected function setHasMore(EntityConfig $result, array $config)
+    protected function setHasMore(EntityConfig $result, array $config): void
     {
         if (\array_key_exists(ConfigUtil::HAS_MORE, $config)
             && $config[ConfigUtil::HAS_MORE]
@@ -128,7 +121,7 @@ class ConfigConverter
         }
     }
 
-    protected function setPostSerializeHandler(EntityConfig $result, array $config)
+    protected function setPostSerializeHandler(EntityConfig $result, array $config): void
     {
         if (\array_key_exists(ConfigUtil::POST_SERIALIZE, $config)
             && null !== $config[ConfigUtil::POST_SERIALIZE]
@@ -137,7 +130,7 @@ class ConfigConverter
         }
     }
 
-    protected function setPostSerializeCollectionHandler(EntityConfig $result, array $config)
+    protected function setPostSerializeCollectionHandler(EntityConfig $result, array $config): void
     {
         if (\array_key_exists(ConfigUtil::POST_SERIALIZE_COLLECTION, $config)
             && null !== $config[ConfigUtil::POST_SERIALIZE_COLLECTION]
@@ -146,7 +139,7 @@ class ConfigConverter
         }
     }
 
-    protected function setExcludedFields(EntityConfig $result, array $config)
+    protected function setExcludedFields(EntityConfig $result, array $config): void
     {
         if (\array_key_exists(ConfigUtil::EXCLUDED_FIELDS, $config)
             && !empty($config[ConfigUtil::EXCLUDED_FIELDS])
@@ -155,7 +148,7 @@ class ConfigConverter
         }
     }
 
-    protected function setRenamedFields(EntityConfig $result, array $config)
+    protected function setRenamedFields(EntityConfig $result, array $config): void
     {
         if (\array_key_exists(ConfigUtil::RENAMED_FIELDS, $config)
             && !empty($config[ConfigUtil::RENAMED_FIELDS])
@@ -164,14 +157,14 @@ class ConfigConverter
         }
     }
 
-    protected function setPropertyPath(FieldConfig $result, array $config)
+    protected function setPropertyPath(FieldConfig $result, array $config): void
     {
         if (!empty($config[ConfigUtil::PROPERTY_PATH])) {
             $result->setPropertyPath($config[ConfigUtil::PROPERTY_PATH]);
         }
     }
 
-    protected function setExcluded(FieldConfig $result, array $config)
+    protected function setExcluded(FieldConfig $result, array $config): void
     {
         if (\array_key_exists(ConfigUtil::EXCLUDE, $config)
             && $config[ConfigUtil::EXCLUDE]
@@ -180,7 +173,7 @@ class ConfigConverter
         }
     }
 
-    protected function setCollapsed(FieldConfig $result, array $config)
+    protected function setCollapsed(FieldConfig $result, array $config): void
     {
         if (\array_key_exists(ConfigUtil::COLLAPSE, $config)
             && $config[ConfigUtil::COLLAPSE]
@@ -189,7 +182,7 @@ class ConfigConverter
         }
     }
 
-    protected function setCollapseField(FieldConfig $result, array $config)
+    protected function setCollapseField(FieldConfig $result, array $config): void
     {
         if (\array_key_exists(ConfigUtil::COLLAPSE_FIELD, $config)) {
             $field = $config[ConfigUtil::COLLAPSE_FIELD];
@@ -199,7 +192,7 @@ class ConfigConverter
         }
     }
 
-    protected function setDataTransformers(FieldConfig $result, array $config)
+    protected function setDataTransformers(FieldConfig $result, array $config): void
     {
         if (!empty($config[ConfigUtil::DATA_TRANSFORMER])) {
             if (\is_string($config[ConfigUtil::DATA_TRANSFORMER])
@@ -214,7 +207,7 @@ class ConfigConverter
         }
     }
 
-    protected function setAssociationQuery(FieldConfig $result, array $config)
+    protected function setAssociationQuery(FieldConfig $result, array $config): void
     {
         if (isset($config[ConfigUtil::ASSOCIATION_QUERY])) {
             $result->set(ConfigUtil::ASSOCIATION_QUERY, $config[ConfigUtil::ASSOCIATION_QUERY]);

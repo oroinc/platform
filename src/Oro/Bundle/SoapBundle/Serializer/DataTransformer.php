@@ -11,8 +11,7 @@ use Oro\Component\EntitySerializer\DataTransformerInterface;
  */
 class DataTransformer implements DataTransformerInterface
 {
-    /** @var DataTransformerInterface */
-    private $innerDataTransformer;
+    private DataTransformerInterface $innerDataTransformer;
 
     public function __construct(DataTransformerInterface $innerDataTransformer)
     {
@@ -20,12 +19,12 @@ class DataTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function transform($value, array $config, array $context)
+    public function transform(mixed $value, array $config, array $context): mixed
     {
         $value = $this->innerDataTransformer->transform($value, $config, $context);
-        if (is_object($value)) {
+        if (\is_object($value)) {
             if (method_exists($value, '__toString')) {
                 $value = (string)$value;
             } elseif ($value instanceof \DateTime) {

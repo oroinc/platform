@@ -12,8 +12,7 @@ use Oro\Component\EntitySerializer\DataTransformerInterface;
  */
 class EntityClassToEntityTypeTransformer implements DataTransformerInterface
 {
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct(ValueNormalizer $valueNormalizer)
     {
@@ -21,9 +20,9 @@ class EntityClassToEntityTypeTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function transform($value, array $config, array $context)
+    public function transform(mixed $value, array $config, array $context): mixed
     {
         if (empty($value)) {
             return $value;

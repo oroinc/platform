@@ -11,7 +11,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertConfigProvider
      */
-    public function testConvertConfig($config, $expectedConfig)
+    public function testConvertConfig(array $config, array $expectedConfig): void
     {
         $configConverter = new ConfigConverter();
 
@@ -271,7 +271,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConvertConfigWithAssociationQuery()
+    public function testConvertConfigWithAssociationQuery(): void
     {
         $associationName = 'association1';
         $associationQuery = new AssociationQuery($this->createMock(QueryBuilder::class), 'Test\TargetClass');

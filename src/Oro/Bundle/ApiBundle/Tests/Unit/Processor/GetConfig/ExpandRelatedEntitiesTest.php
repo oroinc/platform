@@ -221,6 +221,10 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 ['realAssociation3', 'Test\Association3Target'],
                 ['association4', 'Test\Association4Target']
             ]);
+        $rootEntityMetadata->expects(self::exactly(3))
+            ->method('isCollectionValuedAssociation')
+            ->withConsecutive(['association1'], ['association2'], ['realAssociation3'])
+            ->willReturn(false);
         $association1Metadata = new ClassMetadata('Test\Association1Target');
         $association2Metadata = new ClassMetadata('Test\Association2Target');
         $association3Metadata = new ClassMetadata('Test\Association3Target');
@@ -470,6 +474,10 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ->method('getAssociationTargetClass')
             ->with('association1')
             ->willReturn('Test\Association1Target');
+        $rootEntityMetadata->expects(self::once())
+            ->method('isCollectionValuedAssociation')
+            ->with('association1')
+            ->willReturn(false);
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::once())
@@ -653,6 +661,10 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             ->method('getAssociationTargetClass')
             ->with('association1')
             ->willReturn('Test\Association1Target');
+        $rootEntityMetadata->expects(self::once())
+            ->method('isCollectionValuedAssociation')
+            ->with('association1')
+            ->willReturn(false);
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::once())

@@ -17,97 +17,82 @@ class Department
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(name="name", type="string", length=255, unique=true)
      */
-    protected $name;
+    private ?string $name = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="Person")
      * @ORM\JoinColumn(name="manager_id", referencedColumnName="id")
      */
-    protected $manager;
+    private ?Person $manager = null;
 
     /**
      * @ORM\OneToMany(targetEntity="Person", mappedBy="department")
      */
-    protected $staff;
+    private Collection $staff;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="products")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
      */
-    protected $owner;
+    private ?User $owner = null;
 
     public function __construct()
     {
         $this->staff = new ArrayCollection();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name)
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return Person
-     */
-    public function getManager()
+    public function getManager(): ?Person
     {
         return $this->manager;
     }
 
-    /**
-     * @param Person|null $manager
-     */
-    public function setManager($manager)
+    public function setManager(?Person $manager): void
     {
         $this->manager = $manager;
     }
 
     /**
-     * @return Collection|Person[]
+     * @return Collection<Person>
      */
-    public function getStaff()
+    public function getStaff(): Collection
     {
         return $this->staff;
     }
 
-    public function setStaff(Collection $staff)
+    /**
+     * @param Collection<Person> $staff
+     */
+    public function setStaff(Collection $staff): void
     {
         $this->staff = $staff;
     }
 
-    public function addStaff(Person $person)
+    public function addStaff(Person $person): void
     {
         if (!$this->staff->contains($person)) {
             $this->staff->add($person);
@@ -115,7 +100,7 @@ class Department
         }
     }
 
-    public function removeStaff(Person $person)
+    public function removeStaff(Person $person): void
     {
         if ($this->staff->contains($person)) {
             $this->staff->removeElement($person);
@@ -123,18 +108,12 @@ class Department
         }
     }
 
-    /**
-     * @return User
-     */
-    public function getOwner()
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
 
-    /**
-     * @param User|null $owner
-     */
-    public function setOwner($owner)
+    public function setOwner(?User $owner): void
     {
         $this->owner = $owner;
     }

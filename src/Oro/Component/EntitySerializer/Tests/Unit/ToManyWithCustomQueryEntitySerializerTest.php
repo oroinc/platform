@@ -11,7 +11,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testToManyCustomAssociationWhenOnlyIdentifierFieldIsRequested()
+    public function testToManyCustomAssociationWhenOnlyIdentifierFieldIsRequested(): void
     {
         $qb = $this->em->getRepository(Entity\Group::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
@@ -107,7 +107,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testToManyCustomAssociationWhenOnlyIdentifierFieldWithLimitIsRequested()
+    public function testToManyCustomAssociationWhenOnlyIdentifierFieldWithLimitIsRequested(): void
     {
         $qb = $this->em->getRepository(Entity\Group::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
@@ -210,7 +210,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testToManyCustomAssociationWhenOnlyScalarFieldsAreRequested()
+    public function testToManyCustomAssociationWhenOnlyScalarFieldsAreRequested(): void
     {
         $qb = $this->em->getRepository(Entity\Group::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
@@ -309,7 +309,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testToManyCustomAssociationWhenOnlyScalarFieldsWithLimitAreRequested()
+    public function testToManyCustomAssociationWhenOnlyScalarFieldsWithLimitAreRequested(): void
     {
         $qb = $this->em->getRepository(Entity\Group::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
@@ -430,7 +430,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testToManyCustomAssociationWithToOneCustomAssociation()
+    public function testToManyCustomAssociationWithToOneCustomAssociation(): void
     {
         $qb = $this->em->getRepository(Entity\Group::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
