@@ -11,15 +11,14 @@ use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
  */
 class QueryResolver
 {
-    /** @var QueryHintResolverInterface */
-    private $queryHintResolver;
+    private QueryHintResolverInterface $queryHintResolver;
 
     public function __construct(QueryHintResolverInterface $queryHintResolver)
     {
         $this->queryHintResolver = $queryHintResolver;
     }
 
-    public function resolveQuery(Query $query, EntityConfig $config)
+    public function resolveQuery(Query $query, EntityConfig $config): void
     {
         $this->queryHintResolver->resolveHints($query, $config->getHints());
 

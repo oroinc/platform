@@ -16,18 +16,18 @@ class Role
      * @ORM\Column(name="code", type="string", length=50)
      * @ORM\Id
      */
-    protected $code;
+    private ?string $code;
 
     /**
      * @ORM\Column(name="label", type="string", length=255, unique=true)
      */
-    protected $label;
+    private ?string $label = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="Category")
      * @ORM\JoinColumn(name="category_name", referencedColumnName="name")
      */
-    protected $category;
+    private ?Category $category = null;
 
     /**
      * @ORM\ManyToMany(targetEntity="Group")
@@ -36,71 +36,44 @@ class Role
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_group_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      */
-    protected $groups;
+    private Collection $groups;
 
-    /**
-     * @param string|null $code
-     */
-    public function __construct($code = null)
+    public function __construct(string $code = null)
     {
         $this->code = $code;
         $this->groups = new ArrayCollection();
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): ?string
     {
         return $this->code;
     }
 
-    /**
-     * @param string $code
-     *
-     * @return self
-     */
-    public function setCode($code)
+    public function setCode(?string $code): static
     {
         $this->code = $code;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): ?string
     {
         return $this->label;
     }
 
-    /**
-     * @param string $label
-     *
-     * @return self
-     */
-    public function setLabel($label)
+    public function setLabel(?string $label): static
     {
         $this->label = $label;
 
         return $this;
     }
 
-    /**
-     * @return Category
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    /**
-     * @param Category $category
-     *
-     * @return self
-     */
-    public function setCategory($category)
+    public function setCategory(?Category $category): static
     {
         $this->category = $category;
 
@@ -108,19 +81,14 @@ class Role
     }
 
     /**
-     * @return Group[]|Collection
+     * @return Collection<Group>
      */
-    public function getGroups()
+    public function getGroups(): Collection
     {
         return $this->groups;
     }
 
-    /**
-     * @param Group $group
-     *
-     * @return self
-     */
-    public function addGroup(Group $group)
+    public function addGroup(Group $group): static
     {
         if (!$this->groups->contains($group)) {
             $this->groups->add($group);
@@ -129,12 +97,7 @@ class Role
         return $this;
     }
 
-    /**
-     * @param Group $group
-     *
-     * @return self
-     */
-    public function removeGroup(Group $group)
+    public function removeGroup(Group $group): static
     {
         if ($this->groups->contains($group)) {
             $this->groups->removeElement($group);

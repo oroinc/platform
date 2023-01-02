@@ -12,15 +12,14 @@ class EntityDataAccessor implements DataAccessorInterface
     private const NO_GETTER = '';
 
     /** @var \ReflectionClass[] */
-    private $reflCache = [];
-
+    private array $reflCache = [];
     /** @var array [class name => [property name => getter name, ...], ...] */
-    private $getterCache = [];
+    private array $getterCache = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function hasGetter($className, $property)
+    public function hasGetter(string $className, string $property): bool
     {
         $reflClass = $this->getReflectionClass($className);
         $getter = $this->findGetterName($reflClass, $property);
@@ -29,9 +28,9 @@ class EntityDataAccessor implements DataAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function tryGetValue($object, $property, &$value)
+    public function tryGetValue(object|array $object, string $property, mixed &$value): bool
     {
         $hasValue = false;
         if (\is_array($object)) {
@@ -57,9 +56,9 @@ class EntityDataAccessor implements DataAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getValue($object, $property)
+    public function getValue(object|array $object, string $property): mixed
     {
         $value = null;
         if (!$this->tryGetValue($object, $property, $value)) {
@@ -71,31 +70,17 @@ class EntityDataAccessor implements DataAccessorInterface
                     ClassUtils::getClass($object)
                 );
             throw new \RuntimeException($message);
-        };
+        }
 
         return $value;
     }
 
-    /**
-     * Camelizes a given string.
-     *
-     * @param string $string Some string
-     *
-     * @return string The camelized version of the string
-     */
-    protected function camelize($string)
+    protected function camelize(string $string): string
     {
         return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
     }
 
-    /**
-     * Gets an instance of \ReflectionClass for the given class name
-     *
-     * @param string $className
-     *
-     * @return \ReflectionClass
-     */
-    protected function getReflectionClass($className)
+    protected function getReflectionClass(string $className): \ReflectionClass
     {
         if (isset($this->reflCache[$className])) {
             return $this->reflCache[$className];
@@ -107,13 +92,7 @@ class EntityDataAccessor implements DataAccessorInterface
         return $reflClass;
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     * @param string           $property
-     *
-     * @return string|null
-     */
-    protected function findGetterName(\ReflectionClass $reflClass, $property)
+    protected function findGetterName(\ReflectionClass $reflClass, string $property): ?string
     {
         if (isset($this->getterCache[$reflClass->name][$property])) {
             $getterName = $this->getterCache[$reflClass->name][$property];
@@ -125,13 +104,7 @@ class EntityDataAccessor implements DataAccessorInterface
         return self::NO_GETTER === $getterName ? null : $getterName;
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     * @param string           $property
-     *
-     * @return string
-     */
-    protected function getGetterName(\ReflectionClass $reflClass, $property)
+    protected function getGetterName(\ReflectionClass $reflClass, string $property): string
     {
         $camelized = $this->camelize($property);
 
@@ -155,13 +128,7 @@ class EntityDataAccessor implements DataAccessorInterface
         return self::NO_GETTER;
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     * @param string           $methodName
-     *
-     * @return bool
-     */
-    protected function isGetter(\ReflectionClass $reflClass, $methodName)
+    protected function isGetter(\ReflectionClass $reflClass, string $methodName): bool
     {
         if (!$reflClass->hasMethod($methodName)) {
             return false;

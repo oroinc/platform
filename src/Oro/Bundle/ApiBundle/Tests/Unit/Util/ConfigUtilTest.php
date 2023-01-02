@@ -11,7 +11,7 @@ use Oro\Component\ChainProcessor\Tests\Unit\TestArrayObject;
  */
 class ConfigUtilTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConvertObjectsToArrayDoNotTreatEmptyAsNull()
+    public function testConvertObjectsToArrayDoNotTreatEmptyAsNull(): void
     {
         $objects = [
             'obj1' => new TestArrayObject([]),
@@ -25,7 +25,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, ConfigUtil::convertObjectsToArray($objects));
     }
 
-    public function testConvertObjectsToArrayTreatEmptyAsNull()
+    public function testConvertObjectsToArrayTreatEmptyAsNull(): void
     {
         $objects = [
             'obj1' => new TestArrayObject([]),
@@ -40,19 +40,19 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, ConfigUtil::convertObjectsToArray($objects, true));
     }
 
-    public function testBuildMetaPropertyName()
+    public function testBuildMetaPropertyName(): void
     {
         self::assertEquals('__name__', ConfigUtil::buildMetaPropertyName('name'));
     }
 
-    public function testGetPropertyPathOfMetaPropertyForEmptyConfig()
+    public function testGetPropertyPathOfMetaPropertyForEmptyConfig(): void
     {
         $config = new EntityDefinitionConfig();
 
         self::assertNull(ConfigUtil::getPropertyPathOfMetaProperty('name', $config));
     }
 
-    public function testGetPropertyPathOfMetaPropertyWhenMetaPropertyDoesNotExist()
+    public function testGetPropertyPathOfMetaPropertyWhenMetaPropertyDoesNotExist(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('__field1__')->setMetaProperty(true);
@@ -60,7 +60,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertNull(ConfigUtil::getPropertyPathOfMetaProperty('field2', $config));
     }
 
-    public function testGetPropertyPathOfMetaPropertyWhenFoundItemIsFieldNotMetaProperty()
+    public function testGetPropertyPathOfMetaPropertyWhenFoundItemIsFieldNotMetaProperty(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('__field1__');
@@ -68,7 +68,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertNull(ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
     }
 
-    public function testGetPropertyPathOfMetaPropertyForExistingMetaProperty()
+    public function testGetPropertyPathOfMetaPropertyForExistingMetaProperty(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('__field1__')->setMetaProperty(true);
@@ -76,7 +76,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('__field1__', ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
     }
 
-    public function testGetPropertyPathOfMetaPropertyForExistingMetaPropertyWithPropertyPath()
+    public function testGetPropertyPathOfMetaPropertyForExistingMetaPropertyWithPropertyPath(): void
     {
         $config = new EntityDefinitionConfig();
         $field = $config->addField('someField');
@@ -86,7 +86,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('__field1__', ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
     }
 
-    public function testGetPropertyPathOfMetaPropertyForExistingExcludedMetaProperty()
+    public function testGetPropertyPathOfMetaPropertyForExistingExcludedMetaProperty(): void
     {
         $config = new EntityDefinitionConfig();
         $field = $config->addField('__field1__');
@@ -96,12 +96,12 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertNull(ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
     }
 
-    public function testGetAssociationTargetTypeForSingleValuedAssociation()
+    public function testGetAssociationTargetTypeForSingleValuedAssociation(): void
     {
         self::assertEquals(ConfigUtil::TO_ONE, ConfigUtil::getAssociationTargetType(false));
     }
 
-    public function testGetAssociationTargetTypeForCollectionValuedAssociation()
+    public function testGetAssociationTargetTypeForCollectionValuedAssociation(): void
     {
         self::assertEquals(ConfigUtil::TO_MANY, ConfigUtil::getAssociationTargetType(true));
     }

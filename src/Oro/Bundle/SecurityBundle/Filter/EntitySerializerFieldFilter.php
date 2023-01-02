@@ -14,20 +14,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class EntitySerializerFieldFilter implements FieldFilterInterface
 {
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var bool TRUE if access to entity ID field should be checked */
-    private $isIdFieldProtected;
-
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private DoctrineHelper $doctrineHelper;
+    private ConfigManager $configManager;
+    /** TRUE if access to entity ID field should be checked */
+    private bool $isIdFieldProtected;
     /** @var ConfigInterface[] */
-    private $securityConfigs = [];
+    private array $securityConfigs = [];
 
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
@@ -42,9 +35,9 @@ class EntitySerializerFieldFilter implements FieldFilterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function checkField($entity, string $entityClass, string $field): ?bool
+    public function checkField(object $entity, string $entityClass, string $field): ?bool
     {
         if (!$this->isIdFieldProtected && $this->isIdentifierField($entityClass, $field)) {
             return null;

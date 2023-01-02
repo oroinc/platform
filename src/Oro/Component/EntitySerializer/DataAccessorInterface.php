@@ -2,6 +2,9 @@
 
 namespace Oro\Component\EntitySerializer;
 
+/**
+ * Represents a service to read property values from entity objects or arrays.
+ */
 interface DataAccessorInterface
 {
     /**
@@ -12,7 +15,7 @@ interface DataAccessorInterface
      *
      * @return bool
      */
-    public function hasGetter($className, $property);
+    public function hasGetter(string $className, string $property): bool;
 
     /**
      * Attempts to get the value of the specified property
@@ -24,7 +27,7 @@ interface DataAccessorInterface
      *
      * @return bool true if a value is got; otherwise, false
      */
-    public function tryGetValue($object, $property, &$value);
+    public function tryGetValue(object|array $object, string $property, mixed &$value): bool;
 
     /**
      * Returns the value of the specified property
@@ -36,5 +39,5 @@ interface DataAccessorInterface
      *
      * @throws \RuntimeException if the operation failed
      */
-    public function getValue($object, $property);
+    public function getValue(object|array $object, string $property): mixed;
 }

@@ -1,0 +1,26 @@
+Oro\Bundle\TestFrameworkBundle\Entity\TestProductType:
+    product_type:
+        name: type
+
+Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
+    product{1..2}:
+        name: product <current()>
+        productType: '@product_type'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder:
+    order{1..2}:
+        poNumber: ORDER<current()>
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem:
+    order_line_item11:
+        order: '@order1'
+        product: '@product1'
+        quantity: 1
+    order_line_item12:
+        order: '@order1'
+        product: '@product2'
+        quantity: 1
+    order_line_item21:
+        order: '@order2'
+        product: '@product1'
+        quantity: 1

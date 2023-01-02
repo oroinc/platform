@@ -12,12 +12,12 @@ use Oro\Component\EntitySerializer\DataTransformerInterface;
 class DecimalToStringTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function transform($value, array $config, array $context)
+    public function transform(mixed $value, array $config, array $context): mixed
     {
         if (null === $value) {
-            return $value;
+            return null;
         }
 
         $result = (string)BigDecimal::of($value);

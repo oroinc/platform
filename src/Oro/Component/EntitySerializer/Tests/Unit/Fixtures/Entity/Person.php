@@ -21,85 +21,61 @@ abstract class Person
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(name="name", type="string", length=255)
      */
-    protected $name;
+    private ?string $name = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="Department", inversedBy="staff")
      * @ORM\JoinColumn(name="department_id", referencedColumnName="id"),
      */
-    protected $department;
+    private ?Department $department = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="products")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
      */
-    protected $owner;
+    private ?User $owner = null;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId($id)
+    public function setId(?int $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name)
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return Department|null
-     */
-    public function getDepartment()
+    public function getDepartment(): ?Department
     {
         return $this->department;
     }
 
-    /**
-     * @param Department|null $department
-     */
-    public function setDepartment($department)
+    public function setDepartment(?Department $department): void
     {
         $this->department = $department;
     }
 
-    /**
-     * @return User
-     */
-    public function getOwner()
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
 
-    /**
-     * @param User|null $owner
-     */
-    public function setOwner($owner)
+    public function setOwner(?User $owner): void
     {
         $this->owner = $owner;
     }

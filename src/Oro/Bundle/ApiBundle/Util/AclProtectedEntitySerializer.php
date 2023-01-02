@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\EntitySerializer;
 
 /**
@@ -11,14 +12,14 @@ use Oro\Component\EntitySerializer\EntitySerializer;
  */
 class AclProtectedEntitySerializer extends EntitySerializer
 {
-    private $contextStack = [];
+    private array $contextStack = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function serialize(
         QueryBuilder $qb,
-        $config,
+        EntityConfig|array $config,
         array $context = [],
         bool $skipPostSerializationForPrimaryEntities = false
     ): array {
@@ -31,12 +32,12 @@ class AclProtectedEntitySerializer extends EntitySerializer
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function serializeEntities(
         array $entities,
         string $entityClass,
-        $config,
+        EntityConfig|array $config,
         array $context = [],
         bool $skipPostSerializationForPrimaryEntities = false
     ): array {
@@ -68,9 +69,9 @@ class AclProtectedEntitySerializer extends EntitySerializer
             $this->applyContext($context);
         } else {
             // clear the context
-            $this->configConverter->setRequestType();
-            $this->queryFactory->setRequestType();
-            $this->fieldAccessor->setRequestType();
+            $this->configConverter->setRequestType(null);
+            $this->queryFactory->setRequestType(null);
+            $this->fieldAccessor->setRequestType(null);
         }
     }
 
