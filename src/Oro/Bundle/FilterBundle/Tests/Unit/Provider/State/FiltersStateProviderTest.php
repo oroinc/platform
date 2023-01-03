@@ -45,14 +45,12 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     private function mockParametersState(array $state, array $minifiedState): void
     {
-        $this->datagridParametersHelper
-            ->expects(self::once())
+        $this->datagridParametersHelper->expects(self::once())
             ->method('getFromParameters')
             ->with($this->datagridParameters, AbstractFilterExtension::FILTER_ROOT_PARAM)
             ->willReturn($state);
 
-        $this->datagridParametersHelper
-            ->expects(self::once())
+        $this->datagridParametersHelper->expects(self::once())
             ->method('getFromMinifiedParameters')
             ->with($this->datagridParameters, AbstractFilterExtension::MINIFIED_FILTER_PARAM)
             ->willReturn($minifiedState);
@@ -60,8 +58,7 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     private function mockFiltersColumns(array $filtersColumns, array $defaultFilters): void
     {
-        $this->datagridConfiguration
-            ->expects(self::exactly(2))
+        $this->datagridConfiguration->expects(self::exactly(2))
             ->method('offsetGetByPath')
             ->willReturnMap([
                 [FilterConfiguration::COLUMNS_PATH, [], $filtersColumns],
@@ -130,11 +127,10 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
         $this->mockGridName($gridName = 'sample-datagrid');
         $this->mockCurrentGridViewId($viewId = 'sample-view');
 
-        $this->gridViewManager
-            ->expects(self::once())
+        $this->gridViewManager->expects(self::once())
             ->method('getView')
             ->with($viewId, 1, $gridName)
-            ->willReturn($gridView = $this->mockGridView('getFiltersData', $state));
+            ->willReturn($this->mockGridView('getFiltersData', $state));
 
         $actualState = $this->provider->getState($this->datagridConfiguration, $this->datagridParameters);
 
@@ -156,16 +152,14 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
         $user = $this->getEntity(User::class, ['id' => 42]);
 
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->gridViewManager
-            ->expects(self::once())
+        $this->gridViewManager->expects(self::once())
             ->method('getDefaultView')
             ->with($user, $gridName)
-            ->willReturn($gridView = $this->mockGridView('getFiltersData', $state));
+            ->willReturn($this->mockGridView('getFiltersData', $state));
 
         $actualState = $this->provider->getState($this->datagridConfiguration, $this->datagridParameters);
 

@@ -13,9 +13,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class WebsocketServerConsoleHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    private SymfonyConsoleHandler|\PHPUnit\Framework\MockObject\MockObject $consoleHandler;
+    /** @var SymfonyConsoleHandler|\PHPUnit\Framework\MockObject\MockObject */
+    private $consoleHandler;
 
-    private WebsocketServerConsoleHandler $handler;
+    /** @var WebsocketServerConsoleHandler */
+    private $handler;
 
     protected function setUp(): void
     {
@@ -32,8 +34,7 @@ class WebsocketServerConsoleHandlerTest extends \PHPUnit\Framework\TestCase
             $this->createMock(OutputInterface::class)
         );
 
-        $this->consoleHandler
-            ->expects(self::never())
+        $this->consoleHandler->expects(self::never())
             ->method(self::anything());
 
         $this->handler->onCommand($event);
@@ -47,8 +48,7 @@ class WebsocketServerConsoleHandlerTest extends \PHPUnit\Framework\TestCase
             $this->createMock(OutputInterface::class)
         );
 
-        $this->consoleHandler
-            ->expects(self::never())
+        $this->consoleHandler->expects(self::never())
             ->method(self::anything());
 
         $this->handler->onCommand($event);
@@ -63,8 +63,7 @@ class WebsocketServerConsoleHandlerTest extends \PHPUnit\Framework\TestCase
             $output
         );
 
-        $this->consoleHandler
-            ->expects(self::once())
+        $this->consoleHandler->expects(self::once())
             ->method('setOutput')
             ->with($output);
 
@@ -83,8 +82,7 @@ class WebsocketServerConsoleHandlerTest extends \PHPUnit\Framework\TestCase
             Command::SUCCESS
         );
 
-        $this->consoleHandler
-            ->expects(self::never())
+        $this->consoleHandler->expects(self::never())
             ->method(self::anything());
 
         $this->handler->onTerminate($event);
@@ -99,8 +97,7 @@ class WebsocketServerConsoleHandlerTest extends \PHPUnit\Framework\TestCase
             $output
         );
 
-        $this->consoleHandler
-            ->expects(self::once())
+        $this->consoleHandler->expects(self::once())
             ->method('setOutput')
             ->with($output);
 
@@ -111,8 +108,7 @@ class WebsocketServerConsoleHandlerTest extends \PHPUnit\Framework\TestCase
             Command::SUCCESS
         );
 
-        $this->consoleHandler
-            ->expects(self::once())
+        $this->consoleHandler->expects(self::once())
             ->method('onTerminate')
             ->with($terminateEvent);
 
