@@ -19,8 +19,7 @@ class TwigLayoutRendererTest extends \PHPUnit\Framework\TestCase
         $environment = $this->createMock(Environment::class);
         $newEnvironment = clone $environment;
 
-        $innerRenderer
-            ->expects(self::exactly(2))
+        $innerRenderer->expects(self::exactly(2))
             ->method('setEnvironment')
             ->withConsecutive([self::identicalTo($environment)], [self::identicalTo($newEnvironment)]);
 

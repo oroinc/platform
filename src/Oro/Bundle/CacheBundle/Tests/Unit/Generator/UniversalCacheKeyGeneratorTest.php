@@ -25,8 +25,7 @@ class UniversalCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
      */
     public function testGenerate(mixed $arguments, string $expectedCacheKey): void
     {
-        $this->objectCacheKeyGenerator
-            ->expects($this->any())
+        $this->objectCacheKeyGenerator->expects($this->any())
             ->method('generate')
             ->with($this->isInstanceOf(\stdClass::class), 'sample_scope')
             ->willReturn('sample_key');

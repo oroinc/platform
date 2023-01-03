@@ -11,13 +11,16 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class DeleteMaterializedViewMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    private MaterializedViewManager|\PHPUnit\Framework\MockObject\MockObject $materializedViewManager;
+    /** @var MaterializedViewManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $materializedViewManager;
 
-    private DeleteMaterializedViewMessageProcessor $processor;
+    /** @var DeleteMaterializedViewMessageProcessor */
+    private $processor;
 
     protected function setUp(): void
     {
         $this->materializedViewManager = $this->createMock(MaterializedViewManager::class);
+
         $this->processor = new DeleteMaterializedViewMessageProcessor($this->materializedViewManager);
     }
 
@@ -35,8 +38,7 @@ class DeleteMaterializedViewMessageProcessorTest extends \PHPUnit\Framework\Test
         $messageBody = ['materializedViewName' => 'sample-name'];
         $message->setBody($messageBody);
 
-        $this->materializedViewManager
-            ->expects(self::once())
+        $this->materializedViewManager->expects(self::once())
             ->method('delete')
             ->with($messageBody['materializedViewName']);
 

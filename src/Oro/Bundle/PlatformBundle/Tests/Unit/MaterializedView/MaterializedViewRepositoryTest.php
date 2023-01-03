@@ -9,7 +9,8 @@ use Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewRepository;
 
 class MaterializedViewRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager;
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
     protected function setUp(): void
     {
@@ -19,8 +20,7 @@ class MaterializedViewRepositoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateQueryBuilder(): void
     {
         $connection = $this->createMock(Connection::class);
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getConnection')
             ->willReturn($connection);
 
@@ -38,8 +38,7 @@ class MaterializedViewRepositoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateQueryBuilderWhenUnsafeName(): void
     {
         $connection = $this->createMock(Connection::class);
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getConnection')
             ->willReturn($connection);
 
@@ -59,8 +58,7 @@ class MaterializedViewRepositoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateQueryBuilderWhenUnsafeRootAlias(): void
     {
         $connection = $this->createMock(Connection::class);
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getConnection')
             ->willReturn($connection);
 

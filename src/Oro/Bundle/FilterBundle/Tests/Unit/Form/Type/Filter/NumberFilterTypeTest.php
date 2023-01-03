@@ -19,14 +19,14 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class NumberFilterTypeTest extends AbstractTypeTestCase
 {
-    /** @var NumberFilterType */
-    private $type;
-
     /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $localeSettings;
 
     /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
     private $numberFormatter;
+
+    /** @var NumberFilterType */
+    private $type;
 
     protected function setUp(): void
     {
@@ -98,8 +98,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         // NOTE: must be executed after EntityBundle, because it will be fail result
 
         $locale = 'en';
-        $this->localeSettings
-            ->expects(self::atLeastOnce())
+        $this->localeSettings->expects(self::atLeastOnce())
             ->method('getLocale')
             ->willReturn($locale);
 
@@ -292,8 +291,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         // NOTE: must be executed after EntityBundle, because it will be fail result
 
         $locale = 'de_DE';
-        $this->localeSettings
-            ->expects(self::atLeastOnce())
+        $this->localeSettings->expects(self::atLeastOnce())
             ->method('getLocale')
             ->willReturn($locale);
 

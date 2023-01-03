@@ -11,14 +11,14 @@ class CommandExecutorTest extends \PHPUnit\Framework\TestCase
     private const NON_DEFAULT_OPTION_NAME = 'non_default_option_name';
     private const DEFAULT_OPTION_NAME = 'default_option_name';
 
-    /** @var CommandExecutor */
-    private $commandExecutor;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|BaseCommandExecutor */
     private $baseCommandExecutor;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|OroDataCacheManager */
     private $dataCacheManager;
+
+    /** @var CommandExecutor */
+    private $commandExecutor;
 
     protected function setUp(): void
     {
@@ -29,13 +29,11 @@ class CommandExecutorTest extends \PHPUnit\Framework\TestCase
 
     public function testDefaultOption(): void
     {
-        $this->baseCommandExecutor
-            ->expects(self::exactly(3))
+        $this->baseCommandExecutor->expects(self::exactly(3))
             ->method('getDefaultOption')
             ->willReturnOnConsecutiveCalls(BaseCommandExecutor::DEFAULT_TIMEOUT, null, true);
 
-        $this->baseCommandExecutor
-            ->expects(self::once())
+        $this->baseCommandExecutor->expects(self::once())
             ->method('setDefaultOption')
             ->willReturnSelf();
 
@@ -59,13 +57,11 @@ class CommandExecutorTest extends \PHPUnit\Framework\TestCase
      */
     public function testRunCommand(array $runCommand, array $cacheManager, int $expected): void
     {
-        $this->baseCommandExecutor
-            ->expects($runCommand['expects'])
+        $this->baseCommandExecutor->expects($runCommand['expects'])
             ->method('runCommand')
             ->willReturn($runCommand['code']);
 
-        $this->dataCacheManager
-            ->expects($cacheManager['expects'])
+        $this->dataCacheManager->expects($cacheManager['expects'])
             ->method('sync');
 
         $exitCode = $this->commandExecutor->runCommand('oro:acme', [

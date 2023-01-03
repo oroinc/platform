@@ -22,15 +22,13 @@ class ExtendFieldFormOptionsProviderTest extends \PHPUnit\Framework\TestCase
         $fieldName = 'sampleField';
 
         $provider1 = $this->createMock(ExtendFieldFormOptionsProviderInterface::class);
-        $provider1
-            ->expects(self::once())
+        $provider1->expects(self::once())
             ->method('getOptions')
             ->with($className, $fieldName)
             ->willReturn([]);
 
         $provider2 = $this->createMock(ExtendFieldFormOptionsProviderInterface::class);
-        $provider2
-            ->expects(self::once())
+        $provider2->expects(self::once())
             ->method('getOptions')
             ->with($className, $fieldName)
             ->willReturn([]);
@@ -45,15 +43,13 @@ class ExtendFieldFormOptionsProviderTest extends \PHPUnit\Framework\TestCase
         $fieldName = 'sampleField';
 
         $provider1 = $this->createMock(ExtendFieldFormOptionsProviderInterface::class);
-        $provider1
-            ->expects(self::once())
+        $provider1->expects(self::once())
             ->method('getOptions')
             ->with($className, $fieldName)
             ->willReturn(['sample_key1' => 'sample_value1']);
 
         $provider2 = $this->createMock(ExtendFieldFormOptionsProviderInterface::class);
-        $provider2
-            ->expects(self::once())
+        $provider2->expects(self::once())
             ->method('getOptions')
             ->with($className, $fieldName)
             ->willReturn(['sample_key2' => 'sample_value2']);
@@ -71,15 +67,13 @@ class ExtendFieldFormOptionsProviderTest extends \PHPUnit\Framework\TestCase
         $fieldName = 'sampleField';
 
         $provider1 = $this->createMock(ExtendFieldFormOptionsProviderInterface::class);
-        $provider1
-            ->expects(self::once())
+        $provider1->expects(self::once())
             ->method('getOptions')
             ->with($className, $fieldName)
             ->willReturn(['sample_key1' => ['sample_key1_1' => 'sample_value_1_1', 'same_key' => 'same_value']]);
 
         $provider2 = $this->createMock(ExtendFieldFormOptionsProviderInterface::class);
-        $provider2
-            ->expects(self::once())
+        $provider2->expects(self::once())
             ->method('getOptions')
             ->with($className, $fieldName)
             ->willReturn(['sample_key1' => ['sample_key2_1' => 'sample_value_2_1', 'same_key' => 'new_value']]);

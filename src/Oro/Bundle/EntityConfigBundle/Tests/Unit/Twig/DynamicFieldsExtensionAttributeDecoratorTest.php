@@ -144,8 +144,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
             ->with($entity, $entityClass)
             ->willReturn($fields);
 
-        $this->attributeConfigHelper
-            ->expects($this->exactly(count($fields)))
+        $this->attributeConfigHelper->expects($this->exactly(count($fields)))
             ->method('isFieldAttribute')
             ->withConsecutive(...$attributeHelperWiths)
             ->willReturnOnConsecutiveCalls(...$attributeHelperReturns);
