@@ -30,3 +30,14 @@ Feature: Translation cache actualization
       | Translated Value    | Maintenance Notifications |
       | Current Value       | Maintenance Notifications |
       | English Translation | Maintenance Notifications |
+
+  Scenario: JS translations editing for key oro.datagrid.gridView.actions
+    Given I go to System/User Management/Users
+    Then I should see "Options"
+    Then I go to System/Localization/Translations
+    And I filter Key as is equal to "oro.datagrid.gridView.actions"
+    And I edit first record from grid:
+      | Translated Value |  OptionsTranslatedValue |
+    And I go to System/User Management/Users
+    When I reload the page
+    Then I should see "OptionsTranslatedValue"

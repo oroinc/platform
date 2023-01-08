@@ -60,7 +60,7 @@ class OroRichTextType extends AbstractType
      * @var array
      */
     public static $defaultPlugins = [
-        'code', 'link', 'fullscreen', 'paste', 'lists', 'image', 'advlist'
+        'code', 'link', 'fullscreen', 'lists', 'image', 'advlist'
     ];
 
     public function __construct(

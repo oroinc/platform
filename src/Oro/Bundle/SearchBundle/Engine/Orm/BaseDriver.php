@@ -255,6 +255,7 @@ abstract class BaseDriver implements DBALPersisterInterface
         foreach ($query->getAggregations() as $name => $options) {
             $field = $options['field'];
             $function = $options['function'];
+            $parameters = $options['parameters'];
             [$fieldType, $fieldName] = Criteria::explodeFieldTypeName($field);
             $fieldName = str_replace('.', self::SPECIAL_SEPARATOR, $fieldName);
             QueryBuilderUtil::checkField($fieldName);
@@ -274,7 +275,12 @@ abstract class BaseDriver implements DBALPersisterInterface
                         $fieldSelect,
                         sprintf('%s as countValue', $queryBuilder->expr()->countDistinct('search.id'))
                     ]);
-                    $queryBuilder->groupBy($fieldName);
+                    $queryBuilder->groupBy($fieldName)
+                        ->orderBy('countValue', 'DESC');
+
+                    if (isset($parameters[Query::AGGREGATE_PARAMETER_MAX])) {
+                        $queryBuilder->setMaxResults((int)$parameters[Query::AGGREGATE_PARAMETER_MAX]);
+                    }
 
                     foreach ($queryBuilder->getQuery()->getArrayResult() as $row) {
                         $key = $row[$fieldName];

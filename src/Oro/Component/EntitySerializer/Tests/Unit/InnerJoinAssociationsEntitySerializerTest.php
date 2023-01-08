@@ -6,7 +6,7 @@ use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Product;
 
 class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
 {
-    public function testInnerJoinForFirstLevelAssociation()
+    public function testInnerJoinForFirstLevelAssociation(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -57,7 +57,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testInnerJoinForFirstLevelAssociationAndHasLeftJoinForSecondLevelAssociation()
+    public function testInnerJoinForFirstLevelAssociationAndHasLeftJoinForSecondLevelAssociation(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -134,7 +134,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testInnerJoinForFirstLevelAssociationAndLeftJoinAlreadyExists()
+    public function testInnerJoinForFirstLevelAssociationAndLeftJoinAlreadyExists(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->leftJoin('e.owner', 'owner', 'WITH', 'owner.id > 0')
@@ -186,7 +186,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testInnerJoinForFirstLevelAssociationAndDisabledPartialLoad()
+    public function testInnerJoinForFirstLevelAssociationAndDisabledPartialLoad(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -245,7 +245,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testInnerJoinForSecondLevelAssociation()
+    public function testInnerJoinForSecondLevelAssociation(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -304,7 +304,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testInnerJoinForSecondLevelAssociationAndFirstLevelAssociationIsRequested()
+    public function testInnerJoinForSecondLevelAssociationAndFirstLevelAssociationIsRequested(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -367,7 +367,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testInnerJoinForSecondLevelAssociationAndDisabledPartialLoad()
+    public function testInnerJoinForSecondLevelAssociationAndDisabledPartialLoad(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')

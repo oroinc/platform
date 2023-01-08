@@ -12,15 +12,21 @@ use Twig\Environment;
 
 class TwigRendererTest extends \PHPUnit\Framework\TestCase
 {
-    private TwigRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject $twigRendererEngine;
+    /** @var TwigRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $twigRendererEngine;
 
     private LayoutContextStack $layoutContextStack;
 
     private RenderCache|\PHPUnit\Framework\MockObject\MockObject $rendererCache;
 
-    private PlaceholderRenderer|\PHPUnit\Framework\MockObject\MockObject $placeholderRenderer;
+    /** @var PlaceholderRenderer|\PHPUnit\Framework\MockObject\MockObject */
+    private $placeholderRenderer;
 
-    private Environment|\PHPUnit\Framework\MockObject\MockObject $environment;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $environment;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     protected function setUp(): void
     {
@@ -34,8 +40,7 @@ class TwigRendererTest extends \PHPUnit\Framework\TestCase
 
     public function testConstructor(): void
     {
-        $this->twigRendererEngine
-            ->expects(self::once())
+        $this->twigRendererEngine->expects(self::once())
             ->method('setEnvironment')
             ->with(self::identicalTo($this->environment));
 
@@ -52,8 +57,7 @@ class TwigRendererTest extends \PHPUnit\Framework\TestCase
     public function testSetEnvironment(): void
     {
         $newEnvironment = clone $this->environment;
-        $this->twigRendererEngine
-            ->expects(self::exactly(3))
+        $this->twigRendererEngine->expects(self::exactly(3))
             ->method('setEnvironment')
             ->withConsecutive(
                 [self::identicalTo($this->environment)],

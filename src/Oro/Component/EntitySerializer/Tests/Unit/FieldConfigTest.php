@@ -7,7 +7,7 @@ use Oro\Component\EntitySerializer\FieldConfig;
 
 class FieldConfigTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $attrName = 'test';
 
@@ -31,7 +31,7 @@ class FieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $fieldConfig->toArray());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $fieldConfig = new FieldConfig();
         $this->assertEquals([], $fieldConfig->toArray());
@@ -51,7 +51,7 @@ class FieldConfigTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $fieldConfig = new FieldConfig();
         $this->assertTrue($fieldConfig->isEmpty());
@@ -76,7 +76,7 @@ class FieldConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($fieldConfig->isEmpty());
     }
 
-    public function testTargetEntity()
+    public function testTargetEntity(): void
     {
         $fieldConfig = new FieldConfig();
         $this->assertNull($fieldConfig->getTargetEntity());
@@ -86,7 +86,7 @@ class FieldConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($targetEntity, $fieldConfig->getTargetEntity());
     }
 
-    public function testExcluded()
+    public function testExcluded(): void
     {
         $fieldConfig = new FieldConfig();
         $this->assertFalse($fieldConfig->isExcluded());
@@ -100,7 +100,7 @@ class FieldConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $fieldConfig->toArray());
     }
 
-    public function testCollapsed()
+    public function testCollapsed(): void
     {
         $fieldConfig = new FieldConfig();
         $this->assertFalse($fieldConfig->isCollapsed());
@@ -114,7 +114,7 @@ class FieldConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $fieldConfig->toArray());
     }
 
-    public function testPropertyPath()
+    public function testPropertyPath(): void
     {
         $fieldConfig = new FieldConfig();
         $this->assertNull($fieldConfig->getPropertyPath());
@@ -131,7 +131,7 @@ class FieldConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $fieldConfig->toArray());
     }
 
-    public function testDataTransformers()
+    public function testDataTransformers(): void
     {
         $fieldConfig = new FieldConfig();
         $this->assertEquals([], $fieldConfig->getDataTransformers());

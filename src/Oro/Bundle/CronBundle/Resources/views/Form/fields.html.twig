@@ -65,7 +65,7 @@
                 </table>
             </div>
             <div class="btn-container">
-                <a class="btn add-list-item" data-container=".oro-item-collection tbody" href="#"><i class="fa-plus"></i>{{ 'oro.cron.schedule_interval.add'|trans }}</a>
+                <button type="button" class="btn add-list-item" data-container=".oro-item-collection tbody"><i class="fa-plus"></i>{{ 'oro.cron.schedule_interval.add'|trans }}</button>
             </div>
         </div>
         {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}

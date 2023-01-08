@@ -12,23 +12,21 @@ class CompilerTest extends \PHPUnit\Framework\TestCase
     public function testCompile()
     {
         $expectedResult = 'Compiled String';
-        $inputString    = 'some test string';
-        $tokens         = [new Token(Token::TYPE_DATE, '2001-02-03')];
+        $inputString = 'some test string';
+        $tokens = [new Token(Token::TYPE_DATE, '2001-02-03')];
 
-        $lexerMock = $this->createMock(Lexer::class);
-        $parserMock = $this->createMock(Parser::class);
-        $lexerMock
-            ->expects($this->once())
+        $lexer = $this->createMock(Lexer::class);
+        $lexer->expects($this->once())
             ->method('tokenize')
             ->with($inputString)
             ->willReturn($tokens);
-        $parserMock
-            ->expects($this->once())
+        $parser = $this->createMock(Parser::class);
+        $parser->expects($this->once())
             ->method('parse')
             ->with($tokens, false)
             ->willReturn($expectedResult);
 
-        $compiler = new Compiler($lexerMock, $parserMock);
+        $compiler = new Compiler($lexer, $parser);
         $this->assertSame($expectedResult, $compiler->compile($inputString, false));
     }
 }

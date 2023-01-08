@@ -33,7 +33,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSimpleEntityWithPostSerializeAsClosure()
+    public function testSimpleEntityWithPostSerializeAsClosure(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -143,7 +143,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSimpleEntityWithPostSerializeAsCallable()
+    public function testSimpleEntityWithPostSerializeAsCallable(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -238,7 +238,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPostSerializeForNullChild()
+    public function testPostSerializeForNullChild(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -295,7 +295,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testManyToManyBidirectionalWithPostSerialize()
+    public function testManyToManyBidirectionalWithPostSerialize(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')

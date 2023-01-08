@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class DataFixturesExecutor implements DataFixturesExecutorInterface
 {
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     private $em;
 
     /** @var EventDispatcherInterface */
@@ -21,7 +21,7 @@ class DataFixturesExecutor implements DataFixturesExecutorInterface
     /** @var callable|null */
     private $logger;
 
-    public function __construct(EntityManager $em, EventDispatcherInterface $eventDispatcher)
+    public function __construct(EntityManagerInterface $em, EventDispatcherInterface $eventDispatcher)
     {
         $this->em = $em;
         $this->eventDispatcher = $eventDispatcher;

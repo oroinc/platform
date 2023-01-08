@@ -11,14 +11,9 @@ use Oro\Component\PhpUtils\ReflectionUtil;
  */
 class QueryModifier
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var FieldAccessor */
-    private $fieldAccessor;
-
-    /** @var ConfigAccessor */
-    private $configAccessor;
+    private DoctrineHelper $doctrineHelper;
+    private FieldAccessor $fieldAccessor;
+    private ConfigAccessor $configAccessor;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -57,19 +52,12 @@ class QueryModifier
         }
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string       $alias
-     * @param string       $entityClass
-     * @param EntityConfig $config
-     * @param bool         $withAssociations
-     */
     public function updateSelectQueryPart(
         QueryBuilder $qb,
-        $alias,
-        $entityClass,
+        string $alias,
+        string $entityClass,
         EntityConfig $config,
-        $withAssociations = false
+        bool $withAssociations = false
     ): void {
         if ($config->isPartialLoadEnabled()) {
             $fields = $this->fieldAccessor->getFieldsToSelect($entityClass, $config, $withAssociations);
@@ -260,7 +248,7 @@ class QueryModifier
         if (null === $joinTypeProperty) {
             throw new \LogicException(sprintf(
                 'The "joinType" property does not exist in %s.',
-                get_class($join)
+                \get_class($join)
             ));
         }
         $joinTypeProperty->setAccessible(true);

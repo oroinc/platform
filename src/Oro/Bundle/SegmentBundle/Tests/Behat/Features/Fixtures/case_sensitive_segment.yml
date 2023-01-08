@@ -3,6 +3,6 @@ Oro\Bundle\SegmentBundle\Entity\Segment:
         name: 'NEW segment'
         type: '@segment_dynamic_type'
         entity: 'Oro\Bundle\UserBundle\Entity\User'
-        definition: ''
+        definition: <('{"columns":[{"name":"id"}]}')>
         organization: '@organization'
         owner: '@business_unit'

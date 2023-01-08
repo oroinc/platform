@@ -56,14 +56,12 @@ class AttributeFamilyActionsConfigurationTest extends \PHPUnit\Framework\TestCas
 
         $record = new ResultRecord(['id' => self::ENTITY_ID]);
 
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getReference')
             ->with(AttributeFamily::class, self::ENTITY_ID)
             ->willReturn($attributeFamily);
 
-        $this->authorizationChecker
-            ->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('delete', $attributeFamily)
             ->willReturn($isGranted);

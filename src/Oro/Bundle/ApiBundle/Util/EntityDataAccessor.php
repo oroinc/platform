@@ -10,9 +10,9 @@ use Oro\Component\EntitySerializer\EntityDataAccessor as BaseEntityDataAccessor;
 class EntityDataAccessor extends BaseEntityDataAccessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function hasGetter($className, $property): bool
+    public function hasGetter(string $className, string $property): bool
     {
         $result = parent::hasGetter($className, $property)
             || $this->getReflectionClass($className)->hasMethod('__get');
@@ -25,14 +25,15 @@ class EntityDataAccessor extends BaseEntityDataAccessor
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function tryGetValue($object, $property, &$value)
+    public function tryGetValue(object|array $object, string $property, mixed &$value): bool
     {
         $result = parent::tryGetValue($object, $property, $value);
 
-        if (!$result && is_object($object)
-            && $this->getReflectionClass(get_class($object))->hasMethod('__get')
+        if (!$result
+            && \is_object($object)
+            && $this->getReflectionClass(\get_class($object))->hasMethod('__get')
         ) {
             try {
                 [$result, $value] = [true, $object->__get($property)];

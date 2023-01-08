@@ -25,13 +25,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    private ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject $translationHelper;
+    /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationHelper;
 
-    private ConfigSubscriber $subscriber;
+    /** @var ConfigSubscriber */
+    private $subscriber;
 
     protected function setUp(): void
     {
@@ -474,8 +478,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $form->expects(self::once())
             ->method('getClickedButton')
             ->willReturn($button);
-        $button
-            ->expects(self::once())
+        $button->expects(self::once())
             ->method('getName')
             ->willReturn(ConfigType::PARTIAL_SUBMIT);
 

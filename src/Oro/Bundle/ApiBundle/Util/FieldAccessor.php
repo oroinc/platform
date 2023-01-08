@@ -11,24 +11,21 @@ use Oro\Component\EntitySerializer\FieldAccessor as BaseFieldAccessor;
  */
 class FieldAccessor extends BaseFieldAccessor
 {
-    /** @var MandatoryFieldProviderRegistry */
-    private $mandatoryFieldProvider;
-
-    /** @var RequestType|null */
-    private $requestType;
+    private MandatoryFieldProviderRegistry $mandatoryFieldProvider;
+    private ?RequestType $requestType = null;
 
     public function setMandatoryFieldProvider(MandatoryFieldProviderRegistry $mandatoryFieldProvider): void
     {
         $this->mandatoryFieldProvider = $mandatoryFieldProvider;
     }
 
-    public function setRequestType(RequestType $requestType = null): void
+    public function setRequestType(?RequestType $requestType): void
     {
         $this->requestType = $requestType;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getFieldsToSelect(string $entityClass, EntityConfig $config, bool $withAssociations = false): array
     {

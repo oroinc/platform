@@ -10,7 +10,7 @@
     {% else %}
         {% set user_name = app.user|oro_format_name %}
         {{ user_name }}
-        {% if app.user.avatar %}
+        {% if app.user.avatar is defined %}
             {% include '@OroAttachment/Twig/picture.html.twig' with {
                 file: app.user.avatar,
                 filter: 'avatar_med',

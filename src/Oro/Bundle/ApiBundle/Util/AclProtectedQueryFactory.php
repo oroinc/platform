@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\EntitySerializer\DoctrineHelper as SerializerDoctrineHelper;
@@ -15,11 +16,8 @@ use Oro\Component\EntitySerializer\QueryResolver;
  */
 class AclProtectedQueryFactory extends QueryFactory
 {
-    /** @var QueryModifierRegistry */
-    private $queryModifier;
-
-    /** @var RequestType|null */
-    private $requestType;
+    private QueryModifierRegistry $queryModifier;
+    private ?RequestType $requestType = null;
 
     public function __construct(
         SerializerDoctrineHelper $doctrineHelper,
@@ -35,15 +33,15 @@ class AclProtectedQueryFactory extends QueryFactory
         return $this->requestType;
     }
 
-    public function setRequestType(RequestType $requestType = null)
+    public function setRequestType(?RequestType $requestType): void
     {
         $this->requestType = $requestType;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getQuery(QueryBuilder $qb, EntityConfig $config)
+    public function getQuery(QueryBuilder $qb, EntityConfig $config): Query
     {
         if (null === $this->requestType) {
             throw new \LogicException('The query factory was not initialized.');

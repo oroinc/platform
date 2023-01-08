@@ -4,10 +4,22 @@ The current file describes significant changes in the code that may affect the u
 
 ## UNRELEASED
 
+### Added
+
+#### SearchBundle
+* Search query aggregations now can have parameters added via fourth parameter of the `addAggregate` method
+* Added possibility to set maximum number of results for the count search aggregation
+
 ### Changed
 
 #### AssetBundle
 * Changed configuration option `disable_babel` (`true` by default) to `with_babel` (`false` by default).
+
+### Added
+
+#### MigrationBundle
+
+* For better data consistency and more valid testing scenarios, data fixtures are now validated during ORM demo data load, and Behat fixtures load.
 
 ## 5.1.0-beta.2 (2022-11-30)
 [Show detailed list of changes](incompatibilities-5-1-beta-2.md)

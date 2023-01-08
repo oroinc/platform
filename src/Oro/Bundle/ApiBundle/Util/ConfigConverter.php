@@ -14,26 +14,23 @@ use Oro\Component\EntitySerializer\FieldConfig;
  */
 class ConfigConverter extends BaseConfigConverter
 {
-    /** @var EntityOverrideProviderRegistry */
-    private $entityOverrideProviderRegistry;
-
-    /** @var RequestType|null */
-    private $requestType;
+    private EntityOverrideProviderRegistry $entityOverrideProviderRegistry;
+    private ?RequestType $requestType = null;
 
     public function __construct(EntityOverrideProviderRegistry $entityOverrideProviderRegistry)
     {
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
     }
 
-    public function setRequestType(RequestType $requestType = null): void
+    public function setRequestType(?RequestType $requestType): void
     {
         $this->requestType = $requestType;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function buildEntityConfig(EntityConfig $result, array $config)
+    protected function buildEntityConfig(EntityConfig $result, array $config): void
     {
         parent::buildEntityConfig($result, $config);
 
@@ -43,9 +40,9 @@ class ConfigConverter extends BaseConfigConverter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function setAssociationQuery(FieldConfig $result, array $config)
+    protected function setAssociationQuery(FieldConfig $result, array $config): void
     {
         if (isset($config[ConfigUtil::ASSOCIATION_QUERY])) {
             $result->set(

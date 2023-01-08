@@ -10,11 +10,11 @@ use Oro\Component\EntitySerializer\DataTransformerInterface;
 class EmptyArrayToNullTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function transform($value, array $config, array $context)
+    public function transform(mixed $value, array $config, array $context): mixed
     {
-        if (is_array($value) && empty($value)) {
+        if (\is_array($value) && empty($value)) {
             return null;
         }
 
