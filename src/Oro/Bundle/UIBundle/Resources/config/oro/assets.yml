@@ -31,3 +31,4 @@ css:
     output: css/oro.css
     auto_rtl_inputs:
         - 'bundles/oro*/**'
+        - '~timepicker/jquery.timepicker.css'
