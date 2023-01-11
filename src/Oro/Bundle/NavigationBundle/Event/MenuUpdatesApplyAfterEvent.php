@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Event;
 
-use Oro\Bundle\NavigationBundle\MenuUpdateApplier\Model\MenuUpdatesApplyResult;
+use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\Model\MenuUpdateApplierContext;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -10,15 +10,15 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class MenuUpdatesApplyAfterEvent extends Event
 {
-    private MenuUpdatesApplyResult $menuUpdatesApplyResult;
+    private MenuUpdateApplierContext $menuUpdateApplierContext;
 
-    public function __construct(MenuUpdatesApplyResult $menuUpdatesApplyResult)
+    public function __construct(MenuUpdateApplierContext $menuUpdateApplierContext)
     {
-        $this->menuUpdatesApplyResult = $menuUpdatesApplyResult;
+        $this->menuUpdateApplierContext = $menuUpdateApplierContext;
     }
 
-    public function getApplyResult(): MenuUpdatesApplyResult
+    public function getContext(): MenuUpdateApplierContext
     {
-        return $this->menuUpdatesApplyResult;
+        return $this->menuUpdateApplierContext;
     }
 }

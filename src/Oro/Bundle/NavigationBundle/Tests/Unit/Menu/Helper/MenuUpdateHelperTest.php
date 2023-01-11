@@ -110,41 +110,6 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($result, $update);
     }
 
-    public function testApplyLocalizedFallbackValueWhenTranslateDisabled(): void
-    {
-        $update = new MenuUpdateStub();
-
-        $this->translator->expects(self::never())
-            ->method('trans');
-
-        $enLocalization = new Localization();
-        $enLocalization->setLanguage($this->getLanguage('en'));
-
-        $deLocalization = new Localization();
-        $deLocalization->setLanguage($this->getLanguage('de'));
-
-        $this->localizationHelper->expects(self::once())
-            ->method('getLocalizations')
-            ->willReturn([$enLocalization, $deLocalization]);
-
-        $this->helper->applyLocalizedFallbackValue($update, 'Test Title', 'title', 'string', true);
-
-        $deFallbackValue = new LocalizedFallbackValue();
-        $deFallbackValue->setLocalization($deLocalization);
-        $deFallbackValue->setFallback(FallbackType::SYSTEM);
-
-        $enFallbackValue = new LocalizedFallbackValue();
-        $enFallbackValue->setLocalization($enLocalization);
-        $enFallbackValue->setFallback(FallbackType::SYSTEM);
-
-        $result = new MenuUpdateStub();
-        $result->setDefaultTitle('Test Title');
-        $result->addTitle($enFallbackValue);
-        $result->addTitle($deFallbackValue);
-
-        self::assertEquals($result, $update);
-    }
-
     public function testApplyLocalizedFallbackValueWithExistedFallbackValue(): void
     {
         $update = new MenuUpdateStub();

@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Validator\Constraints;
 
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Oro\Bundle\NavigationBundle\MenuUpdateApplier\MenuUpdateApplierInterface;
+use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\MenuUpdateApplierInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
@@ -54,7 +54,7 @@ class MaxNestedLevelValidator extends ConstraintValidator
 
         $itemExists = (bool)MenuUpdateUtils::findMenuItem($menu, $value->getKey());
 
-        $this->menuUpdateApplier->applyMenuUpdates($menu, [$value], $options);
+        $this->menuUpdateApplier->applyMenuUpdate($value, $menu, $options, null);
         $item = MenuUpdateUtils::findMenuItem($menu, $value->getKey());
 
         if ($item instanceof ItemInterface) {

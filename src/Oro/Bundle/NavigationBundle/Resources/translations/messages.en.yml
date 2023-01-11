@@ -45,6 +45,7 @@ oro:
             id.label: Id
             key.label: Key
             parent_key.label: Parent Key
+            origin_key.label: Origin Key
             menu.label: Menu
             title.label: Title
             titles.label: Title
@@ -67,6 +68,7 @@ oro:
             validation_error_message: Validation error. Please contact system administrator.
             divider: Divider
             custom.label: Is Custom
+            synthetic.label: Is Synthetic
             divider.label: Is Divider
             icon.label: Icon
             descriptions.label: Description

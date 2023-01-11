@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Utils;
 
-use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
-use Oro\Bundle\NavigationBundle\Utils\LostItemsManipulator;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Component\Testing\ReflectionUtil;
@@ -72,63 +70,5 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
             ],
             MenuUpdateUtils::flattenMenuItem($menu),
         );
-    }
-
-    public function testGetAllowedNestingLevelWhenNoParent(): void
-    {
-        $menu = $this->createItem('sample_menu');
-        self::assertEquals(0, MenuUpdateUtils::getAllowedNestingLevel($menu));
-    }
-
-    /**
-     * @dataProvider getAllowedNestingLevelWhenHasParentDataProvider
-     */
-    public function testGetAllowedNestingLevelWhenHasParent(int $maxNestingLevel, int $expected): void
-    {
-        $menu = $this->createItem('sample_menu')
-            ->setExtra(ConfigurationBuilder::MAX_NESTING_LEVEL, $maxNestingLevel);
-        $item1 = $menu->addChild('menu_item1');
-        $item11 = $this->createItem('menu_item11');
-        $item1->addChild($item11);
-
-        self::assertEquals($expected, MenuUpdateUtils::getAllowedNestingLevel($item11));
-    }
-
-    public function getAllowedNestingLevelWhenHasParentDataProvider(): array
-    {
-        return [
-            ['maxNestingLevel' => 0, 'expected' => 0],
-            ['maxNestingLevel' => 2, 'expected' => 0],
-            ['maxNestingLevel' => 5, 'expected' => 3],
-        ];
-    }
-
-    /**
-     * @dataProvider getAllowedNestingLevelWhenHasImpliedParentDataProvider
-     */
-    public function testGetAllowedNestingLevelWhenHasImpliedParent(int $maxNestingLevel, int $expected): void
-    {
-        $menu = $this->createItem('sample_menu')
-            ->setExtra(ConfigurationBuilder::MAX_NESTING_LEVEL, $maxNestingLevel);
-        $item1 = $menu->addChild('menu_item1');
-        $item11 = $this->createItem('menu_item11');
-        $item1->addChild($item11);
-
-        $item111 = $this->createItem('menu_item111')
-            ->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $item11->getName());
-
-        $lostItemsContainer = LostItemsManipulator::getLostItemsContainer($menu);
-        $lostItemsContainer->addChild($item111);
-
-        self::assertEquals($expected, MenuUpdateUtils::getAllowedNestingLevel($item111));
-    }
-
-    public function getAllowedNestingLevelWhenHasImpliedParentDataProvider(): array
-    {
-        return [
-            ['maxNestingLevel' => 0, 'expected' => 0],
-            ['maxNestingLevel' => 3, 'expected' => 0],
-            ['maxNestingLevel' => 5, 'expected' => 2],
-        ];
     }
 }

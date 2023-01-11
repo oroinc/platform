@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Knp\Menu\FactoryInterface;
@@ -6,9 +7,11 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\Util\MenuManipulator;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
+use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -18,6 +21,8 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
 {
+    use MenuItemTestTrait;
+
     private FactoryInterface|\PHPUnit\Framework\MockObject\MockObject $factory;
 
     private ArrayLoader|\PHPUnit\Framework\MockObject\MockObject $loader;
@@ -237,16 +242,16 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
 
         $topMenu = $this->createMock(ItemInterface::class);
         $topMenu->expects(self::any())
-            ->method('hasChildren')
-            ->willReturn(true);
+            ->method('count')
+            ->willReturn(4);
         $topMenu->expects(self::any())
             ->method('getDisplayChildren')
             ->willReturn(true);
 
         $menu = $this->createMock(ItemInterface::class);
         $menu->expects(self::any())
-            ->method('hasChildren')
-            ->willReturn(true);
+            ->method('count')
+            ->willReturn(1);
         $menu->expects(self::any())
             ->method('getDisplayChildren')
             ->willReturn(true);
@@ -258,11 +263,18 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
 
         $menu->expects(self::any())
             ->method('getChildren')
-            ->willReturn([$childOne, $childTwo, $childThree, $childFour]);
+            ->willReturn(
+                [
+                    $childOne->getName() => $childOne,
+                    $childTwo->getName() => $childTwo,
+                    $childThree->getName() => $childThree,
+                    $childFour->getName() => $childFour
+                ]
+            );
 
         $topMenu->expects(self::any())
             ->method('getChildren')
-            ->willReturn([$menu]);
+            ->willReturn([$menu->getName() => $menu]);
 
         $this->factory->expects(self::once())
             ->method('createItem')
@@ -296,15 +308,7 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
 
     private function getChildItem(string $name, int $position = null): ItemInterface
     {
-        $child = $this->createMock(ItemInterface::class);
-        $child->expects(self::once())
-            ->method('getExtra')
-            ->with('position', null)
-            ->willReturn($position);
-        $child->expects(self::once())
-            ->method('getName')
-            ->willReturn($name);
-
-        return $child;
+        return $this->createItem($name)
+            ->setExtra(MenuUpdateInterface::POSITION, $position);
     }
 }

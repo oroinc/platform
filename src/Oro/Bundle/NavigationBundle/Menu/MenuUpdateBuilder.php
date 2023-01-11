@@ -4,7 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdatesApplyAfterEvent;
-use Oro\Bundle\NavigationBundle\MenuUpdateApplier\MenuUpdateApplierInterface;
+use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\MenuUpdateApplierInterface;
+use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\Model\MenuUpdateApplierContext;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -31,13 +32,21 @@ class MenuUpdateBuilder implements BuilderInterface
 
     public function build(ItemInterface $menu, array $options = [], $alias = null): void
     {
+        if (!$menu->isDisplayed()) {
+            return;
+        }
+
         $menuUpdates = $this->menuUpdateProvider->getMenuUpdatesForMenuItem($menu, $options);
         if (!$menuUpdates) {
             return;
         }
 
-        $menuUpdatesApplyResult = $this->menuUpdateApplier->applyMenuUpdates($menu, $menuUpdates, $options);
+        $context = new MenuUpdateApplierContext($menu);
+        foreach ($menuUpdates as $menuUpdate) {
+            $this->menuUpdateApplier->applyMenuUpdate($menuUpdate, $menu, $options, $context);
+        }
 
-        $this->eventDispatcher->dispatch(new MenuUpdatesApplyAfterEvent($menuUpdatesApplyResult));
+        $event = new MenuUpdatesApplyAfterEvent($context);
+        $this->eventDispatcher->dispatch($event);
     }
 }

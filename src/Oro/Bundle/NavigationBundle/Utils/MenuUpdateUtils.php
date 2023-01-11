@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Utils;
 
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Iterator\RecursiveItemIterator;
-use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 /**
@@ -21,17 +20,33 @@ class MenuUpdateUtils
             return null;
         }
 
+        if ($menuItem->getName() === $name) {
+            return $menuItem;
+        }
+
         $item = $menuItem->getChild($name);
         if (!$item) {
             foreach ($menuItem->getChildren() as $child) {
                 $item = self::findMenuItem($child, $name);
-                if ($item instanceof ItemInterface) {
+                if ($item !== null) {
                     break;
                 }
             }
         }
 
         return $item;
+    }
+
+    /**
+     * @param ItemInterface $menuItem
+     * @return iterable<ItemInterface>
+     */
+    public static function createRecursiveIterator(ItemInterface $menuItem): iterable
+    {
+        return new \RecursiveIteratorIterator(
+            new RecursiveItemIterator($menuItem),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
     }
 
     /**
@@ -47,10 +62,8 @@ class MenuUpdateUtils
      */
     public static function flattenMenuItem(ItemInterface $menuItem): array
     {
-        $menuIterator = new RecursiveItemIterator($menuItem);
-        $recursiveMenuIterator = new \RecursiveIteratorIterator($menuIterator, \RecursiveIteratorIterator::SELF_FIRST);
         $menuItemsByName = [$menuItem->getName() => $menuItem];
-        foreach ($recursiveMenuIterator as $eachName => $eachMenuItem) {
+        foreach (self::createRecursiveIterator($menuItem) as $eachName => $eachMenuItem) {
             $menuItemsByName[$eachName] = $eachMenuItem;
         }
 
@@ -63,14 +76,5 @@ class MenuUpdateUtils
     public static function generateKey(string $menuName, Scope $scope): string
     {
         return $menuName . '_' . $scope->getId();
-    }
-
-    public static function getAllowedNestingLevel(ItemInterface $menuItem): int
-    {
-        $menu = $menuItem->getRoot();
-        $menuMaxNestingLevel = (int)$menu->getExtra(ConfigurationBuilder::MAX_NESTING_LEVEL, 0);
-        $level = count(LostItemsManipulator::getParents($menuItem));
-
-        return max(0, $menuMaxNestingLevel - $level);
     }
 }

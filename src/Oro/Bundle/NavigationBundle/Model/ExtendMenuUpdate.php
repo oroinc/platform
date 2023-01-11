@@ -4,10 +4,11 @@ namespace Oro\Bundle\NavigationBundle\Model;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 
-abstract class ExtendMenuUpdate implements
-    MenuUpdateInterface
+/**
+ * This class is required to make MenuUpdate entity extendable.
+ */
+abstract class ExtendMenuUpdate
 {
     /**
      * Constructor

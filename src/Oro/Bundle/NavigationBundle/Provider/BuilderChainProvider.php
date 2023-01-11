@@ -7,6 +7,7 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
@@ -94,26 +95,29 @@ class BuilderChainProvider implements MenuProviderInterface
      */
     private function sort(ItemInterface $menu): void
     {
-        if ($menu->hasChildren() && $menu->getDisplayChildren()) {
+        if ($menu->count() && $menu->getDisplayChildren()) {
             $orderedChildren = [];
             $hasOrdering = false;
             $children = $menu->getChildren();
-            $index = 0;
             foreach ($children as $child) {
-                if ($child->hasChildren() && $child->getDisplayChildren()) {
+                if ($child->count() && $child->getDisplayChildren()) {
                     $this->sort($child);
                 }
-                $position = $child->getExtra('position');
+                $position = $child->getExtra(MenuUpdateInterface::POSITION);
                 if ($position !== null) {
                     $orderedChildren[$child->getName()] = (int) $position;
                     $hasOrdering = true;
-                } else {
-                    $orderedChildren[$child->getName()] = $index ++;
                 }
             }
             if ($hasOrdering) {
+                $childrenNames = \array_keys(array_diff_key($children, $orderedChildren));
+
                 asort($orderedChildren);
-                $menu->reorderChildren(array_keys($orderedChildren));
+                foreach ($orderedChildren as $name => $position) {
+                    \array_splice($childrenNames, $position, 0, $name);
+                }
+
+                $menu->reorderChildren($childrenNames);
             }
         }
     }

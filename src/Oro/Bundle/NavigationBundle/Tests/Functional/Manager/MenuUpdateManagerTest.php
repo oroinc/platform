@@ -12,7 +12,6 @@ use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UIBundle\Model\TreeItem;
 
 class MenuUpdateManagerTest extends WebTestCase
 {
@@ -36,13 +35,11 @@ class MenuUpdateManagerTest extends WebTestCase
         $scope = $this->getScope();
         $actualMenuUpdate = $this->manager->createMenuUpdate(
             $this->getMenu(),
+            $scope,
             [
                 'key' => 'unique_item_key',
-                'custom' => true,
-                'menu' => 'application_menu',
-                'scope' => $scope,
                 'parentKey' => null,
-                'isDivider' => false,
+                'divider' => false,
             ]
         );
         $expectedMenuUpdate = new MenuUpdate();
@@ -55,33 +52,21 @@ class MenuUpdateManagerTest extends WebTestCase
         self::assertEquals($expectedMenuUpdate, $actualMenuUpdate);
     }
 
-    public function testUpdateMenuUpdate(): void
+    public function testCreateMenuUpdateWhenNotCustom(): void
     {
         $menu = $this->getMenu();
         $item = MenuUpdateUtils::findMenuItem($menu, 'oro_organization_list');
-        $update = new MenuUpdate();
-        $update->setKey('oro_organization_list')
-            ->setParentKey('dashboard_tab');
+        $item->setExtra('position', 42);
 
-        $this->manager->updateMenuUpdate($update, $item, 'menu');
-        self::assertEquals('oro_organization_list', $update->getKey());
-        self::assertEquals('dashboard_tab', $update->getParentKey());
-    }
+        $menuUpdate = $this->manager->createMenuUpdate(
+            $this->getMenu(),
+            $this->getScope(),
+            ['key' => $item->getName()]
+        );
 
-    public function testUpdateMenuUpdateWhenTranslateDisabled(): void
-    {
-        $menu = $this->getMenu();
-        $item = MenuUpdateUtils::findMenuItem($menu, 'oro_organization_list');
-        $item->setExtra('translate_disabled', true);
-
-        $update = new MenuUpdate();
-        $update->setKey('oro_organization_list')
-            ->setParentKey('dashboard_tab');
-
-        $this->manager->updateMenuUpdate($update, $item, 'menu');
-        self::assertEquals($item->getLabel(), $update->getDefaultTitle());
-        self::assertEquals('oro_organization_list', $update->getKey());
-        self::assertEquals('dashboard_tab', $update->getParentKey());
+        self::assertEquals($item->getName(), $menuUpdate->getKey());
+        self::assertEquals($item->getParent()->getName(), $menuUpdate->getParentKey());
+        self::assertEquals(42, $menuUpdate->getPriority());
     }
 
     public function testFindOrCreateMenuUpdate(): void
@@ -95,94 +80,13 @@ class MenuUpdateManagerTest extends WebTestCase
             ->setScope($scope)
             ->setDivider(false);
 
-        $actualMenuUpdate = $this->manager->findOrCreateMenuUpdate($this->getMenu(), 'unique_item_key', $scope);
+        $actualMenuUpdate = $this->manager->findOrCreateMenuUpdate(
+            $this->getMenu(),
+            $scope,
+            ['key' => 'unique_item_key']
+        );
+
         self::assertEquals($expectedMenuUpdate, $actualMenuUpdate);
-    }
-
-    public function testShowMenuItem(): void
-    {
-        $scope = $this->getScope();
-        $this->manager->showMenuItem($this->getMenu(), MenuUpdateData::MENU_UPDATE_2_1, $scope);
-
-        /** @var MenuUpdate[] $result */
-        $result = $this->repository->findBy([
-            'menu' => self::MENU_NAME,
-            'key' => [
-                MenuUpdateData::MENU_UPDATE_2,
-                MenuUpdateData::MENU_UPDATE_2_1,
-                MenuUpdateData::MENU_UPDATE_2_1_1,
-            ],
-            'scope' => $scope,
-        ]);
-
-        foreach ($result as $entity) {
-            self::assertTrue($entity->isActive());
-        }
-    }
-
-    public function testHideMenuItem(): void
-    {
-        $scope = $this->getScope();
-        $this->manager->hideMenuItem($this->getMenu(), MenuUpdateData::MENU_UPDATE_1, $scope);
-
-        /** @var MenuUpdate[] $result */
-        $result = $this->repository->findBy([
-            'menu' => self::MENU_NAME,
-            'key' => [MenuUpdateData::MENU_UPDATE_1, MenuUpdateData::MENU_UPDATE_1_1],
-            'scope' => $scope,
-        ]);
-
-        foreach ($result as $entity) {
-            self::assertFalse($entity->isActive());
-        }
-    }
-
-    public function testMoveMenuItem(): void
-    {
-        $updates = $this->manager->moveMenuItem(
-            $this->getMenu(),
-            MenuUpdateData::MENU_UPDATE_3_1,
-            $this->getScope(),
-            MenuUpdateData::MENU_UPDATE_2,
-            0
-        );
-
-        self::assertCount(2, $updates);
-
-        self::assertEquals(0, $updates[0]->getPriority());
-        self::assertEquals(MenuUpdateData::MENU_UPDATE_3_1, $updates[0]->getKey());
-        self::assertEquals(MenuUpdateData::MENU_UPDATE_2, $updates[0]->getParentKey());
-
-        self::assertEquals(MenuUpdateData::MENU_UPDATE_2_1, $updates[1]->getKey());
-        self::assertEquals(1, $updates[1]->getPriority());
-    }
-
-    public function testMoveMenuItems(): void
-    {
-        $updates = $this->manager->moveMenuItems(
-            $this->getMenu(),
-            [
-                new TreeItem(MenuUpdateData::MENU_UPDATE_3_1),
-                new TreeItem(MenuUpdateData::MENU_UPDATE_3),
-            ],
-            $this->getScope(),
-            MenuUpdateData::MENU_UPDATE_2,
-            0
-        );
-
-        self::assertCount(3, $updates);
-
-        self::assertEquals(MenuUpdateData::MENU_UPDATE_3_1, $updates[0]->getKey());
-        self::assertEquals(MenuUpdateData::MENU_UPDATE_3, $updates[1]->getKey());
-        self::assertEquals(MenuUpdateData::MENU_UPDATE_2_1, $updates[2]->getKey());
-
-        self::assertEquals(MenuUpdateData::MENU_UPDATE_2, $updates[0]->getParentKey());
-        self::assertEquals(MenuUpdateData::MENU_UPDATE_2, $updates[1]->getParentKey());
-        self::assertEquals(MenuUpdateData::MENU_UPDATE_2, $updates[2]->getParentKey());
-
-        self::assertEquals(0, $updates[0]->getPriority());
-        self::assertEquals(1, $updates[1]->getPriority());
-        self::assertEquals(2, $updates[2]->getPriority());
     }
 
     public function testDeleteMenuUpdates(): void

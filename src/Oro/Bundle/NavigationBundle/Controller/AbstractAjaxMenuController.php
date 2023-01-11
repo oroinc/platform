@@ -5,7 +5,9 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 use Doctrine\ORM\EntityManager;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
+use Oro\Bundle\NavigationBundle\Manager\MenuUpdateDisplayManager;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
+use Oro\Bundle\NavigationBundle\Manager\MenuUpdateMoveManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
@@ -13,6 +15,7 @@ use Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper;
 use Oro\Bundle\ScopeBundle\Manager\ContextNormalizer;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +44,13 @@ abstract class AbstractAjaxMenuController extends AbstractController
         if (null === $scope) {
             return new JsonResponse(null, Response::HTTP_NO_CONTENT);
         }
-        $updates = $manager->getRepository()->findMenuUpdatesByScope($menuName, $scope);
+
+        $menuUpdateRepository = $manager->getRepository();
+
+        // Disables query result cache to ensure we get all menu updates that should be removed.
+        $menuUpdateRepository->setQueryResultCache(new NullAdapter());
+
+        $updates = $menuUpdateRepository->findMenuUpdatesByScope($menuName, $scope);
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManagerForClass($manager->getEntityClass());
@@ -70,15 +79,13 @@ abstract class AbstractAjaxMenuController extends AbstractController
         $this->checkAcl($context);
         $manager = $this->getMenuUpdateManager();
         $menu = $this->getMenu($menuName, $context);
-        $scope = $this->getScopeManager()->find($manager->getScopeType(), $context);
+        $scope = $this->findOrCreateScope($context, $manager->getScopeType());
         $menuUpdate = $manager->createMenuUpdate(
             $menu,
+            $scope,
             [
-                'menu' => $menuName,
                 'parentKey' => $parentKey,
-                'isDivider' => $request->get('isDivider'),
-                'custom' => true,
-                'scope' => $scope
+                'divider' => $request->get('isDivider'),
             ]
         );
         $errors = $this->getValidator()->validate($menuUpdate);
@@ -87,8 +94,6 @@ abstract class AbstractAjaxMenuController extends AbstractController
                 'message' => $this->getValidationErrorMessage($errors)
             ], Response::HTTP_BAD_REQUEST);
         }
-        $scope = $this->findOrCreateScope($context, $manager->getScopeType());
-        $menuUpdate->setScope($scope);
 
         $em = $this->getDoctrine()->getManagerForClass($manager->getEntityClass());
         $em->persist($menuUpdate);
@@ -152,11 +157,10 @@ abstract class AbstractAjaxMenuController extends AbstractController
     {
         $context = $this->getContextFromRequest($request);
         $this->checkAcl($context);
-        $manager = $this->getMenuUpdateManager();
 
-        $scope = $this->findOrCreateScope($context, $manager->getScopeType());
+        $scope = $this->findOrCreateScope($context, $this->getMenuUpdateManager()->getScopeType());
         $menu = $this->getMenu($menuName, $context);
-        $this->getMenuUpdateManager()->showMenuItem($menu, $key, $scope);
+        $this->getMenuUpdateDisplayManager()->showMenuItem($menu, $key, $scope);
 
         $this->dispatchMenuUpdateScopeChangeEvent($menuName, $context);
 
@@ -174,11 +178,10 @@ abstract class AbstractAjaxMenuController extends AbstractController
     {
         $context = $this->getContextFromRequest($request);
         $this->checkAcl($context);
-        $manager = $this->getMenuUpdateManager();
 
-        $scope = $this->findOrCreateScope($context, $manager->getScopeType());
+        $scope = $this->findOrCreateScope($context, $this->getMenuUpdateManager()->getScopeType());
         $menu = $this->getMenu($menuName, $context);
-        $manager->hideMenuItem($menu, $key, $scope);
+        $this->getMenuUpdateDisplayManager()->hideMenuItem($menu, $key, $scope);
 
         $this->dispatchMenuUpdateScopeChangeEvent($menuName, $context);
 
@@ -206,7 +209,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
 
         $scope = $this->findOrCreateScope($context, $manager->getScopeType());
         $menu = $this->getMenu($menuName, $context);
-        $updates = $manager->moveMenuItem(
+        $updates = $this->getMenuUpdateMoveManager()->moveMenuItem(
             $menu,
             $key,
             $scope,
@@ -313,7 +316,17 @@ abstract class AbstractAjaxMenuController extends AbstractController
 
     protected function getMenuUpdateManager(): MenuUpdateManager
     {
-        return $this->get(MenuUpdateManager::class);
+        return $this->container->get(MenuUpdateManager::class);
+    }
+
+    protected function getMenuUpdateMoveManager(): MenuUpdateMoveManager
+    {
+        return $this->container->get(MenuUpdateMoveManager::class);
+    }
+
+    protected function getMenuUpdateDisplayManager(): MenuUpdateDisplayManager
+    {
+        return $this->container->get(MenuUpdateDisplayManager::class);
     }
 
     private function getScopeManager(): ScopeManager
@@ -351,6 +364,8 @@ abstract class AbstractAjaxMenuController extends AbstractController
             ContextRequestHelper::class,
             BuilderChainProvider::class,
             MenuUpdateManager::class,
+            MenuUpdateMoveManager::class,
+            MenuUpdateDisplayManager::class,
             ScopeManager::class,
             TranslatorInterface::class,
             ContextNormalizer::class,

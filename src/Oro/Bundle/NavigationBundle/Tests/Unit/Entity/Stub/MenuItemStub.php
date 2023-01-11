@@ -496,5 +496,6 @@ class MenuItemStub implements ItemInterface
      */
     public function count(): int
     {
+        return count($this->children);
     }
 }

@@ -37,7 +37,6 @@ class MenuUpdateHelper
      * @param string|null $value
      * @param string $name
      * @param string $type
-     * @param bool $translateDisabled
      *
      * @return MenuUpdateHelper
      */
@@ -45,20 +44,22 @@ class MenuUpdateHelper
         MenuUpdateInterface $entity,
         ?string $value,
         string $name,
-        string $type,
-        bool $translateDisabled = false
+        string $type
     ) {
         $values = $this->getPropertyAccessor()->getValue($entity, $name . 's');
         if ($values instanceof Collection && $values->count() <= 0) {
             $value = (string) $value;
-            $doTranslation = !$translateDisabled && $value !== '';
+            $doTranslation = $value !== '';
 
             // Default translation for menu must always have value for English locale, because out of the box app has
             // translations only for English language.
             $defaultValue = $doTranslation
                 ? $this->translator->trans($value, [], null, Configuration::DEFAULT_LOCALE)
                 : $value;
-            $this->getPropertyAccessor()->setValue($entity, 'default_' . $name, $defaultValue);
+            $defaultFallbackValue = new LocalizedFallbackValue();
+            $this->getPropertyAccessor()->setValue($defaultFallbackValue, $type, $defaultValue);
+
+            $fallbackValues = [$defaultFallbackValue];
             foreach ($this->localizationHelper->getLocalizations() as $localization) {
                 $locale = $localization->getLanguageCode();
                 $translatedValue = $doTranslation ? $this->translator->trans($value, [], null, $locale) : $value;
@@ -72,8 +73,10 @@ class MenuUpdateHelper
                     $this->getPropertyAccessor()->setValue($fallbackValue, $type, $translatedValue);
                 }
 
-                $this->getPropertyAccessor()->setValue($entity, $name, [$fallbackValue]);
+                $fallbackValues[] = $fallbackValue;
             }
+
+            $this->getPropertyAccessor()->setValue($entity, $name, $fallbackValues);
         }
 
         return $this;

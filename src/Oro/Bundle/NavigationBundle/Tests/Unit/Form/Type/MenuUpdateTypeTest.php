@@ -6,6 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\OroIconTypeStub;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Oro\Bundle\LocaleBundle\Form\EventSubscriber\LocalizedFallbackValueCollectionClearingSubscriber;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionTypeStub;
@@ -31,8 +32,11 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     protected function getExtensions(): array
     {
         $registry = $this->createMock(ManagerRegistry::class);
-
         $kernel = $this->createMock(KernelInterface::class);
+        $menuUpdateType = new MenuUpdateType();
+        $menuUpdateType->setLocalizedFallbackValueCollectionSubscriber(
+            new LocalizedFallbackValueCollectionClearingSubscriber()
+        );
 
         return [
             new PreloadedExtension(
@@ -40,6 +44,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
                     new LocalizedFallbackValueCollectionType($registry),
                     LocalizationCollectionType::class => new LocalizationCollectionTypeStub(),
                     OroIconType::class => new OroIconTypeStub($kernel),
+                    MenuUpdateType::class => $menuUpdateType,
                 ],
                 []
             ),
@@ -53,7 +58,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     protected function getValidators(): array
     {
         $uriSecurityHelper = $this->createMock(UriSecurityHelper::class);
-        $uriSecurityHelper->expects($this->any())
+        $uriSecurityHelper->expects(self::any())
             ->method('uriHasDangerousProtocol')
             ->willReturnMap([
                 ['javascript:alert(1)', true],
@@ -70,7 +75,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    public function testSubmitValid()
+    public function testSubmitValid(): void
     {
         $menuUpdate = new MenuUpdate();
         $menu = $this->createItem('sample_menu');
@@ -104,10 +109,10 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $this->assertFormNotContainsField('aclResourceId', $form);
 
         $this->assertFormIsValid($form);
-        $this->assertEquals($expected, $form->getData());
+        self::assertEquals($expected, $form->getData());
     }
 
-    public function testSubmitIsCustom()
+    public function testSubmitIsCustom(): void
     {
         $menuUpdate = new MenuUpdate();
         $menuUpdate->setCustom(true);
@@ -135,10 +140,10 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
             ->setUri(self::TEST_URI);
 
         $this->assertFormIsValid($form);
-        $this->assertEquals($expected, $form->getData());
+        self::assertEquals($expected, $form->getData());
     }
 
-    public function testSubmitEmptyTitle()
+    public function testSubmitEmptyTitle(): void
     {
         $menuUpdate = new MenuUpdate();
         $menu = $this->createItem('sample_menu');
@@ -152,10 +157,51 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $expected->addDescription(new LocalizedFallbackValue);
 
         $this->assertFormIsNotValid($form);
-        $this->assertEquals($expected, $form->getData());
+        self::assertEquals($expected, $form->getData());
     }
 
-    public function testSubmitCustomWithEmptyUri()
+    public function testSubmitWhenTitleIsNotChanged(): void
+    {
+        $menuUpdate = (new MenuUpdate())
+            ->addTitle((new LocalizedFallbackValue())->setString(self::TEST_TITLE));
+        $menu = $this->createItem('sample_menu');
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate, ['menu' => $menu]);
+
+        $form->submit([
+            'titles' => [
+                'values' => [
+                    'default' => self::TEST_TITLE,
+                ],
+            ]
+        ]);
+
+        $this->assertFormIsValid($form);
+        self::assertEquals([], $form->getData()->getTitles()->toArray());
+    }
+
+    public function testSubmitWhenTitleIsChanged(): void
+    {
+        $menuUpdate = (new MenuUpdate())
+            ->addTitle((new LocalizedFallbackValue())->setString(self::TEST_TITLE));
+        $menu = $this->createItem('sample_menu');
+        $form = $this->factory->create(MenuUpdateType::class, $menuUpdate, ['menu' => $menu]);
+
+        $form->submit([
+            'titles' => [
+                'values' => [
+                    'default' => self::TEST_TITLE . ' updated',
+                ],
+            ]
+        ]);
+
+        $this->assertFormIsValid($form);
+        self::assertEqualsCanonicalizing(
+            [(new LocalizedFallbackValue())->setString(self::TEST_TITLE . ' updated')],
+            $form->getData()->getTitles()->toArray()
+        );
+    }
+
+    public function testSubmitCustomWithEmptyUri(): void
     {
         $menuUpdate = new MenuUpdate();
         $menuUpdate->setCustom(true);
@@ -180,10 +226,10 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
             ->addTitle($expectedTitle);
 
         $this->assertFormIsNotValid($form);
-        $this->assertEquals($expected, $form->getData());
+        self::assertEquals($expected, $form->getData());
     }
 
-    public function testAclResourceIdShouldExist()
+    public function testAclResourceIdShouldExist(): void
     {
         $menuUpdate = new MenuUpdate();
         $menu = $this->createItem('sample_menu');
@@ -231,7 +277,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
             ->setUri($uri);
 
         $this->assertFormIsNotValid($form);
-        $this->assertEquals($expected, $form->getData());
+        self::assertEquals($expected, $form->getData());
     }
 
     public function submitCustomWithJavascriptUriDataProvider(): array

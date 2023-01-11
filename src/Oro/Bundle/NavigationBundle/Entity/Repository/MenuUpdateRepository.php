@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr\Join;
@@ -154,6 +155,32 @@ class MenuUpdateRepository extends ServiceEntityRepository
             ->leftJoin('u.descriptions', 'descriptions')
             ->where('u.id IN (:menuUpdates)')
             ->setParameter('menuUpdates', $menuUpdates)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @param string $menuName
+     * @param int $scopeId
+     * @param string[] $keys
+     *
+     * @return array<int,MenuUpdateInterface>
+     */
+    public function findMany(string $menuName, int $scopeId, array $keys): array
+    {
+        if (!$keys) {
+            return [];
+        }
+
+        $queryBuilder = $this->createQueryBuilder('mu', 'mu.key');
+
+        return $queryBuilder
+            ->where($queryBuilder->expr()->eq('mu.menu', ':menu'))
+            ->setParameter('menu', $menuName, Types::STRING)
+            ->andWhere($queryBuilder->expr()->in('mu.key', ':keys'))
+            ->setParameter('keys', $keys, Connection::PARAM_STR_ARRAY)
+            ->andWhere($queryBuilder->expr()->eq('mu.scope', ':scope'))
+            ->setParameter('scope', $scopeId, Types::INTEGER)
             ->getQuery()
             ->getResult();
     }

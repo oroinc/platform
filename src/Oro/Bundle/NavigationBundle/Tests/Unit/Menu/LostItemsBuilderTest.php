@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdatesApplyAfterEvent;
 use Oro\Bundle\NavigationBundle\Menu\LostItemsBuilder;
-use Oro\Bundle\NavigationBundle\MenuUpdateApplier\MenuUpdateApplier;
+use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\Model\MenuUpdateApplierContext;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
-use Oro\Bundle\NavigationBundle\Utils\LostItemsManipulator;
 
 class LostItemsBuilderTest extends \PHPUnit\Framework\TestCase
 {
@@ -22,82 +23,76 @@ class LostItemsBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $menu = $this->createItem('sample_menu')
             ->setDisplay(false);
-        $lostItemsContainer = LostItemsManipulator::getLostItemsContainer($menu);
 
         $this->builder->build($menu);
-
-        self::assertSame($lostItemsContainer, $menu->getChild($lostItemsContainer->getName()));
     }
 
-    public function testWhenNoLostItemsContainer(): void
+    public function testWhenNoMenuUpdateApplierContext(): void
     {
         $menu = $this->createItem('sample_menu');
-        self::assertNull(LostItemsManipulator::getLostItemsContainer($menu, false));
 
         $this->builder->build($menu);
-
-        self::assertNull(LostItemsManipulator::getLostItemsContainer($menu, false));
     }
 
-    public function testWhenLostItemsContainerIsEmpty(): void
+    public function testWhenNoLostItems(): void
     {
         $menu = $this->createItem('sample_menu');
-        LostItemsManipulator::getLostItemsContainer($menu);
 
+        $context = new MenuUpdateApplierContext($menu);
+        $this->builder->onMenuUpdatesApplyAfter(new MenuUpdatesApplyAfterEvent($context));
         $this->builder->build($menu);
-
-        self::assertNull(LostItemsManipulator::getLostItemsContainer($menu, false));
     }
 
-    public function testWhenLostItemsContainerHasNonCustomItem(): void
+    public function testWhenHasLostItem(): void
     {
         $menu = $this->createItem('sample_menu');
-        $lostItemsContainer = LostItemsManipulator::getLostItemsContainer($menu);
-        $nonCustomItem = $lostItemsContainer->addChild('non_custom');
+        $sampleItem = $menu->addChild('sample_item');
+        $lostItem = $menu->addChild('lost_item');
 
+        $context = new MenuUpdateApplierContext($menu);
+        $context->addLostItem($lostItem, $this->createMock(MenuUpdateInterface::class));
+        $this->builder->onMenuUpdatesApplyAfter(new MenuUpdatesApplyAfterEvent($context));
         $this->builder->build($menu);
 
-        self::assertSame([$nonCustomItem->getName() => $nonCustomItem], $lostItemsContainer->getChildren());
-        self::assertSame([], $menu->getChildren());
+        self::assertSame([$sampleItem->getName() => $sampleItem], $menu->getChildren());
     }
 
-    public function testWhenLostItemsContainerHasCustomItem(): void
+    public function testWhenHasLostItemWithCustomItemInside(): void
     {
         $menu = $this->createItem('sample_menu');
-        $menuItem1 = $this->createItem('item1');
-        $menu->addChild($menuItem1);
-        $lostItemsContainer = LostItemsManipulator::getLostItemsContainer($menu);
-        $customItem = $lostItemsContainer->addChild('custom_item')
-            ->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, $menuItem1->getName())
-            ->setExtra(MenuUpdateApplier::IS_CUSTOM, true);
+        $sampleItem = $menu->addChild('sample_item');
+        $lostItem = $menu->addChild('lost_item');
+        $customItem = $lostItem->addChild('custom_item', ['extras' => [MenuUpdateInterface::IS_CUSTOM => true]]);
 
+        $context = new MenuUpdateApplierContext($menu);
+        $context->addLostItem($lostItem, $this->createMock(MenuUpdateInterface::class));
+        $this->builder->onMenuUpdatesApplyAfter(new MenuUpdatesApplyAfterEvent($context));
         $this->builder->build($menu);
 
-        self::assertSame([], $lostItemsContainer->getChildren());
-        self::assertSame([$menuItem1->getName() => $menuItem1], $menu->getChildren());
-        self::assertSame([$customItem->getName() => $customItem], $menuItem1->getChildren());
-    }
-
-    public function testWhenLostItemsContainerHasCustomItemButNoParent(): void
-    {
-        $menu = $this->createItem('sample_menu');
-        $menuItem1 = $this->createItem('item1');
-        $menu->addChild($menuItem1);
-        $lostItemsContainer = LostItemsManipulator::getLostItemsContainer($menu);
-        $customItem = $lostItemsContainer->addChild('custom_item')
-            ->setExtra(LostItemsManipulator::IMPLIED_PARENT_NAME, 'non_existing_parent')
-            ->setExtra(MenuUpdateApplier::IS_CUSTOM, true);
-
-        $this->builder->build($menu);
-
-        self::assertSame([], $lostItemsContainer->getChildren());
         self::assertSame(
-            [
-                $menuItem1->getName() => $menuItem1,
-                $customItem->getName() => $customItem,
-            ],
+            [$sampleItem->getName() => $sampleItem, $customItem->getName() => $customItem],
             $menu->getChildren()
         );
-        self::assertSame([], $menuItem1->getChildren());
+    }
+
+    public function testWhenHasLostItemWithSyntheticItemInside(): void
+    {
+        $menu = $this->createItem('sample_menu');
+        $sampleItem = $menu->addChild('sample_item');
+        $lostItem = $menu->addChild('lost_item');
+        $syntheticItem = $lostItem->addChild(
+            'synthetic_item',
+            ['extras' => [MenuUpdateInterface::IS_SYNTHETIC => true]]
+        );
+
+        $context = new MenuUpdateApplierContext($menu);
+        $context->addLostItem($lostItem, $this->createMock(MenuUpdateInterface::class));
+        $this->builder->onMenuUpdatesApplyAfter(new MenuUpdatesApplyAfterEvent($context));
+        $this->builder->build($menu);
+
+        self::assertSame(
+            [$sampleItem->getName() => $sampleItem, $syntheticItem->getName() => $syntheticItem],
+            $menu->getChildren()
+        );
     }
 }

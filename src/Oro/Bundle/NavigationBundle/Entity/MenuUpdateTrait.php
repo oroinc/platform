@@ -40,6 +40,13 @@ trait MenuUpdateTrait
     protected $parentKey;
 
     /**
+     * The parent key with which a menu update was initially created.
+     *
+     * @ORM\Column(name="origin_key", type="string", length=100, nullable=true)
+     */
+    protected ?string $originKey = null;
+
+    /**
      * @var Collection|LocalizedFallbackValue[]
      *
      * @ORM\ManyToMany(
@@ -112,11 +119,21 @@ trait MenuUpdateTrait
     protected $divider = false;
 
     /**
-     * @var boolean
+     * Marks menu item as custom.
+     * Custom is a menu item initially created by a menu update and which exists owing to a menu update.
      *
      * @ORM\Column(name="is_custom", type="boolean")
      */
     protected $custom = false;
+
+    /**
+     * Marks menu item as synthetic.
+     * Synthetic is a menu item that initially created not by a menu update (i.e. non-custom), but should not be lost
+     * even if initial menu item does not exist anymore.
+     *
+     * @ORM\Column(name="is_synthetic", type="boolean", options={"default"=false})
+     */
+    protected bool $synthetic = false;
 
     public function __construct()
     {
@@ -168,6 +185,24 @@ trait MenuUpdateTrait
     public function setParentKey($parentKey)
     {
         $this->parentKey = $parentKey;
+
+        return $this;
+    }
+
+    /**
+     * Returns the parent key with which a menu update was initially created.
+     */
+    public function getOriginKey(): ?string
+    {
+        return $this->originKey;
+    }
+
+    /**
+     * Set the parent key with which a menu update was initially created.
+     */
+    public function setOriginKey(?string $originKey): self
+    {
+        $this->originKey = $originKey;
 
         return $this;
     }
@@ -416,6 +451,21 @@ trait MenuUpdateTrait
     public function setCustom($custom)
     {
         $this->custom = $custom;
+
+        return $this;
+    }
+
+    /**
+     * Synthetic is a non-custom menu item that should remain in tree even if target item does not exist.
+     */
+    public function isSynthetic(): bool
+    {
+        return $this->synthetic;
+    }
+
+    public function setSynthetic(bool $synthetic): self
+    {
+        $this->synthetic = $synthetic;
 
         return $this;
     }

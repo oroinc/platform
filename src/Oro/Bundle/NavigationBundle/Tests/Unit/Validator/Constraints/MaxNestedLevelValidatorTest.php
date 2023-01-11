@@ -3,8 +3,9 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-use Oro\Bundle\NavigationBundle\MenuUpdateApplier\MenuUpdateApplier;
-use Oro\Bundle\NavigationBundle\MenuUpdateApplier\MenuUpdateApplierInterface;
+use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\MenuUpdateApplier;
+use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\MenuUpdateApplierInterface;
+use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\MenuUpdateToMenuItemPropagatorInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
@@ -31,7 +32,9 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
             ->method('getLocalizedValue')
             ->willReturnCallback(static fn ($collection) => $collection[0] ?? null);
 
-        $this->menuUpdateApplier = new MenuUpdateApplier($localizationHelper);
+        $this->menuUpdateApplier = new MenuUpdateApplier(
+            $this->createMock(MenuUpdateToMenuItemPropagatorInterface::class)
+        );
 
         parent::setUp();
     }

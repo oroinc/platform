@@ -12,6 +12,16 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
  */
 interface MenuUpdateInterface
 {
+    public const TITLES = 'titles';
+    public const DESCRIPTION = 'description';
+    public const IS_DIVIDER = 'divider';
+    public const IS_TRANSLATE_DISABLED = 'translate_disabled';
+    public const IS_CUSTOM = 'custom';
+    public const IS_SYNTHETIC = 'synthetic';
+    public const ORIGIN_KEY = 'origin_key';
+    public const POSITION = 'position';
+    public const ICON = 'icon';
+
     /**
      * @return int
      */
@@ -45,6 +55,10 @@ interface MenuUpdateInterface
      * @return MenuUpdateInterface
      */
     public function setParentKey($parentKey);
+
+    public function getOriginKey(): ?string;
+
+    public function setOriginKey(?string $originKey): self;
 
     /**
      * @return Collection|LocalizedFallbackValue[]
@@ -195,13 +209,6 @@ interface MenuUpdateInterface
      * @return MenuUpdateInterface
      */
     public function setCustom($custom);
-
-    /**
-     * Get array of extra data that is not declared in MenuUpdateInterface model
-     *
-     * @return array
-     */
-    public function getExtras();
 
     /**
      * Get array of link attributes

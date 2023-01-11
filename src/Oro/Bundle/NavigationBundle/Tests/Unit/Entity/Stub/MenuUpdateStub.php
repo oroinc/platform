@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
@@ -64,6 +65,18 @@ class MenuUpdateStub implements MenuUpdateInterface
     public function getTitle(Localization $localization = null)
     {
         return $this->getFallbackValue($this->titles, $localization);
+    }
+
+    public function getTitles(): Collection
+    {
+        return $this->titles;
+    }
+
+    public function setTitles(Collection $titles): self
+    {
+        $this->titles = $titles;
+
+        return $this;
     }
 
     /**

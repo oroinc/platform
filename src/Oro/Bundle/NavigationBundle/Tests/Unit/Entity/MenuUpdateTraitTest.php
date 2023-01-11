@@ -12,29 +12,32 @@ class MenuUpdateTraitTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 
-    public function testProperties()
+    public function testProperties(): void
     {
         $properties = [
             ['id', 42],
             ['key', 'page_wrapper'],
             ['parentKey', 'page_container'],
+            ['originKey', 'page_container'],
             ['uri', 'uri'],
             ['menu', 'main_menu'],
             ['scope', new Scope()],
             ['active', true],
             ['divider', true],
+            ['custom', true],
+            ['synthetic', true],
             ['priority', 1],
         ];
 
         $update = new MenuUpdateStub();
 
-        $this->assertPropertyAccessors($update, $properties);
+        self::assertPropertyAccessors($update, $properties);
     }
 
-    public function testTitleAccessors()
+    public function testTitleAccessors(): void
     {
         $update = new MenuUpdateStub();
-        $this->assertEmpty($update->getTitles()->toArray());
+        self::assertEmpty($update->getTitles()->toArray());
 
         $firstTitle = $this->createLocalizedValue();
 
@@ -44,20 +47,20 @@ class MenuUpdateTraitTest extends \PHPUnit\Framework\TestCase
             ->addTitle($secondTitle)
             ->addTitle($secondTitle);
 
-        $this->assertCount(2, $update->getTitles()->toArray());
+        self::assertCount(2, $update->getTitles()->toArray());
 
-        $this->assertEquals([$firstTitle, $secondTitle], array_values($update->getTitles()->toArray()));
+        self::assertEquals([$firstTitle, $secondTitle], array_values($update->getTitles()->toArray()));
 
         $update->removeTitle($firstTitle)
             ->removeTitle($firstTitle);
 
-        $this->assertEquals([$secondTitle], array_values($update->getTitles()->toArray()));
+        self::assertEquals([$secondTitle], array_values($update->getTitles()->toArray()));
     }
 
-    public function testDescriptionAccessors()
+    public function testDescriptionAccessors(): void
     {
         $update = new MenuUpdateStub();
-        $this->assertEmpty($update->getDescriptions()->toArray());
+        self::assertEmpty($update->getDescriptions()->toArray());
 
         $firstDescription = $this->createLocalizedValue();
 
@@ -67,9 +70,9 @@ class MenuUpdateTraitTest extends \PHPUnit\Framework\TestCase
             ->addDescription($secondDescription)
             ->addDescription($secondDescription);
 
-        $this->assertCount(2, $update->getDescriptions()->toArray());
+        self::assertCount(2, $update->getDescriptions()->toArray());
 
-        $this->assertEquals(
+        self::assertEquals(
             [$firstDescription, $secondDescription],
             array_values($update->getDescriptions()->toArray())
         );
@@ -77,11 +80,11 @@ class MenuUpdateTraitTest extends \PHPUnit\Framework\TestCase
         $update->removeDescription($firstDescription)
             ->removeDescription($firstDescription);
 
-        $this->assertEquals([$secondDescription], array_values($update->getDescriptions()->toArray()));
+        self::assertEquals([$secondDescription], array_values($update->getDescriptions()->toArray()));
 
         $defaultDescriptionString = 'default description string';
         $update->setDefaultDescription($defaultDescriptionString);
-        $this->assertEquals($defaultDescriptionString, $update->getDefaultDescription()->getText());
+        self::assertEquals($defaultDescriptionString, $update->getDefaultDescription()->getText());
     }
 
     /**
@@ -89,7 +92,7 @@ class MenuUpdateTraitTest extends \PHPUnit\Framework\TestCase
      *
      * @return LocalizedFallbackValue
      */
-    protected function createLocalizedValue($default = false)
+    protected function createLocalizedValue($default = false): LocalizedFallbackValue
     {
         $localized = (new LocalizedFallbackValue())->setString('some string');
 
