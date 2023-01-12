@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
-use Gaufrette\Adapter\GridFS;
 use Gaufrette\Exception\FileNotFound as GaufretteFileNotFoundException;
 use Gaufrette\Filesystem;
 use Gaufrette\Stream\InMemoryBuffer;
@@ -13,6 +12,7 @@ use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Mapper\ClientMimeTypeMapper;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
+use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestGaufretteAdapterWithMetadata;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidatorInterface;
 use Oro\Bundle\GaufretteBundle\FilesystemMap;
@@ -28,15 +28,19 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_FILE_SYSTEM_NAME = 'testAttachments';
-    private const TEST_PROTOCOL         = 'testProtocol';
+    private const TEST_PROTOCOL = 'testProtocol';
 
-    private Filesystem|\PHPUnit\Framework\MockObject\MockObject $filesystem;
+    /** @var Filesystem|\PHPUnit\Framework\MockObject\MockObject */
+    private $filesystem;
 
-    private ProtocolValidatorInterface|\PHPUnit\Framework\MockObject\MockObject $protocolValidator;
+    /** @var ProtocolValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $protocolValidator;
 
-    private ExternalFileFactory $externalFileFactory;
+    /** @var ExternalFileFactory */
+    private $externalFileFactory;
 
-    private FileManager $fileManager;
+    /** @var FileManager */
+    private $fileManager;
 
     protected function setUp(): void
     {
@@ -594,7 +598,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileEntity->getFilename())
             ->willReturn($memoryBuffer);
 
-        $adapter = $this->createMock(GridFS::class);
+        $adapter = $this->createMock(TestGaufretteAdapterWithMetadata::class);
         $this->filesystem->expects(self::any())
             ->method('getAdapter')
             ->willReturn($adapter);
