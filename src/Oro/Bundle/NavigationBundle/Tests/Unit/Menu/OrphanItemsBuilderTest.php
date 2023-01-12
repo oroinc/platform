@@ -77,4 +77,24 @@ class OrphanItemsBuilderTest extends \PHPUnit\Framework\TestCase
         );
         self::assertSame([], $sampleItem->getChildren());
     }
+
+    public function testWhenHasOrphanItemButIsLost(): void
+    {
+        $menu = $this->createItem('sample_menu');
+        $sampleItem = $menu->addChild('sample_item');
+        $orphanItem = $menu->addChild('orphan_item');
+
+        $context = new MenuUpdateApplierContext($menu);
+        $context->addOrphanedItem($sampleItem->getName(), $orphanItem, $this->createMock(MenuUpdateInterface::class));
+        $context->addLostItem($orphanItem, $this->createMock(MenuUpdateInterface::class));
+        $this->builder->onMenuUpdatesApplyAfter(new MenuUpdatesApplyAfterEvent($context));
+        $this->builder->build($menu);
+
+        self::assertNotEmpty($context->getOrphanedItems($sampleItem->getName()));
+        self::assertSame(
+            [$sampleItem->getName() => $sampleItem, $orphanItem->getName() => $orphanItem],
+            $menu->getChildren()
+        );
+        self::assertSame([], $sampleItem->getChildren());
+    }
 }

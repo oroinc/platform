@@ -35,6 +35,10 @@ class OrphanItemsBuilder implements BuilderInterface
             }
 
             foreach ($menuItemsByName as $menuItemName => $menuItem) {
+                if ($menuUpdateApplierContext->isLostItem($menuItem->getName())) {
+                    continue;
+                }
+
                 $menuItem->getParent()?->removeChild($menuItemName);
                 $parentMenuItem->addChild($menuItem);
                 $menuUpdateApplierContext->removeOrphanedItem($parentMenuItemName, $menuItemName);

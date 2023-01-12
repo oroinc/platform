@@ -45,7 +45,8 @@ class MenuUpdateManagerTest extends WebTestCase
         $expectedMenuUpdate = new MenuUpdate();
         $expectedMenuUpdate->setKey('unique_item_key')
             ->setCustom(true)
-            ->setMenu('application_menu')
+            ->setMenu(self::MENU_NAME)
+            ->setOriginKey(self::MENU_NAME)
             ->setParentKey(null)
             ->setDivider(false)
             ->setScope($scope);
@@ -65,6 +66,7 @@ class MenuUpdateManagerTest extends WebTestCase
         );
 
         self::assertEquals($item->getName(), $menuUpdate->getKey());
+        self::assertEquals($item->getParent()->getName(), $menuUpdate->getOriginKey());
         self::assertEquals($item->getParent()->getName(), $menuUpdate->getParentKey());
         self::assertEquals(42, $menuUpdate->getPriority());
     }
@@ -75,7 +77,8 @@ class MenuUpdateManagerTest extends WebTestCase
         $expectedMenuUpdate = new MenuUpdate();
         $expectedMenuUpdate->setKey('unique_item_key')
             ->setCustom(true)
-            ->setMenu('application_menu')
+            ->setMenu(self::MENU_NAME)
+            ->setOriginKey(self::MENU_NAME)
             ->setParentKey(null)
             ->setScope($scope)
             ->setDivider(false);

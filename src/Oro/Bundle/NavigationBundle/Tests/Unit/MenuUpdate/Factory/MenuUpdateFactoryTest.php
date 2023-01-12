@@ -43,14 +43,18 @@ class MenuUpdateFactoryTest extends \PHPUnit\Framework\TestCase
         return [
             'empty options' => [
                 'options' => [],
-                'expected' => (new MenuUpdateStub())->setMenu(self::MENU)->setScope($this->createMock(Scope::class)),
+                'expected' => (new MenuUpdateStub())
+                    ->setMenu(self::MENU)
+                    ->setScope($this->createMock(Scope::class))
+                    ->setOriginKey(self::MENU),
             ],
             'with key' => [
                 'options' => ['key' => 'sample_key'],
                 'expected' => (new MenuUpdateStub())
                     ->setMenu(self::MENU)
                     ->setScope($this->createMock(Scope::class))
-                    ->setKey('sample_key'),
+                    ->setKey('sample_key')
+                    ->setOriginKey(self::MENU),
             ],
             'with parentKey' => [
                 'options' => ['key' => 'sample_key', 'parentKey' => 'sample_parent_key'],
@@ -60,6 +64,14 @@ class MenuUpdateFactoryTest extends \PHPUnit\Framework\TestCase
                     ->setKey('sample_key')
                     ->setParentKey('sample_parent_key')
                     ->setOriginKey('sample_parent_key'),
+            ],
+            'with originKey' => [
+                'options' => ['key' => 'sample_key', 'originKey' => 'sample_origin_key'],
+                'expected' => (new MenuUpdateStub())
+                    ->setMenu(self::MENU)
+                    ->setScope($this->createMock(Scope::class))
+                    ->setKey('sample_key')
+                    ->setOriginKey('sample_origin_key'),
             ],
             'with divider' => [
                 'options' => ['key' => 'sample_key', 'parentKey' => 'sample_parent_key', 'divider' => true],

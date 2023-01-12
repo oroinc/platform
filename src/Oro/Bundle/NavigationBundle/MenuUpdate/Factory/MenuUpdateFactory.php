@@ -43,15 +43,12 @@ class MenuUpdateFactory implements MenuUpdateFactoryInterface
         $menuUpdate->setMenu($menuName);
         $menuUpdate->setScope($scope);
 
-        if (isset($options['key'])) {
-            $menuUpdate->setKey($options['key']);
-        } else {
+        if (!isset($options['key'])) {
             $menuUpdate->generateKey();
         }
 
-        if (isset($options['parentKey'])) {
-            $menuUpdate->setParentKey($options['parentKey']);
-            $menuUpdate->setOriginKey($options['originKey'] ?? $options['parentKey']);
+        if (!isset($options['originKey'])) {
+            $options['originKey'] = $options['parentKey'] ?? $menuName;
         }
 
         if (isset($options['divider']) && $options['divider']) {
