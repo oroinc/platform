@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Manager;
 
+use Gaufrette\Exception\FileNotFound;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\ExternalFileNotAccessibleException;
 use Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException;
@@ -23,9 +24,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class FileManager extends GaufretteFileManager
 {
     private ProtocolValidatorInterface $protocolValidator;
-
     private ClientMimeTypeMapperInterface $clientMimeTypeMapper;
-
     private ExternalFileFactory $externalFileFactory;
 
     public function __construct(
@@ -41,14 +40,17 @@ class FileManager extends GaufretteFileManager
     }
 
     /**
-     * Returns the content of a file
+     * Gets the content of a file.
      *
      * @param File|string $file           The File entity or file name
      * @param bool        $throwException Whether to throw exception in case the file does not exist in the storage
      *
      * @return string|null
+     *
+     * @throws FileNotFound When the file does not exist and throw exception is requested
+     * @throws \RuntimeException When the file cannot be read
      */
-    public function getContent($file, bool $throwException = true): ?string
+    public function getContent(File|string $file, bool $throwException = true): ?string
     {
         if ($file instanceof File) {
             if ($file->getExternalUrl()) {
@@ -69,9 +71,9 @@ class FileManager extends GaufretteFileManager
      *
      * @return File
      *
-     * @throws FileNotFoundException         When the given file doesn't exist
+     * @throws FileNotFoundException When the given file doesn't exist
      * @throws ProtocolNotSupportedException When the given file path is not supported
-     * @throws IOException                   When the given file cannot be copied to a temporary folder
+     * @throws IOException When the given file cannot be copied to a temporary folder
      */
     public function createFileEntity(string $path): File
     {
@@ -83,29 +85,14 @@ class FileManager extends GaufretteFileManager
     }
 
     /**
+     * @param File   $file The file entity for which is needed to set file property.
      * @param string $path The local path or remote URL of a file
      *
-     * @return string
-     */
-    private function getFilenameFromPath(string $path): string
-    {
-        $fileName = pathinfo(trim($path), PATHINFO_BASENAME);
-        $parametersPosition = strpos($fileName, '?');
-        if ($parametersPosition) {
-            $fileName = substr($fileName, 0, $parametersPosition);
-        }
-
-        return $fileName;
-    }
-
-    /**
-     * @param string $path The local path or remote URL of a file
-     *
-     * @throws FileNotFoundException         When the given file doesn't exist
      * @throws ProtocolNotSupportedException When the given file path is not supported
-     * @throws IOException                   When the given file cannot be copied to a temporary folder
+     * @throws FileNotFoundException When the given file doesn't exist
+     * @throws IOException When copy fails
      */
-    private function assertValidProtocolInPath(string $path): void
+    public function setFileFromPath(File $file, string $path): void
     {
         $path = trim($path);
         $protocolDelimiter = strpos($path, '://');
@@ -114,17 +101,12 @@ class FileManager extends GaufretteFileManager
         ) {
             throw new ProtocolNotSupportedException($path);
         }
-    }
 
-    /**
-     * @param File $file The file entity for which is needed to set file property.
-     * @param string $path The local path or remote URL of a file
-     */
-    public function setFileFromPath(File $file, string $path): void
-    {
-        $this->assertValidProtocolInPath($path);
-
-        $fileName = $this->getFilenameFromPath($path);
+        $fileName = pathinfo($path, PATHINFO_BASENAME);
+        $parametersPosition = strpos($fileName, '?');
+        if ($parametersPosition) {
+            $fileName = substr($fileName, 0, $parametersPosition);
+        }
 
         $tmpFile = $this->getTemporaryFileName($fileName);
         $filesystem = new SymfonyFileSystem();
@@ -135,10 +117,10 @@ class FileManager extends GaufretteFileManager
     }
 
     /**
-     * @param File $file The file entity for which is needed to set file property.
+     * @param File   $file        The file entity for which is needed to set file property.
      * @param string $externalUrl The external URL to create an {@see ExternalFile} from.
      *
-     * @throws ExternalFileNotAccessibleException
+     * @throws ExternalFileNotAccessibleException When the given external URL is not accessible
      */
     public function setExternalFileFromUrl(File $file, string $externalUrl): void
     {
@@ -148,7 +130,7 @@ class FileManager extends GaufretteFileManager
     }
 
     /**
-     * Makes a copy of File entity
+     * Makes a copy of the given File entity.
      */
     public function cloneFileEntity(File $file): ?File
     {
@@ -185,7 +167,7 @@ class FileManager extends GaufretteFileManager
     }
 
     /**
-     * Updates File entity before upload
+     * Updates the given File entity before it will be uploaded to the storage.
      */
     public function preUpload(File $entity): void
     {
@@ -217,13 +199,11 @@ class FileManager extends GaufretteFileManager
             $entity->setMimeType($mimeType);
             $entity->setExtension($file->getOriginalExtension() ?: $file->getExtension());
         } else {
-            throw new \LogicException(
-                sprintf(
-                    'File %s is not supported. One of the following was expected: %s',
-                    get_debug_type($file),
-                    implode(', ', [UploadedFile::class, SymfonyFile::class, ExternalFile::class])
-                )
-            );
+            throw new \LogicException(sprintf(
+                'File %s is not supported. One of the following was expected: %s',
+                get_debug_type($file),
+                implode(', ', [UploadedFile::class, SymfonyFile::class, ExternalFile::class])
+            ));
         }
 
         $entity->setFileSize($file->getSize());
@@ -238,14 +218,14 @@ class FileManager extends GaufretteFileManager
     {
         $file = $fileEntity->getFile();
         if ($file instanceof ExternalFile) {
-            return (bool) $file->getUrl();
+            return (bool)$file->getUrl();
         }
 
-        return (bool) $file?->isFile();
+        return (bool)$file?->isFile();
     }
 
     /**
-     * Uploads a file to the storage
+     * Uploads a file to the storage.
      */
     public function upload(File $entity): void
     {

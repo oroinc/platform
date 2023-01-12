@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * A topic to remove image files related to removed attachment related entities
+ * The topic to remove image files related to removed attachment related entities.
  */
 class AttachmentRemoveImageTopic extends AbstractTopic
 {

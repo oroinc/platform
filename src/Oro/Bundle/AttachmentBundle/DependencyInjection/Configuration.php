@@ -5,29 +5,26 @@ namespace Oro\Bundle\AttachmentBundle\DependencyInjection;
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * Maximum upload file size default value.
-     */
+    /** Maximum upload file size default value. */
     private const MAX_FILESIZE_MB = 10;
 
     public const JPEG_QUALITY = 85;
     public const PNG_QUALITY = 100;
     public const WEBP_QUALITY = 85;
 
-    /**
-     * Bytes in one MB. Used to calculate exact bytes in certain MB amount.
-     */
+    /** Bytes in one MB. Used to calculate exact bytes in certain MB amount. */
     public const BYTES_MULTIPLIER = 1048576;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('oro_attachment');
         $rootNode = $treeBuilder->getRootNode();
@@ -71,6 +68,7 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue(WebpConfiguration::ENABLED_IF_SUPPORTED)
                 ->end()
             ->end();
+        $this->appendCleanupOptions($rootNode->children());
 
         SettingsBuilder::append(
             $rootNode,
@@ -106,5 +104,34 @@ class Configuration implements ConfigurationInterface
             ->end();
 
         return $treeBuilder;
+    }
+
+    private function appendCleanupOptions(NodeBuilder $node): void
+    {
+        $node
+            ->arrayNode('cleanup')
+                ->info('The configuration of the attachment cleanup command.')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->scalarNode('collect_attachment_files_batch_size')
+                        ->info('The number of attachment files that can be loaded from the filesystem at once.')
+                        ->cannotBeEmpty()
+                        ->defaultValue(20000)
+                    ->end()
+                    ->scalarNode('load_existing_attachments_batch_size')
+                        ->info(
+                            'The number of attachment entities that can be loaded from the database at once'
+                            . ' to check whether an attachment file is linked to an attachment entity.'
+                        )
+                        ->cannotBeEmpty()
+                        ->defaultValue(500)
+                    ->end()
+                    ->scalarNode('load_attachments_batch_size')
+                        ->info('The number of attachment entities that can be loaded from the database at once.')
+                        ->cannotBeEmpty()
+                        ->defaultValue(10000)
+                    ->end()
+                ->end()
+            ->end();
     }
 }

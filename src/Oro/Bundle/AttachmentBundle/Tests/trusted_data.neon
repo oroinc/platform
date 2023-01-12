@@ -4,3 +4,12 @@ trusted_data:
         Oro\Bundle\AttachmentBundle\Migration\SetUUIDFieldOfFileEntityQuery:
             executeQuery:
                 query: true
+        Oro\Bundle\AttachmentBundle\Command\CleanupAttachmentFilesCommand:
+            loadExistingAttachments:
+                params: true
+    safe_methods:
+        Oro\Bundle\AttachmentBundle\Command\CleanupAttachmentFilesCommand:
+            getTemporaryTableName: true
+            getCreateTemporaryTableSql: true
+            getCreateTemporaryTableIndexSql: true
+            getDeleteTemporaryTableSql: true
