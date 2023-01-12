@@ -98,7 +98,7 @@ oro_behat_extension:
       selector: '.navigation .pull-right.pinned-dropdown .btn-primary.dropdown-toggle'
 
     JS Tree item:
-      selector: '.jstree-wrapper .jstree-container-ul .jstree-anchor'
+      selector: '.jstree-node > .jstree-anchor'
 
     Scrollspy Link:
       selector:

@@ -8,6 +8,7 @@ use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\StepNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Driver\Selenium2Driver;
+use Behat\Mink\Element\ElementInterface;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Session;
@@ -2053,20 +2054,18 @@ JS;
         $this->dragAndDropElementToAnotherOne($elementName, $dropZoneName);
     }
 
-    /**
-     * @param string $elementName
-     * @param string $dropZoneName
-     * @param int $xOffset
-     * @param int $yOffset
-     */
-    public function dragAndDropElementToAnotherOne($elementName, $dropZoneName, $xOffset = null, $yOffset = null)
-    {
+    public function dragAndDropElementToAnotherOne(
+        ElementInterface|string $element,
+        ElementInterface|string|null $dropZone,
+        ?int $xOffset = null,
+        ?int $yOffset = null
+    ): void {
         /** @var Selenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
         $webDriverSession = $driver->getWebDriverSession();
 
-        $element = $this->createElement($elementName);
-        $source = $webDriverSession->element('xpath', $element->getXpath());
+        $sourceXpath = is_string($element) ? $this->createElement($element)->getXpath() : $element->getXpath();
+        $source = $webDriverSession->element('xpath', $sourceXpath);
 
         $webDriverSession->moveto([
             'element' => $source->getID(),
@@ -2075,9 +2074,9 @@ JS;
 
         $moveToOptions = ['element' => null];
 
-        if ($dropZoneName) {
-            $dropZone = $this->createElement($dropZoneName);
-            $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+        if ($dropZone) {
+            $destXpath = is_string($dropZone) ? $this->createElement($dropZone)->getXpath() : $dropZone->getXpath();
+            $destination = $webDriverSession->element('xpath', $destXpath);
 
             $moveToOptions['element'] = $destination->getID();
         }
@@ -2088,7 +2087,9 @@ JS;
         if (!is_null($yOffset)) {
             $moveToOptions['yoffset'] = $yOffset;
         }
+
         $this->waitForAjax();
+
         $webDriverSession->moveto($moveToOptions);
         $webDriverSession->buttonup();
     }
@@ -2109,46 +2110,134 @@ JS;
         self::assertEquals($width, $driver->evaluateScript($javascipt));
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: When I move "Retail Supplies" before "Clearance" in tree
+     *
+     * @When /^(?:|I )move "(?P<nodeTitle>(?:[^"]|\\")+)" (?P<operation>before|into) "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
+     * @When /^(?:|I )move "(?P<nodeTitle>(?:[^"]|\\")+)" (?P<operation>before|into) "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iMoveNodeInTree(
+        string $nodeTitle,
+        string $operation,
+        string $anotherNodeTitle,
+        string $treeElementName = ''
+    ): void {
+        $nodeTitle = $this->fixStepArgument($nodeTitle);
+        $anotherNodeTitle = $this->fixStepArgument($anotherNodeTitle);
+
+        $treeElement = null;
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $jsTreeItem = $this->createElement('JS Tree item', $treeElement);
+
+        $nodeElement = $jsTreeItem->find('named', ['content', $nodeTitle]);
+        self::assertTrue(
+            $nodeElement?->isValid(),
+            sprintf('Tree item with title "%s" is not found', $nodeTitle)
+        );
+
+        $anotherNodeElement = $jsTreeItem->find('named', ['content', $anotherNodeTitle]);
+        self::assertTrue(
+            $anotherNodeElement?->isValid(),
+            sprintf('Tree item with title "%s" is not found', $anotherNodeTitle)
+        );
+
+        if ($operation === 'before') {
+            $xOffset = 1;
+            $yOffset = 1;
+        } else {
+            $xOffset = $yOffset = null;
+        }
+
+        $this->dragAndDropElementToAnotherOne($nodeElement, $anotherNodeElement, $xOffset, $yOffset);
+    }
+
     /**
      * Expand node of JS Tree detected by given title
      * Example: When I expand "Retail Supplies" in tree
      *
      * @When /^(?:|I )expand "(?P<nodeTitle>(?:[^"]|\\")+)" in tree$/
-     * @param string $nodeTitle
+     * @When /^(?:|I )expand "(?P<nodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
-    public function iExpandNodeInTree($nodeTitle)
+    public function iExpandNodeInTree(string $nodeTitle, string $treeElementName = ''): void
     {
         $nodeTitle = $this->fixStepArgument($nodeTitle);
 
         $page = $this->getSession()->getPage();
-        $nodeStateControl = $page->find(
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $nodeStateControl = ($treeElement ?? $page)->find(
             'xpath',
             '//a[contains(., "' . $nodeTitle . '")]/parent::li[contains(@class, "jstree-closed")]'
             . '/i[contains(@class, "jstree-ocl")]'
         );
-        if (null !== $nodeStateControl) {
-            $nodeStateControl->click();
-        }
+
+        $nodeStateControl?->click();
     }
 
+    /**
+     * Example: When I click on "Retail Supplies" in tree
+     *
+     * @When /^(?:|I )click on "(?P<nodeTitle>(?:[^"]|\\")+)" in tree$/
+     * @When /^(?:|I )click on "(?P<nodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
+     */
+    public function iClickOnNodeInTree(string $nodeTitle, string $treeElementName = ''): void
+    {
+        $nodeTitle = $this->fixStepArgument($nodeTitle);
+
+        $treeElement = null;
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $jsTreeItem = $this->createElement('JS Tree item', $treeElement);
+        $nodeElement = $jsTreeItem->find('named', ['content', $nodeTitle]);
+
+        self::assertTrue(
+            $nodeElement?->isValid(),
+            sprintf('Tree item with title "%s" is not found', $nodeTitle)
+        );
+
+        $nodeElement->click();
+    }
+
+    //@codingStandardsIgnoreStart
     /**
      * Check that some JS Tree node located right after another one node
      * Example: Then I see "By Brand" after "New Arrivals" in tree
      *
      * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" after "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
-     * @param string $nodeTitle
-     * @param string $anotherNodeTitle
+     * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" after "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
-    public function iSeeNodeAfterAnotherOneInTree($nodeTitle, $anotherNodeTitle)
-    {
+    //@codingStandardsIgnoreEnd
+    public function iSeeNodeAfterAnotherOneInTree(
+        string $nodeTitle,
+        string $anotherNodeTitle,
+        string $treeElementName = ''
+    ): void {
         $nodeTitle = $this->fixStepArgument($nodeTitle);
         $anotherNodeTitle = $this->fixStepArgument($anotherNodeTitle);
 
         $page = $this->getSession()->getPage();
-        $resultElement = $page->find(
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $resultElement = ($treeElement ?? $page)->find(
             'xpath',
-            '//a[contains(., "' . $anotherNodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
-            . '/following-sibling::li[contains(@class, "jstree-node")]/a[contains(., "' . $nodeTitle . '")]'
+            '//a[normalize-space(string(.)) = "' . $anotherNodeTitle . '"]/parent::li[contains(@class, "jstree-node")]'
+            . '/following-sibling::li[contains(@class, "jstree-node")]/a[normalize-space(string(.)) = "'
+            . $nodeTitle . '"]'
         );
 
         self::assertNotNull(
@@ -2167,19 +2256,29 @@ JS;
      * Example: Then I should see "By Brand" belongs to "New Arrivals" in tree
      *
      * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
-     * @param string $nodeTitle
-     * @param string $anotherNodeTitle
+     * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
     //@codingStandardsIgnoreEnd
-    public function iSeeNodeBelongsAnotherOneInTree($nodeTitle, $anotherNodeTitle)
-    {
+    public function iSeeNodeBelongsAnotherOneInTree(
+        string $nodeTitle,
+        string $anotherNodeTitle,
+        string $treeElementName = ''
+    ): void {
+        $nodeTitle = $this->fixStepArgument($nodeTitle);
+        $anotherNodeTitle = $this->fixStepArgument($anotherNodeTitle);
+
         $page = $this->getSession()->getPage();
-        $resultElement = $page->find(
-            'xpath',
-            '//a[contains(., "' . $nodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
-            . '/parent::ul[contains(@class, "jstree-children")]/parent::li[contains(@class, "jstree-node")]'
-            . '/a[contains(., "' . $anotherNodeTitle . '")]'
-        );
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $xpath = '//a[normalize-space(string(.)) = ' . $this->escapeXpath($nodeTitle) . ']'
+            . '/parent::li[contains(@class, "jstree-node")]'
+            . '/parent::ul[contains(@class, "jstree-children")]'
+            . '/parent::li[contains(@class, "jstree-node")]'
+            . '/a[normalize-space(string(.)) = ' . $this->escapeXpath($anotherNodeTitle) . ']';
+        $resultElement = ($treeElement ?? $page)->find('xpath', $xpath);
 
         self::assertNotNull(
             $resultElement,
@@ -2197,22 +2296,32 @@ JS;
      * Example: Then I should not see "By Brand" belongs to "New Arrivals" in tree
      *
      * @Then /^(?:|I )should not see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
-     * @param string $nodeTitle
-     * @param string $anotherNodeTitle
+     * @Then /^(?:|I )should not see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
     //@codingStandardsIgnoreEnd
-    public function iNotSeeNodeBelongsAnotherOneInTree($nodeTitle, $anotherNodeTitle)
-    {
+    public function iNotSeeNodeBelongsAnotherOneInTree(
+        string $nodeTitle,
+        string $anotherNodeTitle,
+        string $treeElementName = ''
+    ): void {
+        $nodeTitle = $this->fixStepArgument($nodeTitle);
+        $anotherNodeTitle = $this->fixStepArgument($anotherNodeTitle);
+
         $page = $this->getSession()->getPage();
-        $resultElement = $page->find(
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $resultElement = ($treeElement ?? $page)->find(
             'xpath',
-            '//a[contains(., "' . $nodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
+            '//a[normalize-space(string(.)) = "' . $nodeTitle . '"]/parent::li[contains(@class, "jstree-node")]'
             . '/parent::ul[contains(@class, "jstree-children")]/parent::li[contains(@class, "jstree-node")]'
-            . '/a[contains(., "' . $anotherNodeTitle . '")]'
+            . '/a[normalize-space(string(.)) = "' . $anotherNodeTitle . '"]'
         );
 
-        self::assertTrue(
-            is_null($resultElement),
+        self::assertNull(
+            $resultElement,
             sprintf(
                 'Node "%s" belong to "%s" in tree.',
                 $nodeTitle,
@@ -2850,6 +2959,31 @@ JS;
     protected function fixStepArgument($argument)
     {
         return str_replace(['\\"', '\\#'], ['"', '#'], $argument);
+    }
+
+    /**
+     * Properly escapes XPath selector.
+     * If the string contains both types of quotes, then splits it into multiple parts and passes to concat().
+     */
+    protected function escapeXpath(string $string): string
+    {
+        $parts = explode("'", $string);
+        if (count($parts) < 2) {
+            return "'" . $string . "'";
+        }
+
+        $concat = [];
+        foreach ($parts as $part) {
+            if (str_contains($part, '"')) {
+                $concat[] = "'" . $part . "'";
+            } else {
+                $concat[] = '"' . $part . '"';
+            }
+            $concat[] = '"' . "'" . '"';
+        }
+        array_pop($concat);
+
+        return sprintf('concat(%s)', implode(', ', $concat));
     }
 
     /**
