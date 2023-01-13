@@ -18,7 +18,6 @@ class MenuUpdateTraitTest extends \PHPUnit\Framework\TestCase
             ['id', 42],
             ['key', 'page_wrapper'],
             ['parentKey', 'page_container'],
-            ['originKey', 'page_container'],
             ['uri', 'uri'],
             ['menu', 'main_menu'],
             ['scope', new Scope()],

@@ -87,8 +87,7 @@ class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
             ->setExtra(MenuUpdateInterface::IS_DIVIDER, false)
             ->setExtra(MenuUpdateInterface::IS_TRANSLATE_DISABLED, false)
             ->setExtra(MenuUpdateInterface::IS_CUSTOM, false)
-            ->setExtra(MenuUpdateInterface::IS_SYNTHETIC, false)
-            ->setExtra(MenuUpdateInterface::ORIGIN_KEY, null);
+            ->setExtra(MenuUpdateInterface::IS_SYNTHETIC, false);
 
         return [
             'empty' => [
@@ -150,22 +149,6 @@ class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
                     ->setExtra(MenuUpdateInterface::IS_CUSTOM, true)
                     ->setExtra(MenuUpdateInterface::IS_SYNTHETIC, true),
             ],
-            'with origin key' => [
-                'menuUpdate' => (new MenuUpdateStub(42))
-                    ->addTitle((new LocalizedFallbackValue())->setString('sample title'))
-                    ->addDescription((new LocalizedFallbackValue())->setText('sample description'))
-                    ->setDivider(true)
-                    ->setCustom(true)
-                    ->setSynthetic(true)
-                    ->setOriginKey('sample_key'),
-                'expected' => (clone $menuItem)
-                    ->setExtra(MenuUpdateInterface::DESCRIPTION, 'sample description')
-                    ->setExtra(MenuUpdateInterface::IS_DIVIDER, true)
-                    ->setExtra(MenuUpdateInterface::IS_TRANSLATE_DISABLED, true)
-                    ->setExtra(MenuUpdateInterface::IS_CUSTOM, true)
-                    ->setExtra(MenuUpdateInterface::IS_SYNTHETIC, true)
-                    ->setExtra(MenuUpdateInterface::ORIGIN_KEY, 'sample_key'),
-            ],
             'with priority' => [
                 'menuUpdate' => (new MenuUpdateStub(42))
                     ->addTitle((new LocalizedFallbackValue())->setString('sample title'))
@@ -173,7 +156,6 @@ class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
                     ->setDivider(true)
                     ->setCustom(true)
                     ->setSynthetic(true)
-                    ->setOriginKey('sample_key')
                     ->setPriority(42),
                 'expected' => (clone $menuItem)
                     ->setExtra(MenuUpdateInterface::DESCRIPTION, 'sample description')
@@ -181,7 +163,6 @@ class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
                     ->setExtra(MenuUpdateInterface::IS_TRANSLATE_DISABLED, true)
                     ->setExtra(MenuUpdateInterface::IS_CUSTOM, true)
                     ->setExtra(MenuUpdateInterface::IS_SYNTHETIC, true)
-                    ->setExtra(MenuUpdateInterface::ORIGIN_KEY, 'sample_key')
                     ->setExtra(MenuUpdateInterface::POSITION, 42),
             ],
             'with icon' => [
@@ -191,7 +172,6 @@ class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
                     ->setDivider(true)
                     ->setCustom(true)
                     ->setSynthetic(true)
-                    ->setOriginKey('sample_key')
                     ->setPriority(42)
                     ->setIcon('sample-icon'),
                 'expected' => (clone $menuItem)
@@ -200,7 +180,6 @@ class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
                     ->setExtra(MenuUpdateInterface::IS_TRANSLATE_DISABLED, true)
                     ->setExtra(MenuUpdateInterface::IS_CUSTOM, true)
                     ->setExtra(MenuUpdateInterface::IS_SYNTHETIC, true)
-                    ->setExtra(MenuUpdateInterface::ORIGIN_KEY, 'sample_key')
                     ->setExtra(MenuUpdateInterface::POSITION, 42)
                     ->setExtra(MenuUpdateInterface::ICON, 'sample-icon'),
             ],

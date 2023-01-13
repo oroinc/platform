@@ -45,16 +45,14 @@ class MenuUpdateFactoryTest extends \PHPUnit\Framework\TestCase
                 'options' => [],
                 'expected' => (new MenuUpdateStub())
                     ->setMenu(self::MENU)
-                    ->setScope($this->createMock(Scope::class))
-                    ->setOriginKey(self::MENU),
+                    ->setScope($this->createMock(Scope::class)),
             ],
             'with key' => [
                 'options' => ['key' => 'sample_key'],
                 'expected' => (new MenuUpdateStub())
                     ->setMenu(self::MENU)
                     ->setScope($this->createMock(Scope::class))
-                    ->setKey('sample_key')
-                    ->setOriginKey(self::MENU),
+                    ->setKey('sample_key'),
             ],
             'with parentKey' => [
                 'options' => ['key' => 'sample_key', 'parentKey' => 'sample_parent_key'],
@@ -62,16 +60,7 @@ class MenuUpdateFactoryTest extends \PHPUnit\Framework\TestCase
                     ->setMenu(self::MENU)
                     ->setScope($this->createMock(Scope::class))
                     ->setKey('sample_key')
-                    ->setParentKey('sample_parent_key')
-                    ->setOriginKey('sample_parent_key'),
-            ],
-            'with originKey' => [
-                'options' => ['key' => 'sample_key', 'originKey' => 'sample_origin_key'],
-                'expected' => (new MenuUpdateStub())
-                    ->setMenu(self::MENU)
-                    ->setScope($this->createMock(Scope::class))
-                    ->setKey('sample_key')
-                    ->setOriginKey('sample_origin_key'),
+                    ->setParentKey('sample_parent_key'),
             ],
             'with divider' => [
                 'options' => ['key' => 'sample_key', 'parentKey' => 'sample_parent_key', 'divider' => true],
@@ -80,7 +69,6 @@ class MenuUpdateFactoryTest extends \PHPUnit\Framework\TestCase
                     ->setScope($this->createMock(Scope::class))
                     ->setKey('sample_key')
                     ->setParentKey('sample_parent_key')
-                    ->setOriginKey('sample_parent_key')
                     ->setDivider(true)
                     ->setUri('#')
                     ->setDefaultTitle(MenuUpdateTreeHandler::MENU_ITEM_DIVIDER_LABEL),

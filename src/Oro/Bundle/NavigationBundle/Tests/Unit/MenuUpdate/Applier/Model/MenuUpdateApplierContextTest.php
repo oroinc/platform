@@ -69,6 +69,17 @@ class MenuUpdateApplierContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testIsCreatedItem(): void
+    {
+        $menu = $this->getMenu();
+
+        $context = (new MenuUpdateApplierContext($menu))
+            ->addCreatedItem($menu->getChild('item-1'), $this->createMock(MenuUpdateInterface::class));
+
+        self::assertTrue($context->isCreatedItem('item-1'));
+        self::assertFalse($context->isCreatedItem('item-2'));
+    }
+
     public function testGetUpdatedItems(): void
     {
         $menu = $this->getMenu();
@@ -94,6 +105,17 @@ class MenuUpdateApplierContextTest extends \PHPUnit\Framework\TestCase
             ['item-1' => [$menuUpdate->getId() => $menuUpdate]],
             $context->getUpdatedItemsMenuUpdates()
         );
+    }
+
+    public function testIsUpdatedItem(): void
+    {
+        $menu = $this->getMenu();
+
+        $context = (new MenuUpdateApplierContext($menu))
+            ->addUpdatedItem($menu->getChild('item-1'), $this->createMock(MenuUpdateInterface::class));
+
+        self::assertTrue($context->isUpdatedItem('item-1'));
+        self::assertFalse($context->isUpdatedItem('item-2'));
     }
 
     public function testGetOrphanedItems(): void

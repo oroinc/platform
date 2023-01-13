@@ -127,7 +127,6 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('key', 'string', ['length' => 100]);
         $table->addColumn('parent_key', 'string', ['length' => 100, 'notnull' => false]);
-        $table->addColumn('origin_key', 'string', ['length' => 100, 'notnull' => false]);
         $table->addColumn('uri', 'string', ['length' => 8190, 'notnull' => false]);
         $table->addColumn('menu', 'string', ['length' => 100]);
         $table->addColumn('icon', 'string', ['length' => 150, 'notnull' => false]);

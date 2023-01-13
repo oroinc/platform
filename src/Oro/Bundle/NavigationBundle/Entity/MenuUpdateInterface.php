@@ -18,7 +18,6 @@ interface MenuUpdateInterface
     public const IS_TRANSLATE_DISABLED = 'translate_disabled';
     public const IS_CUSTOM = 'custom';
     public const IS_SYNTHETIC = 'synthetic';
-    public const ORIGIN_KEY = 'origin_key';
     public const POSITION = 'position';
     public const ICON = 'icon';
 
@@ -55,10 +54,6 @@ interface MenuUpdateInterface
      * @return MenuUpdateInterface
      */
     public function setParentKey($parentKey);
-
-    public function getOriginKey(): ?string;
-
-    public function setOriginKey(?string $originKey): self;
 
     /**
      * @return Collection|LocalizedFallbackValue[]

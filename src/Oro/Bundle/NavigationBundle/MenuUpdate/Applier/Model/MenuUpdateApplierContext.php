@@ -119,6 +119,11 @@ class MenuUpdateApplierContext
         return $this;
     }
 
+    public function isCreatedItem(string $menuItemName): bool
+    {
+        return isset($this->createdItems[$menuItemName]);
+    }
+
     /**
      * @return array<string,ItemInterface>
      */
@@ -141,6 +146,11 @@ class MenuUpdateApplierContext
         $this->updatedItemsMenuUpdates[$menuItem->getName()][$menuUpdate->getId()] = $menuUpdate;
 
         return $this;
+    }
+
+    public function isUpdatedItem(string $menuItemName): bool
+    {
+        return isset($this->updatedItems[$menuItemName]);
     }
 
     /**

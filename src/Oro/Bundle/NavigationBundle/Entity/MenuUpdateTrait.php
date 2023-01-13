@@ -40,13 +40,6 @@ trait MenuUpdateTrait
     protected $parentKey;
 
     /**
-     * The parent key with which a menu update was initially created.
-     *
-     * @ORM\Column(name="origin_key", type="string", length=100, nullable=true)
-     */
-    protected ?string $originKey = null;
-
-    /**
      * @var Collection|LocalizedFallbackValue[]
      *
      * @ORM\ManyToMany(
@@ -185,24 +178,6 @@ trait MenuUpdateTrait
     public function setParentKey($parentKey)
     {
         $this->parentKey = $parentKey;
-
-        return $this;
-    }
-
-    /**
-     * Returns the parent key with which a menu update was initially created.
-     */
-    public function getOriginKey(): ?string
-    {
-        return $this->originKey;
-    }
-
-    /**
-     * Set the parent key with which a menu update was initially created.
-     */
-    public function setOriginKey(?string $originKey): self
-    {
-        $this->originKey = $originKey;
 
         return $this;
     }

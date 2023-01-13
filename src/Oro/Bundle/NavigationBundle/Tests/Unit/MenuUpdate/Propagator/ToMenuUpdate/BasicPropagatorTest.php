@@ -85,8 +85,7 @@ class BasicPropagatorTest extends \PHPUnit\Framework\TestCase
             ->addChild('menu_item_for_existing_menu_update')
             ->setDisplay(false)
             ->setUri('new/uri')
-            ->setParent($menu->getChild('menu_item_has_child'))
-            ->setExtra(MenuUpdateInterface::ORIGIN_KEY, 'new_origin_key');
+            ->setParent($menu->getChild('menu_item_has_child'));
 
         return [
             'not displayed' => [
@@ -99,8 +98,7 @@ class BasicPropagatorTest extends \PHPUnit\Framework\TestCase
                 'menuItem' => $menu->getChild('menu_item_has_child')->getChild('menu_item_has_parent'),
                 'expected' => (new MenuUpdateStub())
                     ->setKey('menu_item_has_parent')
-                    ->setParentKey('menu_item_has_child')
-                    ->setOriginKey('menu_item_has_child'),
+                    ->setParentKey('menu_item_has_child'),
             ],
             'with parent, menu update has parentKey' => [
                 'menuUpdate' => (new MenuUpdateStub())
@@ -109,8 +107,7 @@ class BasicPropagatorTest extends \PHPUnit\Framework\TestCase
                 'menuItem' => $menu->getChild('menu_item_has_child')->getChild('menu_item_has_parent'),
                 'expected' => (new MenuUpdateStub())
                     ->setKey('menu_item_has_parent')
-                    ->setParentKey('menu_item_has_child')
-                    ->setOriginKey('menu_item_has_child'),
+                    ->setParentKey('menu_item_has_child'),
             ],
             'with uri' => [
                 'menuUpdate' => (new MenuUpdateStub())->setKey('menu_item_with_uri'),
@@ -123,7 +120,6 @@ class BasicPropagatorTest extends \PHPUnit\Framework\TestCase
                 'menuUpdate' => (new MenuUpdateStub(42))
                     ->setKey('menu_item_has_parent')
                     ->setParentKey('sample_parent_key')
-                    ->setOriginKey('sample_origin_key')
                     ->setCustom(true)
                     ->setUri('existing/uri')
                     ->setActive(true),
@@ -131,7 +127,6 @@ class BasicPropagatorTest extends \PHPUnit\Framework\TestCase
                 'expected' => (new MenuUpdateStub(42))
                     ->setKey('menu_item_has_parent')
                     ->setParentKey('menu_item_has_child')
-                    ->setOriginKey('sample_origin_key')
                     ->setCustom(true)
                     ->setUri('existing/uri')
                     ->setActive(true),

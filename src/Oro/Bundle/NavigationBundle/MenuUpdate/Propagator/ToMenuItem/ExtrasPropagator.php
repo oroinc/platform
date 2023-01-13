@@ -51,7 +51,6 @@ class ExtrasPropagator implements MenuUpdateToMenuItemPropagatorInterface
         );
         $menuItem->setExtra(MenuUpdateInterface::IS_CUSTOM, $menuUpdate->isCustom());
         $menuItem->setExtra(MenuUpdateInterface::IS_SYNTHETIC, $menuUpdate->isSynthetic());
-        $menuItem->setExtra(MenuUpdateInterface::ORIGIN_KEY, $menuUpdate->getOriginKey());
 
         if ($menuUpdate->getPriority() !== null) {
             $menuItem->setExtra(MenuUpdateInterface::POSITION, $menuUpdate->getPriority());

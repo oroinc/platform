@@ -37,7 +37,6 @@ class BasicPropagator implements MenuItemToMenuUpdatePropagatorInterface
             $menuUpdate->setCustom(false);
             $menuUpdate->setActive($menuItem->isDisplayed());
             $menuUpdate->setUri($menuItem->getUri());
-            $menuUpdate->setOriginKey($menuItem->getExtra(MenuUpdateInterface::ORIGIN_KEY) ?? $parentKey ?? null);
         }
     }
 }

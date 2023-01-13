@@ -241,4 +241,123 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $expectedContext->getMenuItemsByName();
         self::assertEquals($expectedContext, $context);
     }
+
+    public function testApplyMenuUpdateWhenAlreadyCreatedButNotCustomAndNotSynthetic(): void
+    {
+        $menu = $this->getMenu();
+        $menu->addChild('item-new');
+
+        $menuUpdate = new MenuUpdateStub(42);
+        $menuUpdate->setKey('item-new');
+
+        $this->menuUpdateToMenuItemPropagator
+            ->expects(self::once())
+            ->method('propagateFromMenuUpdate')
+            ->with(
+                self::isInstanceOf(ItemInterface::class),
+                $menuUpdate,
+                MenuUpdateToMenuItemPropagatorInterface::STRATEGY_FULL
+            );
+
+        $itemNewMenuUpdate = new MenuUpdateStub(4242);
+        $expectedItem = $this->createItem('item-new');
+        $expectedItem->setParent($menu);
+
+        $context = new MenuUpdateApplierContext($menu);
+        $context->addCreatedItem($expectedItem, $itemNewMenuUpdate);
+
+        self::assertEquals(
+            MenuUpdateApplierInterface::RESULT_ITEM_UPDATED | MenuUpdateApplierInterface::RESULT_ITEM_LOST,
+            $this->applier->applyMenuUpdate($menuUpdate, $menu, [], $context)
+        );
+
+        self::assertEquals($expectedItem, $menu->getChild('item-new'));
+
+        $expectedContext = (new MenuUpdateApplierContext($menu))
+            ->addCreatedItem($expectedItem, $itemNewMenuUpdate)
+            ->addUpdatedItem($expectedItem, $menuUpdate)
+            ->addLostItem($expectedItem, $menuUpdate);
+        $expectedContext->getMenuItemsByName();
+        self::assertEquals($expectedContext, $context);
+    }
+
+    public function testApplyMenuUpdateWhenAlreadyCreatedAndLostButIsSynthetic(): void
+    {
+        $menu = $this->getMenu();
+        $menu->addChild('item-new');
+
+        $menuUpdate = new MenuUpdateStub(42);
+        $menuUpdate->setKey('item-new');
+        $menuUpdate->setSynthetic(true);
+
+        $this->menuUpdateToMenuItemPropagator
+            ->expects(self::once())
+            ->method('propagateFromMenuUpdate')
+            ->with(
+                self::isInstanceOf(ItemInterface::class),
+                $menuUpdate,
+                MenuUpdateToMenuItemPropagatorInterface::STRATEGY_FULL
+            );
+
+        $itemNewMenuUpdate = new MenuUpdateStub(4242);
+        $expectedItem = $this->createItem('item-new');
+        $expectedItem->setParent($menu);
+
+        $context = new MenuUpdateApplierContext($menu);
+        $context->addCreatedItem($expectedItem, $itemNewMenuUpdate);
+        $context->addLostItem($expectedItem, $itemNewMenuUpdate);
+
+        self::assertEquals(
+            MenuUpdateApplierInterface::RESULT_ITEM_UPDATED,
+            $this->applier->applyMenuUpdate($menuUpdate, $menu, [], $context)
+        );
+
+        self::assertEquals($expectedItem, $menu->getChild('item-new'));
+
+        $expectedContext = (new MenuUpdateApplierContext($menu))
+            ->addCreatedItem($expectedItem, $itemNewMenuUpdate)
+            ->addUpdatedItem($expectedItem, $menuUpdate);
+        $expectedContext->getMenuItemsByName();
+        self::assertEquals($expectedContext, $context);
+    }
+
+    public function testApplyMenuUpdateWhenAlreadyCreatedAndLostButIsCustom(): void
+    {
+        $menu = $this->getMenu();
+        $menu->addChild('item-new');
+
+        $menuUpdate = new MenuUpdateStub(42);
+        $menuUpdate->setKey('item-new');
+        $menuUpdate->setCustom(true);
+
+        $this->menuUpdateToMenuItemPropagator
+            ->expects(self::once())
+            ->method('propagateFromMenuUpdate')
+            ->with(
+                self::isInstanceOf(ItemInterface::class),
+                $menuUpdate,
+                MenuUpdateToMenuItemPropagatorInterface::STRATEGY_FULL
+            );
+
+        $itemNewMenuUpdate = new MenuUpdateStub(4242);
+        $expectedItem = $this->createItem('item-new');
+        $expectedItem->setParent($menu);
+
+        $context = new MenuUpdateApplierContext($menu);
+        $context->addCreatedItem($expectedItem, $itemNewMenuUpdate);
+        $context->addLostItem($expectedItem, $itemNewMenuUpdate);
+
+        self::assertEquals(
+            MenuUpdateApplierInterface::RESULT_ITEM_UPDATED,
+            $this->applier->applyMenuUpdate($menuUpdate, $menu, [], $context)
+        );
+
+        self::assertEquals($expectedItem, $menu->getChild('item-new'));
+
+        $expectedContext = (new MenuUpdateApplierContext($menu))
+            ->addCreatedItem($expectedItem, $itemNewMenuUpdate)
+            ->addUpdatedItem($expectedItem, $menuUpdate);
+        $expectedContext->getMenuItemsByName();
+        self::assertEquals($expectedContext, $context);
+    }
 }

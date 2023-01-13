@@ -29,7 +29,6 @@ class MenuUpdateFactory implements MenuUpdateFactoryInterface
      *  [
      *      ?'key' => string, // Menu item name to apply the menu update to.
      *      ?'parentKey' => string, // Parent name of the menu item to apply the menu update to.
-     *      ?'originKey' => string, // Parent name with which a menu update was initially created.
      *      ?'divider' => bool, // Whether menu update should be marked as divider.
      *      // ... other available fields of the menu update.
      *  ]
@@ -45,10 +44,6 @@ class MenuUpdateFactory implements MenuUpdateFactoryInterface
 
         if (!isset($options['key'])) {
             $menuUpdate->generateKey();
-        }
-
-        if (!isset($options['originKey'])) {
-            $options['originKey'] = $options['parentKey'] ?? $menuName;
         }
 
         if (isset($options['divider']) && $options['divider']) {

@@ -35,38 +35,21 @@ class MenuUpdateApplier implements MenuUpdateApplierInterface
         $targetMenuItemName = $menuUpdate->getKey();
         $parentMenuItemName = $menuUpdate->getParentKey() ?? $context->getMenu()->getName();
 
-        $parentFound = true;
+        $isParentFound = true;
         $parentMenuItem = $context->getMenuItemByName($parentMenuItemName);
         if ($parentMenuItem === null) {
-            $parentFound = false;
+            $isParentFound = false;
             $parentMenuItem = $menu;
         }
 
         $targetMenuItem = $context->getMenuItemByName($targetMenuItemName);
         if ($targetMenuItem === null) {
             $targetMenuItem = $this->createMenuItem($menuUpdate, $parentMenuItem, $menuOptions, $context, $resultCode);
-
-            // Moves orphans into the newly created menu item.
-            $orphanItems = $context->getOrphanedItems($targetMenuItemName);
-            if (count($orphanItems) > 0) {
-                foreach ($orphanItems as $orphanItem) {
-                    $this->move($orphanItem, $targetMenuItem);
-                }
-
-                $context->removeOrphanedItems($targetMenuItemName);
-            }
         } else {
-            $resultCode |= self::RESULT_ITEM_UPDATED;
-            $context->addUpdatedItem($targetMenuItem, $menuUpdate);
-
-            if ($parentFound && $targetMenuItem->getParent()?->getName() !== $parentMenuItemName) {
-                // Moves the menu item according to its menu update parent key.
-                $this->move($targetMenuItem, $parentMenuItem);
-                $context->removeOrphanedItem($targetMenuItemName, $targetMenuItemName);
-            }
+            $this->updateMenuItem($targetMenuItem, $menuUpdate, $parentMenuItem, $isParentFound, $context, $resultCode);
         }
 
-        if (!$parentFound) {
+        if (!$isParentFound) {
             // Marks the menu item as orphan as it is not located inside the parent with menu update parent key.
             $context->addOrphanedItem($parentMenuItemName, $targetMenuItem, $menuUpdate);
             $resultCode |= self::RESULT_ITEM_ORPHANED;
@@ -97,7 +80,46 @@ class MenuUpdateApplier implements MenuUpdateApplierInterface
             $resultCode |= self::RESULT_ITEM_LOST;
         }
 
+        // Moves orphans into the newly created menu item.
+        $orphanItems = $context->getOrphanedItems($menuItem->getName());
+        if (count($orphanItems) > 0) {
+            foreach ($orphanItems as $orphanItem) {
+                $this->move($orphanItem, $menuItem);
+            }
+
+            $context->removeOrphanedItems($menuItem->getName());
+        }
+
         return $menuItem;
+    }
+
+    private function updateMenuItem(
+        ItemInterface $targetMenuItem,
+        MenuUpdateInterface $menuUpdate,
+        ItemInterface $parentMenuItem,
+        bool $isParentFound,
+        MenuUpdateApplierContext $context,
+        int &$resultCode
+    ): void {
+        $resultCode |= self::RESULT_ITEM_UPDATED;
+        $context->addUpdatedItem($targetMenuItem, $menuUpdate);
+
+        $targetMenuItemName = $targetMenuItem->getName();
+        if ($context->isCreatedItem($targetMenuItemName)) {
+            if (!$menuUpdate->isCustom() && !$menuUpdate->isSynthetic()) {
+                $resultCode |= self::RESULT_ITEM_LOST;
+                $context->addLostItem($targetMenuItem, $menuUpdate);
+            } else {
+                $context->removeLostItem($targetMenuItemName);
+            }
+        }
+
+        $parentMenuItemName = $parentMenuItem->getName();
+        if ($isParentFound && $targetMenuItem->getParent()?->getName() !== $parentMenuItemName) {
+            // Moves the menu item according to its menu update parent key.
+            $this->move($targetMenuItem, $parentMenuItem);
+            $context->removeOrphanedItem($parentMenuItemName, $targetMenuItemName);
+        }
     }
 
     private function move(ItemInterface $menuItem, ItemInterface $parentMenuItem): void

@@ -17,6 +17,11 @@ class ProxyStub implements Proxy
         $this->id = $id;
     }
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
     public function __setInitialized($initialized)
     {
     }
