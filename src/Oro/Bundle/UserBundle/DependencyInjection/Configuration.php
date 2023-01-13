@@ -22,6 +22,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->canBeUnset()
                     ->children()
+                        // reset password token ttl, sec
                         ->scalarNode('ttl')
                             ->defaultValue(86400)
                         ->end()

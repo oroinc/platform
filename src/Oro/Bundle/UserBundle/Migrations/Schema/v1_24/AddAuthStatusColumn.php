@@ -30,7 +30,7 @@ class AddAuthStatusColumn implements Migration, ExtendExtensionAwareInterface
             'immutable_codes',
             [
                 UserManager::STATUS_ACTIVE,
-                UserManager::STATUS_EXPIRED,
+                UserManager::STATUS_RESET,
             ]
         );
 
