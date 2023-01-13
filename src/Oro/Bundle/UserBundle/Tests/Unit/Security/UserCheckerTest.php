@@ -45,14 +45,14 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         return $authStatus;
     }
 
-    public function testCheckPostAuthForNotUser()
+    public function testCheckPostAuthForNotUser(): void
     {
         $user = $this->createMock(UserInterface::class);
 
         $this->userChecker->checkPostAuth($user);
     }
 
-    public function testCheckPostAuthForUser()
+    public function testCheckPostAuthForUser(): void
     {
         $user = new User();
         $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
@@ -64,7 +64,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPostAuth($user);
     }
 
-    public function testCheckPostAuthForDisabledUser()
+    public function testCheckPostAuthForDisabledUser(): void
     {
         $this->expectException(DisabledException::class);
 
@@ -74,7 +74,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPostAuth($user);
     }
 
-    public function testCheckPostAuthForUserWithoutAuthStatus()
+    public function testCheckPostAuthForUserWithoutAuthStatus(): void
     {
         $user = new User();
         $user->setOwner(new BusinessUnit());
@@ -82,7 +82,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPostAuth($user);
     }
 
-    public function testCheckPostAuthForUserInDisabledOrganization()
+    public function testCheckPostAuthForUserInDisabledOrganization(): void
     {
         $this->expectException(OrganizationException::class);
 
@@ -96,7 +96,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPostAuth($user);
     }
 
-    public function testCheckPostAuthForUserNotBelongsToAnyOrganization()
+    public function testCheckPostAuthForUserNotBelongsToAnyOrganization(): void
     {
         $this->expectException(OrganizationException::class);
 
@@ -107,7 +107,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPostAuth($user);
     }
 
-    public function testCheckPostAuthForUserWithoutOwner()
+    public function testCheckPostAuthForUserWithoutOwner(): void
     {
         $this->expectException(EmptyOwnerException::class);
 
@@ -120,7 +120,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPostAuth($user);
     }
 
-    public function testCheckPreAuthForNotUser()
+    public function testCheckPreAuthForNotUser(): void
     {
         $user = $this->createMock(UserInterface::class);
 
@@ -130,7 +130,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPreAuth($user);
     }
 
-    public function testCheckPreAuthForUserWithNotChangedPassword()
+    public function testCheckPreAuthForUserWithNotChangedPassword(): void
     {
         $user = new User();
         $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
@@ -142,7 +142,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPreAuth($user);
     }
 
-    public function testCheckPreAuthForUserWithPasswordChangedBeforeLastLogin()
+    public function testCheckPreAuthForUserWithPasswordChangedBeforeLastLogin(): void
     {
         $user = new User();
         $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
@@ -157,7 +157,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testCheckPreAuthForUserWithPasswordChangedAfterLastLogin()
+    public function testCheckPreAuthForUserWithPasswordChangedAfterLastLogin(): void
     {
         $this->expectException(PasswordChangedException::class);
 
@@ -173,7 +173,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPreAuth($user);
     }
 
-    public function testCheckPreAuthForUserWithoutAuthStatus()
+    public function testCheckPreAuthForUserWithoutAuthStatus(): void
     {
         $user = new User();
 
@@ -184,7 +184,7 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPreAuth($user);
     }
 
-    public function testCheckPreAuthForUserWithActiveAuthStatus()
+    public function testCheckPreAuthForUserWithActiveAuthStatus(): void
     {
         $user = new User();
         $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_ACTIVE));
@@ -196,12 +196,12 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPreAuth($user);
     }
 
-    public function testCheckPreAuthForUserWithExpiredAuthStatus()
+    public function testCheckPreAuthForUserWithExpiredAuthStatus(): void
     {
         $this->expectException(CredentialsResetException::class);
 
         $user = new User();
-        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_EXPIRED));
+        $user->setAuthStatus($this->getAuthStatus(UserManager::STATUS_RESET));
 
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
