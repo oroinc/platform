@@ -7,6 +7,9 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\AbstractViewsList;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 
+/**
+ * Grid views for users-grid datagrid.
+ */
 class UserViewList extends AbstractViewsList
 {
     const GRID_NAME = 'users-grid';
@@ -42,9 +45,9 @@ class UserViewList extends AbstractViewsList
                 'enabled' => [
                     'value' => BooleanFilterType::TYPE_YES,
                 ],
-                'auth_status' => [
+                'authStatus' => [
                     'type' => EnumFilterType::TYPE_IN,
-                    'value' => ['expired'],
+                    'value' => ['reset'],
                 ],
             ],
             'sorters' => [],
@@ -61,7 +64,7 @@ class UserViewList extends AbstractViewsList
                 'enabled' => [
                     'value' => BooleanFilterType::TYPE_NO,
                 ],
-                'auth_status' =>  null,
+                'authStatus' =>  null,
             ],
             'sorters' => [],
             'columns' => [

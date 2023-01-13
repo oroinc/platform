@@ -37,37 +37,37 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResetPasswordAndNotifyIfUserDisabled()
+    public function testResetPasswordAndNotifyIfUserDisabled(): void
     {
         $user = new User();
         $user->setEnabled(false);
-        $this->userManager->expects($this->never())
+        $this->userManager->expects(self::never())
             ->method('setAuthStatus');
-        $this->userManager->expects($this->never())
+        $this->userManager->expects(self::never())
             ->method('updateUser');
-        $this->emailNotificationManager->expects($this->never())
+        $this->emailNotificationManager->expects(self::never())
             ->method('processSingle');
 
         $result = $this->handler->resetPasswordAndNotify($user);
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function testResetPasswordAndNotifyIfThrowsException()
+    public function testResetPasswordAndNotifyIfThrowsException(): void
     {
         $email = 'example@test.com';
         $user = new User();
         $user->setEmail($email);
-        $this->userManager->expects($this->once())
+        $this->userManager->expects(self::once())
             ->method('setAuthStatus')
-            ->with($user, UserManager::STATUS_EXPIRED);
-        $this->userManager->expects($this->once())
+            ->with($user, UserManager::STATUS_RESET);
+        $this->userManager->expects(self::once())
             ->method('updateUser')
             ->with($user);
         $message = 'Message';
-        $this->emailNotificationManager->expects($this->once())
+        $this->emailNotificationManager->expects(self::once())
             ->method('processSingle')
             ->willThrowException(new \Exception($message));
-        $this->logger->expects($this->exactly(2))
+        $this->logger->expects(self::exactly(2))
             ->method('error')
             ->withConsecutive(
                 [sprintf('Sending email to %s failed.', $email)],
@@ -75,51 +75,51 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
             );
 
         $result = $this->handler->resetPasswordAndNotify($user);
-        $this->assertFalse($result);
+        self::assertFalse($result);
     }
 
-    public function testResetPasswordAndNotifyWhenNoConfirmationToken()
+    public function testResetPasswordAndNotifyWhenNoConfirmationToken(): void
     {
         $email = 'example@test.com';
         $user = new User();
         $user->setEmail($email);
-        $this->userManager->expects($this->once())
+        $this->userManager->expects(self::once())
             ->method('setAuthStatus')
-            ->with($user, UserManager::STATUS_EXPIRED);
-        $this->userManager->expects($this->once())
+            ->with($user, UserManager::STATUS_RESET);
+        $this->userManager->expects(self::once())
             ->method('updateUser')
             ->with($user);
-        $this->emailNotificationManager->expects($this->once())
+        $this->emailNotificationManager->expects(self::once())
             ->method('processSingle')
             ->willReturnCallback(
                 function (TemplateEmailNotification $notification) use ($user) {
-                    $this->assertSame($user, $notification->getEntity());
-                    $this->assertInstanceOf(TemplateEmailNotification::class, $notification);
-                    $this->assertEquals(
+                    self::assertSame($user, $notification->getEntity());
+                    self::assertInstanceOf(TemplateEmailNotification::class, $notification);
+                    self::assertEquals(
                         new EmailTemplateCriteria('force_reset_password', User::class),
                         $notification->getTemplateCriteria()
                     );
-                    $this->assertEquals([$user], $notification->getRecipients());
+                    self::assertEquals([$user], $notification->getRecipients());
                 }
             );
 
-        $this->assertEmpty($user->getConfirmationToken());
+        self::assertEmpty($user->getConfirmationToken());
         $result = $this->handler->resetPasswordAndNotify($user);
-        $this->assertTrue($result);
-        $this->assertNotEmpty($user->getConfirmationToken());
+        self::assertTrue($result);
+        self::assertNotEmpty($user->getConfirmationToken());
     }
 
-    public function testResetPasswordAndNotify()
+    public function testResetPasswordAndNotify(): void
     {
         $email = 'example@test.com';
         $token = 'sometoken';
         $user = new User();
         $user->setConfirmationToken($token);
         $user->setEmail($email);
-        $this->userManager->expects($this->once())
+        $this->userManager->expects(self::once())
             ->method('setAuthStatus')
-            ->with($user, UserManager::STATUS_EXPIRED);
-        $this->userManager->expects($this->once())
+            ->with($user, UserManager::STATUS_RESET);
+        $this->userManager->expects(self::once())
             ->method('updateUser')
             ->with($user);
 
@@ -128,12 +128,12 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
             [$user],
             $user
         );
-        $this->emailNotificationManager->expects($this->once())
+        $this->emailNotificationManager->expects(self::once())
             ->method('processSingle')
             ->with($expectedNotification, [], $this->logger);
 
         $result = $this->handler->resetPasswordAndNotify($user);
-        $this->assertTrue($result);
-        $this->assertEquals($token, $user->getConfirmationToken());
+        self::assertTrue($result);
+        self::assertEquals($token, $user->getConfirmationToken());
     }
 }

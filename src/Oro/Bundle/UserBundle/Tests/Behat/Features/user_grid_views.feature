@@ -32,7 +32,7 @@ Feature: User Grid Views
     Then there is 3 records in grid
     When I click on "Cannot login" in grid view list
     Then I should see "Enabled: Enabled"
-    And I should see "Status: is any of \"Password reset,Locked\""
+    And I should see "Password: is any of \"Reset"
     And there is one record in grid
     When I click on "Disabled Users" in grid view list
     Then I should see "Enabled: Disabled"

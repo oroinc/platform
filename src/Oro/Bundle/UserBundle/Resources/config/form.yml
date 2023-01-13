@@ -227,6 +227,7 @@ services:
             - '@oro_user.form.reset'
             - '@request_stack'
             - '@oro_user.manager'
+            - '@logger'
 
     oro_user.form.handler.abstract.acl_role:
         class: Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler
