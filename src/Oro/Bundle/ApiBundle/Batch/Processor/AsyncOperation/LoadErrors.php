@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Batch\ErrorManager;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Filter\FilterHelper;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -69,7 +70,17 @@ class LoadErrors implements ProcessorInterface
             ? $filterHelper->getPageSize() * ($filterHelper->getPageNumber() - 1)
             : 0;
         $limit = $filterHelper->getPageSize();
-        $errors = $this->errorManager->readErrors($this->fileManager, $operationId, $offset, $limit);
+        $errors = $this->errorManager->readErrors(
+            $this->fileManager,
+            $operationId,
+            $offset,
+            (null !== $limit && $context->getConfig()->getHasMore()) ? $limit + 1 : $limit
+        );
+
+        if (null !== $limit && \count($errors) > $limit) {
+            $errors = \array_slice($errors, 0, $limit);
+            $errors[ConfigUtil::INFO_RECORD_KEY] = [ConfigUtil::HAS_MORE => true];
+        }
 
         $context->setResult($errors);
 
