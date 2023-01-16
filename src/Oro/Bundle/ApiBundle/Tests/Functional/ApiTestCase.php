@@ -302,6 +302,17 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * Resolves "{baseUrl}" placeholders and all entity references in the given expected content.
+     */
+    protected function getExpectedContentWithPaginationLinks(array $expectedContent): array
+    {
+        $content = Yaml::dump($expectedContent);
+        $content = str_replace('{baseUrl}', $this->getApiBaseUrl(), $content);
+
+        return self::processTemplateData(Yaml::parse($content));
+    }
+
+    /**
      * Replaces all values in the given expected response content
      * with corresponding value from the actual response content
      * when the key of an element is equal to the given key

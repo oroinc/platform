@@ -91,6 +91,60 @@ class AsyncOperationErrorsTest extends RestJsonApiTestCase
         );
     }
 
+    public function testPaginationLinksForFirstPage(): void
+    {
+        $operationId = $this->getReference('user_operation2')->getId();
+        $response = $this->getSubresource(
+            ['entity' => 'asyncoperations', 'id' => (string)$operationId, 'association' => 'errors'],
+            ['page[size]' => 2, 'page[number]' => 1],
+            ['HTTP_HATEOAS' => true]
+        );
+        $url = sprintf('{baseUrl}/asyncoperations/%d/errors', $operationId);
+        $expectedContent = $this->updateIds('get_async_operation_errors_first_page.yml', $operationId);
+        $expectedContent['links'] = $this->getExpectedContentWithPaginationLinks([
+            'self' => $url,
+            'next' => $url . '?page%5Bnumber%5D=2&page%5Bsize%5D=2',
+        ]);
+        $this->assertResponseContains($expectedContent, $response);
+    }
+
+    public function testPaginationLinksForSecondPage(): void
+    {
+        $operationId = $this->getReference('user_operation2')->getId();
+        $response = $this->getSubresource(
+            ['entity' => 'asyncoperations', 'id' => (string)$operationId, 'association' => 'errors'],
+            ['page[size]' => 2, 'page[number]' => 2],
+            ['HTTP_HATEOAS' => true]
+        );
+        $url = sprintf('{baseUrl}/asyncoperations/%d/errors', $operationId);
+        $expectedContent = $this->updateIds('get_async_operation_errors_second_page.yml', $operationId);
+        $expectedContent['links'] = $this->getExpectedContentWithPaginationLinks([
+            'self'  => $url,
+            'first' => $url . '?page%5Bsize%5D=2',
+            'prev'  => $url . '?page%5Bsize%5D=2',
+            'next'  => $url . '?page%5Bnumber%5D=3&page%5Bsize%5D=2',
+        ]);
+        $this->assertResponseContains($expectedContent, $response);
+    }
+
+    public function testPaginationLinksForLastPage(): void
+    {
+        $operationId = $this->getReference('user_operation2')->getId();
+        $response = $this->getSubresource(
+            ['entity' => 'asyncoperations', 'id' => (string)$operationId, 'association' => 'errors'],
+            ['page[size]' => 2, 'page[number]' => 4],
+            ['HTTP_HATEOAS' => true]
+        );
+        $url = sprintf('{baseUrl}/asyncoperations/%d/errors', $operationId);
+        $expectedContent = $this->updateIds('get_async_operation_errors_last_page.yml', $operationId);
+        $expectedContent['links'] = $this->getExpectedContentWithPaginationLinks([
+            'self'  => $url,
+            'first' => $url . '?page%5Bsize%5D=2',
+            'prev'  => $url . '?page%5Bnumber%5D=3&page%5Bsize%5D=2',
+        ]);
+        $this->assertResponseContains($expectedContent, $response);
+    }
+
     public function testGetErrorsForOperationWithoutErrorsOnOwnOperationOnUserAccessLevel()
     {
         $this->updateRolePermissions(
