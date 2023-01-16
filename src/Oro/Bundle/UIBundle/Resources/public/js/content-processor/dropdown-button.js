@@ -4,6 +4,7 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
+    const tools = require('oroui/js/tools');
     const stickyElementMixin = require('oroui/js/app/views/sticky-element/sticky-element-mixin');
     require('jquery-ui/widget');
 
@@ -20,7 +21,7 @@ define(function(require) {
             useMainButtonsClone: false,
             truncateLength: null,
             moreLabel: '',
-            groupContainer: '<div class="btn-group"></div>',
+            groupContainer: '<div class="dropdown btn-group"></div>',
             minItemQuantity: 1,
             moreButtonAttrs: {},
             decoreClass: null
@@ -142,7 +143,8 @@ define(function(require) {
                     'aria-expanded': false,
                     'data-toggle': 'dropdown',
                     'data-placement': 'bottom-end',
-                    'data-inherit-parent-width': 'loosely'
+                    'data-inherit-parent-width': 'loosely',
+                    'data-fullscreenable': tools.isMobile()
                 }, this.options.moreButtonAttrs))
                 .addClass('btn dropdown-toggle btn-more-actions')
                 .addClass(this.options.decoreClass || '')

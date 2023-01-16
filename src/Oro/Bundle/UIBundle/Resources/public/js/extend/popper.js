@@ -3,102 +3,102 @@ define(function(require) {
 
     const Popper = require('popper');
     const _ = require('underscore');
+    const popperUtils = require('popper-utils');
 
-    function getStyleComputedProperty(element, property) {
-        if (element.nodeType !== 1) {
-            return [];
-        }
-        // NOTE: 1 DOM access here
-        const window = element.ownerDocument.defaultView;
-        const css = window.getComputedStyle(element, null);
-        return property ? css[property] : css;
-    }
-
-    /**
-     * Given element offsets, generate an output similar to getBoundingClientRect
-     * @method
-     * @memberof Popper.Utils
-     * @argument {Object} offsets
-     * @returns {Object} ClientRect like output
-     */
-    function getClientRect(offsets) {
-        return Object.assign({}, offsets, {
-            right: offsets.left + offsets.width,
-            bottom: offsets.top + offsets.height
-        });
-    }
-
-    function getOffsetRectRelativeToArbitraryNode(children, parent, fixedPosition = false) {
-        const isHTML = parent.nodeName === 'HTML';
-        const childrenRect = children.getBoundingClientRect();
-        const parentRect = parent.getBoundingClientRect();
-
-        const styles = getStyleComputedProperty(parent);
-        const borderTopWidth = parseFloat(styles.borderTopWidth, 10);
-        const borderLeftWidth = parseFloat(styles.borderLeftWidth, 10);
-
-        // In cases where the parent is fixed, we must ignore negative scroll in offset calc
-        if (fixedPosition && isHTML) {
-            parentRect.top = Math.max(parentRect.top, 0);
-            parentRect.left = Math.max(parentRect.left, 0);
-        }
-        const offsets = getClientRect({
-            top: childrenRect.top - parentRect.top - borderTopWidth,
-            left: childrenRect.left - parentRect.left - borderLeftWidth,
-            width: childrenRect.width,
-            height: childrenRect.height
-        });
-        offsets.marginTop = 0;
-        offsets.marginLeft = 0;
-
-        // Subtract margins of documentElement in case it's being used as parent
-        // we do this only on HTML because it's the only element that behaves
-        // differently when margins are applied to it. The margins are included in
-        // the box of the documentElement, in the other cases not.
-        if (isHTML) {
-            const marginTop = parseFloat(styles.marginTop, 10);
-            const marginLeft = parseFloat(styles.marginLeft, 10);
-
-            offsets.top -= borderTopWidth - marginTop;
-            offsets.bottom -= borderTopWidth - marginTop;
-            offsets.left -= borderLeftWidth - marginLeft;
-            offsets.right -= borderLeftWidth - marginLeft;
-
-            // Attach marginTop and marginLeft because in some circumstances we may need them
-            offsets.marginTop = marginTop;
-            offsets.marginLeft = marginLeft;
-        }
-
-        return offsets;
-    }
-
-    Popper.Defaults.modifiers.adjustHeight = {
-        order: 550,
-        enabled: false,
-        fn: function(data, options) {
-            const element = data.instance.popper;
-            const html = element.ownerDocument.documentElement;
-            const relativeOffset = getOffsetRectRelativeToArbitraryNode(element, html);
-            const scrollElement = data.instance.state.scrollElement;
-            let clientRect;
-            let availableHeight;
-            if (scrollElement.tagName.toUpperCase() === 'BODY') {
-                availableHeight = scrollElement.parentElement.clientHeight - relativeOffset.top;
-            } else {
-                clientRect = scrollElement.getBoundingClientRect();
-                availableHeight = clientRect.top + clientRect.height - relativeOffset.top;
+    Object.assign(Popper.Defaults, {
+        onDestroy: () => {}
+    });
+    Object.assign(Popper.Defaults.modifiers, {
+        adjustHeight: {
+            order: 550,
+            enabled: false,
+            fn(data) {
+                const boundaries = _getBoundaries(data);
+                const availableHeight = Math.floor(boundaries.bottom - data.offsets.reference.bottom);
+                if (data.popper.height > availableHeight) {
+                    data.styles.maxHeight = availableHeight + 'px';
+                    data.attributes['x-adjusted-height'] = '';
+                } else {
+                    data.styles.maxHeight = 'none';
+                    data.attributes['x-adjusted-height'] = false;
+                }
+                return data;
             }
+        },
+        fullscreenable: {
+            order: 560,
+            enabled: false,
+            fn(data) {
+                const {instance} = data;
+                const boundaries = _getBoundaries(data);
+                const availableHeight = Math.floor(boundaries.bottom - data.offsets.reference.bottom);
+                const popperHeight = Math.ceil(instance.popper.getBoundingClientRect().height);
+                if (popperHeight && !instance.state.hasOwnProperty('isFullscreen')) {
+                    // popper element has shown (has rect dimensions) and isFullscreen isn't defined yet
+                    instance.state.isFullscreen = popperHeight > availableHeight;
+                }
 
-            if (data.popper.height > availableHeight) {
-                data.styles.maxHeight = availableHeight + 'px';
-                data.attributes['x-adjusted-height'] = '';
-            } else {
-                data.styles.maxHeight = 'none';
-                data.attributes['x-adjusted-height'] = false;
+                if (instance.state.isFullscreen) {
+                    data.styles.maxHeight = `${boundaries.height}px`;
+                    data.styles.top = '0';
+                    data.styles.transform = 'none';
+                    data.attributes['x-fullscreen'] = '';
+                    data.attributes['x-placement'] = false;
+                } else {
+                    data.styles.maxHeight = 'none';
+                    data.attributes['x-fullscreen'] = false;
+                    if (data.instance.popper.getAttribute('x-fullscreen') !== null) {
+                        // schedule one more update cycle after fullscreen is turned off
+                        data.instance.scheduleUpdate();
+                    }
+                }
+
+                return data;
             }
-            return data;
+        },
+        rtl: {
+            order: 650,
+            enabled: _.isRTL(),
+            fn(data, options) {
+                if (data.originalPlacement) {
+                    data.originalPlacement = swapPlacement(data.originalPlacement);
+                }
+
+                if (data.placement) {
+                    data.placement = swapPlacement(data.placement);
+                    data.instance.options.placement = swapPlacement(data.instance.options.placement);
+                }
+
+                if (data.attributes['x-placement']) {
+                    data.attributes['x-placement'] = swapPlacement(data.attributes['x-placement']);
+                }
+
+                data.instance.scheduleUpdate();
+
+                options.enabled = false;
+                return data;
+            }
         }
-    };
+    });
+
+    class OroPopper extends Popper {
+        constructor(reference, popper, options = {}) {
+            super(reference, popper, options);
+        }
+
+        destroy() {
+            // Popper element is already removed from the DOM
+            // See: https://github.com/floating-ui/floating-ui/blob/v1.16.1/dist/popper.js#L931-L933
+            if (this.options.removeOnDestroy && !document.contains(this.popper)) {
+                this.options.removeOnDestroy = false;
+            }
+            this.options.onDestroy(this);
+            this.popper.removeAttribute('x-fullscreen');
+            this.popper.removeAttribute('x-adjusted-height');
+            this.popper.style.maxHeight = '';
+            return super.destroy();
+        }
+    }
 
     function swapPlacement(placement) {
         const placementRTLMap = {
@@ -125,39 +125,12 @@ define(function(require) {
         return placement;
     }
 
-    Popper.Defaults.modifiers.rtl = {
-        order: 650,
-        enabled: _.isRTL(),
-        fn(data, options) {
-            if (data.originalPlacement) {
-                data.originalPlacement = swapPlacement(data.originalPlacement);
-            }
+    function _getBoundaries(data) {
+        const {instance, positionFixed} = data;
+        const {padding, boundariesElement} = instance.modifiers.find(({name}) => name === 'flip');
+        return popperUtils
+            .getBoundaries(instance.popper, instance.reference, padding, boundariesElement, positionFixed);
+    }
 
-            if (data.placement) {
-                data.placement = swapPlacement(data.placement);
-                data.instance.options.placement = swapPlacement(data.instance.options.placement);
-            }
-
-            if (data.attributes['x-placement']) {
-                data.attributes['x-placement'] = swapPlacement(data.attributes['x-placement']);
-            }
-
-            data.instance.scheduleUpdate();
-
-            options.enabled = false;
-            return data;
-        }
-    };
-    Popper.Defaults.onDestroy = () => {};
-    Popper.prototype.destroy = _.wrap(Popper.prototype.destroy, function(original, ...rest) {
-        // Popper element is already removed from the DOM
-        // See: https://github.com/floating-ui/floating-ui/blob/v1.16.1/dist/popper.js#L931-L933
-        if (this.options.removeOnDestroy && !document.contains(this.popper)) {
-            this.options.removeOnDestroy = false;
-        }
-        this.options.onDestroy(this);
-        return original.apply(this, rest);
-    });
-
-    return Popper;
+    return OroPopper;
 });
