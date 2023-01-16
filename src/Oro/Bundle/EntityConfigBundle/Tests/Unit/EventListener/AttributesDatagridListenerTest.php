@@ -93,14 +93,12 @@ class AttributesDatagridListenerTest extends \PHPUnit\Framework\TestCase
             5 => [['id' => 2, 'labels' => new ArrayCollection([$label2])]]
         ];
 
-        $repository
-            ->expects($this->once())
+        $repository->expects($this->once())
             ->method('getFamiliesLabelsByAttributeIdsWithAcl')
             ->with([1, 2, 5], $this->aclHelper)
             ->willReturn($families);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with(AttributeGroupRelation::class)
             ->willReturn($repository);

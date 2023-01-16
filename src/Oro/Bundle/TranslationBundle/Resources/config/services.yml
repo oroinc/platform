@@ -178,10 +178,8 @@ services:
         class: Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslationListener
         arguments:
             - '@oro_translation.provider.language'
-            - '@translator'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-translations-grid, method: onBuildBefore }
-            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.oro-translation-translations-grid, method: onResultAfter }
 
     oro_translation.listener.datagrid.translatable:
         class: Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslatableListener

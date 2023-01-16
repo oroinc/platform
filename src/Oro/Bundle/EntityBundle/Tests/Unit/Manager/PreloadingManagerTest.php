@@ -15,16 +15,16 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var EventDispatcherInterface */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /** @var EntityAliasResolver */
+    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $entityAliasResolver;
 
-    /** @var PropertyAccessorInterface */
+    /** @var PropertyAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $propertyAccessor;
 
     /** @var PreloadingManager */
@@ -47,8 +47,7 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testPreloadInEntitiesWhenNoEntities(): void
     {
-        $this->doctrineHelper
-            ->expects($this->never())
+        $this->doctrineHelper->expects($this->never())
             ->method('getEntityClass');
 
         $this->manager->preloadInEntities([], [], []);
@@ -61,26 +60,22 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $eventName = 'oro_entity.preload_entity.stdclass';
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($entities[0])
             ->willReturn(\stdClass::class);
 
-        $this->entityAliasResolver
-            ->expects($this->once())
+        $this->entityAliasResolver->expects($this->once())
             ->method('getAlias')
             ->with(\stdClass::class)
             ->willReturn('stdclass');
 
         $event = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
-        $this->eventDispatcher
-            ->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with($event, $eventName);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityMetadataForClass')
             ->with(\stdClass::class)
             ->willReturn($this->createMock(ClassMetadata::class));
@@ -95,25 +90,21 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
         $fieldsToPreload = [$invalidField => []];
         $context = [];
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($entities[0])
             ->willReturn(\stdClass::class);
 
-        $this->eventDispatcher
-            ->expects($this->never())
+        $this->eventDispatcher->expects($this->never())
             ->method('dispatch');
 
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityMetadataForClass')
             ->with(\stdClass::class)
             ->willReturn($entityMetadata);
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('hasAssociation')
             ->with($invalidField)
             ->willReturn(false);
@@ -134,33 +125,28 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $eventName = 'oro_entity.preload_entity.stdclass';
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($entities[0])
             ->willReturn(\stdClass::class);
 
-        $this->entityAliasResolver
-            ->expects($this->once())
+        $this->entityAliasResolver->expects($this->once())
             ->method('getAlias')
             ->with(\stdClass::class)
             ->willReturn('stdclass');
 
         $event = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
-        $this->eventDispatcher
-            ->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with($event, $eventName);
 
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityMetadataForClass')
             ->with(\stdClass::class)
             ->willReturn($entityMetadata);
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('hasAssociation')
             ->with($targetField)
             ->willReturn(true);
@@ -178,49 +164,42 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
         $eventName1 = 'oro_entity.preload_entity.stdclass';
         $eventName2 = 'oro_entity.preload_entity.substdclass';
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($entities[0])
             ->willReturn(\stdClass::class);
 
-        $this->entityAliasResolver
-            ->expects($this->atLeastOnce())
+        $this->entityAliasResolver->expects($this->atLeastOnce())
             ->method('getAlias')
             ->withConsecutive([\stdClass::class], [\stdClass::class])
             ->willReturnOnConsecutiveCalls('stdclass', 'substdclass');
 
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $this->doctrineHelper
-            ->expects($this->atLeastOnce())
+        $this->doctrineHelper->expects($this->atLeastOnce())
             ->method('getEntityMetadataForClass')
             ->with(\stdClass::class)
             ->willReturn($entityMetadata);
 
-        $entityMetadata
-            ->expects($this->exactly(2))
+        $entityMetadata->expects($this->exactly(2))
             ->method('hasAssociation')
             ->withConsecutive([$targetField], [$subField])
             ->willReturnOnConsecutiveCalls(true, true);
 
         $assocMapping = ['type' => ClassMetadata::MANY_TO_ONE];
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('getAssociationMapping')
             ->with($targetField)
             ->willReturn($assocMapping);
 
         $targetFieldEntity1 = new \stdClass();
         $targetFieldEntity2 = new \stdClass();
-        $this->propertyAccessor
-            ->expects($this->exactly(2))
+        $this->propertyAccessor->expects($this->exactly(2))
             ->method('getValue')
             ->withConsecutive([$entities[0], $targetField], [$entities[1], $targetField])
             ->willReturnOnConsecutiveCalls($targetFieldEntity1, $targetFieldEntity2);
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('getAssociationTargetClass')
             ->with($targetField)
             ->willReturn(\stdClass::class);
@@ -231,8 +210,7 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
             $fieldsToPreload[$targetField],
             $context
         );
-        $this->eventDispatcher
-            ->expects($this->exactly(2))
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
             ->withConsecutive([$event1, $eventName1], [$event2, $eventName2]);
 
@@ -248,52 +226,44 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $eventName1 = 'oro_entity.preload_entity.stdclass';
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($entities[0])
             ->willReturn(\stdClass::class);
 
-        $this->entityAliasResolver
-            ->expects($this->atLeastOnce())
+        $this->entityAliasResolver->expects($this->atLeastOnce())
             ->method('getAlias')
             ->withConsecutive([\stdClass::class], [\stdClass::class])
             ->willReturnOnConsecutiveCalls('stdclass', 'substdclass');
 
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $this->doctrineHelper
-            ->expects($this->atLeastOnce())
+        $this->doctrineHelper->expects($this->atLeastOnce())
             ->method('getEntityMetadataForClass')
             ->with(\stdClass::class)
             ->willReturn($entityMetadata);
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('hasAssociation')
             ->with($targetField)
             ->willReturn(true);
 
         $assocMapping = ['type' => ClassMetadata::MANY_TO_ONE];
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('getAssociationMapping')
             ->with($targetField)
             ->willReturn($assocMapping);
 
-        $this->propertyAccessor
-            ->expects($this->once())
+        $this->propertyAccessor->expects($this->once())
             ->method('getValue')
             ->with($entities[0], $targetField)
             ->willReturn(null);
 
-        $entityMetadata
-            ->expects($this->never())
+        $entityMetadata->expects($this->never())
             ->method('getAssociationTargetClass');
 
         $event1 = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
-        $this->eventDispatcher
-            ->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with($event1, $eventName1);
 
@@ -310,35 +280,30 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
         $eventName1 = 'oro_entity.preload_entity.stdclass';
         $eventName2 = 'oro_entity.preload_entity.substdclass';
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($entities[0])
             ->willReturn(\stdClass::class);
 
-        $this->entityAliasResolver
-            ->expects($this->atLeastOnce())
+        $this->entityAliasResolver->expects($this->atLeastOnce())
             ->method('getAlias')
             ->withConsecutive([\stdClass::class], [\stdClass::class])
             ->willReturnOnConsecutiveCalls('stdclass', 'substdclass');
 
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $this->doctrineHelper
-            ->expects($this->atLeastOnce())
+        $this->doctrineHelper->expects($this->atLeastOnce())
             ->method('getEntityMetadataForClass')
             ->with(\stdClass::class)
             ->willReturn($entityMetadata);
 
-        $entityMetadata
-            ->expects($this->exactly(2))
+        $entityMetadata->expects($this->exactly(2))
             ->method('hasAssociation')
             ->withConsecutive([$targetField], [$subField])
             ->willReturnOnConsecutiveCalls(true, true);
 
         $assocMapping = ['type' => ClassMetadata::ONE_TO_MANY];
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('getAssociationMapping')
             ->with($targetField)
             ->willReturn($assocMapping);
@@ -346,8 +311,7 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
         $targetFieldEntity1 = new \stdClass();
         $targetFieldEntity2 = new \stdClass();
         $targetFieldEntity3 = new \stdClass();
-        $this->propertyAccessor
-            ->expects($this->exactly(2))
+        $this->propertyAccessor->expects($this->exactly(2))
             ->method('getValue')
             ->withConsecutive([$entities[0], $targetField], [$entities[1], $targetField])
             ->willReturnOnConsecutiveCalls(
@@ -355,8 +319,7 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
                 new ArrayCollection([$targetFieldEntity3])
             );
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('getAssociationTargetClass')
             ->with($targetField)
             ->willReturn(\stdClass::class);
@@ -367,8 +330,7 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
             $fieldsToPreload[$targetField],
             $context
         );
-        $this->eventDispatcher
-            ->expects($this->exactly(2))
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
             ->withConsecutive([$event1, $eventName1], [$event2, $eventName2]);
 
@@ -384,52 +346,44 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $eventName1 = 'oro_entity.preload_entity.stdclass';
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($entities[0])
             ->willReturn(\stdClass::class);
 
-        $this->entityAliasResolver
-            ->expects($this->atLeastOnce())
+        $this->entityAliasResolver->expects($this->atLeastOnce())
             ->method('getAlias')
             ->withConsecutive([\stdClass::class], [\stdClass::class])
             ->willReturnOnConsecutiveCalls('stdclass', 'substdclass');
 
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $this->doctrineHelper
-            ->expects($this->atLeastOnce())
+        $this->doctrineHelper->expects($this->atLeastOnce())
             ->method('getEntityMetadataForClass')
             ->with(\stdClass::class)
             ->willReturn($entityMetadata);
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('hasAssociation')
             ->with($targetField)
             ->willReturn(true);
 
         $assocMapping = ['type' => ClassMetadata::ONE_TO_MANY];
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('getAssociationMapping')
             ->with($targetField)
             ->willReturn($assocMapping);
 
-        $this->propertyAccessor
-            ->expects($this->once())
+        $this->propertyAccessor->expects($this->once())
             ->method('getValue')
             ->withConsecutive([$entities[0], $targetField])
             ->willReturn(new ArrayCollection());
 
-        $entityMetadata
-            ->expects($this->never())
+        $entityMetadata->expects($this->never())
             ->method('getAssociationTargetClass');
 
         $event1 = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
-        $this->eventDispatcher
-            ->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with($event1, $eventName1);
 
@@ -445,35 +399,30 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $eventName1 = 'oro_entity.preload_entity.stdclass';
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($entities[0])
             ->willReturn(\stdClass::class);
 
-        $this->entityAliasResolver
-            ->expects($this->atLeastOnce())
+        $this->entityAliasResolver->expects($this->atLeastOnce())
             ->method('getAlias')
             ->withConsecutive([\stdClass::class], [\stdClass::class])
             ->willReturnOnConsecutiveCalls('stdclass', 'substdclass');
 
         $entityMetadata = $this->createMock(ClassMetadata::class);
-        $this->doctrineHelper
-            ->expects($this->atLeastOnce())
+        $this->doctrineHelper->expects($this->atLeastOnce())
             ->method('getEntityMetadataForClass')
             ->with(\stdClass::class)
             ->willReturn($entityMetadata);
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('hasAssociation')
             ->with($targetField)
             ->willReturn(true);
 
         $assocMapping = ['type' => ClassMetadata::ONE_TO_MANY];
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('getAssociationMapping')
             ->with($targetField)
             ->willReturn($assocMapping);
@@ -485,19 +434,16 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
         );
         $collection->setInitialized(false);
 
-        $this->propertyAccessor
-            ->expects($this->once())
+        $this->propertyAccessor->expects($this->once())
             ->method('getValue')
             ->withConsecutive([$entities[0], $targetField])
             ->willReturn($collection);
 
-        $entityMetadata
-            ->expects($this->never())
+        $entityMetadata->expects($this->never())
             ->method('getAssociationTargetClass');
 
         $event1 = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
-        $this->eventDispatcher
-            ->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with($event1, $eventName1);
 

@@ -140,38 +140,17 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class EntitySerializer
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var SerializationHelper */
-    protected $serializationHelper;
-
-    /** @var DataAccessorInterface */
-    protected $dataAccessor;
-
-    /** @var QueryFactory */
-    protected $queryFactory;
-
-    /** @var FieldAccessor */
-    protected $fieldAccessor;
-
-    /** @var ConfigNormalizer */
-    protected $configNormalizer;
-
-    /** @var ConfigConverter */
-    protected $configConverter;
-
-    /** @var DataNormalizer */
-    protected $dataNormalizer;
-
-    /** @var FieldFilterInterface */
-    protected $fieldFilter;
-
-    /** @var ConfigAccessor */
-    private $configAccessor;
-
-    /** @var QueryModifier */
-    private $queryModifier;
+    protected DoctrineHelper $doctrineHelper;
+    protected SerializationHelper $serializationHelper;
+    protected DataAccessorInterface $dataAccessor;
+    protected QueryFactory $queryFactory;
+    protected FieldAccessor $fieldAccessor;
+    protected ConfigNormalizer $configNormalizer;
+    protected ConfigConverter $configConverter;
+    private DataNormalizer $dataNormalizer;
+    private ConfigAccessor $configAccessor;
+    private QueryModifier $queryModifier;
+    private ?FieldFilterInterface $fieldFilter = null;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -199,22 +178,14 @@ class EntitySerializer
         );
     }
 
-    public function setFieldFilter(FieldFilterInterface $filter)
+    public function setFieldFilter(FieldFilterInterface $filter): void
     {
         $this->fieldFilter = $filter;
     }
 
-    /**
-     * @param QueryBuilder       $qb      A query builder is used to get data
-     * @param EntityConfig|array $config  Serialization rules
-     * @param array              $context Options post serializers and data transformers have access to
-     * @param bool               $skipPostSerializationForPrimaryEntities
-     *
-     * @return array
-     */
     public function serialize(
         QueryBuilder $qb,
-        $config,
+        EntityConfig|array $config,
         array $context = [],
         bool $skipPostSerializationForPrimaryEntities = false
     ): array {
@@ -238,19 +209,10 @@ class EntitySerializer
         return $this->dataNormalizer->normalizeData($data, $entityConfig);
     }
 
-    /**
-     * @param object[]           $entities    The list of entities to be serialized
-     * @param string             $entityClass The entity class name
-     * @param EntityConfig|array $config      Serialization rules
-     * @param array              $context     Options post serializers and data transformers have access to
-     * @param bool               $skipPostSerializationForPrimaryEntities
-     *
-     * @return array
-     */
     public function serializeEntities(
         array $entities,
         string $entityClass,
-        $config,
+        EntityConfig|array $config,
         array $context = [],
         bool $skipPostSerializationForPrimaryEntities = false
     ): array {
@@ -267,21 +229,12 @@ class EntitySerializer
         return $this->dataNormalizer->normalizeData($data, $entityConfig);
     }
 
-    /**
-     * @param QueryBuilder       $qb
-     * @param EntityConfig|array $config
-     */
-    public function prepareQuery(QueryBuilder $qb, $config)
+    public function prepareQuery(QueryBuilder $qb, EntityConfig|array $config): void
     {
         $this->queryModifier->updateQuery($qb, $this->normalizeConfig($config));
     }
 
-    /**
-     * @param EntityConfig|array $config
-     *
-     * @return EntityConfig
-     */
-    protected function normalizeConfig($config)
+    protected function normalizeConfig(EntityConfig|array $config): EntityConfig
     {
         if ($config instanceof EntityConfig) {
             $config = $config->toArray();
@@ -292,17 +245,10 @@ class EntitySerializer
         );
     }
 
-    /**
-     * @param array        $items
-     * @param EntityConfig $config
-     * @param int|null     $limit
-     *
-     * @return bool
-     */
-    protected function preSerializeItems(array &$items, EntityConfig $config, $limit)
+    protected function preSerializeItems(array &$items, EntityConfig $config, ?int $limit): bool
     {
         $hasMore = false;
-        if (null !== $limit && $config->getHasMore() && count($items) > $limit) {
+        if (null !== $limit && $config->getHasMore() && \count($items) > $limit) {
             $hasMore = true;
             $items = \array_slice($items, 0, $limit);
         }
@@ -310,24 +256,14 @@ class EntitySerializer
         return $hasMore;
     }
 
-    /**
-     * @param object[]     $entities    The list of entities to be serialized
-     * @param string       $entityClass The entity class name
-     * @param EntityConfig $config      Serialization rules
-     * @param array        $context     Options post serializers and data transformers have access to
-     * @param bool         $useIdAsKey  Defines whether the entity id should be used as a key of the result array
-     * @param bool         $skipPostSerializationForPrimaryEntities
-     *
-     * @return array
-     */
     protected function serializeItems(
         array $entities,
-        $entityClass,
+        string $entityClass,
         EntityConfig $config,
         array $context,
-        $useIdAsKey = false,
+        bool $useIdAsKey = false,
         bool $skipPostSerializationForPrimaryEntities = false
-    ) {
+    ): array {
         if (empty($entities)) {
             return [];
         }
@@ -345,13 +281,8 @@ class EntitySerializer
             }
         }
 
-        $this->loadRelatedData(
-            $result,
-            $entityClass,
-            $this->getEntityIds($entities, $idFieldName),
-            $config,
-            $context
-        );
+        $entityIds = $this->getEntityIds($entities, $idFieldName);
+        $this->loadRelatedData($result, $entityClass, $entityIds, $config, $context);
 
         if (!$skipPostSerializationForPrimaryEntities) {
             $result = $this->serializationHelper->processPostSerializeItems($result, $config, $context);
@@ -361,15 +292,9 @@ class EntitySerializer
     }
 
     /**
-     * @param mixed        $entity
-     * @param string       $entityClass
-     * @param EntityConfig $config
-     * @param array        $context
-     *
-     * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function serializeItem($entity, $entityClass, EntityConfig $config, array $context)
+    protected function serializeItem(mixed $entity, string $entityClass, EntityConfig $config, array $context): array
     {
         if (!$entity) {
             return [];
@@ -383,10 +308,12 @@ class EntitySerializer
             $fieldConfig = $config->getField($field);
             $property = $this->configAccessor->getPropertyPath($field, $fieldConfig);
             $path = ConfigUtil::explodePropertyPath($property);
-            $isReference = count($path) > 1;
+            $isReference = \count($path) > 1;
 
             if (null !== $this->fieldFilter && !$isReference) {
-                $fieldCheckResult = $this->fieldFilter->checkField($entity, $entityClass, $property);
+                $fieldCheckResult = \is_object($entity)
+                    ? $this->fieldFilter->checkField($entity, $entityClass, $property)
+                    : null;
                 if (null !== $fieldCheckResult) {
                     if (false === $fieldCheckResult) {
                         // return field but without value
@@ -421,21 +348,9 @@ class EntitySerializer
         return $result;
     }
 
-    /**
-     * @param mixed            $value
-     * @param object           $entity
-     * @param string           $field
-     * @param string           $property
-     * @param FieldConfig|null $fieldConfig
-     * @param EntityMetadata   $entityMetadata
-     * @param EntityConfig     $config
-     * @param array            $context
-     *
-     * @return bool
-     */
     protected function tryGetValue(
-        &$value,
-        $entity,
+        mixed &$value,
+        object|array $entity,
         string $field,
         string $property,
         ?FieldConfig $fieldConfig,
@@ -476,27 +391,17 @@ class EntitySerializer
         return true;
     }
 
-    /**
-     * @param string           $fieldName
-     * @param EntityMetadata   $entityMetadata
-     * @param FieldConfig|null $fieldConfig
-     *
-     * @return bool
-     */
-    protected function isAssociation($fieldName, EntityMetadata $entityMetadata, FieldConfig $fieldConfig = null)
-    {
+    private function isAssociation(
+        string $fieldName,
+        EntityMetadata $entityMetadata,
+        FieldConfig $fieldConfig = null
+    ): bool {
         return
-            $entityMetadata->isAssociation($fieldName)
+            (ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldName && $entityMetadata->isAssociation($fieldName))
             || (null !== $fieldConfig && null !== $fieldConfig->getTargetEntity());
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param EntityConfig $config
-     *
-     * @return Query
-     */
-    protected function getQuery(QueryBuilder $qb, EntityConfig $config)
+    protected function getQuery(QueryBuilder $qb, EntityConfig $config): Query
     {
         $query = $this->queryFactory->getQuery($qb, $config);
         if ($config->isPartialLoadEnabled()) {
@@ -515,16 +420,15 @@ class EntitySerializer
     }
 
     /**
-     * @param array        $result
-     * @param string       $entityClass
-     * @param array        $entityIds
-     * @param EntityConfig $config
-     * @param array        $context
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function loadRelatedData(array &$result, $entityClass, $entityIds, EntityConfig $config, array $context)
-    {
+    protected function loadRelatedData(
+        array &$result,
+        string $entityClass,
+        array $entityIds,
+        EntityConfig $config,
+        array $context
+    ): void {
         $relatedData = [];
         $toOneRelatedData = [];
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
@@ -574,22 +478,13 @@ class EntitySerializer
         }
     }
 
-    /**
-     * @param EntityConfig $config
-     * @param array        $associationMapping
-     * @param string       $field
-     * @param array        $entityIds
-     * @param array        $context
-     *
-     * @return array|null
-     */
     protected function loadRelatedCollectionValuedAssociationData(
         EntityConfig $config,
         array $associationMapping,
-        $field,
-        $entityIds,
+        string $field,
+        array $entityIds,
         array $context
-    ) {
+    ): ?array {
         $targetEntityClass = $associationMapping['targetEntity'];
         $targetConfig = $this->configAccessor->getTargetEntity($config, $field);
 
@@ -616,24 +511,14 @@ class EntitySerializer
         );
     }
 
-    /**
-     * @param EntityConfig     $config
-     * @param AssociationQuery $associationQuery
-     * @param string           $entityClass
-     * @param string           $field
-     * @param array            $entityIds
-     * @param array            $context
-     *
-     * @return array|null
-     */
     protected function loadRelatedCollectionValuedAssociationDataForCustomAssociation(
         EntityConfig $config,
         AssociationQuery $associationQuery,
-        $entityClass,
-        $field,
-        $entityIds,
+        string $entityClass,
+        string $field,
+        array $entityIds,
         array $context
-    ) {
+    ): ?array {
         $targetEntityClass = $associationQuery->getTargetEntityClass();
         $targetConfig = $this->configAccessor->getTargetEntity($config, $field);
 
@@ -663,20 +548,13 @@ class EntitySerializer
         );
     }
 
-    /**
-     * @param mixed        $entity
-     * @param string       $entityClass
-     * @param mixed        $entityId
-     * @param EntityConfig $config
-     * @param array        $context
-     */
     protected function loadRelatedDataForOneEntity(
-        &$entity,
-        $entityClass,
-        $entityId,
+        mixed &$entity,
+        string $entityClass,
+        mixed $entityId,
         EntityConfig $config,
         array $context
-    ) {
+    ): void {
         $items = [$entity];
         $this->loadRelatedData($items, $entityClass, [$entityId], $config, $context);
         $items = $this->serializationHelper->processPostSerializeItems($items, $config, $context);
@@ -689,8 +567,12 @@ class EntitySerializer
      * @param EntityConfig $config
      * @param array        $relatedData [field => [entityId => [field => value, ...], ...], ...]
      */
-    protected function applyRelatedData(array &$result, $entityClass, EntityConfig $config, $relatedData)
-    {
+    private function applyRelatedData(
+        array &$result,
+        string $entityClass,
+        EntityConfig $config,
+        array $relatedData
+    ): void {
         $entityIdFieldName = $this->fieldAccessor->getIdField($entityClass, $config);
         foreach ($result as &$resultItem) {
             if (!\array_key_exists($entityIdFieldName, $resultItem)) {
@@ -723,8 +605,12 @@ class EntitySerializer
      * @param EntityConfig $config
      * @param array        $relatedData [field => [entityId => [field => value, ...], ...], ...]
      */
-    protected function applyToOneRelatedData(array &$result, $entityClass, EntityConfig $config, $relatedData)
-    {
+    private function applyToOneRelatedData(
+        array &$result,
+        string $entityClass,
+        EntityConfig $config,
+        array $relatedData
+    ): void {
         $entityIdFieldName = $this->fieldAccessor->getIdField($entityClass, $config);
         foreach ($result as &$resultItem) {
             if (!\array_key_exists($entityIdFieldName, $resultItem)) {
@@ -742,13 +628,7 @@ class EntitySerializer
         }
     }
 
-    /**
-     * @param string       $entityClass
-     * @param EntityConfig $config
-     *
-     * @return bool
-     */
-    protected function isSingleStepLoading($entityClass, EntityConfig $config)
+    private function isSingleStepLoading(string $entityClass, EntityConfig $config): bool
     {
         return
             null === $config->getMaxResults()
@@ -766,11 +646,11 @@ class EntitySerializer
      */
     protected function loadRelatedItemsIds(
         QueryBuilder $qb,
-        $entityClass,
-        $targetEntityClass,
+        string $entityClass,
+        string $targetEntityClass,
         array $entityIds,
         EntityConfig $config
-    ) {
+    ): array {
         $orderBy = $config->getOrderBy();
         foreach ($orderBy as $field => $direction) {
             $qb->addOrderBy(QueryBuilderUtil::getField('r', $field), QueryBuilderUtil::getSortOrder($direction));
@@ -788,8 +668,12 @@ class EntitySerializer
      * @return array [entityId => [field => value, ...], ...]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function loadRelatedItems($relatedItemsIds, $entityClass, EntityConfig $config, array $context)
-    {
+    protected function loadRelatedItems(
+        array $relatedItemsIds,
+        string $entityClass,
+        EntityConfig $config,
+        array $context
+    ): array {
         $limit = $config->getMaxResults();
         $bindings = $this->getRelatedItemsBindings($relatedItemsIds, $entityClass);
 
@@ -819,10 +703,10 @@ class EntitySerializer
                     }
                 }
                 if (null !== $limit
-                    && $config->getHasMore()
                     && isset($result[$entityId])
-                    && count($result[$entityId]) == $limit
-                    && count($relatedEntityIds) > $limit
+                    && $config->getHasMore()
+                    && \count($result[$entityId]) === $limit
+                    && \count($relatedEntityIds) > $limit
                 ) {
                     $result[$entityId][ConfigUtil::INFO_RECORD_KEY] = [ConfigUtil::HAS_MORE => true];
                 }
@@ -832,24 +716,16 @@ class EntitySerializer
         return $result;
     }
 
-    /**
-     * @param EntityConfig $config
-     * @param string       $entityClass
-     *
-     * @return string|null The name of result field if only identity field should be returned;
-     *                     otherwise, NULL
-     */
-    protected function getIdFieldNameIfIdOnlyRequested(EntityConfig $config, $entityClass)
+    private function getIdFieldNameIfIdOnlyRequested(EntityConfig $config, string $entityClass): ?string
     {
         if (!$config->isExcludeAll()) {
             return null;
         }
         $fields = $config->getFields();
-        if (count($fields) !== 1) {
+        if (\count($fields) !== 1) {
             return null;
         }
         reset($fields);
-        /** @var FieldConfig $field */
         $fieldName = key($fields);
         $field = current($fields);
         if ($this->doctrineHelper->getEntityIdFieldName($entityClass) !== $field->getPropertyPath($fieldName)) {
@@ -865,7 +741,7 @@ class EntitySerializer
      *
      * @return array [entityId => [relatedEntityId, ...], ...]
      */
-    protected function getRelatedItemsBindings($relatedItemsIds, $entityClass)
+    private function getRelatedItemsBindings(array $relatedItemsIds, string $entityClass): array
     {
         $result = [];
         if (!empty($relatedItemsIds)) {
@@ -878,13 +754,7 @@ class EntitySerializer
         return $result;
     }
 
-    /**
-     * @param array    $bindings [entityId => relatedEntityId, ...]
-     * @param int|null $limit
-     *
-     * @return array of unique ids of all related entities from $bindings array
-     */
-    protected function getRelatedItemsIds($bindings, $limit)
+    private function getRelatedItemsIds(array $bindings, ?int $limit): array
     {
         $result = [];
         foreach ($bindings as $ids) {
@@ -914,10 +784,10 @@ class EntitySerializer
      */
     protected function loadRelatedItemsForSimpleEntity(
         QueryBuilder $qb,
-        $entityClass,
+        string $entityClass,
         EntityConfig $config,
         array $context
-    ) {
+    ): array {
         $orderBy = $config->getOrderBy();
         foreach ($orderBy as $field => $direction) {
             $qb->addOrderBy(QueryBuilderUtil::getField('r', $field), QueryBuilderUtil::getSortOrder($direction));
@@ -950,12 +820,12 @@ class EntitySerializer
      * @return array [entityId => [field => value, ...], ...]
      */
     protected function serializeRelatedItemsForSimpleEntity(
-        $items,
-        $isObject,
-        $entityClass,
+        array $items,
+        bool $isObject,
+        string $entityClass,
         EntityConfig $config,
         array $context
-    ) {
+    ): array {
         $resultMap = [];
         $serializedItems = [];
         foreach ($items as $key => $item) {
@@ -983,19 +853,14 @@ class EntitySerializer
         return $result;
     }
 
-    /**
-     * @param string       $entityClass
-     * @param EntityConfig $config
-     *
-     * @return bool
-     */
-    protected function hasAssociations($entityClass, EntityConfig $config)
+    private function hasAssociations(string $entityClass, EntityConfig $config): bool
     {
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
         $fields = $this->fieldAccessor->getFields($entityClass, $config);
         foreach ($fields as $field) {
-            $propertyPath = $this->configAccessor->getPropertyPath($field, $config->getField($field));
-            if ($entityMetadata->isAssociation($propertyPath)) {
+            $fieldConfig = $config->getField($field);
+            $property = $this->configAccessor->getPropertyPath($field, $fieldConfig);
+            if ($this->isAssociation($property, $entityMetadata, $fieldConfig)) {
                 return true;
             }
         }
@@ -1003,13 +868,7 @@ class EntitySerializer
         return false;
     }
 
-    /**
-     * @param object[] $entities    A list of entities
-     * @param string   $idFieldName The name of entity identifier field
-     *
-     * @return array of unique ids of all entities from $entities array
-     */
-    protected function getEntityIds($entities, $idFieldName)
+    private function getEntityIds(array $entities, string $idFieldName): array
     {
         $ids = [];
         foreach ($entities as $entity) {
@@ -1022,13 +881,7 @@ class EntitySerializer
         return array_values($ids);
     }
 
-    /**
-     * @param mixed  $value
-     * @param string $type
-     *
-     * @return mixed
-     */
-    protected function getTypedEntityId($value, $type)
+    private function getTypedEntityId(mixed $value, string $type): mixed
     {
         if (Types::INTEGER === $type || Types::SMALLINT === $type) {
             $value = (int)$value;
@@ -1040,14 +893,8 @@ class EntitySerializer
     /**
      * Check access to a specified field for each entity object from the given $entityIds list
      * and returns ids only for entities for which the access is granted.
-     *
-     * @param array  $entityIds
-     * @param string $entityClass
-     * @param string $field
-     *
-     * @return array
      */
-    private function getAccessibleIds(array $entityIds, $entityClass, $field)
+    private function getAccessibleIds(array $entityIds, string $entityClass, string $field): array
     {
         if (null === $this->fieldFilter) {
             return $entityIds;

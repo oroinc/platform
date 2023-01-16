@@ -108,7 +108,7 @@ oro:
             label:                          Emails
             add:                            Add another email
         auth_status:
-            label:                          Status
+            label:                          Password status
             description:                    Defines the actuality of the user's current password, whether the user can use it to log into the system, is in the process of the password change, or (for EE) their password needs to be reset because the user has too many failed login attempts.
         first_name:
             label:                          First name
@@ -158,6 +158,7 @@ oro:
                 label: Reset
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
+                ttl_expired.message: The reset password link has expired.
             force_reset:
                 popup.message: User {{ user }} will receive reset password by email and will be disabled from login.
                 popup.question: Are you sure you want to proceed?
@@ -213,6 +214,7 @@ oro:
                 active: Active Users
                 cannot_login: Cannot login
                 disabled: Disabled Users
+            auth_status.label: Password
 
     #
     # Oro/Bundle/UserBundle/Entity/Email

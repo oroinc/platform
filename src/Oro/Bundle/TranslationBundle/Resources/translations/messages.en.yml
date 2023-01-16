@@ -82,7 +82,6 @@ oro.translation:
         english_translation.label: 'English translation'
         context.label: 'Context'
         status.label: 'Translated'
-        current.label: 'Current Value'
 
         feature:
             manage:

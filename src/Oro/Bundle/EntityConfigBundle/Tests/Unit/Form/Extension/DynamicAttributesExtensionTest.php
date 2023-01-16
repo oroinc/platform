@@ -126,8 +126,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
                 )
             );
 
-        $this->attributeConfigHelper
-            ->expects($this->exactly(2))
+        $this->attributeConfigHelper->expects($this->exactly(2))
             ->method('isFieldAttribute')
             ->willReturnOnConsecutiveCalls(false, true);
 

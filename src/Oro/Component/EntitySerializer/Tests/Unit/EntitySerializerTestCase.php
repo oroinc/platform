@@ -29,10 +29,10 @@ abstract class EntitySerializerTestCase extends OrmTestCase
     /** @var EntityManagerMock */
     protected $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityFieldFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityFieldFilter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var EntitySerializer */

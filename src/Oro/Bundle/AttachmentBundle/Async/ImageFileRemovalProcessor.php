@@ -17,11 +17,8 @@ use Psr\Log\LoggerInterface;
  */
 class ImageFileRemovalProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /** @var FileRemovalManagerInterface */
-    private $imageRemovalManager;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private FileRemovalManagerInterface $imageRemovalManager;
+    private LoggerInterface $logger;
 
     public function __construct(
         FileRemovalManagerInterface $imageRemovalManager,
@@ -32,33 +29,32 @@ class ImageFileRemovalProcessor implements MessageProcessorInterface, TopicSubsc
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [AttachmentRemoveImageTopic::getName()];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
-        //array<array{id: int, fileName: string, originalFileName: string}}>
         $messageBody = $message->getBody();
-        foreach ($messageBody['images'] as $imageData) {
+        foreach ($messageBody['images'] as $item) {
             try {
-                $fileId = $imageData['id'];
-                $fileName = $imageData['fileName'];
-                $originalFileName = $imageData['originalFileName'];
-                $parentEntityClass = $imageData['parentEntityClass'];
-
-                /** @var File $file */
-                $file = $this->getFile($fileId, $fileName, $originalFileName, $parentEntityClass);
-                $this->imageRemovalManager->removeFiles($file);
+                $this->imageRemovalManager->removeFiles(
+                    $this->getFile(
+                        $item['id'],
+                        $item['fileName'],
+                        $item['originalFileName'],
+                        $item['parentEntityClass']
+                    )
+                );
             } catch (\Exception $e) {
                 $this->logger->warning(
-                    sprintf('Unable to remove image %s', $fileName),
+                    sprintf('Unable to remove image %s', $item['fileName']),
                     ['exception' => $e]
                 );
             }

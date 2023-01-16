@@ -5,7 +5,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\Api\RestJsonApi;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * @dbIsolationPerTest
@@ -15,14 +14,6 @@ class UserProfileTest extends RestJsonApiTestCase
     private function getCurrentUser(): User
     {
         return self::getContainer()->get('security.token_storage')->getToken()->getUser();
-    }
-
-    private function getExpectedContent(array $expectedContent): array
-    {
-        $content = Yaml::dump($expectedContent);
-        $content = str_replace('{baseUrl}', $this->getApiBaseUrl(), $content);
-
-        return self::processTemplateData(Yaml::parse($content));
     }
 
     public function testGet()
@@ -63,7 +54,7 @@ class UserProfileTest extends RestJsonApiTestCase
         self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $user = $this->getCurrentUser();
-        $this->assertResponseContains($this->getExpectedContent([
+        $this->assertResponseContains($this->getExpectedContentWithPaginationLinks([
             'data' => [
                 'type'          => 'userprofile',
                 'id'            => (string)$user->getId(),

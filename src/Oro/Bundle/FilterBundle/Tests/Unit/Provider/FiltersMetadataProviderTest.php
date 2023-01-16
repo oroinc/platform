@@ -12,30 +12,28 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FiltersMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RawConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private RawConfigurationProvider $configurationProvider;
+    private $configurationProvider;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private TranslatorInterface $translator;
-
-    private FiltersMetadataProvider $provider;
+    /** @var FiltersMetadataProvider */
+    private $provider;
 
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(RawConfigurationProvider::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $this->translator
-            ->expects($this->any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(fn (string $key) => $key . '.translated');
+            ->willReturnCallback(function ($id) {
+                return $id . '.translated';
+            });
 
-        $this->provider = new FiltersMetadataProvider($this->configurationProvider, $this->translator);
+        $this->provider = new FiltersMetadataProvider($this->configurationProvider, $translator);
     }
 
     public function testGetMetadataForFiltersWhenNoFilters(): void
     {
-        $this->configurationProvider
-            ->expects($this->never())
+        $this->configurationProvider->expects($this->never())
             ->method($this->anything());
 
         $this->assertEmpty(
@@ -53,8 +51,7 @@ class FiltersMetadataProviderTest extends \PHPUnit\Framework\TestCase
     ): void {
         $gridConfig = DatagridConfiguration::createNamed('sample_grid', []);
 
-        $this->configurationProvider
-            ->expects($this->once())
+        $this->configurationProvider->expects($this->once())
             ->method('getRawConfiguration')
             ->with($gridConfig->getName())
             ->willReturn($rawConfig);
@@ -134,8 +131,7 @@ class FiltersMetadataProviderTest extends \PHPUnit\Framework\TestCase
     private function createFilter(array $filterMetadata): FilterInterface
     {
         $filter = $this->createMock(FilterInterface::class);
-        $filter
-            ->expects($this->once())
+        $filter->expects($this->once())
             ->method('getMetadata')
             ->willReturn($filterMetadata);
 

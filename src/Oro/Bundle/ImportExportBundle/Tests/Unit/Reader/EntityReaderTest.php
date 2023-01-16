@@ -12,7 +12,6 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -20,6 +19,7 @@ use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\ExportPreGetIds;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\ImportExportBundle\ORM\Query\ExportBufferedIdentityQueryResultIterator;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -170,7 +170,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        self::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
+        self::assertInstanceOf(ExportBufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
         self::assertEquals($queryBuilder, $this->reader->getSourceIterator()->getSource());
     }
 
@@ -209,7 +209,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        self::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
+        self::assertInstanceOf(ExportBufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
         self::assertEquals($query, $this->reader->getSourceIterator()->getSource());
     }
 
@@ -274,7 +274,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        self::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
+        self::assertInstanceOf(ExportBufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
         self::assertEquals($query, $this->reader->getSourceIterator()->getSource());
     }
 

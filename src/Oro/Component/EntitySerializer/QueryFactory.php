@@ -23,11 +23,8 @@ class QueryFactory
     /** the maximum number of sub-queries in UNION query */
     private const UNION_QUERY_LIMIT = 100;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var QueryResolver */
-    private $queryResolver;
+    private DoctrineHelper $doctrineHelper;
+    private QueryResolver $queryResolver;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -37,13 +34,7 @@ class QueryFactory
         $this->queryResolver = $queryResolver;
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param EntityConfig $config
-     *
-     * @return Query
-     */
-    public function getQuery(QueryBuilder $qb, EntityConfig $config)
+    public function getQuery(QueryBuilder $qb, EntityConfig $config): Query
     {
         $query = $qb->getQuery();
         $this->queryResolver->resolveQuery($query, $config);
@@ -118,10 +109,10 @@ class QueryFactory
             $limit++;
         }
 
-        if (null !== $limit && $limit > 0 && count($entityIds) > 1) {
+        if (null !== $limit && $limit > 0 && \count($entityIds) > 1) {
             $this->initializeAssociationQueryBuilder($qb, $entityClass, [self::FAKE_ID]);
             $query = $this->getRelatedItemsIdsQuery($qb, $targetEntityClass, $config);
-            $rows = count($entityIds) > self::UNION_QUERY_LIMIT
+            $rows = \count($entityIds) > self::UNION_QUERY_LIMIT
                 ? $this->getRelatedItemsIdsBySeveralUnionAllQueries($query, $entityIds, $limit)
                 : $this->getRelatedItemsUnionAllQuery($query, $entityIds, $limit)
                     ->getQuery()
@@ -232,7 +223,7 @@ class QueryFactory
         array $entityIds,
         bool $forceIn = false
     ): void {
-        if (!$forceIn && count($entityIds) === 1) {
+        if (!$forceIn && \count($entityIds) === 1) {
             $qb
                 ->where(sprintf('%s.%s = :id', $alias, $entityIdField))
                 ->setParameter('id', reset($entityIds));

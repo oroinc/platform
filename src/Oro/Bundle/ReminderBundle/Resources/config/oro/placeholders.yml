@@ -1,6 +1,6 @@
 placeholders:
     placeholders:
-        scripts_after:
+        after_body_start:
             items:
                oro_reminder_subscribe_script:
                   order: 10

@@ -16,7 +16,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function doNormalizeConfig(array $config)
+    protected function doNormalizeConfig(array $config): array
     {
         if (!empty($config[ConfigUtil::FIELDS])) {
             $toRemove = [];
@@ -61,7 +61,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
      * @param array    $config
      * @param string[] $dependsOn
      */
-    protected function processDependentFields(array &$config, array $dependsOn)
+    protected function processDependentFields(array &$config, array $dependsOn): void
     {
         foreach ($dependsOn as $dependsOnPropertyPath) {
             $this->processDependentField($config, ConfigUtil::explodePropertyPath($dependsOnPropertyPath));
@@ -73,7 +73,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
      * @param string[] $dependsOnPropertyPath
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function processDependentField(array &$config, array $dependsOnPropertyPath)
+    protected function processDependentField(array &$config, array $dependsOnPropertyPath): void
     {
         if (!\array_key_exists(ConfigUtil::FIELDS, $config)) {
             $config[ConfigUtil::FIELDS] = [];
@@ -109,12 +109,7 @@ class ConfigNormalizer extends BaseConfigNormalizer
         }
     }
 
-    /**
-     * @param array $config The config of a field
-     *
-     * @return bool
-     */
-    protected function isExtendedAssociation(array $config)
+    private function isExtendedAssociation(array $config): bool
     {
         return
             !empty($config[ConfigUtil::DATA_TYPE])

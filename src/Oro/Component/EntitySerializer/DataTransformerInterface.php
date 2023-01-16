@@ -9,12 +9,6 @@ interface DataTransformerInterface
 {
     /**
      * Prepares the given value for serialization.
-     *
-     * @param mixed  $value
-     * @param array  $config
-     * @param array  $context
-     *
-     * @return mixed
      */
-    public function transform($value, array $config, array $context);
+    public function transform(mixed $value, array $config, array $context): mixed;
 }

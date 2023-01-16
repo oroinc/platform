@@ -34,6 +34,19 @@ class ConfigUtil
     public const CLASS_NAME = '__class__';
 
     /**
+     * You can use this constant as a property path for computed field
+     * to avoid collisions with existing getters.
+     * Example of usage:
+     *  'fields' => [
+     *      'primaryPhone' => ['property_path' => '_']
+     *  ]
+     * In this example a value of primaryPhone will not be loaded
+     * even if an entity has getPrimaryPhone method.
+     * Also such field will be marked as not mapped for Symfony forms.
+     */
+    public const IGNORE_PROPERTY_PATH = '_';
+
+    /**
      * a key of a record contains an additional information about a collection,
      * e.g. "has_more" flag indicates whether a collection has more records than it was requested.
      */
@@ -113,13 +126,7 @@ class ConfigUtil
     /** @internal filled automatically by ConfigConverter and used only during serialization */
     public const RENAMED_FIELDS = '_renamed_fields';
 
-    /**
-     * @param array  $config A config
-     * @param string $key    A config key
-     *
-     * @return array
-     */
-    public static function getArrayValue(array $config, $key)
+    public static function getArrayValue(array $config, string $key): array
     {
         if (!isset($config[$key])) {
             return [];
@@ -135,106 +142,65 @@ class ConfigUtil
 
         throw new \UnexpectedValueException(sprintf(
             'Expected value of type "array, string or nothing", "%s" given.',
-            \is_object($value) ? \get_class($value) : \gettype($value)
+            get_debug_type($value)
         ));
     }
 
-    /**
-     * @param array $config The config of an entity
-     *
-     * @return string
-     */
-    public static function getExclusionPolicy(array $config)
+    public static function getExclusionPolicy(array $config): string
     {
         return $config[self::EXCLUSION_POLICY] ?? self::EXCLUSION_POLICY_NONE;
     }
 
-    /**
-     * @param array $config The config of an entity
-     *
-     * @return bool
-     */
-    public static function isExcludeAll(array $config)
+    public static function isExcludeAll(array $config): bool
     {
         return
             isset($config[self::EXCLUSION_POLICY])
             && $config[self::EXCLUSION_POLICY] === self::EXCLUSION_POLICY_ALL;
     }
 
-    /**
-     * @param array $config The config of a field
-     *
-     * @return bool
-     */
-    public static function isExclude(array $config)
+    public static function isExclude(array $config): bool
     {
         return
             isset($config[self::EXCLUDE])
             && $config[self::EXCLUDE];
     }
 
-    /**
-     * @param array $config The config of a field
-     *
-     * @return bool
-     */
-    public static function isCollapse(array $config)
+    public static function isCollapse(array $config): bool
     {
         return
             isset($config[self::COLLAPSE])
             && $config[self::COLLAPSE];
     }
 
-    /**
-     * @param array $config The config of an entity
-     *
-     * @return bool
-     */
-    public static function isPartialAllowed($config)
+    public static function isPartialAllowed(array $config): bool
     {
         return
             !isset($config[self::DISABLE_PARTIAL_LOAD])
             || !$config[self::DISABLE_PARTIAL_LOAD];
     }
 
-    /**
-     * Checks if the specified field has some special configuration
-     *
-     * @param array  $config The config of an entity the specified field belongs
-     * @param string $field  The name of the field
-     *
-     * @return bool
-     */
-    public static function hasFieldConfig($config, $field)
+    public static function hasFieldConfig(array $config, string $field): bool
     {
         return
             !empty($config[self::FIELDS])
             && \array_key_exists($field, $config[self::FIELDS]);
     }
 
-    /**
-     * Returns a configuration of the specified field
-     *
-     * @param array  $config The config of an entity the specified field belongs
-     * @param string $field  The name of the field
-     *
-     * @return array
-     */
-    public static function getFieldConfig($config, $field)
+    public static function getFieldConfig(array $config, string $field): array
     {
         return $config[self::FIELDS][$field] ?? [];
     }
 
     /**
-     * Splits a property path to parts
+     * Splits a property path to parts.
      *
      * @param string $propertyPath
      *
      * @return string[]
      */
-    public static function explodePropertyPath($propertyPath)
+    public static function explodePropertyPath(string $propertyPath): array
     {
-        return \explode(self::PATH_DELIMITER, $propertyPath);
+        return explode(self::PATH_DELIMITER, $propertyPath);
     }
 
     /**
@@ -244,7 +210,7 @@ class ConfigUtil
      *
      * @return object[]
      */
-    public static function cloneObjects(array $objects)
+    public static function cloneObjects(array $objects): array
     {
         $result = [];
         foreach ($objects as $key => $val) {
@@ -256,12 +222,8 @@ class ConfigUtil
 
     /**
      * Makes a deep copy of an array of configuration options.
-     *
-     * @param array $items
-     *
-     * @return array
      */
-    public static function cloneItems(array $items)
+    public static function cloneItems(array $items): array
     {
         $result = [];
         foreach ($items as $key => $val) {

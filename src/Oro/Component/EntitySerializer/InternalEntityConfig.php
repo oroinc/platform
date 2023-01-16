@@ -3,7 +3,7 @@
 namespace Oro\Component\EntitySerializer;
 
 /**
- * This class is used by EntitySerializer instead of EntityConfig
+ * This class is used by the entity serializer instead of EntityConfig
  * and allows caching intermediate data related to an entity.
  */
 final class InternalEntityConfig extends EntityConfig
@@ -11,7 +11,7 @@ final class InternalEntityConfig extends EntityConfig
     private array $cache = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toArray(): array
     {
@@ -19,7 +19,7 @@ final class InternalEntityConfig extends EntityConfig
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function has(string $key): bool
     {
@@ -27,7 +27,7 @@ final class InternalEntityConfig extends EntityConfig
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function get(string $key, mixed $defaultValue = null): mixed
     {
@@ -39,7 +39,7 @@ final class InternalEntityConfig extends EntityConfig
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function set(string $key, mixed $value): void
     {
@@ -47,7 +47,7 @@ final class InternalEntityConfig extends EntityConfig
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function remove(string $key): void
     {

@@ -2,8 +2,6 @@
 
 namespace Oro\Component\EntitySerializer;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-
 /**
  * A set of reusable static methods to find a field in a configuration section.
  */

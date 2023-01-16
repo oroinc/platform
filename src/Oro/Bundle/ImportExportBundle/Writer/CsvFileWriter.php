@@ -15,20 +15,14 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
  */
 class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInterface
 {
-    /**
-     * @var ContextRegistry
-     */
-    protected $contextRegistry;
+    private ContextRegistry $contextRegistry;
+    private DoctrineClearWriter $clearWriter;
 
-    /**
-     * @var DoctrineClearWriter
-     */
-    protected $clearWriter;
-
-    public function __construct(ContextRegistry $contextRegistry)
+    public function __construct(ContextRegistry $contextRegistry, DoctrineClearWriter $clearWriter)
     {
         parent::__construct();
         $this->contextRegistry = $contextRegistry;
+        $this->clearWriter = $clearWriter;
     }
 
     /**
@@ -41,28 +35,16 @@ class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInt
         return fopen($this->filePath, 'a');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function write(array $items)
     {
         parent::write($items);
 
-        if ($this->clearWriter) {
-            $this->clearWriter->write($items);
-        }
+        $this->clearWriter->write($items);
     }
 
-    public function setClearWriter(DoctrineClearWriter $clearWriter)
-    {
-        $this->clearWriter = $clearWriter;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function setStepExecution(StepExecution $stepExecution)
     {
+        $this->clearWriter->setStepExecution($stepExecution);
         $context = $this->contextRegistry->getByStepExecution($stepExecution);
         $this->setImportExportContext($context);
     }

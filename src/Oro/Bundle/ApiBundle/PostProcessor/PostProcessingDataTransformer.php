@@ -9,11 +9,8 @@ use Oro\Component\EntitySerializer\DataTransformerInterface;
  */
 class PostProcessingDataTransformer implements DataTransformerInterface
 {
-    /** @var PostProcessorInterface */
-    private $postProcessor;
-
-    /** @var array */
-    private $postProcessorOptions;
+    private PostProcessorInterface $postProcessor;
+    private array $postProcessorOptions;
 
     public function __construct(PostProcessorInterface $postProcessor, array $postProcessorOptions)
     {
@@ -22,9 +19,9 @@ class PostProcessingDataTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function transform($value, array $config, array $context)
+    public function transform(mixed $value, array $config, array $context): mixed
     {
         return $this->postProcessor->process($value, $this->postProcessorOptions);
     }

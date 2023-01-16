@@ -257,8 +257,8 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             [
-                'test_name1' => ['field' => 'test_field1', 'function' => 'test_function1'],
-                'test_name2' => ['field' => 'test_field2', 'function' => 'test_function2'],
+                'test_name1' => ['field' => 'test_field1', 'function' => 'test_function1', 'parameters' => []],
+                'test_name2' => ['field' => 'test_field2', 'function' => 'test_function2', 'parameters' => []],
             ],
             $this->query->getAggregations()
         );

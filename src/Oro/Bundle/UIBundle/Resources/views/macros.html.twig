@@ -209,11 +209,11 @@
             {% import _self as UIMacro %}
 
             {{ UIMacro.renderAttribute(title,
-                '<div class="control-label collapse-overflow collapse no-transition" data-toggle="false" data-check-overflow="true"' ~
+                '<div class="control-label collapse-overflow collapse no-transition" data-toggle="false" data-check-overflow="true" ' ~
                       'id="'~ collapseId ~'" data-state-id="'~ collapseKey ~'" data-collapsed-text="'~ moreText|trans ~ '" data-expanded-text="'~ lessText|trans ~'">' ~
                     data|default('oro.ui.empty'|trans) ~
                 '</div>' ~
-                '<a href="#" role=button class="control-label collapse-toggle" data-toggle="collapse"' ~
+                '<a href="#" role="button" class="control-label collapse-toggle" data-toggle="collapse" ' ~
                    'data-target="#'~ collapseId ~'" aria-expanded="false" aria-controls="'~ collapseId ~'"><span data-text>' ~ moreText|trans ~ '</span></a>'
             ) }}
         </div>
@@ -236,9 +236,9 @@
                  data-expanded-text="{{ lessText|trans }}"
                  data-check-overflow="true"
                  data-toggle="false"
-            {%- if entity is not empty and fieldName is not empty -%}
+            {% if entity is not empty and fieldName is not empty %}
                  data-state-id="{{ 'collapseBlock[' ~ oro_class_name(entity) ~ '][' ~ fieldName ~ '][' ~ entity.id|default(0) ~ ']'}}"
-            {%- endif -%}
+            {% endif %}
             >{{ data|raw }}</div>
             <a href="#"
                role="button"
@@ -1577,9 +1577,9 @@
                     </tbody>
                 </table>
             </div>
-            <a class="btn add-list-item" data-container=".oro-item-collection tbody" href="#">
+            <button type="button" class="btn add-list-item" data-container=".oro-item-collection tbody">
                 {{ options.add_btn_label|default('') }}
-            </a>
+            </button>
         </div>
     </div>
 {% endmacro %}

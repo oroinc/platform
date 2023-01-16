@@ -6,6 +6,9 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
+/**
+ * User entity placeholder filter.
+ */
 class PlaceholderFilter
 {
     /** @var TokenAccessorInterface */
@@ -26,7 +29,7 @@ class PlaceholderFilter
     {
         if ($entity instanceof User &&
             $entity->getAuthStatus() &&
-            $entity->getAuthStatus()->getId() === UserManager::STATUS_EXPIRED
+            $entity->getAuthStatus()->getId() !== UserManager::STATUS_ACTIVE
         ) {
             return false;
         }
