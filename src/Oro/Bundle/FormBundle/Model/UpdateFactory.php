@@ -4,30 +4,30 @@ namespace Oro\Bundle\FormBundle\Model;
 
 use Oro\Bundle\FormBundle\Form\Handler\CallbackFormHandler;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
-use Oro\Bundle\FormBundle\Provider\CallbackFormTemplateDataProvider;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Creates {@see Update} according to form, form handler, data and form template data provider
+ * using {@see UpdateBuilder}
+ */
 class UpdateFactory
 {
-    /** @var FormFactory */
-    private $formFactory;
+    private FormFactory $formFactory;
 
-    /** @var FormHandlerRegistry */
-    private $formHandlerRegistry;
+    private FormHandlerRegistry $formHandlerRegistry;
 
-    /** @var FormTemplateDataProviderRegistry */
-    private $dataProviderRegistry;
+    private FormTemplateDataProviderResolver $formTemplateDataProviderResolver;
 
     public function __construct(
         FormFactory $formFactory,
         FormHandlerRegistry $formHandlerRegistry,
-        FormTemplateDataProviderRegistry $dataProviderRegistry
+        FormTemplateDataProviderResolver $formTemplateDataProviderResolver
     ) {
         $this->formFactory = $formFactory;
         $this->formHandlerRegistry = $formHandlerRegistry;
-        $this->dataProviderRegistry = $dataProviderRegistry;
+        $this->formTemplateDataProviderResolver = $formTemplateDataProviderResolver;
     }
 
     /**
@@ -39,13 +39,13 @@ class UpdateFactory
      */
     public function createUpdate($data, $form, $formHandler, $resultProvider)
     {
-        $builder = $this->createBuilder();
-        return $builder->build(
-            $data,
-            $this->resolveForm($form, $data),
-            $this->resolveHandler($formHandler),
-            $this->resolveTemplateDataProvider($resultProvider)
-        );
+        return $this->createBuilder()
+            ->build(
+                $data,
+                $this->resolveForm($form, $data),
+                $this->resolveHandler($formHandler),
+                $this->formTemplateDataProviderResolver->resolve($resultProvider)
+            );
     }
 
     /**
@@ -74,26 +74,6 @@ class UpdateFactory
         }
 
         return $this->formHandlerRegistry->get($formHandler);
-    }
-
-    /**
-     * @param null|callable|string|FormTemplateDataProviderInterface $resultProvider
-     *
-     * @return FormTemplateDataProviderInterface
-     */
-    private function resolveTemplateDataProvider($resultProvider = null)
-    {
-        $resultProvider = $resultProvider ?: FormTemplateDataProviderRegistry::DEFAULT_PROVIDER_NAME;
-
-        if ($resultProvider instanceof FormTemplateDataProviderInterface) {
-            return $resultProvider;
-        }
-
-        if (is_callable($resultProvider)) {
-            return new CallbackFormTemplateDataProvider($resultProvider);
-        }
-
-        return $this->dataProviderRegistry->get($resultProvider);
     }
 
     /**

@@ -149,6 +149,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )save form and return/
+     */
+    public function iSaveFormAndReturn()
+    {
+        $this->createOroForm()->saveAndReturn();
+    }
+
+    /**
      * Find and assert field value
      * It's valid for entity edit or entity view page
      * Example: And Account Name field should has Good Company value
@@ -517,6 +525,30 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
         self::assertTrue($form->isUseDefaultCheckboxExists($label, $checkbox));
+    }
+
+    /**
+     * @Then I should see :label action button
+     */
+    public function iShouldSeeActionButton(string $label): void
+    {
+        $button = $this->createOroForm()->findButton($label);
+        self::assertNotNull(
+            $button,
+            sprintf('Expected action button "%s" is not present on page', $label)
+        );
+    }
+
+    /**
+     * @Then I should not see :label action button
+     */
+    public function iShouldNotSeeActionButton(string $label): void
+    {
+        $button = $this->createOroForm()->findButton($label);
+        self::assertNull(
+            $button,
+            sprintf('Expected action button "%s" is present on page', $label)
+        );
     }
 
     /**

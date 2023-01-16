@@ -115,6 +115,7 @@ dynamic-imports:
         - oroui/js/app/views/content-sidebar-view
         - oroui/js/app/views/datepicker/datepicker-view
         - oroui/js/app/views/datepicker/datetimepicker-view
+        - oroui/js/app/views/dynamic-accessible-button-view
         - oroui/js/app/views/element-value-copy-to-clipboard-view
         - oroui/js/app/views/hidden-initialization-view
         - oroui/js/app/views/highlight-text-view
