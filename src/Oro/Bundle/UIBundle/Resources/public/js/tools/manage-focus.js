@@ -16,10 +16,14 @@ export default {
 
         let $elToFocus = $el !== null
             ? $el
-            : $container.find('.active:tabbable,[data-autofocus]:tabbable,[autofocus]').first();
+            : $container.find([
+                '.active:tabbable',
+                '[data-autofocus]:not([data-autofocus="false"]):tabbable',
+                '[autofocus]'
+            ].join(',')).first();
 
         if (!$elToFocus.length) {
-            $elToFocus = $(this.getFirstTabbable($container.find(':tabbable').toArray()));
+            $elToFocus = $(this.getFirstTabbable($container.find(':not([data-autofocus="false"]):tabbable').toArray()));
         }
 
         $elToFocus.focus();

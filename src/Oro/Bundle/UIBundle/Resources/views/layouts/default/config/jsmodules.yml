@@ -35,7 +35,8 @@ aliases:
     oro/block-widget$: oroui/js/widget/block-widget
     oroui/js/widget-manager$: oroui/js/widget/widget-manager
     overlayScrollbars$: overlayscrollbars/js/OverlayScrollbars
-    popper$: popper.js/dist/umd/popper
+    popper$: popper.js/dist/popper
+    popper-utils$: popper.js/dist/popper-utils
     scriptjs$: scriptjs/dist/script
     styled-scroll-bar$: oroui/js/app/plugins/styled-scroll-bar
     underscore$: underscore/underscore
