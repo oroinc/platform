@@ -52,14 +52,14 @@ class LoadEntitiesByEntitySerializer implements ProcessorInterface
 
         if ($context->has(self::ENTITY_IDS)) {
             $idFieldNames = $config->getIdentifierFieldNames();
-            if (count($idFieldNames) !== 1) {
+            if (\count($idFieldNames) !== 1) {
                 throw new RuntimeException('The entity must have one identifier field.');
             }
             $entityIds = $context->get(self::ENTITY_IDS);
             $hasMore = $config->getHasMore();
             $maxResults = $query->getMaxResults();
             $config->setHasMore(false);
-            $query->setMaxResults(count($entityIds));
+            $query->setMaxResults(\count($entityIds));
             try {
                 $data = $this->sortByIds(
                     $this->entitySerializer->serialize($query, $config, $context->getNormalizationContext()),
@@ -72,7 +72,7 @@ class LoadEntitiesByEntitySerializer implements ProcessorInterface
             }
             if ($hasMore) {
                 $limit = $query->getMaxResults();
-                if (null !== $limit && count($data) > $limit) {
+                if (null !== $limit && \count($data) > $limit) {
                     $data = \array_slice($data, 0, $limit);
                     $data[ConfigUtil::INFO_RECORD_KEY] = [ConfigUtil::HAS_MORE => true];
                 }

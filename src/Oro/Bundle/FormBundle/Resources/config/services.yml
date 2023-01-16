@@ -37,7 +37,7 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_form.registry.form_handler'
-            - '@oro_form.registry.form_template_data_provider'
+            - '@oro_form.registry.form_template_data_provider_resolver'
 
     oro_form.update_handler:
         class: Oro\Bundle\FormBundle\Model\UpdateHandlerFacade
@@ -79,3 +79,24 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_form.form.handler, alias: default }
+
+    oro_form.registry.form_template_data_provider_resolver:
+        class: Oro\Bundle\FormBundle\Model\FormTemplateDataProviderResolver
+        arguments:
+            - '@oro_form.registry.form_template_data_provider'
+
+    oro_form.provider.form_template_data.composite:
+        class: Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderComposite
+        arguments:
+            - '@oro_form.registry.form_template_data_provider_resolver'
+
+    Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderComposite:
+        alias: oro_form.provider.form_template_data.composite
+
+    oro_form.provider.form_template_data.return_action:
+        class: Oro\Bundle\FormBundle\Provider\SaveAndReturnActionFormTemplateDataProvider
+        tags:
+            - { name: oro_form.form_template_data_provider, alias: return_action }
+
+    Oro\Bundle\FormBundle\Provider\SaveAndReturnActionFormTemplateDataProvider:
+        alias: oro_form.provider.form_template_data.return_action

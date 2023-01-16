@@ -148,6 +148,11 @@ class Form extends Element
         $this->pressActionButton('Save and New');
     }
 
+    public function saveAndReturn()
+    {
+        $this->pressActionButton('Save and Return');
+    }
+
     /**
      * Choose from list Save, Save and Close, Save and New etc. on from element
      * If button is visible it'll pressed

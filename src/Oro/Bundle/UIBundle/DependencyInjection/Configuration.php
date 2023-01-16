@@ -19,9 +19,10 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'organization_name' => ['value' => 'ORO'],
-                'application_url'   => ['value' => 'http://localhost'],
-                'navbar_position'   => ['value' => 'left']
+                'organization_name'    => ['value' => 'ORO'],
+                'application_url'      => ['value' => 'http://localhost'],
+                'navbar_position'      => ['value' => 'left'],
+                'quick_create_actions' => ['value' => 'current_page']
             ]
         );
 
