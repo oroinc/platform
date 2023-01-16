@@ -14,6 +14,7 @@ use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Form extends Element
 {
@@ -145,6 +146,11 @@ class Form extends Element
     public function saveAndCreateNew()
     {
         $this->pressActionButton('Save and New');
+    }
+
+    public function saveAndReturn()
+    {
+        $this->pressActionButton('Save and Return');
     }
 
     /**

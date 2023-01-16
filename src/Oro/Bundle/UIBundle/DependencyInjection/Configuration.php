@@ -20,8 +20,13 @@ class Configuration implements ConfigurationInterface
             $rootNode,
             [
                 'organization_name' => ['value' => 'ORO'],
-                'application_url'   => ['value' => 'http://localhost'],
-                'navbar_position'   => ['value' => 'left']
+                'application_url' => ['value' => 'http://localhost'],
+                'navbar_position' => ['value' => 'left'],
+                'enable_quick_creation_buttons' => [
+                    'type' => 'boolean',
+                    'value' => false
+                ],
+                'quick_create_actions' => ['value' => 'current_page']
             ]
         );
 
