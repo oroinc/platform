@@ -7,23 +7,14 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification;
  */
 class FeaturePathLocator
 {
-    /**
-     * @var string
-     */
-    private $basePath;
-
-    /**
-     * @var array
-     */
-    private $basePathDirectories;
+    private array $basePathDirectories;
 
     /**
      * @param string $basePath
      */
     public function __construct($basePath)
     {
-        $this->basePath = $basePath;
-        $this->basePathDirectories = explode(DIRECTORY_SEPARATOR, realpath($this->basePath));
+        $this->basePathDirectories = explode(DIRECTORY_SEPARATOR, realpath($basePath));
     }
 
     /**
@@ -32,8 +23,15 @@ class FeaturePathLocator
      */
     public function getRelativePath($featurePath)
     {
-        $featureDirectories = explode(DIRECTORY_SEPARATOR, realpath($featurePath));
+        $featurePathParts = explode(DIRECTORY_SEPARATOR, realpath($featurePath));
+        foreach ($this->basePathDirectories as $part) {
+            if (count($featurePathParts) > 0 && $part === $featurePathParts[0]) {
+                array_shift($featurePathParts);
+            } else {
+                break;
+            }
+        }
 
-        return implode(DIRECTORY_SEPARATOR, array_diff($featureDirectories, $this->basePathDirectories));
+        return implode(DIRECTORY_SEPARATOR, $featurePathParts);
     }
 }
