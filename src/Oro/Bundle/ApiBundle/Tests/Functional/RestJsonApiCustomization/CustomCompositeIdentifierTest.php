@@ -135,26 +135,17 @@ class CustomCompositeIdentifierTest extends RestJsonApiTestCase
 
         $response = $this->cget(
             ['entity' => $entityType],
-            ['meta' => 'title', 'fields[' . $entityType . ']' => 'id,parent', 'include' => 'parent']
+            [
+                'meta'                        => 'title',
+                'fields[' . $entityType . ']' => 'id,parent',
+                'include'                     => 'parent',
+                'filter[id]'                  => $this->getEntityId('item 3', 3)
+            ]
         );
 
         $this->assertResponseContains(
             [
                 'data'     => [
-                    [
-                        'type' => $entityType,
-                        'id'   => $this->getEntityId('item 1', 1),
-                        'meta' => [
-                            'title' => 'item 1 Item 1'
-                        ]
-                    ],
-                    [
-                        'type' => $entityType,
-                        'id'   => $this->getEntityId('item 2', 2),
-                        'meta' => [
-                            'title' => 'item 2 Item 2'
-                        ]
-                    ],
                     [
                         'type' => $entityType,
                         'id'   => $this->getEntityId('item 3', 3),

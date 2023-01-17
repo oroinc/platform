@@ -39,14 +39,10 @@ class MultiCurrencyGuesserTest extends \PHPUnit\Framework\TestCase
     public function testRelationGuess(array $column, array $expected, bool $isEnabledInline, array $choices)
     {
         if (empty($choices)) {
-            $this
-                ->currencyHelper
-                ->expects($this->never())
+            $this->currencyHelper->expects($this->never())
                 ->method('getCurrencyChoices');
         } else {
-            $this
-                ->currencyHelper
-                ->expects($this->once())
+            $this->currencyHelper->expects($this->once())
                 ->method('getCurrencyChoices')
                 ->willReturn($choices);
         }

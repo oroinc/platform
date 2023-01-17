@@ -15,22 +15,22 @@ class Group
      * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private ?int $id;
 
     /**
      * @ORM\Column(name="name", type="string", length=50)
      */
-    protected $name;
+    private ?string $name = null;
 
     /**
      * @ORM\Column(name="label", type="string", length=255, nullable=true)
      */
-    protected $label;
+    private ?string $label = null;
 
     /**
      * @ORM\Column(name="public", type="boolean")
      */
-    protected $public = false;
+    private bool $public = false;
 
     /**
      * This field has getter and setter which not match the field name
@@ -38,108 +38,67 @@ class Group
      *
      * @ORM\Column(name="is_exception", type="boolean")
      */
-    protected $isException;
+    private bool $isException = false;
 
-    /**
-     * @param int|null $id
-     */
-    public function __construct($id = null)
+    public function __construct(int $id = null)
     {
         $this->id = $id;
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return self
-     */
-    public function setName($name)
+    public function setName(?string $name): static
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): ?string
     {
         return $this->label;
     }
 
-    /**
-     * @param string $label
-     *
-     * @return self
-     */
-    public function setLabel($label)
+    public function setLabel(?string $label): static
     {
         $this->label = $label;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->public;
     }
 
-    /**
-     * @param boolean $public
-     *
-     * @return self
-     */
-    public function setPublic($public)
+    public function setPublic(bool $public): static
     {
         $this->public = $public;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isException()
+    public function isException(): bool
     {
         return $this->isException;
     }
 
-    /**
-     * @param boolean $exception
-     *
-     * @return self
-     */
-    public function setException($exception)
+    public function setException(bool $exception): static
     {
         $this->isException = $exception;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getComputedName()
+    public function getComputedName(): string
     {
         return sprintf('%s (COMPUTED)', $this->name);
     }

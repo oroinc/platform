@@ -7,7 +7,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class BuildVersionStrategyTest extends WebTestCase
 {
-    public const VERSION_REGEXP_BASE = '[\?|\&]v\=[a-z0-9]{8}';
+    public const VERSION_REGEXP_BASE = '[\?|\&]v\=[a-z0-9\-]{8,15}';
 
     public const VERSION_REGEXP = '/' . self::VERSION_REGEXP_BASE . '(\&|\s+|$)/';
 

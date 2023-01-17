@@ -1,5 +1,6 @@
 /* @theme: admin.oro; */
 
+@import 'root-css-variables';
 @import 'app-page';
 @import 'attribute-item';
 @import 'drag-and-drop-support';
@@ -53,3 +54,4 @@
 @import 'image-preview-modal';
 @import 'social-list';
 @import 'noscript-container';
+@import 'buttons-row';

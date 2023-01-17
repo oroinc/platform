@@ -21,7 +21,7 @@ class DockerComposePgsqlIsolator extends DockerPgsqlIsolator
     protected function runInDocker(string $command): string
     {
         return sprintf(
-            'docker exec -i --env=PGPASSWORD="%%database_password%%" $(docker-compose ps -q pgsql) %s',
+            'docker exec -i --env=PGPASSWORD="%%database_password%%" $(docker compose ps -q pgsql) %s',
             $command
         );
     }

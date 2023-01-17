@@ -55,6 +55,8 @@ class Query
     const AGGREGATE_FUNCTION_MIN   = 'min';
     const AGGREGATE_FUNCTION_AVG   = 'avg';
 
+    const AGGREGATE_PARAMETER_MAX = 'max';
+
     const DELIMITER = ' ';
 
     /** @var array */
@@ -366,15 +368,15 @@ class Query
      *
      * @return $this
      */
-    public function addAggregate($name, $field, $function)
+    public function addAggregate($name, $field, $function, array $parameters = [])
     {
-        $this->aggregations[$name] = ['field' => $field, 'function' => $function];
+        $this->aggregations[$name] = ['field' => $field, 'function' => $function, 'parameters' => $parameters];
 
         return $this;
     }
 
     /**
-     * @return array [name => ['field' => field name, 'function' => function], ...]
+     * @return array [name => ['field' => field name, 'function' => function, 'parameters' => params], ...]
      */
     public function getAggregations()
     {
@@ -382,7 +384,7 @@ class Query
     }
 
     /**
-     * @param array $aggregations [name => ['field' => field name, 'function' => function], ...]
+     * @param array $aggregations [name => ['field' => field name, 'function' => function, 'parameters' => params], ...]
      *
      * @return $this
      */

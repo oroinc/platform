@@ -12,7 +12,7 @@ use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Product;
  */
 class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
 {
-    public function testRename()
+    public function testRename(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -57,7 +57,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testRenameChild()
+    public function testRenameChild(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -110,7 +110,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testMetadata()
+    public function testMetadata(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -154,7 +154,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPath()
+    public function testPropertyPath(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -230,7 +230,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathWithExplicitlyDefinedAssociations()
+    public function testPropertyPathWithExplicitlyDefinedAssociations(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -316,7 +316,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathWithExcludedFirstLevelAssociation()
+    public function testPropertyPathWithExcludedFirstLevelAssociation(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -387,7 +387,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathWithExcludedFirstLevelAssociationAndDisabledPartialLoad()
+    public function testPropertyPathWithExcludedFirstLevelAssociationAndDisabledPartialLoad(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -459,7 +459,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathWithExcludedFirstAndSecondLevelAssociations()
+    public function testPropertyPathWithExcludedFirstAndSecondLevelAssociations(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -535,7 +535,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathWithExcludedFirstAndSecondLevelAssociationsAndDisabledPartialLoad()
+    public function testPropertyPathWithExcludedFirstAndSecondLevelAssociationsAndDisabledPartialLoad(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -612,7 +612,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathWithDisabledForcePartialLoadQueryHint()
+    public function testPropertyPathWithDisabledForcePartialLoadQueryHint(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -686,7 +686,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathWithDisabledPartialLoad()
+    public function testPropertyPathWithDisabledPartialLoad(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -764,7 +764,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathWithDisabledPartialLoadForAllAssociations()
+    public function testPropertyPathWithDisabledPartialLoadForAllAssociations(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -844,7 +844,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathWithExcludedAndExplicitlyDefinedFirstLevelAssociation()
+    public function testPropertyPathWithExcludedAndExplicitlyDefinedFirstLevelAssociation(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -913,7 +913,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathForThirdLevelRelation()
+    public function testPropertyPathForThirdLevelRelation(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -998,7 +998,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathForComputedField()
+    public function testPropertyPathForComputedField(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -1055,7 +1055,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPropertyPathForRenamedComputedField()
+    public function testPropertyPathForRenamedComputedField(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')

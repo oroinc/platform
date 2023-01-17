@@ -3,8 +3,9 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
 use Behat\Gherkin\Node\TableNode;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\MigrationBundle\Doctrine\ORM\Decorator\DataFixtureEntityManager;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\Exception\FileNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader as AliceLoader;
@@ -19,33 +20,20 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class FixtureLoader
 {
-    private AliceLoader $aliceLoader;
-
-    private KernelInterface $kernel;
-
-    private EntityClassResolver $entityClassResolver;
-
-    private EntitySupplement $entitySupplement;
-
     private array $fileLoaderProcessorsStates = [];
 
     public function __construct(
-        KernelInterface $kernel,
-        EntityClassResolver $entityClassResolver,
-        EntitySupplement $entitySupplement,
-        AliceLoader $aliceLoader
+        private KernelInterface $kernel,
+        private EntityClassResolver $entityClassResolver,
+        private EntitySupplement $entitySupplement,
+        private AliceLoader $aliceLoader,
     ) {
-        $this->kernel = $kernel;
-        $this->entityClassResolver = $entityClassResolver;
-        $this->entitySupplement = $entitySupplement;
-        $this->aliceLoader = $aliceLoader;
     }
 
     public function loadFixtureFile(string $filename): void
     {
         $parameters = $this->processFileParametersBefore($filename);
         $file = $this->findFile($filename);
-
         $objects = $this->load($file);
         $this->persist($objects);
 
@@ -107,32 +95,6 @@ class FixtureLoader
     }
 
     /**
-     * @param string $entityName
-     * @param int $numberOfEntities
-     * @return array Generated objects in format ['aliceReference' => object]
-     */
-    public function loadRandomEntities(string $entityName, int $numberOfEntities)
-    {
-        $className = $this->getEntityClass($entityName);
-        $em = $this->getEntityManager();
-        $entities = [];
-
-        for ($i = 0; $i < $numberOfEntities; $i++) {
-            $id = uniqid('alice_', true);
-            $entities[$id] = $entity = new $className;
-            $this->aliceLoader->getReferenceRepository()->set($id, $entity);
-
-            $this->entitySupplement->completeRequired($entity);
-
-            $em->persist($entity);
-        }
-
-        $em->flush();
-
-        return $entities;
-    }
-
-    /**
      * @param string|array $dataOrFilename
      * @return array
      */
@@ -141,7 +103,6 @@ class FixtureLoader
         if (\is_string($dataOrFilename)) {
             $dataOrFilename = [$dataOrFilename];
         }
-
         $result = $this->aliceLoader->load($dataOrFilename);
 
         $helper = $this->kernel->getContainer()->get('oro_entity.doctrine_helper');
@@ -178,7 +139,6 @@ class FixtureLoader
                     $metadata->setIdGenerator(new \Doctrine\ORM\Id\AssignedGenerator());
                 }
             }
-
             $em->persist($object);
         }
 
@@ -232,9 +192,14 @@ class FixtureLoader
         return null;
     }
 
-    protected function getEntityManager(): EntityManager
+    protected function getEntityManager(): EntityManagerInterface
     {
-        return $this->kernel->getContainer()->get('doctrine')->getManager();
+        $em = $this->kernel->getContainer()->get('oro_migration.data_fixture.entity_manager');
+        if ($em instanceof DataFixtureEntityManager) {
+            $em->setValidateBeforeFlush(false);
+        }
+
+        return $em;
     }
 
     /**

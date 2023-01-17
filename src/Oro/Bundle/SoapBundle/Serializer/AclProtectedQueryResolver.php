@@ -14,8 +14,7 @@ use Oro\Component\EntitySerializer\QueryResolver;
  */
 class AclProtectedQueryResolver extends QueryResolver
 {
-    /** @var AclHelper */
-    private $aclHelper;
+    private AclHelper $aclHelper;
 
     public function __construct(QueryHintResolverInterface $queryHintResolver, AclHelper $aclHelper)
     {
@@ -24,11 +23,11 @@ class AclProtectedQueryResolver extends QueryResolver
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function resolveQuery(Query $query, EntityConfig $config)
+    public function resolveQuery(Query $query, EntityConfig $config): void
     {
-        $query = $this->aclHelper->apply($query);
+        $this->aclHelper->apply($query);
         parent::resolveQuery($query, $config);
     }
 }

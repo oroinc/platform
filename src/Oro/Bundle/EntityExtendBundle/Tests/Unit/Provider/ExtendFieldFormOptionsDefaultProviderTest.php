@@ -9,9 +9,11 @@ use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsDefaultProvider
 
 class ExtendFieldFormOptionsDefaultProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject $entityConfigManager;
+    /** @var EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityConfigManager;
 
-    private ExtendFieldFormOptionsDefaultProvider $provider;
+    /** @var ExtendFieldFormOptionsDefaultProvider */
+    private $provider;
 
     protected function setUp(): void
     {
@@ -27,8 +29,7 @@ class ExtendFieldFormOptionsDefaultProviderTest extends \PHPUnit\Framework\TestC
         $configOptions = ['label' => 'Sample label'];
         $entityFieldConfig = new Config(new FieldConfigId('entity', $className, $fieldName, 'string'), $configOptions);
 
-        $this->entityConfigManager
-            ->expects(self::once())
+        $this->entityConfigManager->expects(self::once())
             ->method('getFieldConfig')
             ->willReturn($entityFieldConfig);
 

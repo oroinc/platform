@@ -8,6 +8,9 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Abstract handler for user form.
+ */
 abstract class AbstractUserHandler
 {
     use RequestHandlerTrait;
@@ -56,9 +59,18 @@ abstract class AbstractUserHandler
 
                 return true;
             }
+
+            $this->onFail($user);
         }
 
         return false;
+    }
+
+    /**
+     * "Fail" form handler
+     */
+    protected function onFail(User $user): void
+    {
     }
 
     /**

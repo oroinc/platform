@@ -149,7 +149,7 @@ define(function(require) {
 
         onInitAfterSubmit: function(options) {
             if (options.isFormValid) {
-                messenger.notificationMessage('info', __('Please wait until page will be reloaded...'));
+                messenger.notificationMessage('info', __('Please wait for the page to reload...'));
                 // force reload without hash navigation
                 window.location.reload();
 

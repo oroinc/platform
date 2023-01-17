@@ -47,7 +47,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
         $this->queryFactory->setRequestType($requestType);
         self::assertSame($requestType, $this->queryFactory->getRequestType());
 
-        $this->queryFactory->setRequestType();
+        $this->queryFactory->setRequestType(null);
         self::assertNull($this->queryFactory->getRequestType());
     }
 

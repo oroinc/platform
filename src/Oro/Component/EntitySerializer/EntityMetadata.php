@@ -9,8 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
  */
 class EntityMetadata
 {
-    /** @var ClassMetadata */
-    private $metadata;
+    private ClassMetadata $metadata;
 
     public function __construct(ClassMetadata $metadata)
     {
@@ -68,12 +67,8 @@ class EntityMetadata
      * Gets the discriminator value of the given entity class.
      * This does only apply to the JOINED and SINGLE_TABLE inheritance mapping strategies
      * where a discriminator column is used.
-     *
-     * @param string $entityClass
-     *
-     * @return mixed
      */
-    public function getDiscriminatorValue(string $entityClass)
+    public function getDiscriminatorValue(string $entityClass): mixed
     {
         $map = array_flip($this->metadata->discriminatorMap);
 

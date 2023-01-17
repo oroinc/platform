@@ -17,11 +17,14 @@ use Oro\Bundle\PlatformBundle\Provider\DbalTypeDefaultValueProvider;
 
 class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private AttributeValueProvider $provider;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
+    /** @var ClassMetadata */
+    private $classMetadata;
 
-    private ClassMetadata $classMetadata;
+    /** @var AttributeValueProvider */
+    private $provider;
 
     protected function setUp(): void
     {
@@ -29,8 +32,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
         $queryBuilder = new QueryBuilder($this->entityManager);
 
         $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry
-            ->expects(self::any())
+        $managerRegistry->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($this->entityManager);
 
@@ -38,19 +40,16 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider = new AttributeValueProvider($managerRegistry, $dbalTypeDefaultValueProvider);
 
-        $this->entityManager
-            ->expects(self::any())
+        $this->entityManager->expects(self::any())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $this->entityManager
-            ->expects(self::any())
+        $this->entityManager->expects(self::any())
             ->method('getExpressionBuilder')
             ->willReturn(new Expr());
 
         $this->classMetadata = new ClassMetadata(\stdClass::class);
-        $this->entityManager
-            ->expects(self::any())
+        $this->entityManager->expects(self::any())
             ->method('getClassMetadata')
             ->willReturn($this->classMetadata);
     }
@@ -67,8 +66,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
             ->addMethods(['setFirstResult', 'setMaxResults'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('createQuery')
             ->with(
                 'UPDATE SET entity.sample_association_1 = :sample_association_1 '
@@ -76,8 +74,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($query);
 
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setParameters')
             ->with(
                 new ArrayCollection([
@@ -86,19 +83,13 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
                 ])
             )
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setFirstResult')
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setMaxResults')
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('execute');
 
         $this->provider->removeAttributeValues($attributeFamily, $names);
@@ -111,8 +102,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->classMetadata->associationMappings[$names[0]] = ['type' => ClassMetadataInfo::TO_MANY];
 
-        $this->entityManager
-            ->expects(self::never())
+        $this->entityManager->expects(self::never())
             ->method('createQuery');
 
         $this->provider->removeAttributeValues($attributeFamily, $names);
@@ -130,14 +120,12 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
             ->addMethods(['setFirstResult', 'setMaxResults'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('createQuery')
             ->with('UPDATE SET entity.sample_field_1 = :sample_field_1 WHERE entity.attributeFamily = :attributeFamily')
             ->willReturn($query);
 
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setParameters')
             ->with(
                 new ArrayCollection([
@@ -146,19 +134,14 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
                 ])
             )
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setFirstResult')
             ->willReturnSelf();
 
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setMaxResults')
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('execute');
 
         $this->provider->removeAttributeValues($attributeFamily, $names);
@@ -177,14 +160,12 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
             ->addMethods(['setFirstResult', 'setMaxResults'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('createQuery')
             ->with('UPDATE SET entity.sample_field_1 = :sample_field_1 WHERE entity.attributeFamily = :attributeFamily')
             ->willReturn($query);
 
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setParameters')
             ->with(
                 new ArrayCollection([
@@ -193,19 +174,13 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
                 ])
             )
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setFirstResult')
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setMaxResults')
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('execute');
 
         $this->provider->removeAttributeValues($attributeFamily, $names);
@@ -223,14 +198,12 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
             ->addMethods(['setFirstResult', 'setMaxResults'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('createQuery')
             ->with('UPDATE SET entity.sample_field_1 = :sample_field_1 WHERE entity.attributeFamily = :attributeFamily')
             ->willReturn($query);
 
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setParameters')
             ->with(
                 new ArrayCollection([
@@ -239,19 +212,13 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
                 ])
             )
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setFirstResult')
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setMaxResults')
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('execute');
 
         $this->provider->removeAttributeValues($attributeFamily, $names);
@@ -264,8 +231,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->classMetadata->fieldMappings[$names[0]] = ['type' => 'unsupported_type'];
 
-        $this->entityManager
-            ->expects(self::never())
+        $this->entityManager->expects(self::never())
             ->method('createQuery');
 
         $this->provider->removeAttributeValues($attributeFamily, $names);
@@ -276,8 +242,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
         $attributeFamily = new AttributeFamily();
         $names = ['sample_field_1'];
 
-        $this->entityManager
-            ->expects(self::never())
+        $this->entityManager->expects(self::never())
             ->method('createQuery');
 
         $this->provider->removeAttributeValues($attributeFamily, $names);

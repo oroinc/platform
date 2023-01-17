@@ -11,6 +11,9 @@ system_configuration:
         navbar_settings:
             title: oro.ui.system_configuration.groups.navbar_settings.title
 
+        window_settings:
+            title: oro.ui.system_configuration.groups.window_settings.title
+
     fields:
         oro_ui.application_url:
             data_type: string
@@ -36,6 +39,20 @@ system_configuration:
                 choices:
                     oro.ui.system_configuration.fields.navbar_position.choices.top: top
                     oro.ui.system_configuration.fields.navbar_position.choices.left: left
+        oro_ui.quick_create_actions:
+            data_type: string
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+            search_type: choice
+            options:
+                label: oro.ui.system_configuration.fields.quick_create_actions.label
+                tooltip: oro.ui.system_configuration.fields.quick_create_actions.tooltip
+                choices:
+                    oro.ui.system_configuration.fields.quick_create_actions.choices.tab: tab
+                    oro.ui.system_configuration.fields.quick_create_actions.choices.popup: popup
+                    oro.ui.system_configuration.fields.quick_create_actions.choices.current_page: current_page
+                constraints:
+                    - Choice:
+                          choices: [tab, popup, current_page]
 
     tree:
         system_configuration:
@@ -54,6 +71,11 @@ system_configuration:
                                     navbar_settings:
                                         children:
                                             - oro_ui.navbar_position
+                                    window_settings:
+                                        priority: -100
+                                        children:
+                                            - oro_ui.quick_create_actions
+
         user_configuration:
             platform:
                 children:
@@ -65,6 +87,10 @@ system_configuration:
                                     navbar_settings:
                                         children:
                                             - oro_ui.navbar_position
+                                    window_settings:
+                                        priority: -100
+                                        children:
+                                            - oro_ui.quick_create_actions
 
     api_tree:
         application:

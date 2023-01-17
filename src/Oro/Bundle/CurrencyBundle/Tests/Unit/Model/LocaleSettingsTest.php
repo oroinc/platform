@@ -67,13 +67,11 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         string $currencyCode,
         string $expectedSymbol
     ) {
-        $this->viewTypeProvider
-            ->expects(self::once())
+        $this->viewTypeProvider->expects(self::once())
             ->method('getViewType')
             ->willReturn($viewType);
 
-        $this->currencyProvider
-            ->expects(self::any())
+        $this->currencyProvider->expects(self::any())
             ->method('getCurrencyList')
             ->willReturn($currencyList);
 

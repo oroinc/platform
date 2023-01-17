@@ -84,7 +84,7 @@ define(function(require) {
                             __('oro.entity_extend.schema_updated'),
                             {afterReload: true}
                         );
-                        mediator.execute('showMessage', 'info', __('Please wait until page will be reloaded...'));
+                        mediator.execute('showMessage', 'info', __('Please wait for the page to reload...'));
                         mediator.execute('showLoading');
                         // force reload of the application to make sure 'js/routes' is reloaded
                         if (typeof self.options.redirectRoute !== 'undefined') {

@@ -8,7 +8,7 @@ use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Employee;
 
 class InheritanceEntitySerializerTest extends EntitySerializerTestCase
 {
-    public function testManyToOne()
+    public function testManyToOne(): void
     {
         $qb = $this->em->getRepository(Department::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -69,7 +69,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testManyToOneWithDisabledPartialLoad()
+    public function testManyToOneWithDisabledPartialLoad(): void
     {
         $qb = $this->em->getRepository(Department::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -139,7 +139,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testManyToMany()
+    public function testManyToMany(): void
     {
         $qb = $this->em->getRepository(Department::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
@@ -236,7 +236,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testManyToManyWithDisabledPartialLoad()
+    public function testManyToManyWithDisabledPartialLoad(): void
     {
         $qb = $this->em->getRepository(Department::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')

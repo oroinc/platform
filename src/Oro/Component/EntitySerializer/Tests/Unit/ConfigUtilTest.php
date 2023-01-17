@@ -9,7 +9,7 @@ use Oro\Component\EntitySerializer\ConfigUtil;
  */
 class ConfigUtilTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetArrayValueWhenConfigDoesNotContainsKey()
+    public function testGetArrayValueWhenConfigDoesNotContainsKey(): void
     {
         $key = 'testKey';
         $config = [];
@@ -17,7 +17,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], ConfigUtil::getArrayValue($config, $key));
     }
 
-    public function testGetArrayValueWhenConfigValueIsNull()
+    public function testGetArrayValueWhenConfigValueIsNull(): void
     {
         $key = 'testKey';
         $config = [
@@ -27,7 +27,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], ConfigUtil::getArrayValue($config, $key));
     }
 
-    public function testGetArrayValueWhenConfigValueIsString()
+    public function testGetArrayValueWhenConfigValueIsString(): void
     {
         $key = 'testKey';
         $config = [
@@ -37,7 +37,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['testValue' => null], ConfigUtil::getArrayValue($config, $key));
     }
 
-    public function testGetArrayValueWhenConfigValueIsArray()
+    public function testGetArrayValueWhenConfigValueIsArray(): void
     {
         $key = 'testKey';
         $config = [
@@ -47,10 +47,10 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['key' => 'val'], ConfigUtil::getArrayValue($config, $key));
     }
 
-    public function testGetArrayValueWhenConfigValueIsUnexpectedType()
+    public function testGetArrayValueWhenConfigValueIsUnexpectedType(): void
     {
         $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Expected value of type "array, string or nothing", "integer" given.');
+        $this->expectExceptionMessage('Expected value of type "array, string or nothing", "int" given.');
 
         $key = 'testKey';
         $config = [
@@ -63,7 +63,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getExclusionPolicyProvider
      */
-    public function testGetExclusionPolicy($config, $expectedValue)
+    public function testGetExclusionPolicy(array $config, string $expectedValue): void
     {
         self::assertSame($expectedValue, ConfigUtil::getExclusionPolicy($config));
     }
@@ -89,7 +89,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isExcludeAllProvider
      */
-    public function testIsExcludeAll($config, $expectedValue)
+    public function testIsExcludeAll(array $config, bool $expectedValue): void
     {
         self::assertSame($expectedValue, ConfigUtil::isExcludeAll($config));
     }
@@ -115,7 +115,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isExcludeProvider
      */
-    public function testIsExclude($config, $expectedValue)
+    public function testIsExclude(array $config, bool $expectedValue): void
     {
         self::assertSame($expectedValue, ConfigUtil::isExclude($config));
     }
@@ -141,7 +141,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isPartialAllowedProvider
      */
-    public function testIsPartialAllowed($config, $expectedValue)
+    public function testIsPartialAllowed(array $config, bool $expectedValue): void
     {
         self::assertSame($expectedValue, ConfigUtil::isPartialAllowed($config));
     }
@@ -167,7 +167,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasFieldConfigProvider
      */
-    public function testHasFieldConfig($config, $fieldName, $expectedValue)
+    public function testHasFieldConfig(array $config, string $fieldName, bool $expectedValue): void
     {
         self::assertSame($expectedValue, ConfigUtil::hasFieldConfig($config, $fieldName));
     }
@@ -201,7 +201,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFieldConfigProvider
      */
-    public function testGetFieldConfig($config, $fieldName, $expectedValue)
+    public function testGetFieldConfig(array $config, string $fieldName, array $expectedValue): void
     {
         self::assertSame($expectedValue, ConfigUtil::getFieldConfig($config, $fieldName));
     }
@@ -235,7 +235,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider explodePropertyPathProvider
      */
-    public function testExplodePropertyPath($propertyPath, $expectedValue)
+    public function testExplodePropertyPath(string $propertyPath, array $expectedValue): void
     {
         self::assertSame($expectedValue, ConfigUtil::explodePropertyPath($propertyPath));
     }
@@ -243,10 +243,6 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
     public function explodePropertyPathProvider(): array
     {
         return [
-            'null'                 => [
-                null,
-                ['']
-            ],
             'empty'                => [
                 '',
                 ['']
@@ -262,7 +258,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testCloneObjects()
+    public function testCloneObjects(): void
     {
         $object1 = new \stdClass();
         $objects = [
@@ -275,7 +271,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($objects['obj1'], $clonedObjects['obj1']);
     }
 
-    public function testCloneItems()
+    public function testCloneItems(): void
     {
         $value1 = 123;
         $object1 = new \stdClass();

@@ -159,8 +159,6 @@ datagrids:
                             - key
                             - locale
                             - domain
-            current:
-                label: oro.translation.translation.current.label
             key:
                 label: oro.translation.translation_key.key.label
             domain:

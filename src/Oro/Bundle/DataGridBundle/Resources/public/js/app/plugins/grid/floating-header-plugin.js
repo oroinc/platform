@@ -254,7 +254,7 @@ define(function(require) {
                         let top = visibleRect.top;
 
                         // On the iOS device need to fix value from getBoundingClientRect()
-                        if (tools.isIOS()) {
+                        if (tools.isIOS() && tools.isDesktop()) {
                             top += document.scrollingElement.scrollTop;
                         }
 

@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
+    const _ = require('underscore');
     const mask = require('oroui/js/dropdown-mask');
     require('oroui/js/jquery-timepicker-l10n');
     require('jquery.timepicker');
@@ -13,6 +14,9 @@ define(function(require) {
         if (typeof method === 'object' || !method || method === 'init') {
             options = method === 'init' ? args[1] : method;
             options = $.extend(true, {}, origTimepicker.defaults, options);
+            if (_.isRTL()) {
+                options.orientation = 'r';
+            }
             result = origTimepicker.call(this, options);
         } else {
             args.unshift(method);

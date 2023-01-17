@@ -17,7 +17,7 @@ class ToOneWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
      * @dataProvider hasLimitDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testToOneCustomAssociationWhenOnlyIdentifierFieldIsRequested(bool $hasLimit)
+    public function testToOneCustomAssociationWhenOnlyIdentifierFieldIsRequested(bool $hasLimit): void
     {
         $qb = $this->em->getRepository(Entity\Group::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
@@ -106,7 +106,7 @@ class ToOneWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
      * @dataProvider hasLimitDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testToOneCustomAssociationWhenOnlyScalarFieldsAreRequested(bool $hasLimit)
+    public function testToOneCustomAssociationWhenOnlyScalarFieldsAreRequested(bool $hasLimit): void
     {
         $qb = $this->em->getRepository(Entity\Group::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')

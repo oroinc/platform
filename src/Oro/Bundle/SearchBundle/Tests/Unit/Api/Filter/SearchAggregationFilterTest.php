@@ -88,21 +88,21 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
             ],
             'field with mapping'    => [
                 new FilterValue('path', 'field1 count'),
-                ['field1Count' => ['field' => 'integer.field_1', 'function' => 'count']]
+                ['field1Count' => ['field' => 'integer.field_1', 'function' => 'count', 'parameters' => []]]
             ],
             'field without mapping' => [
                 new FilterValue('path', 'field2 count'),
-                ['field2Count' => ['field' => 'text.field2', 'function' => 'count']]
+                ['field2Count' => ['field' => 'text.field2', 'function' => 'count', 'parameters' => []]]
             ],
             'custom field alias'    => [
                 new FilterValue('path', 'field2 count myCount'),
-                ['myCount' => ['field' => 'text.field2', 'function' => 'count']]
+                ['myCount' => ['field' => 'text.field2', 'function' => 'count', 'parameters' => []]]
             ],
             'several aggregations'  => [
                 new FilterValue('path', ['field2 count', 'field1 sum']),
                 [
-                    'field2Count' => ['field' => 'text.field2', 'function' => 'count'],
-                    'field1Sum'   => ['field' => 'integer.field_1', 'function' => 'sum']
+                    'field2Count' => ['field' => 'text.field2', 'function' => 'count', 'parameters' => []],
+                    'field1Sum'   => ['field' => 'integer.field_1', 'function' => 'sum', 'parameters' => []]
                 ]
             ]
         ];

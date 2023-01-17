@@ -5,7 +5,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\Api\RestJsonApi;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * @group search
@@ -21,14 +20,6 @@ class UserSearchTextFilterTest extends RestJsonApiTestCase
         // do the reindex because by some unknown reasons the search index is empty
         // after upgrade from old application version
         self::getContainer()->get('oro_search.search.engine.indexer')->reindex(User::class);
-    }
-
-    private function getExpectedContentWithPaginationLinks(array $expectedContent): array
-    {
-        $content = Yaml::dump($expectedContent);
-        $content = str_replace('{baseUrl}', $this->getApiBaseUrl(), $content);
-
-        return self::processTemplateData(Yaml::parse($content));
     }
 
     public function testSearchTextFilter(): void

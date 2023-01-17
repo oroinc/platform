@@ -27,7 +27,7 @@ define(function(require) {
             isHtml: true,
             width: '100%',
             min_height: 250,
-            plugins: ['code', 'paste', 'lists', 'advlist', 'image'],
+            plugins: ['code', 'lists', 'advlist', 'image'],
             pluginsMap: {},
             menubar: false,
             toolbar: ['undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist' +
@@ -36,9 +36,6 @@ define(function(require) {
             elementpath: false,
             branding: false,
             browser_spellcheck: true,
-            images_dataimg_filter: function() {
-                return false;
-            },
             file_picker_types: 'image',
             file_picker_callback: function(callback, value, meta) {
                 const input = document.createElement('input');

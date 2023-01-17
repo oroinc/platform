@@ -11,11 +11,14 @@ use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider;
 
 class ExtendFieldFormOptionsByFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject $entityConfigManager;
+    /** @var EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityConfigManager;
 
-    private ExtendFieldFormTypeProvider $extendFieldFormTypeProvider;
+    /** @var ExtendFieldFormTypeProvider */
+    private $extendFieldFormTypeProvider;
 
-    private ExtendFieldFormOptionsByFieldTypeProvider $provider;
+    /** @var ExtendFieldFormOptionsByFieldTypeProvider */
+    private $provider;
 
     protected function setUp(): void
     {
@@ -37,8 +40,7 @@ class ExtendFieldFormOptionsByFieldTypeProviderTest extends \PHPUnit\Framework\T
         $fieldName = 'sampleField';
         $formFieldConfig = new Config(new FieldConfigId('form', $className, $fieldName, $fieldType), []);
 
-        $this->entityConfigManager
-            ->expects(self::once())
+        $this->entityConfigManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('form', $className, $fieldName)
             ->willReturn($formFieldConfig);
@@ -96,8 +98,7 @@ class ExtendFieldFormOptionsByFieldTypeProviderTest extends \PHPUnit\Framework\T
             ['enum_code' => 'sample_enum']
         );
 
-        $this->entityConfigManager
-            ->expects(self::exactly(2))
+        $this->entityConfigManager->expects(self::exactly(2))
             ->method('getFieldConfig')
             ->willReturnMap([
                 ['form', $className, $fieldName, $formFieldConfig],
@@ -151,8 +152,7 @@ class ExtendFieldFormOptionsByFieldTypeProviderTest extends \PHPUnit\Framework\T
             $extendScopeOptions
         );
 
-        $this->entityConfigManager
-            ->expects(self::exactly(2))
+        $this->entityConfigManager->expects(self::exactly(2))
             ->method('getFieldConfig')
             ->willReturnMap([
                 ['form', $className, $fieldName, $formFieldConfig],

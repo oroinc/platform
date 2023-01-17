@@ -10,7 +10,7 @@ use Oro\Component\EntitySerializer\FieldConfig;
  */
 class EntityConfigTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $attrName = 'test';
 
@@ -34,7 +34,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $entityConfig->toArray());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertEquals([], $entityConfig->toArray());
@@ -56,7 +56,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertTrue($entityConfig->isEmpty());
@@ -77,7 +77,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($entityConfig->isEmpty());
     }
 
-    public function testFields()
+    public function testFields(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertFalse($entityConfig->hasField('test'));
@@ -98,7 +98,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $entityConfig->toArray());
     }
 
-    public function testExclusionPolicy()
+    public function testExclusionPolicy(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertFalse($entityConfig->isExcludeAll());
@@ -131,7 +131,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($entityConfig->isEmpty());
     }
 
-    public function testPartialLoad()
+    public function testPartialLoad(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertTrue($entityConfig->isPartialLoadEnabled());
@@ -145,7 +145,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $entityConfig->toArray());
     }
 
-    public function testOrderBy()
+    public function testOrderBy(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertEquals([], $entityConfig->getOrderBy());
@@ -159,7 +159,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $entityConfig->toArray());
     }
 
-    public function testMaxResults()
+    public function testMaxResults(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertNull($entityConfig->getMaxResults());
@@ -173,7 +173,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $entityConfig->toArray());
     }
 
-    public function testHasMore()
+    public function testHasMore(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertFalse($entityConfig->getHasMore());
@@ -187,7 +187,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $entityConfig->toArray());
     }
 
-    public function testHints()
+    public function testHints(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertSame([], $entityConfig->getHints());
@@ -214,7 +214,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $entityConfig->toArray());
     }
 
-    public function testInnerJoinAssociations()
+    public function testInnerJoinAssociations(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertSame([], $entityConfig->getInnerJoinAssociations());
@@ -252,7 +252,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $entityConfig->toArray());
     }
 
-    public function testPostSerializeHandler()
+    public function testPostSerializeHandler(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertNull($entityConfig->getPostSerializeHandler());
@@ -268,7 +268,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $entityConfig->toArray());
     }
 
-    public function testPostSerializeCollectionHandler()
+    public function testPostSerializeCollectionHandler(): void
     {
         $entityConfig = new EntityConfig();
         $this->assertNull($entityConfig->getPostSerializeCollectionHandler());

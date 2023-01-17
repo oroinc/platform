@@ -3,19 +3,11 @@
 namespace Oro\Component\EntitySerializer;
 
 /**
- * Normalizes result data of the EntitySerializer.
+ * The result data normalizer.
  */
 class DataNormalizer
 {
-    /**
-     * Normalizes result data of the EntitySerializer
-     *
-     * @param array        $data
-     * @param EntityConfig $config
-     *
-     * @return array
-     */
-    public function normalizeData(array $data, EntityConfig $config)
+    public function normalizeData(array $data, EntityConfig $config): array
     {
         $fields = $config->getFields();
         if (!empty($fields)) {
@@ -25,7 +17,7 @@ class DataNormalizer
         return $data;
     }
 
-    protected function normalizeRows(array &$rows, EntityConfig $config)
+    protected function normalizeRows(array &$rows, EntityConfig $config): void
     {
         foreach ($rows as $key => &$row) {
             if (ConfigUtil::INFO_RECORD_KEY !== $key && \is_array($row)) {
@@ -34,7 +26,7 @@ class DataNormalizer
         }
     }
 
-    protected function normalizeRow(array &$row, EntityConfig $config)
+    protected function normalizeRow(array &$row, EntityConfig $config): void
     {
         $fields = $config->getFields();
         foreach ($fields as $field => $fieldConfig) {
@@ -56,12 +48,7 @@ class DataNormalizer
         $this->removeExcludedFields($row, $config);
     }
 
-    /**
-     * @param array  $row
-     * @param string $field
-     * @param string $targetField
-     */
-    protected function normalizeCollapsed(array &$row, $field, $targetField)
+    protected function normalizeCollapsed(array &$row, string $field, string $targetField): void
     {
         if (\array_key_exists(0, $row[$field])) {
             // to-many association
@@ -76,15 +63,13 @@ class DataNormalizer
                 $values[$key] = $value;
             }
             $row[$field] = $values;
-        } else {
+        } elseif (\array_key_exists($targetField, $row[$field])) {
             // to-one association
-            if (\array_key_exists($targetField, $row[$field])) {
-                $row[$field] = $row[$field][$targetField];
-            }
+            $row[$field] = $row[$field][$targetField];
         }
     }
 
-    protected function removeExcludedFields(array &$row, EntityConfig $config)
+    protected function removeExcludedFields(array &$row, EntityConfig $config): void
     {
         $excludedFields = $config->get(ConfigUtil::EXCLUDED_FIELDS);
         if (!empty($excludedFields)) {

@@ -10,7 +10,7 @@ use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterf
 
 class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
 {
-    public function testUndefinedDataTransformerService()
+    public function testUndefinedDataTransformerService(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Undefined data transformer service "data_transformer_service_id".');
@@ -53,7 +53,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testInvalidDataTransformerType()
+    public function testInvalidDataTransformerType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
@@ -100,7 +100,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testDataTransformer()
+    public function testDataTransformer(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -162,7 +162,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testFormDataTransformer()
+    public function testFormDataTransformer(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -218,7 +218,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testDataTransformerAsClosure()
+    public function testDataTransformerAsClosure(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -267,7 +267,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testDataTransformerForRenamedField()
+    public function testDataTransformerForRenamedField(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -328,7 +328,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testDataTransformerForMovedField()
+    public function testDataTransformerForMovedField(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')

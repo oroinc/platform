@@ -77,6 +77,11 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'jpeg_quality' => 85,
                 'processors_allowed' => true,
                 'webp_strategy' => WebpConfiguration::ENABLED_IF_SUPPORTED,
+                'cleanup' => [
+                    'collect_attachment_files_batch_size' => 20000,
+                    'load_existing_attachments_batch_size' => 500,
+                    'load_attachments_batch_size' => 10000
+                ]
             ];
 
         self::assertEquals($expected, $processor->processConfiguration(new Configuration(), []));
