@@ -11,7 +11,7 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 use Psr\Log\LoggerInterface;
 
 /**
- * Responsible for resetting user's password, setting auth_status to expired and sending reset token to the user
+ * Responsible for resetting user's password, setting auth_status to reset and sending reset token to the user
  */
 class ResetPasswordHandler
 {
@@ -45,7 +45,7 @@ class ResetPasswordHandler
             $user->setConfirmationToken($user->generateToken());
         }
 
-        $this->userManager->setAuthStatus($user, UserManager::STATUS_EXPIRED);
+        $this->userManager->setAuthStatus($user, UserManager::STATUS_RESET);
         $this->userManager->updateUser($user);
 
         try {

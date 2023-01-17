@@ -16,7 +16,6 @@ Feature: Translation cache actualization
     And I edit "oro.notification.massnotification.entity_plural_label" Translated Value as "Entities"
     Then I should see oro.notification.massnotification.entity_plural_label in grid with following data:
       | Translated Value    | Entities |
-      | Current Value       | Entities |
       | English Translation | Entities |
     And I go to System/Emails/Maintenance Notifications
     And I reload the page
@@ -28,7 +27,6 @@ Feature: Translation cache actualization
     And I edit "oro.notification.massnotification.entity_plural_label" Translated Value as "Maintenance Notifications"
     Then I should see oro.notification.massnotification.entity_plural_label in grid with following data:
       | Translated Value    | Maintenance Notifications |
-      | Current Value       | Maintenance Notifications |
       | English Translation | Maintenance Notifications |
 
   Scenario: JS translations editing for key oro.datagrid.gridView.actions

@@ -3,7 +3,7 @@ define(function(require) {
 
     const $ = require('jquery');
     const _ = require('underscore');
-    const Popper = require('popper');
+    const Popper = require('popper').default;
     const BaseView = require('oroui/js/app/views/base/view');
     const VALIDATOR_ERROR_CLASS = 'validation-failed';
 

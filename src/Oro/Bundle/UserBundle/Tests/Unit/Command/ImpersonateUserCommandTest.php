@@ -30,7 +30,7 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
     /** @var ImpersonateUserCommand */
     private $command;
 
-    public function testSuccessfulExecuteReturnsZeroAndSuggestsURL()
+    public function testSuccessfulExecuteReturnsZeroAndSuggestsURL(): void
     {
         $this->createMocks();
         $commandTester = $this->executeCommand();
@@ -38,7 +38,7 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertReturnsSuccessAndSuggestsUrl($commandTester);
     }
 
-    public function testSuccessfulExecuteDisplaysWarningForDisabledUser()
+    public function testSuccessfulExecuteDisplaysWarningForDisabledUser(): void
     {
         $this->createMocks(false);
 
@@ -51,9 +51,9 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSuccessfulExecuteDisplaysWarningForNonActiveAuthStatus()
+    public function testSuccessfulExecuteDisplaysWarningForNonActiveAuthStatus(): void
     {
-        $this->createMocks(null, UserManager::STATUS_EXPIRED);
+        $this->createMocks(null, UserManager::STATUS_RESET);
 
         $commandTester = $this->executeCommand();
 
@@ -64,7 +64,7 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecuteDisplaysErrorIfUserDoesntExist()
+    public function testExecuteDisplaysErrorIfUserDoesntExist(): void
     {
         $this->createMocks(null, null, null, true);
 
@@ -76,7 +76,7 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecuteDisplaysErrorIfUnknownUserType()
+    public function testExecuteDisplaysErrorIfUnknownUserType(): void
     {
         $this->createMocks(null, null, null, null, $this->createMock(UserInterface::class));
 
@@ -108,29 +108,29 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
         string $userClass = null,
         bool $nullUserStub = null,
         object $userStub = null
-    ) {
+    ): void {
         if (null === $userStub && true !== $nullUserStub) {
             $userStub = $this->getMockBuilder($userClass ?? User::class)
                 ->disableOriginalConstructor()
                 ->onlyMethods(['isEnabled'])
                 ->addMethods(['getAuthStatus'])
                 ->getMock();
-            $userStub->expects($this->any())
+            $userStub->expects(self::any())
                 ->method('isEnabled')
                 ->willReturn($userEnabled ?? true);
-            $userStub->expects($this->any())
+            $userStub->expects(self::any())
                 ->method('getAuthStatus')
                 ->willReturn(new TestEnumValue(
                     $authStatusId ?? UserManager::STATUS_ACTIVE,
                     $authStatusId ?? UserManager::STATUS_ACTIVE
                 ));
         }
-        $this->userManager->expects($this->any())
+        $this->userManager->expects(self::any())
             ->method('findUserByUsername')
             ->willReturn($userStub);
 
         $managerStub = $this->createMock(EntityManager::class);
-        $this->managerRegistry->expects($this->any())
+        $this->managerRegistry->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($managerStub);
     }
@@ -142,7 +142,7 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    private function assertReturnsSuccessAndSuggestsUrl(CommandTester $commandTester)
+    private function assertReturnsSuccessAndSuggestsUrl(CommandTester $commandTester): void
     {
         $this->assertSuccessReturnCode($commandTester);
         $this->assertOutputContains($commandTester, 'open the following URL');

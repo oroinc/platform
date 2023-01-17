@@ -92,7 +92,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'options'           => ['configurable' => true, 'auditable' => true]
                     ],
                     [
-                        'label'             => 'Status',
+                        'label'             => 'Password status',
                         'name'              => 'auth_status',
                         'type'              => 'enum',
                         'relationType'      => 'manyToOne',

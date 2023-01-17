@@ -106,56 +106,56 @@ class TranslationControllerTest extends WebTestCase
                 'input'          => 'value1',
                 'expectedStatus' => true,
                 'expectedValue'  => 'value1',
-                'expectedFields' => ['current' => 'value1']
+                'expectedFields' => []
             ],
             'space value'             => [
                 'locale'         => LoadLanguages::LANGUAGE1,
                 'input'          => ' ',
                 'expectedStatus' => true,
                 'expectedValue'  => ' ',
-                'expectedFields' => ['current' => ' ']
+                'expectedFields' => []
             ],
             'empty string value'      => [
                 'locale'         => LoadLanguages::LANGUAGE1,
                 'input'          => '',
                 'expectedStatus' => false,
                 'expectedValue'  => null,
-                'expectedFields' => ['current' => 'translation.trans1']
+                'expectedFields' => []
             ],
             'null value'              => [
                 'locale'         => LoadLanguages::LANGUAGE1,
                 'input'          => null,
                 'expectedStatus' => false,
                 'expectedValue'  => null,
-                'expectedFields' => ['current' => 'translation.trans1']
+                'expectedFields' => []
             ],
             'update value (EN)'       => [
                 'locale'         => Translator::DEFAULT_LOCALE,
                 'input'          => 'value1',
                 'expectedStatus' => true,
                 'expectedValue'  => 'value1',
-                'expectedFields' => ['current' => 'value1', 'englishValue' => 'value1']
+                'expectedFields' => ['englishValue' => 'value1']
             ],
             'space value (EN)'        => [
                 'locale'         => Translator::DEFAULT_LOCALE,
                 'input'          => ' ',
                 'expectedStatus' => true,
                 'expectedValue'  => ' ',
-                'expectedFields' => ['current' => ' ', 'englishValue' => ' ']
+                'expectedFields' => ['englishValue' => ' ']
             ],
             'empty string value (EN)' => [
                 'locale'         => Translator::DEFAULT_LOCALE,
                 'input'          => '',
                 'expectedStatus' => true,
                 'expectedValue'  => '',
-                'expectedFields' => ['current' => '', 'englishValue' => '']
+                'expectedFields' => ['englishValue' => '']
             ],
             'null value (EN)'         => [
                 'locale'         => Translator::DEFAULT_LOCALE,
                 'input'          => null,
                 'expectedStatus' => false,
                 'expectedValue'  => null,
-                'expectedFields' => ['current' => 'translation.trans1', 'englishValue' => 'translation.trans1']
+                'expectedFields' => ['englishValue' => 'translation.trans1']
             ],
         ];
     }

@@ -23,8 +23,8 @@ trait EntityTrait
      * @return object
      *
      * @template T
-     * @@psalm-param class-string<T> $className
-     * @phpstan-return T
+     * @psalm-param class-string<T> $className
+     * @psalm-return T
      */
     protected function getEntity($className, array $properties = [], array $constructorArgs = null)
     {
