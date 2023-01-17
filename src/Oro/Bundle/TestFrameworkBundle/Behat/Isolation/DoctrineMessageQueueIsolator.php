@@ -10,44 +10,27 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Process all messages in queue before make db dump
+ * Processes all the messages after Doctrine fixtures were loaded
  */
-class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueProcessorAwareInterface
+class DoctrineMessageQueueIsolator implements IsolatorInterface, MessageQueueProcessorAwareInterface
 {
     use MessageQueueProcessorAwareTrait;
-
-    /** @var KernelInterface */
-    private $kernel;
-
-    public function __construct(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
-    }
 
     /** {@inheritdoc} */
     public function start(BeforeStartTestsEvent $event)
     {
-        $event->writeln('<info>Process messages before make db dump</info>');
-
-        $this->kernel->boot();
-
-        if ($this->kernel->getContainer()->has('oro_message_queue.mock_lifecycle_message.cache')) {
-            $cache = $this->kernel->getContainer()->get('oro_message_queue.mock_lifecycle_message.cache');
-            $cache->clear();
-        }
-
-        $this->messageQueueProcessor->startMessageQueue();
-        $this->messageQueueProcessor->waitWhileProcessingMessages();
-        $this->messageQueueProcessor->stopMessageQueue();
-        $this->kernel->shutdown();
     }
 
     /** {@inheritdoc} */
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
+        $event->writeln('<info>Process messages after fixtures loading</info>');
+
+        $this->messageQueueProcessor->startMessageQueue();
+        $this->messageQueueProcessor->waitWhileProcessingMessages();
+        $this->messageQueueProcessor->stopMessageQueue();
     }
 
     /** {@inheritdoc} */
@@ -80,14 +63,12 @@ class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueProce
     /** {@inheritdoc} */
     public function getName()
     {
-        return sprintf('Initial Message Queue Isolator');
+        return 'Doctrine Message Queue Isolator';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** {@inheritdoc} */
     public function getTag()
     {
-        return 'inital_message_queue';
+        return 'doctrine_message_queue';
     }
 }

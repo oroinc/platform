@@ -474,7 +474,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * Assert main menu item existing
      *
-     * @Given /^(?:|I )should(?P<negotiation>(\s| not ))see (?P<path>[\/\w\s]+) in main menu$/
+     * @Given /^(?:|I )should(?P<negotiation>(\s| not ))see (?P<path>[\/\w\s\&]+) in main menu$/
      */
     public function iShouldSeeOrNotInMainMenu($negotiation, $path)
     {
