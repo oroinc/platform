@@ -9,7 +9,6 @@ use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
 use Akeneo\Bundle\BatchBundle\Job\Job;
-use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\RetryableException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
@@ -172,8 +171,6 @@ class JobExecutor
         $failureExceptions = $this->collectFailureExceptions($jobExecution);
 
         foreach ($jobExecution->getAllFailureExceptions() as $failureException) {
-            // in most cases this occurs in a race condition issue when couple of consumers try to process data
-            // in which we have a UNIQUE constraint. workaround is to requeue a message with this job
             if ($this->isRedeliveryException($failureException['class'])) {
                 $jobResult->setNeedRedelivery(true);
                 return false;
@@ -446,10 +443,18 @@ class JobExecutor
         return $this->contextAggregatorRegistry->getAggregator($aggregatorType);
     }
 
+    /**
+     * In most cases this occurs in a race condition issue when couple of consumers try to process data
+     * in which we have a UNIQUE constraint. workaround is to requeue a message with this job
+     * or exception is a RetryableException
+     *
+     * @param string $exceptionClass
+     *
+     * @return bool
+     */
     private function isRedeliveryException(string $exceptionClass): bool
     {
         return UniqueConstraintViolationException::class === $exceptionClass
-            || ForeignKeyConstraintViolationException::class === $exceptionClass
             || is_a($exceptionClass, RetryableException::class, true);
     }
 }
