@@ -46,7 +46,9 @@ class PlaceholderFilter
      */
     public function isPasswordResetEnabled($entity)
     {
-        return $entity instanceof User && $entity->isEnabled();
+        return $entity instanceof User
+            && $entity->isEnabled()
+            && $this->tokenAccessor->getUserId() !== $entity->getId();
     }
 
     /**
