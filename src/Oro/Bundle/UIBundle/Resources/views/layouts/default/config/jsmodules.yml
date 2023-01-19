@@ -43,7 +43,6 @@ aliases:
 app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/component-shortcuts-module
-    - oroui/js/app/modules/css-variable-module
     - oroui/js/app/modules/focus-visible
     - oroui/js/app/modules/ignore-tabbable
     - oroui/js/app/modules/init-layout
@@ -74,7 +73,6 @@ configs:
     oroui/js/messenger: {}
     oroui/js/modal: {}
     oroui/js/tools/scroll-helper: {}
-    oroui/js/viewport-manager: {}
 dynamic-imports:
     commons:
         - controllers/page-controller

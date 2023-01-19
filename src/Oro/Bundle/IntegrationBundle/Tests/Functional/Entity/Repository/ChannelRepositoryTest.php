@@ -7,11 +7,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadStatusData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Entity\User;
 
-/**
- * @dbIsolationPerTest
- */
 class ChannelRepositoryTest extends WebTestCase
 {
     protected function setUp(): void
@@ -56,54 +52,6 @@ class ChannelRepositoryTest extends WebTestCase
                 'first_connector',
                 Status::STATUS_COMPLETED
             )
-        );
-    }
-
-    public function testFindByTypeReturnsCorrectData()
-    {
-        $fooIntegration = $this->getReference('oro_integration:foo_integration');
-
-        self::assertSame([$fooIntegration], $this->getRepository()->findByType('foo'));
-    }
-
-    public function testFindByTypeAndExclude()
-    {
-        $expectedIntegration = $this->getReference('oro_integration:bar_integration');
-        $excludedIntegration = $this->getReference('oro_integration:extended_bar_integration');
-
-        self::assertContains(
-            $expectedIntegration,
-            $this->getRepository()->findByTypeAndExclude('bar', [$excludedIntegration])
-        );
-    }
-
-    public function testFindByTypeAndExcludeById()
-    {
-        $expectedIntegration = $this->getReference('oro_integration:bar_integration');
-        $excludedIntegration = $this->getReference('oro_integration:extended_bar_integration');
-
-        self::assertContains(
-            $expectedIntegration,
-            $this->getRepository()->findByTypeAndExclude('bar', [$excludedIntegration->getId()])
-        );
-    }
-
-    public function testFindByTypeAndExcludeWithOrganization()
-    {
-        $container = self::getContainer();
-
-        /** @var User $user */
-        $user = $container->get('doctrine')
-            ->getRepository(User::class)
-            ->findOneBy(['username' => 'admin']);
-        $this->updateUserSecurityToken($user->getEmail());
-
-        $expectedIntegration = $this->getReference('oro_integration:bar_integration');
-        $excludedIntegration = $this->getReference('oro_integration:extended_bar_integration');
-
-        self::assertContains(
-            $expectedIntegration,
-            $this->getRepository()->findByTypeAndExclude('bar', [$excludedIntegration])
         );
     }
 
