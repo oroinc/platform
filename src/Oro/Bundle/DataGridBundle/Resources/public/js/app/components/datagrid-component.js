@@ -466,7 +466,7 @@ define(function(require) {
                     plugins.push({
                         constructor: modules.StickedScrollbarPlugin,
                         options: {
-                            viewport: this.metadata.responsiveGrids.viewport || {}
+                            viewport: this.metadata.responsiveGrids.viewport || 'all'
                         }
                     });
                 } else {

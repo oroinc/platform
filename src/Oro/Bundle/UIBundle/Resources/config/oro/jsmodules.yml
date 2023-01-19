@@ -56,7 +56,6 @@ app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/color-util
     - oroui/js/app/modules/component-shortcuts-module
-    - oroui/js/app/modules/css-variable-module
     - oroui/js/app/modules/focus-visible
     - oroui/js/app/modules/ignore-tabbable
     - oroui/js/app/modules/init-image-preview
@@ -96,7 +95,6 @@ configs:
     oroui/js/tools/highlighter/highlighter-favicon: {}
     oroui/js/tools/highlighter/highlighter-title: {}
     oroui/js/tools/scroll-helper: {}
-    oroui/js/viewport-manager: {}
 dynamic-imports:
     commons:
         - controllers/page-controller
