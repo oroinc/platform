@@ -3,7 +3,6 @@ Oro\Bundle\TranslationBundle\Entity\Language:
         code: 'ru_RU'
         enabled: true
         organization: '@organization'
-        owner: '@admin'
 
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
     title_localization_ru:

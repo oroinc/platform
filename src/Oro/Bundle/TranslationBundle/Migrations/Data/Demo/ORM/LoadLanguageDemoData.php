@@ -8,6 +8,9 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 
+/**
+ * Loads demo languages
+ */
 class LoadLanguageDemoData extends AbstractFixture
 {
     use UserUtilityTrait;
@@ -49,7 +52,6 @@ class LoadLanguageDemoData extends AbstractFixture
                 $language = new Language();
                 $language->setCode($code)
                     ->setEnabled(true)
-                    ->setOwner($user)
                     ->setOrganization($organization);
 
                 $manager->persist($language);

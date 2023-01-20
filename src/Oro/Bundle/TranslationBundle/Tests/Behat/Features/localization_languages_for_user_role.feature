@@ -14,7 +14,7 @@ Feature: Localization languages for user role
     Then fill form with:
       | Role | ROLE_TRANSLATOR |
     And select following permissions:
-      | Language | View:Business Unit | Create:Business Unit | Edit:Business Unit | Translate:Business Unit |
+      | Language | View:Organization | Create:Organization | Edit:Organization | Translate:Organization |
     And I check "Export Entity Records" entity permission
     And I check "Import Entity Records" entity permission
     When I save and close form
