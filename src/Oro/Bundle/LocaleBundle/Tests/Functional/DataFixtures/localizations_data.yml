@@ -7,13 +7,11 @@ Oro\Bundle\TranslationBundle\Entity\Language:
     code: 'lang1'
     enabled: true
     organization: '@organization'
-    owner: '@user'
 
   german_language:
     code: 'de'
     enabled: true
     organization: '@organization'
-    owner: '@user'
 
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
   title_localization1:

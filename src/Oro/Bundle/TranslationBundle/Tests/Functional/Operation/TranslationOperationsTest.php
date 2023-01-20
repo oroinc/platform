@@ -6,6 +6,9 @@ use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 
+/**
+ * @dbIsolationPerTest
+ */
 class TranslationOperationsTest extends ActionTestCase
 {
     protected function setUp(): void
