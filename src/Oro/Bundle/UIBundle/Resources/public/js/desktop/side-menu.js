@@ -25,6 +25,8 @@ define(function(require) {
 
         timeout: 50,
 
+        $currentItem: null,
+
         /**
          * Do initial changes
          */
@@ -39,6 +41,8 @@ define(function(require) {
             this._super();
 
             this.$menu = this.element.find(this.options.menuSelector);
+
+            mediator.on('mainMenuUpdated', this.onMenuUpdate, this);
 
             this._on(this.element, {
                 'click .dropdown-level-1': this.onMenuOpen,
@@ -105,6 +109,7 @@ define(function(require) {
         _destroy: function() {
             this._super();
 
+            mediator.off('mainMenuUpdated', this.onMenuUpdate, this);
             this.overlay.off();
             this.overlay.dispose();
             delete this.overlay;
@@ -140,6 +145,7 @@ define(function(require) {
          * @private
          */
         _removeHandlersFormDocument: function() {
+            this.highlightDropdown(this.$currentItem);
             $(document).off(this.eventNamespace);
         },
 
@@ -182,6 +188,21 @@ define(function(require) {
         },
 
         /**
+         * Handles menu update event
+         *
+         * @param {Object} menuView
+         */
+        onMenuUpdate: function(menuView) {
+            const data = menuView.getTemplateData();
+            const currentRoute = menuView.getCurrentRoute(data);
+            const item = menuView.getMatchedMenuItem(currentRoute);
+
+            if (!_.isUndefined(item)) {
+                this.$currentItem = item.closest('.dropdown-level-1');
+            }
+        },
+
+        /**
          * @returns {boolean}
          */
         isMinimized: function() {
@@ -192,10 +213,16 @@ define(function(require) {
          * @param {Element} $element
          */
         highlightDropdown: function($element) {
-            $element
-                .addClass('active')
-                .siblings()
-                .removeClass('active');
+            if ($element && $element.length) {
+                $element
+                    .addClass('active')
+                    .siblings()
+                    .removeClass('active');
+            } else {
+                this.element
+                    .find('.dropdown-level-1.active')
+                    .removeClass('active');
+            }
         },
 
         /**

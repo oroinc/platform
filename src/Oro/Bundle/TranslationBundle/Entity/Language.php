@@ -7,7 +7,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
-use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
+use Oro\Bundle\OrganizationBundle\Entity\Ownership\OrganizationAwareTrait;
 
 /**
  * Store Language in a database
@@ -21,11 +21,9 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  *              "icon"="fa-flag"
  *          },
  *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
+ *              "owner_type"="ORGANIZATION",
+ *              "owner_field_name"="organization",
+ *              "owner_column_name"="organization_id",
  *          },
  *          "security"={
  *              "type"="ACL",
@@ -37,7 +35,7 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
 class Language implements DatesAwareInterface, OrganizationAwareInterface
 {
     use DatesAwareTrait;
-    use UserAwareTrait;
+    use OrganizationAwareTrait;
 
     /**
      * @var int

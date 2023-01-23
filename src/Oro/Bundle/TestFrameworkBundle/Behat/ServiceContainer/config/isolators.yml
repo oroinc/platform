@@ -122,6 +122,13 @@ services:
     tags:
       - { name: 'oro_behat.isolator', priority: 300 }
 
+  oro_behat_extension.isolation.doctrine_message_queue_isolator:
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineMessageQueueIsolator'
+    calls:
+      - [ 'setMessageQueueProcessor', [ '@oro_test.processor.message_queue' ] ]
+    tags:
+      - { name: 'oro_behat.isolator', priority: 310 }
+
   oro_behat_extension.isolation.import_export:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ImportExportIsolator'
     arguments:

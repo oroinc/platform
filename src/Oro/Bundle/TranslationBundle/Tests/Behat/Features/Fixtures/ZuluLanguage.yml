@@ -3,4 +3,3 @@ Oro\Bundle\TranslationBundle\Entity\Language:
         code: 'zu_ZA'
         enabled: true
         organization: '@organization'
-        owner: '@admin'

@@ -34,7 +34,7 @@ class LoadTranslationRoles extends AbstractFixture implements ContainerAwareInte
             $aclManager,
             $role,
             [
-                'entity:' . Language::class => ['VIEW_LOCAL', 'EDIT_LOCAL', 'CREATE_LOCAL', 'TRANSLATE_LOCAL'],
+                'entity:' . Language::class => ['VIEW_SYSTEM', 'EDIT_SYSTEM', 'CREATE_SYSTEM', 'TRANSLATE_SYSTEM'],
                 'action:oro_importexport_import' => ['EXECUTE'],
                 'action:oro_importexport_export' => ['EXECUTE'],
             ]
