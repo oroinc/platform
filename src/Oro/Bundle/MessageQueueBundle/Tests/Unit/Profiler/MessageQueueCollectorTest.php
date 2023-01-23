@@ -1,39 +1,31 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Profiler;
 
 use Oro\Bundle\MessageQueueBundle\Profiler\MessageQueueCollector;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
-use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 class MessageQueueCollectorTest extends \PHPUnit\Framework\TestCase
 {
-    use ClassExtensionTrait;
-
-    public function testShouldExtendDataCollectorClass()
-    {
-        $this->assertClassExtends(DataCollector::class, MessageQueueCollector::class);
-    }
-
     public function testCouldBeConstructedWithMessageProducerAsFirstArgument()
     {
-        new MessageQueueCollector($this->createMessageProducerMock());
+        new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
     }
 
     public function testShouldReturnExpectedName()
     {
-        $collector = new MessageQueueCollector($this->createMessageProducerMock());
+        $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 
         $this->assertEquals('message_queue', $collector->getName());
     }
 
     public function testShouldReturnEmptySentMessageArrayIfNotTraceableMessageProducer()
     {
-        $collector = new MessageQueueCollector($this->createMessageProducerMock());
+        $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 
         $collector->collect(new Request(), new Response());
 
@@ -42,13 +34,12 @@ class MessageQueueCollectorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReturnSentMessageArrayTakenFromTraceableMessageProducer()
     {
-        $producerMock = $this->createTraceableMessageProducerMock();
-        $producerMock
-            ->expects($this->once())
+        $producer = $this->createMock(TraceableMessageProducer::class);
+        $producer->expects($this->once())
             ->method('getTraces')
             ->willReturn([['foo'], ['bar']]);
 
-        $collector = new MessageQueueCollector($producerMock);
+        $collector = new MessageQueueCollector($producer);
 
         $collector->collect(new Request(), new Response());
 
@@ -57,21 +48,21 @@ class MessageQueueCollectorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldPrettyPrintKnownPriority()
     {
-        $collector = new MessageQueueCollector($this->createMessageProducerMock());
+        $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 
         $this->assertEquals('normal', $collector->prettyPrintPriority(MessagePriority::NORMAL));
     }
 
     public function testShouldPrettyPrintUnknownPriority()
     {
-        $collector = new MessageQueueCollector($this->createMessageProducerMock());
+        $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 
         $this->assertEquals('unknownPriority', $collector->prettyPrintPriority('unknownPriority'));
     }
 
     public function testShouldPrettyPrintScalarMessage()
     {
-        $collector = new MessageQueueCollector($this->createMessageProducerMock());
+        $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 
         $this->assertEquals('foo', $collector->prettyPrintMessage('foo'));
         $this->assertEquals('&lt;p&gt;', $collector->prettyPrintMessage('<p>'));
@@ -79,26 +70,10 @@ class MessageQueueCollectorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldPrettyPrintArrayMessage()
     {
-        $collector = new MessageQueueCollector($this->createMessageProducerMock());
+        $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 
         $expected = "[\n    &quot;foo&quot;,\n    &quot;bar&quot;\n]";
 
         $this->assertEquals($expected, $collector->prettyPrintMessage(['foo', 'bar']));
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
-     */
-    protected function createMessageProducerMock()
-    {
-        return $this->createMock(MessageProducerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|TraceableMessageProducer
-     */
-    protected function createTraceableMessageProducerMock()
-    {
-        return $this->createMock(TraceableMessageProducer::class);
     }
 }

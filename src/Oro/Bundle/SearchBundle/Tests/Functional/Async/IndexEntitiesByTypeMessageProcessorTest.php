@@ -10,6 +10,7 @@ use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
@@ -58,7 +59,8 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
         $this->getSearchIndexer()->resetIndex(Item::class);
         self::getMessageCollector()->clear();
 
-        $this->getIndexEntitiesByTypeMessageProcessor()->process($message, $this->createQueueSessionMock());
+        $this->getIndexEntitiesByTypeMessageProcessor()
+            ->process($message, $this->createMock(SessionInterface::class));
 
         $messages = self::getSentMessagesByTopic(IndexEntitiesByRangeTopic::getName());
 
@@ -70,32 +72,18 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
         $this->assertIsInt($messages[0]['jobId']);
     }
 
-    /**
-     * @return \Oro\Component\MessageQueue\Job\JobProcessor
-     */
-    private function getJobProcessor()
+    private function getJobProcessor(): JobProcessor
     {
-        return $this->getContainer()->get('oro_message_queue.job.processor');
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createQueueSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
+        return self::getContainer()->get('oro_message_queue.job.processor');
     }
 
     private function getDoctrine(): ManagerRegistry
     {
-        return $this->getContainer()->get('doctrine');
+        return self::getContainer()->get('doctrine');
     }
 
-    /**
-     * @return IndexEntitiesByTypeMessageProcessor
-     */
-    private function getIndexEntitiesByTypeMessageProcessor()
+    private function getIndexEntitiesByTypeMessageProcessor(): IndexEntitiesByTypeMessageProcessor
     {
-        return $this->getContainer()->get('oro_search.async.index_entities_by_type_processor');
+        return self::getContainer()->get('oro_search.async.index_entities_by_type_processor');
     }
 }
