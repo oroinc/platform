@@ -18,18 +18,18 @@ Feature: Managing users roles
       | Role        | Test role              |
       | Description | Hello it's description |
     And select following permissions:
-      | Call        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
-      | Lead        | View:Division      | Create:User          | Edit:User | Delete:User | Assign:User |
-      | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
-      | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
+      | Call     | View:Division     | Create:Business Unit | Edit:User         | Delete:User         | Assign:User            |
+      | Lead     | View:Division     | Create:User          | Edit:User         | Delete:User         | Assign:User            |
+      | Language | View:Organization | Create:Organization  | Edit:Organization | Assign:Organization | Translate:Organization |
+      | Task     | View:Division     | Create:Business Unit | Edit:User         | Delete:User         | Assign:User            |
     And I check "Access system information" entity permission
     When I save and close form
     Then I should see "Test role"
     And the role has following active permissions:
-      | Call        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
-      | Lead        | View:Division      | Create:User          | Edit:User | Delete:User | Assign:User |
-      | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
-      | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
+      | Call     | View:Division     | Create:Business Unit | Edit:User         | Delete:User         | Assign:User            |
+      | Lead     | View:Division     | Create:User          | Edit:User         | Delete:User         | Assign:User            |
+      | Language | View:Organization | Create:Organization  | Edit:Organization | Assign:Organization | Translate:Organization |
+      | Task     | View:Division     | Create:Business Unit | Edit:User         | Delete:User         | Assign:User            |
     And following capability permissions should be checked:
       | Access system information |
 
@@ -48,12 +48,12 @@ Feature: Managing users roles
     When I save and close form
     Then I should see "Edited test role"
     And the role has following active permissions:
-      | Contact        | View:Business Unit | Create:Business Unit | Edit:Division | Delete:Division      | Assign:User     |
-      | Email Campaign | View:Global        | Create:Division      | Edit:Global   | Assign:Division      | Assign:Division |
-      | Task           | View:User          | Create:Business Unit | Edit:User     | Delete:User          | Assign:User     |
-      | Call           | View:Division      | Create:Business Unit | Edit:User     | Delete:User       | Assign:User    |
-      | Lead           | View:Division      | Create:User          | Edit:User     | Delete:User       | Assign:User    |
-      | Language       | View:Business Unit | Create:User          | Edit:User     | Assign:User       | Translate:User |
+      | Contact        | View:Business Unit | Create:Business Unit | Edit:Division     | Delete:Division     | Assign:User            |
+      | Email Campaign | View:Global        | Create:Division      | Edit:Global       | Assign:Division     | Assign:Division        |
+      | Task           | View:User          | Create:Business Unit | Edit:User         | Delete:User         | Assign:User            |
+      | Call           | View:Division      | Create:Business Unit | Edit:User         | Delete:User         | Assign:User            |
+      | Lead           | View:Division      | Create:User          | Edit:User         | Delete:User         | Assign:User            |
+      | Language       | View:Organization  | Create:Organization  | Edit:Organization | Assign:Organization | Translate:Organization |
     And following capability permissions should be checked:
       | Access system information       |
       | Access job queue                |

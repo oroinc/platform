@@ -9,6 +9,9 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 
+/**
+ * Loads language owner data
+ */
 class UpdateLanguageOwner extends AbstractFixture implements DependentFixtureInterface
 {
     /**
@@ -33,7 +36,6 @@ class UpdateLanguageOwner extends AbstractFixture implements DependentFixtureInt
 
         foreach ($languages as $language) {
             $language
-                ->setOwner($user)
                 ->setOrganization($user->getOrganization());
         }
 

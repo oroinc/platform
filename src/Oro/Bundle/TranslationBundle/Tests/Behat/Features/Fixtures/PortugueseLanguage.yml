@@ -3,4 +3,3 @@ Oro\Bundle\TranslationBundle\Entity\Language:
         code: 'pt'
         enabled: true
         organization: '@organization'
-        owner: '@admin'

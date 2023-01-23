@@ -199,7 +199,11 @@ class DoctrineIsolator implements IsolatorInterface
                 $this->fixtureLoader->loadFixtureFile($fixtureFile);
             } catch (\Exception $e) {
                 throw new RuntimeException(
-                    sprintf('Exception while loading "%s" fixture file', $fixtureFile),
+                    sprintf(
+                        'Exception while loading "%s" fixture file with message: "%s"',
+                        $fixtureFile,
+                        $e->getMessage()
+                    ),
                     0,
                     $e
                 );

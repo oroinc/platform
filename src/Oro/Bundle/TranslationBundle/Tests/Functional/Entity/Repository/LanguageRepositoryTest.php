@@ -59,9 +59,15 @@ class LanguageRepositoryTest extends WebTestCase
 
         self::assertEquals(
             [
-                $this->getReference(LoadLanguages::LANGUAGE3)
+                'en',
+                $this->getReference(LoadLanguages::LANGUAGE1)->getCode(),
+                $this->getReference(LoadLanguages::LANGUAGE2)->getCode(),
+                $this->getReference(LoadLanguages::LANGUAGE3)->getCode(),
             ],
-            $this->getRepository()->getAvailableLanguagesByCurrentUser($aclHelper)
+            array_map(
+                fn (Language $language) => $language->getCode(),
+                $this->getRepository()->getAvailableLanguagesByCurrentUser($aclHelper)
+            )
         );
     }
 

@@ -3,5 +3,4 @@ Oro\Bundle\TranslationBundle\Entity\Language:
     code: 'fr_FR_file_based'
     enabled: false
     organization: '@organization'
-    owner: '@admin'
     local_files_language: true

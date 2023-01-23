@@ -10,8 +10,6 @@ datagrids:
                     - language.enabled
                     - language.createdAt
                     - language.updatedAt
-                    - CONCAT_WS(' ', languageOwner.firstName, languageOwner.lastName) as ownerName
-                    - languageOwner.id as owner
                     - COUNT(translation) as translationCount
                     - language.installedBuildDate
                     - language.localFilesLanguage
@@ -19,7 +17,6 @@ datagrids:
                     - { table: 'Oro\Bundle\TranslationBundle\Entity\Language', alias: language }
                 join:
                     left:
-                        - { join: language.owner, alias: languageOwner }
                         -
                             join: 'Oro\Bundle\TranslationBundle\Entity\Translation'
                             alias: translation
@@ -32,20 +29,6 @@ datagrids:
         columns:
             language:
                 label: oro.translation.language.entity_label
-            ownerName:
-                label: oro.translation.language.owner.label
-                frontend_type: relation
-                inline_editing:
-                    enable: true
-                    editor:
-                        view: oroform/js/app/views/editor/related-id-relation-editor-view
-                        view_options:
-                            value_field_name: owner
-                    autocomplete_api_accessor:
-                        class: orouser/js/tools/acl-users-search-api-accessor
-                        permission_check_entity_name: Oro_Bundle_TranslationBundle_Entity_Language
-                        permission: EDIT
-                renderable: false
             enabled:
                 label: oro.translation.language.enabled.label
                 type: twig
@@ -104,7 +87,6 @@ datagrids:
                     renderable: false
         properties:
             id: ~
-            owner: ~
             language:
                 type: callback
                 callable: ["@oro_locale.formatter.language_code", "formatLocale"]

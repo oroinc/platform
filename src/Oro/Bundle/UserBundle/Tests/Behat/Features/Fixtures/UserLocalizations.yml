@@ -6,7 +6,6 @@ Oro\Bundle\TranslationBundle\Entity\Language:
         code: 'fr_FR'
         enabled: true
         organization: '@organization'
-        owner: '@admin'
 
 Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
     title_french_localization:
