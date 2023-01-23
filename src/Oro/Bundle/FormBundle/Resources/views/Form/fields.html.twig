@@ -161,6 +161,7 @@
             {% elseif form.vars.selection_url is defined and form.vars.selection_url %}
                 {% set selectionUrl = form.vars.selection_url %}
             {% endif %}
+            {% set selectionUrlMethod = form.vars.selection_url_method|default(null) %}
             {% set selectionRouteName = form.vars.selection_route|default(null) %}
             {% set selectionRouteParameters = form.vars.selection_route_parameters|default({}) %}
 
@@ -171,6 +172,7 @@
                 name: {{ id|json_encode|raw }},
                 defaultElement: {{ form.vars.default_element|json_encode|raw }},
                 selectionUrl: {{ selectionUrl|json_encode|raw }},
+                selectionUrlMethod: {{ selectionUrlMethod|json_encode|raw }},
                 selectionRouteName: {{ selectionRouteName|json_encode|raw }},
                 selectionRouteParams: {{ selectionRouteParameters|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
                 allowAction: {{ form.vars.allow_action|json_encode|raw }},

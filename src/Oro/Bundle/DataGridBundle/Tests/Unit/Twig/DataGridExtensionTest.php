@@ -143,7 +143,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider routeProvider
      */
-    public function testGetGridMetadataWorks(?string $configRoute, string $expectedRoute)
+    public function testGetGridMetadataWorks(?string $configRoute, string $expectedRoute, string $requestMethod)
     {
         $gridName = 'test-grid';
         $gridScope = 'test-scope';
@@ -186,13 +186,14 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
 
         $metadata->expects($this->once())
             ->method('offsetAddToArray')
-            ->with('options', ['url' => $url, 'urlParams' => $params]);
+            ->with('options', ['url' => $url, 'urlParams' => $params, 'type' => $requestMethod]);
 
         $metadata->expects($this->any())
             ->method('offsetGetByPath')
             ->with()
             ->willReturnMap([
-                ['[options][route]', $configRoute],
+                ['[options][route]', '', $configRoute],
+                ['[options][requestMethod]', 'GET', $requestMethod],
             ]);
 
         $metadataArray = ['metadata-array'];
@@ -209,7 +210,8 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
     public function routeProvider(): array
     {
         return [
-            [null, 'oro_datagrid_index'],
+            [null, 'oro_datagrid_index', 'GET'],
+            [null, 'oro_datagrid_index', 'POST'],
         ];
     }
 
