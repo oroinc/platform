@@ -751,6 +751,12 @@ define([
             options.url = url;
             options.data = data;
 
+            const type = this.options.type || '';
+
+            if (type !== '') {
+                options.type = type;
+            }
+
             if (!options.error) {
                 options.errorHandlerMessage = __('oro.datagrid.loading_failed_message');
             }
