@@ -33,6 +33,8 @@ oro:
             gray:           Gray
         icon_select:
             adjust: adjust
+            address-card: address card
+            address-card-o: address card alt
             anchor: anchor
             archive: archive
             asterisk: asterisk
