@@ -8,7 +8,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
 /**
- * Changes auth status from "expired" to "active" for newly created users
+ * Changes auth status from to "active" for newly created users
  * and when password changed for existing users.
  */
 class PasswordChangedListener
@@ -34,7 +34,7 @@ class PasswordChangedListener
 
     private function updateAuthStatus(User $user): void
     {
-        if ($user->getAuthStatus() && $user->getAuthStatus()->getId() === UserManager::STATUS_EXPIRED) {
+        if ($user->getAuthStatus() && $user->getAuthStatus()->getId() !== UserManager::STATUS_ACTIVE) {
             $user->setAuthStatus(
                 $this->enumValueProvider->getEnumValueByCode('auth_status', UserManager::STATUS_ACTIVE)
             );

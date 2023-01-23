@@ -109,11 +109,14 @@ operations:
         routes:
             - oro_user_index
             - oro_user_view
+        preactions:
+            - '@get_active_user': $.currentUser
         preconditions:
-          '@and':
-              - '@or':
-                  - '@not_blank': $.routes[name]
-                  - '@not_blank': $.gridName
+              '@and':
+                  - '@or':
+                      - '@not_blank': $.routes[name]
+                      - '@not_blank': $.gridName
+                  - '@not_equal': [$id, $.currentUser.id]
         order: 50
         acl_resource: [password_management]
         button_options:

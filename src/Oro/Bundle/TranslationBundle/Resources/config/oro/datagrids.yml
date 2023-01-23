@@ -179,11 +179,6 @@ datagrids:
                             - key
                             - locale
                             - domain
-            current:
-                label: oro.translation.translation.current.label
-                type: twig
-                frontend_type: html
-                template: '@OroTranslation/Translation/Datagrid/current.html.twig'
             key:
                 label: oro.translation.translation_key.key.label
             domain:

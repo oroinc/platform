@@ -659,10 +659,10 @@ Example:
 
 Retrieve a specific authentication status record.
 
-The authentication status defines the actuality of the user's password, whether it is active, expired, or locked.
+The authentication status defines the actuality of the user's password, whether it is active, reset, expired, or locked.
 
 ### get_list
 
 Retrieve a collection of authentication status records.
 
-The authentication status defines the actuality of the user's password, whether it is active, expired, or locked.
+The authentication status defines the actuality of the user's password, whether it is active, reset, expired, or locked.

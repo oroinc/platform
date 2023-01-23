@@ -81,7 +81,6 @@ oro.translation:
         message:
             rebuild_cache: 'The translation cache has been updated,'
             rebuild_cache_failure: 'Failed to update the translation cache.'
-        current.label: 'Current (Cached) Value'
         rebuild_cache_required: 'Translation cache update is required. <a href="%path%">Click here</a> to update'
 
     translation_key:

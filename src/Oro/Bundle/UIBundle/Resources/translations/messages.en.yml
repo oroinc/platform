@@ -2,6 +2,7 @@
 "Save": "Save"
 "Save and Close": "Save and Close"
 "Save and New": "Save and New"
+"Save and Return": "Save and Return"
 "Update": "Update"
 "Accept": "Accept"
 "Apply": "Apply"
@@ -66,15 +67,29 @@ oro:
         system_configuration:
             groups:
                 navbar_settings.title: 'Navigation bar'
+                upcoming_changes.title: 'Upcoming Changes'
                 application_settings.title: 'Application Settings'
                 application_name_settings.title: 'URL'
+                window_settings:
+                    title: 'Window Settings'
             fields:
                 application_url.label: 'Application URL'
+                upcoming_changes:
+                    enable_quick_creation_buttons:
+                        label: 'Enable Quick Creation Buttons'
+                        tooltip: 'The quick creation buttons and actions will be enabled by default in the next major OroCommerce version.'
                 navbar_position:
                     label: 'Position'
                     choices:
                         top: 'Top'
                         left: 'Left'
+                quick_create_actions:
+                    label: 'Quick Create Actions'
+                    tooltip: 'The quick creation buttons form can be displayed in a new browser tab, a popup dialog window, or replace the current page.'
+                    choices:
+                        tab: 'Open New Browser Tab'
+                        popup: 'Open Popup Dialog'
+                        current_page: 'Replace Current Page'
         http_codes:
             226: 'IM Used'
             300: 'Multiple Choices'

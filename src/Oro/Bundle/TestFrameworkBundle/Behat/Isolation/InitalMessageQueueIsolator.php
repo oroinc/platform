@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Process all messages in queue before make db dump
  */
-class InitalMessageQueueIsolator implements MessageQueueProcessorAwareInterface
+class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueProcessorAwareInterface
 {
     use MessageQueueProcessorAwareTrait;
 

@@ -11,6 +11,9 @@
 
     white-space: normal;
 
+    // Floating the elements, such as quickly accessible buttons close to datagrids, are not allowed to float on both sides
+    clear: both;
+
     &__title {
         margin: 0;
 

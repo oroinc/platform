@@ -36,7 +36,7 @@ class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnKernelRequestWithExpiredUser(): void
     {
-        $enum = new TestEnumValue(UserManager::STATUS_EXPIRED, UserManager::STATUS_EXPIRED);
+        $enum = new TestEnumValue(UserManager::STATUS_RESET, UserManager::STATUS_RESET);
         $this->user->setAuthStatus($enum);
 
         $this->tokenStorage->expects(self::once())

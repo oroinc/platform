@@ -24,6 +24,7 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
     use AssertTrait, MessageQueueProcessorAwareTrait;
 
     private string $downloadedFile = '';
+    private array $rememberedData = [];
 
     public function __construct(private EmailClient $emailClient)
     {
@@ -427,6 +428,33 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         self::assertNotNull($url, sprintf('"%s" link not found in the email', $linkCaption));
 
         $this->visitPath($url);
+    }
+
+    /**
+     * Example: I remember "Confirm" link from the email
+     *
+     * @Then /^I remember "(?P<linkCaption>[^"]+)" link from the email$/
+     * @param string $imageType
+     */
+    public function iRememberLinkFromEmail($linkCaption)
+    {
+        $url = $this->getLinkUrlFromEmail($linkCaption);
+
+        self::assertNotNull($url, sprintf('"%s" link not found in the email', $linkCaption));
+
+        $this->rememberedData[$linkCaption] = $url;
+    }
+
+    /**
+     * Example: Then I follow remembered "Confirm" link from the email
+     *
+     * @Given /^(?:|I )follow remembered "(?P<linkCaption>[^"]+)" link from the email$/
+     */
+    public function followRememberedLinkFromEmail(string $linkCaption)
+    {
+        self::assertTrue(isset($this->rememberedData[$linkCaption]));
+
+        $this->visitPath($this->rememberedData[$linkCaption]);
     }
 
     public function getLinkUrlFromEmail(string $linkCaption): ?string

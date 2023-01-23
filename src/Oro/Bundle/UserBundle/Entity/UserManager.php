@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 class UserManager extends BaseUserManager
 {
     public const STATUS_ACTIVE  = 'active';
-    public const STATUS_EXPIRED = 'expired';
+    public const STATUS_RESET = 'reset';
 
     private const AUTH_STATUS_ENUM_CODE = 'auth_status';
 
