@@ -82,6 +82,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
             'selector_window_title',
             'extra_config',
             'selection_url',
+            'selection_url_method',
             'selection_route',
             'selection_route_parameters',
         ];

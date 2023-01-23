@@ -13,7 +13,7 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldSplitFile()
     {
-        $reader = $this->createReaderMock();
+        $reader = $this->createMock(AbstractFileReader::class);
         $reader->expects($this->once())
             ->method('initializeByContext')
             ->with(new Context([
@@ -34,8 +34,8 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getHeader')
             ->willReturn(['a', 'b']);
 
-        $fileManagerMock = $this->createFileManagerMock();
-        $writer = $this->createWriterMock();
+        $fileManagerMock = $this->createMock(FileManager::class);
+        $writer = $this->createMock(FileStreamWriter::class);
         $writer->expects($this->exactly(2))
             ->method('setImportExportContext');
 
@@ -52,22 +52,19 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
             Context::OPTION_DELIMITER => ';',
             Context::OPTION_ENCLOSURE => '|',
         ]);
-        $splittedFiles = $batchFileManager->splitFile('test.csv');
-        $this->assertCount(2, $splittedFiles);
+        $this->assertCount(2, $batchFileManager->splitFile('test.csv'));
     }
 
     public function testShouldSplitFileWithCustomBatchSize(): void
     {
-        $context = new Context(
-            [
-                Context::OPTION_FILE_PATH => 'test.csv',
-                Context::OPTION_DELIMITER => ';',
-                Context::OPTION_ENCLOSURE => '|',
-                Context::OPTION_BATCH_SIZE => 3,
-            ]
-        );
+        $context = new Context([
+            Context::OPTION_FILE_PATH => 'test.csv',
+            Context::OPTION_DELIMITER => ';',
+            Context::OPTION_ENCLOSURE => '|',
+            Context::OPTION_BATCH_SIZE => 3,
+        ]);
 
-        $reader = $this->createReaderMock();
+        $reader = $this->createMock(AbstractFileReader::class);
         $reader->expects($this->once())
             ->method('initializeByContext')
             ->with($context);
@@ -79,9 +76,9 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getHeader')
             ->willReturn(['a', 'b']);
 
-        $fileManagerMock = $this->createFileManagerMock();
+        $fileManagerMock = $this->createMock(FileManager::class);
 
-        $writer = $this->createWriterMock();
+        $writer = $this->createMock(FileStreamWriter::class);
         $writer->expects($this->exactly(2))
             ->method('setImportExportContext');
 
@@ -99,13 +96,12 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
             Context::OPTION_ENCLOSURE => '|',
             Context::OPTION_BATCH_SIZE => 3,
         ]);
-        $splittedFiles = $batchFileManager->splitFile('test.csv');
-        $this->assertCount(2, $splittedFiles);
+        $this->assertCount(2, $batchFileManager->splitFile('test.csv'));
     }
 
     public function testShouldThrowErrorDuringSplitFile()
     {
-        $fileManagerMock = $this->createFileManagerMock();
+        $fileManagerMock = $this->createMock(FileManager::class);
         $batchFileManager = new BatchFileManager($fileManagerMock, 1);
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Reader and Writer must be configured.');
@@ -114,7 +110,7 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldThrowErrorDuringMergeFiles()
     {
-        $fileManagerMock = $this->createFileManagerMock();
+        $fileManagerMock = $this->createMock(FileManager::class);
         $batchFileManager = new BatchFileManager($fileManagerMock, 1);
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Reader and Writer must be configured.');
@@ -123,9 +119,9 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldMergeFiles()
     {
-        $fileManagerMock = $this->createFileManagerMock();
+        $fileManagerMock = $this->createMock(FileManager::class);
 
-        $reader = $this->createReaderMock();
+        $reader = $this->createMock(AbstractFileReader::class);
         $reader->expects($this->exactly(2))
             ->method('initializeByContext')
             ->withConsecutive(
@@ -146,7 +142,7 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getHeader')
             ->willReturn(['a', 'b']);
 
-        $writer = $this->createWriterMock();
+        $writer = $this->createMock(FileStreamWriter::class);
         $writer->expects($this->once())
             ->method('setImportExportContext')
             ->with(new Context(['filePath' => 'result', 'header' => ['a', 'b'], 'firstLineIsHeader' => true]));
@@ -163,14 +159,14 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
         $batchFileManager->setReader($reader);
         $batchFileManager->setWriter($writer);
 
-        $this->assertEquals($batchFileManager->mergeFiles(['test1', 'test2'], 'result'), 'result');
+        $this->assertEquals('result', $batchFileManager->mergeFiles(['test1', 'test2'], 'result'));
     }
 
     public function testShouldMergeFilesWhenBatchSizeIsExceeded()
     {
-        $fileManagerMock = $this->createFileManagerMock();
+        $fileManagerMock = $this->createMock(FileManager::class);
 
-        $reader = $this->createReaderMock();
+        $reader = $this->createMock(AbstractFileReader::class);
         $reader->expects($this->exactly(2))
             ->method('initializeByContext')
             ->withConsecutive(
@@ -192,7 +188,7 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getHeader')
             ->willReturn(['a', 'b']);
 
-        $writer = $this->createWriterMock();
+        $writer = $this->createMock(FileStreamWriter::class);
         $writer->expects($this->once())
             ->method('setImportExportContext')
             ->with(new Context(['filePath' => 'result', 'header' => ['a', 'b'], 'firstLineIsHeader' => true]));
@@ -210,29 +206,6 @@ class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
         $batchFileManager->setReader($reader);
         $batchFileManager->setWriter($writer);
 
-        $this->assertEquals($batchFileManager->mergeFiles(['test1', 'test2'], 'result'), 'result');
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|AbstractFileReader
-     */
-    private function createReaderMock()
-    {
-        return $this->createMock(AbstractFileReader::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|FileStreamWriter
-     */
-    private function createWriterMock()
-    {
-        return $this->createMock(FileStreamWriter::class);
-    }
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|FileManager
-     */
-    private function createFileManagerMock()
-    {
-        return $this->createMock(FileManager::class);
+        $this->assertEquals('result', $batchFileManager->mergeFiles(['test1', 'test2'], 'result'));
     }
 }

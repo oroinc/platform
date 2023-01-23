@@ -11,19 +11,13 @@ use Psr\Log\LoggerInterface;
 
 class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeCreatedWithRequiredArguments()
-    {
-        new RejectMessageOnExceptionDbalExtension();
-    }
-
     public function testShouldDoNothingIfExceptionIsMissing()
     {
-        $consumer = $this->createMessageConsumerMock();
-        $consumer
-            ->expects($this->never())
+        $consumer = $this->createMock(MessageConsumerInterface::class);
+        $consumer->expects($this->never())
             ->method('reject');
 
-        $context = new Context($this->createSessionMock());
+        $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessageConsumer($consumer);
 
         $extension = new RejectMessageOnExceptionDbalExtension();
@@ -32,12 +26,11 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestC
 
     public function testShouldDoNothingIfMessageIsMissing()
     {
-        $consumer = $this->createMessageConsumerMock();
-        $consumer
-            ->expects($this->never())
+        $consumer = $this->createMock(MessageConsumerInterface::class);
+        $consumer->expects($this->never())
             ->method('reject');
 
-        $context = new Context($this->createSessionMock());
+        $context = new Context($this->createMock(SessionInterface::class));
         $context->setException(new \Exception());
         $context->setMessageConsumer($consumer);
 
@@ -50,22 +43,20 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestC
         $message = new Message();
         $message->setMessageId(123);
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('debug')
             ->with(
                 'Execution was interrupted and message was rejected. {id}',
                 ['id' => '123']
             );
 
-        $consumer = $this->createMessageConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $consumer = $this->createMock(MessageConsumerInterface::class);
+        $consumer->expects($this->once())
             ->method('reject')
             ->with($this->identicalTo($message), $this->isTrue());
 
-        $context = new Context($this->createSessionMock());
+        $context = new Context($this->createMock(SessionInterface::class));
         $context->setLogger($logger);
         $context->setException(new \Exception());
         $context->setMessage($message);
@@ -73,29 +64,5 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestC
 
         $extension = new RejectMessageOnExceptionDbalExtension();
         $extension->onInterrupted($context);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createMessageConsumerMock()
-    {
-        return $this->createMock(MessageConsumerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
     }
 }
