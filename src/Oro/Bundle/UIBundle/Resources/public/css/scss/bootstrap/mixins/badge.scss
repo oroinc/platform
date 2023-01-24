@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 @mixin badge-custom-variant($background, $icon-color, $color: color-yiq($background)) {
     color: $color;
     background-color: $background;
@@ -11,7 +13,7 @@
 
     &[href] {
         @include hover-focus {
-            $background-color: darken($background, 10%);
+            $background-color: color.adjust($background, $lightness: -10%);
 
             color: $color;
             text-decoration: none;

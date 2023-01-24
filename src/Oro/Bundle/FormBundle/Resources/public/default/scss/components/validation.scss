@@ -4,19 +4,19 @@
 .validation-error,
 .validation-passed,
 .validation-warning {
-    @extend .notification;
+    @extend %base-notification;
 
     display: block;
     color: $validation-failed-color;
 
     &--lite {
-        @extend .notification--lite;
+        @extend %base-notification-light;
     }
 }
 
 .validation-failed,
 .validation-error {
-    @extend .notification--error;
+    @extend %base-notification-error;
 
     &__icon {
         @include fa-icon($fa-var-warning, before, true) {
@@ -39,7 +39,7 @@
 }
 
 .validation-warning {
-    @extend .notification--warning;
+    @extend %base-notification-warning;
 
     &__icon {
         @include fa-icon($fa-var-warning, before, true) {
@@ -50,7 +50,7 @@
 }
 
 .validation-passed {
-    @extend .notification--success;
+    @extend %base-notification-success;
 }
 
 .controls {

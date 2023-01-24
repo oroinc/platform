@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 .grid-main-container {
     display: table;
     width: 100%;
@@ -171,7 +173,7 @@
         background-color: $cell-success-background;
 
         &:hover {
-            background-color: darken($cell-success-background, 5%);
+            background-color: color.adjust($cell-success-background, $lightness: -5%);
         }
     }
 

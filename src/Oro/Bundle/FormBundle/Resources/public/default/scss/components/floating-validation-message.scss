@@ -1,8 +1,9 @@
 /* @theme: default; */
 
-$arrow-height: 6px;
-$field-size: 40px;
+@use 'sass:selector';
 
+// More about placeholders https://github.com/sass/sass/issues/2808#issuecomment-574413393
+%base-floating-validation-message,
 .floating-validation-message {
     display: block;
     position: absolute;
@@ -38,7 +39,7 @@ $field-size: 40px;
         border-radius: $floating-validation-message-label-border-radius;
     }
 
-    &__icon {
+    @at-root #{selector.append(&, '__icon')} {
         display: $floating-validation-message-icon-display;
     }
 }

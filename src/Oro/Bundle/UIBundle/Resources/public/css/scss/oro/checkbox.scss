@@ -26,8 +26,10 @@
 [type='checkbox'],
 [type='radio'] {
     background-color: $checkbox-background;
-    width: $checkbox-size-var;
-    height: $checkbox-size-var;
+    // stylelint-disable-next-line declaration-no-important
+    width: $checkbox-size-var !important;
+    // stylelint-disable-next-line declaration-no-important
+    height: $checkbox-size-var !important;
     margin: $checkbox-margin;
     color: $checkbox-color;
     appearance: $checkbox-appearance;

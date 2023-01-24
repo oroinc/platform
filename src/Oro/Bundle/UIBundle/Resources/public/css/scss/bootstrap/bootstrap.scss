@@ -35,3 +35,6 @@
 @import '~@oroinc/bootstrap/scss/carousel';
 @import '~@oroinc/bootstrap/scss/utilities';
 @import '~@oroinc/bootstrap/scss/print';
+
+// Must be the last in the list
+@import 'placeholders';

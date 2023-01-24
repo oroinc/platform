@@ -1,10 +1,12 @@
 /* @theme: admin.oro; */
 
+@use 'sass:map';
+
 $btn-group-divider-width: 1px;
 $btn-group-divider-color: $primary-inverse;
 
 $btn-group-divider-keys: () !default;
-$btn-group-divider-keys: map-merge(
+$btn-group-divider-keys: map.merge(
     (
         'light': transparent,
         'lighter': transparent,
@@ -22,7 +24,7 @@ $btn-group-divider-keys: map-merge(
 $btn-group-square-divider-width: $btn-square-border-width;
 
 $btn-group-square-divider-keys: () !default;
-$btn-group-square-divider-keys: map-merge(
+$btn-group-square-divider-keys: map.merge(
     (
         'default': $primary-750,
         'light': transparent,

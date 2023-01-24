@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:map';
+
 $btn-fa-icon-font-size: $base-font-size--m !default;
 $btn-fa-icon-line-height: $btn-line-height - 2 !default;
 $btn-fa-icon-vertical-align: middle !default;
@@ -136,7 +138,7 @@ $btn-theme-inverse: (
 ) !default;
 
 $btn-theme-keys: () !default;
-$btn-theme-keys: map-merge(
+$btn-theme-keys: map.merge(
     (
         'light': $btn-theme-light,
         'light-custom': $btn-theme-light-custom,
@@ -201,7 +203,7 @@ $btn-theme-square-lighter: (
 ) !default;
 
 $btn-theme-square-keys: () !default;
-$btn-theme-square-keys: map-merge(
+$btn-theme-square-keys: map.merge(
     (
         'default': $btn-theme-square-default,
         'light': $btn-theme-square-light,

@@ -1,4 +1,6 @@
 /* @theme: default; */
+@use 'sass:list';
+@use 'sass:map';
 
 @import './rect';
 @import './ellipse';
@@ -12,11 +14,11 @@
 
     @each $particle in $particles {
         @if type-of($particle) == 'list' {
-            $result: join($result, $particle, comma);
+            $result: list.join($result, $particle, comma);
         }
 
         @if type-of($particle) == 'map' {
-            $result: append($result, $particle, comma);
+            $result: list.append($result, $particle, comma);
         }
     }
 
@@ -37,12 +39,12 @@
     $result: ();
 
     @each $particle in $particles {
-        @if map-get($particle, 'type') == 'rect' {
-            $result: append($result, skeleton-image-rect($particle), comma);
+        @if map.get($particle, 'type') == 'rect' {
+            $result: list.append($result, skeleton-image-rect($particle), comma);
         }
 
-        @if map-get($particle, 'type') == 'ellipse' {
-            $result: append($result, skeleton-image-ellipse($particle), comma);
+        @if map.get($particle, 'type') == 'ellipse' {
+            $result: list.append($result, skeleton-image-ellipse($particle), comma);
         }
     }
 
@@ -63,12 +65,12 @@
     $result: ();
 
     @each $particle in $particles {
-        @if map-get($particle, 'type') == 'rect' {
-            $result: append($result, skeleton-size-rect($particle), comma);
+        @if map.get($particle, 'type') == 'rect' {
+            $result: list.append($result, skeleton-size-rect($particle), comma);
         }
 
-        @if map-get($particle, 'type') == 'ellipse' {
-            $result: append($result, skeleton-size-ellipse($particle), comma);
+        @if map.get($particle, 'type') == 'ellipse' {
+            $result: list.append($result, skeleton-size-ellipse($particle), comma);
         }
     }
 
@@ -89,12 +91,12 @@
     $result: ();
 
     @each $particle in $particles {
-        @if map-get($particle, 'type') == 'rect' {
-            $result: append($result, skeleton-position-rect($particle), comma);
+        @if map.get($particle, 'type') == 'rect' {
+            $result: list.append($result, skeleton-position-rect($particle), comma);
         }
 
-        @if map-get($particle, 'type') == 'ellipse' {
-            $result: append($result, skeleton-position-ellipse($particle), comma);
+        @if map.get($particle, 'type') == 'ellipse' {
+            $result: list.append($result, skeleton-position-ellipse($particle), comma);
         }
     }
 

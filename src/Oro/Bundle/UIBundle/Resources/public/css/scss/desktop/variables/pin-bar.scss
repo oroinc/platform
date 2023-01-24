@@ -1,10 +1,12 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 $pin-item-active-bg-color: $extra-200 !default;
 $pin-item-close-color: $primary-700 !default;
-$pin-item-close-hover-color: darken($pin-item-close-color, 8%) !default;
+$pin-item-close-hover-color: color.adjust($pin-item-close-color, $lightness: -8%) !default;
 $pin-item-outdated-color: $warning-dark !default;
-$pin-item-outdated-hover-color: darken($pin-item-outdated-color, 8%) !default;
+$pin-item-outdated-hover-color: color.adjust($pin-item-outdated-color, $lightness: -8%) !default;
 
 $pin-item-show-more-menu-width: 20px !default;
 $pin-item-show-more-menu-offset: -8px !default;

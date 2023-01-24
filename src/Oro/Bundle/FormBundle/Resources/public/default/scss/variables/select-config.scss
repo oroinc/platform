@@ -1,6 +1,7 @@
 /* @theme: default; */
 
 @use 'sass:string';
+@use 'sass:color';
 
 $use-base-style-for-select: true !default;
 
@@ -30,8 +31,8 @@ $select-arrow-color: $base-ui-element-arrow-color !default;
 $select-bg: url('data:image/svg+xml;utf8,<svg width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M0 .027l4.99 5.954L9.98.027z" fill="#{str-replace(string.unquote('#{$select-arrow-color}'), '#', '%23')}" fill-rule="evenodd"/></svg>') no-repeat right 8px center get-color('additional', 'ultra') !default;
 
 $select-border-color-hover-state: get-color('additional', 'dark') !default;
-$select-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additional', 'ultra'), .75),
-                                      0 0 8px transparentize(get-color('ui', 'focus'), .6) !default;
+$select-box-shadow-hover-state: inset 0 1px 1px color.scale(get-color('additional', 'ultra'), $alpha: -75%),
+                                      0 0 8px color.scale(get-color('ui', 'focus'), $alpha: -60%) !default;
 
 // Focus State
 $select-border-color-focus-state: $base-ui-element-border-color-focus !default;
@@ -39,7 +40,7 @@ $select-box-shadow-focus-state: $base-ui-element-focus-style !default;
 
 // Error State
 $select-border-color-error-state: get-color('ui', 'error-dark') !default;
-$select-box-shadow-error-state: 0 1px 7px 0 transparentize(get-color('ui', 'error-dark'), .6);
+$select-box-shadow-error-state: 0 1px 7px 0 color.scale(get-color('ui', 'error-dark'), $alpha: -60%);
 
 // Disabled
 

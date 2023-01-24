@@ -17,7 +17,7 @@
         padding-top: math.div($height, $width) * 100%;
     }
 
-    @if $content != null {
+    @if $content {
         > #{$content} {
             position: absolute;
             top: 0;

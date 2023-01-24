@@ -1,4 +1,5 @@
 /* @theme: default; */
+@use 'sass:list';
 
 // Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal, ('woff', 'woff2'), swap);
 @mixin font-face(
@@ -18,7 +19,7 @@
             $url: null;
 
             @each $font-format in $font-formats {
-                $i: index($font-formats, $font-format);
+                $i: list.index($font-formats, $font-format);
 
                 @if ($font-format == 'ttf') {
                     $url: url('#{$file-path}.#{$font-format}') format('truetype');
@@ -117,7 +118,7 @@
 
             // Iterate section name
             // 'main' or 'secondary' or 'icon' or '...'
-            $current-section-name: nth($font-names, $font-index);
+            $current-section-name: list.nth($font-names, $font-index);
 
             // Iterate section
             // (

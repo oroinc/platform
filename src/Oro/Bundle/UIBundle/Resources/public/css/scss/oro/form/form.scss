@@ -108,7 +108,7 @@
 }
 
 #{map_get($oro-form-selectors, 'inputs')} {
-    @extend .input;
+    @extend %base-input;
 
     &.full {
         width: 100%;
