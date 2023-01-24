@@ -1,14 +1,17 @@
 /* @theme: default; */
 
+@use 'sass:map';
+@use 'sass:math';
+
 // @private: background-image generator
 // Take a particle map and generate background-image value
 // @param: Map $particle
 // @return: List of background-image value
 @function skeleton-image-rect($particle) {
-    $color: map-get($particle, 'color');
-    $width: map-get($particle, 'width');
-    $height: map-get($particle, 'height');
-    $radius: min(map-get($particle, 'radius'), floor($width * .5), floor($height * .5));
+    $color: map.get($particle, 'color');
+    $width: map.get($particle, 'width');
+    $height: map.get($particle, 'height');
+    $radius: math.min(map.get($particle, 'radius'), math.floor($width * .5), math.floor($height * .5));
     $result: ();
 
     @if not $radius or strip-units($radius) == 0 {
@@ -34,9 +37,9 @@
 // @param: Map $particle
 // @return: List of background-size value
 @function skeleton-size-rect($particle) {
-    $width: map-get($particle, 'width');
-    $height: map-get($particle, 'height');
-    $radius: min(map-get($particle, 'radius'), floor($width * .5), floor($height * .5));
+    $width: map.get($particle, 'width');
+    $height: map.get($particle, 'height');
+    $radius: math.min(map.get($particle, 'radius'), math.floor($width * .5), math.floor($height * .5));
     $result: ();
 
     @if not $radius or strip-units($radius) == 0 {
@@ -62,11 +65,11 @@
 // @param: Map $particle
 // @return: List of background-position value
 @function skeleton-position-rect($particle) {
-    $width: map-get($particle, 'width');
-    $height: map-get($particle, 'height');
-    $x: map-get($particle, 'x');
-    $y: map-get($particle, 'y');
-    $radius: min(map-get($particle, 'radius'), floor($width * .5), floor($height * .5));
+    $width: map.get($particle, 'width');
+    $height: map.get($particle, 'height');
+    $x: map.get($particle, 'x');
+    $y: map.get($particle, 'y');
+    $radius: math.min(map.get($particle, 'radius'), math.floor($width * .5), math.floor($height * .5));
     $result: ();
 
     @if not $radius or strip-units($radius) == 0 {

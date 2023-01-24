@@ -151,7 +151,7 @@
     &,
     .dropdown-menu-items {
         > li > a {
-            @extend .dropdown-item;
+            @extend %dropdown-item;
         }
     }
 

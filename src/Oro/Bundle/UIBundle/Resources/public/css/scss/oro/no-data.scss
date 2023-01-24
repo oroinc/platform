@@ -1,5 +1,9 @@
 /* @theme: admin.oro; */
 
+@use 'sass:selector';
+
+// More about placeholders https://github.com/sass/sass/issues/2808#issuecomment-574413393
+%base-no-data,
 .no-data {
     margin: $no-data-offset;
     padding: 0 $content-padding;
@@ -14,7 +18,7 @@
     // Floating the elements, such as quickly accessible buttons close to datagrids, are not allowed to float on both sides
     clear: both;
 
-    &__title {
+    @at-root #{selector.append(&, '__title')} {
         margin: 0;
 
         font-size: $no-data-title-font-size;
@@ -38,7 +42,7 @@
         }
     }
 
-    &__text {
+    @at-root #{selector.append(&, '__text')} {
         margin: 0;
     }
 }

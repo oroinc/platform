@@ -2,12 +2,13 @@
 
 @use 'sass:meta';
 @use 'sass:list';
+@use 'sass:map';
 
 // @return the value in a $font-weights map associated with a given key;
 // Use: font-weight: font-weight('bold') => font-weight: 700;
 
 @function font-weight($key) {
-    $font-weight-key: map-get($font-weights, $key);
+    $font-weight-key: map.get($font-weights, $key);
 
     @if ($font-weight-key) {
         @return $font-weight-key;

@@ -1,5 +1,7 @@
 /* @theme: default; */
 
+@use 'sass:color';
+
 $use-base-style-for-input: true !default;
 
 // Default
@@ -24,8 +26,9 @@ $input-time-placeholder-color: get-color('additional', 'middle') !default;
 
 // Hover
 $input-border-color-hover-state: get-color('additional', 'dark') !default;
-$input-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additional', 'ultra'), .75),
-0 0 8px transparentize(get-color('ui', 'focus'), .6);
+$input-box-shadow-hover-state:
+    inset 0 1px 1px color.scale(get-color('additional', 'ultra'), $alpha: -75%),
+    0 0 8px color.scale(get-color('ui', 'focus'), $alpha: -60%);
 
 // Focus
 $input-border-color-focus-state: $base-ui-element-border-color-focus !default;
@@ -33,10 +36,9 @@ $input-box-shadow-focus-state: $base-ui-element-focus-style !default;
 
 // Error
 $input-border-color-error-state: get-color('ui', 'error-dark') !default;
-$input-box-shadow-error-state: 0 1px 7px 0 transparentize(get-color('ui', 'error-dark'), .6);
+$input-box-shadow-error-state: 0 1px 7px 0 color.scale(get-color('ui', 'error-dark'), $alpha: -60%);
 
 // Disabled
-$input-background-color-disabled-state: get-color('additional', 'base') !default;
 $input-border-color-disabled-background: get-color('additional', 'base') !default;
 $input-border-color-disabled-hover-border-color: get-color('additional', 'light') !default;
 

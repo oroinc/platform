@@ -10,7 +10,7 @@ $oro-breakpoints: (
         '(max-width: #{$breakpoint-tablet})',
     'strict-tablet':
         '(max-width: #{$breakpoint-tablet}) and (min-width: #{$breakpoint-tablet-small + 1})',
-    'tablet-small': '(max-width: ' +  $breakpoint-tablet-small + ')',
+    'tablet-small': '(max-width: ' + $breakpoint-tablet-small + ')',
     'strict-tablet-small':
         '(max-width: #{$breakpoint-tablet-small}) and (min-width: #{$breakpoint-mobile-landscape + 1})',
     'mobile-big':

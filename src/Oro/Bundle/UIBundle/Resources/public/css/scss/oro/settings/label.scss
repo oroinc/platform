@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:map';
+
 $label-theme-success: (
     'background': $success-ultra-light,
     'color': $success-darken
@@ -16,7 +18,7 @@ $label-theme-warning: (
 ) !default;
 
 $label-theme-keys: () !default;
-$label-theme-keys: map-merge(
+$label-theme-keys: map.merge(
     (
         'success': $label-theme-success,
         'info': $label-theme-info,

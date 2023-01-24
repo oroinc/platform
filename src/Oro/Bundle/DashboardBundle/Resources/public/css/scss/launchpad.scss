@@ -63,7 +63,7 @@
 
     @for $i from 1 through 7 {
         &--with-#{$i}-items &__item {
-            width: floor(math.div(100%, $i));
+            width: math.floor(math.div(100%, $i));
         }
     }
 }

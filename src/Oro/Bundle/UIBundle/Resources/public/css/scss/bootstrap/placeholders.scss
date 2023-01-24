@@ -1,0 +1,15 @@
+/* @theme: admin.oro; */
+
+/* stylelint-disable scss/at-extend-no-missing-placeholder*/
+/* Creating placeholders for Bootstrap's classes */
+%dropdown-item {
+    @extend .dropdown-item;
+}
+
+%badge {
+    @extend .badge;
+}
+
+%badge-pill {
+    @extend .badge-pill;
+}

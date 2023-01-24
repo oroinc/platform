@@ -1,11 +1,13 @@
 /* @theme: default; */
 
+@use 'sass:map';
+
 // @private: background-image generator
 // Take a particle map and generate background-image value
 // @param: Map $particle
 // @return: List of background-image value
 @function skeleton-image-ellipse($particle) {
-    $color: map-get($particle, 'color');
+    $color: map.get($particle, 'color');
 
     @return (
         radial-gradient(closest-side, $color 100%, transparent 100%),
@@ -17,8 +19,8 @@
 // @param: Map $particle
 // @return: List of background-size value
 @function skeleton-size-ellipse($particle) {
-    $width: map-get($particle, 'width');
-    $height: map-get($particle, 'height');
+    $width: map.get($particle, 'width');
+    $height: map.get($particle, 'height');
 
     @return (
         $width $height,
@@ -30,8 +32,8 @@
 // @param: Map $particle
 // @return: List of background-position value
 @function skeleton-position-ellipse($particle) {
-    $x: map-get($particle, 'x');
-    $y: map-get($particle, 'y');
+    $x: map.get($particle, 'x');
+    $y: map.get($particle, 'y');
 
     @return (
         $x $y,

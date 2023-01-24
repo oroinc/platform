@@ -1,5 +1,7 @@
 /* @theme: default; */
 
+@use 'sass:color';
+
 $base-ui-element-offset: 11px 16px !default;
 $base-ui-element-cursor: null !default;
 
@@ -19,10 +21,10 @@ $base-ui-element-arrow-color: get-color('additional', 'dark') !default;
 
 $base-ui-element-border-color-focus: transparent !default;
 $base-ui-element-focus-style: 0 0 0 2px get-color('ui', 'focus'),
-                              0 0 6px lighten(get-color('ui', 'normal'), 1%) !default;
+                              0 0 6px color.adjust(get-color('ui', 'normal'), $lightness: 1%) !default;
 $base-ui-bth-focus-style: 0 0 0 1px get-color('additional', 'ultra'),
                           0 0 0 3px get-color('ui', 'focus'),
-                          0 0 6px lighten(get-color('ui', 'normal'), 1%) !default;
+                          0 0 6px color.adjust(get-color('ui', 'normal'), $lightness: 1%) !default;
 $base-ui-popup-border-radius: $base-ui-element-border-radius !default;
 
 $base-ui-popup-background: get-color('additional', 'ultra') !default;

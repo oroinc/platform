@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 // Your variable overrides
 $border-radius: 4px;
 $btn-border-radius: 16px;
@@ -109,8 +111,8 @@ $pagination-active-bg: transparent;
 $pagination-disabled-bg: transparent;
 
 $pagination-fa-color: $primary-400;
-$pagination-fa-hover-color: lighten($primary-400, 2%);
-$pagination-fa-active-color: lighten($primary-400, 2%);
+$pagination-fa-hover-color: color.adjust($primary-400, $lightness: 2%);
+$pagination-fa-active-color: color.adjust($primary-400, $lightness: 2%);
 $pagination-fa-disabled-color: $primary-500;
 
 $pagination-focus-outline: none;
@@ -243,7 +245,7 @@ $inline-action-color: #94b4c9;
 $inline-action-background: $secondary-300;
 $cell-selected-background: $inline-action-background;
 $row-selected-background: $extra-300;
-$row-highlight-background: darken($row-selected-background, 2%);
+$row-highlight-background: color.adjust($row-selected-background, $lightness: -2%);
 $cell-success-background: #f1f8dc;
 $cell-success-color: #96b76d;
 $cell-error-background: #fcd4d3;
@@ -284,13 +286,13 @@ $info-background: $info-lighten;
 $info-border: $info-lighten;
 $info-close: $info-dark;
 
-$error-message-balloon-background: lighten($error-text, 20%);
+$error-message-balloon-background: color.adjust($error-text, $lightness: 20%);
 
 $hover-transition: all 230ms ease-out !default;
 
 // Links
 $link-color: $secondary;
-$link-color-hover: darken($link-color, 10%);
+$link-color-hover: color.adjust($link-color, $lightness: -10%);
 $menu-item-color: $primary-200;
 
 // Screen sizes

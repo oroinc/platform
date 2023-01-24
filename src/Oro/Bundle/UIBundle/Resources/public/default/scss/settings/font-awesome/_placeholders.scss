@@ -1,0 +1,17 @@
+/* @theme: default; */
+
+/* stylelint-disable scss/at-extend-no-missing-placeholder*/
+/* Creating placeholders for Font's awesome classes */
+
+%fa-spinner {
+    @extend .fa-spinner;
+}
+
+%fa-spin {
+    @extend .fa-spin;
+}
+
+%fa-pulse {
+    @extend .fa-pulse;
+}
+

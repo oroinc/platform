@@ -136,7 +136,8 @@
     }
 
     &.ui-resizable {
-        width: $dialog-resizable-width;
+        // stylelint-disable-next-line declaration-no-important
+        width: $dialog-resizable-width !important;
 
         &:not(.ui-dialog-buttons) {
             .ui-dialog-content {
