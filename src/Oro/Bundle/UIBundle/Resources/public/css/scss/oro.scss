@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:math';
+
 /* stylelint-disable no-descending-specificity */
 
 .widget-content > .label-info:first-child {
@@ -881,7 +883,7 @@ label .popover-body {
 .collapse-overflow {
     position: relative;
 
-    max-height: round($font-size-base * $line-height-base * 3);
+    max-height: math.round($font-size-base * $line-height-base * 3);
 
     overflow: hidden;
 
@@ -895,7 +897,7 @@ label .popover-body {
             bottom: 0;
 
             display: block;
-            height: round($font-size-base * $line-height-base);
+            height: math.round($font-size-base * $line-height-base);
             width: 100%;
 
             background-image: linear-gradient(to top, $primary-inverse, rgba($primary-inverse, .1));

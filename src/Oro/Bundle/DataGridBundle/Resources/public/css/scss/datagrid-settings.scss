@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 .datagrid-settings {
     &:not(:last-child) {
         margin-right: 4px;
@@ -250,7 +252,7 @@
             content: '\f002';
             font-family: $fa-font-family;
             font-size: $base-font-size * 1.15;
-            color: lighten($btn-text-color, 15%);
+            color: color.adjust($btn-text-color, $lightness: 15%);
             position: absolute;
             top: 50%;
             margin-top: -12px;
@@ -267,7 +269,7 @@
             font-size: $base-font-size * 1.15;
             font-weight: font-weight('bold');
             line-height: 20px;
-            color: lighten($btn-text-color, 15%);
+            color: color.adjust($btn-text-color, $lightness: 15%);
 
             &:hover {
                 color: $btn-text-color;
@@ -285,7 +287,7 @@
         line-height: 0;
 
         .disabled {
-            color: lighten($btn-text-color, 35%);
+            color: color.adjust($btn-text-color, $lightness: 35%);
             pointer-events: none;
         }
 

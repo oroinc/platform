@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 $loading-bar-display: none !default;
 $loading-bar-background: $extra !default;
 $loading-bar-box-shadow: none !default;
@@ -13,7 +15,7 @@ $loading-bar-animation-name: line-loader !default;
 $loading-bar-animation: $loading-bar-animation-name 5s forwards !default;
 $loading-bar-overflow: hidden !default;
 
-$loading-bar-point-background: lighten($loading-bar-background, 15%) !default;
+$loading-bar-point-background: color.adjust($loading-bar-background, $lightness: 15%) !default;
 $loading-bar-point-box-shadow: none !default;
 $loading-bar-point-width: 15% !default;
 $loading-bar-point-height: 100% !default;

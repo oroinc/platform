@@ -120,7 +120,7 @@ $select2-search-field-default-inner-offset: 0 5px !default;
 $select2-search-field-offset: 0 !default;
 $select2-search-field-white-space: nowrap !default;
 
-$select2-search-field-input-inner-offset-start: 6px !important !default;
+$select2-search-field-input-inner-offset-start: 6px !default;
 
 $select2-search-choice-close-width: 16px !default;
 $select2-search-choice-close-height: 16px !default;
@@ -189,7 +189,7 @@ $select2-search-z-index: 10000 !default;
 $select2-search-white-space: nowrap !default;
 
 // !important for override default input width
-$select2-search-input-width: 100% !important !default;
+$select2-search-input-width: 100% !default;
 $select2-search-input-inner-offset: 0 0 0 $select2-search-choice-offset !default;
 
 $select2-results-max-height: 300px !default;

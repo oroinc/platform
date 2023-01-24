@@ -1,6 +1,6 @@
 /* @theme: default; */
 
-.input {
+@mixin base-input() {
     margin: 0;
 
     @include base-ui-element(
@@ -92,10 +92,13 @@
 
     @include element-state('error') {
         border-color: $input-border-color-error-state;
+        box-shadow: $input-box-shadow-error-state;
     }
 
     @include element-state('disabled') {
         background: $input-border-color-disabled-background;
+        box-shadow: none;
+        border: $input-border;
 
         @include base-disabled-style();
 
@@ -103,16 +106,10 @@
             border-color: $input-border-color-disabled-hover-border-color;
         }
     }
+}
 
-    @include element-state('error') {
-        box-shadow: $input-box-shadow-error-state;
-    }
-
-    @include element-state('disabled') {
-        background: $input-background-color-disabled-state;
-        box-shadow: none;
-        border: $input-border;
-    }
+.input {
+    @include base-input;
 
     &--empty {
         &[type='date'],

@@ -1,9 +1,11 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 $tree-link-color: $primary-200 !default;
 $tree-link-bg-color: $extra-200 !default;
 $tree-icon-color: $primary-400 !default;
-$tree-icon-color-hover: darken($tree-icon-color, 10%) !default;
+$tree-icon-color-hover: color.adjust($tree-icon-color, $lightness: -10%) !default;
 
 $jstree-wholerow-ul-width: 100% !default;
 $jstree-wholerow-ul-offset-bottom: 10px !default;
