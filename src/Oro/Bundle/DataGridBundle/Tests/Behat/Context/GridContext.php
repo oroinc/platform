@@ -2659,6 +2659,7 @@ TEXT;
      *   | Amount      | -$2.00   |
      *
      * @Then /^(?:|I )should see next rows in "(?P<elementName>[\w\s]+)" table$/
+     * @Then /^(?:|I )should see following rows in "(?P<elementName>[\w\s]+)" table$/
      * @param TableNode $expectedTableNode
      * @param string $elementName
      */
