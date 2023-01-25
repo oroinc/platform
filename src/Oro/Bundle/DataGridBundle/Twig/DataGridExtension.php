@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -145,11 +146,13 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
         );
 
         $route = (string) $metaData->offsetGetByPath('[options][route]', '');
+        $type = $metaData->offsetGetByPath('[options][requestMethod]', Request::METHOD_GET);
         $metaData->offsetAddToArray(
             'options',
             [
                 'url'       => $this->generateUrl($grid, $route, $params),
                 'urlParams' => $params,
+                'type'      => $type,
             ]
         );
 

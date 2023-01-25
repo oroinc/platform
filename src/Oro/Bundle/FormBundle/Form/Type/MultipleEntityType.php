@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * The form type to select several entities from a list.
+ */
 class MultipleEntityType extends AbstractType
 {
     /** @var DoctrineHelper */
@@ -70,6 +73,7 @@ class MultipleEntityType extends AbstractType
                 'extra_config'               => null,
                 'grid_url'                   => null, // deprecated
                 'selection_url'              => null,
+                'selection_url_method'       => null,
                 'selection_route'            => null,
                 'selection_route_parameters' => [],
             ]
@@ -84,6 +88,7 @@ class MultipleEntityType extends AbstractType
         $this->setOptionToView($view, $options, 'extra_config');
         $this->setOptionToView($view, $options, 'grid_url'); // deprecated
         $this->setOptionToView($view, $options, 'selection_url');
+        $this->setOptionToView($view, $options, 'selection_url_method');
         $this->setOptionToView($view, $options, 'selection_route');
         $this->setOptionToView($view, $options, 'selection_route_parameters');
         $this->setOptionToView($view, $options, 'initial_elements');

@@ -223,6 +223,15 @@
     }
 }
 
+.editing-cell {
+    padding: $oro-datagrid-body-editing-cell-inner-offset;
+
+    .input-editor {
+        width: 80px;
+        text-align: right;
+    }
+}
+
 .date-cell {
     white-space: nowrap;
 }

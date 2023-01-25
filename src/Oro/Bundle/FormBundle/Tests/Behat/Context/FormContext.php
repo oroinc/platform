@@ -23,6 +23,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class FormContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -155,6 +156,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function iSaveAndCreateNewForm()
     {
         $this->createOroForm()->saveAndCreateNew();
+    }
+
+    /**
+     * @When /^(?:|I )save form and return/
+     */
+    public function iSaveFormAndReturn()
+    {
+        $this->createOroForm()->saveAndReturn();
     }
 
     /**
@@ -526,6 +535,30 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
         self::assertTrue($form->isUseDefaultCheckboxExists($label, $checkbox));
+    }
+
+    /**
+     * @Then I should see :label action button
+     */
+    public function iShouldSeeActionButton(string $label): void
+    {
+        $button = $this->createOroForm()->findButton($label);
+        self::assertNotNull(
+            $button,
+            sprintf('Expected action button "%s" is not present on page', $label)
+        );
+    }
+
+    /**
+     * @Then I should not see :label action button
+     */
+    public function iShouldNotSeeActionButton(string $label): void
+    {
+        $button = $this->createOroForm()->findButton($label);
+        self::assertNull(
+            $button,
+            sprintf('Expected action button "%s" is present on page', $label)
+        );
     }
 
     /**

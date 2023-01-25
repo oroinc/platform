@@ -20,7 +20,7 @@ class DisabledLoginSubscriber implements EventSubscriberInterface
 
     /** @var array Disallowed auth statuses */
     protected static array $disallowed = [
-        UserManager::STATUS_EXPIRED,
+        UserManager::STATUS_RESET,
     ];
 
     public function __construct(TokenStorageInterface $tokenStorage)

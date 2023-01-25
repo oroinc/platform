@@ -47,6 +47,7 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
      */
     public function setStepExecution(StepExecution $stepExecution): void
     {
+        $this->clearWriter?->setStepExecution($stepExecution);
         $context = $this->contextRegistry->getByStepExecution($stepExecution);
         $this->setImportExportContext($context);
     }

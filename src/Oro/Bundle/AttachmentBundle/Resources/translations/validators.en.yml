@@ -16,3 +16,6 @@ oro:
         incompatible_field:
             external_file: 'The specified external file is not compatible with the field {{ field }} that is configured to upload files.'
             regular_file: 'The specified file is not compatible with the field {{ field }} that is configured to store files externally.'
+
+        filename_with_path:
+            not_allowed: 'The file name should not have a path.'

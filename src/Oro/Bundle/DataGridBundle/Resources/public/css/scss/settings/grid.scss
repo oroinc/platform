@@ -38,6 +38,11 @@ $oro-datagrid-body-cell-wide-inner-offset:
     $oro-datagrid-body-cell-inner-horizontal
     ($oro-datagrid-body-cell-inner-bottom - 6px) !default;
 
+$oro-datagrid-body-editing-cell-inner-offset:
+    ($oro-datagrid-body-cell-inner-top - 6px)
+    $oro-datagrid-body-cell-inner-horizontal
+    ($oro-datagrid-body-cell-inner-bottom - 6px) !default;
+
 $oro-datagrid-body-cell-border-width: 1px !default;
 $oro-datagrid-body-cell-border-bottom: $oro-datagrid-body-cell-border-width
     solid $oro-datagrid-cell-border-color !default;

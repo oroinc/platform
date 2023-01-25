@@ -8,6 +8,7 @@ define(function(require, exports, module) {
 
     const Popper = require('popper');
     const manageFocus = require('oroui/js/tools/manage-focus').default;
+    const scrollLocker = require('oroui/js/app/services/body-scroll-locker').default;
     const Dropdown = require('bootstrap-dropdown');
     const original = _.clone(Dropdown.prototype);
     const _clearMenus = Dropdown._clearMenus;
@@ -50,11 +51,12 @@ define(function(require, exports, module) {
 
     config = _.extend({
         displayArrow: true,
-        keepSeparately: true
+        keepSeparately: true,
+        fullscreenable: false
     }, config);
 
     _.extend(Dropdown.prototype, {
-        toggle: function() {
+        toggle() {
             Dropdown._togglingElement = this._element;
             Dropdown._isShowing = !$(this._menu).hasClass('show');
 
@@ -75,19 +77,19 @@ define(function(require, exports, module) {
             delete Dropdown._isShowing;
         },
 
-        show: function() {
+        show() {
             original.show.call(this);
             this.syncAriaExpanded();
             this.bindKeepFocusInside();
         },
 
-        hide: function() {
+        hide() {
             original.hide.call(this);
             this.syncAriaExpanded();
             this.unbindKeepFocusInside();
         },
 
-        bindKeepFocusInside: function() {
+        bindKeepFocusInside() {
             $(this._menu).on(_events(['keydown']), e => {
                 if (e.keyCode === ESCAPE_KEYCODE) {
                     e.stopPropagation();
@@ -99,15 +101,15 @@ define(function(require, exports, module) {
             });
         },
 
-        unbindKeepFocusInside: function() {
+        unbindKeepFocusInside() {
             $(this._menu).off(_events(['keydown']));
         },
 
-        syncAriaExpanded: function() {
+        syncAriaExpanded() {
             this._element.setAttribute('aria-expanded', $(this._menu).hasClass(ClassName.SHOW));
         },
 
-        dispose: function() {
+        dispose() {
             const parent = Dropdown._getParentFromElement(this._element);
             $(parent).off(EVENT_KEY);
 
@@ -115,10 +117,14 @@ define(function(require, exports, module) {
                 $(this._dialog).off(EVENT_KEY);
                 delete this._dialog;
             }
+
+            if (this._popper !== null) {
+                scrollLocker.removeLocker(this._popper.options.cid);
+            }
             original.dispose.call(this);
         },
 
-        _getConfig: function() {
+        _getConfig() {
             const config = original._getConfig.call(this);
 
             if ('adjustHeight' in config) {
@@ -129,7 +135,7 @@ define(function(require, exports, module) {
             return config;
         },
 
-        _getMenuElement: function() {
+        _getMenuElement() {
             original._getMenuElement.call(this);
 
             if (!this._menu) {
@@ -141,7 +147,7 @@ define(function(require, exports, module) {
             return this._menu;
         },
 
-        _addEventListeners: function() {
+        _addEventListeners() {
             this._popperUpdate = this._popperUpdate.bind(this);
 
             original._addEventListeners.call(this);
@@ -170,7 +176,7 @@ define(function(require, exports, module) {
             }
         },
 
-        _popperUpdate: function(e) {
+        _popperUpdate(e) {
             if (this._popper) {
                 // When scrolling leads to hidden dropdown appears again, single call of scroll handler
                 // shows dropdown menu in wrong position. But since single scroll event happens very
@@ -187,7 +193,7 @@ define(function(require, exports, module) {
          * @param event
          * @protected
          */
-        _onShown: function(event) {
+        _onShown(event) {
             let focusTabbable = null;
 
             if (_.isMobile()) {
@@ -216,7 +222,7 @@ define(function(require, exports, module) {
          * @param event
          * @protected
          */
-        _onHide: function(event) {
+        _onHide(event) {
             if (this._element !== event.relatedTarget) {
                 return;
             }
@@ -244,7 +250,7 @@ define(function(require, exports, module) {
             }
         },
 
-        _onHidden: function(event) {
+        _onHidden(event) {
             // removing popper scroll listeners when dropdown is hidden.
             this._popperDestroy();
             // unassign delayed method
@@ -254,16 +260,18 @@ define(function(require, exports, module) {
             }
         },
 
-        _popperDestroy: function() {
+        _popperDestroy() {
             if (this._popper !== null) {
+                scrollLocker.removeLocker(this._popper.options.cid);
                 // the fix deletes previews instance to prevent memory leaks
                 this._popper.destroy();
                 this._popper = null;
             }
         },
 
-        _getPopperConfig: function() {
+        _getPopperConfig() {
             const config = original._getPopperConfig.call(this);
+            config.cid = _.uniqueId('popper');
 
             if (!config.positionFixed && $(this._element).closest(SCROLLABLE_CONTAINER).length) {
                 // dropdowns are shown with position fixed inside scrollable container, to fix overflow
@@ -274,7 +282,7 @@ define(function(require, exports, module) {
                 const inheritParentWidth = this._config.inheritParentWidth;
                 config.positionFixed = true;
                 config.modifiers.offset = {
-                    fn: function(data, options) {
+                    fn(data, options) {
                         const popper = data.instance.popper;
                         const offset = data.offsets.popper;
 
@@ -309,6 +317,51 @@ define(function(require, exports, module) {
                 config.modifiers.flip = {enabled: false};
             }
 
+            if (this._config.fullscreenable && config.placement.substring(0, 6) === 'bottom') {
+                config.modifiers.fullscreenable = {
+                    enabled: true,
+                    fn: (data, options) => {
+                        const menu = this._getMenuElement();
+                        let close = $(menu).children('.dropdown-close')[0];
+
+                        if (!close) {
+                            close = document.createElement(menu.tagName.toLowerCase() === 'ul' ? 'li' : 'span');
+                            close.innerHTML =
+                                '<button data-autofocus="false" class="btn btn-icon btn-lighter" type="button">' +
+                                '<span class="icon fa-close"></span></button>';
+                            close.classList.add('dropdown-close');
+                            close.setAttribute('data-helper-element', '');
+                            if (menu.hasChildNodes()) {
+                                menu.insertBefore(close, menu.firstChild);
+                            } else {
+                                menu.appendChild(close);
+                            }
+                        }
+
+                        return Popper.Defaults.modifiers.fullscreenable.fn(data, options);
+                    }
+                };
+                config.modifiers.flip = {enabled: false};
+
+                const {onUpdate = () => {}, onCreate = () => {}} = config;
+                const updateScrollLocker = data => {
+                    const {cid} = data.instance.options;
+                    if (data.instance.state.isFullscreen) {
+                        scrollLocker.addLocker(cid);
+                    } else {
+                        scrollLocker.removeLocker(cid);
+                    }
+                };
+                config.onUpdate = data => {
+                    onUpdate(data);
+                    updateScrollLocker(data);
+                };
+                config.onCreate = data => {
+                    onCreate(data);
+                    updateScrollLocker(data);
+                };
+            }
+
             if (this._displayArrow()) {
                 const menu = this._getMenuElement();
                 let arrow = $(menu).children('.arrow')[0];
@@ -322,7 +375,7 @@ define(function(require, exports, module) {
 
                 config.modifiers.arrow = _.extend(config.modifiers.arrow || {}, {
                     element: arrow,
-                    fn: function(data, options) {
+                    fn: (data, options) => {
                         if (this._checkKeepSeparately()) {
                             data.arrowStyles = _.extend({}, data.arrowStyles || {}, {
                                 visibility: 'hidden'
@@ -330,7 +383,7 @@ define(function(require, exports, module) {
                         }
 
                         return Popper.Defaults.modifiers.arrow.fn(data, options);
-                    }.bind(this)
+                    }
                 });
             }
 
@@ -353,17 +406,17 @@ define(function(require, exports, module) {
          * @return {boolean}
          * @protected
          */
-        _detectNavbar: function() {
+        _detectNavbar() {
             return original._detectNavbar.call(this) ||
                 this._config.popper === false || // popper plugin is turned off intentionally
                 $(this._element).closest('.app-header').length > 0; // app-header is considered as navbar as well
         },
 
-        _displayArrow: function() {
+        _displayArrow() {
             return _.isBoolean(this._config.displayArrow) ? this._config.displayArrow : config.displayArrow;
         },
 
-        _checkKeepSeparately: function() {
+        _checkKeepSeparately() {
             return _.isBoolean(this._config.keepSeparately) ? this._config.keepSeparately : config.keepSeparately;
         }
     });
@@ -463,9 +516,7 @@ define(function(require, exports, module) {
     };
 
     function _events(names) {
-        return names.map(function(name) {
-            return name + EVENT_KEY + DATA_API_KEY;
-        }).join(' ');
+        return names.map(name => `${name}${EVENT_KEY}${DATA_API_KEY}`).join(' ');
     }
 
     $(document)
@@ -481,7 +532,7 @@ define(function(require, exports, module) {
 
         // nested form click events are processed in _clearMenus method extend
         .off(_events(['click']), Selector.FORM_CHILD)
-        .on(_events(['disposeLayout']), function(event) {
+        .on(_events(['disposeLayout']), event => {
             $('[data-toggle="dropdown"]', event.target).each(function() {
                 const $toogler = $(this);
                 if ($toogler.data('bs.dropdown')) {

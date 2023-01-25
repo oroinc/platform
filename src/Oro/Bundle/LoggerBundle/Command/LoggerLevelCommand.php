@@ -159,6 +159,14 @@ HELP
             );
         }
 
+        $afterHour = clone $now;
+        $afterHour->add(new \DateInterval('PT1H'));
+        if ($disableAfter > $afterHour) {
+            throw new \InvalidArgumentException(
+                \sprintf("Value '%s' should be less than an hour", 'disable-after')
+            );
+        }
+
         return $disableAfter;
     }
 

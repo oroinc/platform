@@ -65,12 +65,13 @@ define(function(require) {
         },
 
         initPopover: function(container, options) {
-            const $items = container.find('[data-toggle="popover"]').filter(function() {
+            const $items = container.find('[data-toggle="popover"]')
                 // skip already initialized popovers
-                return !$(this).data(Popover.DATA_KEY);
-            });
+                .filter((i, elem) => !$(elem).data(Popover.DATA_KEY));
 
-            this.initPopoverForElements($items, options);
+            if ($items.length) {
+                this.initPopoverForElements($items, options);
+            }
         },
 
         initPopoverForElements: function($items, options, overrideOptionsByData) {

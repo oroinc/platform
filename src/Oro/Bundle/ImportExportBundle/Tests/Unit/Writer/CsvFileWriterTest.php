@@ -25,6 +25,9 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
     /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $contextRegistry;
 
+    /** @var DoctrineClearWriter|\PHPUnit\Framework\MockObject\MockObject */
+    private $clearWriter;
+
     /** @var CsvFileWriter */
     private $writer;
 
@@ -36,8 +39,10 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $this->tmpDir = $this->getTempDir('CsvFileWriterTest');
         $this->filePath = $this->tmpDir . DIRECTORY_SEPARATOR . 'new_file.csv';
+        $this->clearWriter = $this->createMock(DoctrineClearWriter::class);
 
         $this->writer = new CsvFileWriter($this->contextRegistry);
+        $this->writer->setClearWriter($this->clearWriter);
     }
 
     public function testSetStepExecutionNoFileException()
@@ -187,11 +192,10 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
     {
         $stepExecution = $this->getStepExecution($options);
         $this->writer->setStepExecution($stepExecution);
-        $clearWriter = $this->createMock(DoctrineClearWriter::class);
-        $clearWriter->expects($this->once())
+        $this->clearWriter
+            ->expects($this->once())
             ->method('write')
             ->with($data);
-        $this->writer->setClearWriter($clearWriter);
         $this->writer->write($data);
         self::assertFileExists($expected);
 

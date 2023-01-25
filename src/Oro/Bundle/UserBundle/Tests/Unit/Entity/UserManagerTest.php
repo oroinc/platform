@@ -70,10 +70,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectGetEntityManager()
+    private function expectGetEntityManager(): EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrine->expects(self::atLeastOnce())
@@ -84,13 +81,9 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         return $em;
     }
 
-    /**
-     * @param User $user
-     *
-     * @return PasswordEncoderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectGetPasswordEncoder(User $user)
-    {
+    private function expectGetPasswordEncoder(
+        User $user
+    ): PasswordEncoderInterface|\PHPUnit\Framework\MockObject\MockObject {
         $encoder = $this->createMock(PasswordEncoderInterface::class);
         $this->encoderFactory->expects(self::once())
             ->method('getEncoder')
@@ -100,7 +93,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         return $encoder;
     }
 
-    public function testGetApi()
+    public function testGetApi(): void
     {
         $user = new User();
         $organization = new Organization();
@@ -121,7 +114,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($userApi, $this->userManager->getApi($user, $organization));
     }
 
-    public function testGetApiWhenApiKeyDoesNotExist()
+    public function testGetApiWhenApiKeyDoesNotExist(): void
     {
         $user = new User();
         $organization = new Organization();
@@ -141,7 +134,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->userManager->getApi($user, $organization));
     }
 
-    public function testUpdateUserWithPlainPassword()
+    public function testUpdateUserWithPlainPassword(): void
     {
         $password = 'password';
         $encodedPassword = 'encodedPassword';
@@ -176,7 +169,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($user->getAuthStatus());
     }
 
-    public function testUpdateUserWithoutPlainPassword()
+    public function testUpdateUserWithoutPlainPassword(): void
     {
         $user = new User();
 
@@ -199,7 +192,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($user->getAuthStatus());
     }
 
-    public function testUpdateUserForUserWithoutAuthStatus()
+    public function testUpdateUserForUserWithoutAuthStatus(): void
     {
         $user = new User();
         $defaultAuthStatus = new TestEnumValue('auth_status_1', 'Auth Status 1');
@@ -221,7 +214,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($defaultAuthStatus, $user->getAuthStatus());
     }
 
-    public function testUpdateUserForUserWithAuthStatus()
+    public function testUpdateUserForUserWithAuthStatus(): void
     {
         $user = new User();
         $authStatus = new TestEnumValue('auth_status_1', 'Auth Status 1');
@@ -242,7 +235,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($authStatus, $user->getAuthStatus());
     }
 
-    public function testSetAuthStatus()
+    public function testSetAuthStatus(): void
     {
         $user = new User();
         self::assertNull($user->getAuthStatus());
@@ -253,7 +246,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
                 return new TestEnumValue($id, $id);
             });
 
-        $this->userManager->setAuthStatus($user, UserManager::STATUS_EXPIRED);
-        self::assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
+        $this->userManager->setAuthStatus($user, UserManager::STATUS_RESET);
+        self::assertEquals(UserManager::STATUS_RESET, $user->getAuthStatus()->getId());
     }
 }

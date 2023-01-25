@@ -328,6 +328,23 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->configuration->isDatagridExtendedFrom('some-datagrid-name'));
     }
 
+    public function testAddProperty()
+    {
+        $this->configuration->addProperty('name', ['definition']);
+        $configArray = $this->configuration->toArray();
+
+        $this->assertEquals(
+            [
+                'properties' => [
+                    'name' => [
+                        0 => 'definition'
+                    ]
+                ]
+            ],
+            $configArray
+        );
+    }
+
     public function addColumnDataProvider(): array
     {
         return [

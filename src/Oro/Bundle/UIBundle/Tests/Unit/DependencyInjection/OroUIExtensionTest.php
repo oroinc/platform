@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class OroUIExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoadDefaultConfiguration()
+    public function testLoadDefaultConfiguration(): void
     {
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.environment' => 'prod'
@@ -22,14 +22,16 @@ class OroUIExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 [
                     'settings' => [
-                        'resolved'          => true,
+                        'resolved' => true,
                         'organization_name' => ['value' => 'ORO', 'scope' => 'app'],
-                        'application_url'   => ['value' => 'http://localhost', 'scope' => 'app'],
-                        'navbar_position'   => ['value' => 'left', 'scope' => 'app']
+                        'application_url' => ['value' => 'http://localhost', 'scope' => 'app'],
+                        'navbar_position' => ['value' => 'left', 'scope' => 'app'],
+                        'enable_quick_creation_buttons' => ['value' => false, 'scope' => 'app'],
+                        'quick_create_actions' => ['value' => 'current_page', 'scope' => 'app'],
                     ]
                 ]
             ],
-            $container->getExtensionConfig($extension->getAlias())
+            $container->getExtensionConfig('oro_ui')
         );
     }
 }

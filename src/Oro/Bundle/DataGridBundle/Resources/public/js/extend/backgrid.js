@@ -36,7 +36,9 @@ define(function(require) {
 
         this.formatter = Formatter;
 
-        this.editor = Backgrid.resolveNameToClass(this.editor, 'CellEditor');
+        this.editor = typeof this.column.get('editor') === 'function'
+            ? this.column.get('editor')
+            : Backgrid.resolveNameToClass(this.editor, 'CellEditor');
 
         this.listenTo(model, 'change:' + column.get('name'), function() {
             if (!$el.hasClass('editor')) {

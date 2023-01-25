@@ -118,7 +118,7 @@ define(function(require) {
                 field.$input.attr('disabled', 'disabled');
 
                 this.operateWithEditor(fieldName, editor => {
-                    editor.setMode('readonly');
+                    editor.mode.set('readonly');
                     $(editor.editorContainer).addClass('disabled');
                     $(editor.editorContainer).children('.disabled-overlay').remove();
                     $(editor.editorContainer).append('<div class="disabled-overlay"></div>');
@@ -129,7 +129,7 @@ define(function(require) {
                 field.$input.removeAttr('disabled');
 
                 this.operateWithEditor(fieldName, editor => {
-                    editor.setMode('design');
+                    editor.mode.set('design');
                     $(editor.editorContainer).removeClass('disabled');
                     $(editor.editorContainer).children('.disabled-overlay').remove();
                 });

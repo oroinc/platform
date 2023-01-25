@@ -54,10 +54,14 @@ class ResetController extends AbstractController
         if (null !== $user && $user->isEnabled()) {
             $email = $user->getEmail();
 
-            if ($user->isPasswordRequestNonExpired($this->getParameter('oro_user.reset.ttl'))
+            $tokenTtl = $this->getParameter('oro_user.reset.ttl');
+            if ($user->isPasswordRequestNonExpired($tokenTtl)
                 && !($request->get('frontend', false) && null === $user->getPasswordRequestedAt())
             ) {
-                $securityLogMessage = 'The password for this user has already been requested within the last 24 hours.';
+                $securityLogMessage = sprintf(
+                    'The password for this user has already been requested within the last %d hours.',
+                    $tokenTtl / 3600 //reset password token ttl in hours
+                );
             } else {
                 try {
                     $userManager->sendResetPasswordEmail($user);
@@ -225,7 +229,7 @@ class ResetController extends AbstractController
         if (!$user->isPasswordRequestNonExpired($this->getParameter('oro_user.reset.ttl'))) {
             $session->getFlashBag()->add(
                 'warn',
-                'The password for this user has already been requested within the last 24 hours.'
+                'oro.user.password.reset.ttl_expired.message'
             );
 
             return $this->redirect($this->generateUrl('oro_user_reset_request'));

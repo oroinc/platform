@@ -97,7 +97,7 @@ class LoadEntitiesBySearchText implements ProcessorInterface
     private function buildSearchResult(array $records, ?int $limit, RequestType $requestType): array
     {
         $hasMore = false;
-        if (null !== $limit && count($records) > $limit) {
+        if (null !== $limit && \count($records) > $limit) {
             $records = \array_slice($records, 0, $limit);
             $hasMore = true;
         }
