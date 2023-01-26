@@ -24,12 +24,12 @@ class DataCollectorBasicLayoutNameProviderTest extends \PHPUnit\Framework\TestCa
         return [
             ['context' => new LayoutContext(), 'expected' => 'Request'],
             ['context' => new LayoutContext(['widget_container' => 'sample']), 'expected' => 'Widget: sample'],
-            ['context' => new LayoutContext(['action' => 'sample_action']), 'expected' => 'Request: sample_action'],
+            ['context' => new LayoutContext(['action' => 'sample_action']), 'expected' => 'Action: sample_action'],
             [
                 'context' => new LayoutContext(
                     ['route_name' => 'sample_route']
                 ),
-                'expected' => 'Request: sample_route',
+                'expected' => 'Route: sample_route',
             ],
         ];
     }

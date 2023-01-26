@@ -21,8 +21,10 @@ class DataCollectorBasicLayoutNameProvider implements DataCollectorLayoutNamePro
             $name = 'Widget';
             $details = $context->getOr('widget_container');
         } elseif ($context->getOr('action')) {
+            $name = 'Action';
             $details = $context->getOr('action');
         } elseif ($context->getOr('route_name')) {
+            $name = 'Route';
             $details = $context->getOr('route_name');
         }
 

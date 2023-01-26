@@ -106,9 +106,6 @@ class MenuUpdateType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired('menu');
-        $resolver->setAllowedTypes('menu', ItemInterface::class);
-
         $resolver->setDefaults(
             [
                 'data_class' => function (Options $options) {
@@ -132,7 +129,9 @@ class MenuUpdateType extends AbstractType
                 }
             ]
         );
-
         $resolver->setAllowedTypes('menu_item', [ItemInterface::class, 'null']);
+
+        $resolver->setRequired('menu');
+        $resolver->setAllowedTypes('menu', ItemInterface::class);
     }
 }

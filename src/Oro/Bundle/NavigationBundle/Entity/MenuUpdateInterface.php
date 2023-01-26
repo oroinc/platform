@@ -206,6 +206,13 @@ interface MenuUpdateInterface
     public function setCustom($custom);
 
     /**
+     * Synthetic is a non-custom menu item that should remain in tree even if target item does not exist.
+     */
+    public function isSynthetic(): bool;
+
+    public function setSynthetic(bool $synthetic): self;
+
+    /**
      * Get array of link attributes
      */
     public function getLinkAttributes(): array;

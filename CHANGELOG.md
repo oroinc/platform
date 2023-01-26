@@ -119,7 +119,6 @@ The current file describes significant changes in the code that may affect the u
 * Added `markAsSkipped` and `isFieldSkipped` method to `\Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent`
   to mark certain field as skipped during denormalization process to avoid possible type conflicts.
   
-  
 #### LocaleBundle
 * Added entity name provider for `Locale` entity
 * Added `oro:localization:localized-fallback-values:cleanup-unused` command that finds and deletes orphaned
@@ -127,7 +126,8 @@ The current file describes significant changes in the code that may affect the u
 * Added `cloneLocalizedFallbackValueAssociations()` method that is generated automatically and should be used in
   `__clone()` for entities with localized fallback value relations to ensure correct cloning of localized fallback value
   collections.
-  
+*  Added `\Oro\Bundle\LocaleBundle\Cache\Normalizer\LocalizedFallbackValueCollectionNormalizer` and `\Oro\Bundle\LocaleBundle\Cache\Normalizer\LocalizedFallbackValueNormalizer` for using when caching complex structures
+
 #### MigrationBundle
 
 * For better data consistency and more valid testing scenarios, data fixtures are now validated during ORM demo data load, and Behat fixtures load.
@@ -152,8 +152,27 @@ The current file describes significant changes in the code that may affect the u
     with the detail option that includes the `x` and `y` coordinates of the pointer.
     It is fired only if the elapsed time between the start and end events is less than or equal to `maxAllowedTime`;
 
+#### LayoutBundle
+* Added `\Oro\Component\Layout\Extension\Theme\Model\ThemeManager::getThemesHierarchy` to easily get the theme hierarchy for the specified theme.
 
-  
+#### Layout Component
+* Added `\Oro\Component\Layout\ContextInterface` and `\Oro\Component\Layout\LayoutContextStack` to `\Oro\Component\Layout\Layout` so now it is aware of own context and can push/pop the current context in the layout context stack.
+
+#### NavigationBundle
+* Added `\Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface::isSynthetic` to distinguish menu updates applied to the system menu items even if they do not exist anymore.
+* Added "synthetic" field to `\Oro\Bundle\NavigationBundle\Entity\MenuUpdate`.
+* Added `\Oro\Bundle\NavigationBundle\Event\MenuUpdatesApplyAfterEvent` that is dispatched in `\Oro\Bundle\NavigationBundle\Menu\MenuUpdateBuilder` after all menu updates are applied.
+* Added `menu` form option as required for `\Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType`.
+* Added `\Oro\Bundle\NavigationBundle\Manager\MenuUpdateDisplayManager`, `\Oro\Bundle\NavigationBundle\Manager\MenuUpdateMoveManager`.
+* Added `\Oro\Bundle\NavigationBundle\Menu\DividerBuilder` that adds "divider" class to menu items.
+* Added `\Oro\Bundle\NavigationBundle\Menu\HideEmptyItemsBuilder` that recursively hides menu items that do not have any children.
+* Added `\Oro\Bundle\NavigationBundle\Menu\LostItemsBuilder` that removes menu items added by non-custom menu updates when target system menu item does not exist anymore.
+* Added `\Oro\Bundle\NavigationBundle\Menu\OrphanItemsBuilder` that moves orphaned menu items to the menu root.
+* Added `\Oro\Bundle\NavigationBundle\MenuUpdate\Applier\MenuUpdateApplier` that applies a menu update to menu item.
+* Added `\Oro\Bundle\NavigationBundle\MenuUpdate\Factory\MenuUpdateFactory`.
+* Added `\Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\MenuUpdateToMenuItemPropagatorInterface`, `\Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\BasicPropagator`, `\Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\ExtrasPropagator` and `\Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\CompositePropagator` that propagate the menu update data to the target menu item.
+* Added `\Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils::createRecursiveIterator`, `\Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils::flattenMenuItem` for more convenient access to the menu item.
+
 ### Changed
 
 #### ApiBundle
@@ -167,7 +186,6 @@ The current file describes significant changes in the code that may affect the u
 #### AssetBundle
 * Changed configuration option `disable_babel` (`true` by default) to `with_babel` (`false` by default).
 
-  
 #### AttachmentBundle
 
   * Changed `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type to `?\SplFileInfo`
@@ -260,10 +278,10 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
     + </div>
     ```
 
-
+#### NavigationBundle
+* Changed the sorting mechanism in `\Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider`: menu items are sorted as a single list instead of separate - sorted and unsorted parts. 
 
 ### Removed
-
 
 #### CronBundle
 * `Oro\Bundle\CronBundle\Command\CronCommandInterface` has been removed.
@@ -312,11 +330,19 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 * The deprecated `pre_conditions` option was removed for the configuration of workflow process definitions.
 * The deprecated `pre_conditions` and `post_actions` options were removed for the configuration of workflows.
 
+#### LayoutBundle
+* Removed `Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder`, use `Oro\Component\Layout\LayoutContextStack` instead.
+
+#### NavigationBundle
+* Removed `Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder`, added `\Oro\Bundle\NavigationBundle\Menu\MenuUpdateBuilder` instead.
+* Removed `\Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface::getExtras`, `\Oro\Bundle\NavigationBundle\Entity\MenuUpdate::getExtras`, its purpose is moved to `\Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\ExtrasPropagator`.
+* Removed `\Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager::moveMenuItem`, `\Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager::moveMenuItems`. Use corresponding methods from `\Oro\Bundle\NavigationBundle\Manager\MenuUpdateMoveManager` instead.
+* Removed `\Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager::showMenuItem`, `\Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager::hideMenuItems`. Use corresponding methods from `\Oro\Bundle\NavigationBundle\Manager\MenuUpdateDisplayManager` instead.
+* Removed `\Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils::updateMenuItem`, use `\Oro\Bundle\NavigationBundle\MenuUpdate\Applier\MenuUpdateApplier` instead.
 
 
 ## 5.0.0 (2022-01-26)
 [Show detailed list of changes](incompatibilities-5-0.md)
-
 
 ### Added
 
