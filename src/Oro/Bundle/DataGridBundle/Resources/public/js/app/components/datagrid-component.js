@@ -190,6 +190,7 @@ define(function(require) {
                 initialState: {},
                 rowActions: {},
                 massActions: {},
+                extraActions: {},
                 customModules: customModules
             });
 
@@ -202,9 +203,12 @@ define(function(require) {
             // load all dependencies and build grid
             loadModules(this.modules, this.build, this);
 
-            this.listenTo(this.metadataModel, 'change:massActions', function(model, massActions) {
-                this.grid.massActions.reset(this.buildMassActionsOptions(massActions));
-            }, this);
+            this.listenTo(this.metadataModel, 'change:massActions', (model, massActions) => {
+                this.grid.massActions.reset(this.buildActionsOptions(massActions));
+            });
+            this.listenTo(this.metadataModel, 'change:extraActions', (model, extraActions) => {
+                this.grid.extraActions.reset(this.buildActionsOptions(extraActions));
+            });
         },
 
         /**
@@ -227,14 +231,12 @@ define(function(require) {
                 const type = column.type;
                 modules[helpers.cellType(type)] = mapCellModuleName(type);
             });
-            // row actions
-            _.each(_.values(metadata.rowActions), function(action) {
-                const type = action.frontend_type;
-                modules[helpers.actionType(type)] = mapActionModuleName(type);
-            });
-            // mass actions
-            _.each(_.values(metadata.massActions), function(action) {
-                const type = action.frontend_type;
+            // actions (row, mass and extra)
+            [
+                ...Object.values(metadata.rowActions),
+                ...Object.values(metadata.massActions),
+                ...Object.values(metadata.extraActions)
+            ].forEach(({frontend_type: type}) => {
                 modules[helpers.actionType(type)] = mapActionModuleName(type);
             });
 
@@ -449,9 +451,10 @@ define(function(require) {
             _.each(metadata.rowActions, function(options, action) {
                 rowActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
             });
-
             // mass actions
-            const massActions = this.buildMassActionsOptions(this.metadata.massActions);
+            const massActions = this.buildActionsOptions(this.metadata.massActions);
+            // extra actions
+            const extraActions = this.buildActionsOptions(this.metadata.extraActions);
 
             Object.values(_.pick(modules, [
                 'FloatingHeaderPlugin',
@@ -499,6 +502,7 @@ define(function(require) {
                 columns,
                 rowActions,
                 massActions: new Backbone.Collection(massActions),
+                extraActions: new Backbone.Collection(extraActions),
                 toolbarOptions: metadata.options.toolbarOptions || {},
                 multipleSorting: metadata.options.multipleSorting || false,
                 entityHint: metadata.options.entityHint,
@@ -515,23 +519,23 @@ define(function(require) {
         },
 
         /**
-         * @param {Object} actions
-         * @returns {Array}
+         * @param {Object} actionsOptions
+         * @returns {Array<{action:string, module: Function}>}
          */
-        buildMassActionsOptions: function(actions) {
-            const modules = this.modules;
-            const massActions = [];
+        buildActionsOptions: function(actionsOptions) {
+            const actions = [];
 
-            _.each(actions, function(options, action) {
-                if (_.has(modules, helpers.actionType(options.frontend_type))) {
-                    massActions.push({
-                        action: action,
-                        module: modules[helpers.actionType(options.frontend_type)].extend(options)
+            for (const [action, options] of Object.entries(actionsOptions)) {
+                const type = helpers.actionType(options.frontend_type);
+                if (type in this.modules) {
+                    actions.push({
+                        action,
+                        module: this.modules[type].extend(options)
                     });
                 }
-            });
+            }
 
-            return massActions;
+            return actions;
         },
 
         fixStates: function(options) {

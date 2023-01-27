@@ -112,6 +112,8 @@
     .ui-dialog-messages {
         padding: $dialog-ui-dialog-messages-inner-offset;
         background: $primary-inverse;
+        display: grid;
+        row-gap: $dialog-ui-dialog-messages-vertical-gap;
 
         &:empty {
             display: none;
