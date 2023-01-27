@@ -55,9 +55,6 @@ oro_behat_extension:
         type: xpath
         locator: '//li/a[contains (@href,"/admin/entity-pagination/previous")]'
 
-    MenuTree:
-      selector: 'div.jstree-wrapper'
-
     Menu Form Title Fallbacks:
       selector:
         type: xpath

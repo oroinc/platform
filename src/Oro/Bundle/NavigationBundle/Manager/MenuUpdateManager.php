@@ -64,6 +64,11 @@ class MenuUpdateManager
         $menuItem = MenuUpdateUtils::findMenuItem($menu, $options['key'] ?? null);
         $options += ['custom' => $menuItem === null];
 
+        if ($menuItem === null) {
+            $menuItemParent = MenuUpdateUtils::findMenuItem($menu, $options['parentKey'] ?? null) ?? $menu;
+            $options += ['priority' => count($menuItemParent->getChildren())];
+        }
+
         $menuUpdate = $this->menuUpdateFactory->createMenuUpdate($menu->getName(), $scope, $options);
         if ($menuItem !== null) {
             $this->menuItemToMenuUpdatePropagator->propagateFromMenuItem($menuUpdate, $menuItem, $propagationStrategy);

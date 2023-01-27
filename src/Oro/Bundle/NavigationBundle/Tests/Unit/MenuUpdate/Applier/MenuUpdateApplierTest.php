@@ -360,4 +360,37 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $expectedContext->getMenuItemsByName();
         self::assertEquals($expectedContext, $context);
     }
+
+    public function testApplyMenuUpdateWhenIsRoot(): void
+    {
+        $menu = $this->getMenu();
+
+        $menuUpdate = new MenuUpdateStub(42);
+        $menuUpdate->setKey($menu->getName());
+
+        $this->menuUpdateToMenuItemPropagator
+            ->expects(self::once())
+            ->method('propagateFromMenuUpdate')
+            ->with(
+                self::isInstanceOf(ItemInterface::class),
+                $menuUpdate,
+                MenuUpdateToMenuItemPropagatorInterface::STRATEGY_FULL
+            );
+
+        $context = new MenuUpdateApplierContext($menu);
+        $context->addUpdatedItem($menu, $menuUpdate);
+
+        self::assertEquals(
+            MenuUpdateApplierInterface::RESULT_ITEM_UPDATED,
+            $this->applier->applyMenuUpdate($menuUpdate, $menu, [], $context)
+        );
+
+        $expectedItem = $this->getMenu();
+        self::assertEquals($expectedItem, $menu);
+
+        $expectedContext = (new MenuUpdateApplierContext($menu))
+            ->addUpdatedItem($expectedItem, $menuUpdate);
+        $expectedContext->getMenuItemsByName();
+        self::assertEquals($expectedContext, $context);
+    }
 }

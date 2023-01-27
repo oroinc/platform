@@ -60,6 +60,15 @@ class ExtrasPropagator implements MenuItemToMenuUpdatePropagatorInterface
 
             $this->setMenuUpdateFieldValue($menuUpdate, $key, $value);
         }
+
+        if ($menuUpdate->getPriority() === null) {
+            $parent = $menuItem->getParent();
+            if ($parent !== null) {
+                $menuUpdate->setPriority(
+                    array_search($menuItem->getName(), array_keys($parent->getChildren()), true)
+                );
+            }
+        }
     }
 
     private function setMenuUpdateFieldValue(MenuUpdateInterface $menuUpdate, string $key, mixed $value): void

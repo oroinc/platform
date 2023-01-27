@@ -120,12 +120,17 @@ abstract class AbstractMenuController extends AbstractController
         return $this->handleUpdate($menuUpdate, $context, $menu);
     }
 
-    protected function update(string $menuName, string $key, array $context = []): array|RedirectResponse
+    protected function update(string $menuName, ?string $key, array $context = []): array|RedirectResponse
     {
         $this->checkAcl($context);
         $context = $this->denormalizeContext($context);
         $scope = $this->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context, false);
         $menu = $this->getMenu($menuName, $context);
+
+        if ($key === null) {
+            $key = $menuName;
+        }
+
         $menuUpdate = $this->getMenuUpdateManager()->findOrCreateMenuUpdate($menu, $scope, ['key' => $key]);
 
         if (!$menuUpdate->getKey()) {

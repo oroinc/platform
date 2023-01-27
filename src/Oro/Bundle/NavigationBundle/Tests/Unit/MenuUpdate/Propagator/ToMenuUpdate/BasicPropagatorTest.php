@@ -88,6 +88,12 @@ class BasicPropagatorTest extends \PHPUnit\Framework\TestCase
             ->setParent($menu->getChild('menu_item_has_child'));
 
         return [
+            'without parent' => [
+                'menuUpdate' => (new MenuUpdateStub())->setKey($menu->getName()),
+                'menuItem' => $menu,
+                'expected' => (new MenuUpdateStub())
+                    ->setKey($menu->getName()),
+            ],
             'not displayed' => [
                 'menuUpdate' => (new MenuUpdateStub())->setKey('menu_item_not_displayed'),
                 'menuItem' => $menu->getChild('menu_item_not_displayed'),

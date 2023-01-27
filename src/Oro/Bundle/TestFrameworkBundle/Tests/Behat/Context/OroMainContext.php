@@ -2183,13 +2183,15 @@ JS;
         $nodeStateControl?->click();
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * Example: When I click on "Retail Supplies" in tree
      *
-     * @When /^(?:|I )click on "(?P<nodeTitle>(?:[^"]|\\")+)" in tree$/
-     * @When /^(?:|I )click on "(?P<nodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
+     * @When /^(?:|I )click on (?:"(?P<nodeTitle>(?:[^"]|\\")+)"|first node) in tree$/
+     * @When /^(?:|I )click on (?:"(?P<nodeTitle>(?:[^"]|\\")+)"|first node) in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
-    public function iClickOnNodeInTree(string $nodeTitle, string $treeElementName = ''): void
+    //@codingStandardsIgnoreEnd
+    public function iClickOnNodeInTree(string $nodeTitle = '', string $treeElementName = ''): void
     {
         $nodeTitle = $this->fixStepArgument($nodeTitle);
 
@@ -2200,14 +2202,20 @@ JS;
         }
 
         $jsTreeItem = $this->createElement('JS Tree item', $treeElement);
-        $nodeElement = $jsTreeItem->find('named', ['content', $nodeTitle]);
+        self::assertTrue($jsTreeItem->isIsset(), 'Tree is empty');
+        
+        if ($nodeTitle !== '') {
+            $nodeElement = $jsTreeItem->find('named', ['content', $nodeTitle]);
 
-        self::assertTrue(
-            $nodeElement?->isValid(),
-            sprintf('Tree item with title "%s" is not found', $nodeTitle)
-        );
+            self::assertTrue(
+                $nodeElement?->isValid(),
+                sprintf('Tree item with title "%s" is not found', $nodeTitle)
+            );
 
-        $nodeElement->click();
+            $nodeElement->click();
+        } else {
+            $jsTreeItem->click();
+        }
     }
 
     //@codingStandardsIgnoreStart

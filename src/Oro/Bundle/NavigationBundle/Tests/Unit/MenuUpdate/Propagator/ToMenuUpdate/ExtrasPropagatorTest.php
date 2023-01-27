@@ -87,6 +87,11 @@ class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
         $menu->addChild('with_existing_bool_value', ['extras' => ['divider' => true]]);
 
         return [
+            'without parent' => [
+                'menuUpdate' => (clone $menuUpdate)->setKey($menu->getName()),
+                'menuItem' => $menu,
+                'expected' => (clone $menuUpdate)->setKey($menu->getName()),
+            ],
             'with excluded key' => [
                 'menuUpdate' => (clone $menuUpdate)->setKey('with_excluded_key'),
                 'menuItem' => $menu->getChild('with_excluded_key'),
@@ -100,24 +105,32 @@ class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
             'with non writable key' => [
                 'menuUpdate' => (clone $menuUpdate)->setKey('with_non_writable_key'),
                 'menuItem' => $menu->getChild('with_non_writable_key'),
-                'expected' => (clone $menuUpdate)->setKey('with_non_writable_key'),
+                'expected' => (clone $menuUpdate)
+                    ->setKey('with_non_writable_key')
+                    ->setPriority(2),
             ],
             'with writable key' => [
                 'menuUpdate' => (clone $menuUpdate)->setKey('with_writable_key'),
                 'menuItem' => $menu->getChild('with_writable_key'),
-                'expected' => (clone $menuUpdate)->setKey('with_writable_key')->setIcon('sample_icon'),
+                'expected' => (clone $menuUpdate)
+                    ->setKey('with_writable_key')
+                    ->setIcon('sample_icon')
+                    ->setPriority(3),
             ],
             'with existing value' => [
                 'menuUpdate' => (clone $menuUpdate)->setKey('with_existing_value'),
                 'menuItem' => $menu->getChild('with_existing_value'),
                 'expected' => (clone $menuUpdate)->setKey('with_existing_value')
-                    ->setDefaultDescription('sample description'),
+                    ->setDefaultDescription('sample description')
+                    ->setPriority(4),
             ],
             'with existing bool value' => [
                 'menuUpdate' => (clone $menuUpdate)->setKey('with_existing_bool_value'),
                 'menuItem' => $menu->getChild('with_existing_bool_value'),
-                'expected' => (clone $menuUpdate)->setKey('with_existing_bool_value')
-                    ->setDivider(true),
+                'expected' => (clone $menuUpdate)
+                    ->setKey('with_existing_bool_value')
+                    ->setDivider(true)
+                    ->setPriority(5),
             ],
         ];
     }

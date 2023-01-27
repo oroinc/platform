@@ -30,11 +30,13 @@ class MenuUpdateManagerTest extends WebTestCase
         $this->repository = self::getContainer()->get('doctrine')->getRepository(MenuUpdate::class);
     }
 
-    public function testCreateMenuUpdate(): void
+    public function testCreateMenuUpdateWhenCustom(): void
     {
         $scope = $this->getScope();
+        $menu = $this->getMenu();
+
         $actualMenuUpdate = $this->manager->createMenuUpdate(
-            $this->getMenu(),
+            $menu,
             $scope,
             [
                 'key' => 'unique_item_key',
@@ -48,7 +50,9 @@ class MenuUpdateManagerTest extends WebTestCase
             ->setMenu(self::MENU_NAME)
             ->setParentKey(null)
             ->setDivider(false)
-            ->setScope($scope);
+            ->setScope($scope)
+            ->setPriority(count($menu->getChildren()));
+
         self::assertEquals($expectedMenuUpdate, $actualMenuUpdate);
     }
 
@@ -72,16 +76,19 @@ class MenuUpdateManagerTest extends WebTestCase
     public function testFindOrCreateMenuUpdate(): void
     {
         $scope = $this->getScope();
+        $menu = $this->getMenu();
+
         $expectedMenuUpdate = new MenuUpdate();
         $expectedMenuUpdate->setKey('unique_item_key')
             ->setCustom(true)
             ->setMenu(self::MENU_NAME)
             ->setParentKey(null)
             ->setScope($scope)
-            ->setDivider(false);
+            ->setDivider(false)
+            ->setPriority(count($menu->getChildren()));
 
         $actualMenuUpdate = $this->manager->findOrCreateMenuUpdate(
-            $this->getMenu(),
+            $menu,
             $scope,
             ['key' => 'unique_item_key']
         );
