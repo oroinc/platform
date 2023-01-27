@@ -626,3 +626,8 @@ services:
         class: Oro\Bundle\NavigationBundle\Menu\DividerBuilder
         tags:
             - { name: oro_menu.builder, priority: 270 }
+
+    oro_navigation.provider.menu_names:
+        class: Oro\Bundle\NavigationBundle\Provider\MenuNamesProvider
+        arguments:
+            - '@oro_navigation.configuration.provider'
