@@ -663,7 +663,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $criteria = $this->createCriteria($isCommonCriteria);
         $this->criteriaConnector->applyCriteria($qb, $criteria);
 
-        self::assertNull($qb->getFirstResult());
+        self::assertEquals(0, $qb->getFirstResult());
     }
 
     /**

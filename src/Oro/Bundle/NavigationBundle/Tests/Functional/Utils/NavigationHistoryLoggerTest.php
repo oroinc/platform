@@ -24,6 +24,8 @@ class NavigationHistoryLoggerTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
+        $this->client->disableReboot();
+
         $this->navigationHistoryLogger = $this->getContainer()->get('oro_navigation.tests.navigation_history_logger');
         $this->tokenAccessor = $this->getContainer()->get('oro_security.token_accessor');
 

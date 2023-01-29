@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
+use Doctrine\Common\Lexer\Token;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 
 /**
@@ -25,16 +26,15 @@ class QueryComponent
     /** @var int|null */
     private $nestingLevel;
 
-    /** @var array|null */
-    private $token;
+    private ?Token $token;
 
     public function __construct(
         ClassMetadata $metadata,
-        array $relation = null,
-        string $parent = null,
-        string $map = null,
-        int $nestingLevel = null,
-        array $token = null
+        array         $relation = null,
+        string        $parent = null,
+        string        $map = null,
+        int           $nestingLevel = null,
+        Token $token = null
     ) {
         $this->metadata = $metadata;
         $this->relation = $relation;
@@ -89,7 +89,7 @@ class QueryComponent
         return $this->nestingLevel;
     }
 
-    public function getToken(): ?array
+    public function getToken(): ?Token
     {
         return $this->token;
     }

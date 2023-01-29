@@ -266,7 +266,7 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
 
                 // Ensure that at least expected data is present.
                 foreach ($expectedEntityData as $property => $value) {
-                    static::assertEquals($value, $entityDataFromCsv[$property]);
+                    static::assertEquals($this->processFunctions($value), $entityDataFromCsv[$property]);
                 }
             }
 
@@ -550,5 +550,20 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         return $this->spin(static function () use ($emailClient) {
             return $emailClient->getMessages();
         }) ?? [];
+    }
+
+    private function processFunctions(mixed $value): mixed
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        switch (true) {
+            case preg_match('/\<eol\("(?P<value>(?:[^"]|\\")+)"\)\>/i', $value, $matches):
+                $value = str_replace('\r\n', PHP_EOL, $matches['value']);
+                break;
+        }
+
+        return $value;
     }
 }

@@ -4,10 +4,20 @@ trusted_data:
         Oro\Component\MessageQueue\Job\JobStorage:
             createJobQueryBuilder:
                 alias: true
+        Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer:
+            send:
+                dbalMessage: true
     properties:
+        Oro\Component\MessageQueue\Job\UniqueJobHandler:
+            insert:
+                uniqueTableName: true
+            delete:
+                uniqueTableName: true
         Oro\Component\MessageQueue\Job\JobStorage:
             createJobQueryBuilder:
                 entityClass: true
     safe_methods:
         Oro\Component\MessageQueue\Transport\Dbal\DbalConnection:
+            getTableName: true
+        Oro\Component\MessageQueue\Transport\ConnectionInterface:
             getTableName: true

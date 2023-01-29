@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TagBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\EventListener\TagListener;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;

@@ -42,7 +42,7 @@ class ObjectManagerPersister implements PersisterInterface
     /**
      * @inheritdoc
      */
-    public function persist($object)
+    public function persist($object): void
     {
         if (null === $this->persistableClasses) {
             $this->persistableClasses = array_flip($this->getPersistableClasses($this->objectManager));
@@ -83,7 +83,7 @@ class ObjectManagerPersister implements PersisterInterface
     /**
      * @inheritdoc
      */
-    public function flush()
+    public function flush(): void
     {
         $this->objectManager->flush();
     }

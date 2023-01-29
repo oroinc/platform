@@ -46,10 +46,9 @@ class CrowdinCatalogueLoaderTest extends WebTestCase
     {
         $catalogue = $this->loader->getCatalogue('en');
         $domains = $catalogue->getDomains();
-        self::assertCount(6, $domains);
+        self::assertCount(4, $domains);
         self::assertContains('config', $domains);
         self::assertContains('validators', $domains);
-        self::assertContains('security', $domains);
         self::assertContains('messages', $domains);
         self::assertContains('jsmessages', $domains);
         self::assertEquals('Invalid credentials.', $catalogue->get('Invalid credentials.', 'security'));

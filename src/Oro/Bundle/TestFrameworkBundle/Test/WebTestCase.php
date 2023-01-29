@@ -90,6 +90,9 @@ abstract class WebTestCase extends BaseWebTestCase
     /** @var Client */
     protected $client;
 
+    /** @var ReferenceRepository[] */
+    private array $referenceRepositories = [];
+
     /** @var ReferenceRepository */
     private static $referenceRepository;
 
@@ -573,11 +576,16 @@ abstract class WebTestCase extends BaseWebTestCase
             $loader->addFixture($fixture);
         }
 
-        $executor = new DataFixturesExecutor($this->getDataFixturesExecutorEntityManager());
+        $executor = new DataFixturesExecutor(
+            $this->getDataFixturesExecutorEntityManager(),
+            $this->getContainer()->get('doctrine')
+        );
         self::$referenceRepository = $executor->getReferenceRepository();
         $this->preFixtureLoad();
         $this->doLoadFixtures($executor, $loader);
         $this->postFixtureLoad();
+
+        $this->referenceRepositories = $executor->getReferenceRepositories();
     }
 
     /**
@@ -699,15 +707,39 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * @return ReferenceRepository
+     * @throws \Exception
      */
-    protected function getReferenceRepository()
+    protected function getReferenceRepository(string $class = null): ReferenceRepository
     {
         if (null === self::$referenceRepository) {
             throw new \LogicException('The reference repository is not set. Have you loaded fixtures?');
         }
 
-        return self::$referenceRepository;
+        if (is_null($class)) {
+            return self::$referenceRepository;
+        }
+
+        if (!$objectManager = $this->getContainer()->get('doctrine')->getManagerForClass($class)) {
+            throw new \Exception(sprintf(
+                'Reference repository is not created for class "%s". Did you forget'
+                . ' to associate your object manager with class "%s"?',
+                $class,
+                $class
+            ));
+        }
+
+        foreach ($this->referenceRepositories as $referenceRepository) {
+            if ($objectManager === $referenceRepository->getManager()) {
+                return $referenceRepository;
+            }
+        }
+
+        throw new \Exception(sprintf(
+            'Reference repository is not created for class "%s". '
+                . 'Did you forget to extend Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture '
+                . 'in your fixture to use not default ObjectManager?',
+            $class
+        ));
     }
 
     /**
