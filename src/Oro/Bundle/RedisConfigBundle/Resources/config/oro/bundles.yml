@@ -1,0 +1,2 @@
+bundles:
+  - { name: Oro\Bundle\RedisConfigBundle\OroRedisConfigBundle, priority: -210 }

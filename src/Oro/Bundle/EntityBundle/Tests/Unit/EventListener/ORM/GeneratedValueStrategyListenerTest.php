@@ -10,7 +10,6 @@ use Doctrine\ORM\Id\IdentityGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener;
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
 class GeneratedValueStrategyListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,19 +27,7 @@ class GeneratedValueStrategyListenerTest extends \PHPUnit\Framework\TestCase
         $this->event = $this->createMock(LoadClassMetadataEventArgs::class);
         $this->metadata = $this->createMock(ClassMetadataInfo::class);
 
-        $this->listener = new GeneratedValueStrategyListener(
-            DatabaseDriverInterface::DRIVER_POSTGRESQL
-        );
-    }
-
-    public function testPlatformNotMatch()
-    {
-        $listener = new GeneratedValueStrategyListener('not_postgres');
-
-        $this->event->expects($this->never())
-            ->method('getClassMetadata');
-
-        $listener->loadClassMetadata($this->event);
+        $this->listener = new GeneratedValueStrategyListener();
     }
 
     public function testNotIdGeneratorSequence()

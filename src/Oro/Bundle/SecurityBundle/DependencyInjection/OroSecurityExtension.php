@@ -4,10 +4,11 @@ namespace Oro\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class OroSecurityExtension extends Extension
+class OroSecurityExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * {@inheritDoc}
@@ -35,6 +36,14 @@ class OroSecurityExtension extends Extension
         $this->configureCookieTokenStorage($container, $config);
 
         $container->setParameter('oro_security.login_target_path_excludes', $config['login_target_path_excludes']);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        $container->setParameter('session_handler', 'oro.session_handler');
     }
 
     private function configureCookieTokenStorage(ContainerBuilder $container, array $config): void

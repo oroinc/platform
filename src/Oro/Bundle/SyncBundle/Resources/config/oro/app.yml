@@ -2,18 +2,13 @@ gos_web_socket:
     client:
         firewall: ~
     server:
-        port: "%websocket_bind_port%"      # The port the socket server will listen on
-        host: "%websocket_bind_address%"   # (optional) The host ip to bind to
+        # 'host', 'port' default values are given to pass configuration checks.
+        # These values are not used because they are replaced for gos websocket server command through its decoration.
+        port: 8080        # The port the socket server will listen on
+        host: '0.0.0.0'   # The host ip to bind to
         router:
             resources: []
         origin_check: true
 
     # We don`t need server connection parameters provided by GosWebSocketBundle in TWIG.
     shared_config: false
-
-twig:
-    globals:
-        ws:
-            port:       "%websocket_frontend_port%"  # Websocket port used in JS
-            host:       "%websocket_frontend_host%"  # Websocket host used in JS
-            path:       "%websocket_frontend_path%"  # Websocket request path used in JS

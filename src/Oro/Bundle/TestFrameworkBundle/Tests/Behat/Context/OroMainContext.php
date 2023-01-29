@@ -2893,6 +2893,19 @@ JS;
     }
 
     /**
+     * One minute(maximum) awaiting given element to appear
+     *
+     * @Then /^(?:|I )wait for "(?P<element>[\w\s]+)" element to appear$/
+     */
+    public function waitForElementToAppear($element)
+    {
+        $awaitedElement = $this->createElement($element);
+        $this->spin(function () use ($awaitedElement) {
+            return $awaitedElement->isIsset();
+        }, 60);
+    }
+
+    /**
      * Click on button or link if it is present on page
      * Example: Given I click "Edit" if present
      * Example: When I click "Save and Close" if present

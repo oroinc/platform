@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Client;
 
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
-use Oro\Bundle\SyncBundle\Client\Wamp\Factory\ClientAttributes;
 use Oro\Bundle\SyncBundle\Client\Wamp\Factory\WampClientFactoryInterface;
 use Oro\Bundle\SyncBundle\Client\Wamp\WampClient;
 use Oro\Bundle\SyncBundle\Client\WebsocketClient;
 use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
+use Oro\Bundle\SyncBundle\Provider\WebsocketClientParametersProviderInterface;
 
 class WebsocketClientTest extends \PHPUnit\Framework\TestCase
 {
@@ -16,8 +16,8 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     /** @var WampClientFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $wampClientFactory;
 
-    /** @var ClientAttributes|\PHPUnit\Framework\MockObject\MockObject */
-    private $clientAttributes;
+    /** @var WebsocketClientParametersProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $clientParametersProvider;
 
     /** @var TicketProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ticketProvider;
@@ -31,12 +31,12 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->wampClientFactory = $this->createMock(WampClientFactoryInterface::class);
-        $this->clientAttributes = $this->createMock(ClientAttributes::class);
+        $this->clientParametersProvider = $this->createMock(WebsocketClientParametersProviderInterface::class);
         $this->ticketProvider = $this->createMock(TicketProviderInterface::class);
 
         $this->websocketClient = new WebsocketClient(
             $this->wampClientFactory,
-            $this->clientAttributes,
+            $this->clientParametersProvider,
             $this->ticketProvider
         );
 
@@ -50,7 +50,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     {
         $connectionSession = 'sampleSession';
 
-        $this->clientAttributes->expects(self::once())
+        $this->clientParametersProvider->expects(self::once())
             ->method('getPath')
             ->willReturn($target);
 
@@ -217,7 +217,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     {
         $this->wampClientFactory->expects(self::once())
             ->method('createClient')
-            ->with($this->clientAttributes)
+            ->with($this->clientParametersProvider)
             ->willReturn($this->wampClient);
     }
 }

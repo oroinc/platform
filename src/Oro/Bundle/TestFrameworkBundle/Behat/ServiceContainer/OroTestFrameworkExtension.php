@@ -99,6 +99,8 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     public function load(ContainerBuilder $container, array $config)
     {
+        $this->loadBootstrap($container);
+
         $extension = new NelmioAliceExtension();
         $extension->load([], $container);
 
@@ -143,6 +145,16 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processContextInitializers($container);
 
         $container->get(SymfonyExtension::KERNEL_ID)->shutdown();
+    }
+
+    private function loadBootstrap(ContainerBuilder $container)
+    {
+        /** @var KernelInterface $kernel */
+        $kernel = $container->get(SymfonyExtension::KERNEL_ID);
+        $bootstrapFile = $kernel->getProjectDir().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'bootstrap_test.php';
+        if (file_exists($bootstrapFile)) {
+            require_once $bootstrapFile;
+        }
     }
 
     private function resolveClassPass(ContainerBuilder $container): void

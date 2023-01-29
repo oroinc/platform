@@ -3,8 +3,8 @@ oro:
         system_info: System Information
         packages: Packages
         deployment_variables: Deployment
-        deployment_type:
-            label: Deployment Type
+        environment:
+            label: Environment
 
         no_packages: There are no installed packages
         package:

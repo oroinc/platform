@@ -1,0 +1,7 @@
+services:
+    oro.cache.layout.redis_provider:
+        class: 'Symfony\Component\Cache\Adapter\RedisAdapter'
+        factory: '@oro_redis_config.redis_connection_factory'
+        public: true
+        arguments:
+            - '%redis_dsn_layout%'

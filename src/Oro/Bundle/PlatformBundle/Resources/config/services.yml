@@ -182,3 +182,6 @@ services:
             - 'Oro\Bundle\PlatformBundle\Entity\MaterializedView'
         tags:
             - { name: doctrine.repository_service }
+
+    Oro\Component\DependencyInjection\PgsqlAdvisorySchemaInUrlEnvVarProcessor:
+        tags: [container.env_var_processor]

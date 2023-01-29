@@ -269,18 +269,18 @@ abstract class WebTestCase extends BaseWebTestCase
     protected static function createKernel(array $options = [])
     {
         if (!array_key_exists('environment', $options)) {
-            if (isset($_ENV['SYMFONY_ENV'])) {
-                $options['environment'] = $_ENV['SYMFONY_ENV'];
-            } elseif (isset($_SERVER['SYMFONY_ENV'])) {
-                $options['environment'] = $_SERVER['SYMFONY_ENV'];
+            if (isset($_ENV['ORO_ENV'])) {
+                $options['environment'] = $_ENV['ORO_ENV'];
+            } elseif (isset($_SERVER['ORO_ENV'])) {
+                $options['environment'] = $_SERVER['ORO_ENV'];
             }
         }
 
         if (!array_key_exists('debug', $options)) {
-            if (isset($_ENV['SYMFONY_DEBUG'])) {
-                $options['debug'] = $_ENV['SYMFONY_DEBUG'];
-            } elseif (isset($_SERVER['SYMFONY_DEBUG'])) {
-                $options['debug'] = $_SERVER['SYMFONY_DEBUG'];
+            if (isset($_ENV['ORO_DEBUG'])) {
+                $options['debug'] = $_ENV['ORO_DEBUG'];
+            } elseif (isset($_SERVER['ORO_DEBUG'])) {
+                $options['debug'] = $_SERVER['ORO_DEBUG'];
             }
         }
 

@@ -1,0 +1,25 @@
+parameters:
+    message_queue_transport_dsn: 'dbal:'
+services:
+    oro_message_queue.transport.parameters:
+        class: Oro\Component\MessageQueue\Transport\DsnBasedParameters
+        public: true
+        arguments:
+            - '%message_queue_transport_dsn%'
+
+    oro_message_queue.transport.connection:
+        class: 'Oro\Component\MessageQueue\Transport\ConnectionInterface'
+        arguments:
+            - !tagged_locator { tag: 'oro_message_queue.transport', index_by: 'transport_name' }
+            - '@oro_message_queue.transport.parameters'
+        factory: [ 'Oro\Bundle\MessageQueueBundle\Transport\ConnectionFactory', 'create' ]
+
+    oro_message_queue.transport.dbal.connection:
+        class: Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection
+        arguments:
+            - '@doctrine'
+            - '%oro_message_queue.dbal.connection%'
+            - '%oro_message_queue.dbal.table%'
+            - '%oro_message_queue.dbal.options%'
+        tags:
+            - { name: oro_message_queue.transport, transport_name: dbal }

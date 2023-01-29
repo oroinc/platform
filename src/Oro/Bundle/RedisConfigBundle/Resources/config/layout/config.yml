@@ -1,0 +1,11 @@
+framework:
+    cache:
+        pools:
+            cache.oro_layout.render:
+                adapter: cache.adapter.redis_tag_aware
+                provider: oro.cache.layout.redis_provider
+
+oro_message_queue:
+    persistent_services:
+        # `oro.cache.layout.redis_provider` can be persistent in order to not duplicate connections on container clear
+        - 'oro.cache.layout.redis_provider'

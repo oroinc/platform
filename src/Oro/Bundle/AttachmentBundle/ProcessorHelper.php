@@ -4,7 +4,7 @@ namespace Oro\Bundle\AttachmentBundle;
 
 use Oro\Bundle\AttachmentBundle\Exception\ProcessorsException;
 use Oro\Bundle\AttachmentBundle\Exception\ProcessorsVersionException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * An auxiliary class that finds libraries and validate it.
@@ -14,14 +14,18 @@ class ProcessorHelper
     public const PNGQUANT = 'pngquant';
     public const JPEGOPTIM = 'jpegoptim';
 
-    /**
-     * @var ParameterBagInterface
-     */
-    private $parameterBag;
+    private string $pngquantBinaryPath;
+    private string $jpegoptimBinaryPath;
+    private CacheInterface $cache;
 
-    public function __construct(ParameterBagInterface $parameterBag)
-    {
-        $this->parameterBag = $parameterBag;
+    public function __construct(
+        string $jpegoptimBinaryPath,
+        string $pngquantBinaryPath,
+        CacheInterface $cache
+    ) {
+        $this->jpegoptimBinaryPath = $jpegoptimBinaryPath;
+        $this->pngquantBinaryPath = $pngquantBinaryPath;
+        $this->cache = $cache;
     }
 
     public function librariesExists(): bool
@@ -31,21 +35,28 @@ class ProcessorHelper
 
     public function getPNGQuantLibrary(): ?string
     {
-        return $this->getLibrary(self::PNGQUANT) ?? $this->findLibrary(self::PNGQUANT);
+        return $this->cache->get(self::PNGQUANT, function () {
+            return $this->getLibrary(self::PNGQUANT) ?? $this->findLibrary(self::PNGQUANT);
+        });
     }
 
     public function getJPEGOptimLibrary(): ?string
     {
-        return $this->getLibrary(self::JPEGOPTIM) ?? $this->findLibrary(self::JPEGOPTIM);
+        return $this->cache->get(self::JPEGOPTIM, function () {
+            return $this->getLibrary(self::JPEGOPTIM) ?? $this->findLibrary(self::JPEGOPTIM);
+        });
     }
 
     private function getLibrary($name): ?string
     {
-        $binary = null;
-        $parameter = $this->generateParameter($name);
-        # parameter may be null or an empty string
-        if (!empty($this->parameterBag->get($parameter))) {
-            $binary = $this->parameterBag->get($parameter);
+        if ($name === self::JPEGOPTIM) {
+            $binary = $this->jpegoptimBinaryPath;
+        } elseif ($name === self::PNGQUANT) {
+            $binary = $this->pngquantBinaryPath;
+        } else {
+            throw new \InvalidArgumentException(sprintf('Library %s is not supported.', $name));
+        }
+        if (!empty($binary)) {
             if (!is_executable($binary)) {
                 throw new ProcessorsException($name);
             }
@@ -71,10 +82,5 @@ class ProcessorHelper
         }
 
         return null;
-    }
-
-    public function generateParameter(string $name): string
-    {
-        return sprintf('liip_imagine.%s.binary', $name);
     }
 }

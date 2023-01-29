@@ -135,43 +135,4 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
             ]
         ];
     }
-
-    public function testBootDeploymentWithoutParameters()
-    {
-        $this->kernel->setAppDir('application/app1-without-parameters');
-        $this->kernel->boot();
-
-        $container = $this->kernel->getContainer();
-        $this->assertFalse($container->hasParameter('deployment_type'));
-        $this->assertEquals('configParam1GlobalValue', $container->getParameter('configParam1'));
-    }
-
-    public function testBootDeploymentWithEmptyDeploymetType()
-    {
-        $this->kernel->setAppDir('application/app2-without-deployment-type');
-        $this->kernel->boot();
-
-        $container = $this->kernel->getContainer();
-        $this->assertNull($container->getParameter('deployment_type'));
-        $this->assertEquals('configParam1GlobalValue', $container->getParameter('configParam1'));
-    }
-
-    public function testBootDeploymentWithoutDeploymentFile()
-    {
-        $this->kernel->setAppDir('application/app3-without-deployment-config');
-        $this->kernel->boot();
-
-        $container = $this->kernel->getContainer();
-        $this->assertFalse($container->hasParameter('deployment_type'));
-    }
-
-    public function testBootDeploymentWithLocalConfig()
-    {
-        $this->kernel->setAppDir('application/app4-with-deployment-config');
-        $this->kernel->boot();
-
-        $container = $this->kernel->getContainer();
-        $this->assertEquals('local', $container->getParameter('deployment_type'));
-        $this->assertEquals('configParam1DeploymentValue', $container->getParameter('configParam1'));
-    }
 }

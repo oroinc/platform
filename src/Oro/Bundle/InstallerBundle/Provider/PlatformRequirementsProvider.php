@@ -11,7 +11,6 @@ use Oro\Bundle\AttachmentBundle\Exception\ProcessorsVersionException;
 use Oro\Bundle\AttachmentBundle\ProcessorHelper;
 use Oro\Bundle\AttachmentBundle\ProcessorVersionChecker;
 use Oro\Bundle\DistributionBundle\OroKernel;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Process\Process;
 use Symfony\Requirements\RequirementCollection;
@@ -33,13 +32,13 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
 
     protected Connection $connection;
     protected string $projectDirectory;
-    protected array $imageProcessorConfig;
+    private ProcessorHelper $processorHelper;
 
-    public function __construct(Connection $connection, string $projectDirectory, array $imageProcessorConfig)
+    public function __construct(Connection $connection, string $projectDirectory, ProcessorHelper $processorHelper)
     {
         $this->connection = $connection;
         $this->projectDirectory = $projectDirectory;
-        $this->imageProcessorConfig = $imageProcessorConfig;
+        $this->processorHelper = $processorHelper;
     }
 
     /**
@@ -503,7 +502,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         $library = null;
 
         try {
-            $library = $this->getImageProcessorLibrary($libraryName, $this->imageProcessorConfig);
+            $library = $this->getImageProcessorLibrary($libraryName);
         } catch (ProcessorsException $exception) {
             $collection->addRequirement(
                 null !== $library,
@@ -772,7 +771,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
     {
         $library = null;
         try {
-            $library = $this->getImageProcessorLibrary($libraryName, $this->imageProcessorConfig);
+            $library = $this->getImageProcessorLibrary($libraryName);
         } catch (ProcessorsException $exception) {
             return;
         } catch (ProcessorsVersionException $exception) {
@@ -819,12 +818,10 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         return (int)$size;
     }
 
-    protected function getImageProcessorLibrary(string $libraryName, array $config): ?string
+    protected function getImageProcessorLibrary(string $libraryName): ?string
     {
-        $processorHelper = new ProcessorHelper(new ParameterBag($config));
-
         return $libraryName === ProcessorHelper::JPEGOPTIM
-            ? $processorHelper->getJPEGOptimLibrary()
-            : $processorHelper->getPNGQuantLibrary();
+            ? $this->processorHelper->getJPEGOptimLibrary()
+            : $this->processorHelper->getPNGQuantLibrary();
     }
 }
