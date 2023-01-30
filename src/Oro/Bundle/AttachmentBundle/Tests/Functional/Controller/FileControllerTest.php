@@ -68,7 +68,11 @@ class FileControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         self::assertResponseContentTypeEquals($result, 'application/force-download');
-        self::assertResponseHeader($result, 'Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store, private');
+        self::assertResponseHeader(
+            $result,
+            'Cache-Control',
+            'max-age=-172800, must-revalidate, no-cache, no-store, private'
+        );
         self::assertResponseHeader($result, 'Content-Disposition', 'attachment');
         self::assertResponseHeader($result, 'Content-Length', $file->getFileSize());
         self::assertResponseStatusCodeEquals($result, 200);
@@ -83,7 +87,11 @@ class FileControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         self::assertResponseContentTypeEquals($result, 'application/force-download');
-        self::assertResponseHeader($result, 'Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store, private');
+        self::assertResponseHeader(
+            $result,
+            'Cache-Control',
+            'max-age=-172800, must-revalidate, no-cache, no-store, private'
+        );
         self::assertResponseHeader(
             $result,
             'Content-Disposition',
@@ -102,7 +110,11 @@ class FileControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         self::assertResponseContentTypeEquals($result, 'text/plain; charset=UTF-8');
-        self::assertResponseHeader($result, 'Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store, private');
+        self::assertResponseHeader(
+            $result,
+            'Cache-Control',
+            'max-age=-172800, must-revalidate, no-cache, no-store, private'
+        );
         self::assertResponseHeader($result, 'Content-Length', $file->getFileSize());
         self::assertResponseStatusCodeEquals($result, 200);
     }

@@ -17,7 +17,7 @@ abstract class AbstractCompleteStatusCodes extends AbstractAddStatusCodes
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -34,11 +34,7 @@ abstract class AbstractCompleteStatusCodes extends AbstractAddStatusCodes
         $this->addStatusCodes($statusCodes, $context->getTargetAction());
     }
 
-    /**
-     * @param StatusCodesConfig $statusCodes
-     * @param string|null       $targetAction
-     */
-    protected function addStatusCodes(StatusCodesConfig $statusCodes, $targetAction)
+    protected function addStatusCodes(StatusCodesConfig $statusCodes, ?string $targetAction): void
     {
         $this->addStatusCode(
             $statusCodes,

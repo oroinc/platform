@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit;
 
 use Oro\Bundle\AttachmentBundle\ProcessorHelper;
+use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
@@ -12,7 +13,7 @@ trait CheckProcessorsTrait
 {
     protected function checkProcessors(): void
     {
-        $processorsFinder = new ProcessorHelper($this->getParameters());
+        $processorsFinder = new ProcessorHelper('', '', new NullAdapter);
         if (!$processorsFinder->librariesExists()) {
             $this->markTestSkipped(
                 sprintf(

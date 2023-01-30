@@ -26,17 +26,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ExpandRelatedEntities implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var ConfigProvider */
-    private $configProvider;
-
-    /** @var EntityOverrideProviderRegistry */
-    private $entityOverrideProviderRegistry;
-
-    /** @var CompleteCustomDataTypeHelper */
-    private $customDataTypeHelper;
+    private DoctrineHelper $doctrineHelper;
+    private ConfigProvider $configProvider;
+    private EntityOverrideProviderRegistry $entityOverrideProviderRegistry;
+    private CompleteCustomDataTypeHelper $customDataTypeHelper;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -53,7 +46,7 @@ class ExpandRelatedEntities implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -100,11 +93,11 @@ class ExpandRelatedEntities implements ProcessorInterface
     private function completeEntityAssociations(
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition,
-        $expandedEntities,
-        $version,
+        array $expandedEntities,
+        string $version,
         RequestType $requestType,
         array $extras
-    ) {
+    ): void {
         $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider($requestType);
         $associations = $this->splitExpandedEntities($expandedEntities);
         foreach ($associations as $fieldName => $targetExpandedEntities) {
@@ -190,11 +183,11 @@ class ExpandRelatedEntities implements ProcessorInterface
      */
     private function completeObjectAssociations(
         EntityDefinitionConfig $definition,
-        $expandedEntities,
-        $version,
+        array $expandedEntities,
+        string $version,
         RequestType $requestType,
         array $extras
-    ) {
+    ): void {
         $associations = $this->splitExpandedEntities($expandedEntities);
         foreach ($associations as $fieldName => $targetExpandedEntities) {
             $field = $definition->getField($fieldName);
@@ -226,13 +219,13 @@ class ExpandRelatedEntities implements ProcessorInterface
      */
     private function completeAssociation(
         EntityDefinitionConfig $definition,
-        $fieldName,
-        $targetClass,
-        $targetExpandedEntities,
-        $version,
+        string $fieldName,
+        string $targetClass,
+        array $targetExpandedEntities,
+        string $version,
         RequestType $requestType,
         array $extras
-    ) {
+    ): void {
         if (!empty($targetExpandedEntities)) {
             $extras[] = new ExpandRelatedEntitiesConfigExtra($targetExpandedEntities);
         }
@@ -277,7 +270,7 @@ class ExpandRelatedEntities implements ProcessorInterface
      *
      * @return array
      */
-    private function splitExpandedEntities($expandedEntities)
+    private function splitExpandedEntities(array $expandedEntities): array
     {
         $result = [];
         foreach ($expandedEntities as $expandedEntity) {
@@ -293,13 +286,7 @@ class ExpandRelatedEntities implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param string                 $fieldName
-     * @param EntityDefinitionConfig $definition
-     *
-     * @return string
-     */
-    private function getPropertyPath($fieldName, EntityDefinitionConfig $definition)
+    private function getPropertyPath(string $fieldName, EntityDefinitionConfig $definition): string
     {
         if (!$definition->hasField($fieldName)) {
             return $fieldName;

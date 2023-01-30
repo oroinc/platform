@@ -6,12 +6,12 @@ use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * This class configures the container services and describes additional
@@ -25,6 +25,12 @@ class DbalTransportFactory implements TransportFactoryInterface
     public function create(ContainerBuilder $container, array $config)
     {
         $container->setParameter('oro_message_queue.dbal.pid_file_dir', $config['pid_file_dir']);
+        $container->setParameter('oro_message_queue.dbal.connection', $config['connection']);
+        $container->setParameter('oro_message_queue.dbal.table', $config['table']);
+        $container->setParameter(
+            'oro_message_queue.dbal.options',
+            ['polling_interval' => $config['polling_interval']]
+        );
 
         $pidFileManager = new Definition(DbalPidFileManager::class, [$config['pid_file_dir']]);
         $pidFileManagerId = sprintf('oro_message_queue.consumption.%s.pid_file_manager', $this->getKey());
@@ -39,7 +45,8 @@ class DbalTransportFactory implements TransportFactoryInterface
         $orphanExtension = new Definition(RedeliverOrphanMessagesDbalExtension::class, [
             new Reference($pidFileManagerId),
             new Reference($cliProcessManagerId),
-            $config['consumer_process_pattern']
+            $config['consumer_process_pattern'],
+            new Expression("service('oro_message_queue.transport.parameters').getTransportName()"),
         ]);
         $orphanExtension->addTag('oro_message_queue.consumption.extension', ['priority' => -20]);
         $container->setDefinition(
@@ -53,17 +60,6 @@ class DbalTransportFactory implements TransportFactoryInterface
             sprintf('oro_message_queue.consumption.%s.reject_message_on_exception_extension', $this->getKey()),
             $rejectOnExceptionExtension
         );
-
-        $connection = new Definition(DbalLazyConnection::class, [
-            new Reference('doctrine'),
-            $config['connection'],
-            $config['table'],
-            ['polling_interval' => $config['polling_interval']]
-        ]);
-        $connectionId = sprintf('oro_message_queue.transport.%s.connection', $this->getKey());
-        $container->setDefinition($connectionId, $connection);
-
-        return $connectionId;
     }
 
     /**

@@ -10,11 +10,9 @@ use Oro\Bundle\FeatureToggleBundle\Event\FeaturesChange;
  */
 class ApiSourceListener
 {
-    /** @var CacheManager */
-    private $cacheManager;
-
+    private CacheManager $cacheManager;
     /** @var string[] */
-    private $excludedFeatures;
+    private array $excludedFeatures;
 
     /**
      * @param CacheManager $cacheManager
@@ -44,7 +42,7 @@ class ApiSourceListener
                 $numberOfChangedExcludedFeatures++;
             }
         }
-        if (0 === $numberOfChangedExcludedFeatures || count($changeSet) > $numberOfChangedExcludedFeatures) {
+        if (0 === $numberOfChangedExcludedFeatures || \count($changeSet) > $numberOfChangedExcludedFeatures) {
             $this->clearCache();
         }
     }

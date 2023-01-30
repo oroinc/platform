@@ -16,7 +16,7 @@ class MetadataHelper
     public function assertDataType(?string $dataType, string $entityClass, string $fieldName): string
     {
         if (!$dataType) {
-            throw new RuntimeException(\sprintf(
+            throw new RuntimeException(sprintf(
                 'The "%s" configuration attribute should be specified for the "%s" field of the "%s" entity.',
                 ConfigUtil::DATA_TYPE,
                 $fieldName,

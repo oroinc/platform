@@ -13,13 +13,9 @@ use Psr\Container\ContainerInterface;
 class DataTransformerRegistry
 {
     /** @var array [data type => [[transformer service id, request type expression], ...], ...] */
-    private $transformers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $transformers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $transformers [data type => [[service id, request type expression], ...], ...]
@@ -39,11 +35,11 @@ class DataTransformerRegistry
      * @param string      $dataType
      * @param RequestType $requestType
      *
-     * @return mixed|null Can be NULL,
-     *                    an instance of {@see \Oro\Component\EntitySerializer\DataTransformerInterface}
-     *                    or {@see \Symfony\Component\Form\DataTransformerInterface}.
+     * @return mixed Can be NULL,
+     *               an instance of {@see \Oro\Component\EntitySerializer\DataTransformerInterface}
+     *               or {@see \Symfony\Component\Form\DataTransformerInterface}.
      */
-    public function getDataTransformer(string $dataType, RequestType $requestType)
+    public function getDataTransformer(string $dataType, RequestType $requestType): mixed
     {
         $result = null;
         if (isset($this->transformers[$dataType])) {

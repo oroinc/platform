@@ -3,8 +3,8 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Listener;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\NavigationBundle\Entity\Listener\PrepareUrlListener;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\UrlAwareStub;
 

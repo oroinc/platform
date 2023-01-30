@@ -15,11 +15,9 @@ class Criteria extends BaseCriteria
     public const ENTITY_ALIAS_PLACEHOLDER = '{entity}';
     public const PLACEHOLDER_TEMPLATE     = '{%s}';
 
-    /** @var EntityClassResolver */
-    private $entityClassResolver;
-
+    private EntityClassResolver $entityClassResolver;
     /** @var Join[] */
-    private $joins = [];
+    private array $joins = [];
 
     public function __construct(EntityClassResolver $entityClassResolver)
     {
@@ -135,7 +133,7 @@ class Criteria extends BaseCriteria
             throw new \InvalidArgumentException('The property path must be not empty.');
         }
         if (!$join) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'The join must be be not empty. Join path: "%s".',
                 $propertyPath
             ));
@@ -143,7 +141,7 @@ class Criteria extends BaseCriteria
         if (!str_contains($join, '.')) {
             $entityClass = $this->resolveEntityClass($join);
             if (!$entityClass) {
-                throw new \InvalidArgumentException(\sprintf(
+                throw new \InvalidArgumentException(sprintf(
                     '"%s" is not valid entity name. Join path: "%s".',
                     $join,
                     $propertyPath
@@ -152,7 +150,7 @@ class Criteria extends BaseCriteria
             $join = $entityClass;
         }
         if ($condition && !$conditionType) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'The condition type must be specified if the condition exists. Join path: "%s".',
                 $propertyPath
             ));
@@ -164,7 +162,7 @@ class Criteria extends BaseCriteria
         } else {
             $existingJoinObject = $this->joins[$propertyPath];
             if (!$existingJoinObject->equals($joinObject)) {
-                throw new \LogicException(\sprintf(
+                throw new \LogicException(sprintf(
                     'The join definition for "%s" conflicts with already added join. '
                     . 'Existing join: "%s". New join: "%s".',
                     $propertyPath,

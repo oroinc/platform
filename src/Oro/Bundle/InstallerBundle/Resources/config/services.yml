@@ -20,10 +20,7 @@ services:
         arguments:
             - '@doctrine.dbal.default_connection'
             - '%kernel.project_dir%'
-            - {
-                  liip_imagine.jpegoptim.binary: '%liip_imagine.jpegoptim.binary%',
-                  liip_imagine.pngquant.binary: '%liip_imagine.pngquant.binary%'
-              }
+            - '@oro_attachment.processor_helper'
         tags:
             - { name: oro.requirements_provider }
 

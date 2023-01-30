@@ -22,13 +22,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
+    /** @var ActionProcessorBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $processorBag;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorCompleterInterface */
+    /** @var ErrorCompleterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $errorCompleter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExceptionTextExtractorInterface */
+    /** @var ExceptionTextExtractorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $exceptionTextExtractor;
 
     /** @var ParameterBag */

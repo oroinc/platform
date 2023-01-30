@@ -19,31 +19,27 @@ class EntityIdHelper
     /**
      * Sets the identifier value to a given entity.
      *
-     * @param object                    $entity
-     * @param mixed                     $entityId
-     * @param EntityIdMetadataInterface $metadata
-     *
      * @throws \InvalidArgumentException
      */
-    public function setEntityIdentifier($entity, $entityId, EntityIdMetadataInterface $metadata): void
+    public function setEntityIdentifier(object $entity, mixed $entityId, EntityIdMetadataInterface $metadata): void
     {
         if (!\is_array($entityId)) {
             $idFieldNames = $metadata->getIdentifierFieldNames();
             if (\count($idFieldNames) > 1) {
-                throw new \InvalidArgumentException(\sprintf(
+                throw new \InvalidArgumentException(sprintf(
                     'Unexpected identifier value "%s" for composite identifier of the entity "%s".',
                     $entityId,
                     $metadata->getClassName()
                 ));
             }
-            $entityId = [\reset($idFieldNames) => $entityId];
+            $entityId = [reset($idFieldNames) => $entityId];
         }
 
         $reflClass = new \ReflectionClass($entity);
         foreach ($entityId as $fieldName => $value) {
             $propertyName = $metadata->getPropertyPath($fieldName);
             if (null === $propertyName) {
-                throw new \InvalidArgumentException(\sprintf(
+                throw new \InvalidArgumentException(sprintf(
                     'The entity "%s" does not have metadata for the "%s" property.',
                     \get_class($entity),
                     $fieldName
@@ -55,7 +51,7 @@ class EntityIdHelper
             } else {
                 $property = ReflectionUtil::getProperty($reflClass, $propertyName);
                 if (null === $property) {
-                    throw new \InvalidArgumentException(\sprintf(
+                    throw new \InvalidArgumentException(sprintf(
                         'The entity "%s" does not have the "%s" property.',
                         \get_class($entity),
                         $propertyName
@@ -72,16 +68,10 @@ class EntityIdHelper
 
     /**
      * Adds a restriction by the entity identifier to the given query builder.
-     *
-     * @param QueryBuilder              $qb
-     * @param mixed                     $entityId
-     * @param EntityIdMetadataInterface $metadata
-     * @param string|null               $entityAlias
-     * @param string|null               $idParamName
      */
     public function applyEntityIdentifierRestriction(
         QueryBuilder $qb,
-        $entityId,
+        mixed $entityId,
         EntityIdMetadataInterface $metadata,
         string $entityAlias = null,
         string $idParamName = null
@@ -96,19 +86,19 @@ class EntityIdHelper
         if (\count($idFieldNames) === 1) {
             // single identifier
             if (\is_array($entityId)) {
-                throw new RuntimeException(\sprintf(
+                throw new RuntimeException(sprintf(
                     'The entity identifier cannot be an array because the entity "%s" has single identifier.',
                     $metadata->getClassName()
                 ));
             }
-            $propertyName = $metadata->getPropertyPath(\reset($idFieldNames));
+            $propertyName = $metadata->getPropertyPath(reset($idFieldNames));
             $qb
-                ->andWhere(\sprintf('%s.%s = :%s', $entityAlias, $propertyName, $idParamName))
+                ->andWhere(sprintf('%s.%s = :%s', $entityAlias, $propertyName, $idParamName))
                 ->setParameter($idParamName, $entityId);
         } else {
             // composite identifier
             if (!\is_array($entityId)) {
-                throw new RuntimeException(\sprintf(
+                throw new RuntimeException(sprintf(
                     'The entity identifier must be an array because the entity "%s" has composite identifier.',
                     $metadata->getClassName()
                 ));
@@ -116,7 +106,7 @@ class EntityIdHelper
             $counter = 1;
             foreach ($idFieldNames as $fieldName) {
                 if (!\array_key_exists($fieldName, $entityId)) {
-                    throw new RuntimeException(\sprintf(
+                    throw new RuntimeException(sprintf(
                         'The entity identifier array must have the key "%s" because '
                         . 'the entity "%s" has composite identifier.',
                         $fieldName,
@@ -125,8 +115,8 @@ class EntityIdHelper
                 }
                 $propertyName = $metadata->getPropertyPath($fieldName);
                 $qb
-                    ->andWhere(\sprintf('%s.%s = :%s%d', $entityAlias, $propertyName, $idParamName, $counter))
-                    ->setParameter(\sprintf('%s%d', $idParamName, $counter), $entityId[$fieldName]);
+                    ->andWhere(sprintf('%s.%s = :%s%d', $entityAlias, $propertyName, $idParamName, $counter))
+                    ->setParameter(sprintf('%s%d', $idParamName, $counter), $entityId[$fieldName]);
                 $counter++;
             }
         }
@@ -165,13 +155,8 @@ class EntityIdHelper
 
     /**
      * Checks whether the given entity identifiers are equal.
-     *
-     * @param mixed $identifier1
-     * @param mixed $identifier2
-     *
-     * @return bool
      */
-    public function areEntityIdentifiersEqual($identifier1, $identifier2): bool
+    public function areEntityIdentifiersEqual(mixed $identifier1, mixed $identifier2): bool
     {
         if (\is_array($identifier1)) {
             if (!\is_array($identifier2) || \count($identifier2) !== \count($identifier1)) {
@@ -179,8 +164,8 @@ class EntityIdHelper
             }
 
             $isEqual = true;
-            \ksort($identifier1);
-            \ksort($identifier2);
+            ksort($identifier1);
+            ksort($identifier2);
             foreach ($identifier1 as $fieldName => $value) {
                 if (!\array_key_exists($fieldName, $identifier2) || $identifier2[$fieldName] != $value) {
                     $isEqual = false;
@@ -206,7 +191,7 @@ class EntityIdHelper
      * @return mixed A scalar value if the entity has a single identifier,
      *               or an array [field name => value, ...] if the entity has a composite identifier
      */
-    public function getEntityIdentifier($entity, EntityIdMetadataInterface $metadata)
+    public function getEntityIdentifier(object $entity, EntityIdMetadataInterface $metadata): mixed
     {
         $idFieldNames = [];
         foreach ($metadata->getIdentifierFieldNames() as $fieldName) {
@@ -226,7 +211,7 @@ class EntityIdHelper
             } else {
                 $property = ReflectionUtil::getProperty($reflClass, $fieldName);
                 if (null === $property) {
-                    throw new \InvalidArgumentException(\sprintf(
+                    throw new \InvalidArgumentException(sprintf(
                         'The entity "%s" does not have the "%s" property.',
                         \get_class($entity),
                         $fieldName
@@ -240,7 +225,7 @@ class EntityIdHelper
         }
 
         if (\count($identifier) === 1) {
-            $identifier = \reset($identifier);
+            $identifier = reset($identifier);
         }
 
         return $identifier;
@@ -250,12 +235,8 @@ class EntityIdHelper
      * Checks whether the given entity identifier is empty.
      * A single valued identifier is empty if its value equals to NULL.
      * A composite identifier is empty if values of all its fields equal to NULL.
-     *
-     * @param mixed $identifier
-     *
-     * @return bool
      */
-    public function isEntityIdentifierEmpty($identifier): bool
+    public function isEntityIdentifierEmpty(mixed $identifier): bool
     {
         if (null === $identifier) {
             return true;
@@ -315,6 +296,6 @@ class EntityIdHelper
      */
     private function camelize(string $value): string
     {
-        return \str_replace(' ', '', \ucwords(\str_replace('.', ' ', \str_replace('_', ' ', $value))));
+        return str_replace(' ', '', ucwords(str_replace('.', ' ', str_replace('_', ' ', $value))));
     }
 }

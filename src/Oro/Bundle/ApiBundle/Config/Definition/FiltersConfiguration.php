@@ -12,8 +12,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class FiltersConfiguration extends AbstractConfigurationSection
 {
-    /** @var FilterOperatorRegistry */
-    private $filterOperatorRegistry;
+    private FilterOperatorRegistry $filterOperatorRegistry;
 
     public function __construct(FilterOperatorRegistry $filterOperatorRegistry)
     {

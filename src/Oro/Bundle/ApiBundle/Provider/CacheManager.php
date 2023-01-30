@@ -14,34 +14,18 @@ use Symfony\Contracts\Service\ResetInterface;
 class CacheManager
 {
     /** @var array [config key => [request type aspect, ...], ...] */
-    private $configKeys;
-
+    private array $configKeys;
     /** @var array [view => [request type aspect, ...], ...] */
-    private $apiDocViews;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
-
-    /** @var ConfigCacheFactory */
-    private $configCacheFactory;
-
-    /** @var ConfigCacheWarmer */
-    private $configCacheWarmer;
-
-    /** @var EntityAliasResolverRegistry */
-    private $entityAliasResolverRegistry;
-
-    /** @var ResourcesCacheWarmer */
-    private $resourcesCacheWarmer;
-
-    /** @var ApiDocExtractor */
-    private $apiDocExtractor;
-
-    /** @var ConfigProvider */
-    private $configProvider;
-
+    private array $apiDocViews;
+    private RequestExpressionMatcher $matcher;
+    private ConfigCacheFactory $configCacheFactory;
+    private ConfigCacheWarmer $configCacheWarmer;
+    private EntityAliasResolverRegistry $entityAliasResolverRegistry;
+    private ResourcesCacheWarmer $resourcesCacheWarmer;
+    private ApiDocExtractor $apiDocExtractor;
+    private ConfigProvider $configProvider;
     /** @var ResetInterface[] */
-    private $resettableServices = [];
+    private array $resettableServices = [];
 
     public function __construct(
         array $configKeys,
@@ -69,7 +53,7 @@ class CacheManager
      * Clears all API caches except API documentation cache.
      * To clear API documentation cache the clearApiDocCache() method should be used.
      */
-    public function clearCaches()
+    public function clearCaches(): void
     {
         $this->configCacheWarmer->warmUp();
         $this->entityAliasResolverRegistry->clearCache();
@@ -80,7 +64,7 @@ class CacheManager
      * Warms up all API caches except API documentation cache.
      * To warm up API documentation cache the warmUpApiDocCache() method should be used.
      */
-    public function warmUpCaches()
+    public function warmUpCaches(): void
     {
         $this->configCacheWarmer->warmUp();
         $this->entityAliasResolverRegistry->warmUpCache();
@@ -91,7 +75,7 @@ class CacheManager
      * Warms up all dirty API caches and clears all affected API documentation caches.
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function warmUpDirtyCaches()
+    public function warmUpDirtyCaches(): void
     {
         $dirtyRequestTypeExpressions = [];
         foreach ($this->configKeys as $configKey => $aspects) {
@@ -123,20 +107,16 @@ class CacheManager
 
     /**
      * Checks if API documentation cache is enabled.
-     *
-     * @return bool
      */
-    public function isApiDocCacheEnabled()
+    public function isApiDocCacheEnabled(): bool
     {
         return $this->apiDocExtractor instanceof CachingApiDocExtractor;
     }
 
     /**
      * Clears API documentation cache.
-     *
-     * @param string|null $view
      */
-    public function clearApiDocCache($view = null)
+    public function clearApiDocCache(?string $view = null): void
     {
         if ($this->apiDocExtractor instanceof CachingApiDocExtractor) {
             if ($view) {
@@ -151,10 +131,8 @@ class CacheManager
 
     /**
      * Warms up API documentation cache.
-     *
-     * @param string|null $view
      */
-    public function warmUpApiDocCache($view = null)
+    public function warmUpApiDocCache(?string $view = null): void
     {
         if ($this->apiDocExtractor instanceof CachingApiDocExtractor) {
             $this->configProvider->disableFullConfigsCache();
@@ -178,7 +156,7 @@ class CacheManager
      * Registers a service that should be reset to its initial state
      * after API documentation cache for a specific view is warmed up.
      */
-    public function addResettableService(ResetInterface $service)
+    public function addResettableService(ResetInterface $service): void
     {
         $this->resettableServices[] = $service;
     }
@@ -186,20 +164,14 @@ class CacheManager
     /**
      * Resets all registered resettable services to theirs initial state.
      */
-    private function resetServices()
+    private function resetServices(): void
     {
         foreach ($this->resettableServices as $service) {
             $service->reset();
         }
     }
 
-    /**
-     * @param string $expr
-     * @param array  $toMatchAspects
-     *
-     * @return bool
-     */
-    private function matchRequestType($expr, array $toMatchAspects)
+    private function matchRequestType(string $expr, array $toMatchAspects): bool
     {
         return
             !$expr

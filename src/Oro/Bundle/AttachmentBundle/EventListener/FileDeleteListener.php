@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\AttachmentBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Psr\Log\LoggerInterface;
@@ -61,7 +61,7 @@ class FileDeleteListener
             return;
         }
 
-        $changeSet = $args->getEntityManager()->getUnitOfWork()->getEntityChangeSet($file);
+        $changeSet = $args->getObjectManager()->getUnitOfWork()->getEntityChangeSet($file);
         if (!empty($changeSet['filename'][0])) {
             $this->filesShouldBeDeleted[] = $changeSet['filename'][0];
         }

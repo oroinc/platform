@@ -15,8 +15,7 @@ class RestPrefixRouteOptionsResolver implements RouteOptionsResolverInterface
 {
     private const PREFIX = '%' . OroApiExtension::REST_API_PREFIX_PARAMETER_NAME . '%';
 
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -26,7 +25,7 @@ class RestPrefixRouteOptionsResolver implements RouteOptionsResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(Route $route, RouteCollectionAccessor $routes)
+    public function resolve(Route $route, RouteCollectionAccessor $routes): void
     {
         $path = $route->getPath();
         if ($path && $this->hasPrefix($path)) {

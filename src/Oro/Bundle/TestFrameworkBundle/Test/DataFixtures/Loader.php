@@ -243,7 +243,11 @@ class Loader
     {
         if (!$fixture instanceof FixtureInterface) {
             throw new \InvalidArgumentException(
-                sprintf('The class "%s" must implement "%s".', get_class($fixture), FixtureInterface::class)
+                sprintf(
+                    'The class "%s" must implement "%s".',
+                    get_class($fixture),
+                    FixtureInterface::class
+                )
             );
         }
         if ($fixture instanceof OrderedFixtureInterface && $fixture instanceof DependentFixtureInterface) {

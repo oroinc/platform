@@ -19,7 +19,7 @@ class FixFieldNaming implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -36,7 +36,7 @@ class FixFieldNaming implements ProcessorInterface
         }
         // process "id" field
         $idFieldNames = $definition->getIdentifierFieldNames();
-        $numberOfIdFields = count($idFieldNames);
+        $numberOfIdFields = \count($idFieldNames);
         if ($numberOfIdFields === 1) {
             $idFieldName = reset($idFieldNames);
             if (JsonApiDoc::ID !== $idFieldName) {
@@ -53,14 +53,13 @@ class FixFieldNaming implements ProcessorInterface
     }
 
     /**
-     * @param EntityDefinitionConfig $definition
-     * @param string|null            $entityClass
-     * @param string                 $fieldName
-     *
      * @throws \RuntimeException if a field cannot be renamed
      */
-    protected function renameReservedField(EntityDefinitionConfig $definition, $entityClass, $fieldName)
-    {
+    protected function renameReservedField(
+        EntityDefinitionConfig $definition,
+        ?string $entityClass,
+        string $fieldName
+    ): void {
         $newFieldName = lcfirst($this->getShortClassName($entityClass)) . ucfirst($fieldName);
         if ($definition->hasField($newFieldName)) {
             throw new \RuntimeException(sprintf(
@@ -87,12 +86,7 @@ class FixFieldNaming implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $fieldName
-     * @param string                 $newFieldName
-     */
-    protected function renameIdField(EntityDefinitionConfig $definition, $fieldName, $newFieldName)
+    protected function renameIdField(EntityDefinitionConfig $definition, string $fieldName, string $newFieldName): void
     {
         $field = $definition->getField($fieldName);
         if (null !== $field && !$field->hasPropertyPath()) {
@@ -105,12 +99,8 @@ class FixFieldNaming implements ProcessorInterface
 
     /**
      * Gets the short name of the class, the part without the namespace
-     *
-     * @param string $className The full name of a class
-     *
-     * @return string
      */
-    protected function getShortClassName($className)
+    protected function getShortClassName(string $className): string
     {
         $lastDelimiter = strrpos($className, '\\');
 

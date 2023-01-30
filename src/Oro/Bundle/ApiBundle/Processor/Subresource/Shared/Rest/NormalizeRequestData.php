@@ -20,11 +20,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeRequestData implements ProcessorInterface
 {
-    /** @var EntityIdTransformerRegistry */
-    private $entityIdTransformerRegistry;
-
-    /** @var ChangeRelationshipContext */
-    private $context;
+    private EntityIdTransformerRegistry $entityIdTransformerRegistry;
+    private ?ChangeRelationshipContext $context = null;
 
     public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {
@@ -34,7 +31,7 @@ class NormalizeRequestData implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */
 
@@ -94,7 +91,7 @@ class NormalizeRequestData implements ProcessorInterface
     private function normalizeRelationId(
         string $propertyPath,
         string $entityClass,
-        $entityId,
+        mixed $entityId,
         EntityMetadata $metadata
     ): array {
         return [
@@ -103,14 +100,7 @@ class NormalizeRequestData implements ProcessorInterface
         ];
     }
 
-    /**
-     * @param string         $propertyPath
-     * @param mixed          $entityId
-     * @param EntityMetadata $metadata
-     *
-     * @return mixed
-     */
-    private function normalizeEntityId(string $propertyPath, $entityId, EntityMetadata $metadata)
+    private function normalizeEntityId(string $propertyPath, mixed $entityId, EntityMetadata $metadata): mixed
     {
         try {
             $normalizedId = $this->getEntityIdTransformer($this->context->getRequestType())

@@ -15,8 +15,7 @@ use Psr\Log\LoggerInterface;
  */
 class CompleteItemErrorPaths extends BaseCompleteItemErrorPaths
 {
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {

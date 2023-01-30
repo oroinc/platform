@@ -21,17 +21,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class AddPaginationLinksForAssociations implements ProcessorInterface
 {
-    /** @var RestRoutesRegistry */
-    private $routesRegistry;
-
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
-
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
-
-    /** @var SubresourcesProvider */
-    private $subresourcesProvider;
+    private RestRoutesRegistry $routesRegistry;
+    private FilterNamesRegistry $filterNamesRegistry;
+    private UrlGeneratorInterface $urlGenerator;
+    private SubresourcesProvider $subresourcesProvider;
 
     public function __construct(
         RestRoutesRegistry $routesRegistry,
@@ -48,7 +41,7 @@ class AddPaginationLinksForAssociations implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */
 

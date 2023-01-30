@@ -30,14 +30,9 @@ class CollectFormErrors implements ProcessorInterface
 {
     public const OPERATION_NAME = 'collect_form_errors';
 
-    /** @var ConstraintTextExtractorInterface */
-    protected $constraintTextExtractor;
-
-    /** @var ErrorCompleterRegistry */
-    protected $errorCompleterRegistry;
-
-    /** @var PropertyAccessorInterface */
-    protected $propertyAccessor;
+    protected ConstraintTextExtractorInterface $constraintTextExtractor;
+    protected ErrorCompleterRegistry $errorCompleterRegistry;
+    protected PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(
         ConstraintTextExtractorInterface $constraintTextExtractor,
@@ -52,7 +47,7 @@ class CollectFormErrors implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */
 
@@ -325,13 +320,7 @@ class CollectFormErrors implements ProcessorInterface
         return $key;
     }
 
-    /**
-     * @param FormInterface $form
-     * @param string        $propertyName
-     *
-     * @return mixed
-     */
-    protected function getPropertyValueFromFormData(FormInterface $form, string $propertyName)
+    protected function getPropertyValueFromFormData(FormInterface $form, string $propertyName): mixed
     {
         $parentData = $form->getData();
         if (!\is_object($parentData) || !$this->propertyAccessor->isReadable($parentData, $propertyName)) {
@@ -388,12 +377,7 @@ class CollectFormErrors implements ProcessorInterface
         return \array_reverse($path);
     }
 
-    /**
-     * @param FormInterface $field
-     *
-     * @return bool
-     */
-    protected function isCompoundForm(FormInterface $field)
+    protected function isCompoundForm(FormInterface $field): bool
     {
         return $field->getConfig()->getCompound();
     }

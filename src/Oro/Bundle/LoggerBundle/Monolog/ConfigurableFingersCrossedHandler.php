@@ -11,7 +11,7 @@ use Monolog\Handler\FingersCrossedHandler;
  */
 class ConfigurableFingersCrossedHandler extends FingersCrossedHandler
 {
-    private LogLevelConfig $config;
+    private ?LogLevelConfig $config = null;
 
     /**
      * Using setter instead of a constructor argument to not rely on a parent handler constructor signature
@@ -23,7 +23,7 @@ class ConfigurableFingersCrossedHandler extends FingersCrossedHandler
 
     public function handle(array $record): bool
     {
-        if (!$this->config->isActive()) {
+        if (!$this->config?->isActive()) {
             return parent::handle($record);
         }
         if ($record['level'] >= $this->config->getMinLevel()) {

@@ -16,7 +16,7 @@ class DisabledAssociationsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -40,7 +40,7 @@ class DisabledAssociationsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritDoc}
      */
-    public function getCacheKeyPart(): string
+    public function getCacheKeyPart(): ?string
     {
         return self::NAME;
     }

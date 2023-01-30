@@ -20,7 +20,6 @@ use Oro\Component\MessageQueue\Client\NoopMessageProcessor;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -30,7 +29,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $container = $this->getContainer(['message_queue_transport' => 'dbal', 'kernel.environment' => 'prod']);
+        $container = $this->getContainer(['kernel.environment' => 'prod']);
         $container->addDefinitions(
             [
                 'oro_message_queue.client.driver_factory' => new Definition(\stdClass::class, [[]]),
@@ -100,7 +99,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $container = $this->getContainer(['message_queue_transport' => 'dbal', 'kernel.environment' => 'prod']);
+        $container = $this->getContainer(['kernel.environment' => 'prod']);
         $container->addDefinitions(
             [
                 'oro_message_queue.client.driver_factory' => new Definition(\stdClass::class, [[]]),
@@ -145,7 +144,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $container = $this->getContainer(['message_queue_transport' => 'dbal', 'kernel.environment' => 'prod']);
+        $container = $this->getContainer(['kernel.environment' => 'prod']);
         $container->addDefinitions(
             [
                 'oro_message_queue.client.driver_factory' => new Definition(\stdClass::class, [[]]),
@@ -204,7 +203,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $container = $this->getContainer(['message_queue_transport' => 'dbal', 'kernel.environment' => 'prod']);
+        $container = $this->getContainer(['kernel.environment' => 'prod']);
         $container->addDefinitions(
             [
                 'oro_message_queue.client.driver_factory' => new Definition(\stdClass::class, [[]]),
@@ -269,7 +268,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $container = $this->getContainer(['message_queue_transport' => 'dbal', 'kernel.environment' => 'prod']);
+        $container = $this->getContainer(['kernel.environment' => 'prod']);
         $container->addDefinitions(
             [
                 'oro_message_queue.client.driver_factory' => new Definition(\stdClass::class, [[]]),
@@ -313,7 +312,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadTestEnvironment(): void
     {
-        $container = $this->getContainer(['message_queue_transport' => 'dbal', 'kernel.environment' => 'test']);
+        $container = $this->getContainer(['kernel.environment' => 'test']);
         $container->addDefinitions(
             [
                 'oro_message_queue.client.driver_factory' => new Definition(\stdClass::class, [[]]),
@@ -360,47 +359,6 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             TestMessageBufferManager::class,
             $container->getDefinition('oro_message_queue.client.message_buffer_manager')->getClass()
         );
-    }
-
-    /**
-     * @dataProvider invalidConfigurationDataProvider
-     *
-     * @param string|null $transport
-     * @param string $expectedExceptionMessage
-     */
-    public function testLoadInvalidConfigurationException(?string $transport, string $expectedExceptionMessage): void
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
-        $container = $this->getContainer(['message_queue_transport' => $transport, 'kernel.environment' => 'prod']);
-        $container->addDefinitions(
-            [
-                'oro_message_queue.client.driver_factory' => new Definition(\stdClass::class, [[]]),
-                'oro_message_queue.client.config' => new Definition(),
-            ]
-        );
-
-        $extension = new OroMessageQueueExtension();
-        $extension->load([], $container);
-    }
-
-    public function invalidConfigurationDataProvider(): array
-    {
-        return [
-            'null transport' => [
-                'transport' => null,
-                'expectedExceptionMessage' => 'Message queue transport key is not defined.',
-            ],
-            'empty transport' => [
-                'transport' => '',
-                'expectedExceptionMessage' => 'Message queue transport key is not defined.',
-            ],
-            'invalid transport' => [
-                'transport' => 'test',
-                'expectedExceptionMessage' => 'Message queue transport with key "test" is not found.',
-            ],
-        ];
     }
 
     private function getRequiredParameters(): array
@@ -501,7 +459,6 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             'oro_message_queue.consumption.dbal.cli_process_manager',
             'oro_message_queue.consumption.dbal.redeliver_orphan_messages_extension',
             'oro_message_queue.consumption.dbal.reject_message_on_exception_extension',
-            'oro_message_queue.transport.dbal.connection',
             TopicsCommand::class,
             DestinationsCommand::class,
             CreateQueuesCommand::class,

@@ -36,15 +36,12 @@ class BufferedMessageProducerTest extends WebTestCase
     {
         self::getMessageCollector()->clear();
 
-        // make sure that there are not messages in the database
+        // make sure that there are no messages in the database
         // it can happen because the database transaction was closed in setUp() method
         $container = self::getContainer();
-        $dbalConnectionServiceId = 'oro_message_queue.transport.dbal.connection';
-        if ($container->has($dbalConnectionServiceId)) {
-            $connection = $container->get($dbalConnectionServiceId);
-            if ($connection instanceof DbalConnection) {
-                $connection->getDBALConnection()->executeQuery('DELETE FROM ' . $connection->getTableName());
-            }
+        $connection = $container->get('oro_message_queue.transport.connection');
+        if ($connection instanceof DbalConnection) {
+            $connection->getDBALConnection()->executeQuery('DELETE FROM ' . $connection->getTableName());
         }
     }
 

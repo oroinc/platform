@@ -12,13 +12,9 @@ use Psr\Container\ContainerInterface;
 class ChunkFileClassifierRegistry
 {
     /** @var array [[classifier service id, request type expression], ...] */
-    private $classifiers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $classifiers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $classifiers [[classifier service id, request type expression], ...]

@@ -11,13 +11,9 @@ use Psr\Container\ContainerInterface;
 class DocumentBuilderFactory
 {
     /** @var array [[document builder service id, request type expression], ...] */
-    private $documentBuilders;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $documentBuilders;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $documentBuilders [[document builder service id, request type expression], ...]
@@ -43,7 +39,7 @@ class DocumentBuilderFactory
     public function createDocumentBuilder(RequestType $requestType): DocumentBuilderInterface
     {
         $documentBuilderServiceId = null;
-        foreach ($this->documentBuilders as list($serviceId, $expression)) {
+        foreach ($this->documentBuilders as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $documentBuilderServiceId = $serviceId;
                 break;

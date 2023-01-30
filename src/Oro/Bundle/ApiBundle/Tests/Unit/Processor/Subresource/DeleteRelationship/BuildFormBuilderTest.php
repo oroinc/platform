@@ -14,21 +14,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {
     private const TEST_PARENT_CLASS_NAME = 'Test\Entity';
     private const TEST_ASSOCIATION_NAME = 'testAssociation';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $formFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|PropertyAccessorInterface */
-    private $propertyAccessor;
 
     /** @var BuildFormBuilder */
     private $processor;
@@ -39,16 +36,16 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->container = $this->createMock(ContainerInterface::class);
-        $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         $this->processor = new BuildFormBuilder(
             new FormHelper(
                 $this->formFactory,
-                $this->createMock(DataTypeGuesser::class),
-                $this->propertyAccessor,
+                new DataTypeGuesser([]),
+                $propertyAccessor,
                 $this->container
             ),
-            $this->propertyAccessor
+            $propertyAccessor
         );
 
         $this->context->setParentClassName(self::TEST_PARENT_CLASS_NAME);
@@ -76,6 +73,10 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [self::isInstanceOf(PropertyPathMapper::class)],
                 [self::isInstanceOf(RemoveRelationshipMapper::class)]
             );
+        $formBuilder->expects(self::once())
+            ->method('add')
+            ->with(self::TEST_ASSOCIATION_NAME, null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);

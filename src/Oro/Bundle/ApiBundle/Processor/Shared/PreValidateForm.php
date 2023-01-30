@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class PreValidateForm implements ProcessorInterface
 {
-    /** @var FormValidationHandler */
-    private $validator;
+    private FormValidationHandler $validator;
 
     public function __construct(FormValidationHandler $validator)
     {
@@ -23,7 +22,7 @@ class PreValidateForm implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */
 

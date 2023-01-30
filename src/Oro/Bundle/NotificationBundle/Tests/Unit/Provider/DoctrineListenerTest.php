@@ -3,8 +3,8 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Provider\DoctrineListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

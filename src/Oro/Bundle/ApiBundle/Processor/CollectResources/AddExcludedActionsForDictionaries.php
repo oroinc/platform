@@ -14,11 +14,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class AddExcludedActionsForDictionaries implements ProcessorInterface
 {
-    /** @var ChainDictionaryValueListProvider */
-    protected $dictionaryProvider;
-
-    /** @var array The list of excluded actions */
-    protected $excludedActions;
+    private ChainDictionaryValueListProvider $dictionaryProvider;
+    private array $excludedActions;
 
     public function __construct(ChainDictionaryValueListProvider $dictionaryProvider, array $excludedActions)
     {
@@ -29,7 +26,7 @@ class AddExcludedActionsForDictionaries implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */
 
@@ -50,13 +47,13 @@ class AddExcludedActionsForDictionaries implements ProcessorInterface
      * @param array           $actionNames
      * @param ActionsConfig[] $actionsConfig
      */
-    protected function addExcludedActions(ApiResource $resource, array $actionNames, array $actionsConfig)
+    private function addExcludedActions(ApiResource $resource, array $actionNames, array $actionsConfig): void
     {
         $excludeActions = $resource->getExcludedActions();
         $entityClass = $resource->getEntityClass();
 
         foreach ($actionNames as $actionName) {
-            if (in_array($actionName, $excludeActions, true)) {
+            if (\in_array($actionName, $excludeActions, true)) {
                 // the action is already added to the exclude list
                 continue;
             }

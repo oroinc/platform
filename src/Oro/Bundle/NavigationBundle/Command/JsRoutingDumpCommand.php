@@ -90,9 +90,9 @@ class JsRoutingDumpCommand extends Command
             ->addOption(
                 'domain',
                 null,
-                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                InputOption::VALUE_OPTIONAL,
                 'Specify expose domain',
-                []
+                ''
             )
         ;
     }

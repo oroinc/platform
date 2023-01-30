@@ -10,23 +10,15 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
  */
 class InvalidFilterValueKeyException extends RuntimeException
 {
-    /** @var FilterValue */
-    private $filterValue;
+    private FilterValue $filterValue;
 
-    /**
-     * @param string      $message
-     * @param FilterValue $filterValue
-     */
-    public function __construct($message, FilterValue $filterValue)
+    public function __construct(string $message, FilterValue $filterValue)
     {
         parent::__construct($message);
         $this->filterValue = $filterValue;
     }
 
-    /**
-     * @return FilterValue
-     */
-    public function getFilterValue()
+    public function getFilterValue(): FilterValue
     {
         return $this->filterValue;
     }

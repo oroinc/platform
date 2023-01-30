@@ -4,7 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\EventListener\ReminderListener;

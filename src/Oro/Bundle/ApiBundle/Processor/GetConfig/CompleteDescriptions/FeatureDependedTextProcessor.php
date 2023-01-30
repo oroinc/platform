@@ -10,10 +10,9 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 class FeatureDependedTextProcessor extends AbstractTextProcessor
 {
     private const START_FEATURE_TAG = '{@feature:';
-    private const END_FEATURE_TAG   = '{@/feature}';
+    private const END_FEATURE_TAG = '{@/feature}';
 
-    /** @var FeatureChecker */
-    private $featureChecker;
+    private FeatureChecker $featureChecker;
 
     public function __construct(FeatureChecker $featureChecker)
     {

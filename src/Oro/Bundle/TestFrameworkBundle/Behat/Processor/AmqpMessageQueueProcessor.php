@@ -133,7 +133,8 @@ class AmqpMessageQueueProcessor implements MessageQueueProcessorInterface
         if (!$this->channel) {
             $container = $this->kernel->getContainer();
 
-            $config = $container->getParameter('message_queue_transport_config');
+            $config = $container->get('oro_message_queue.transport.amqp.connection.config_provider')
+                ->getConfiguration();
             $amqpStreamConnection = new AMQPStreamConnection(
                 $config['host'],
                 $config['port'],

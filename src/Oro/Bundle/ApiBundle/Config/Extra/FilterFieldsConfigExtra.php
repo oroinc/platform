@@ -12,8 +12,7 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
 {
     public const NAME = 'filter_fields';
 
-    /** @var array */
-    private $fieldFilters;
+    private array $fieldFilters;
 
     /**
      * @param array $fieldFilters The list of fields that should be returned for a specified type of an entity.
@@ -37,7 +36,7 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -45,7 +44,7 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(ConfigContext $context)
+    public function configureContext(ConfigContext $context): void
     {
         $context->set(self::NAME, $this->fieldFilters);
     }
@@ -53,7 +52,7 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function isPropagable()
+    public function isPropagable(): bool
     {
         return true;
     }
@@ -61,7 +60,7 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         $result = '';
         foreach ($this->fieldFilters as $entity => $fields) {

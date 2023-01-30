@@ -10,11 +10,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class ConfigLoaderFactory
 {
-    /** @var ConfigExtensionRegistry */
-    protected $extensionRegistry;
-
-    /** @var ConfigLoaderInterface[] */
-    private $loaders;
+    private ConfigExtensionRegistry $extensionRegistry;
+    /** @var ConfigLoaderInterface[]|null */
+    private ?array $loaders = null;
 
     public function __construct(ConfigExtensionRegistry $extensionRegistry)
     {
@@ -23,12 +21,8 @@ class ConfigLoaderFactory
 
     /**
      * Indicates whether a loader for a given configuration type exists.
-     *
-     * @param string $configType
-     *
-     * @return bool
      */
-    public function hasLoader($configType)
+    public function hasLoader(string $configType): bool
     {
         return null !== $this->findLoader($configType);
     }
@@ -36,13 +30,9 @@ class ConfigLoaderFactory
     /**
      * Returns the loader that can be used to load a given configuration type.
      *
-     * @param string $configType
-     *
-     * @return ConfigLoaderInterface
-     *
      * @throws \InvalidArgumentException if the loader was not found
      */
-    public function getLoader($configType)
+    public function getLoader(string $configType): ConfigLoaderInterface
     {
         $loader = $this->findLoader($configType);
         if (null === $loader) {
@@ -58,11 +48,8 @@ class ConfigLoaderFactory
      * Registers the loader for a given configuration type.
      * This method can be used to register a loader for new configuration type
      * or to override a default loader.
-     *
-     * @param string                     $configType
-     * @param ConfigLoaderInterface|null $loader
      */
-    protected function setLoader($configType, ConfigLoaderInterface $loader = null)
+    private function setLoader(string $configType, ConfigLoaderInterface $loader = null): void
     {
         if ($loader instanceof ConfigLoaderFactoryAwareInterface) {
             $loader->setConfigLoaderFactory($this);
@@ -70,12 +57,7 @@ class ConfigLoaderFactory
         $this->loaders[$configType] = $loader;
     }
 
-    /**
-     * @param string $configType
-     *
-     * @return ConfigLoaderInterface|null
-     */
-    protected function findLoader($configType)
+    private function findLoader(string $configType): ?ConfigLoaderInterface
     {
         if (null === $this->loaders) {
             $this->loaders = [];
@@ -99,12 +81,7 @@ class ConfigLoaderFactory
         return $loader;
     }
 
-    /**
-     * @param string $configType
-     *
-     * @return ConfigLoaderInterface|null
-     */
-    protected function createDefaultLoader($configType)
+    private function createDefaultLoader(string $configType): ?ConfigLoaderInterface
     {
         switch ($configType) {
             case ConfigUtil::DEFINITION:

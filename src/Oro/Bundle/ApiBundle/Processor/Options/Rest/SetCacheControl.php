@@ -13,8 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetCacheControl implements ProcessorInterface
 {
-    /** @var CorsSettings */
-    private $corsSettings;
+    private CorsSettings $corsSettings;
 
     public function __construct(CorsSettings $corsSettings)
     {
@@ -24,7 +23,7 @@ class SetCacheControl implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var OptionsContext $context */
 

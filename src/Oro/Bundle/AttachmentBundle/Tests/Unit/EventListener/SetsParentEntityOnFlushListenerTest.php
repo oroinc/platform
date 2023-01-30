@@ -5,12 +5,12 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\EventArgs;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\EventListener\SetsParentEntityOnFlushListener;
@@ -668,7 +668,7 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
     private function mockEntityManager(EventArgs|\PHPUnit\Framework\MockObject\MockObject $event): array
     {
         $event->expects(self::any())
-            ->method('getEntityManager')
+            ->method('getObjectManager')
             ->willReturn($entityManager = $this->createMock(EntityManager::class));
 
         $entityManager->expects(self::any())
@@ -678,11 +678,11 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         return [$entityManager, $unitOfWork];
     }
 
-    private function mockLifecycleEvent(object $entity): LifecycleEventArgs|\PHPUnit\Framework\MockObject\MockObject
+    private function mockLifecycleEvent(object $entity): LifecycleEventArgs&\PHPUnit\Framework\MockObject\MockObject
     {
         $eventPostPersist = $this->createMock(LifecycleEventArgs::class);
         $eventPostPersist->expects(self::any())
-            ->method('getEntity')
+            ->method('getObject')
             ->willReturn($entity);
 
         return $eventPostPersist;

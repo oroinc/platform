@@ -7,17 +7,12 @@ namespace Oro\Bundle\ApiBundle\Batch;
  */
 class ChunkSizeProvider
 {
-    /** @var int */
-    private $defaultChunkSize;
-
+    private int $defaultChunkSize;
     /** @var int[] [entity class => chunk size, ...] */
-    private $entityChunkSizes;
-
-    /** @var int */
-    private $defaultIncludedDataChunkSize;
-
+    private array $entityChunkSizes;
+    private int $defaultIncludedDataChunkSize;
     /** @var int[] [entity class => chunk size, ...] */
-    private $entityIncludedDataChunkSizes;
+    private array $entityIncludedDataChunkSizes;
 
     /**
      * @param int   $defaultChunkSize

@@ -20,8 +20,7 @@ class AddMetaPropertyFilter implements ProcessorInterface
 {
     public const FILTER_DESCRIPTION = 'A list of meta properties to be returned. Comma-separated names.';
 
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
+    private FilterNamesRegistry $filterNamesRegistry;
 
     public function __construct(FilterNamesRegistry $filterNamesRegistry)
     {
@@ -31,7 +30,7 @@ class AddMetaPropertyFilter implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

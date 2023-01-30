@@ -4,7 +4,6 @@ namespace Oro\Bundle\DistributionBundle;
 
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
-use Oro\Bundle\DistributionBundle\Resolver\DeploymentConfigResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendReflectionErrorHandler;
 use Oro\Bundle\PlatformBundle\Profiler\ProfilerConfig;
 use Oro\Component\Config\CumulativeResourceManager;
@@ -32,7 +31,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class OroKernel extends Kernel
 {
-    public const REQUIRED_PHP_VERSION = '8.1';
+    public const REQUIRED_PHP_VERSION = '8.2';
 
     /** @var string|null */
     private $warmupDir;
@@ -530,28 +529,6 @@ abstract class OroKernel extends Kernel
             && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')
         ) {
             $container->setProxyInstantiator(new RuntimeInstantiator());
-        }
-
-        return $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function buildContainer(): ContainerBuilder
-    {
-        $container = parent::buildContainer();
-
-        try {
-            $deploymentConfig = DeploymentConfigResolver::resolveConfig($this->getProjectDir());
-        } catch (\LogicException $e) {
-            $deploymentConfig = null;
-            // do nothing, the warning message would be shown later by
-            // {@ see \Oro\Bundle\DistributionBundle\EventListener\InstallCommandDeploymentTypeListener}
-        }
-
-        if (null !== $deploymentConfig) {
-            $this->getContainerLoader($container)->load($deploymentConfig);
         }
 
         return $container;

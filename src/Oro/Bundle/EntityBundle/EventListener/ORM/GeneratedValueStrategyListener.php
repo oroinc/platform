@@ -8,32 +8,14 @@ use Doctrine\ORM\Id\BigIntegerIdentityGenerator;
 use Doctrine\ORM\Id\IdentityGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
 /**
  * Force IDENTITY strategy for PostgreSQL sequence generators.
  */
 class GeneratedValueStrategyListener
 {
-    /**
-     * @var string
-     */
-    protected $databaseDriver;
-
-    /**
-     * @param string $databaseDriver
-     */
-    public function __construct($databaseDriver)
-    {
-        $this->databaseDriver = $databaseDriver;
-    }
-
     public function loadClassMetadata(LoadClassMetadataEventArgs $event)
     {
-        if ($this->databaseDriver !== DatabaseDriverInterface::DRIVER_POSTGRESQL) {
-            return;
-        }
-
         /** @var ClassMetadataInfo $classMetadata */
         $classMetadata = $event->getClassMetadata();
 

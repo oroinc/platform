@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
  */
 class NullEntityIdTransformer implements EntityIdTransformerInterface
 {
-    /** @var NullEntityIdTransformer|null */
-    private static $instance;
+    private static ?NullEntityIdTransformer $instance = null;
 
     /**
      * A private constructor to prevent create an instance of this class explicitly.
@@ -19,10 +18,7 @@ class NullEntityIdTransformer implements EntityIdTransformerInterface
     {
     }
 
-    /**
-     * @return NullEntityIdTransformer
-     */
-    public static function getInstance()
+    public static function getInstance(): NullEntityIdTransformer
     {
         if (null === self::$instance) {
             self::$instance = new self();
@@ -34,7 +30,7 @@ class NullEntityIdTransformer implements EntityIdTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($id, EntityMetadata $metadata)
+    public function transform(mixed $id, EntityMetadata $metadata): mixed
     {
         return $id;
     }
@@ -42,7 +38,7 @@ class NullEntityIdTransformer implements EntityIdTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($value, EntityMetadata $metadata)
+    public function reverseTransform(mixed $value, EntityMetadata $metadata): mixed
     {
         return $value;
     }

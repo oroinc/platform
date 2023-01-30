@@ -14,8 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ValidateParentActionAvailability implements ProcessorInterface
 {
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
+    private ResourcesProvider $resourcesProvider;
 
     public function __construct(ResourcesProvider $resourcesProvider)
     {
@@ -25,7 +24,7 @@ class ValidateParentActionAvailability implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */
 

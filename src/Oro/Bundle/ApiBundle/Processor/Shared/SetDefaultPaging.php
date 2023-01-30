@@ -16,11 +16,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetDefaultPaging implements ProcessorInterface
 {
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
-
-    /** @var int */
-    private $defaultPageSize;
+    private FilterNamesRegistry $filterNamesRegistry;
+    private int $defaultPageSize;
 
     public function __construct(FilterNamesRegistry $filterNamesRegistry, int $defaultPageSize)
     {
@@ -31,7 +28,7 @@ class SetDefaultPaging implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

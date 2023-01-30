@@ -1,0 +1,4 @@
+oro_message_queue:
+    persistent_services:
+        # `oro.cache.doctrine.redis_provider:` can be persistent in order to not duplicate connections on container clear
+        - 'oro.cache.doctrine.redis_provider'

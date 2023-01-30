@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine\Orm;
 
 use Doctrine\ORM\Configuration;
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql\TsRank;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql\TsvectorTsquery;
@@ -17,14 +16,6 @@ class PdoPgsqlTest extends AbstractDriverTest
     {
         $recordString = PdoPgsql::getPlainSql();
         $this->assertTrue(strpos($recordString, 'to_tsvector') > 0);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDriverName()
-    {
-        return DatabaseDriverInterface::DRIVER_POSTGRESQL;
     }
 
     /**

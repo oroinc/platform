@@ -25,8 +25,8 @@ class DeploymentVariableProvider
     {
         return [
             DeploymentVariable::create(
-                'oro.platform.deployment_type.label',
-                $this->parametersBag->has('deployment_type') ? $this->parametersBag->get('deployment_type') : null
+                'oro.platform.environment.label',
+                $this->parametersBag->has('kernel.environment') ? $this->parametersBag->get('kernel.environment') : null
             ),
         ];
     }

@@ -11,27 +11,17 @@ use Oro\Component\ChainProcessor\ProcessorBagInterface;
  */
 class RequestActionProcessor extends NormalizeResultActionProcessor
 {
-    /** @var ConfigProvider */
-    protected $configProvider;
+    protected ConfigProvider $configProvider;
+    protected MetadataProvider $metadataProvider;
 
-    /** @var MetadataProvider */
-    protected $metadataProvider;
-
-    /**
-     * @param ProcessorBagInterface $processorBag
-     * @param string                $action
-     * @param ConfigProvider        $configProvider
-     * @param MetadataProvider      $metadataProvider
-     */
     public function __construct(
         ProcessorBagInterface $processorBag,
-        $action,
+        string $action,
         ConfigProvider $configProvider,
         MetadataProvider $metadataProvider
     ) {
         parent::__construct($processorBag, $action);
-
-        $this->configProvider   = $configProvider;
+        $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
     }
 }

@@ -19,34 +19,18 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class ValidateParentEntityTypeAccess implements ProcessorInterface
 {
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private DoctrineHelper $doctrineHelper;
+    private AclGroupProviderInterface $aclGroupProvider;
+    private string $permission;
+    private bool $forcePermissionUsage;
 
-    /** @var string */
-    private $permission;
-
-    /** @var bool */
-    private $forcePermissionUsage;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var AclGroupProviderInterface */
-    private $aclGroupProvider;
-
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param DoctrineHelper                $doctrineHelper
-     * @param AclGroupProviderInterface     $aclGroupProvider
-     * @param string                        $permission
-     * @param bool                          $forcePermissionUsage
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         DoctrineHelper $doctrineHelper,
         AclGroupProviderInterface $aclGroupProvider,
-        $permission,
-        $forcePermissionUsage = false
+        string $permission,
+        bool $forcePermissionUsage = false
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->doctrineHelper = $doctrineHelper;
@@ -58,7 +42,7 @@ class ValidateParentEntityTypeAccess implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */
 
@@ -69,13 +53,13 @@ class ValidateParentEntityTypeAccess implements ProcessorInterface
             $aclResource = $parentConfig->getAclResource();
             if ($aclResource) {
                 if ($this->forcePermissionUsage) {
-                    $isGranted = $isGranted = $this->isGrantedForClass($context);
+                    $isGranted = $this->isGrantedForClass($context);
                 } else {
                     $isGranted = $this->authorizationChecker->isGranted($aclResource);
                 }
             }
         } else {
-            $isGranted = $isGranted = $this->isGrantedForClass($context);
+            $isGranted = $this->isGrantedForClass($context);
         }
 
         if (!$isGranted) {

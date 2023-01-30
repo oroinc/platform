@@ -23,7 +23,7 @@ class EntityAliasCompilerPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $classProviders = $this->getProviders($container, self::CLASS_PROVIDER_TAG_NAME);
         $aliasProviders = $this->getProviders($container, self::ALIAS_PROVIDER_TAG_NAME);
@@ -77,7 +77,7 @@ class EntityAliasCompilerPass implements CompilerPassInterface
                 $loaderServiceId,
                 $argumentIndex,
                 IteratorArgument::class,
-                is_object($existingArgument) ? get_class($existingArgument) : gettype($existingArgument)
+                get_debug_type($existingArgument)
             ));
         }
 

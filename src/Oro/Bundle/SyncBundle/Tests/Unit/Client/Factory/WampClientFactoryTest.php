@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Client\Factory;
 
-use Oro\Bundle\SyncBundle\Client\Wamp\Factory\ClientAttributes;
 use Oro\Bundle\SyncBundle\Client\Wamp\Factory\WampClientFactory;
+use Oro\Bundle\SyncBundle\Provider\WebsocketClientParametersProviderInterface;
 
 class WampClientFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -11,16 +11,16 @@ class WampClientFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $factory = new WampClientFactory();
 
-        $clientAttributes = $this->createMock(ClientAttributes::class);
-        $clientAttributes->expects(self::once())
+        $clientParametersProvider = $this->createMock(WebsocketClientParametersProviderInterface::class);
+        $clientParametersProvider->expects(self::once())
             ->method('getHost');
-        $clientAttributes->expects(self::once())
+        $clientParametersProvider->expects(self::once())
             ->method('getPort');
-        $clientAttributes->expects(self::once())
+        $clientParametersProvider->expects(self::once())
             ->method('getTransport');
-        $clientAttributes->expects(self::once())
+        $clientParametersProvider->expects(self::once())
             ->method('getContextOptions');
 
-        $factory->createClient($clientAttributes);
+        $factory->createClient($clientParametersProvider);
     }
 }

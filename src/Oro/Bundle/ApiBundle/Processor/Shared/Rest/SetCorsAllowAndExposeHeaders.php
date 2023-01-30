@@ -27,8 +27,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetCorsAllowAndExposeHeaders implements ProcessorInterface
 {
-    /** @var CorsSettings */
-    private $corsSettings;
+    private CorsSettings $corsSettings;
 
     public function __construct(CorsSettings $corsSettings)
     {
@@ -38,7 +37,7 @@ class SetCorsAllowAndExposeHeaders implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -86,6 +85,6 @@ class SetCorsAllowAndExposeHeaders implements ProcessorInterface
      */
     private static function getHeaders(array $defaultHeaders, array $customHeaders): string
     {
-        return \implode(',', \array_merge($defaultHeaders, $customHeaders));
+        return implode(',', array_merge($defaultHeaders, $customHeaders));
     }
 }

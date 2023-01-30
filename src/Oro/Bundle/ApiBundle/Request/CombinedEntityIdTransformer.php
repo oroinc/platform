@@ -11,14 +11,9 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
  */
 class CombinedEntityIdTransformer implements EntityIdTransformerInterface
 {
-    /** @var EntityIdTransformerInterface */
-    private $mainTransformer;
-
-    /** @var EntityIdResolverRegistry */
-    private $resolverRegistry;
-
-    /** @var RequestType */
-    private $requestType;
+    private EntityIdTransformerInterface $mainTransformer;
+    private EntityIdResolverRegistry $resolverRegistry;
+    private RequestType $requestType;
 
     public function __construct(
         EntityIdTransformerInterface $mainTransformer,
@@ -33,7 +28,7 @@ class CombinedEntityIdTransformer implements EntityIdTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($id, EntityMetadata $metadata)
+    public function transform(mixed $id, EntityMetadata $metadata): mixed
     {
         return $this->mainTransformer->transform($id, $metadata);
     }
@@ -41,7 +36,7 @@ class CombinedEntityIdTransformer implements EntityIdTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($value, EntityMetadata $metadata)
+    public function reverseTransform(mixed $value, EntityMetadata $metadata): mixed
     {
         $resolver = null;
         if (\is_string($value)) {

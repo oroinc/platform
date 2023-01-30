@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeEntities implements ProcessorInterface
 {
-    /** @var ObjectNormalizer */
-    protected $objectNormalizer;
+    private ObjectNormalizer $objectNormalizer;
 
     public function __construct(ObjectNormalizer $objectNormalizer)
     {
@@ -23,7 +22,7 @@ class NormalizeEntities implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

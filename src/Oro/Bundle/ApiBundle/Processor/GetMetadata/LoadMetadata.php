@@ -15,17 +15,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadMetadata implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var ObjectMetadataLoader */
-    protected $objectMetadataLoader;
-
-    /** @var EntityMetadataLoader */
-    protected $entityMetadataLoader;
-
-    /** @var AssociationMetadataLoader */
-    protected $associationMetadataLoader;
+    private DoctrineHelper $doctrineHelper;
+    private ObjectMetadataLoader $objectMetadataLoader;
+    private EntityMetadataLoader $entityMetadataLoader;
+    private AssociationMetadataLoader $associationMetadataLoader;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -42,7 +35,7 @@ class LoadMetadata implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */
 

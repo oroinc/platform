@@ -7,11 +7,9 @@ namespace Oro\Bundle\ApiBundle\Config\Definition;
  */
 class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
 {
-    /** @var ConfigurationSettingsInterface */
-    private $settings;
-
+    private ConfigurationSettingsInterface $settings;
     /** @var array [section path => callback[], ...] */
-    private $additionalConfigureCallbacks = [];
+    private array $additionalConfigureCallbacks = [];
 
     public function __construct(ConfigurationSettingsInterface $settings)
     {
@@ -55,11 +53,7 @@ class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
         return $this->settings->getPostProcessCallbacks($section);
     }
 
-    /**
-     * @param string   $section
-     * @param callable $callback
-     */
-    public function addAdditionalConfigureCallback(string $section, $callback): void
+    public function addAdditionalConfigureCallback(string $section, callable $callback): void
     {
         $this->additionalConfigureCallbacks[$section][] = $callback;
     }

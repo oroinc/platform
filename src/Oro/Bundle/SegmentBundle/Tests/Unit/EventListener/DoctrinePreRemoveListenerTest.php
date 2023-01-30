@@ -4,9 +4,9 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 use Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener;

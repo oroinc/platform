@@ -15,8 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetMaxRelatedEntities implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -26,7 +25,7 @@ class SetMaxRelatedEntities implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -54,12 +53,7 @@ class SetMaxRelatedEntities implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param ClassMetadata          $metadata
-     * @param int                    $limit
-     */
-    protected function setEntityLimits(EntityDefinitionConfig $definition, ClassMetadata $metadata, $limit)
+    private function setEntityLimits(EntityDefinitionConfig $definition, ClassMetadata $metadata, int $limit): void
     {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
@@ -70,18 +64,12 @@ class SetMaxRelatedEntities implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param ClassMetadata               $metadata
-     * @param string                      $fieldName
-     * @param int                         $limit
-     */
-    protected function setEntityFieldLimit(
+    private function setEntityFieldLimit(
         EntityDefinitionFieldConfig $field,
         ClassMetadata $metadata,
-        $fieldName,
-        $limit
-    ) {
+        string $fieldName,
+        int $limit
+    ): void {
         if ($metadata->isCollectionValuedAssociation($fieldName)) {
             $targetEntity = $field->getOrCreateTargetEntity();
             if (!$targetEntity->hasMaxResults()) {
@@ -100,11 +88,7 @@ class SetMaxRelatedEntities implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param int                    $limit
-     */
-    protected function setObjectLimits(EntityDefinitionConfig $definition, $limit)
+    private function setObjectLimits(EntityDefinitionConfig $definition, int $limit): void
     {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
@@ -114,11 +98,7 @@ class SetMaxRelatedEntities implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param int                         $limit
-     */
-    protected function setObjectFieldLimit(EntityDefinitionFieldConfig $field, $limit)
+    private function setObjectFieldLimit(EntityDefinitionFieldConfig $field, int $limit): void
     {
         if ($field->isCollectionValuedAssociation()) {
             $targetEntity = $field->getOrCreateTargetEntity();

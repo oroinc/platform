@@ -17,14 +17,9 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class AddParentEntityIdToTreeNodePathQuery implements ProcessorInterface
 {
-    /** @var TreeListener */
-    private $treeListener;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var string|null */
-    private $sourceEntityClass;
+    private TreeListener $treeListener;
+    private DoctrineHelper $doctrineHelper;
+    private ?string $sourceEntityClass = null;
 
     public function __construct(TreeListener $treeListener, DoctrineHelper $doctrineHelper)
     {
@@ -40,7 +35,7 @@ class AddParentEntityIdToTreeNodePathQuery implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */
 

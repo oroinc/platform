@@ -19,42 +19,23 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class MapPrimaryField implements ProcessorInterface
 {
-    protected const PRIMARY_ITEM_KEY   = 'primary_item_key';
-    protected const PRIMARY_ITEM_VALUE = 'primary_item_value';
+    private const PRIMARY_ITEM_KEY   = 'primary_item_key';
+    private const PRIMARY_ITEM_VALUE = 'primary_item_value';
 
-    /** @var PropertyAccessorInterface */
-    protected $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
+    private string $unknownPrimaryValueValidationMessage;
+    private string $primaryFieldName;
+    private string $associationName;
+    private string $associationDataFieldName;
+    private string $associationPrimaryFlagFieldName;
 
-    /** @var string */
-    protected $unknownPrimaryValueValidationMessage;
-
-    /** @var string */
-    protected $primaryFieldName;
-
-    /** @var string */
-    protected $associationName;
-
-    /** @var string */
-    protected $associationDataFieldName;
-
-    /** @var string */
-    protected $associationPrimaryFlagFieldName;
-
-    /**
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param string                    $unknownPrimaryValueValidationMessage
-     * @param string                    $primaryFieldName
-     * @param string                    $associationName
-     * @param string                    $associationDataFieldName
-     * @param string                    $associationPrimaryFlagFieldName
-     */
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
-        $unknownPrimaryValueValidationMessage,
-        $primaryFieldName,
-        $associationName,
-        $associationDataFieldName,
-        $associationPrimaryFlagFieldName = 'primary'
+        string $unknownPrimaryValueValidationMessage,
+        string $primaryFieldName,
+        string $associationName,
+        string $associationDataFieldName,
+        string $associationPrimaryFlagFieldName = 'primary'
     ) {
         $this->propertyAccessor = $propertyAccessor;
         $this->unknownPrimaryValueValidationMessage = $unknownPrimaryValueValidationMessage;
@@ -67,7 +48,7 @@ class MapPrimaryField implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
 
@@ -84,10 +65,10 @@ class MapPrimaryField implements ProcessorInterface
         }
     }
 
-    protected function processPreSubmit(CustomizeFormDataContext $context)
+    private function processPreSubmit(CustomizeFormDataContext $context): void
     {
         $submittedData = $context->getData();
-        if (!is_array($submittedData) && !$submittedData instanceof \ArrayAccess) {
+        if (!\is_array($submittedData) && !$submittedData instanceof \ArrayAccess) {
             return;
         }
 
@@ -96,10 +77,10 @@ class MapPrimaryField implements ProcessorInterface
             return;
         }
 
-        if (!array_key_exists($this->associationName, $submittedData)
-            && array_key_exists($this->primaryFieldName, $submittedData)
+        if (!\array_key_exists($this->associationName, $submittedData)
+            && \array_key_exists($this->primaryFieldName, $submittedData)
         ) {
-            list($collectionSubmitData, $primaryItemKey) = $this->getAssociationSubmitData(
+            [$collectionSubmitData, $primaryItemKey] = $this->getAssociationSubmitData(
                 $context->getForm()->get($this->associationName)->getData(),
                 $submittedData[$this->primaryFieldName],
                 $associationField
@@ -109,8 +90,8 @@ class MapPrimaryField implements ProcessorInterface
             if (null !== $primaryItemKey) {
                 $context->set(self::PRIMARY_ITEM_KEY, $primaryItemKey);
             }
-        } elseif (array_key_exists($this->associationName, $submittedData)
-            && !array_key_exists($this->primaryFieldName, $submittedData)
+        } elseif (\array_key_exists($this->associationName, $submittedData)
+            && !\array_key_exists($this->primaryFieldName, $submittedData)
         ) {
             $context->set(
                 self::PRIMARY_ITEM_VALUE,
@@ -125,7 +106,7 @@ class MapPrimaryField implements ProcessorInterface
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function processPostSubmit(CustomizeFormDataContext $context)
+    private function processPostSubmit(CustomizeFormDataContext $context): void
     {
         $associationField = $this->getAssociationFieldIfBothAssociationAndPrimaryFieldFormsExist($context);
         if (null === $associationField) {
@@ -160,7 +141,7 @@ class MapPrimaryField implements ProcessorInterface
         }
     }
 
-    protected function processPostValidate(CustomizeFormDataContext $context)
+    private function processPostValidate(CustomizeFormDataContext $context): void
     {
         $form = $context->getForm();
         $primaryItemKey = $context->get(self::PRIMARY_ITEM_KEY);
@@ -175,13 +156,7 @@ class MapPrimaryField implements ProcessorInterface
         }
     }
 
-    /**
-     * @param mixed                       $collection
-     * @param EntityDefinitionFieldConfig $association
-     *
-     * @return mixed
-     */
-    protected function getPrimaryValue($collection, EntityDefinitionFieldConfig $association)
+    private function getPrimaryValue(mixed $collection, EntityDefinitionFieldConfig $association): mixed
     {
         $this->assertAssociationData($collection);
 
@@ -206,11 +181,11 @@ class MapPrimaryField implements ProcessorInterface
      *
      * @return array [collection submit data, the primary item key]
      */
-    protected function getAssociationSubmitData(
-        $collection,
-        $submittedPrimaryValue,
+    private function getAssociationSubmitData(
+        mixed $collection,
+        mixed $submittedPrimaryValue,
         EntityDefinitionFieldConfig $association
-    ) {
+    ): array {
         $this->assertAssociationData($collection);
 
         $isCollapsed = $association->isCollapsed();
@@ -223,10 +198,10 @@ class MapPrimaryField implements ProcessorInterface
         foreach ($collection as $item) {
             $value = $this->propertyAccessor->getValue($item, $dataPropertyPath);
             if ($this->propertyAccessor->getValue($item, $primaryFlagPropertyPath)) {
-                $oldPrimaryItemIndex = count($result);
+                $oldPrimaryItemIndex = \count($result);
             }
             if (trim($value) === trim($submittedPrimaryValue)) {
-                $newPrimaryItemIndex = count($result);
+                $newPrimaryItemIndex = \count($result);
             }
             $result[] = $this->getAssociationSubmittedDataItem($value, $isCollapsed);
         }
@@ -237,38 +212,25 @@ class MapPrimaryField implements ProcessorInterface
                 unset($result[$oldPrimaryItemIndex]);
                 $result = array_values($result);
             }
-            $primaryItemKey = (string)count($result);
+            $primaryItemKey = (string)\count($result);
             $result[] = $this->getAssociationSubmittedDataItem($submittedPrimaryValue, $isCollapsed);
         }
 
         return [$result, $primaryItemKey];
     }
 
-    /**
-     * @param mixed $value
-     * @param bool  $isCollapsed
-     *
-     * @return mixed
-     */
-    protected function getAssociationSubmittedDataItem($value, $isCollapsed)
+    private function getAssociationSubmittedDataItem(mixed $value, bool $isCollapsed): mixed
     {
         return $isCollapsed
             ? $value
             : [$this->associationDataFieldName => $value];
     }
 
-    /**
-     * @param mixed                       $collection
-     * @param mixed                       $primaryValue
-     * @param EntityDefinitionFieldConfig $association
-     *
-     * @return bool
-     */
-    protected function updateAssociationData(
-        $collection,
-        $primaryValue,
+    private function updateAssociationData(
+        mixed $collection,
+        mixed $primaryValue,
         EntityDefinitionFieldConfig $association
-    ) {
+    ): bool {
         $this->assertAssociationData($collection);
 
         $dataPropertyPath = $this->getAssociationDataPropertyPath($association);
@@ -293,34 +255,20 @@ class MapPrimaryField implements ProcessorInterface
         return $isKnownPrimaryValue || $isEmptyCollection;
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $association
-     *
-     * @return string
-     */
-    protected function getAssociationDataPropertyPath(EntityDefinitionFieldConfig $association)
+    private function getAssociationDataPropertyPath(EntityDefinitionFieldConfig $association): string
     {
         return $this->getAssociationFieldPropertyPath($association, $this->associationDataFieldName);
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $association
-     *
-     * @return string
-     */
-    protected function getAssociationPrimaryFlagPropertyPath(EntityDefinitionFieldConfig $association)
+    private function getAssociationPrimaryFlagPropertyPath(EntityDefinitionFieldConfig $association): string
     {
         return $this->getAssociationFieldPropertyPath($association, $this->associationPrimaryFlagFieldName);
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $association
-     * @param string                      $fieldName
-     *
-     * @return string
-     */
-    protected function getAssociationFieldPropertyPath(EntityDefinitionFieldConfig $association, $fieldName)
-    {
+    private function getAssociationFieldPropertyPath(
+        EntityDefinitionFieldConfig $association,
+        string $fieldName
+    ): string {
         $result = $fieldName;
         $associationTarget = $association->getTargetEntity();
         if (null !== $associationTarget) {
@@ -336,29 +284,20 @@ class MapPrimaryField implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param mixed $collection
-     */
-    protected function assertAssociationData($collection)
+    private function assertAssociationData(mixed $collection): void
     {
-        if (!$collection instanceof \Traversable && !is_array($collection)) {
-            throw new \RuntimeException(
-                sprintf(
-                    'The "%s" field should be \Traversable or array, got "%s".',
-                    $this->associationName,
-                    is_object($collection) ? get_class($collection) : gettype($collection)
-                )
-            );
+        if (!$collection instanceof \Traversable && !\is_array($collection)) {
+            throw new \RuntimeException(sprintf(
+                'The "%s" field should be \Traversable or array, got "%s".',
+                $this->associationName,
+                get_debug_type($collection)
+            ));
         }
     }
 
-    /**
-     * @param CustomizeFormDataContext $context
-     *
-     * @return EntityDefinitionFieldConfig|null
-     */
-    protected function getAssociationFieldIfBothAssociationAndPrimaryFieldFormsExist(CustomizeFormDataContext $context)
-    {
+    private function getAssociationFieldIfBothAssociationAndPrimaryFieldFormsExist(
+        CustomizeFormDataContext $context
+    ): ?EntityDefinitionFieldConfig {
         $config = $context->getConfig();
         if (null === $config) {
             return null;

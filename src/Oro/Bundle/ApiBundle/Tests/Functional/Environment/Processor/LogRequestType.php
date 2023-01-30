@@ -9,8 +9,7 @@ use Psr\Log\LoggerInterface;
 
 class LogRequestType implements ProcessorInterface
 {
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {
@@ -20,7 +19,7 @@ class LogRequestType implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

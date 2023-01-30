@@ -13,7 +13,7 @@ class BuildSingleItemResultDocument extends BuildResultDocument
     /**
      * {@inheritdoc}
      */
-    protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context)
+    protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context): void
     {
         $documentBuilder->setDataObject(
             $context->getResult(),

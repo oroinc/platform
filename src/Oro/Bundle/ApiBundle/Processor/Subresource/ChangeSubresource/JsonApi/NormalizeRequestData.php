@@ -16,7 +16,7 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ChangeSubresourceContext $context */
 
@@ -26,9 +26,10 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
                 $data = $requestData[JsonApiDoc::DATA];
                 if (!\is_array($data)) {
                     // the request data were not validated
-                    throw new RuntimeException(
-                        \sprintf('The "%s" top-section of the request data should be an array.', JsonApiDoc::DATA)
-                    );
+                    throw new RuntimeException(sprintf(
+                        'The "%s" top-section of the request data should be an array.',
+                        JsonApiDoc::DATA
+                    ));
                 }
                 $metadata = $context->getMetadata();
                 $this->context = $context;

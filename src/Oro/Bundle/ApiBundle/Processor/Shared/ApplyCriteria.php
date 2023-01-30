@@ -13,8 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ApplyCriteria implements ProcessorInterface
 {
-    /** @var CriteriaConnector */
-    private $criteriaConnector;
+    private CriteriaConnector $criteriaConnector;
 
     public function __construct(CriteriaConnector $criteriaConnector)
     {
@@ -24,7 +23,7 @@ class ApplyCriteria implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

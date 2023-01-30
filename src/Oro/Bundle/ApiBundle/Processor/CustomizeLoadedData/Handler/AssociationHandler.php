@@ -13,11 +13,8 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
  */
 class AssociationHandler extends EntityHandler
 {
-    /** @var string */
-    private $rootEntityClass;
-
-    /** @var string */
-    private $propertyPath;
+    private string $rootEntityClass;
+    private string $propertyPath;
 
     /**
      * @param ActionProcessorInterface $customizationProcessor

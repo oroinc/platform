@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Form\DataMapper\AppendRelationshipMapper;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildFormBuilder as BaseBuildFormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -14,8 +15,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class BuildFormBuilder extends BaseBuildFormBuilder
 {
-    /** @var PropertyAccessorInterface */
-    protected $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(FormHelper $formHelper, PropertyAccessorInterface $propertyAccessor)
     {
@@ -26,7 +26,7 @@ class BuildFormBuilder extends BaseBuildFormBuilder
     /**
      * {@inheritdoc}
      */
-    protected function getFormBuilder(ChangeRelationshipContext $context)
+    protected function getFormBuilder(ChangeRelationshipContext $context): FormBuilderInterface
     {
         $formBuilder = parent::getFormBuilder($context);
         $formBuilder->setDataMapper(

@@ -14,11 +14,12 @@ class AssertHasResult implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         if (!$context->hasResult()) {
             throw new NotFoundHttpException('Unsupported request.');
-        } elseif (null === $context->getResult()) {
+        }
+        if (null === $context->getResult()) {
             throw new NotFoundHttpException('An entity with the requested identifier does not exist.');
         }
     }

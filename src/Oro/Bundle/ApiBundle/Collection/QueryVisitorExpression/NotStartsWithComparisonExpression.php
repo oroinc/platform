@@ -17,8 +17,8 @@ class NotStartsWithComparisonExpression implements ComparisonExpressionInterface
         string $field,
         string $expression,
         string $parameterName,
-        $value
-    ) {
+        mixed $value
+    ): mixed {
         $visitor->addParameter($parameterName, $value . '%');
 
         return $visitor->getExpressionBuilder()

@@ -249,7 +249,11 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
                     ));
                 }
             } else {
-                \PHPUnit\Framework\Assert::assertSame($expected, $actual);
+                if (is_float($expected)) {
+                    \PHPUnit\Framework\Assert::assertEqualsWithDelta($expected, $actual, 0.0000001);
+                } else {
+                    \PHPUnit\Framework\Assert::assertSame($expected, $actual);
+                }
             }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->errors[] = [$path, $e->getMessage()];

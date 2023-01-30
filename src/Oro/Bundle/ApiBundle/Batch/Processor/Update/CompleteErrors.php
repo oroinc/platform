@@ -20,8 +20,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class CompleteErrors implements ProcessorInterface
 {
-    /** @var ErrorCompleterRegistry */
-    private $errorCompleterRegistry;
+    private ErrorCompleterRegistry $errorCompleterRegistry;
 
     public function __construct(ErrorCompleterRegistry $errorCompleterRegistry)
     {
@@ -31,7 +30,7 @@ class CompleteErrors implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */
 

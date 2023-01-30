@@ -755,7 +755,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
     public function testRequestBodyWithNotStringScalarParameterValue()
     {
         $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Expected string value for the filter "prm1", given "integer".');
+        $this->expectExceptionMessage('Expected string value for the filter "prm1", given "int".');
 
         $requestBody = [
             'prm1' => 1
@@ -800,7 +800,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
     public function testRequestBodyWithNotStringScalarParameterValueWithOperator()
     {
         $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Expected string value for the filter "prm1", given "integer".');
+        $this->expectExceptionMessage('Expected string value for the filter "prm1", given "int".');
 
         $requestBody = [
             'prm1' => ['neq' => 1]
@@ -845,7 +845,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
     public function testRequestBodyWithNestedParameterAndNotStringScalarParameterValue()
     {
         $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "integer".');
+        $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "int".');
 
         $requestBody = [
             'filter' => ['prm1' => 1]
@@ -890,7 +890,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
     public function testRequestBodyWithNestedParameterAndNotStringScalarParameterValueWithOperator()
     {
         $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "integer".');
+        $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "int".');
 
         $requestBody = [
             'filter' => ['prm1' => ['neq' => 1]]

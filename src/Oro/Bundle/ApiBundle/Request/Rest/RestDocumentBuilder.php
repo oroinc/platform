@@ -21,11 +21,11 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class RestDocumentBuilder extends AbstractDocumentBuilder
 {
     public const OBJECT_TYPE = 'entity';
-    public const LINKS       = 'links';
-    public const HREF        = 'href';
+    public const LINKS = 'links';
+    public const HREF = 'href';
 
-    private const ERROR_CODE   = 'code';
-    private const ERROR_TITLE  = 'title';
+    private const ERROR_CODE = 'code';
+    private const ERROR_TITLE = 'title';
     private const ERROR_DETAIL = 'detail';
     private const ERROR_SOURCE = 'source';
 
@@ -51,9 +51,9 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
      * {@inheritdoc}
      */
     protected function convertCollectionToArray(
-        $collection,
+        iterable $collection,
         RequestType $requestType,
-        EntityMetadata $metadata = null
+        ?EntityMetadata $metadata
     ): array {
         $result = [];
         foreach ($collection as $object) {
@@ -69,9 +69,9 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
      * {@inheritdoc}
      */
     protected function convertObjectToArray(
-        $object,
+        mixed $object,
         RequestType $requestType,
-        EntityMetadata $metadata = null
+        ?EntityMetadata $metadata
     ): array {
         $data = $this->objectAccessor->toArray($object);
         if (null === $metadata) {
@@ -210,7 +210,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function addMetaToCollectionResult(array &$result, string $name, $value): void
+    protected function addMetaToCollectionResult(array &$result, string $name, mixed $value): void
     {
         // not supported
     }
@@ -261,10 +261,10 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
      * {@inheritdoc}
      */
     protected function processRelatedObject(
-        $object,
+        mixed $object,
         RequestType $requestType,
         AssociationMetadata $associationMetadata
-    ) {
+    ): mixed {
         if (\is_scalar($object)) {
             return $object;
         }
@@ -276,7 +276,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
             if ($targetMetadata && $this->hasIdentifierFieldsOnly($targetMetadata)) {
                 $data = $this->objectAccessor->toArray($object);
 
-                return count($data) === 1
+                return \count($data) === 1
                     ? reset($data)
                     : $data;
             }
@@ -300,20 +300,14 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
      */
     protected function hasIdentifierFieldsOnly(EntityMetadata $metadata): bool
     {
-        if (count($metadata->getMetaProperties()) > 0) {
+        if (\count($metadata->getMetaProperties()) > 0) {
             return false;
         }
 
         return parent::hasIdentifierFieldsOnly($metadata);
     }
 
-    /**
-     * @param string     $href
-     * @param array|null $properties
-     *
-     * @return array|string
-     */
-    protected function getLinkObject(string $href, ?array $properties)
+    protected function getLinkObject(string $href, ?array $properties): array|string
     {
         if (empty($properties)) {
             return $href;

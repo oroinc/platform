@@ -9,7 +9,7 @@ class TestConfigLoader extends AbstractConfigLoader
     /**
      * {@inheritdoc}
      */
-    public function load(array $config)
+    public function load(array $config): mixed
     {
         $result = new TestConfig();
         foreach ($config as $key => $value) {

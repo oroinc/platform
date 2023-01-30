@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Entity\Repository\DigitalAssetRepository;

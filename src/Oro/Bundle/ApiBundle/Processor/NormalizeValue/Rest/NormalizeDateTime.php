@@ -15,7 +15,7 @@ class NormalizeDateTime extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypeString()
+    protected function getDataTypeString(): string
     {
         return 'datetime';
     }
@@ -23,7 +23,7 @@ class NormalizeDateTime extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypePluralString()
+    protected function getDataTypePluralString(): string
     {
         return 'datetimes';
     }
@@ -31,7 +31,7 @@ class NormalizeDateTime extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getRequirement()
+    protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
@@ -39,7 +39,7 @@ class NormalizeDateTime extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function normalizeValue($value)
+    protected function normalizeValue(mixed $value): mixed
     {
         // datetime value hack due to the fact that some clients pass + encoded as %20 and not %2B,
         // so it becomes space on symfony side due to parse_str php function in HttpFoundation\Request

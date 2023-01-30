@@ -14,8 +14,7 @@ use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
  */
 abstract class SetHttpAllowHeader extends BaseSetHttpAllowHeader
 {
-    /** @var SubresourcesProvider */
-    private $subresourcesProvider;
+    private SubresourcesProvider $subresourcesProvider;
 
     public function __construct(ResourcesProvider $resourcesProvider, SubresourcesProvider $subresourcesProvider)
     {
@@ -26,7 +25,7 @@ abstract class SetHttpAllowHeader extends BaseSetHttpAllowHeader
     /**
      * {@inheritdoc}
      */
-    protected function getHttpMethodToActionsMapForResourceWithoutIdentifier()
+    protected function getHttpMethodToActionsMapForResourceWithoutIdentifier(): array
     {
         return $this->getHttpMethodToActionsMap();
     }
@@ -34,7 +33,7 @@ abstract class SetHttpAllowHeader extends BaseSetHttpAllowHeader
     /**
      * {@inheritdoc}
      */
-    protected function getExcludeActions(Context $context)
+    protected function getExcludeActions(Context $context): array
     {
         /** @var SubresourceContext $context */
 
@@ -52,7 +51,7 @@ abstract class SetHttpAllowHeader extends BaseSetHttpAllowHeader
         if (null !== $subresource) {
             $subresourceExcludedActions = $subresource->getExcludedActions();
             if (!empty($subresourceExcludedActions)) {
-                $excludeActions = \array_unique(\array_merge($excludeActions, $subresourceExcludedActions));
+                $excludeActions = array_unique(array_merge($excludeActions, $subresourceExcludedActions));
             }
         }
 

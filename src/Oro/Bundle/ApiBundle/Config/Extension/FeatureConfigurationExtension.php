@@ -131,7 +131,7 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface, 
     private function validateApiResource(mixed $value): mixed
     {
         if (\is_array($value)) {
-            if (ArrayUtil::isAssoc($value) || count($value) !== 2) {
+            if (ArrayUtil::isAssoc($value) || \count($value) !== 2) {
                 throw new \InvalidArgumentException(
                     'The array value must contains 2 elements,'
                     . ' an entity class and an array of API actions.'

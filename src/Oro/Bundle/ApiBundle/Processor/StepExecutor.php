@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
  */
 class StepExecutor
 {
-    /** @var ByStepNormalizeResultActionProcessor */
-    private $processor;
+    private ByStepNormalizeResultActionProcessor $processor;
 
     public function __construct(ByStepNormalizeResultActionProcessor $processor)
     {

@@ -13,16 +13,11 @@ use Psr\Container\ContainerInterface;
 class ExclusionProviderRegistry
 {
     /** @var array [[provider service id, request type expression], ...] */
-    private $exclusionProviders;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
-
+    private array $exclusionProviders;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
     /** @var ExclusionProviderInterface[] [request type => ExclusionProviderInterface, ...] */
-    private $cache = [];
+    private array $cache = [];
 
     /**
      * @param array                    $exclusionProviders [[provider service id, request type expression], ...]
@@ -52,7 +47,7 @@ class ExclusionProviderRegistry
         }
 
         $exclusionProviderServiceId = null;
-        foreach ($this->exclusionProviders as list($serviceId, $expression)) {
+        foreach ($this->exclusionProviders as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $exclusionProviderServiceId = $serviceId;
                 break;

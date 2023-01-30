@@ -12,8 +12,7 @@ use Oro\Component\PhpUtils\ReflectionUtil;
  */
 class EntityInstantiator
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -22,12 +21,8 @@ class EntityInstantiator
 
     /**
      * Creates an instance of a given class.
-     *
-     * @param string $className
-     *
-     * @return object
      */
-    public function instantiate(string $className)
+    public function instantiate(string $className): object
     {
         $reflClass = new \ReflectionClass($className);
 
@@ -48,22 +43,12 @@ class EntityInstantiator
             );
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     *
-     * @return object
-     */
-    private function instantiateViaConstructor(\ReflectionClass $reflClass)
+    private function instantiateViaConstructor(\ReflectionClass $reflClass): object
     {
         return $reflClass->newInstance();
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     *
-     * @return object
-     */
-    private function instantiateViaReflection(\ReflectionClass $reflClass)
+    private function instantiateViaReflection(\ReflectionClass $reflClass): object
     {
         $entity = $reflClass->newInstanceWithoutConstructor();
 

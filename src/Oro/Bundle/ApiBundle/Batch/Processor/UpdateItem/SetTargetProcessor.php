@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetTargetProcessor implements ProcessorInterface
 {
-    /** @var ActionProcessorBagInterface */
-    private $processorBag;
+    private ActionProcessorBagInterface $processorBag;
 
     public function __construct(ActionProcessorBagInterface $processorBag)
     {
@@ -23,7 +22,7 @@ class SetTargetProcessor implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateItemContext $context */
 

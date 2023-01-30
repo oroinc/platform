@@ -9,21 +9,11 @@ interface ObjectPropertyAccessorInterface
 {
     /**
      * Returns the value of a given property.
-     *
-     * @param mixed  $object
-     * @param string $propertyName
-     *
-     * @return mixed
      */
-    public function getValue($object, string $propertyName);
+    public function getValue(mixed $object, string $propertyName): mixed;
 
     /**
      * Checks whether the object has a given property.
-     *
-     * @param mixed  $object
-     * @param string $propertyName
-     *
-     * @return bool
      */
-    public function hasProperty($object, string $propertyName): bool;
+    public function hasProperty(mixed $object, string $propertyName): bool;
 }
