@@ -243,7 +243,7 @@ class Parser
                                 if (\is_int($name = array_search($token->value, $this->names)) || $name === false) {
                                     $name = $token->value;
                                 }
-                                // [/CUSTOM LINES]
+                            // [/CUSTOM LINES]
                             } else {
                                 $name = $token->value;
                             }
@@ -383,7 +383,7 @@ class Parser
                 } else {
                     $type = GetAttrNodeFactory::PROPERTY_CALL;
                 }
-                // [/CUSTOM LINES]
+            // [/CUSTOM LINES]
             } elseif ('[' === $token->value) {
                 // [CUSTOM LINES]
                 if ($node instanceof CustomNode\AbstractCollectionMethodCallNode) {

@@ -70,7 +70,7 @@ class ConfigurationLoader
                 $exclusionProviderServiceId,
                 $entityOverrideProviderServiceId,
                 $configCacheStateServiceId
-                ] = $this->configureApi($configKey, $fileConfig['file_name']);
+            ] = $this->configureApi($configKey, $fileConfig['file_name']);
             $requestTypeExpression = $this->getRequestTypeExpression($fileConfig);
 
             $configBagsConfig[] = [$configBagServiceId, $requestTypeExpression];

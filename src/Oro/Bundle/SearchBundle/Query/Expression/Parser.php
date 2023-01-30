@@ -135,7 +135,7 @@ class Parser
                 $this->query->select($fieldDeclaration);
                 break;
 
-            // if got opening bracket (punctuation '(') - collect all arguments
+                // if got opening bracket (punctuation '(') - collect all arguments
             case (true === $this->stream->current->test(Token::PUNCTUATION_TYPE, '(')):
                 $this->query->select($this->parseSelectKeywordArguments());
                 break;
@@ -161,13 +161,13 @@ class Parser
                 $this->stream->next();
                 break;
 
-            // if got operator (only '*' is supported in from statement)
+                // if got operator (only '*' is supported in from statement)
             case (true === $this->stream->current->test(Token::OPERATOR_TYPE, '*')):
                 $this->query->from(['*']);
                 $this->stream->next();
                 break;
 
-            // if got opening bracket (punctuation '(') - collect all arguments
+                // if got opening bracket (punctuation '(') - collect all arguments
             case (true === $this->stream->current->test(Token::PUNCTUATION_TYPE, '(')):
                 $this->query->from($this->parseArguments());
                 break;

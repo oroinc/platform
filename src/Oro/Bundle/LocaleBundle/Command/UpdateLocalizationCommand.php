@@ -68,7 +68,7 @@ language entity for the <info>--language</info> option value if such language do
 <error>This is an internal command. Please do not run it manually.</error>
 
 HELP
-            // @codingStandardsIgnoreEnd
+                // @codingStandardsIgnoreEnd
             )
             ->addUsage('--formatting-code=<formatting-code> --language=<language>')
         ;

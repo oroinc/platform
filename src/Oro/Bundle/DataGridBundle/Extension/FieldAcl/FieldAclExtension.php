@@ -180,7 +180,7 @@ class FieldAclExtension extends AbstractExtension
             $entityIdFieldAlias,
             $organizationIdFieldAlias,
             $ownerIdFieldAlias
-            ) = $this->ownershipFields[$entityAlias];
+        ) = $this->ownershipFields[$entityAlias];
 
         $ownerId = $record->getValue($ownerIdFieldAlias);
         if (null === $ownerId) {
