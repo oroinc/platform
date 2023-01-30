@@ -16,14 +16,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ValidateNewIncludedEntityExistence implements ProcessorInterface
 {
-    /** @var PropertyAccessorInterface */
-    protected $propertyAccessor;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
+    private PropertyAccessorInterface $propertyAccessor;
+    private TranslatorInterface $translator;
     /** @var array [association_name_in_entity => is_collection, ...] */
-    private $associations;
+    private array $associations;
 
     /**
      * @param PropertyAccessorInterface $propertyAccessor
@@ -43,10 +39,9 @@ class ValidateNewIncludedEntityExistence implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
-        $entity = $context->getData();
 
         $includedEntities = $context->getIncludedEntities();
         if (null === $includedEntities) {
@@ -54,7 +49,7 @@ class ValidateNewIncludedEntityExistence implements ProcessorInterface
         }
 
         foreach ($this->associations as $associationName => $isCollection) {
-            $propertyValue = $this->propertyAccessor->getValue($entity, $associationName);
+            $propertyValue = $this->propertyAccessor->getValue($context->getData(), $associationName);
             if ($isCollection) {
                 foreach ($propertyValue as $propertyEntity) {
                     $this->validateEntity($propertyEntity, $includedEntities);

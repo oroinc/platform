@@ -8,11 +8,8 @@ namespace Oro\Bundle\ApiBundle\Exception;
  */
 class NotSupportedConfigOperationException extends \RuntimeException implements ValidationExceptionInterface
 {
-    /** @var string */
-    private $className;
-
-    /** @var string */
-    private $operation;
+    private string $className;
+    private string $operation;
 
     /**
      * @param string $className The class name of an entity the config is loaded for

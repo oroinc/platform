@@ -17,7 +17,7 @@ class NormalizeFilters extends NormalizeSection
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 

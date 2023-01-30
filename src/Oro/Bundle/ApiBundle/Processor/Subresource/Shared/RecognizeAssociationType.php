@@ -19,8 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class RecognizeAssociationType implements ProcessorInterface
 {
-    /** @var SubresourcesProvider */
-    private $subresourcesProvider;
+    private SubresourcesProvider $subresourcesProvider;
 
     public function __construct(SubresourcesProvider $subresourcesProvider)
     {
@@ -30,7 +29,7 @@ class RecognizeAssociationType implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */
 

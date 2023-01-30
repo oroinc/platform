@@ -23,14 +23,9 @@ class ValidateParentEntityAccess implements ProcessorInterface
 {
     public const OPERATION_NAME = 'validate_parent_entity_access';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityIdHelper */
-    private $entityIdHelper;
-
-    /** @var QueryAclHelper */
-    private $queryAclHelper;
+    private DoctrineHelper $doctrineHelper;
+    private EntityIdHelper $entityIdHelper;
+    private QueryAclHelper $queryAclHelper;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -45,7 +40,7 @@ class ValidateParentEntityAccess implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */
 
@@ -88,16 +83,9 @@ class ValidateParentEntityAccess implements ProcessorInterface
         $context->setProcessed(self::OPERATION_NAME);
     }
 
-    /**
-     * @param string                    $parentEntityClass
-     * @param mixed                     $parentEntityId
-     * @param EntityDefinitionConfig    $parentConfig
-     * @param EntityIdMetadataInterface $parentMetadata
-     * @param RequestType               $requestType
-     */
     private function checkParentEntityAccess(
         string $parentEntityClass,
-        $parentEntityId,
+        mixed $parentEntityId,
         EntityDefinitionConfig $parentConfig,
         EntityIdMetadataInterface $parentMetadata,
         RequestType $requestType
@@ -122,16 +110,9 @@ class ValidateParentEntityAccess implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string                    $parentEntityClass
-     * @param mixed                     $parentEntityId
-     * @param EntityIdMetadataInterface $parentMetadata
-     *
-     * @return QueryBuilder
-     */
     private function getQueryBuilder(
         string $parentEntityClass,
-        $parentEntityId,
+        mixed $parentEntityId,
         EntityIdMetadataInterface $parentMetadata
     ): QueryBuilder {
         $qb = $this->doctrineHelper->createQueryBuilder($parentEntityClass, 'e');

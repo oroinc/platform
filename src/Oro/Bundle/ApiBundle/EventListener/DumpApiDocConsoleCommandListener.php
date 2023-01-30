@@ -20,8 +20,7 @@ class DumpApiDocConsoleCommandListener
 {
     private const VIEW_OPTION = 'view';
 
-    /** @var RestDocViewDetector */
-    private $docViewDetector;
+    private RestDocViewDetector $docViewDetector;
 
     public function __construct(RestDocViewDetector $docViewDetector)
     {
@@ -65,7 +64,7 @@ class DumpApiDocConsoleCommandListener
 
     private function isApiDocDumpCommand(Command $command): bool
     {
-        return in_array($command->getName(), $this->getApiDocDumpCommands(), true);
+        return \in_array($command->getName(), $this->getApiDocDumpCommands(), true);
     }
 
     private function getApiDocDumpCommandFromParameterOptions(InputInterface $input): ?string

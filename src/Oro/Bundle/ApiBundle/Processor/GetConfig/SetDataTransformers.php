@@ -18,14 +18,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetDataTransformers implements ProcessorInterface
 {
-    /** @var DataTransformerRegistry */
-    private $dataTransformerRegistry;
-
-    /** @var PostProcessorRegistry */
-    private $postProcessorRegistry;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DataTransformerRegistry $dataTransformerRegistry;
+    private PostProcessorRegistry $postProcessorRegistry;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(
         DataTransformerRegistry $dataTransformerRegistry,
@@ -40,7 +35,7 @@ class SetDataTransformers implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 

@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class UpdateLoadedDataDecorator implements ProcessorInterface
 {
-    /** @var ProcessorInterface */
-    private $innerProcessor;
+    private ProcessorInterface $innerProcessor;
 
     public function __construct(ProcessorInterface $innerProcessor)
     {
@@ -23,7 +22,7 @@ class UpdateLoadedDataDecorator implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */
 

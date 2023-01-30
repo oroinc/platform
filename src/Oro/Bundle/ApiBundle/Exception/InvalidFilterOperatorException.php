@@ -9,22 +9,15 @@ namespace Oro\Bundle\ApiBundle\Exception;
  */
 class InvalidFilterOperatorException extends RuntimeException
 {
-    /** @var string */
-    private $operator;
+    private string $operator;
 
-    /**
-     * @param string $operator
-     */
-    public function __construct($operator)
+    public function __construct(string $operator)
     {
         parent::__construct(sprintf('The operator "%s" is not supported.', $operator));
         $this->operator = $operator;
     }
 
-    /**
-     * @return string
-     */
-    public function getOperator()
+    public function getOperator(): string
     {
         return $this->operator;
     }

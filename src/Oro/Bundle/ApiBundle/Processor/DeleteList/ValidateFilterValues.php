@@ -15,7 +15,7 @@ class ValidateFilterValues implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var DeleteListContext $context */
 
@@ -36,10 +36,7 @@ class ValidateFilterValues implements ProcessorInterface
 
         if (!$hasFilters) {
             $context->addError(
-                Error::createValidationError(
-                    Constraint::FILTER,
-                    'At least one filter must be provided.'
-                )
+                Error::createValidationError(Constraint::FILTER, 'At least one filter must be provided.')
             );
         }
     }

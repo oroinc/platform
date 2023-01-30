@@ -10,10 +10,10 @@ interface FormExtensionSwitcherInterface
     /**
      * Switches to default form extension.
      */
-    public function switchToDefaultFormExtension();
+    public function switchToDefaultFormExtension(): void;
 
     /**
      * Switches to API form extension.
      */
-    public function switchToApiFormExtension();
+    public function switchToApiFormExtension(): void;
 }

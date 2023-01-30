@@ -16,7 +16,7 @@ class FiltersConfigExtra implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -24,7 +24,7 @@ class FiltersConfigExtra implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(ConfigContext $context)
+    public function configureContext(ConfigContext $context): void
     {
         // no any modifications of the ConfigContext is required
     }
@@ -32,7 +32,7 @@ class FiltersConfigExtra implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function isPropagable()
+    public function isPropagable(): bool
     {
         return false;
     }
@@ -40,7 +40,7 @@ class FiltersConfigExtra implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigType()
+    public function getConfigType(): string
     {
         return ConfigUtil::FILTERS;
     }
@@ -48,7 +48,7 @@ class FiltersConfigExtra implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         return self::NAME;
     }

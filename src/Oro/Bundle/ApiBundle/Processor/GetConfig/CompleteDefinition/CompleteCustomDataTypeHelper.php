@@ -15,16 +15,11 @@ use Psr\Container\ContainerInterface;
 class CompleteCustomDataTypeHelper
 {
     /** @var array [[completer service id, request type expression], ...] */
-    private $customDataTypeCompleters;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
-
+    private array $customDataTypeCompleters;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
     /** @var array [request type => [service id, ...], ...] */
-    private $cache = [];
+    private array $cache = [];
 
     /**
      * @param array                    $customDataTypeCompleters [[completer service id, request type expression], ...]
@@ -105,7 +100,7 @@ class CompleteCustomDataTypeHelper
         }
 
         $completers = [];
-        foreach ($this->customDataTypeCompleters as list($serviceId, $expression)) {
+        foreach ($this->customDataTypeCompleters as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $completers[] = $serviceId;
             }

@@ -13,7 +13,7 @@ class BuildListResultDocument extends BuildResultDocument
     /**
      * {@inheritdoc}
      */
-    protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context)
+    protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context): void
     {
         $documentBuilder->setDataCollection(
             $context->getResult(),

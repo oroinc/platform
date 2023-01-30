@@ -12,13 +12,9 @@ use Psr\Container\ContainerInterface;
 class EntityIdResolverRegistry
 {
     /** @var array [entity id => [entity class => [resolver service id, request type expression], ...], ...] */
-    private $resolvers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $resolvers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     public function __construct(
         array $resolvers,
@@ -46,7 +42,7 @@ class EntityIdResolverRegistry
         RequestType $requestType
     ): ?EntityIdResolverInterface {
         if (isset($this->resolvers[$entityId][$entityClass])) {
-            foreach ($this->resolvers[$entityId][$entityClass] as list($serviceId, $expression)) {
+            foreach ($this->resolvers[$entityId][$entityClass] as [$serviceId, $expression]) {
                 if ($this->isMatched($expression, $requestType)) {
                     return $this->instantiateResolver($serviceId);
                 }
@@ -70,7 +66,7 @@ class EntityIdResolverRegistry
         $descriptions = [];
         foreach ($this->resolvers as $idData) {
             foreach ($idData as $classData) {
-                foreach ($classData as list($serviceId, $expression)) {
+                foreach ($classData as [$serviceId, $expression]) {
                     if ($this->isMatched($expression, $requestType)) {
                         $descriptions[] = $this->instantiateResolver($serviceId)->getDescription();
                     }
@@ -81,13 +77,7 @@ class EntityIdResolverRegistry
         return $descriptions;
     }
 
-    /**
-     * @param mixed       $expression
-     * @param RequestType $requestType
-     *
-     * @return bool
-     */
-    private function isMatched($expression, RequestType $requestType): bool
+    private function isMatched(mixed $expression, RequestType $requestType): bool
     {
         return !$expression || $this->matcher->matchValue($expression, $requestType);
     }

@@ -26,17 +26,10 @@ class FormHelper
 {
     public const EXTRA_FIELDS_MESSAGE = 'oro.api.form.extra_fields';
 
-    /** @var FormFactoryInterface */
-    private $formFactory;
-
-    /** @var DataTypeGuesser */
-    private $dataTypeGuesser;
-
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
-
-    /** @var ContainerInterface */
-    private $container;
+    private FormFactoryInterface $formFactory;
+    private DataTypeGuesser $dataTypeGuesser;
+    private PropertyAccessorInterface $propertyAccessor;
+    private ContainerInterface $container;
 
     public function __construct(
         FormFactoryInterface $formFactory,
@@ -55,16 +48,13 @@ class FormHelper
      * Please note that the form validation is disabled by default,
      * to enable it use "enable_validation" option.
      * @see getFormDefaultOptions to find all default options
-     *
-     * @param string     $formType
-     * @param mixed      $data
-     * @param array      $options
-     * @param array|null $eventSubscribers
-     *
-     * @return FormBuilderInterface
      */
-    public function createFormBuilder($formType, $data, array $options, array $eventSubscribers = null)
-    {
+    public function createFormBuilder(
+        string $formType,
+        mixed $data,
+        array $options,
+        ?array $eventSubscribers = null
+    ): FormBuilderInterface {
         $formBuilder = $this->formFactory->createNamedBuilder(
             '',
             $formType,
@@ -86,7 +76,7 @@ class FormHelper
         FormBuilderInterface $formBuilder,
         EntityMetadata $entityMetadata,
         EntityDefinitionConfig $entityConfig
-    ) {
+    ): void {
         $metaProperties = $entityMetadata->getMetaProperties();
         foreach ($metaProperties as $name => $metaProperty) {
             if (!$metaProperty->isInput()) {
@@ -116,25 +106,16 @@ class FormHelper
     /**
      * Adds a field to the given form.
      *
-     * @param FormBuilderInterface        $formBuilder
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $fieldConfig
-     * @param PropertyMetadata            $fieldMetadata
-     * @param array                       $options
-     * @param bool                        $allowGuessType
-     *
-     * @return FormBuilderInterface
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function addFormField(
         FormBuilderInterface $formBuilder,
-        $fieldName,
+        string $fieldName,
         EntityDefinitionFieldConfig $fieldConfig,
         PropertyMetadata $fieldMetadata,
         array $options = [],
         bool $allowGuessType = false
-    ) {
+    ): FormBuilderInterface {
         $formType = $fieldConfig->getFormType();
         /**
          * Ignore configured form options for associations that are represented as fields
@@ -175,10 +156,8 @@ class FormHelper
 
     /**
      * Returns default options of a form.
-     *
-     * @return array
      */
-    private function getFormDefaultOptions()
+    private function getFormDefaultOptions(): array
     {
         return [
             'validation_groups'    => ['Default', 'api'],
@@ -189,13 +168,8 @@ class FormHelper
 
     /**
      * Gets options of a form field.
-     *
-     * @param PropertyMetadata            $property
-     * @param EntityDefinitionFieldConfig $config
-     *
-     * @return array
      */
-    private function getFormFieldOptions(PropertyMetadata $property, EntityDefinitionFieldConfig $config)
+    private function getFormFieldOptions(PropertyMetadata $property, EntityDefinitionFieldConfig $config): array
     {
         $options = $config->getFormOptions() ?? [];
         if (!\array_key_exists('property_path', $options)) {
@@ -210,7 +184,7 @@ class FormHelper
         return $options;
     }
 
-    private function addFormEventSubscribers(FormBuilderInterface $formBuilder, array $eventSubscribers)
+    private function addFormEventSubscribers(FormBuilderInterface $formBuilder, array $eventSubscribers): void
     {
         foreach ($eventSubscribers as $eventSubscriber) {
             if (\is_string($eventSubscriber)) {

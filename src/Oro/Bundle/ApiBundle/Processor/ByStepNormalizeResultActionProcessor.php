@@ -15,12 +15,12 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     /**
      * {@inheritdoc}
      */
-    public function process(ComponentContextInterface $context)
+    public function process(ComponentContextInterface $context): void
     {
         /** @var ByStepNormalizeResultContext $context */
 
         if (!$context->getFirstGroup() || $context->getFirstGroup() !== $context->getLastGroup()) {
-            throw new \LogicException(\sprintf(
+            throw new \LogicException(sprintf(
                 'Both the first and the last groups must be specified for the "%s" action'
                 . ' and these groups must be equal. First Group: "%s". Last Group: "%s".',
                 $this->getAction(),
@@ -39,13 +39,13 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function executeProcessors(ComponentContextInterface $context)
+    protected function executeProcessors(ComponentContextInterface $context): void
     {
         /** @var ByStepNormalizeResultContext $context */
 
         $sourceGroup = $context->getFirstGroup();
         if ($context->hasErrors()) {
-            $initialErrorCount = count($context->getErrors());
+            $initialErrorCount = \count($context->getErrors());
             $processors = $this->processorBag->getProcessors($context);
             $processorId = null;
             $group = null;
@@ -53,7 +53,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
                 $errorsHandled = false;
                 /** @var ProcessorInterface $processor */
                 foreach ($processors as $processor) {
-                    if (count($context->getErrors()) > $initialErrorCount) {
+                    if (\count($context->getErrors()) > $initialErrorCount) {
                         $errorsHandled = true;
                         if (ApiActionGroup::NORMALIZE_RESULT !== $group) {
                             $this->handleErrors($context, $processorId, $group);
@@ -64,7 +64,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
                     $group = $processors->getGroup();
                     $processor->process($context);
                 }
-                if (!$errorsHandled && count($context->getErrors()) > $initialErrorCount) {
+                if (!$errorsHandled && \count($context->getErrors()) > $initialErrorCount) {
                     $this->handleErrors($context, $processorId, $group);
                 }
             } catch (\Error $e) {
@@ -85,7 +85,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     /**
      * {@inheritdoc}
      */
-    protected function handleErrors(NormalizeResultContext $context, $processorId, $group)
+    protected function handleErrors(NormalizeResultContext $context, string $processorId, ?string $group): void
     {
         /** @var ByStepNormalizeResultContext $context */
 
@@ -99,8 +99,12 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     /**
      * {@inheritdoc}
      */
-    protected function handleException(\Exception $e, NormalizeResultContext $context, $processorId, $group)
-    {
+    protected function handleException(
+        \Exception $e,
+        NormalizeResultContext $context,
+        string $processorId,
+        ?string $group
+    ): void {
         /** @var ByStepNormalizeResultContext $context */
 
         if (ApiActionGroup::NORMALIZE_RESULT !== $group) {
@@ -113,7 +117,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     /**
      * {@inheritdoc}
      */
-    protected function isNormalizeResultEnabled(NormalizeResultContext $context)
+    protected function isNormalizeResultEnabled(NormalizeResultContext $context): bool
     {
         return true;
     }
@@ -121,7 +125,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     /**
      * {@inheritdoc}
      */
-    protected function executeNormalizeResultProcessors(NormalizeResultContext $context)
+    protected function executeNormalizeResultProcessors(NormalizeResultContext $context): void
     {
         $context->setLastGroup(ApiActionGroup::NORMALIZE_RESULT);
         parent::executeNormalizeResultProcessors($context);

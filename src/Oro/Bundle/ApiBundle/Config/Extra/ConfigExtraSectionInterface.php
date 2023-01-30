@@ -14,8 +14,6 @@ interface ConfigExtraSectionInterface extends ConfigExtraInterface
      * Returns the configuration type that should be loaded into this section.
      * This string is used by ConfigLoaderFactory to find the appropriate loader.
      * @see \Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory
-     *
-     * @return string
      */
-    public function getConfigType();
+    public function getConfigType(): string;
 }

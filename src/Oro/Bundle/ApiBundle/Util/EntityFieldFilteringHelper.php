@@ -11,8 +11,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
  */
 class EntityFieldFilteringHelper
 {
-    /** @var ConfigManager */
-    private $configManager;
+    private ConfigManager $configManager;
 
     public function __construct(ConfigManager $configManager)
     {

@@ -13,13 +13,9 @@ use Psr\Container\ContainerInterface;
 class QueryModifierRegistry
 {
     /** @var array [[query modifier service id, request type expression], ...] */
-    private $queryModifiers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $queryModifiers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $queryModifiers [[query modifier service id, request type expression], ...]
@@ -45,7 +41,7 @@ class QueryModifierRegistry
      */
     public function modifyQuery(QueryBuilder $qb, bool $skipRootEntity, RequestType $requestType): void
     {
-        foreach ($this->queryModifiers as list($serviceId, $expression)) {
+        foreach ($this->queryModifiers as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 /** @var QueryModifierInterface $queryModifier */
                 $queryModifier = $this->container->get($serviceId);

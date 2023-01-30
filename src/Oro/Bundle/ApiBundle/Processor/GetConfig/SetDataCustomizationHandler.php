@@ -18,8 +18,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetDataCustomizationHandler implements ProcessorInterface
 {
-    /** @var ActionProcessorInterface */
-    private $customizationProcessor;
+    private ActionProcessorInterface $customizationProcessor;
 
     public function __construct(ActionProcessorInterface $customizationProcessor)
     {
@@ -29,7 +28,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -42,7 +41,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
         $this->setCustomizationHandler($definition, $context);
     }
 
-    private function setCustomizationHandler(EntityDefinitionConfig $definition, ConfigContext $context)
+    private function setCustomizationHandler(EntityDefinitionConfig $definition, ConfigContext $context): void
     {
         $version = $context->getVersion();
         $requestType = $context->getRequestType();

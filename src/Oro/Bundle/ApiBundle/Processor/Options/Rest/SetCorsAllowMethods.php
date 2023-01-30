@@ -17,7 +17,7 @@ class SetCorsAllowMethods implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var OptionsContext $context */
 

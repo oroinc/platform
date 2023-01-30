@@ -13,11 +13,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class BuildSingleItemQuery implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityIdHelper */
-    private $entityIdHelper;
+    private DoctrineHelper $doctrineHelper;
+    private EntityIdHelper $entityIdHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper, EntityIdHelper $entityIdHelper)
     {
@@ -28,7 +25,7 @@ class BuildSingleItemQuery implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */
 

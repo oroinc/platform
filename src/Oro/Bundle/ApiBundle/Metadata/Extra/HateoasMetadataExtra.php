@@ -13,8 +13,7 @@ class HateoasMetadataExtra implements MetadataExtraInterface
 {
     public const NAME = 'hateoas';
 
-    /** @var QueryStringAccessorInterface */
-    private $queryStringAccessor;
+    private QueryStringAccessorInterface $queryStringAccessor;
 
     /**
      * @param QueryStringAccessorInterface $queryStringAccessor An accessor to a query string contains
@@ -28,7 +27,7 @@ class HateoasMetadataExtra implements MetadataExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -36,7 +35,7 @@ class HateoasMetadataExtra implements MetadataExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(MetadataContext $context)
+    public function configureContext(MetadataContext $context): void
     {
         // no any modifications of the MetadataContext is required
     }
@@ -44,7 +43,7 @@ class HateoasMetadataExtra implements MetadataExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         return self::NAME;
     }

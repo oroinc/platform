@@ -26,14 +26,9 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
 {
     protected const ROOT_POINTER = '';
 
-    /** @var ValueNormalizer */
-    protected $valueNormalizer;
-
-    /** @var EntityIdTransformerRegistry */
-    protected $entityIdTransformerRegistry;
-
-    /** @var FormContext */
-    protected $context;
+    protected ValueNormalizer $valueNormalizer;
+    protected EntityIdTransformerRegistry $entityIdTransformerRegistry;
+    protected ?FormContext $context = null;
 
     public function __construct(
         ValueNormalizer $valueNormalizer,
@@ -82,14 +77,12 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
 
             // Relation data can be null in case to-one and an empty array in case to-many relation.
             // In this case we should process this relation data as empty relation
-            if (null === $relationData || empty($relationData)) {
+            if (empty($relationData)) {
                 $relations[$name] = [];
                 continue;
             }
 
-            $associationMetadata = null !== $metadata
-                ? $metadata->getAssociation($name)
-                : null;
+            $associationMetadata = $metadata?->getAssociation($name);
             if (ArrayUtil::isAssoc($relationData)) {
                 $relations[$name] = $this->normalizeRelationshipItem(
                     $relationshipsDataItemPath,
@@ -133,10 +126,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         $entityId = $data[JsonApiDoc::ID];
         if (str_contains($entityClass, '\\')) {
             if ($this->isAcceptableTargetClass($entityClass, $associationMetadata)) {
-                $targetMetadata = null;
-                if (null !== $associationMetadata) {
-                    $targetMetadata = $associationMetadata->getTargetMetadata();
-                }
+                $targetMetadata = $associationMetadata?->getTargetMetadata();
                 $entityId = $this->normalizeEntityId(
                     $this->buildPath($path, 'id'),
                     $this->buildPointer($pointer, JsonApiDoc::ID),
@@ -186,22 +176,13 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         return $entityClass;
     }
 
-    /**
-     * @param string              $path
-     * @param string              $pointer
-     * @param string              $entityClass
-     * @param mixed               $entityId
-     * @param EntityMetadata|null $metadata
-     *
-     * @return mixed
-     */
     protected function normalizeEntityId(
         string $path,
         string $pointer,
         string $entityClass,
-        $entityId,
+        mixed $entityId,
         ?EntityMetadata $metadata
-    ) {
+    ): mixed {
         // keep the id of the primary and an included entity as is
         $includedEntities = $this->context->getIncludedEntities();
         if (null !== $includedEntities

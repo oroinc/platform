@@ -13,8 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetCorsAllowOrigin implements ProcessorInterface
 {
-    /** @var CorsSettings */
-    private $corsSettings;
+    private CorsSettings $corsSettings;
 
     public function __construct(CorsSettings $corsSettings)
     {
@@ -24,7 +23,7 @@ class SetCorsAllowOrigin implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

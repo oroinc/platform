@@ -18,34 +18,21 @@ class IncludeMapManager
     private const FILES = 'files';
     private const ITEMS = 'items';
 
-    private const FILE_NAME              = 0;
-    private const FILE_SECTION_NAME      = 1;
+    private const FILE_NAME = 0;
+    private const FILE_SECTION_NAME = 1;
     private const FILE_FIRST_ITEM_OFFSET = 2;
-    private const ITEM_INDEX             = 1;
+    private const ITEM_INDEX = 1;
 
-    /** @var ItemKeyBuilder */
-    private $itemKeyBuilder;
-
-    /** @var FileNameProvider */
-    private $fileNameProvider;
-
-    /** @var FileLockManager */
-    private $fileLockManager;
-
-    /** @var LoggerInterface */
-    private $logger;
-
+    private ItemKeyBuilder $itemKeyBuilder;
+    private FileNameProvider $fileNameProvider;
+    private FileLockManager $fileLockManager;
+    private LoggerInterface $logger;
     /** @var int limit 100 + waitBetweenAttempts 100 equals to the acquire lock timeout 10 seconds */
-    private $readLockAttemptLimit = 100;
-
-    /** @var int */
-    private $readLockWaitBetweenAttempts = 100;
-
+    private int $readLockAttemptLimit = 100;
+    private int $readLockWaitBetweenAttempts = 100;
     /** @var int limit 3600 + waitBetweenAttempts 50 equals to the acquire lock timeout 3 minutes */
-    private $moveToProcessedLockAttemptLimit = 3600;
-
-    /** @var int */
-    private $moveToProcessedLockWaitBetweenAttempts = 50;
+    private int $moveToProcessedLockAttemptLimit = 3600;
+    private int $moveToProcessedLockWaitBetweenAttempts = 50;
 
     public function __construct(
         ItemKeyBuilder $itemKeyBuilder,

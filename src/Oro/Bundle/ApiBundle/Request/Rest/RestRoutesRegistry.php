@@ -13,13 +13,9 @@ use Psr\Container\ContainerInterface;
 class RestRoutesRegistry
 {
     /** @var array [data type => [[provider, request type expression], ...], ...] */
-    private $providers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $providers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $providers [[provider, request type expression], ...]
@@ -38,7 +34,7 @@ class RestRoutesRegistry
      */
     public function getRoutes(RequestType $requestType): RestRoutes
     {
-        foreach ($this->providers as list($serviceId, $expression)) {
+        foreach ($this->providers as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 return $this->container->get($serviceId);
             }

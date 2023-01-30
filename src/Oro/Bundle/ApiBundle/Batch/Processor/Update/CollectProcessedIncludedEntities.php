@@ -19,11 +19,8 @@ class CollectProcessedIncludedEntities implements ProcessorInterface
 {
     public const OPERATION_NAME = 'collect_processed_included_entities';
 
-    /** @var IncludeMapManager */
-    private $includeMapManager;
-
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
+    private IncludeMapManager $includeMapManager;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct(IncludeMapManager $includeMapManager, ValueNormalizer $valueNormalizer)
     {
@@ -35,7 +32,7 @@ class CollectProcessedIncludedEntities implements ProcessorInterface
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */
 
@@ -90,7 +87,7 @@ class CollectProcessedIncludedEntities implements ProcessorInterface
      * @return array|null [entity type, entity include id, entity id]
      */
     private function getProcessedItem(
-        $entity,
+        object $entity,
         IncludedEntityCollection $includedEntities,
         RequestType $requestType
     ): ?array {

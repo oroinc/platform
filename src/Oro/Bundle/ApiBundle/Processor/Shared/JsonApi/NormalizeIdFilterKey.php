@@ -17,8 +17,7 @@ class NormalizeIdFilterKey implements ProcessorInterface
 {
     private const ID_FILTER_DESCRIPTION = 'Filter records by the identifier field';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -28,7 +27,7 @@ class NormalizeIdFilterKey implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -56,7 +55,7 @@ class NormalizeIdFilterKey implements ProcessorInterface
         if (null !== $config) {
             $idFieldNames = $config->getIdentifierFieldNames();
             if (\count($idFieldNames) === 1) {
-                $idFieldName = \reset($idFieldNames);
+                $idFieldName = reset($idFieldNames);
                 $idField = $config->getField($idFieldName);
                 if (null !== $idField && $idField->hasPropertyPath()) {
                     $idFieldName = $idField->getPropertyPath($idFieldName);
@@ -67,7 +66,7 @@ class NormalizeIdFilterKey implements ProcessorInterface
             if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
                 $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
                 if (\count($idFieldNames) === 1) {
-                    $idFieldName = \reset($idFieldNames);
+                    $idFieldName = reset($idFieldNames);
                 }
             }
         }

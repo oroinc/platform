@@ -16,29 +16,16 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ProtectQueryByAcl implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
+    private AclHelper $aclHelper;
+    private AclAnnotationProvider $aclAnnotationProvider;
+    private string $permission;
 
-    /** @var AclHelper */
-    protected $aclHelper;
-
-    /** @var AclAnnotationProvider */
-    protected $aclAnnotationProvider;
-
-    /** @var string */
-    protected $permission;
-
-    /**
-     * @param DoctrineHelper        $doctrineHelper
-     * @param AclHelper             $aclHelper
-     * @param AclAnnotationProvider $aclAnnotationProvider
-     * @param string                $permission
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AclHelper $aclHelper,
         AclAnnotationProvider $aclAnnotationProvider,
-        $permission
+        string $permission
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->aclHelper = $aclHelper;
@@ -49,7 +36,7 @@ class ProtectQueryByAcl implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -80,13 +67,7 @@ class ProtectQueryByAcl implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string $aclResource
-     * @param string $entityClass
-     *
-     * @return string|null
-     */
-    private function getEntityPermissionByAclResource($aclResource, $entityClass)
+    private function getEntityPermissionByAclResource(string $aclResource, string $entityClass): ?string
     {
         $permission = null;
 

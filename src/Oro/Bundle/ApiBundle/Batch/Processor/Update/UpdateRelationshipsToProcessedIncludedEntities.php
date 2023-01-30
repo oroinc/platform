@@ -18,7 +18,7 @@ class UpdateRelationshipsToProcessedIncludedEntities implements ProcessorInterfa
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */
 

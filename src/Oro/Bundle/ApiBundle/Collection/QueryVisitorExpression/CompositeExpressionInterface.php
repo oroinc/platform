@@ -9,10 +9,6 @@ interface CompositeExpressionInterface
 {
     /**
      * Builds a composite expression.
-     *
-     * @param array $expressions
-     *
-     * @return mixed
      */
-    public function walkCompositeExpression(array $expressions);
+    public function walkCompositeExpression(array $expressions): mixed;
 }

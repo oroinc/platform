@@ -23,6 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -30,13 +31,13 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class BuildFormBuilderTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $formFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
     /** @var BuildFormBuilder */
@@ -53,8 +54,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->processor = new BuildFormBuilder(
             new FormHelper(
                 $this->formFactory,
-                $this->createMock(DataTypeGuesser::class),
-                $this->createMock(PropertyAccessorInterface::class),
+                new DataTypeGuesser([]),
+                PropertyAccess::createPropertyAccessor(),
                 $this->container
             ),
             $this->doctrineHelper
@@ -228,7 +229,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 ['association1', null, []],
                 ['association2', null, ['property_path' => 'realAssociation2']],
                 ['association3', 'text', ['property_path' => 'realAssociation3', 'trim' => false]]
-            );
+            )
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -336,7 +338,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with('field1', null, []);
+            ->with('field1', null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -382,7 +385,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with('field1', null, []);
+            ->with('field1', null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -428,7 +432,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with('field1', null, ['mapped' => false]);
+            ->with('field1', null, ['mapped' => false])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -473,7 +478,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with('field1', null, []);
+            ->with('field1', null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -519,7 +525,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with('association1', null, ['mapped' => false]);
+            ->with('association1', null, ['mapped' => false])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -564,7 +571,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with('association1', null, []);
+            ->with('association1', null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -610,7 +618,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('addEventSubscriber')
-            ->with(self::identicalTo($eventSubscriber));
+            ->with(self::identicalTo($eventSubscriber))
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -650,7 +659,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('addEventSubscriber')
-            ->with(self::identicalTo($eventSubscriber));
+            ->with(self::identicalTo($eventSubscriber))
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -861,9 +871,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
-            ->withConsecutive(
-                ['association', null, []]
-            );
+            ->with('association', null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -910,9 +919,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
-            ->withConsecutive(
-                ['association', 'text', ['trim' => false]]
-            );
+            ->with('association', 'text', ['trim' => false])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -958,9 +966,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
-            ->withConsecutive(
-                ['association', null, ['trim' => false, 'mapped' => false]]
-            );
+            ->with('association', null, ['trim' => false, 'mapped' => false])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);

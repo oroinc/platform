@@ -15,11 +15,8 @@ class StartAsyncOperation implements ProcessorInterface
 {
     public const OPERATION_NAME = 'start_async_operation';
 
-    /** @var MessageProducerInterface */
-    private $producer;
-
-    /** @var ChunkSizeProvider */
-    private $chunkSizeProvider;
+    private MessageProducerInterface $producer;
+    private ChunkSizeProvider $chunkSizeProvider;
 
     public function __construct(MessageProducerInterface $producer, ChunkSizeProvider $chunkSizeProvider)
     {
@@ -30,7 +27,7 @@ class StartAsyncOperation implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */
 

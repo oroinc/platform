@@ -148,7 +148,7 @@ class FormUtil
         string $errorMessage = null,
         string $propertyPath = null
     ): void {
-        if (!$errorMessage && \property_exists($constraint, 'message')) {
+        if (!$errorMessage && property_exists($constraint, 'message')) {
             $errorMessage = $constraint->message;
         }
         if (null === $propertyPath) {
@@ -181,7 +181,7 @@ class FormUtil
             if ($constraint instanceof AccessGranted
                 || (
                     $constraint instanceof All
-                    && count($constraint->constraints) === 1
+                    && \count($constraint->constraints) === 1
                     && $constraint->constraints[0] instanceof AccessGranted
                 )
             ) {
@@ -272,15 +272,15 @@ class FormUtil
             $path[] = $form->getName();
             $form = $form->getParent();
         }
-        $path = \array_merge(\array_reverse($path), \explode('.', $propertyPath));
-        $path = \array_map(
+        $path = array_merge(array_reverse($path), explode('.', $propertyPath));
+        $path = array_map(
             function ($item) {
-                return \sprintf('children[%s]', $item);
+                return sprintf('children[%s]', $item);
             },
             $path
         );
 
-        return \implode('.', $path);
+        return implode('.', $path);
     }
 
     private static function getFormPath(FormInterface $form): string

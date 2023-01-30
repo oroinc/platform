@@ -9,9 +9,9 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
  */
 class OptionsContext extends SubresourceContext
 {
-    public const ACTION_TYPE_ITEM         = 'item';
-    public const ACTION_TYPE_LIST         = 'list';
-    public const ACTION_TYPE_SUBRESOURCE  = 'subresource';
+    public const ACTION_TYPE_ITEM = 'item';
+    public const ACTION_TYPE_LIST = 'list';
+    public const ACTION_TYPE_SUBRESOURCE = 'subresource';
     public const ACTION_TYPE_RELATIONSHIP = 'relationship';
 
     /** the type of action, can be "item", "list", "subresource" or "relationship" */
@@ -55,9 +55,9 @@ class OptionsContext extends SubresourceContext
     public function setActionType(string $actionType): void
     {
         if (!\in_array($actionType, self::ACTION_TYPES, true)) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'The action type must be one of %s. Given: %s.',
-                \implode(', ', self::ACTION_TYPES),
+                implode(', ', self::ACTION_TYPES),
                 $actionType
             ));
         }
@@ -66,20 +66,16 @@ class OptionsContext extends SubresourceContext
 
     /**
      * Gets an identifier of an entity.
-     *
-     * @return mixed
      */
-    public function getId()
+    public function getId(): mixed
     {
         return $this->get(self::ID);
     }
 
     /**
      * Sets an identifier of an entity.
-     *
-     * @param mixed $id
      */
-    public function setId($id)
+    public function setId(mixed $id): void
     {
         $this->set(self::ID, $id);
     }

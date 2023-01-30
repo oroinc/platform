@@ -16,11 +16,8 @@ class ValidateRequestData implements ProcessorInterface
 {
     public const OPERATION_NAME = 'validate_request_data';
 
-    /** @var bool */
-    private $requirePrimaryResourceId;
-
-    /** @var bool */
-    private $allowIncludedResources;
+    private bool $requirePrimaryResourceId;
+    private bool $allowIncludedResources;
 
     public function __construct(
         bool $requirePrimaryResourceId = false,
@@ -33,7 +30,7 @@ class ValidateRequestData implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ChangeSubresourceContext $context */
 

@@ -15,14 +15,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ValidateApiDocViewListener
 {
-    /** @var string */
-    private $basePath;
-
+    private string $basePath;
     /** @var string[] */
-    private $views;
-
-    /** @var string|null */
-    private $defaultView;
+    private array $views;
+    private ?string $defaultView;
 
     /**
      * @param string      $basePath
@@ -80,7 +76,7 @@ class ValidateApiDocViewListener
     protected function isDefaultViewRequested(Request $request): bool
     {
         $pathInfo = $request->getPathInfo();
-        $pos = \strpos($pathInfo, $this->basePath);
+        $pos = strpos($pathInfo, $this->basePath);
 
         return false === $pos || !substr($pathInfo, $pos + 9);
     }

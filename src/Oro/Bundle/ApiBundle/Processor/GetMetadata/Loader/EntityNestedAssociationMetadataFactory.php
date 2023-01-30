@@ -13,11 +13,8 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
  */
 class EntityNestedAssociationMetadataFactory
 {
-    /** @var NestedAssociationMetadataHelper */
-    protected $nestedAssociationMetadataHelper;
-
-    /** @var EntityMetadataFactory */
-    protected $entityMetadataFactory;
+    private NestedAssociationMetadataHelper $nestedAssociationMetadataHelper;
+    private EntityMetadataFactory $entityMetadataFactory;
 
     public function __construct(
         NestedAssociationMetadataHelper $nestedAssociationMetadataHelper,
@@ -27,26 +24,15 @@ class EntityNestedAssociationMetadataFactory
         $this->entityMetadataFactory = $entityMetadataFactory;
     }
 
-    /**
-     * @param EntityMetadata              $entityMetadata
-     * @param ClassMetadata               $classMetadata
-     * @param string                      $entityClass
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     * @param bool                        $withExcludedProperties
-     * @param string                      $targetAction
-     *
-     * @return AssociationMetadata
-     */
     public function createAndAddNestedAssociationMetadata(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
-        $entityClass,
-        $fieldName,
+        string $entityClass,
+        string $fieldName,
         EntityDefinitionFieldConfig $field,
-        $withExcludedProperties,
-        $targetAction
-    ) {
+        bool $withExcludedProperties,
+        ?string $targetAction
+    ): AssociationMetadata {
         $associationMetadata = $this->nestedAssociationMetadataHelper->addNestedAssociation(
             $entityMetadata,
             $entityClass,
@@ -77,20 +63,13 @@ class EntityNestedAssociationMetadataFactory
         return $associationMetadata;
     }
 
-    /**
-     * @param ClassMetadata          $parentClassMetadata
-     * @param EntityMetadata         $targetEntityMetadata
-     * @param EntityDefinitionConfig $targetConfig
-     * @param bool                   $withExcludedProperties
-     * @param string                 $targetAction
-     */
-    protected function loadNestedAssociationFieldsMetadata(
+    private function loadNestedAssociationFieldsMetadata(
         ClassMetadata $parentClassMetadata,
         EntityMetadata $targetEntityMetadata,
         EntityDefinitionConfig $targetConfig,
-        $withExcludedProperties,
-        $targetAction
-    ) {
+        bool $withExcludedProperties,
+        ?string $targetAction
+    ): void {
         $targetFields = $targetConfig->getFields();
         foreach ($targetFields as $targetFieldName => $targetField) {
             if (!$withExcludedProperties && $targetField->isExcluded()) {

@@ -14,8 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadCustomEntities implements ProcessorInterface
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    private ConfigManager $configManager;
 
     public function __construct(ConfigManager $configManager)
     {
@@ -25,7 +24,7 @@ class LoadCustomEntities implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */
         $resources = $context->getResult();

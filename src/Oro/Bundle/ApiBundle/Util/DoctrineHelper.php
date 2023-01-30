@@ -12,8 +12,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
  */
 class DoctrineHelper extends BaseHelper
 {
-    /** @var array */
-    private $manageableEntityClasses = [];
+    private array $manageableEntityClasses = [];
 
     /**
      * {@inheritDoc}
@@ -104,7 +103,7 @@ class DoctrineHelper extends BaseHelper
      *
      * @return ClassMetadata|null
      */
-    public function findEntityMetadataByPath($entityClass, $associationPath)
+    public function findEntityMetadataByPath(string $entityClass, array|string $associationPath): ?ClassMetadata
     {
         $manager = $this->registry->getManagerForClass($entityClass);
         if (null === $manager) {
@@ -113,7 +112,7 @@ class DoctrineHelper extends BaseHelper
 
         $metadata = $manager->getClassMetadata($entityClass);
         if (null !== $metadata) {
-            if (!is_array($associationPath)) {
+            if (!\is_array($associationPath)) {
                 $associationPath = explode('.', $associationPath);
             }
             foreach ($associationPath as $associationName) {
@@ -136,12 +135,12 @@ class DoctrineHelper extends BaseHelper
      * @return array [field name => field data-type, ...]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function getIndexedFields(ClassMetadata $metadata)
+    public function getIndexedFields(ClassMetadata $metadata): array
     {
         $indexedColumns = [];
 
         $idFieldNames = $metadata->getIdentifierFieldNames();
-        if (count($idFieldNames) > 0) {
+        if (\count($idFieldNames) > 0) {
             $mapping = $metadata->getFieldMapping(reset($idFieldNames));
 
             $indexedColumns[$mapping['columnName']] = true;
@@ -163,7 +162,7 @@ class DoctrineHelper extends BaseHelper
             $hasIndex = false;
             if (isset($mapping['unique']) && true === $mapping['unique']) {
                 $hasIndex = true;
-            } elseif (array_key_exists($mapping['columnName'], $indexedColumns)) {
+            } elseif (\array_key_exists($mapping['columnName'], $indexedColumns)) {
                 $hasIndex = true;
             }
             if ($hasIndex) {
@@ -181,14 +180,14 @@ class DoctrineHelper extends BaseHelper
      *
      * @return array [field name => target field data-type, ...]
      */
-    public function getIndexedAssociations(ClassMetadata $metadata)
+    public function getIndexedAssociations(ClassMetadata $metadata): array
     {
         $relations = [];
         $fieldNames = $metadata->getAssociationNames();
         foreach ($fieldNames as $fieldName) {
             $targetMetadata = $this->getEntityMetadataForClass($metadata->getAssociationTargetClass($fieldName));
             $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
-            if (count($targetIdFieldNames) === 1) {
+            if (\count($targetIdFieldNames) === 1) {
                 $relations[$fieldName] = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
             }
         }
@@ -199,13 +198,8 @@ class DoctrineHelper extends BaseHelper
     /**
      * Gets the data type of the specified field
      * or the data type of identifier field if the specified field is an association.
-     *
-     * @param ClassMetadata $metadata
-     * @param string        $fieldName
-     *
-     * @return string|null The data type or NULL if the field does not exist
      */
-    public function getFieldDataType(ClassMetadata $metadata, $fieldName)
+    public function getFieldDataType(ClassMetadata $metadata, string $fieldName): ?string
     {
         $dataType = null;
         if ($metadata->hasField($fieldName)) {
@@ -215,7 +209,7 @@ class DoctrineHelper extends BaseHelper
                 $metadata->getAssociationTargetClass($fieldName)
             );
             $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
-            if (count($targetIdFieldNames) === 1) {
+            if (\count($targetIdFieldNames) === 1) {
                 $dataType = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
             } else {
                 $dataType = DataType::STRING;

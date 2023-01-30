@@ -9,10 +9,6 @@ interface ConfigLoaderInterface
 {
     /**
      * Loads a configuration from an array.
-     *
-     * @param array $config
-     *
-     * @return mixed
      */
-    public function load(array $config);
+    public function load(array $config): mixed;
 }

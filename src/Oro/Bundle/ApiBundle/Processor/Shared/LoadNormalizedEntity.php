@@ -20,11 +20,8 @@ class LoadNormalizedEntity implements ProcessorInterface
 {
     public const OPERATION_NAME = 'normalized_entity_loaded';
 
-    /** @var ActionProcessorBagInterface */
-    protected $processorBag;
-
-    /** @var bool */
-    protected $reuseExistingEntity;
+    private ActionProcessorBagInterface $processorBag;
+    private bool $reuseExistingEntity;
 
     /**
      * @param ActionProcessorBagInterface $processorBag
@@ -32,7 +29,7 @@ class LoadNormalizedEntity implements ProcessorInterface
      *                                                         by the "get" action and use the entity
      *                                                         from the current context
      */
-    public function __construct(ActionProcessorBagInterface $processorBag, $reuseExistingEntity = false)
+    public function __construct(ActionProcessorBagInterface $processorBag, bool $reuseExistingEntity = false)
     {
         $this->processorBag = $processorBag;
         $this->reuseExistingEntity = $reuseExistingEntity;
@@ -41,7 +38,7 @@ class LoadNormalizedEntity implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */
 
@@ -66,13 +63,7 @@ class LoadNormalizedEntity implements ProcessorInterface
         }
     }
 
-    /**
-     * @param SingleItemContext        $context
-     * @param ActionProcessorInterface $processor
-     *
-     * @return GetContext
-     */
-    protected function createGetContext(SingleItemContext $context, ActionProcessorInterface $processor)
+    protected function createGetContext(SingleItemContext $context, ActionProcessorInterface $processor): GetContext
     {
         /** @var GetContext $getContext */
         $getContext = $processor->createContext();
@@ -94,7 +85,7 @@ class LoadNormalizedEntity implements ProcessorInterface
         return $getContext;
     }
 
-    protected function processGetResult(GetContext $getContext, SingleItemContext $context)
+    protected function processGetResult(GetContext $getContext, SingleItemContext $context): void
     {
         if ($getContext->hasErrors()) {
             $errors = $getContext->getErrors();

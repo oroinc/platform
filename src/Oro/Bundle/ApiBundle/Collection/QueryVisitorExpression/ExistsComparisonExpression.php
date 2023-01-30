@@ -17,8 +17,8 @@ class ExistsComparisonExpression implements ComparisonExpressionInterface
         string $field,
         string $expression,
         string $parameterName,
-        $value
-    ) {
+        mixed $value
+    ): mixed {
         if ($value) {
             return $visitor->getExpressionBuilder()->isNotNull($expression);
         }

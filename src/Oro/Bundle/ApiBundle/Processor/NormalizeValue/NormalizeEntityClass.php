@@ -13,11 +13,8 @@ class NormalizeEntityClass extends AbstractProcessor
 {
     private const REQUIREMENT = '[a-zA-Z]\w+';
 
-    /** @var EntityAliasResolverRegistry */
-    private $entityAliasResolverRegistry;
-
-    /** @var EntityAliasResolver|null */
-    private $entityAliasResolver;
+    private EntityAliasResolverRegistry $entityAliasResolverRegistry;
+    private ?EntityAliasResolver $entityAliasResolver = null;
 
     public function __construct(EntityAliasResolverRegistry $entityAliasResolverRegistry)
     {
@@ -27,7 +24,7 @@ class NormalizeEntityClass extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypeString()
+    protected function getDataTypeString(): string
     {
         return 'entity type';
     }
@@ -35,7 +32,7 @@ class NormalizeEntityClass extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypePluralString()
+    protected function getDataTypePluralString(): string
     {
         return 'entity types';
     }
@@ -43,7 +40,7 @@ class NormalizeEntityClass extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getRequirement()
+    protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
@@ -51,7 +48,7 @@ class NormalizeEntityClass extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function isValueNormalizationRequired($value)
+    protected function isValueNormalizationRequired(mixed $value): bool
     {
         return !str_contains($value, '\\');
     }
@@ -59,7 +56,7 @@ class NormalizeEntityClass extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function processNormalization(NormalizeValueContext $context)
+    protected function processNormalization(NormalizeValueContext $context): void
     {
         $this->entityAliasResolver = $this->entityAliasResolverRegistry
             ->getEntityAliasResolver($context->getRequestType());
@@ -73,7 +70,7 @@ class NormalizeEntityClass extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function normalizeValue($value)
+    protected function normalizeValue(mixed $value): mixed
     {
         return $this->entityAliasResolver->getClassByPluralAlias($value);
     }

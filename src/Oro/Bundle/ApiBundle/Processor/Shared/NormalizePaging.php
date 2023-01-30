@@ -14,8 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizePaging implements ProcessorInterface
 {
-    /** @var int */
-    private $maxEntitiesLimit;
+    private int $maxEntitiesLimit;
 
     public function __construct(int $maxEntitiesLimit)
     {
@@ -25,7 +24,7 @@ class NormalizePaging implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

@@ -7,13 +7,9 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 
 class TestMetadataExtra implements MetadataExtraInterface
 {
-    /** @var string */
-    private $name;
+    private string $name;
 
-    /**
-     * @param string $name
-     */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
@@ -21,7 +17,7 @@ class TestMetadataExtra implements MetadataExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -29,14 +25,14 @@ class TestMetadataExtra implements MetadataExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(MetadataContext $context)
+    public function configureContext(MetadataContext $context): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         return null;
     }

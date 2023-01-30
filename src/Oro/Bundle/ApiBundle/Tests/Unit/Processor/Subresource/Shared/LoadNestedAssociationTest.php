@@ -15,7 +15,7 @@ use Oro\Component\EntitySerializer\EntitySerializer;
 
 class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntitySerializer */
+    /** @var EntitySerializer|\PHPUnit\Framework\MockObject\MockObject */
     private $entitySerializer;
 
     /** @var LoadNestedAssociation */

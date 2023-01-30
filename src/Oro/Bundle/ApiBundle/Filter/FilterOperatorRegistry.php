@@ -8,10 +8,9 @@ namespace Oro\Bundle\ApiBundle\Filter;
 class FilterOperatorRegistry
 {
     /** @var array [operator name => operator short name or NULL, ...] */
-    private $operators;
-
+    private array $operators;
     /** @var array [operator short name => operator name, ...] */
-    private $shortOperators;
+    private array $shortOperators;
 
     /**
      * @param array $operators [operator name => operator short name or NULL, ...]
@@ -44,6 +43,6 @@ class FilterOperatorRegistry
         if (isset($this->operators[$operator])) {
             return $operator;
         }
-        throw new \InvalidArgumentException(\sprintf('The operator "%s" is not known.', $operator));
+        throw new \InvalidArgumentException(sprintf('The operator "%s" is not known.', $operator));
     }
 }

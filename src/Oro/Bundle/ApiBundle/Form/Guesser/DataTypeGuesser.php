@@ -12,7 +12,7 @@ use Symfony\Component\Form\Guess\TypeGuess;
 class DataTypeGuesser
 {
     /** @var array [data type => [form type, options], ...] */
-    private $dataTypeMappings;
+    private array $dataTypeMappings;
 
     /**
      * @param array $dataTypeMappings [data type => [form type, options], ...]

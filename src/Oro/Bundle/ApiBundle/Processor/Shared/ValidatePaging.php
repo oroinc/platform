@@ -16,11 +16,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ValidatePaging implements ProcessorInterface
 {
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
-
-    /** @var int */
-    private $maxEntitiesLimit;
+    private FilterNamesRegistry $filterNamesRegistry;
+    private int $maxEntitiesLimit;
 
     public function __construct(FilterNamesRegistry $filterNamesRegistry, int $maxEntitiesLimit)
     {
@@ -31,7 +28,7 @@ class ValidatePaging implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

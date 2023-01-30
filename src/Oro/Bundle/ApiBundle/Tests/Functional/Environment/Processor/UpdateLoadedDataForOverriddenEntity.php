@@ -16,12 +16,12 @@ class UpdateLoadedDataForOverriddenEntity implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */
 
         $data = $context->getData();
-        if (!array_key_exists('name', $data)) {
+        if (!\array_key_exists('name', $data)) {
             return;
         }
 

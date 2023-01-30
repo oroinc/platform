@@ -13,20 +13,17 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class ApiConfiguration implements ConfigurationInterface
 {
-    public const EXCLUSIONS_SECTION     = 'exclusions';
-    public const INCLUSIONS_SECTION     = 'inclusions';
-    public const ENTITY_ATTRIBUTE       = 'entity';
-    public const FIELD_ATTRIBUTE        = 'field';
+    public const EXCLUSIONS_SECTION = 'exclusions';
+    public const INCLUSIONS_SECTION = 'inclusions';
+    public const ENTITY_ATTRIBUTE = 'entity';
+    public const FIELD_ATTRIBUTE = 'field';
     public const ENTITY_ALIASES_SECTION = 'entity_aliases';
-    public const ENTITIES_SECTION       = 'entities';
+    public const ENTITIES_SECTION = 'entities';
 
     public const ROOT_NODE = 'api';
 
-    /** @var ConfigurationSettingsInterface */
-    protected $settings;
-
-    /** @var int */
-    protected $maxNestingLevel;
+    private ConfigurationSettingsInterface $settings;
+    private int $maxNestingLevel;
 
     public function __construct(ConfigExtensionRegistry $extensionRegistry, ?int $maxNestingLevel = null)
     {
@@ -62,7 +59,7 @@ class ApiConfiguration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    protected function createEntityConfiguration(
+    private function createEntityConfiguration(
         string $sectionName,
         TargetEntityDefinitionConfiguration $definitionSection
     ): EntityConfiguration {
@@ -74,7 +71,7 @@ class ApiConfiguration implements ConfigurationInterface
         );
     }
 
-    protected function addEntityAliasesSection(NodeBuilder $parentNode): NodeBuilder
+    private function addEntityAliasesSection(NodeBuilder $parentNode): NodeBuilder
     {
         $node = $parentNode
             ->arrayNode(self::ENTITY_ALIASES_SECTION)
@@ -87,7 +84,7 @@ class ApiConfiguration implements ConfigurationInterface
         return $node;
     }
 
-    protected function addEntitySection(NodeBuilder $parentNode, EntityConfiguration $configuration): NodeBuilder
+    private function addEntitySection(NodeBuilder $parentNode, EntityConfiguration $configuration): NodeBuilder
     {
         $node = $parentNode
             ->arrayNode($configuration->getSectionName())
@@ -102,7 +99,7 @@ class ApiConfiguration implements ConfigurationInterface
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function postProcessConfig(array $config): array
+    private function postProcessConfig(array $config): array
     {
         $config[self::EXCLUSIONS_SECTION] = [];
         $config[self::INCLUSIONS_SECTION] = [];

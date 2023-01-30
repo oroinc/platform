@@ -19,11 +19,11 @@ use Psr\Log\LoggerInterface;
  */
 class RestDocumentBuilderTest extends DocumentBuilderTestCase
 {
-    /** @var RestDocumentBuilder */
-    private $documentBuilder;
-
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
+
+    /** @var RestDocumentBuilder */
+    private $documentBuilder;
 
     protected function setUp(): void
     {
@@ -47,7 +47,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             'name' => 'Name'
         ];
 
-        $this->documentBuilder->setDataObject($object, $this->requestType);
+        $this->documentBuilder->setDataObject($object, $this->requestType, null);
         self::assertEquals(
             [
                 'id'   => 123,
@@ -65,7 +65,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             '__class__' => 'Test\Class'
         ];
 
-        $this->documentBuilder->setDataObject($object, $this->requestType);
+        $this->documentBuilder->setDataObject($object, $this->requestType, null);
         self::assertEquals(
             [
                 'id'     => 123,
@@ -83,7 +83,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             'name' => 'Name'
         ];
 
-        $this->documentBuilder->setDataCollection([$object], $this->requestType);
+        $this->documentBuilder->setDataCollection([$object], $this->requestType, null);
         self::assertEquals(
             [
                 [
@@ -103,7 +103,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             '__class__' => 'Test\Class'
         ];
 
-        $this->documentBuilder->setDataCollection([$object], $this->requestType);
+        $this->documentBuilder->setDataCollection([$object], $this->requestType, null);
         self::assertEquals(
             [
                 [
@@ -118,7 +118,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
 
     public function testSetDataCollectionOfScalarsWithoutMetadata()
     {
-        $this->documentBuilder->setDataCollection(['val1', null, 'val3'], $this->requestType);
+        $this->documentBuilder->setDataCollection(['val1', null, 'val3'], $this->requestType, null);
         self::assertEquals(
             ['val1', null, 'val3'],
             $this->documentBuilder->getDocument()

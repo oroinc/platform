@@ -20,11 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class NormalizeParentEntityClass implements ProcessorInterface
 {
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
+    private ValueNormalizer $valueNormalizer;
+    private ResourcesProvider $resourcesProvider;
 
     public function __construct(ValueNormalizer $valueNormalizer, ResourcesProvider $resourcesProvider)
     {
@@ -35,7 +32,7 @@ class NormalizeParentEntityClass implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */
 

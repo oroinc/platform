@@ -11,8 +11,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
  */
 class EntityLoader
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
 
     public function __construct(ManagerRegistry $doctrine)
     {
@@ -30,7 +29,7 @@ class EntityLoader
      *
      * @return object|null
      */
-    public function findEntity($entityClass, $entityId, EntityMetadata $metadata = null)
+    public function findEntity(string $entityClass, mixed $entityId, EntityMetadata $metadata = null): ?object
     {
         $manager = $this->doctrine->getManagerForClass($entityClass);
 
@@ -40,7 +39,7 @@ class EntityLoader
 
         $criteria = $this->buildFindCriteria($entityId, $metadata);
         if ($this->isEntityIdentifierEqualToPrimaryKey($criteria, $manager->getClassMetadata($entityClass))) {
-            if (is_array($entityId)) {
+            if (\is_array($entityId)) {
                 $entityId = $criteria;
             }
 
@@ -55,17 +54,11 @@ class EntityLoader
         return reset($data);
     }
 
-    /**
-     * @param mixed          $entityId
-     * @param EntityMetadata $metadata
-     *
-     * @return array
-     */
-    private function buildFindCriteria($entityId, EntityMetadata $metadata)
+    private function buildFindCriteria(mixed $entityId, EntityMetadata $metadata): array
     {
         $criteria = [];
         $idFieldNames = $metadata->getIdentifierFieldNames();
-        if (!is_array($entityId) && count($idFieldNames) === 1) {
+        if (!\is_array($entityId) && \count($idFieldNames) === 1) {
             $criteria[$metadata->getProperty(reset($idFieldNames))->getPropertyPath()] = $entityId;
         } else {
             foreach ($idFieldNames as $fieldName) {
@@ -76,16 +69,10 @@ class EntityLoader
         return $criteria;
     }
 
-    /**
-     * @param array         $criteria
-     * @param ClassMetadata $classMetadata
-     *
-     * @return bool
-     */
-    private function isEntityIdentifierEqualToPrimaryKey(array $criteria, ClassMetadata $classMetadata)
+    private function isEntityIdentifierEqualToPrimaryKey(array $criteria, ClassMetadata $classMetadata): bool
     {
         $primaryKeys = $classMetadata->getIdentifierFieldNames();
-        if (count($primaryKeys) !== count($criteria)) {
+        if (\count($primaryKeys) !== \count($criteria)) {
             return false;
         }
 
