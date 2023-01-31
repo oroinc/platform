@@ -11,8 +11,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class EntityTreeSelectTypeTest extends FormIntegrationTestCase
 {
-    /** @var EntityTreeSelectType */
-    private $formType;
+    private EntityTreeSelectType $formType;
 
     protected function setUp(): void
     {
@@ -21,14 +20,11 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
         $this->formType = new EntityTreeSelectType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getExtensions()
     {
         $entityIdentifierType = new EntityIdentifierTypeStub(
             [
-                1 => new TestEntity(1)
+                1 => new TestEntity(1),
             ]
         );
 
@@ -38,35 +34,32 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
                     EntityIdentifierType::class => $entityIdentifierType,
                 ],
                 []
-            )
+            ),
         ];
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
-        $this->assertEquals(EntityTreeSelectType::NAME, $this->formType->getBlockPrefix());
+        self::assertEquals(EntityTreeSelectType::NAME, $this->formType->getBlockPrefix());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(EntityIdentifierType::class, $this->formType->getParent());
+        self::assertEquals(EntityIdentifierType::class, $this->formType->getParent());
     }
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param int|null $data
-     * @param array $expectedViewVars
      */
-    public function testOptions(array $options, $data, array $expectedViewVars)
+    public function testOptions(array $options, int|null $data, array $expectedViewVars): void
     {
         $form = $this->factory->create(EntityTreeSelectType::class, null, $options);
         $form->submit($data);
         $view = $form->createView();
 
         foreach ($expectedViewVars as $expectedKey => $expectedValue) {
-            $this->assertArrayHasKey($expectedKey, $view->vars);
-            $this->assertEquals($expectedValue, $view->vars[$expectedKey]);
+            self::assertArrayHasKey($expectedKey, $view->vars);
+            self::assertEquals($expectedValue, $view->vars[$expectedKey]);
         }
     }
 
@@ -77,7 +70,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
                 [
                     'class' => TestEntity::class,
                     'tree_key' => 'test',
-                    'tree_data' => []
+                    'tree_data' => [],
                 ],
                 null,
                 [
@@ -86,9 +79,10 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
                         'key' => 'test',
                         'data' => [],
                         'nodeId' => null,
-                        'fieldSelector' => '#oro_entity_tree_select'
-                    ]
-                ]
+                        'fieldSelector' => '#oro_entity_tree_select',
+                        'disabled' => false,
+                    ],
+                ],
             ],
             'data callback' => [
                 [
@@ -96,7 +90,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
                     'tree_key' => 'test',
                     'tree_data' => function () {
                         return [];
-                    }
+                    },
                 ],
                 null,
                 [
@@ -105,16 +99,17 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
                         'key' => 'test',
                         'data' => [],
                         'nodeId' => null,
-                        'fieldSelector' => '#oro_entity_tree_select'
-                    ]
-                ]
+                        'fieldSelector' => '#oro_entity_tree_select',
+                        'disabled' => false,
+                    ],
+                ],
             ],
             'custom component' => [
                 [
                     'class' => TestEntity::class,
                     'tree_key' => 'test',
                     'tree_data' => [],
-                    'page_component_module' => 'myModule'
+                    'page_component_module' => 'myModule',
                 ],
                 1,
                 [
@@ -123,10 +118,30 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
                         'key' => 'test',
                         'data' => [],
                         'nodeId' => 1,
-                        'fieldSelector' => '#oro_entity_tree_select'
-                    ]
-                ]
-            ]
+                        'fieldSelector' => '#oro_entity_tree_select',
+                        'disabled' => false,
+                    ],
+                ],
+            ],
+            'disabled' => [
+                [
+                    'class' => TestEntity::class,
+                    'tree_key' => 'test',
+                    'tree_data' => [],
+                    'disabled' => true,
+                ],
+                null,
+                [
+                    'treeOptions' => [
+                        'view' => 'oroform/js/app/components/entity-tree-select-form-type-view',
+                        'key' => 'test',
+                        'data' => [],
+                        'nodeId' => null,
+                        'fieldSelector' => '#oro_entity_tree_select',
+                        'disabled' => true,
+                    ],
+                ],
+            ],
         ];
     }
 }

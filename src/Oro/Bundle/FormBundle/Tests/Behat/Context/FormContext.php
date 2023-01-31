@@ -388,13 +388,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Assert form fields values
-     * Example: And "User Form" must contains values:
+     * Example: And "User Form" must contain values:
      *            | Username          | charlie           |
      *            | First Name        | Charlie           |
      *            | Last Name         | Sheen             |
      *            | Primary Email     | charlie@sheen.com |
      *
      * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contains values:$/
+     * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contain values:$/
      */
     public function formMustContainsValues($formName, TableNode $table)
     {

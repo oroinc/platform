@@ -4,7 +4,7 @@ navigation:
             manage_reports:
                 label:    'oro.report.menu.manage_reports.label'
                 route:    'oro_report_index'
-                position: 10
+                position: 20
                 extras:
                     routes: ['oro_report_update', 'oro_report_create']
                 attributes:

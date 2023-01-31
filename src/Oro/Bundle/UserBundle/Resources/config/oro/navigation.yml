@@ -72,6 +72,7 @@ navigation:
             login_attempts:
                 label:    'oro.user.userloginattempt.entity_plural_label'
                 route:    'oro_user_login_attempts'
+                position: 70
                 extras:
                     description: 'oro.user.userloginattempt.entity_description'
 

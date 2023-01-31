@@ -9,29 +9,9 @@ class MenuUpdateTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 
-    public function testGetExtras()
-    {
-        $priority = 10;
-
-        $update = new MenuUpdate();
-        $update->setPriority($priority);
-        $update->setDivider(true);
-        $update->setIcon('test-icon');
-
-        $this->assertEquals(
-            [
-                'position' => $priority,
-                'divider' => true,
-                'icon' => 'test-icon',
-                'translate_disabled' => false
-            ],
-            $update->getExtras()
-        );
-    }
-
     public function testGetLinkAttributes(): void
     {
         $update = new MenuUpdate();
-        $this->assertSame([], $update->getLinkAttributes());
+        self::assertSame([], $update->getLinkAttributes());
     }
 }

@@ -4,6 +4,9 @@ namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 
+/**
+ * Interface for factory that creates layout registry, builders and manipulators.
+ */
 class LayoutFactory implements LayoutFactoryInterface
 {
     /** @var LayoutRegistryInterface */
@@ -83,9 +86,10 @@ class LayoutFactory implements LayoutFactoryInterface
      */
     public function createLayoutBuilder()
     {
-        $rawLayoutBuilder  = $this->createRawLayoutBuilder();
+        $rawLayoutBuilder = $this->createRawLayoutBuilder();
         $layoutManipulator = $this->createLayoutManipulator($rawLayoutBuilder);
-        $blockFactory      = $this->createBlockFactory($layoutManipulator);
+        $blockFactory = $this->createBlockFactory($layoutManipulator);
+        $layoutContextStack = new LayoutContextStack();
 
         return new LayoutBuilder(
             $this->registry,
@@ -94,6 +98,7 @@ class LayoutFactory implements LayoutFactoryInterface
             $blockFactory,
             $this->rendererRegistry,
             $this->expressionProcessor,
+            $layoutContextStack,
             $this->blockViewCache
         );
     }

@@ -24,4 +24,6 @@ interface LayoutBuilderInterface extends LayoutManipulatorInterface
      * @return array
      */
     public function getNotAppliedActions();
+
+    public function getLayoutContextStack(): LayoutContextStack;
 }

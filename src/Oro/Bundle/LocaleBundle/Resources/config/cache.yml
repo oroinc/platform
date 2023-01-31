@@ -24,3 +24,13 @@ services:
             - '@oro_locale.manager.localization'
         tags:
             - { name: kernel.cache_warmer }
+
+    oro_locale.cache.normalizer.localized_fallback_value:
+        class: Oro\Bundle\LocaleBundle\Cache\Normalizer\LocalizedFallbackValueNormalizer
+        arguments:
+            - '@doctrine'
+
+    oro_locale.cache.normalizer.localized_fallback_value_collection:
+        class: Oro\Bundle\LocaleBundle\Cache\Normalizer\LocalizedFallbackValueCollectionNormalizer
+        arguments:
+            - '@oro_locale.cache.normalizer.localized_fallback_value'

@@ -2,11 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Utils;
 
-use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
-use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
@@ -16,113 +12,14 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
 {
     use MenuItemTestTrait;
 
-    /** @var MenuUpdateHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $menuUpdateHelper;
+    private MenuUpdateHelper|\PHPUnit\Framework\MockObject\MockObject $menuUpdateHelper;
 
     protected function setUp(): void
     {
         $this->menuUpdateHelper = $this->createMock(MenuUpdateHelper::class);
     }
 
-    public function testUpdateMenuItem()
-    {
-        $menu = $this->getMenu();
-        $item = $menu->getChild('item-1')
-            ->getChild('item-1-1')
-            ->getChild('item-1-1-1');
-
-        $firstLocalization = new Localization();
-        ReflectionUtil::setId($firstLocalization, 1);
-        $secondLocalization = new Localization();
-        ReflectionUtil::setId($secondLocalization, 2);
-
-        $update = new MenuUpdateStub();
-        $update->setKey('item-1-1-1');
-        $update->setParentKey('item-2');
-        $update->setUri('URI');
-        $update->addDescription(
-            (new LocalizedFallbackValue())
-                ->setString('first test description')
-                ->setLocalization($firstLocalization)
-        );
-        $update->addDescription(
-            (new LocalizedFallbackValue())
-                ->setString('second test description')
-                ->setLocalization($secondLocalization)
-        );
-        $update->setLinkAttributes(['testAttribute' => 'testValue']);
-
-        $expectedItem = $this->createItem('item-1-1-1');
-        $expectedItem->setParent($menu->getChild('item-2'));
-        $expectedItem->setUri('URI');
-        $expectedItem->setExtra('description', 'second test description');
-        $expectedItem->setLinkAttribute('testAttribute', 'testValue');
-
-        $localizationHelper = $this->createMock(LocalizationHelper::class);
-        $localizationHelper->expects($this->atLeastOnce())
-            ->method('getCurrentLocalization')
-            ->willReturn($secondLocalization);
-
-        MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
-
-        $this->assertEquals($expectedItem, $item);
-    }
-
-    public function testUpdateMenuItemWithoutItem()
-    {
-        $menu = $this->getMenu();
-
-        $update = new MenuUpdateStub();
-        $update->setKey('item-1-1-1-1');
-        $update->setParentKey('item-2');
-        $update->setUri('URI');
-
-        $localizationHelper = $this->createMock(LocalizationHelper::class);
-        MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
-
-        $this->assertNull($menu->getChild('item-2')->getChild('item-1-1-1-1'));
-    }
-
-    public function testUpdateMenuItemWithoutItemIsCustom()
-    {
-        $menu = $this->getMenu();
-
-        $update = new MenuUpdateStub();
-        $update->setKey('item-1-1-1-1');
-        $update->setParentKey('item-2');
-        $update->setUri('URI');
-        $update->setCustom(true);
-
-        $expectedItem = $this->createItem('item-1-1-1-1');
-        $expectedItem->setParent($menu->getChild('item-2'));
-        $expectedItem->setUri('URI');
-        $update->setCustom(true);
-
-        $localizationHelper = $this->createMock(LocalizationHelper::class);
-        MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
-
-        $this->assertEquals($expectedItem, $menu->getChild('item-2')->getChild('item-1-1-1-1'));
-    }
-
-    public function testUpdateMenuItemWithOptions()
-    {
-        $menu = $this->getMenu();
-        $item = $menu->getChild('item-1');
-
-        $update = new MenuUpdateStub();
-        $update->setKey('new');
-        $update->setParentKey('item-1');
-        $update->setCustom(true);
-
-        $localizationHelper = $this->createMock(LocalizationHelper::class);
-
-        $options = ['extras' => ['test' => 'test']];
-        MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper, $options);
-
-        $this->assertEquals(['test' => 'test'], $item->getChild('new')->getExtras());
-    }
-
-    public function testFindMenuItem()
+    public function testFindMenuItem(): void
     {
         $menu = $this->getMenu();
 
@@ -130,46 +27,48 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
             ->getChild('item-1-1')
             ->getChild('item-1-1-1');
 
-        $this->assertEquals($expectedItem, MenuUpdateUtils::findMenuItem($menu, 'item-1-1-1'));
+        self::assertEquals($expectedItem, MenuUpdateUtils::findMenuItem($menu, 'item-1-1-1'));
     }
 
-    public function testFindMenuItemNull()
+    public function testFindMenuItemNull(): void
     {
         $menu = $this->getMenu();
 
-        $this->assertEquals(null, MenuUpdateUtils::findMenuItem($menu, 'item-1-1-1-1'));
+        self::assertEquals(null, MenuUpdateUtils::findMenuItem($menu, 'item-1-1-1-1'));
     }
 
-    public function testGetItemExceededMaxNestingLevel()
-    {
-        $menu = $this->getMenu();
-        $menu->setExtra('max_nesting_level', 2);
-
-        $item = $menu->getChild('item-1');
-
-        $expectedItem = $item->getChild('item-1-1')
-            ->getChild('item-1-1-1');
-
-        $this->assertEquals($expectedItem, MenuUpdateUtils::getItemExceededMaxNestingLevel($menu, $item));
-    }
-
-    public function testGetItemExceededMaxNestingLevelNull()
-    {
-        $menu = $this->getMenu();
-        $menu->setExtra('max_nesting_level', 3);
-
-        $item = $menu->getChild('item-1');
-
-        $this->assertEquals(null, MenuUpdateUtils::getItemExceededMaxNestingLevel($menu, $item));
-    }
-
-    public function testGenerateKey()
+    public function testGenerateKey(): void
     {
         $menuName = 'application_menu';
 
         $scope = new Scope();
         ReflectionUtil::setId($scope, 1);
 
-        $this->assertEquals('application_menu_1', MenuUpdateUtils::generateKey($menuName, $scope));
+        self::assertEquals('application_menu_1', MenuUpdateUtils::generateKey($menuName, $scope));
+    }
+
+    public function testFlattenMenuItemWhenNoChildren(): void
+    {
+        $menuItem = $this->createItem('sample_menu');
+        self::assertEquals([$menuItem->getName() => $menuItem], MenuUpdateUtils::flattenMenuItem($menuItem));
+    }
+
+    public function testFlattenMenuItemWhenHasChildren(): void
+    {
+        $menu = $this->getMenu();
+
+        self::assertEquals(
+            [
+                $menu->getName() => $menu,
+                'item-1' => $menu->getChild('item-1'),
+                'item-2' => $menu->getChild('item-2'),
+                'item-3' => $menu->getChild('item-3'),
+                'item-4' => $menu->getChild('item-4'),
+                'item-1-1' => $menu->getChild('item-1')->getChild('item-1-1'),
+                'item-1-1-1' => $menu->getChild('item-1')->getChild('item-1-1')->getChild('item-1-1-1'),
+                'item-1-2' => $menu->getChild('item-1')->getChild('item-1-2'),
+            ],
+            MenuUpdateUtils::flattenMenuItem($menu),
+        );
     }
 }
