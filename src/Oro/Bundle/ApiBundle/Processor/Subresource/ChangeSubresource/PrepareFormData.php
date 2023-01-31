@@ -14,8 +14,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class PrepareFormData implements ProcessorInterface
 {
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor)
     {
@@ -25,7 +24,7 @@ class PrepareFormData implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ChangeSubresourceContext $context */
 
@@ -49,13 +48,7 @@ class PrepareFormData implements ProcessorInterface
         }
     }
 
-    /**
-     * @param ChangeSubresourceContext $context
-     * @param mixed                    $associationData
-     *
-     * @return bool
-     */
-    private function tryGetAssociationData(ChangeSubresourceContext $context, &$associationData): bool
+    private function tryGetAssociationData(ChangeSubresourceContext $context, mixed &$associationData): bool
     {
         try {
             $associationData = $this->propertyAccessor->getValue(

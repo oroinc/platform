@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\AttachmentBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\AttachmentBundle\ProcessorHelper;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * Responsible for configurations of pngquant, jpegoptim libraries.
@@ -13,24 +13,17 @@ class AttachmentProcessorsCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $processorHelper = new ProcessorHelper($container->getParameterBag());
-        $librariesExists = false;
-        try {
-            $librariesExists = $processorHelper->librariesExists();
-        } catch (\Exception $exception) {
-            // Any error in catch indicates that the library does not exist or its version does not meet the
-            // needs of the system
-        }
-
-        // liip_imagine expects paths to be strings, null is not allowed as a default value, so we override it
-        $PNGQuantLibraryPath = '';
-        $JPEGOptimLibraryPath = '';
-        if ($librariesExists) {
-            $PNGQuantLibraryPath = $processorHelper->getPNGQuantLibrary();
-            $JPEGOptimLibraryPath = $processorHelper->getJPEGOptimLibrary();
-        }
-
-        $container->setParameter('liip_imagine.pngquant.binary', $PNGQuantLibraryPath);
-        $container->setParameter('liip_imagine.jpegoptim.binary', $JPEGOptimLibraryPath);
+        $container->getDefinition('liip_imagine.filter.post_processor.pngquant')
+            ->setArgument(
+                '$executablePath',
+                new Expression("service('oro_attachment.processor_helper').getPNGQuantLibrary() ?: '/usr/bin/pngquant'")
+            );
+        $container->getDefinition('liip_imagine.filter.post_processor.jpegoptim')
+            ->setArgument(
+                '$executablePath',
+                new Expression(
+                    "service('oro_attachment.processor_helper').getJPEGOptimLibrary() ?: '/usr/bin/jpegoptim'"
+                )
+            );
     }
 }

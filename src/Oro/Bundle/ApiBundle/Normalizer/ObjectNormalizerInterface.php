@@ -9,11 +9,5 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 interface ObjectNormalizerInterface
 {
-    /**
-     * @param object      $object
-     * @param RequestType $requestType
-     *
-     * @return mixed
-     */
-    public function normalize($object, RequestType $requestType);
+    public function normalize(object $object, RequestType $requestType): mixed;
 }

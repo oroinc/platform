@@ -11,8 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class TestFlashBagInjection implements ProcessorInterface
 {
-    /** @var TestFlashBagDependedService */
-    private $flashBagDependedService;
+    private TestFlashBagDependedService $flashBagDependedService;
 
     public function __construct(TestFlashBagDependedService $flashBagDependedService)
     {
@@ -22,7 +21,7 @@ class TestFlashBagInjection implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
     }
 }

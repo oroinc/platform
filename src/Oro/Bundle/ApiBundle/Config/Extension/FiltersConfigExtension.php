@@ -12,8 +12,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class FiltersConfigExtension extends AbstractConfigExtension
 {
-    /** @var FilterOperatorRegistry */
-    private $filterOperatorRegistry;
+    private FilterOperatorRegistry $filterOperatorRegistry;
 
     public function __construct(FilterOperatorRegistry $filterOperatorRegistry)
     {
@@ -23,7 +22,7 @@ class FiltersConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationSections()
+    public function getEntityConfigurationSections(): array
     {
         return [ConfigUtil::FILTERS => new FiltersConfiguration($this->filterOperatorRegistry)];
     }
@@ -31,7 +30,7 @@ class FiltersConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationLoaders()
+    public function getEntityConfigurationLoaders(): array
     {
         return [ConfigUtil::FILTERS => new FiltersConfigLoader()];
     }

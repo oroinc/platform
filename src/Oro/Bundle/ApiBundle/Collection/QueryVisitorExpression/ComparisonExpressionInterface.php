@@ -25,6 +25,6 @@ interface ComparisonExpressionInterface
         string $field,
         string $expression,
         string $parameterName,
-        $value
-    );
+        mixed $value
+    ): mixed;
 }

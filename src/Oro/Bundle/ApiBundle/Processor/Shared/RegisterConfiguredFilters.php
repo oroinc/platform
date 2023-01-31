@@ -18,7 +18,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class RegisterConfiguredFilters extends RegisterFilters
 {
-    private const ASSOCIATION_ALLOWED_OPERATORS            = [
+    private const ASSOCIATION_ALLOWED_OPERATORS = [
         FilterOperator::EQ,
         FilterOperator::NEQ,
         FilterOperator::EXISTS,
@@ -32,13 +32,12 @@ class RegisterConfiguredFilters extends RegisterFilters
         FilterOperator::CONTAINS,
         FilterOperator::NOT_CONTAINS
     ];
-    private const SINGLE_IDENTIFIER_EXCLUDED_OPERATORS     = [
+    private const SINGLE_IDENTIFIER_EXCLUDED_OPERATORS = [
         FilterOperator::EXISTS,
         FilterOperator::NEQ_OR_NULL
     ];
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(
         FilterFactoryInterface $filterFactory,
@@ -53,7 +52,7 @@ class RegisterConfiguredFilters extends RegisterFilters
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -99,12 +98,7 @@ class RegisterConfiguredFilters extends RegisterFilters
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return string|null
-     */
-    private function getSingleIdentifierFieldName(?EntityDefinitionConfig $config = null)
+    private function getSingleIdentifierFieldName(?EntityDefinitionConfig $config = null): ?string
     {
         if (null === $config) {
             return null;
@@ -114,7 +108,7 @@ class RegisterConfiguredFilters extends RegisterFilters
             return null;
         }
 
-        return \reset($idFieldNames);
+        return reset($idFieldNames);
     }
 
     /**
@@ -122,26 +116,26 @@ class RegisterConfiguredFilters extends RegisterFilters
      *
      * @return string[]
      */
-    private function getAssociationNames(?ClassMetadata $metadata)
+    private function getAssociationNames(?ClassMetadata $metadata): array
     {
         return null !== $metadata
-            ? \array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
+            ? array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
             : [];
     }
 
-    private function updateSingleIdentifierOperators(StandaloneFilter $filter)
+    private function updateSingleIdentifierOperators(StandaloneFilter $filter): void
     {
         $filter->setSupportedOperators(
-            \array_diff($filter->getSupportedOperators(), self::SINGLE_IDENTIFIER_EXCLUDED_OPERATORS)
+            array_diff($filter->getSupportedOperators(), self::SINGLE_IDENTIFIER_EXCLUDED_OPERATORS)
         );
     }
 
-    private function updateAssociationOperators(StandaloneFilter $filter, bool $isCollection)
+    private function updateAssociationOperators(StandaloneFilter $filter, bool $isCollection): void
     {
         $allowedOperators = $isCollection
             ? self::COLLECTION_ASSOCIATION_ALLOWED_OPERATORS
             : self::ASSOCIATION_ALLOWED_OPERATORS;
-        if ([] !== \array_diff($filter->getSupportedOperators(), $allowedOperators)) {
+        if ([] !== array_diff($filter->getSupportedOperators(), $allowedOperators)) {
             $filter->setSupportedOperators($allowedOperators);
         }
     }

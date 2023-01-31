@@ -9,8 +9,7 @@ use Twig\Environment;
  */
 class TwigPostProcessor implements PostProcessorInterface
 {
-    /** @var Environment */
-    private $twig;
+    private Environment $twig;
 
     public function __construct(Environment $twig)
     {
@@ -23,7 +22,7 @@ class TwigPostProcessor implements PostProcessorInterface
     public function process($value, array $options)
     {
         if (null === $value) {
-            return $value;
+            return null;
         }
 
         $twigContent = $options;

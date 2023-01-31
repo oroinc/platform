@@ -16,11 +16,8 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     /** A symbol to separate fields inside the composite identifier */
     private const COMPOSITE_ID_SEPARATOR = ';';
 
-    /** @var ValueNormalizer */
-    protected $valueNormalizer;
-
-    /** @var RequestType */
-    protected $requestType;
+    private ValueNormalizer $valueNormalizer;
+    private RequestType $requestType;
 
     public function __construct(ValueNormalizer $valueNormalizer)
     {
@@ -31,17 +28,17 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($id, EntityMetadata $metadata)
+    public function transform(mixed $id, EntityMetadata $metadata): mixed
     {
         return \is_array($id)
-            ? \http_build_query($id, '', self::COMPOSITE_ID_SEPARATOR)
+            ? http_build_query($id, '', self::COMPOSITE_ID_SEPARATOR)
             : (string)$id;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($value, EntityMetadata $metadata)
+    public function reverseTransform(mixed $value, EntityMetadata $metadata): mixed
     {
         $idFieldNames = $metadata->getIdentifierFieldNames();
         if (\count($idFieldNames) === 1) {
@@ -56,28 +53,17 @@ class EntityIdTransformer implements EntityIdTransformerInterface
         return $value;
     }
 
-    /**
-     * @param EntityMetadata $metadata
-     *
-     * @return string
-     */
-    protected function getSingleIdDataType(EntityMetadata $metadata)
+    private function getSingleIdDataType(EntityMetadata $metadata): string
     {
         $idFieldNames = $metadata->getIdentifierFieldNames();
-        $idField = $metadata->getProperty(\reset($idFieldNames));
+        $idField = $metadata->getProperty(reset($idFieldNames));
 
         return null !== $idField
             ? $idField->getDataType()
             : DataType::STRING;
     }
 
-    /**
-     * @param mixed  $value
-     * @param string $dataType
-     *
-     * @return mixed
-     */
-    protected function reverseTransformSingleId($value, $dataType)
+    private function reverseTransformSingleId(mixed $value, string $dataType): mixed
     {
         if (DataType::STRING === $dataType) {
             return $value;
@@ -87,14 +73,9 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     }
 
     /**
-     * @param string         $entityId
-     * @param EntityMetadata $metadata
-     *
-     * @return array
-     *
      * @throws \UnexpectedValueException if the given entity id cannot be normalized
      */
-    protected function reverseTransformCompositeEntityId($entityId, EntityMetadata $metadata)
+    private function reverseTransformCompositeEntityId(string $entityId, EntityMetadata $metadata): array
     {
         $fieldMap = [];
         foreach ($metadata->getIdentifierFieldNames() as $fieldName) {
@@ -102,30 +83,26 @@ class EntityIdTransformer implements EntityIdTransformerInterface
         }
 
         $normalized = [];
-        foreach (\explode(self::COMPOSITE_ID_SEPARATOR, $entityId) as $item) {
-            $val = \explode('=', $item);
+        foreach (explode(self::COMPOSITE_ID_SEPARATOR, $entityId) as $item) {
+            $val = explode('=', $item);
             if (\count($val) !== 2) {
-                throw new \UnexpectedValueException(
-                    \sprintf(
-                        'Unexpected identifier value "%s" for composite identifier of the entity "%s".',
-                        $entityId,
-                        $metadata->getClassName()
-                    )
-                );
+                throw new \UnexpectedValueException(sprintf(
+                    'Unexpected identifier value "%s" for composite identifier of the entity "%s".',
+                    $entityId,
+                    $metadata->getClassName()
+                ));
             }
 
-            list($key, $val) = $val;
-            $val = \urldecode($val);
+            [$key, $val] = $val;
+            $val = urldecode($val);
 
             if (!isset($fieldMap[$key])) {
-                throw new \UnexpectedValueException(
-                    \sprintf(
-                        'The entity identifier contains the key "%s" '
-                        . 'which is not defined in composite identifier of the entity "%s".',
-                        $key,
-                        $metadata->getClassName()
-                    )
-                );
+                throw new \UnexpectedValueException(sprintf(
+                    'The entity identifier contains the key "%s" '
+                    . 'which is not defined in composite identifier of the entity "%s".',
+                    $key,
+                    $metadata->getClassName()
+                ));
             }
 
             $dataType = $fieldMap[$key];
@@ -137,13 +114,11 @@ class EntityIdTransformer implements EntityIdTransformerInterface
             unset($fieldMap[$key]);
         }
         if (!empty($fieldMap)) {
-            throw new \UnexpectedValueException(
-                \sprintf(
-                    'The entity identifier does not contain all keys '
-                    . 'defined in composite identifier of the entity "%s".',
-                    $metadata->getClassName()
-                )
-            );
+            throw new \UnexpectedValueException(sprintf(
+                'The entity identifier does not contain all keys '
+                . 'defined in composite identifier of the entity "%s".',
+                $metadata->getClassName()
+            ));
         }
 
         return $normalized;

@@ -15,11 +15,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadParentResourceMetadata implements ProcessorInterface
 {
-    /** @var MetadataProvider */
-    protected $metadataProvider;
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private MetadataProvider $metadataProvider;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(MetadataProvider $metadataProvider, DoctrineHelper $doctrineHelper)
     {
@@ -30,7 +27,7 @@ class LoadParentResourceMetadata implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */
 
@@ -58,11 +55,7 @@ class LoadParentResourceMetadata implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $parentResourceClass
-     */
-    protected function assertRelationship($entityClass, $parentResourceClass)
+    private function assertRelationship(string $entityClass, string $parentResourceClass): void
     {
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
             throw new \LogicException(
@@ -76,26 +69,16 @@ class LoadParentResourceMetadata implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string                 $parentResourceClass
-     * @param EntityDefinitionConfig $config
-     * @param string                 $version
-     * @param RequestType            $requestType
-     * @param array                  $extras
-     *
-     * @return EntityMetadata|null
-     */
-    protected function loadParentResourceMetadata(
-        $parentResourceClass,
+    private function loadParentResourceMetadata(
+        string $parentResourceClass,
         EntityDefinitionConfig $config,
-        $version,
+        string $version,
         RequestType $requestType,
         array $extras
-    ) {
-        $entityMetadata = null;
+    ): ?EntityMetadata {
         $config->setParentResourceClass(null);
         try {
-            $entityMetadata = $this->metadataProvider->getMetadata(
+            return $this->metadataProvider->getMetadata(
                 $parentResourceClass,
                 $version,
                 $requestType,
@@ -105,7 +88,5 @@ class LoadParentResourceMetadata implements ProcessorInterface
         } finally {
             $config->setParentResourceClass($parentResourceClass);
         }
-
-        return $entityMetadata;
     }
 }

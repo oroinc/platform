@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Exception;
 class FileSplitterException extends \RuntimeException
 {
     /** @var string[] */
-    private $targetFileNames;
+    private array $targetFileNames;
 
     /**
      * @param string          $sourceFileName  The name of the source file

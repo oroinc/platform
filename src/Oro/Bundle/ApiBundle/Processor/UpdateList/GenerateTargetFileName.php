@@ -11,8 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class GenerateTargetFileName implements ProcessorInterface
 {
-    /** @var FileNameProvider */
-    private $fileNameProvider;
+    private FileNameProvider $fileNameProvider;
 
     public function __construct(FileNameProvider $fileNameProvider)
     {
@@ -22,7 +21,7 @@ class GenerateTargetFileName implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */
 

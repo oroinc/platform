@@ -9,17 +9,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class RestDocUrlGenerator implements RestDocUrlGeneratorInterface
 {
-    public const ROUTE          = 'nelmio_api_doc_index';
+    public const ROUTE = 'nelmio_api_doc_index';
     public const RESOURCE_ROUTE = 'oro_rest_api_doc_resource';
 
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
-
+    private UrlGeneratorInterface $urlGenerator;
     /** @var string[] */
-    private $views;
-
-    /** @var string|null */
-    private $defaultView;
+    private array $views;
+    private ?string $defaultView;
 
     /**
      * @param UrlGeneratorInterface $urlGenerator
@@ -39,7 +35,7 @@ class RestDocUrlGenerator implements RestDocUrlGeneratorInterface
     public function generate(string $view): string
     {
         if (!\in_array($view, $this->views, true)) {
-            throw new \InvalidArgumentException(\sprintf('Undefined API view: %s.', $view));
+            throw new \InvalidArgumentException(sprintf('Undefined API view: %s.', $view));
         }
 
         $parameters = [];

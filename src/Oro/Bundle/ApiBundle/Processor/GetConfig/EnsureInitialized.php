@@ -14,8 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class EnsureInitialized implements ProcessorInterface
 {
-    /** @var ConfigLoaderFactory */
-    protected $configLoaderFactory;
+    private ConfigLoaderFactory $configLoaderFactory;
 
     public function __construct(ConfigLoaderFactory $configLoaderFactory)
     {
@@ -25,7 +24,7 @@ class EnsureInitialized implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 

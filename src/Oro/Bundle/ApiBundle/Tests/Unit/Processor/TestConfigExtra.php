@@ -7,17 +7,10 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 
 class TestConfigExtra implements ConfigExtraInterface
 {
-    /** @var string */
-    private $name;
+    private string $name;
+    private array $contextAttributes;
 
-    /** @var array */
-    private $contextAttributes;
-
-    /**
-     * @param string $name
-     * @param array  $contextAttributes
-     */
-    public function __construct($name, array $contextAttributes = [])
+    public function __construct(string $name, array $contextAttributes = [])
     {
         $this->name = $name;
         $this->contextAttributes = $contextAttributes;
@@ -26,7 +19,7 @@ class TestConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -34,7 +27,7 @@ class TestConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(ConfigContext $context)
+    public function configureContext(ConfigContext $context): void
     {
         foreach ($this->contextAttributes as $name => $value) {
             $context->set($name, $value);
@@ -44,7 +37,7 @@ class TestConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function isPropagable()
+    public function isPropagable(): bool
     {
         return false;
     }
@@ -52,7 +45,7 @@ class TestConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         return null;
     }

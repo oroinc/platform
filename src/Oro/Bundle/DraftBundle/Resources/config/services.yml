@@ -2,8 +2,6 @@ services:
     oro_draft.event_listener_orm.draft_source_listener:
         class: Oro\Bundle\DraftBundle\EventListener\ORM\DraftSourceListener
         public: false
-        arguments:
-            - '%database_driver%'
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata }
 

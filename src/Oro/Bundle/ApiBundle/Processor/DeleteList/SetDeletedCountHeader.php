@@ -18,7 +18,7 @@ class SetDeletedCountHeader implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var DeleteListContext $context */
 
@@ -28,14 +28,14 @@ class SetDeletedCountHeader implements ProcessorInterface
         }
 
         $xInclude = $context->getRequestHeaders()->get(Context::INCLUDE_HEADER);
-        if (empty($xInclude) || !in_array(self::REQUEST_HEADER_VALUE, $xInclude, true)) {
+        if (empty($xInclude) || !\in_array(self::REQUEST_HEADER_VALUE, $xInclude, true)) {
             // the deleted records count is not requested
             return;
         }
 
         $result = $context->getResult();
-        if (null !== $result && is_array($result)) {
-            $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, count($result));
+        if (\is_array($result)) {
+            $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, \count($result));
         }
     }
 }

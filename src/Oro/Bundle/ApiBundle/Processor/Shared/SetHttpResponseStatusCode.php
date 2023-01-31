@@ -16,8 +16,7 @@ class SetHttpResponseStatusCode implements ProcessorInterface
 {
     use ErrorStatusCodesWithoutContentTrait;
 
-    /** @var int */
-    private $defaultSuccessStatusCode;
+    private int $defaultSuccessStatusCode;
 
     public function __construct(int $defaultSuccessStatusCode = Response::HTTP_OK)
     {
@@ -27,7 +26,7 @@ class SetHttpResponseStatusCode implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

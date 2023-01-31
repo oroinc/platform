@@ -16,11 +16,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class CreateAsyncOperation implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    private DoctrineHelper $doctrineHelper;
+    private AuthorizationCheckerInterface $authorizationChecker;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -33,7 +30,7 @@ class CreateAsyncOperation implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */
 

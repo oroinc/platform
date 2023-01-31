@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SegmentBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 
@@ -30,7 +30,7 @@ class DoctrinePreRemoveListener
         $className = ClassUtils::getClass($entity);
 
         if ($this->configManager->hasConfig($className)) {
-            $metadata  = $args->getEntityManager()->getClassMetadata($className);
+            $metadata = $args->getObjectManager()->getClassMetadata($className);
             $entityIds = $metadata->getIdentifierValues($entity);
             $this->deleteEntities[] = [
                 'id'     => reset($entityIds),

@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadFromConfigBag implements ProcessorInterface
 {
-    /** @var ConfigBagRegistry */
-    protected $configBagRegistry;
+    private ConfigBagRegistry $configBagRegistry;
 
     public function __construct(ConfigBagRegistry $configBagRegistry)
     {
@@ -23,7 +22,7 @@ class LoadFromConfigBag implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */
 

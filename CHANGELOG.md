@@ -4,6 +4,9 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### RedisConfigBundle
+* Added the bundle itself to `oro/platform` package. The bundle came from outer package `oro/redis-config` and it was rebuilt to utilize Symfony redis configuration components instead of once from 3rd party package `snc/redis-bundle`.
+
 #### UIBundle
 * `oroui/js/app/components/viewport-component` has been changed options from `viewport: {maxScreenType: 'tablet'}` or `viewport: {minScreenType: 'tablet'}` to `viewport: 'tablet'`
 - As a result, you need to update your `html`:

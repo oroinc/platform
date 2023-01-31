@@ -617,11 +617,22 @@ services:
         tags:
             - { name: oro_featuretogle.voter, priority: 10 }
 
-    oro_attachment.checker.voter.post_processors_voter:
-        class: 'Oro\Bundle\AttachmentBundle\Checker\Voter\PostProcessorsVoter'
+    oro_attachment.cache.processor_helper:
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_attachment_processor_helper' }
+
+    oro_attachment.processor_helper:
+        class: Oro\Bundle\AttachmentBundle\ProcessorHelper
         arguments:
             - '%liip_imagine.jpegoptim.binary%'
             - '%liip_imagine.pngquant.binary%'
+            - '@oro_attachment.cache.processor_helper'
+
+    oro_attachment.checker.voter.post_processors_voter:
+        class: 'Oro\Bundle\AttachmentBundle\Checker\Voter\PostProcessorsVoter'
+        arguments:
+            - '@oro_attachment.processor_helper'
         tags:
             - { name: oro_featuretogle.voter, priority: 10 }
 

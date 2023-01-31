@@ -16,8 +16,7 @@ class IdentifierDescriptionHelper
     private const REQUIRED_ID_DESCRIPTION =
         '<p>' . self::ID_DESCRIPTION . '</p><p><strong>The required field.</strong></p>';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -37,7 +36,7 @@ class IdentifierDescriptionHelper
         string $targetAction
     ): void {
         $identifierFieldNames = $definition->getIdentifierFieldNames();
-        if (count($identifierFieldNames) !== 1) {
+        if (\count($identifierFieldNames) !== 1) {
             // keep descriptions for composite identifier as is
             return;
         }
@@ -88,7 +87,7 @@ class IdentifierDescriptionHelper
         $entityIdentifierFieldNames = $classMetadata->getIdentifierFieldNames();
 
         return
-            count($entityIdentifierFieldNames) === 1
+            \count($entityIdentifierFieldNames) === 1
             && reset($entityIdentifierFieldNames) === $identifierFieldName;
     }
 }

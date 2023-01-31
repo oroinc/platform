@@ -19,7 +19,7 @@ class StatusCodesConfigLoader extends AbstractConfigLoader
     /**
      * {@inheritdoc}
      */
-    public function load(array $config)
+    public function load(array $config): mixed
     {
         $codes = new StatusCodesConfig();
         foreach ($config as $key => $value) {
@@ -29,12 +29,7 @@ class StatusCodesConfigLoader extends AbstractConfigLoader
         return $codes;
     }
 
-    /**
-     * @param array|null $config
-     *
-     * @return StatusCodeConfig
-     */
-    protected function loadCode(array $config = null)
+    private function loadCode(array $config = null): StatusCodeConfig
     {
         $code = new StatusCodeConfig();
         if (!empty($config)) {

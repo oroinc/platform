@@ -7,13 +7,9 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 
 class TestConfigSection implements ConfigExtraSectionInterface
 {
-    /** @var string */
-    private $name;
+    private string $name;
 
-    /**
-     * @param string $name
-     */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
@@ -21,7 +17,7 @@ class TestConfigSection implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -29,14 +25,14 @@ class TestConfigSection implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(ConfigContext $context)
+    public function configureContext(ConfigContext $context): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isPropagable()
+    public function isPropagable(): bool
     {
         return true;
     }
@@ -44,7 +40,7 @@ class TestConfigSection implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigType()
+    public function getConfigType(): string
     {
         return $this->name;
     }
@@ -52,7 +48,7 @@ class TestConfigSection implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         return null;
     }

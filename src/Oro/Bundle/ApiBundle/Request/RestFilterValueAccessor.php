@@ -42,27 +42,16 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RestFilterValueAccessor extends FilterValueAccessor
 {
-    /** @var Request */
-    private $request;
-
-    /** @var string */
-    private $operatorPattern;
-
+    private Request $request;
+    private string $operatorPattern;
     /** @var string[] [operator short name, ...] */
-    private $operators;
-
+    private array $operators;
     /** @var array [operator name => operator short name or NULL, ...] */
-    private $operatorNameMap;
-
+    private array $operatorNameMap;
     /** @var array [operator short name => operator name, ...] */
-    private $operatorShortNameMap;
+    private array $operatorShortNameMap;
 
-    /**
-     * @param Request $request
-     * @param string  $operatorPattern
-     * @param array   $operatorNameMap
-     */
-    public function __construct(Request $request, $operatorPattern, array $operatorNameMap)
+    public function __construct(Request $request, string $operatorPattern, array $operatorNameMap)
     {
         $this->request = $request;
         $this->operatorPattern = $operatorPattern;
@@ -106,43 +95,34 @@ class RestFilterValueAccessor extends FilterValueAccessor
         return $operator;
     }
 
-    /**
-     * @param string $sourceKey
-     * @param string $group
-     * @param string $key
-     * @param string $path
-     * @param mixed  $value
-     * @param string $operator
-     *
-     * @return FilterValue
-     */
     private function addParsed(
         string $sourceKey,
         string $group,
         string $key,
         string $path,
-        $value,
+        mixed $value,
         string $operator = '='
-    ): FilterValue {
+    ): void {
         if (null === $value) {
             $value = '';
         } elseif (!\is_string($value)) {
             throw new \UnexpectedValueException(sprintf(
                 'Expected string value for the filter "%s", given "%s".',
                 $sourceKey,
-                \is_object($value) ? \get_class($value) : gettype($value)
+                get_debug_type($value)
             ));
         }
 
-        $filterValue = FilterValue::createFromSource(
-            $sourceKey,
-            $path,
-            $value,
-            $this->normalizeOperator($operator)
+        $this->setParameter(
+            $group,
+            $key,
+            FilterValue::createFromSource(
+                $sourceKey,
+                $path,
+                $value,
+                $this->normalizeOperator($operator)
+            )
         );
-        $this->setParameter($group, $key, $filterValue);
-
-        return $filterValue;
     }
 
     private function parseQueryString(): void
@@ -236,7 +216,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
 
     private function isValueWithOperator(array $value): bool
     {
-        if (1 !== count($value)) {
+        if (1 !== \count($value)) {
             return false;
         }
 

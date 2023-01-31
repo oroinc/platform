@@ -22,14 +22,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class LoadEntityByEntitySerializer implements ProcessorInterface
 {
-    /** @var EntitySerializer */
-    private $entitySerializer;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityClassResolver */
-    private $entityClassResolver;
+    private EntitySerializer $entitySerializer;
+    private DoctrineHelper $doctrineHelper;
+    private EntityClassResolver $entityClassResolver;
 
     public function __construct(
         EntitySerializer $entitySerializer,
@@ -44,7 +39,7 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -88,7 +83,7 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
                 throw new AccessDeniedException('No access to the entity.');
             }
             $result = null;
-        } elseif (count($result) === 1) {
+        } elseif (\count($result) === 1) {
             $result = reset($result);
         } else {
             throw new RuntimeException('The result must have one or zero items.');
@@ -102,7 +97,7 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
         $entityClass = $this->entityClassResolver->getEntityClass(QueryBuilderUtil::getSingleRootEntity($qb));
         $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
         if (\count($idFieldNames) !== 0) {
-            $qb->select(QueryBuilderUtil::getSingleRootAlias($qb) . '.' . \reset($idFieldNames));
+            $qb->select(QueryBuilderUtil::getSingleRootAlias($qb) . '.' . reset($idFieldNames));
         }
     }
 }

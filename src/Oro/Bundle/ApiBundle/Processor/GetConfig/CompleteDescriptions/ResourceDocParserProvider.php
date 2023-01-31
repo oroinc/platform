@@ -12,10 +12,8 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 class ResourceDocParserProvider
 {
     /** @var ResourceDocParserInterface[] */
-    private $resourceDocParsers = [];
-
-    /** @var ResourceDocParserRegistry */
-    private $resourceDocParserRegistry;
+    private array $resourceDocParsers = [];
+    private ResourceDocParserRegistry $resourceDocParserRegistry;
 
     public function __construct(ResourceDocParserRegistry $resourceDocParserRegistry)
     {

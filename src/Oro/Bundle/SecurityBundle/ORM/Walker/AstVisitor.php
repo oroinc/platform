@@ -78,7 +78,11 @@ class AstVisitor extends Visitor
         if (\is_array($value->getValue())) {
             $literalValues = [];
             foreach ($value->getValue() as $arrayItemValue) {
-                $literalValues[] = $this->getValueLiteral($arrayItemValue);
+                $arithmeticExpression = new AST\ArithmeticExpression();
+                $arithmeticExpression->simpleArithmeticExpression = new AST\SimpleArithmeticExpression(
+                    [$this->getValueLiteral($arrayItemValue)]
+                );
+                $literalValues[] = $arithmeticExpression;
             }
 
             return $literalValues;

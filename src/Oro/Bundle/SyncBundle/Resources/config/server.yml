@@ -1,0 +1,19 @@
+services:
+    oro_sync.gos_websocket_server.parameters_provider:
+        class: Oro\Bundle\SyncBundle\WebSocket\DsnBasedParameters
+        arguments:
+            - '%websocket_server_dsn%'
+
+    Oro\Bundle\SyncBundle\WebSocket\WebsocketServerCommandFactory:
+        public: false
+
+    oro_sync.gos_web_socket.command.websocket_server.decorator:
+        class: Gos\Bundle\WebSocketBundle\Command\WebsocketServerCommand
+        decorates: gos_web_socket.command.websocket_server
+        factory: ['@Oro\Bundle\SyncBundle\WebSocket\WebsocketServerCommandFactory', 'createGosWebsocketCommand']
+        arguments:
+            - '@gos_web_socket.server.launcher'
+            - '@oro_sync.gos_websocket_server.parameters_provider'
+            - '@gos_web_socket.registry.server'
+        tags:
+            - { name: console.command, command: gos:websocket:server }

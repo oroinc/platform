@@ -12,15 +12,14 @@ use Doctrine\Common\Collections\Expr\Value;
  */
 class FieldVisitor extends ExpressionVisitor
 {
-    /** @var array */
-    private $fields = [];
+    private array $fields = [];
 
     /**
      * Gets all fields are used in a visited expression graph.
      *
      * @return string[]
      */
-    public function getFields()
+    public function getFields(): array
     {
         return \array_keys($this->fields);
     }

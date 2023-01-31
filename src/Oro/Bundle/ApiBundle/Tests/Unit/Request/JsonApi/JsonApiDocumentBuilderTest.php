@@ -49,7 +49,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             'name' => 'Name'
         ];
 
-        $this->documentBuilder->setDataObject($object, $this->requestType);
+        $this->documentBuilder->setDataObject($object, $this->requestType, null);
 
         self::assertEquals(
             [
@@ -69,7 +69,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             'name' => 'Name'
         ];
 
-        $this->documentBuilder->setDataCollection([$object], $this->requestType);
+        $this->documentBuilder->setDataCollection([$object], $this->requestType, null);
 
         self::assertEquals(
             [

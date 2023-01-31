@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Symfony\Contracts\Cache\CacheInterface;
 

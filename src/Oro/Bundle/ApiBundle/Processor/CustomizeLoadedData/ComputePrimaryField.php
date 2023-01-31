@@ -16,29 +16,16 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ComputePrimaryField implements ProcessorInterface
 {
-    /** @var string */
-    protected $primaryFieldName;
+    private string $primaryFieldName;
+    private string $associationName;
+    private string $associationDataFieldName;
+    private string $associationPrimaryFlagFieldName;
 
-    /** @var string */
-    protected $associationName;
-
-    /** @var string */
-    protected $associationDataFieldName;
-
-    /** @var string */
-    protected $associationPrimaryFlagFieldName;
-
-    /**
-     * @param string $primaryFieldName
-     * @param string $associationName
-     * @param string $associationDataFieldName
-     * @param string $associationPrimaryFlagFieldName
-     */
     public function __construct(
-        $primaryFieldName,
-        $associationName,
-        $associationDataFieldName,
-        $associationPrimaryFlagFieldName = 'primary'
+        string $primaryFieldName,
+        string $associationName,
+        string $associationDataFieldName,
+        string $associationPrimaryFlagFieldName = 'primary'
     ) {
         $this->primaryFieldName = $primaryFieldName;
         $this->associationName = $associationName;
@@ -49,7 +36,7 @@ class ComputePrimaryField implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */
 
@@ -62,17 +49,11 @@ class ComputePrimaryField implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param array                  $data
-     *
-     * @return mixed
-     */
-    protected function getPrimaryValue(EntityDefinitionConfig $config, array $data)
+    private function getPrimaryValue(EntityDefinitionConfig $config, array $data): mixed
     {
         $result = null;
         $associationName = $config->findFieldNameByPropertyPath($this->associationName);
-        if ($associationName && !empty($data[$associationName]) && is_array($data[$associationName])) {
+        if ($associationName && !empty($data[$associationName]) && \is_array($data[$associationName])) {
             $associationTargetConfig = $config->getField($associationName)->getTargetEntity();
             if (null !== $associationTargetConfig) {
                 $result = $this->extractPrimaryValue(
@@ -86,21 +67,14 @@ class ComputePrimaryField implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param array  $items
-     * @param string $dataFieldName
-     * @param string $primaryFlagFieldName
-     *
-     * @return mixed
-     */
-    protected function extractPrimaryValue(array $items, $dataFieldName, $primaryFlagFieldName)
+    private function extractPrimaryValue(array $items, string $dataFieldName, string $primaryFlagFieldName): mixed
     {
         $result = null;
         foreach ($items as $item) {
-            if (is_array($item)
-                && array_key_exists($primaryFlagFieldName, $item)
+            if (\is_array($item)
+                && \array_key_exists($primaryFlagFieldName, $item)
                 && $item[$primaryFlagFieldName]
-                && array_key_exists($dataFieldName, $item)
+                && \array_key_exists($dataFieldName, $item)
             ) {
                 $result = $item[$dataFieldName];
                 break;

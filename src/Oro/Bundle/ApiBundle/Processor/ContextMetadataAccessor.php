@@ -11,8 +11,7 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
  */
 class ContextMetadataAccessor implements MetadataAccessorInterface
 {
-    /** @var Context */
-    protected $context;
+    private Context $context;
 
     public function __construct(Context $context)
     {

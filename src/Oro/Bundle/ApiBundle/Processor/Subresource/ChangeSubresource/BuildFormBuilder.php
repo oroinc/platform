@@ -18,11 +18,8 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class BuildFormBuilder implements ProcessorInterface
 {
-    /** @var FormHelper */
-    protected $formHelper;
-
-    /** @var bool */
-    protected $enableFullValidation;
+    private FormHelper $formHelper;
+    private bool $enableFullValidation;
 
     public function __construct(FormHelper $formHelper, bool $enableFullValidation = false)
     {
@@ -33,7 +30,7 @@ class BuildFormBuilder implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ChangeSubresourceContext $context */
 

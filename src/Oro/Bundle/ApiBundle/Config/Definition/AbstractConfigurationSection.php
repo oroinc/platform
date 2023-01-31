@@ -10,8 +10,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 abstract class AbstractConfigurationSection implements ConfigurationSectionInterface
 {
-    /** @var ConfigurationSettingsInterface */
-    protected $settings;
+    protected ConfigurationSettingsInterface $settings;
 
     /**
      * {@inheritdoc}
@@ -37,15 +36,10 @@ abstract class AbstractConfigurationSection implements ConfigurationSectionInter
         }
     }
 
-    /**
-     * @param ArrayNodeDefinition $node
-     * @param string              $section
-     * @param callable|null       $customPreProcessCallback
-     */
     protected function addPreProcessCallbacks(
         ArrayNodeDefinition $node,
         string $section,
-        $customPreProcessCallback = null
+        callable $customPreProcessCallback = null
     ): void {
         $node
             ->beforeNormalization()
@@ -64,15 +58,10 @@ abstract class AbstractConfigurationSection implements ConfigurationSectionInter
             );
     }
 
-    /**
-     * @param ArrayNodeDefinition $node
-     * @param string              $section
-     * @param callable|null       $customPostProcessCallback
-     */
     protected function addPostProcessCallbacks(
         ArrayNodeDefinition $node,
         string $section,
-        $customPostProcessCallback = null
+        callable $customPostProcessCallback = null
     ): void {
         $node
             ->validate()

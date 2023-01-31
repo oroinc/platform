@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\PlatformBundle\DependencyInjection;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\JmsSerializerPass;
 use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
@@ -23,7 +22,6 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
     public function prepend(ContainerBuilder $container)
     {
         $this->loadAppConfigsFromBundles($container);
-        DbalConfigurationLoader::load($container);
         $this->preparePostgreSql($container);
         $this->configureJmsSerializer($container);
     }
@@ -93,27 +91,24 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
      */
     private function preparePostgreSql(ContainerBuilder $container): void
     {
-        $dbDriver = $container->getParameter('database_driver');
-        if ($dbDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL && class_exists(\PDO::class)) {
-            $doctrineConfig = $container->getExtensionConfig('doctrine');
-            $doctrineConnectionOptions = [];
-            foreach ($doctrineConfig as $config) {
-                if (isset($config['dbal']['connections'])) {
-                    foreach (array_keys($config['dbal']['connections']) as $connectionName) {
-                        // Enable ATTR_EMULATE_PREPARES for PostgreSQL
-                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = [
-                            \PDO::ATTR_EMULATE_PREPARES => true
-                        ];
-                        // Add support of "oid" and "name" Db types for EnterpriseDB
-                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = [
-                            'oid'  => 'integer',
-                            'name' => 'string'
-                        ];
-                    }
+        $doctrineConfig = $container->getExtensionConfig('doctrine');
+        $doctrineConnectionOptions = [];
+        foreach ($doctrineConfig as $config) {
+            if (isset($config['dbal']['connections'])) {
+                foreach (array_keys($config['dbal']['connections']) as $connectionName) {
+                    // Enable ATTR_EMULATE_PREPARES for PostgreSQL
+                    $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = [
+                        \PDO::ATTR_EMULATE_PREPARES => true
+                    ];
+                    // Add support of "oid" and "name" Db types for EnterpriseDB
+                    $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = [
+                        'oid'  => 'integer',
+                        'name' => 'string'
+                    ];
                 }
             }
-            $container->prependExtensionConfig('doctrine', $doctrineConnectionOptions);
         }
+        $container->prependExtensionConfig('doctrine', $doctrineConnectionOptions);
     }
 
     /**

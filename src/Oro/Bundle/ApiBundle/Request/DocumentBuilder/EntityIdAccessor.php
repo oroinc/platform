@@ -13,11 +13,8 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class EntityIdAccessor
 {
-    /** @var ObjectPropertyAccessorInterface */
-    private $propertyAccessor;
-
-    /** @var EntityIdTransformerRegistry */
-    private $entityIdTransformerRegistry;
+    private ObjectPropertyAccessorInterface $propertyAccessor;
+    private EntityIdTransformerRegistry $entityIdTransformerRegistry;
 
     public function __construct(
         ObjectPropertyAccessorInterface $propertyAccessor,
@@ -30,17 +27,10 @@ class EntityIdAccessor
     /**
      * Returns a string representation of the identifier of a given entity.
      *
-     * @param mixed          $entity
-     * @param EntityMetadata $metadata
-     * @param RequestType    $requestType
-     *
-     * @return string
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function getEntityId($entity, EntityMetadata $metadata, RequestType $requestType): string
+    public function getEntityId(mixed $entity, EntityMetadata $metadata, RequestType $requestType): string
     {
-        $result = null;
-
         $idFieldNames = $metadata->getIdentifierFieldNames();
         $idFieldNamesCount = \count($idFieldNames);
 
@@ -52,13 +42,11 @@ class EntityIdAccessor
         if ($idFieldNamesCount === 1) {
             $fieldName = \reset($idFieldNames);
             if (!$this->propertyAccessor->hasProperty($entity, $fieldName)) {
-                throw new RuntimeException(
-                    \sprintf(
-                        'An object of the type "%s" does not have the identifier property "%s".',
-                        $metadata->getClassName(),
-                        $fieldName
-                    )
-                );
+                throw new RuntimeException(sprintf(
+                    'An object of the type "%s" does not have the identifier property "%s".',
+                    $metadata->getClassName(),
+                    $fieldName
+                ));
             }
             $result = $this->getEntityIdTransformer($requestType)->transform(
                 $this->propertyAccessor->getValue($entity, $fieldName),
@@ -68,33 +56,27 @@ class EntityIdAccessor
             $id = [];
             foreach ($idFieldNames as $fieldName) {
                 if (!$this->propertyAccessor->hasProperty($entity, $fieldName)) {
-                    throw new RuntimeException(
-                        \sprintf(
-                            'An object of the type "%s" does not have the identifier property "%s".',
-                            $metadata->getClassName(),
-                            $fieldName
-                        )
-                    );
+                    throw new RuntimeException(sprintf(
+                        'An object of the type "%s" does not have the identifier property "%s".',
+                        $metadata->getClassName(),
+                        $fieldName
+                    ));
                 }
                 $id[$fieldName] = $this->propertyAccessor->getValue($entity, $fieldName);
             }
             $result = $this->getEntityIdTransformer($requestType)->transform($id, $metadata);
         } else {
-            throw new RuntimeException(
-                \sprintf(
-                    'The "%s" entity does not have an identifier.',
-                    $metadata->getClassName()
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'The "%s" entity does not have an identifier.',
+                $metadata->getClassName()
+            ));
         }
 
         if (null === $result || '' === $result) {
-            throw new RuntimeException(
-                \sprintf(
-                    'The identifier value for "%s" entity must not be empty.',
-                    $metadata->getClassName()
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'The identifier value for "%s" entity must not be empty.',
+                $metadata->getClassName()
+            ));
         }
 
         return $result;

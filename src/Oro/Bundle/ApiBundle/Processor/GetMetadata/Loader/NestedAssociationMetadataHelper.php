@@ -16,11 +16,8 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  */
 class NestedAssociationMetadataHelper
 {
-    /** @var MetadataHelper */
-    private $metadataHelper;
-
-    /** @var ObjectMetadataFactory */
-    private $objectMetadataFactory;
+    private MetadataHelper $metadataHelper;
+    private ObjectMetadataFactory $objectMetadataFactory;
 
     public function __construct(
         MetadataHelper $metadataHelper,
@@ -31,23 +28,15 @@ class NestedAssociationMetadataHelper
     }
 
     /**
-     * @param EntityMetadata              $entityMetadata
-     * @param string                      $entityClass
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $targetAction
-     *
-     * @return AssociationMetadata
-     *
      * @throws RuntimeException if nested association has invalid configuration
      */
     public function addNestedAssociation(
         EntityMetadata $entityMetadata,
-        $entityClass,
-        $fieldName,
+        string $entityClass,
+        string $fieldName,
         EntityDefinitionFieldConfig $field,
-        $targetAction
-    ) {
+        ?string $targetAction
+    ): AssociationMetadata {
         $targetConfig = $field->getTargetEntity();
         $this->assertRequiredTargetField($targetConfig, ConfigUtil::CLASS_NAME, $entityClass, $fieldName);
         $idField = $this->assertRequiredTargetField(
@@ -77,48 +66,32 @@ class NestedAssociationMetadataHelper
         return $associationMetadata;
     }
 
-    /**
-     * @param PropertyMetadata            $propertyMetadata
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $targetAction
-     */
     public function setTargetPropertyPath(
         PropertyMetadata $propertyMetadata,
-        $fieldName,
+        string $fieldName,
         EntityDefinitionFieldConfig $field,
-        $targetAction
-    ) {
+        ?string $targetAction
+    ): void {
         $targetPropertyPath = $this->metadataHelper->getFormPropertyPath($field, $targetAction);
         if ($targetPropertyPath !== $fieldName) {
             $propertyMetadata->setPropertyPath($targetPropertyPath);
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getIdentifierFieldName()
+    public function getIdentifierFieldName(): string
     {
         return 'id';
     }
 
     /**
-     * @param EntityDefinitionConfig $targetConfig
-     * @param string                 $targetFieldName
-     * @param string                 $parentClassName
-     * @param string                 $parentFieldName
-     *
-     * @return EntityDefinitionFieldConfig
-     *
      * @throws RuntimeException if the target field cannot be found or it has invalid configuration
      */
     private function assertRequiredTargetField(
         EntityDefinitionConfig $targetConfig,
-        $targetFieldName,
-        $parentClassName,
-        $parentFieldName
-    ) {
+        string $targetFieldName,
+        string $parentClassName,
+        string $parentFieldName
+    ): EntityDefinitionFieldConfig {
         $targetField = $targetConfig->getField($targetFieldName);
         if (null === $targetField) {
             throw new RuntimeException(sprintf(

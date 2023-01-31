@@ -11,31 +11,21 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class RequestDataAccessor
 {
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
+    private ?PropertyAccessorInterface $propertyAccessor = null;
 
     /**
-     * @param array  $requestData
-     * @param string $path
-     *
-     * @return mixed
-     *
      * @throws PropertyAccessorException\AccessException          If an index does not exist
      * @throws PropertyAccessorException\UnexpectedTypeException  If a value within the path is not array
      */
-    public function getValue(array $requestData, string $path)
+    public function getValue(array $requestData, string $path): mixed
     {
         return $this->getPropertyAccessor()->getValue($requestData, self::getPropertyPath($path));
     }
 
     /**
-     * @param array  $requestData
-     * @param string $path
-     * @param mixed  $value
-     *
      * @throws PropertyAccessorException\UnexpectedTypeException  If a value within the path is not array
      */
-    public function setValue(array &$requestData, string $path, $value): void
+    public function setValue(array &$requestData, string $path, mixed $value): void
     {
         $this->getPropertyAccessor()->setValue($requestData, self::getPropertyPath($path), $value);
     }

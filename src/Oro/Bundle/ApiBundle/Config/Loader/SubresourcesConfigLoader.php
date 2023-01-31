@@ -17,13 +17,12 @@ class SubresourcesConfigLoader extends AbstractConfigLoader
         ConfigUtil::EXCLUDE      => 'setExcluded'
     ];
 
-    /** @var ActionsConfigLoader */
-    private $actionsConfigLoader;
+    private ?ActionsConfigLoader $actionsConfigLoader = null;
 
     /**
      * {@inheritdoc}
      */
-    public function load(array $config)
+    public function load(array $config): mixed
     {
         $subresources = new SubresourcesConfig();
         foreach ($config as $key => $value) {
@@ -35,12 +34,7 @@ class SubresourcesConfigLoader extends AbstractConfigLoader
         return $subresources;
     }
 
-    /**
-     * @param array $config
-     *
-     * @return SubresourceConfig
-     */
-    protected function loadSubresource(array $config)
+    private function loadSubresource(array $config): SubresourceConfig
     {
         $subresource = new SubresourceConfig();
         foreach ($config as $key => $value) {
@@ -54,7 +48,7 @@ class SubresourcesConfigLoader extends AbstractConfigLoader
         return $subresource;
     }
 
-    protected function loadActions(SubresourceConfig $subresource, array $actions = null)
+    private function loadActions(SubresourceConfig $subresource, array $actions = null): void
     {
         if (!empty($actions)) {
             if (null === $this->actionsConfigLoader) {

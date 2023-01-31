@@ -18,14 +18,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class CorrectSortValue implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
+    private DoctrineHelper $doctrineHelper;
+    private ValueNormalizer $valueNormalizer;
+    private FilterNamesRegistry $filterNamesRegistry;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -40,7 +35,7 @@ class CorrectSortValue implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -83,16 +78,9 @@ class CorrectSortValue implements ProcessorInterface
         }
     }
 
-    /**
-     * @param mixed                       $value
-     * @param string                      $entityClass
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return mixed
-     */
-    private function normalizeValue($value, $entityClass, ?EntityDefinitionConfig $config)
+    private function normalizeValue(mixed $value, string $entityClass, ?EntityDefinitionConfig $config): mixed
     {
-        if (empty($value) || !is_array($value)) {
+        if (empty($value) || !\is_array($value)) {
             return $value;
         }
 
@@ -116,10 +104,10 @@ class CorrectSortValue implements ProcessorInterface
      */
     private function addEntityIdentifierFieldNames(
         array &$result,
-        $entityClass,
-        $direction,
+        string $entityClass,
+        string $direction,
         ?EntityDefinitionConfig $config
-    ) {
+    ): void {
         if (null === $config) {
             $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
             foreach ($idFieldNames as $propertyPath) {

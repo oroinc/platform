@@ -22,17 +22,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class CompleteDescriptions implements ProcessorInterface
 {
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var EntityDescriptionHelper */
-    private $entityDescriptionHelper;
-
-    /** @var FieldsDescriptionHelper */
-    private $fieldsDescriptionHelper;
-
-    /** @var FiltersDescriptionHelper */
-    private $filtersDescriptionHelper;
+    private ResourcesProvider $resourcesProvider;
+    private EntityDescriptionHelper $entityDescriptionHelper;
+    private FieldsDescriptionHelper $fieldsDescriptionHelper;
+    private FiltersDescriptionHelper $filtersDescriptionHelper;
 
     public function __construct(
         ResourcesProvider $resourcesProvider,
@@ -49,7 +42,7 @@ class CompleteDescriptions implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 

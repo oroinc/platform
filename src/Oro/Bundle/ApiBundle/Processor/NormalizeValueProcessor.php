@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
+use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -15,7 +16,7 @@ class NormalizeValueProcessor extends ByStepActionProcessor
     /**
      * {@inheritdoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): Context
     {
         return new NormalizeValueContext();
     }
@@ -23,7 +24,7 @@ class NormalizeValueProcessor extends ByStepActionProcessor
     /**
      * {@inheritdoc}
      */
-    protected function executeProcessors(ComponentContextInterface $context)
+    protected function executeProcessors(ComponentContextInterface $context): void
     {
         /** @var NormalizeValueContext $context */
 

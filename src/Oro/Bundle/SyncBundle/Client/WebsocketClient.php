@@ -5,35 +5,31 @@ namespace Oro\Bundle\SyncBundle\Client;
 use Gos\Component\WebSocketClient\Exception\BadResponseException;
 use Gos\Component\WebSocketClient\Exception\WebsocketException;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
-use Oro\Bundle\SyncBundle\Client\Wamp\Factory\ClientAttributes;
 use Oro\Bundle\SyncBundle\Client\Wamp\Factory\WampClientFactoryInterface;
 use Oro\Bundle\SyncBundle\Client\Wamp\WampClient;
 use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
+use Oro\Bundle\SyncBundle\Provider\WebsocketClientParametersProviderInterface;
 
 /**
  * Websocket client with ticket-authentication.
  */
 class WebsocketClient implements WebsocketClientInterface
 {
-    /** @var WampClientFactoryInterface */
-    private $wampClientFactory;
+    private WampClientFactoryInterface $wampClientFactory;
 
-    /** @var ClientAttributes */
-    private $clientAttributes;
+    private WebsocketClientParametersProviderInterface $clientParametersProvider;
 
-    /** @var TicketProviderInterface */
-    private $ticketProvider;
+    private TicketProviderInterface $ticketProvider;
 
-    /** @var WampClient */
-    private $wampClient;
+    private ?WampClient $wampClient = null;
 
     public function __construct(
         WampClientFactoryInterface $wampClientFactory,
-        ClientAttributes $clientAttributes,
+        WebsocketClientParametersProviderInterface $clientParametersProvider,
         TicketProviderInterface $ticketProvider
     ) {
         $this->wampClientFactory = $wampClientFactory;
-        $this->clientAttributes = $clientAttributes;
+        $this->clientParametersProvider = $clientParametersProvider;
         $this->ticketProvider = $ticketProvider;
     }
 
@@ -45,7 +41,7 @@ class WebsocketClient implements WebsocketClientInterface
      */
     public function connect(): ?string
     {
-        $urlInfo = parse_url($this->clientAttributes->getPath()) + ['path' => '', 'query' => ''];
+        $urlInfo = parse_url($this->clientParametersProvider->getPath()) + ['path' => '', 'query' => ''];
         parse_str($urlInfo['query'], $query);
         $query['ticket'] = $this->ticketProvider->generateTicket();
         $pathWithTicket = sprintf('%s?%s', $urlInfo['path'], http_build_query($query));
@@ -133,8 +129,8 @@ class WebsocketClient implements WebsocketClientInterface
 
     private function getWampClient(): WampClient
     {
-        if (!$this->wampClient) {
-            $this->wampClient = $this->wampClientFactory->createClient($this->clientAttributes);
+        if ($this->wampClient === null) {
+            $this->wampClient = $this->wampClientFactory->createClient($this->clientParametersProvider);
         }
 
         return $this->wampClient;

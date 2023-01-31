@@ -11,7 +11,7 @@ security:
             context: main
             organization-remember-me: # should be the same as for "main" firewall except "csrf_protected_mode" option
                 token_provider:             oro_security.token.provider.rememberme
-                secret:                     '%secret%'
+                secret:                     '%kernel.secret%'
                 name:                       BAPRM
                 lifetime:                   1209600   # stay logged for two weeks
                 httponly:                   true

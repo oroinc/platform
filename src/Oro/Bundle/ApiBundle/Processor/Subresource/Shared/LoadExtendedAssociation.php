@@ -14,7 +14,7 @@ class LoadExtendedAssociation extends LoadCustomAssociation
     /**
      * {@inheritdoc}
      */
-    protected function isSupportedAssociation($dataType)
+    protected function isSupportedAssociation(string $dataType): bool
     {
         return DataType::isExtendedAssociation($dataType);
     }
@@ -22,9 +22,12 @@ class LoadExtendedAssociation extends LoadCustomAssociation
     /**
      * {@inheritdoc}
      */
-    protected function loadAssociationData(SubresourceContext $context, $associationName, $dataType)
-    {
-        list($associationType, ) = DataType::parseExtendedAssociation($dataType);
+    protected function loadAssociationData(
+        SubresourceContext $context,
+        string $associationName,
+        string $dataType
+    ): void {
+        [$associationType,] = DataType::parseExtendedAssociation($dataType);
         $this->saveAssociationDataToContext(
             $context,
             $this->loadData($context, $associationName, $this->isCollection($associationType))

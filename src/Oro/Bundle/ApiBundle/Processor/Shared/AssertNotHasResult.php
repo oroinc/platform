@@ -14,7 +14,7 @@ class AssertNotHasResult implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         if ($context->hasResult()) {
             throw new RuntimeException('The result should not exist.');

@@ -56,7 +56,7 @@ class MessageQueueProcessorFacade implements MessageQueueProcessorInterface
     private function getMessageQueueProcessor(): MessageQueueProcessorInterface
     {
         $container = $this->kernel->getContainer();
-        if ($container->getParameter('message_queue_transport') === 'amqp') {
+        if ($container->get('oro_message_queue.transport.parameters')->getTransportName() === 'amqp') {
             return $this->amqpProcessor;
         }
 

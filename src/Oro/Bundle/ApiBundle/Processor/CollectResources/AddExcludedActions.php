@@ -20,14 +20,9 @@ class AddExcludedActions implements ProcessorInterface
     /** the name of the context item to store the configuration of "actions" section */
     public const ACTIONS_CONFIG_KEY = 'actions_config';
 
-    /** @var ConfigLoaderFactory */
-    private $configLoaderFactory;
-
-    /** @var ConfigBagRegistry */
-    private $configBagRegistry;
-
-    /** @var MergeActionConfigHelper */
-    private $mergeActionConfigHelper;
+    private ConfigLoaderFactory $configLoaderFactory;
+    private ConfigBagRegistry $configBagRegistry;
+    private MergeActionConfigHelper $mergeActionConfigHelper;
 
     public function __construct(
         ConfigLoaderFactory $configLoaderFactory,
@@ -42,7 +37,7 @@ class AddExcludedActions implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */
 

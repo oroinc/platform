@@ -12,10 +12,8 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 class ActionsConfiguration extends AbstractConfigurationSection
 {
     /** @var string[] */
-    protected $permissibleActions;
-
-    /** @var string */
-    protected $sectionName;
+    private array $permissibleActions;
+    private string $sectionName;
 
     /**
      * @param string[] $permissibleActions
@@ -75,7 +73,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
         return 'entities.entity' === $section;
     }
 
-    protected function configureActionNode(NodeBuilder $node): void
+    private function configureActionNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName;
 
@@ -149,7 +147,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function postProcessActionConfig(array $config): array
+    private function postProcessActionConfig(array $config): array
     {
         if (\array_key_exists(ConfigUtil::PAGE_SIZE, $config)
             && -1 === $config[ConfigUtil::PAGE_SIZE]
@@ -202,7 +200,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $this->configureStatusCodeNode($codeNode);
     }
 
-    protected function configureStatusCodeNode(NodeBuilder $node): void
+    private function configureStatusCodeNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName . '.status_code';
 
@@ -213,7 +211,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $this->addPostProcessCallbacks($parentNode, $sectionName);
     }
 
-    protected function configureFieldNode(NodeBuilder $node): void
+    private function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName . '.field';
 
@@ -253,7 +251,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->end();
     }
 
-    protected function postProcessFieldConfig(array $config): array
+    private function postProcessFieldConfig(array $config): array
     {
         if (empty($config[ConfigUtil::FORM_TYPE])) {
             unset($config[ConfigUtil::FORM_TYPE]);

@@ -29,29 +29,14 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
  */
 class CompleteEntityDefinitionHelper
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityOverrideProviderRegistry */
-    private $entityOverrideProviderRegistry;
-
-    /** @var EntityIdHelper */
-    private $entityIdHelper;
-
-    /** @var CompleteAssociationHelper */
-    private $associationHelper;
-
-    /** @var CompleteCustomDataTypeHelper */
-    private $customDataTypeHelper;
-
-    /** @var ExclusionProviderRegistry */
-    private $exclusionProviderRegistry;
-
-    /** @var ExpandedAssociationExtractor */
-    private $expandedAssociationExtractor;
-
-    /** @var EntityFieldFilteringHelper */
-    private $entityFieldFilteringHelper;
+    private DoctrineHelper $doctrineHelper;
+    private EntityOverrideProviderRegistry $entityOverrideProviderRegistry;
+    private EntityIdHelper $entityIdHelper;
+    private CompleteAssociationHelper $associationHelper;
+    private CompleteCustomDataTypeHelper $customDataTypeHelper;
+    private ExclusionProviderRegistry $exclusionProviderRegistry;
+    private ExpandedAssociationExtractor $expandedAssociationExtractor;
+    private EntityFieldFilteringHelper $entityFieldFilteringHelper;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -76,7 +61,7 @@ class CompleteEntityDefinitionHelper
     public function completeDefinition(
         EntityDefinitionConfig $definition,
         ConfigContext $context
-    ) {
+    ): void {
         $entityClass = $context->getClassName();
         /** @var ClassMetadata $metadata */
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
@@ -146,7 +131,7 @@ class CompleteEntityDefinitionHelper
      *
      * @return array [property path => field name, ...]
      */
-    private function getExistingFields(EntityDefinitionConfig $definition)
+    private function getExistingFields(EntityDefinitionConfig $definition): array
     {
         $existingFields = [];
         $fields = $definition->getFields();
@@ -160,7 +145,7 @@ class CompleteEntityDefinitionHelper
         return $existingFields;
     }
 
-    private function addClassNameField(EntityDefinitionConfig $definition)
+    private function addClassNameField(EntityDefinitionConfig $definition): void
     {
         $classNameField = $definition->findFieldNameByPropertyPath(ConfigUtil::CLASS_NAME);
         if (null === $classNameField) {
@@ -170,7 +155,7 @@ class CompleteEntityDefinitionHelper
         }
     }
 
-    private function setIdentifierFieldNames(EntityDefinitionConfig $definition, ClassMetadata $metadata)
+    private function setIdentifierFieldNames(EntityDefinitionConfig $definition, ClassMetadata $metadata): void
     {
         $idFieldNames = [];
         $propertyPaths = $metadata->getIdentifierFieldNames();
@@ -180,16 +165,11 @@ class CompleteEntityDefinitionHelper
         $definition->setIdentifierFieldNames($idFieldNames);
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param ClassMetadata          $metadata
-     * @param string|null            $targetAction
-     */
     private function completeCustomIdentifier(
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,
-        $targetAction
-    ) {
+        ?string $targetAction
+    ): void {
         if ($metadata->usesIdGenerator()
             && (ApiAction::CREATE === $targetAction || ApiAction::UPDATE === $targetAction)
             && !$this->entityIdHelper->isEntityIdentifierEqual($metadata->getIdentifierFieldNames(), $definition)
@@ -214,7 +194,7 @@ class CompleteEntityDefinitionHelper
     private function completeIdentifierFields(
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata
-    ) {
+    ): void {
         // get identifier fields
         $configuredIdFieldNames = $definition->getIdentifierFieldNames();
         if (empty($configuredIdFieldNames)) {
@@ -259,9 +239,9 @@ class CompleteEntityDefinitionHelper
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,
         array $existingFields,
-        $skipNotConfiguredCustomFields,
+        bool $skipNotConfiguredCustomFields,
         RequestType $requestType
-    ) {
+    ): void {
         $exclusionProvider = $this->exclusionProviderRegistry->getExclusionProvider($requestType);
         $fieldNames = $metadata->getFieldNames();
         foreach ($fieldNames as $propertyPath) {
@@ -307,10 +287,10 @@ class CompleteEntityDefinitionHelper
         ClassMetadata $metadata,
         array $existingFields,
         array $expandedEntities,
-        $skipNotConfiguredCustomFields,
-        $version,
+        bool $skipNotConfiguredCustomFields,
+        string $version,
         RequestType $requestType
-    ) {
+    ): void {
         $exclusionProvider = $this->exclusionProviderRegistry->getExclusionProvider($requestType);
         $associations = $metadata->getAssociationMappings();
         foreach ($associations as $propertyPath => $mapping) {
@@ -362,9 +342,9 @@ class CompleteEntityDefinitionHelper
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,
         array $expandedEntities,
-        $version,
+        string $version,
         RequestType $requestType
-    ) {
+    ): void {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $targetClass = $field->getTargetClass();
@@ -389,7 +369,7 @@ class CompleteEntityDefinitionHelper
      *
      * @return array
      */
-    private function getAssociationConfigExtras($fieldName, array $expandedEntities)
+    private function getAssociationConfigExtras(string $fieldName, array $expandedEntities): array
     {
         $extras = [];
         if (!empty($expandedEntities[$fieldName])) {
@@ -411,10 +391,10 @@ class CompleteEntityDefinitionHelper
         EntityOverrideProviderInterface $entityOverrideProvider,
         EntityDefinitionFieldConfig $field,
         array $associationMapping,
-        $version,
+        string $version,
         RequestType $requestType,
         array $extras
-    ) {
+    ): void {
         $this->associationHelper->completeAssociation(
             $field,
             $this->resolveAssociationEntityClass($associationMapping['targetEntity'], $entityOverrideProvider),
@@ -431,22 +411,14 @@ class CompleteEntityDefinitionHelper
         }
     }
 
-    /**
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     * @param EntityDefinitionConfig          $definition
-     * @param ClassMetadata                   $metadata
-     * @param string                          $entityClass
-     * @param string                          $version
-     * @param RequestType                     $requestType
-     */
     private function completeDependentAssociations(
         EntityOverrideProviderInterface $entityOverrideProvider,
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,
-        $entityClass,
-        $version,
+        string $entityClass,
+        string $version,
         RequestType $requestType
-    ) {
+    ): void {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $propertyPath = $field->getPropertyPath();
@@ -513,12 +485,12 @@ class CompleteEntityDefinitionHelper
         EntityOverrideProviderInterface $entityOverrideProvider,
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,
-        $entityClass,
-        $fieldName,
+        string $entityClass,
+        string $fieldName,
         array $dependsOn,
-        $version,
+        string $version,
         RequestType $requestType
-    ) {
+    ): void {
         foreach ($dependsOn as $dependsOnFieldName) {
             try {
                 $this->completeDependentAssociation(
@@ -556,22 +528,16 @@ class CompleteEntityDefinitionHelper
     }
 
     /**
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     * @param EntityDefinitionConfig          $definition
-     * @param ClassMetadata                   $metadata
-     * @param string                          $propertyPath
-     * @param string                          $version
-     * @param RequestType                     $requestType
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function completeDependentAssociation(
         EntityOverrideProviderInterface $entityOverrideProvider,
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,
-        $propertyPath,
-        $version,
+        string $propertyPath,
+        string $version,
         RequestType $requestType
-    ) {
+    ): void {
         $targetClass = $this->resolveEntityClass($metadata->name, $entityOverrideProvider);
         $targetDefinition = $definition;
         $targetMetadata = $metadata;
@@ -640,15 +606,11 @@ class CompleteEntityDefinitionHelper
         return $field;
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return EntityDefinitionConfig
-     */
-    private function loadFullDefinition($entityClass, $version, RequestType $requestType)
-    {
+    private function loadFullDefinition(
+        string $entityClass,
+        string $version,
+        RequestType $requestType
+    ): EntityDefinitionConfig {
         try {
             $definition = $this->associationHelper->loadDefinition($entityClass, $version, $requestType);
         } catch (\Exception $e) {
@@ -696,7 +658,7 @@ class CompleteEntityDefinitionHelper
      *
      * @return array [field name => [path, ...], ...]
      */
-    private function getExpandedEntities(EntityDefinitionConfig $definition, $expandedEntities)
+    private function getExpandedEntities(EntityDefinitionConfig $definition, ?array $expandedEntities): array
     {
         if (empty($expandedEntities)) {
             return [];

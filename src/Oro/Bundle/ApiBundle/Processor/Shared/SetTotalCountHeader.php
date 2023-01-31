@@ -40,7 +40,7 @@ class SetTotalCountHeader implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */
 
@@ -67,7 +67,7 @@ class SetTotalCountHeader implements ProcessorInterface
             } else {
                 $data = $context->getResult();
                 if (\is_array($data)) {
-                    $totalCount = count($data);
+                    $totalCount = \count($data);
                 }
             }
         }
@@ -82,7 +82,7 @@ class SetTotalCountHeader implements ProcessorInterface
         if (!\is_callable($callback)) {
             throw new \RuntimeException(sprintf(
                 'Expected callable for "totalCount", "%s" given.',
-                \is_object($callback) ? \get_class($callback) : gettype($callback)
+                get_debug_type($callback)
             ));
         }
 
@@ -90,7 +90,7 @@ class SetTotalCountHeader implements ProcessorInterface
         if (!\is_int($totalCount)) {
             throw new \RuntimeException(sprintf(
                 'Expected integer as result of "totalCount" callback, "%s" given.',
-                \is_object($totalCount) ? \get_class($totalCount) : gettype($totalCount)
+                get_debug_type($totalCount)
             ));
         }
 
@@ -128,7 +128,7 @@ class SetTotalCountHeader implements ProcessorInterface
                 Query::class,
                 SqlQueryBuilder::class,
                 SqlQuery::class,
-                \is_object($query) ? \get_class($query) : gettype($query)
+                get_debug_type($query)
             ));
         }
 

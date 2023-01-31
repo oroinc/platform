@@ -13,7 +13,7 @@ class NormalizeNumber extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypeString()
+    protected function getDataTypeString(): string
     {
         return 'number';
     }
@@ -21,7 +21,7 @@ class NormalizeNumber extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypePluralString()
+    protected function getDataTypePluralString(): string
     {
         return 'numbers';
     }
@@ -29,7 +29,7 @@ class NormalizeNumber extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getRequirement()
+    protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
@@ -37,7 +37,7 @@ class NormalizeNumber extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function normalizeValue($value)
+    protected function normalizeValue(mixed $value): mixed
     {
         $normalizedSrcValue = $value;
         if (str_starts_with($normalizedSrcValue, '.')) {

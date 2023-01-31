@@ -11,11 +11,8 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 {
-    /** @var string */
-    protected $parentSectionName;
-
-    /** @var string */
-    protected $sectionName;
+    protected string $parentSectionName;
+    protected string $sectionName;
 
     public function __construct(string $sectionName = 'entity')
     {

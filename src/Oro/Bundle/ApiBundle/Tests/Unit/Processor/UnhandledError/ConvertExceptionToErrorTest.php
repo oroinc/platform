@@ -27,7 +27,7 @@ class ConvertExceptionToErrorTest extends UnhandledErrorProcessorTestCase
     public function testProcessForUnexpectedExceptionTypeNull(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The result should be an instance of Throwable, "NULL" given.');
+        $this->expectExceptionMessage('The result should be an instance of Throwable, "null" given.');
 
         $this->context->setResult(null);
         $this->processor->process($this->context);

@@ -205,7 +205,7 @@ class ConfigUtil extends BaseConfigUtil
     {
         $result = $items;
         foreach ($items as $key => $value) {
-            if (\is_object($value) && \method_exists($value, 'toArray')) {
+            if (\is_object($value) && method_exists($value, 'toArray')) {
                 $result[$key] = $value->toArray();
             }
         }
@@ -223,7 +223,7 @@ class ConfigUtil extends BaseConfigUtil
      */
     public static function buildMetaPropertyName(string $resultName): string
     {
-        return \sprintf('__%s__', $resultName);
+        return sprintf('__%s__', $resultName);
     }
 
     /**

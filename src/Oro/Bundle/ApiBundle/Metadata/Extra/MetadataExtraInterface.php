@@ -11,20 +11,16 @@ interface MetadataExtraInterface
 {
     /**
      * Gets a string that uniquely identifies a type of additional metadata.
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Makes modifications of the MetadataContext necessary to get required additional metadata.
      */
-    public function configureContext(MetadataContext $context);
+    public function configureContext(MetadataContext $context): void;
 
     /**
      * Returns a string that should be added to a cache key used by the metadata provider.
-     *
-     * @return string|null
      */
-    public function getCacheKeyPart();
+    public function getCacheKeyPart(): ?string;
 }

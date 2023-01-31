@@ -19,8 +19,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetDefaultSorting implements ProcessorInterface
 {
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
+    private FilterNamesRegistry $filterNamesRegistry;
 
     public function __construct(FilterNamesRegistry $filterNamesRegistry)
     {
@@ -30,7 +29,7 @@ class SetDefaultSorting implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

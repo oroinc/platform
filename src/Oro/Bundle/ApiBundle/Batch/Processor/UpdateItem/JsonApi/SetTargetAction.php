@@ -16,17 +16,17 @@ class SetTargetAction implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateItemContext $context */
 
         $requestData = $context->getRequestData();
-        if (is_array($requestData) && array_key_exists(JsonApiDoc::DATA, $requestData)) {
+        if (\is_array($requestData) && \array_key_exists(JsonApiDoc::DATA, $requestData)) {
             $action = ApiAction::CREATE;
             $data = $requestData[JsonApiDoc::DATA];
-            if (is_array($data) && !empty($data[JsonApiDoc::META])) {
+            if (\is_array($data) && !empty($data[JsonApiDoc::META])) {
                 $meta = $data[JsonApiDoc::META];
-                if (is_array($meta) && true === ($meta[JsonApiDoc::META_UPDATE] ?? null)) {
+                if (\is_array($meta) && true === ($meta[JsonApiDoc::META_UPDATE] ?? null)) {
                     $action = ApiAction::UPDATE;
                 }
             }

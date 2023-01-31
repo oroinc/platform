@@ -13,15 +13,9 @@ use Oro\Component\ChainProcessor\ExpressionParser;
 class RequestExpressionMatcher extends AbstractMatcher
 {
     /** @var array [expression => parsed expression, ...] */
-    private $expressions = [];
+    private array $expressions = [];
 
-    /**
-     * @param mixed       $expression
-     * @param RequestType $requestType
-     *
-     * @return bool
-     */
-    public function matchValue($expression, RequestType $requestType)
+    public function matchValue(mixed $expression, RequestType $requestType): bool
     {
         if (!$expression) {
             return true;

@@ -1,0 +1,4 @@
+oro_message_queue:
+    persistent_services:
+        # `oro_redis_config.session.redis_connection` can be persistent in order to not duplicate connections on container clear
+        - 'oro_redis_config.session.redis_connection'

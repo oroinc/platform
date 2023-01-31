@@ -13,7 +13,7 @@ class NormalizeBoolean extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypeString()
+    protected function getDataTypeString(): string
     {
         return 'boolean';
     }
@@ -21,7 +21,7 @@ class NormalizeBoolean extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypePluralString()
+    protected function getDataTypePluralString(): string
     {
         return 'booleans';
     }
@@ -29,7 +29,7 @@ class NormalizeBoolean extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getRequirement()
+    protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
@@ -37,7 +37,7 @@ class NormalizeBoolean extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function normalizeValue($value)
+    protected function normalizeValue(mixed $value): mixed
     {
         switch ($value) {
             case '1':

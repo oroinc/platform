@@ -13,8 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class RemoveMetaPropertyFilter implements ProcessorInterface
 {
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
+    private FilterNamesRegistry $filterNamesRegistry;
 
     public function __construct(FilterNamesRegistry $filterNamesRegistry)
     {
@@ -24,7 +23,7 @@ class RemoveMetaPropertyFilter implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

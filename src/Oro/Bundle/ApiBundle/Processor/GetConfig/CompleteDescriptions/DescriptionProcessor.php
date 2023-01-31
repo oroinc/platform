@@ -9,11 +9,8 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class DescriptionProcessor
 {
-    /** @var RequestDependedTextProcessor */
-    private $requestDependedTextProcessor;
-
-    /** @var FeatureDependedTextProcessor */
-    private $featureDependedTextProcessor;
+    private RequestDependedTextProcessor $requestDependedTextProcessor;
+    private FeatureDependedTextProcessor $featureDependedTextProcessor;
 
     public function __construct(
         RequestDependedTextProcessor $requestDependedTextProcessor,

@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class PredefinedIdDocumentationProvider implements DocumentationProviderInterface
 {
-    /** @var EntityIdResolverRegistry */
-    private $entityIdResolverRegistry;
+    private EntityIdResolverRegistry $entityIdResolverRegistry;
 
     public function __construct(EntityIdResolverRegistry $entityIdResolverRegistry)
     {
@@ -33,7 +32,7 @@ class PredefinedIdDocumentationProvider implements DocumentationProviderInterfac
             $items[] = '- ' . $description;
         }
 
-        return \sprintf($this->getTemplate(), \implode("\n", $items));
+        return sprintf($this->getTemplate(), implode("\n", $items));
     }
 
     private function getTemplate(): string

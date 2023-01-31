@@ -1,42 +1,18 @@
 # This file is auto-generated during the composer install
 parameters:
-    database_driver: pdo_mysql
-    database_host: database
-    database_port: 3306
-    database_name: oro_db
-    database_user: oro_db_user
-    database_password: oro_db_pass
-    database_driver_options:
-        !php/const PHP_INT_MAX: const_as_key
-        const_as_value: !php/const PHP_INT_MAX
+    database_dsn: 'postgresql://oro_db_user:oro_db_pass@database/oro_db?driverOptions[!php/const PHP_INT_MAX]=const_as_key&driverOptions[const_as_value]=!php/const PHP_INT_MAX'
     mailer_dsn: null://null
-    websocket_bind_address: 0.0.0.0
-    websocket_bind_port: 8080
-    websocket_frontend_host: null
-    websocket_frontend_port: 8080
-    websocket_frontend_path: 'ws'
-    websocket_backend_host: null
-    websocket_backend_port: 8080
-    websocket_backend_path: 'ws'
-    search_engine_name: orm
-    search_engine_host: 127.0.0.1
-    search_engine_port: null
-    search_engine_index_prefix: oro_search
-    search_engine_username: null
-    search_engine_password: null
-    search_engine_ssl_verification: null
-    search_engine_ssl_cert: null
-    search_engine_ssl_cert_password: null
-    search_engine_ssl_key: null
-    search_engine_ssl_key_password: null
-    website_search_engine_index_prefix: oro_website_search
+    websocket_server_dsn: '//0.0.0.0:8080'
+    websocket_frontend_dsn: '//*:8080/ws'
+    websocket_backend_dsn: 'tcp://127.0.0.1:8080'
+    search_engine_dsn: 'orm:'
+    website_search_engine_dsn: 'orm:'
     web_backend_prefix: /admin
     session_handler: null
     locale: en
     secret: ThisTokenIsNotSoSecretChangeIt
     enterprise_licence: null
-    message_queue_transport: dbal
-    message_queue_transport_config: null
+    message_queue_transport_dsn: 'dbal:'
     enable_price_sharding: false
 
 imports:

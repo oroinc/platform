@@ -32,7 +32,7 @@ class DeleteEntitiesByDeleteHandler implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -52,20 +52,15 @@ class DeleteEntitiesByDeleteHandler implements ProcessorInterface
         $context->removeResult();
     }
 
-    /**
-     * @param mixed                        $data
-     * @param EntityDeleteHandlerInterface $handler
-     * @param string                       $entityClass
-     */
     private function processDelete(
-        $data,
+        mixed $data,
         EntityDeleteHandlerInterface $handler,
         string $entityClass
     ): void {
         if (!\is_array($data) && !$data instanceof \Traversable) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The result property of the context should be array or Traversable, "%s" given.',
-                \is_object($data) ? \get_class($data) : \gettype($data)
+                get_debug_type($data)
             ));
         }
 

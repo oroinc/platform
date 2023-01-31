@@ -13,8 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class BuildCollectionFormBuilder extends BuildFormBuilder
 {
-    /** @var bool */
-    protected $enableAdderAndRemover;
+    private bool $enableAdderAndRemover;
 
     public function __construct(
         FormHelper $formHelper,
@@ -25,6 +24,9 @@ class BuildCollectionFormBuilder extends BuildFormBuilder
         $this->enableAdderAndRemover = $enableAdderAndRemover;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function addFormFields(FormBuilderInterface $formBuilder, ChangeSubresourceContext $context): void
     {
         $entryDataClass = $context->getClassName();

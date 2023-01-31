@@ -15,11 +15,10 @@ use Symfony\Component\Form\FormInterface;
  */
 class CustomizeFormDataHandler
 {
-    public const API_CONTEXT       = 'api_context';
+    public const API_CONTEXT = 'api_context';
     public const API_EVENT_CONTEXT = 'api_event_context';
 
-    /** @var ActionProcessorInterface */
-    private $customizationProcessor;
+    private ActionProcessorInterface $customizationProcessor;
 
     public function __construct(ActionProcessorInterface $customizationProcessor)
     {
@@ -96,7 +95,7 @@ class CustomizeFormDataHandler
             $form = $form->getParent();
         }
 
-        return \implode('.', \array_reverse($path));
+        return implode('.', array_reverse($path));
     }
 
     private function getAssociationConfig(

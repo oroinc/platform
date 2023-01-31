@@ -16,14 +16,9 @@ use Psr\Log\LoggerInterface;
  */
 class SaveErrors implements ProcessorInterface
 {
-    /** @var ErrorManager */
-    private $errorManager;
-
-    /** @var RetryHelper */
-    private $retryHelper;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private ErrorManager $errorManager;
+    private RetryHelper $retryHelper;
+    private LoggerInterface $logger;
 
     public function __construct(ErrorManager $errorManager, RetryHelper $retryHelper, LoggerInterface $logger)
     {
@@ -35,7 +30,7 @@ class SaveErrors implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */
 

@@ -25,7 +25,7 @@ class PlatformControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $content = $result->getContent();
-        self::assertStringContainsString('Deployment Type', $content);
+        self::assertStringContainsString('Environment', $content);
         self::assertStringContainsString('Oro Packages', $content);
         self::assertStringContainsString('3rd Party Packages', $content);
         self::assertStringContainsString('doctrine/dbal', $content);

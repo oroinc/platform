@@ -7,20 +7,14 @@ namespace Oro\Bundle\ApiBundle\Util;
  */
 class OptimizeJoinsFieldVisitorFactory
 {
-    /** @var OptimizeJoinsDecisionMakerInterface */
-    private $decisionMaker;
+    private OptimizeJoinsDecisionMakerInterface $decisionMaker;
 
     public function __construct(OptimizeJoinsDecisionMakerInterface $decisionMaker)
     {
         $this->decisionMaker = $decisionMaker;
     }
 
-    /**
-     * Creates a new instance of OptimizeJoinsFieldVisitor.
-     *
-     * @return OptimizeJoinsFieldVisitor
-     */
-    public function createExpressionVisitor()
+    public function createExpressionVisitor(): OptimizeJoinsFieldVisitor
     {
         return new OptimizeJoinsFieldVisitor($this->decisionMaker);
     }

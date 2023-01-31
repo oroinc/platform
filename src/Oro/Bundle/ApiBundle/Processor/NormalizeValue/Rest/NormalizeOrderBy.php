@@ -21,7 +21,7 @@ class NormalizeOrderBy implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var NormalizeValueContext $context */
 
@@ -30,7 +30,7 @@ class NormalizeOrderBy implements ProcessorInterface
         }
         if ($context->hasResult()) {
             $value = $context->getResult();
-            if (null !== $value && \is_string($value)) {
+            if (\is_string($value)) {
                 $orderBy = [];
                 $items = explode(',', $value);
                 foreach ($items as $item) {

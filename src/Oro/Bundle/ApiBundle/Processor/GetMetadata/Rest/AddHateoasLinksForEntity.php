@@ -20,14 +20,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class AddHateoasLinksForEntity implements ProcessorInterface
 {
-    /** @var RestRoutesRegistry */
-    private $routesRegistry;
-
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
-
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
+    private RestRoutesRegistry $routesRegistry;
+    private UrlGeneratorInterface $urlGenerator;
+    private ResourcesProvider $resourcesProvider;
 
     public function __construct(
         RestRoutesRegistry $routesRegistry,
@@ -42,7 +37,7 @@ class AddHateoasLinksForEntity implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */
 

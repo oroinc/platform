@@ -11,10 +11,8 @@ use Psr\Container\ContainerInterface;
 class BatchFlushDataHandlerFactoryRegistry
 {
     /** @var array [[factory service id, entity class name], ...] */
-    private $factories;
-
-    /** @var ContainerInterface */
-    private $container;
+    private array $factories;
+    private ContainerInterface $container;
 
     /**
      * @param array              $factories [[factory service id, entity class name], ...]

@@ -11,8 +11,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
  */
 class ContextParentConfigAccessor implements ConfigAccessorInterface
 {
-    /** @var SubresourceContext */
-    protected $context;
+    private SubresourceContext $context;
 
     public function __construct(SubresourceContext $context)
     {

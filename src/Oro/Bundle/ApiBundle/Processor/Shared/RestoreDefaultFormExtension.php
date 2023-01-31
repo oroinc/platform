@@ -17,7 +17,7 @@ class RestoreDefaultFormExtension extends SwitchFormExtension implements Process
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */
 

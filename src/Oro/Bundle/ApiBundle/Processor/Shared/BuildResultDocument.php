@@ -17,11 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class BuildResultDocument implements ProcessorInterface
 {
-    /** @var ErrorCompleterRegistry */
-    protected $errorCompleterRegistry;
-
-    /** @var LoggerInterface */
-    protected $logger;
+    protected ErrorCompleterRegistry $errorCompleterRegistry;
+    protected LoggerInterface $logger;
 
     public function __construct(ErrorCompleterRegistry $errorCompleterRegistry, LoggerInterface $logger)
     {
@@ -32,7 +29,7 @@ abstract class BuildResultDocument implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -67,8 +64,11 @@ abstract class BuildResultDocument implements ProcessorInterface
         }
     }
 
-    protected function processException(DocumentBuilderInterface $documentBuilder, Context $context, \Exception $e)
-    {
+    protected function processException(
+        DocumentBuilderInterface $documentBuilder,
+        Context $context,
+        \Exception $e
+    ): void {
         $context->setResponseStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         $error = Error::createByException($e);
         $this->errorCompleterRegistry->getErrorCompleter($context->getRequestType())
@@ -77,16 +77,11 @@ abstract class BuildResultDocument implements ProcessorInterface
         $documentBuilder->setErrorObject($error);
 
         $this->logger->error(
-            sprintf('Building of the result document failed.'),
+            'Building of the result document failed.',
             array_merge(['exception' => $e], $this->getExceptionLoggingContext($context))
         );
     }
 
-    /**
-     * @param Context $context
-     *
-     * @return array [key => value, ...]
-     */
     protected function getExceptionLoggingContext(Context $context): array
     {
         return [
@@ -95,5 +90,5 @@ abstract class BuildResultDocument implements ProcessorInterface
         ];
     }
 
-    abstract protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context);
+    abstract protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context): void;
 }

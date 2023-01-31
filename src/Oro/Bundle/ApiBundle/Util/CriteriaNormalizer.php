@@ -15,18 +15,13 @@ class CriteriaNormalizer
 {
     private const JOIN_ALIAS_TEMPLATE = 'alias%d';
 
-    private const FIELD_OPTION         = 'field';
-    private const PARENT_PATH_OPTION   = 'parentPath';
+    private const FIELD_OPTION = 'field';
+    private const PARENT_PATH_OPTION = 'parentPath';
     private const NESTING_LEVEL_OPTION = 'nestingLevel';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var RequireJoinsFieldVisitorFactory */
-    private $requireJoinsFieldVisitorFactory;
-
-    /** @var OptimizeJoinsFieldVisitorFactory */
-    private $optimizeJoinsFieldVisitorFactory;
+    private DoctrineHelper $doctrineHelper;
+    private RequireJoinsFieldVisitorFactory $requireJoinsFieldVisitorFactory;
+    private OptimizeJoinsFieldVisitorFactory $optimizeJoinsFieldVisitorFactory;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,

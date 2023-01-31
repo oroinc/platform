@@ -16,14 +16,14 @@ abstract class AbstractBaseRequestDataValidator
     protected const ROOT_POINTER = '';
 
     /** @var Error[] */
-    private $errors = [];
+    private array $errors = [];
 
     /**
      * @param callable $validationCallback
      *
      * @return Error[]
      */
-    protected function doValidation($validationCallback): array
+    protected function doValidation(callable $validationCallback): array
     {
         try {
             $validationCallback();
@@ -60,7 +60,7 @@ abstract class AbstractBaseRequestDataValidator
         if (\array_key_exists($section, $data)) {
             $this->addError(
                 $this->buildPointer(self::ROOT_POINTER, $section),
-                \sprintf('The \'%s\' section should not exist', $section)
+                sprintf('The \'%s\' section should not exist', $section)
             );
         }
     }
@@ -84,7 +84,7 @@ abstract class AbstractBaseRequestDataValidator
         if (!\array_key_exists($property, $data)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
-                \sprintf('The \'%s\' property is required', $property)
+                sprintf('The \'%s\' property is required', $property)
             );
             $isValid = false;
         }
@@ -107,19 +107,19 @@ abstract class AbstractBaseRequestDataValidator
             if (null === $value) {
                 $this->addError(
                     $this->buildPointer($pointer, $property),
-                    \sprintf('The \'%s\' property should not be null', $property)
+                    sprintf('The \'%s\' property should not be null', $property)
                 );
                 $isValid = false;
             } elseif (!\is_string($value)) {
                 $this->addError(
                     $this->buildPointer($pointer, $property),
-                    \sprintf('The \'%s\' property should be a string', $property)
+                    sprintf('The \'%s\' property should be a string', $property)
                 );
                 $isValid = false;
             } elseif ('' === \trim($value)) {
                 $this->addError(
                     $this->buildPointer($pointer, $property),
-                    \sprintf('The \'%s\' property should not be blank', $property)
+                    sprintf('The \'%s\' property should not be blank', $property)
                 );
                 $isValid = false;
             }
@@ -140,19 +140,19 @@ abstract class AbstractBaseRequestDataValidator
         if (!\is_array($value)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
-                \sprintf('The \'%s\' property should be an array', $property)
+                sprintf('The \'%s\' property should be an array', $property)
             );
             $isValid = false;
         } elseif ($notEmpty && empty($value)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
-                \sprintf('The \'%s\' property should not be empty', $property)
+                sprintf('The \'%s\' property should not be empty', $property)
             );
             $isValid = false;
         } elseif ($associative && !empty($value) && !ArrayUtil::isAssoc($value)) {
             $this->addError(
                 $this->buildPointer($pointer, $property),
-                \sprintf('The \'%s\' property should be an associative array', $property)
+                sprintf('The \'%s\' property should be an associative array', $property)
             );
             $isValid = false;
         }

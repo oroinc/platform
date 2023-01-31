@@ -8,6 +8,7 @@
 
 namespace Oro\Bundle\ApiBundle\Validator\Constraints;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Composite;
 
 /**
@@ -21,7 +22,7 @@ use Symfony\Component\Validator\Constraints\Composite;
  */
 class All extends Composite
 {
-    /** @var array */
+    /** @var Constraint|Constraint[] */
     public $constraints = [];
 
     /**

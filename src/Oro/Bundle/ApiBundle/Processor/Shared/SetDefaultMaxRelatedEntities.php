@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetDefaultMaxRelatedEntities implements ProcessorInterface
 {
-    /** @var int */
-    private $maxRelatedEntitiesLimit;
+    private int $maxRelatedEntitiesLimit;
 
     public function __construct(int $maxRelatedEntitiesLimit)
     {
@@ -23,7 +22,7 @@ class SetDefaultMaxRelatedEntities implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

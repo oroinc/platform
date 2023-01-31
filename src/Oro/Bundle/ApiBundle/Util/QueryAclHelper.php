@@ -14,8 +14,7 @@ use Oro\Component\EntitySerializer\EntityConfig;
  */
 class QueryAclHelper
 {
-    /** @var AclProtectedQueryFactory */
-    private $queryFactory;
+    private AclProtectedQueryFactory $queryFactory;
 
     public function __construct(AclProtectedQueryFactory $queryFactory)
     {

@@ -22,14 +22,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ValidateSorting implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var ConfigProvider */
-    private $configProvider;
-
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
+    private DoctrineHelper $doctrineHelper;
+    private ConfigProvider $configProvider;
+    private FilterNamesRegistry $filterNamesRegistry;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -44,7 +39,7 @@ class ValidateSorting implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -83,9 +78,9 @@ class ValidateSorting implements ProcessorInterface
      */
     private function getValidationErrorMessage(array $unsupportedFields): string
     {
-        return \sprintf(
+        return sprintf(
             'Sorting by "%s" field%s not supported.',
-            \implode(', ', $unsupportedFields),
+            implode(', ', $unsupportedFields),
             \count($unsupportedFields) === 1 ? ' is' : 's are'
         );
     }
@@ -172,7 +167,7 @@ class ValidateSorting implements ProcessorInterface
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
         $targetFieldName = \array_pop($path);
-        list($targetSorters, $associations) = $this->getAssociationSorters($path, $context, $metadata);
+        [$targetSorters, $associations] = $this->getAssociationSorters($path, $context, $metadata);
         $targetFieldName = $this->validateSorter($targetFieldName, $targetSorters);
         if (!$targetFieldName) {
             return null;
@@ -230,6 +225,6 @@ class ValidateSorting implements ProcessorInterface
             $associations[] = $associationName;
         }
 
-        return [$sorters, \implode('.', $associations)];
+        return [$sorters, implode('.', $associations)];
     }
 }

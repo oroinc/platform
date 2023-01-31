@@ -1,6 +1,13 @@
 # Configuration for https://github.com/oroinc/phpstan-rules/
 trusted_data:
     variables:
+        Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager:
+            doResolveNotificationAlert:
+                criteria: true
+            doInsertNotificationAlert:
+                data: true
+            doUpdateNotificationAlert:
+                data: true
         Oro\Bundle\NotificationBundle\Provider\EmailNotificationGridHelper:
             getEntityChoices:
                 select: true

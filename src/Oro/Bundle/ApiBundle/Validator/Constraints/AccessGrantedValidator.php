@@ -12,8 +12,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class AccessGrantedValidator extends ConstraintValidator
 {
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    private AuthorizationCheckerInterface $authorizationChecker;
 
     public function __construct(AuthorizationCheckerInterface $authorizationChecker)
     {
@@ -23,7 +22,7 @@ class AccessGrantedValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof AccessGranted) {
             throw new UnexpectedTypeException($constraint, AccessGranted::class);
@@ -33,7 +32,7 @@ class AccessGrantedValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_object($value)) {
+        if (!\is_object($value)) {
             throw new UnexpectedTypeException($value, 'object');
         }
 

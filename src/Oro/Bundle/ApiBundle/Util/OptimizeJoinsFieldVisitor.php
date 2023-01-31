@@ -13,11 +13,8 @@ use Doctrine\Common\Collections\Expr\Value;
  */
 class OptimizeJoinsFieldVisitor extends ExpressionVisitor
 {
-    /** @var OptimizeJoinsDecisionMakerInterface */
-    private $decisionMaker;
-
-    /** @var array */
-    private $fields = [];
+    private OptimizeJoinsDecisionMakerInterface $decisionMaker;
+    private array $fields = [];
 
     public function __construct(OptimizeJoinsDecisionMakerInterface $decisionMaker)
     {

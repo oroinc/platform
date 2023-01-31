@@ -1,0 +1,8 @@
+framework:
+    cache:
+        default_redis_provider: oro.cache.redis_provider
+
+oro_message_queue:
+    persistent_services:
+        # `oro.cache.redis_provider` can be persistent in order to not duplicate connections on container clear
+        - 'oro.cache.redis_provider'

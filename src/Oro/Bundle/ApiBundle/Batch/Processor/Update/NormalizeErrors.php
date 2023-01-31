@@ -13,8 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class NormalizeErrors implements ProcessorInterface
 {
-    /** @var TranslatorInterface */
-    private $translator;
+    private TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {
@@ -24,7 +23,7 @@ class NormalizeErrors implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */
 

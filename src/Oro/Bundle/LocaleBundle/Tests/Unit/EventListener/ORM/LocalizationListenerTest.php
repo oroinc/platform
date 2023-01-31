@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\EventListener\ORM;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\EventListener\ORM\LocalizationListener;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
