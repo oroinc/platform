@@ -10,30 +10,34 @@ use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\DeferredLayoutManipulatorInterface;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
+use Oro\Component\Layout\LayoutContextStack;
 use Oro\Component\Layout\LayoutFactoryInterface;
 use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\LayoutRendererRegistryInterface;
 use Oro\Component\Layout\RawLayoutBuilderInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CacheLayoutFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $baseLayoutFactory;
+    private LayoutFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $baseLayoutFactory;
 
-    /** @var CacheLayoutFactory */
-    private $cacheLayoutFactory;
+    private CacheLayoutFactory $cacheLayoutFactory;
 
     protected function setUp(): void
     {
         $this->baseLayoutFactory = $this->createMock(LayoutFactoryInterface::class);
+        $layoutContextStack = new LayoutContextStack();
         $expressionProcessor = $this->createMock(ExpressionProcessor::class);
         $renderCache = $this->createMock(RenderCache::class);
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $blockViewCache = $this->createMock(BlockViewCache::class);
 
         $this->cacheLayoutFactory = new CacheLayoutFactory(
             $this->baseLayoutFactory,
+            $layoutContextStack,
             $expressionProcessor,
             $renderCache,
+            $eventDispatcher,
             $blockViewCache
         );
     }
@@ -41,11 +45,11 @@ class CacheLayoutFactoryTest extends \PHPUnit\Framework\TestCase
     public function testGetType(): void
     {
         $type = $this->createMock(BlockTypeInterface::class);
-        $this->baseLayoutFactory->expects($this->once())
+        $this->baseLayoutFactory->expects(self::once())
             ->method('getType')
             ->with('type name')
             ->willReturn($type);
-        $this->assertSame(
+        self::assertSame(
             $type,
             $this->cacheLayoutFactory->getType('type name')
         );
@@ -55,11 +59,11 @@ class CacheLayoutFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $layoutManipulator = $this->createMock(DeferredLayoutManipulatorInterface::class);
         $rawLayoutBuilder = $this->createMock(RawLayoutBuilderInterface::class);
-        $this->baseLayoutFactory->expects($this->once())
+        $this->baseLayoutFactory->expects(self::once())
             ->method('createLayoutManipulator')
             ->with($rawLayoutBuilder)
             ->willReturn($layoutManipulator);
-        $this->assertSame(
+        self::assertSame(
             $layoutManipulator,
             $this->cacheLayoutFactory->createLayoutManipulator($rawLayoutBuilder)
         );
@@ -68,10 +72,10 @@ class CacheLayoutFactoryTest extends \PHPUnit\Framework\TestCase
     public function testGetRegistry(): void
     {
         $registry = $this->createMock(LayoutRegistryInterface::class);
-        $this->baseLayoutFactory->expects($this->once())
+        $this->baseLayoutFactory->expects(self::once())
             ->method('getRegistry')
             ->willReturn($registry);
-        $this->assertSame(
+        self::assertSame(
             $registry,
             $this->cacheLayoutFactory->getRegistry()
         );
@@ -80,10 +84,10 @@ class CacheLayoutFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateRawLayoutBuilder(): void
     {
         $rawLayoutBuilder = $this->createMock(RawLayoutBuilderInterface::class);
-        $this->baseLayoutFactory->expects($this->once())
+        $this->baseLayoutFactory->expects(self::once())
             ->method('createRawLayoutBuilder')
             ->willReturn($rawLayoutBuilder);
-        $this->assertSame(
+        self::assertSame(
             $rawLayoutBuilder,
             $this->cacheLayoutFactory->createRawLayoutBuilder()
         );
@@ -92,10 +96,10 @@ class CacheLayoutFactoryTest extends \PHPUnit\Framework\TestCase
     public function testGetRendererRegistry(): void
     {
         $rendererRegistry = $this->createMock(LayoutRendererRegistryInterface::class);
-        $this->baseLayoutFactory->expects($this->once())
+        $this->baseLayoutFactory->expects(self::once())
             ->method('getRendererRegistry')
             ->willReturn($rendererRegistry);
-        $this->assertSame(
+        self::assertSame(
             $rendererRegistry,
             $this->cacheLayoutFactory->getRendererRegistry()
         );
@@ -105,11 +109,11 @@ class CacheLayoutFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $layoutManipulator = $this->createMock(DeferredLayoutManipulatorInterface::class);
         $blockFactory = $this->createMock(BlockFactoryInterface::class);
-        $this->baseLayoutFactory->expects($this->once())
+        $this->baseLayoutFactory->expects(self::once())
             ->method('createBlockFactory')
             ->with($layoutManipulator)
             ->willReturn($blockFactory);
-        $this->assertSame(
+        self::assertSame(
             $blockFactory,
             $this->cacheLayoutFactory->createBlockFactory($layoutManipulator)
         );
@@ -119,28 +123,28 @@ class CacheLayoutFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $layoutManipulator = $this->createMock(DeferredLayoutManipulatorInterface::class);
         $rawLayoutBuilder = $this->createMock(RawLayoutBuilderInterface::class);
-        $this->baseLayoutFactory->expects($this->once())
+        $this->baseLayoutFactory->expects(self::once())
             ->method('createLayoutManipulator')
             ->with($rawLayoutBuilder)
             ->willReturn($layoutManipulator);
-        $this->baseLayoutFactory->expects($this->once())
+        $this->baseLayoutFactory->expects(self::once())
             ->method('createRawLayoutBuilder')
             ->willReturn($rawLayoutBuilder);
         $registry = $this->createMock(LayoutRegistryInterface::class);
-        $this->baseLayoutFactory->expects($this->once())
+        $this->baseLayoutFactory->expects(self::once())
             ->method('getRegistry')
             ->willReturn($registry);
         $rendererRegistry = $this->createMock(LayoutRendererRegistryInterface::class);
-        $this->baseLayoutFactory->expects($this->once())
+        $this->baseLayoutFactory->expects(self::once())
             ->method('getRendererRegistry')
             ->willReturn($rendererRegistry);
         $blockFactory = $this->createMock(BlockFactoryInterface::class);
-        $this->baseLayoutFactory->expects($this->once())
+        $this->baseLayoutFactory->expects(self::once())
             ->method('createBlockFactory')
             ->with($layoutManipulator)
             ->willReturn($blockFactory);
 
-        $this->assertInstanceOf(
+        self::assertInstanceOf(
             CacheLayoutBuilder::class,
             $this->cacheLayoutFactory->createLayoutBuilder()
         );

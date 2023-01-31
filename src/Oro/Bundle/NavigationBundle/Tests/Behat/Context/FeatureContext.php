@@ -507,7 +507,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iClickLinkInMenuTree($record)
     {
-        $menuTree = $this->createElement('MenuTree');
+        $menuTree = $this->createElement('Sidebar Menu Tree');
         self::assertTrue($menuTree->isValid());
         $menuTree->clickLink($record);
     }

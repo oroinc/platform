@@ -2,7 +2,10 @@ import $ from 'jquery';
 import _ from 'underscore';
 import BaseView from 'oroui/js/app/views/base/view';
 
+import 'jquery-ui/scroll-parent';
+
 const KEY_CODES = {
+    ENTER: 13,
     ESC: 27,
     SPACE: 32,
     END: 35,
@@ -21,17 +24,22 @@ const NavigationMenuView = BaseView.extend({
      * @inheritdoc
      */
     events() {
-        return {
+        const events = {
             'keydown': 'onKeyDown',
             [`focus ${this.options.focusableElements}`]: 'onFocus',
             [`focusin ${this.options.focusableElements}`]: 'onFocusInToFocusable',
             [`focusout ${this.options.focusableElements}`]: 'onFocusOutToFocusable',
             'focusout': 'onFocusOut',
             'show.bs.dropdown': 'onDropdownToggle',
-            'hide.bs.dropdown': 'onDropdownToggle',
-            [`mousemove ${this.options.itemSelector}`]: 'onMouseMove',
-            [`mouseleave ${this.options.itemSelector}`]: 'onMouseLeave'
+            'hide.bs.dropdown': 'onDropdownToggle'
         };
+
+        if (this.options.listenToMouseEvents) {
+            events[`mousemove ${this.options.itemSelector}`] = 'onMouseMove';
+            events[`mouseleave ${this.options.itemSelector}`] = 'onMouseLeave';
+        }
+
+        return events;
     },
 
     hasFocus: false,
@@ -55,22 +63,30 @@ const NavigationMenuView = BaseView.extend({
      */
     options: {
         openClass: 'show',
+        // Elements that may receive a focus during keyboard navigation
         focusableElements: 'a:visible:not([data-ignore-navigation]), button:visible:not([data-ignore-navigation])',
-        itemSelector: '.main-menu__item',
-        linkSelector: '.main-menu__link:first',
+        // Elements that are keyboard focusable but not part of the Tab sequence of the page.
+        tabbableElements: 'a:visible, button:visible',
+        itemSelector: 'li, [role="listitem"]',
+        linkSelector: 'a:first',
         subMenus: 'ul, ol, nav, [data-role="sub-menu"]',
-        popupMenuCriteria: '[aria-hidden]'
+        popupMenuCriteria: '[aria-hidden]',
+        closeMenu: '[data-role="close"]',
+        listenToMouseEvents: true
     },
 
     $lastFocusedElementInRow: null,
+
+    preinitialize(options) {
+        this.options = {...this.options, ...options};
+        this._keysMap = {};
+    },
 
     /**
      * @inheritdoc
      * @param {Object} options
      */
     initialize(options) {
-        this.options = {...this.options, ...options};
-        this._keysMap = {};
         this.openNextRootMenu = false;
 
         this.markMenuBar();
@@ -115,7 +131,7 @@ const NavigationMenuView = BaseView.extend({
         delete this._keysMap;
         delete this._searchData;
         delete this.$lastFocusedElementInRow;
-        this.$(this.options.focusableElements).removeAttr('tabindex');
+        this.$(this.options.tabbableElements).removeAttr('tabindex');
         this.$el
             .removeAttr(MENU_BAR_ATTR)
             .removeClass(this.plainMenuClass);
@@ -232,17 +248,17 @@ const NavigationMenuView = BaseView.extend({
      * @param {jQuery.Element} [$element]
      */
     setRovingTabIndex($element) {
-        const $focusableElements = this.$(this.options.focusableElements);
+        const $tabbableElements = this.$(this.options.tabbableElements);
 
-        if (!$focusableElements.length) {
+        if (!$tabbableElements.length) {
             return;
         }
 
         if (!$element || !$element.length) {
-            $element = $focusableElements.first();
+            $element = $tabbableElements.first();
         }
 
-        $focusableElements.attr('tabindex', -1);
+        $tabbableElements.attr('tabindex', -1);
         $element.attr('tabindex', 0);
     },
 
@@ -251,7 +267,12 @@ const NavigationMenuView = BaseView.extend({
      * @param {Object} event
      */
     navigateTo(event) {
-        if (typeof this._keysMap[event.keyCode] === 'function') {
+        if (
+            $(event.target).is(this.options.closeMenu) &&
+            (event.keyCode === KEY_CODES.SPACE || event.keyCode === KEY_CODES.ENTER)
+        ) {
+            this.closeMenu(event);
+        } else if (typeof this._keysMap[event.keyCode] === 'function') {
             this._keysMap[event.keyCode].call(this, event);
         } else if (this.isPrintableCharacter(event.key)) {
             this.setFocusByFirstCharacter(event);
@@ -399,7 +420,9 @@ const NavigationMenuView = BaseView.extend({
 
             this.setFocus($el);
         } else {
-            this.moveFocusToPreviousRelativeSibling($currentMenu);
+            const $prevNext = this.moveFocusToPreviousRelativeSibling($currentMenu);
+
+            this.scrollToEl($prevNext);
         }
     },
 
@@ -422,7 +445,9 @@ const NavigationMenuView = BaseView.extend({
             this.showSubMenu($element);
             this.setFocus(this.getFirstFocusableElement($subMenu));
         } else {
-            this.moveFocusToNextRelativeSibling($currentMenu);
+            const $nextEl = this.moveFocusToNextRelativeSibling($currentMenu);
+
+            this.scrollToEl($nextEl);
         }
     },
 
@@ -431,7 +456,13 @@ const NavigationMenuView = BaseView.extend({
      * @returns {jQuery.Element}
      */
     getSubMenu($element) {
-        return $element.nextAll(this.options.subMenus).first();
+        const $menu = $(`#${$element.attr('aria-controls')}`);
+
+        if ($menu.length === 0) {
+            return $element.nextAll(this.options.subMenus).first();
+        }
+
+        return $menu;
     },
 
     getMenuBarSubMenu: function(menuLink) {
@@ -641,7 +672,7 @@ const NavigationMenuView = BaseView.extend({
 
         $element
             .attr('aria-expanded', true)
-            .parent()
+            .parents(this.options.itemSelector).first()
             .addClass(this.options.openClass);
         $menu
             .attr({
@@ -649,7 +680,7 @@ const NavigationMenuView = BaseView.extend({
                 [MENU_ITEM_INDEX_ATTR]: this.getIndexForElement($element)
             })
             .addClass(this.options.openClass);
-        this.trigger('sub-menus:shown');
+        this.$el.trigger('sub-menus:shown');
     },
 
     /**
@@ -666,12 +697,11 @@ const NavigationMenuView = BaseView.extend({
             if ($el.data('toggle') === 'dropdown') {
                 $el.dropdown('hide');
             } else if (
-                $el.attr('aria-expanded') !== void 0 &&
-                $el.is(this.options.focusableElements)
+                $el.attr('aria-expanded') !== void 0
             ) {
                 $el
                     .attr('aria-expanded', false)
-                    .parent()
+                    .parents(this.options.itemSelector).first()
                     .removeClass(this.options.openClass);
             } else if (
                 $el.hasClass(this.options.openClass) &&
@@ -683,7 +713,7 @@ const NavigationMenuView = BaseView.extend({
                     .removeClass(this.options.openClass);
             }
         });
-        this.trigger('sub-menus:hidden');
+        this.$el.trigger('sub-menus:hidden');
     },
 
     /**
@@ -710,7 +740,12 @@ const NavigationMenuView = BaseView.extend({
                         continue;
                     }
 
-                    $el = this.getFirstFocusableElement($parentMenu);
+                    const hasPopupSubMenu = $parentMenu.find(this.options.subMenus)
+                        .filter((index, el) => this.isPopupMenu($(el))).length > 0;
+
+                    if (!hasPopupSubMenu) {
+                        $el = this.getFirstFocusableElement($parentMenu);
+                    }
                 }
 
                 if (!$el.length) {
@@ -818,6 +853,36 @@ const NavigationMenuView = BaseView.extend({
         if (index > -1) {
             this.setFocus(this.getFocusableElementByIndex(index, this._searchData.$elements));
         }
+    },
+
+    /**
+     * @param {Object} event
+     */
+    closeMenu(event) {
+        event.preventDefault();
+
+        this.openNextRootMenu = false;
+        this.setFocus(this.getRootFocusableElement($(event.target)));
+        this.hideSubMenu();
+        this.$el.trigger('close-menus', this.$el);
+    },
+
+    /**
+     * @param {jQuery.Element} $element
+     */
+    scrollToEl($element) {
+        const $scrollParent = $element.scrollParent();
+        const scrollBottom = $scrollParent.offset().top + $scrollParent.outerHeight(true);
+        const elementTop = $element.offset().top;
+
+        if (
+            this.el.contains($scrollParent[0]) &&
+            elementTop <= scrollBottom
+        ) {
+            return;
+        }
+
+        $scrollParent.scrollTop(elementTop + $element.outerHeight(true) - scrollBottom);
     },
 
     /**

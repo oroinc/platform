@@ -30,10 +30,6 @@ services:
         arguments:
             - "@oro_menu.factory"
 
-    oro_menu.manipulator:
-        class: Knp\Menu\Util\MenuManipulator
-        public: false
-
     oro_menu.builder_chain:
         class: Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
         public: true
@@ -364,27 +360,108 @@ services:
     Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface:
         alias: oro_navigation.chain_breadcrumb_manager
 
-    oro_navigation.menu_update.builder.menu_default_visibility:
-        class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
+    oro_navigation.menu.menu_update_builder:
+        class: Oro\Bundle\NavigationBundle\Menu\MenuUpdateBuilder
         arguments:
-            - '@oro_locale.helper.default_locale_localization'
             - '@oro_navigation.provider.menu_update_provider'
+            - '@oro_navigation.menu_update.applier'
+            - '@event_dispatcher'
         tags:
             - { name: oro_menu.builder, priority: 100 }
 
+    oro_navigation.menu_update.applier:
+        class: Oro\Bundle\NavigationBundle\MenuUpdate\Applier\MenuUpdateApplier
+        arguments:
+            - '@oro_navigation.menu_update.propagator.to_menu_item'
+
+    oro_navigation.menu_update.propagator.to_menu_item:
+        class: Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\CompositePropagator
+        arguments:
+            - !tagged_iterator { tag: oro_navigation.menu_update.propagator.to_menu_item }
+
+    oro_navigation.menu_update.propagator.to_menu_item.basic:
+        class: Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\BasicPropagator
+        arguments:
+            - '@oro_locale.helper.default_locale_localization'
+        tags:
+            - { name: oro_navigation.menu_update.propagator.to_menu_item }
+
+    oro_navigation.menu_update.propagator.to_menu_item.extras:
+        class: Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\ExtrasPropagator
+        arguments:
+            - '@oro_locale.helper.default_locale_localization'
+        tags:
+            - { name: oro_navigation.menu_update.propagator.to_menu_item }
+
     oro_navigation.manager.menu_update:
         class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
-        public: true
         arguments:
-            - "@doctrine"
-            - "@oro_navigation.menu_helper.menu_update"
-            - "@property_accessor"
+            - '@doctrine'
+            - '@oro_navigation.menu_update.factory'
+            - '@oro_navigation.menu_update.propagator.to_menu_update'
             - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
             - 'menu_default_visibility'
 
+    oro_navigation.manager.menu_update.move:
+        class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateMoveManager
+        arguments:
+            - '@doctrine'
+            - '@oro_navigation.manager.menu_update'
+            - '@oro_navigation.menu_update.propagator.to_menu_update'
+            - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
+
+    oro_navigation.manager.menu_update.display:
+        class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateDisplayManager
+        arguments:
+            - '@doctrine'
+            - '@oro_navigation.manager.menu_update'
+            - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
+
+    oro_navigation.menu_update.factory:
+        class: Oro\Bundle\NavigationBundle\MenuUpdate\Factory\MenuUpdateFactory
+        arguments:
+            - '@property_accessor'
+            - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
+
+    oro_navigation.menu_update.propagator.to_menu_update:
+        class: Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuUpdate\CompositePropagator
+        arguments:
+            - !tagged_iterator { tag: oro_navigation.menu_update.propagator.to_menu_update }
+
+    oro_navigation.menu_update.propagator.to_menu_update.basic:
+        class: Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuUpdate\BasicPropagator
+        tags:
+            - { name: oro_navigation.menu_update.propagator.to_menu_update }
+
+    oro_navigation.menu_update.propagator.to_menu_update.extras:
+        class: Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuUpdate\ExtrasPropagator
+        arguments:
+            - '@property_accessor'
+        calls:
+            - [setExcludeKeys, [['titles', 'description']]]
+        tags:
+            - { name: oro_navigation.menu_update.propagator.to_menu_update }
+
+    oro_navigation.menu_update.propagator.to_menu_update.description:
+        class: Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuUpdate\DescriptionPropagator
+        arguments:
+            - '@oro_navigation.menu_helper.menu_update'
+        tags:
+            - { name: oro_navigation.menu_update.propagator.to_menu_update }
+
+    oro_navigation.menu_update.propagator.to_menu_update.title:
+        class: Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuUpdate\TitlePropagator
+        arguments:
+            - '@property_accessor'
+            - '@oro_navigation.menu_helper.menu_update'
+        tags:
+            - { name: oro_navigation.menu_update.propagator.to_menu_update }
+
     oro_navigation.menu_manipulator:
         class: Knp\Menu\Util\MenuManipulator
-        public: false
+
+    oro_menu.manipulator:
+        alias: oro_navigation.menu_manipulator
 
     oro_navigation.extension.datasource.menu:
         class: Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource
@@ -431,7 +508,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator
         arguments:
             - '@oro_menu.builder_chain'
-            - '@oro_locale.helper.localization'
+            - '@oro_navigation.menu_update.applier'
         tags:
             - { name: validator.constraint_validator }
 
@@ -539,3 +616,18 @@ services:
             - '@router'
         tags:
             - { name: oro_featuretogle.feature, feature: email }
+
+    oro_navigation.menu.hide_empty_items_builder:
+        class: Oro\Bundle\NavigationBundle\Menu\HideEmptyItemsBuilder
+        tags:
+            - { name: oro_menu.builder, priority: 270 }
+
+    oro_navigation.menu.divider_builder:
+        class: Oro\Bundle\NavigationBundle\Menu\DividerBuilder
+        tags:
+            - { name: oro_menu.builder, priority: 270 }
+
+    oro_navigation.provider.menu_names:
+        class: Oro\Bundle\NavigationBundle\Provider\MenuNamesProvider
+        arguments:
+            - '@oro_navigation.configuration.provider'

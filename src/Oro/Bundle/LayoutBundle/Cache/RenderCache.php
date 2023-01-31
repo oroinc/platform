@@ -4,9 +4,10 @@ namespace Oro\Bundle\LayoutBundle\Cache;
 
 use LogicException;
 use Oro\Bundle\LayoutBundle\Cache\Extension\RenderCacheExtensionInterface;
-use Oro\Bundle\LayoutBundle\Cache\Metadata\CacheMetadataProvider;
+use Oro\Bundle\LayoutBundle\Cache\Metadata\CacheMetadataProviderInterface;
 use Oro\Bundle\LayoutBundle\Cache\Metadata\LayoutCacheMetadata;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\ContextInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
@@ -38,7 +39,7 @@ class RenderCache
     private $alwaysVaryBy = [];
 
     /**
-     * @var CacheMetadataProvider
+     * @var CacheMetadataProviderInterface
      */
     private $metadataProvider;
 
@@ -48,14 +49,14 @@ class RenderCache
     private $fetchedItems = [];
 
     /**
-     * @param TagAwareAdapterInterface                 $cache
-     * @param CacheMetadataProvider                    $metadataProvider
-     * @param RequestStack                             $requestStack
+     * @param TagAwareAdapterInterface $cache
+     * @param CacheMetadataProviderInterface $metadataProvider
+     * @param RequestStack $requestStack
      * @param RenderCacheExtensionInterface[]|iterable $extensions
      */
     public function __construct(
         TagAwareAdapterInterface $cache,
-        CacheMetadataProvider $metadataProvider,
+        CacheMetadataProviderInterface $metadataProvider,
         RequestStack $requestStack,
         iterable $extensions
     ) {
@@ -72,13 +73,9 @@ class RenderCache
         return $request && $request->isMethodCacheable();
     }
 
-    /**
-     * @param BlockView $blockView
-     * @return bool
-     */
-    public function isCached(BlockView $blockView)
+    public function isCached(BlockView $blockView, ContextInterface $context): bool
     {
-        $metadata = $this->getMetadata($blockView);
+        $metadata = $this->getMetadata($blockView, $context);
 
         if (!$metadata) {
             return false;
@@ -88,7 +85,7 @@ class RenderCache
             return false;
         }
 
-        $item = $this->getItem($blockView);
+        $item = $this->getItem($blockView, $context);
         // prevents isCached and getItem from returning inconsistent result, when isCached returns true but on getItem
         // call it's already expired
         $this->fetchedItems[$item->getKey()] = $item;
@@ -99,9 +96,9 @@ class RenderCache
     /**
      * @throws InvalidArgumentException
      */
-    public function getItem(BlockView $blockView): CacheItemInterface
+    public function getItem(BlockView $blockView, ContextInterface $context): CacheItemInterface
     {
-        $metadata = $this->getMetadata($blockView);
+        $metadata = $this->getMetadata($blockView, $context);
         if (!$metadata) {
             throw new LogicException(
                 sprintf('Block "%s" is not cacheable, please provide "cache" option.', $blockView->getId())
@@ -150,16 +147,19 @@ class RenderCache
     private function getAlwaysVaryBy(): array
     {
         if (!$this->alwaysVaryBy) {
+            $this->alwaysVaryBy = [];
             foreach ($this->extensions as $extension) {
-                $this->alwaysVaryBy = array_merge($this->alwaysVaryBy, $extension->alwaysVaryBy());
+                $this->alwaysVaryBy[] = $extension->alwaysVaryBy();
             }
+
+            $this->alwaysVaryBy = array_merge(...$this->alwaysVaryBy);
         }
 
         return $this->alwaysVaryBy;
     }
 
-    public function getMetadata(BlockView $blockView): ?LayoutCacheMetadata
+    public function getMetadata(BlockView $blockView, ContextInterface $context): ?LayoutCacheMetadata
     {
-        return $this->metadataProvider->getCacheMetadata($blockView);
+        return $this->metadataProvider->getCacheMetadata($blockView, $context);
     }
 }

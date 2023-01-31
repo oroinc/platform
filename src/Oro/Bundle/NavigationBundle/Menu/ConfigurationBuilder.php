@@ -14,9 +14,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ConfigurationBuilder implements BuilderInterface
 {
-    const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
+    public const MAX_NESTING_LEVEL = 'max_nesting_level';
 
-    const NO_CHILDREN_IN_CONFIG = 'no_children_in_config';
+    const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
 
     /** @var ResolverInterface */
     protected $resolver;
@@ -63,7 +63,7 @@ class ConfigurationBuilder implements BuilderInterface
             $this->setExtraFromConfig($menu, $treeData, 'type');
             $this->setExtraFromConfig($menu, $treeData, 'scope_type', ConfigurationBuilder::DEFAULT_SCOPE_TYPE);
             $this->setExtraFromConfig($menu, $treeData, 'read_only', false);
-            $this->setExtraFromConfig($menu, $treeData, 'max_nesting_level', 0);
+            $this->setExtraFromConfig($menu, $treeData, self::MAX_NESTING_LEVEL, 0);
 
             $existingNames[$alias] = true;
             $this->appendChildData($menu, $treeData['children'], $options, $existingNames);
@@ -78,9 +78,6 @@ class ConfigurationBuilder implements BuilderInterface
      */
     private function appendChildData(ItemInterface $menu, array $sliceData, array $options, array &$existingNames)
     {
-        // If menu doesn't have children, it should be disabled
-        $isAllowed = false;
-
         $items = $this->configurationProvider->getMenuItems();
 
         foreach ($sliceData as $itemName => $itemData) {
@@ -113,17 +110,6 @@ class ConfigurationBuilder implements BuilderInterface
             if (!empty($itemData['children'])) {
                 $this->appendChildData($newMenuItem, $itemData['children'], $options, $existingNames);
             }
-
-            // Enable menu item if one of child items exist and available
-            $isAllowed = $isAllowed || $newMenuItem->getExtra('isAllowed');
-        }
-
-        //If flag isAllowed is False because no one child exist or allowed
-        //And current menu isAllowed option is True as well as displayChildren
-        //We set isAllowed to False to not show menu in the UI
-        if (!$isAllowed && $menu->getExtra('isAllowed') && $menu->getDisplayChildren()) {
-            $menu->setExtra('isAllowed', $isAllowed);
-            $menu->setExtra(self::NO_CHILDREN_IN_CONFIG, true);
         }
     }
 

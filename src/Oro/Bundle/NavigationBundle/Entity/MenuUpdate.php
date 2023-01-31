@@ -73,46 +73,18 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  * )
  * @ORM\HasLifecycleCallbacks()
  */
-class MenuUpdate extends ExtendMenuUpdate implements
-    MenuUpdateInterface
+class MenuUpdate extends ExtendMenuUpdate implements MenuUpdateInterface
 {
     use MenuUpdateTrait {
         MenuUpdateTrait::__construct as traitConstructor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct()
     {
         parent::__construct();
         $this->traitConstructor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtras()
-    {
-        $extras = [
-            'divider' => $this->isDivider(),
-            'translate_disabled' => $this->getId() ? true : false
-        ];
-
-        if ($this->getPriority() !== null) {
-            $extras['position'] = $this->getPriority();
-        }
-
-        if ($this->getIcon() !== null) {
-            $extras['icon'] = $this->getIcon();
-        }
-
-        return $extras;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getLinkAttributes(): array
     {
         return [];

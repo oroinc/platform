@@ -3,9 +3,8 @@
 namespace Oro\Bundle\LayoutBundle\Provider\Image;
 
 use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProviderInterface;
-use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
-use Oro\Component\Layout\LayoutContext;
+use Oro\Component\Layout\LayoutContextStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -13,7 +12,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
 {
-    private LayoutContextHolder $contextHolder;
+    private LayoutContextStack $layoutContextStack;
 
     private ThemeManager $themeManager;
 
@@ -22,12 +21,12 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
     private string $placeholderName;
 
     public function __construct(
-        LayoutContextHolder $contextHolder,
+        LayoutContextStack $layoutContextStack,
         ThemeManager $themeManager,
         ImagineUrlProviderInterface $imagineUrlProvider,
         string $placeholderName
     ) {
-        $this->contextHolder = $contextHolder;
+        $this->layoutContextStack = $layoutContextStack;
         $this->themeManager = $themeManager;
         $this->imagineUrlProvider = $imagineUrlProvider;
         $this->placeholderName = $placeholderName;
@@ -49,8 +48,8 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
 
     private function getImagePlaceholders(): array
     {
-        $context = $this->contextHolder->getContext();
-        if (!$context instanceof LayoutContext) {
+        $context = $this->layoutContextStack->getCurrentContext();
+        if (!$context) {
             return [];
         }
 
@@ -59,7 +58,6 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
             return [];
         }
 
-        return $this->themeManager->getTheme($themeName)
-            ->getImagePlaceholders();
+        return $this->themeManager->getTheme($themeName)->getImagePlaceholders();
     }
 }

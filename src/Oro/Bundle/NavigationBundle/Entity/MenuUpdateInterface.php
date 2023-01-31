@@ -12,6 +12,15 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
  */
 interface MenuUpdateInterface
 {
+    public const TITLES = 'titles';
+    public const DESCRIPTION = 'description';
+    public const IS_DIVIDER = 'divider';
+    public const IS_TRANSLATE_DISABLED = 'translate_disabled';
+    public const IS_CUSTOM = 'custom';
+    public const IS_SYNTHETIC = 'synthetic';
+    public const POSITION = 'position';
+    public const ICON = 'icon';
+
     /**
      * @return int
      */
@@ -197,11 +206,11 @@ interface MenuUpdateInterface
     public function setCustom($custom);
 
     /**
-     * Get array of extra data that is not declared in MenuUpdateInterface model
-     *
-     * @return array
+     * Synthetic is a non-custom menu item that should remain in tree even if target item does not exist.
      */
-    public function getExtras();
+    public function isSynthetic(): bool;
+
+    public function setSynthetic(bool $synthetic): self;
 
     /**
      * Get array of link attributes

@@ -5,25 +5,22 @@ namespace Oro\Bundle\IntegrationBundle\Generator\Prefixed;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Generator\IntegrationIdentifierGeneratorInterface;
 
+/**
+ * Generates an integration identifier using unique prefix for each integration.
+ */
 class PrefixedIntegrationIdentifierGenerator implements IntegrationIdentifierGeneratorInterface
 {
-    /**
-     * @var string
-     */
-    private $prefix;
+    private string $prefix;
 
-    /**
-     * @param string $prefix
-     */
-    public function __construct($prefix)
+    public function __construct(string $prefix)
     {
         $this->prefix = $prefix;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function generateIdentifier(Channel $channel)
+    public function generateIdentifier(Channel $channel): string
     {
         return sprintf('%s_%s', $this->prefix, $channel->getId());
     }

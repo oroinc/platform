@@ -59,10 +59,12 @@ define(function(require) {
                 '#': {
                     valid_children: ['menu_item']
                 },
-                'default': {
-                    max_depth: 3
-                }
+                'default': {}
             };
+
+            if (options.maxDepth) {
+                config.types.default.max_depth = options.maxDepth;
+            }
 
             return config;
         },

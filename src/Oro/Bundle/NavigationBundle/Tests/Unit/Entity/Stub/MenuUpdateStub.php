@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
@@ -12,17 +13,16 @@ class MenuUpdateStub implements MenuUpdateInterface
 {
     use MenuUpdateTrait;
 
-    /** @var array */
-    protected $extras = [];
+    protected array $extras = [];
 
-    /** @var array */
-    private $linkAttributes = [];
+    private array $linkAttributes = [];
 
-    /**
-     * MenuUpdateStub constructor.
-     */
-    public function __construct()
+    public function __construct(?int $id = null)
     {
+        if ($id !== null) {
+            $this->id = $id;
+        }
+
         $this->titles = new ArrayCollection();
         $this->descriptions = new ArrayCollection();
     }
@@ -30,24 +30,19 @@ class MenuUpdateStub implements MenuUpdateInterface
     /**
      * {@inheritdoc}
      */
-    public function getExtras()
+    public function getExtras(): array
     {
         return $this->extras;
     }
 
-    /**
-     * @param array $extras
-     *
-     * @return MenuUpdateStub
-     */
-    public function setExtras(array $extras)
+    public function setExtras(array $extras): self
     {
         $this->extras = $extras;
 
         return $this;
     }
 
-    public function setImage($value)
+    public function setImage($value): self
     {
         $this->image = $value;
 
@@ -58,7 +53,7 @@ class MenuUpdateStub implements MenuUpdateInterface
      * @param string $value
      * @return $this
      */
-    public function setDefaultTitle($value)
+    public function setDefaultTitle($value): self
     {
         return $this->setDefaultFallbackValue($this->titles, $value);
     }
@@ -67,16 +62,28 @@ class MenuUpdateStub implements MenuUpdateInterface
      * @param Localization|null $localization
      * @return LocalizedFallbackValue|null
      */
-    public function getTitle(\Oro\Bundle\LocaleBundle\Entity\Localization $localization = null)
+    public function getTitle(Localization $localization = null)
     {
         return $this->getFallbackValue($this->titles, $localization);
+    }
+
+    public function getTitles(): Collection
+    {
+        return $this->titles;
+    }
+
+    public function setTitles(Collection $titles): self
+    {
+        $this->titles = $titles;
+
+        return $this;
     }
 
     /**
      * @param Localization|null $localization
      * @return LocalizedFallbackValue|null
      */
-    public function getDescription(\Oro\Bundle\LocaleBundle\Entity\Localization $localization = null)
+    public function getDescription(Localization $localization = null)
     {
         return $this->getFallbackValue($this->descriptions, $localization);
     }

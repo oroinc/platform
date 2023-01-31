@@ -4,11 +4,10 @@ namespace Oro\Bundle\IntegrationBundle\Generator;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
+/**
+ * Represents a service that is used to generate an integration identifier.
+ */
 interface IntegrationIdentifierGeneratorInterface
 {
-    /**
-     * @param Channel $channel
-     * @return string
-     */
-    public function generateIdentifier(Channel $channel);
+    public function generateIdentifier(Channel $channel): string;
 }

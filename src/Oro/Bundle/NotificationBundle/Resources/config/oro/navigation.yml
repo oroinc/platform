@@ -16,6 +16,7 @@ navigation:
                 label: 'oro.notification.menu.notification_alerts.label'
                 route: 'oro_notification_notificationalert_index'
                 acl_resource_id: 'oro_notification_notificationalert_view'
+                position: 140
 
         tree:
             application_menu:

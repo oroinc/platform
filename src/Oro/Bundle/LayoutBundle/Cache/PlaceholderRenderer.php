@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Cache;
 
-use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
+use Oro\Component\Layout\LayoutContextStack;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -12,33 +12,21 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class PlaceholderRenderer implements ResetInterface
 {
-    /**
-     * @var LayoutManager
-     */
-    private $layoutManager;
-
-    /**
-     * @var LayoutContextHolder
-     */
-    private $contextHolder;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var array
-     */
-    private $renderedPlaceholders = [];
+    private LayoutManager $layoutManager;
+    
+    private LayoutContextStack $layoutContextStack;
+    
+    private LoggerInterface $logger;
+    
+    private array $renderedPlaceholders = [];
 
     public function __construct(
         LayoutManager $layoutManager,
-        LayoutContextHolder $contextHolder,
+        LayoutContextStack $layoutContextStack,
         LoggerInterface $logger
     ) {
         $this->layoutManager = $layoutManager;
-        $this->contextHolder = $contextHolder;
+        $this->layoutContextStack = $layoutContextStack;
         $this->logger = $logger;
     }
 
@@ -91,7 +79,11 @@ class PlaceholderRenderer implements ResetInterface
             // handle nested placeholders
             return $this->renderPlaceholders($html);
         }
-        $context = $this->contextHolder->getContext();
+
+        $context = $this->layoutContextStack->getCurrentContext();
+        if (!$context) {
+            return '';
+        }
 
         return $this->layoutManager->getLayout($context, $blockId)->render();
     }
