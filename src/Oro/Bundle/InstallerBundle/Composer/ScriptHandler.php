@@ -9,13 +9,10 @@ use Exception;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Script handler for composer.
  * - installs npm assets
- * - sets assets version in parameters.yml
  * - sets permission on app directories
  */
 class ScriptHandler
@@ -181,14 +178,11 @@ class ScriptHandler
 
         $webDir = $options['symfony-web-dir'];
 
-        $parametersFile = self::getParametersFile($options);
-
         $directories = [
             'var/cache',
             'var/logs',
             'var/data',
             $webDir,
-            $parametersFile
         ];
 
         $permissionHandler = new PermissionsHandler();
@@ -228,31 +222,6 @@ class ScriptHandler
     protected static function getAssetsVersionFile(): string
     {
         return 'public/build/build_version.txt';
-    }
-
-    protected static function loadParametersFile(string $parametersFile): array
-    {
-        $yamlParser = new Parser();
-
-        return $yamlParser->parse(file_get_contents($parametersFile));
-    }
-
-    protected static function saveParametersFile(string $parametersFile, array $values): void
-    {
-        file_put_contents(
-            $parametersFile,
-            "# This file is auto-generated during the composer install\n" . Yaml::dump($values, 99)
-        );
-    }
-
-    protected static function getParametersFile(array $options): string
-    {
-        return $options['incenteev-parameters']['file'] ?? 'config/parameters.yml';
-    }
-
-    protected static function getParametersKey(array $options): string
-    {
-        return $options['incenteev-parameters']['parameter-key'] ?? 'parameters';
     }
 
     protected static function getOptions(Event $event): array

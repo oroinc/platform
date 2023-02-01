@@ -93,7 +93,6 @@
         "doctrine/persistence": "~2.5.5",
         "symfony/monolog-bundle": "~3.7.0",
         "sensio/framework-extra-bundle": "~6.2.6",
-        "incenteev/composer-parameter-handler": "2.1.*",
         "knplabs/knp-menu": "~3.3.0",
         "knplabs/knp-menu-bundle": "~3.2.0",
         "friendsofsymfony/rest-bundle": "~3.5.0",

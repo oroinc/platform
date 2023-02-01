@@ -1,10 +1,4 @@
 services:
-    oro_installer.yaml_persister:
-        class: Oro\Bundle\InstallerBundle\Persister\YamlPersister
-        arguments:
-            - '%kernel.project_dir%/config'
-            - '%kernel.environment%'
-
     oro_installer.script_manager:
         class: Oro\Bundle\InstallerBundle\ScriptManager
         arguments:
