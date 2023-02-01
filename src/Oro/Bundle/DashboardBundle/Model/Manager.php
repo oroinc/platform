@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
@@ -18,24 +19,11 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class Manager
 {
-    /**
-     * @var Factory
-     */
-    protected $factory;
+    protected Factory $factory;
+    protected EntityManagerInterface $entityManager;
+    protected TokenStorageInterface $tokenStorage;
+    protected AclHelper $aclHelper;
 
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @var TokenStorageInterface
-     */
-    protected $tokenStorage;
-
-    /**
-     * Constructor
-     */
     public function __construct(
         Factory $factory,
         EntityManager $entityManager,

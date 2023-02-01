@@ -17,10 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FilterTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FormFactoryInterface
-     */
-    private $factory;
+    private FormFactoryInterface $factory;
 
     protected function setUp(): void
     {
@@ -37,8 +34,8 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
             ->addTypeGuesser($this->createMock(ValidatorTypeGuesser::class))
             ->getFormFactory();
 
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->builder = new FormBuilder(null, null, $dispatcher, $this->factory);
     }
 
     public function testSubmit()
