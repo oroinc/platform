@@ -2,61 +2,6 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-### Changed
-
-#### RedisConfigBundle
-* Added the bundle itself to `oro/platform` package. The bundle came from outer package `oro/redis-config` and it was rebuilt to utilize Symfony redis configuration components instead of once from 3rd party package `snc/redis-bundle`.
-
-#### UIBundle
-* `oroui/js/app/components/viewport-component` has been changed options from `viewport: {maxScreenType: 'tablet'}` or `viewport: {minScreenType: 'tablet'}` to `viewport: 'tablet'`
-- As a result, you need to update your `html`:
-
-  **view.twig**
-    ```diff
-      {% block _main_menu_container_widget %}
-        {% set attr =  layout_attr_defaults(attr, {
-          '~class': ' main-menu-outer',
-          'data-page-component-module': 'oroui/js/app/components/viewport-component',
-          'data-page-component-options': {
-    -         viewport: {
-    -             maxScreenType: 'tablet',
-    -         },
-              component: 'oroui/js/app/components/view-component',
-              view: 'orocommercemenu/js/app/widgets/menu-traveling-widget'
-          },
-    ```
-    ```diff
-      {% block _main_menu_container_widget %}
-        {% set attr =  layout_attr_defaults(attr, {
-          '~class': ' main-menu-outer',
-          'data-page-component-module': 'oroui/js/app/components/viewport-component',
-          'data-page-component-options': {
-    +         viewport: 'tablet',
-              component: 'oroui/js/app/components/view-component',
-              view: 'orocommercemenu/js/app/widgets/menu-traveling-widget'
-          },
-    ```
-* `oroui/js/viewport-manager` has been update `isApplicable` method. From now on, the method accepts, as arguments, a string or an array of strings of media types.
-- For example:
-  + `viewportManager.isApplicable('tablet')`
-  + `viewportManager.isApplicable('tablet', 'tablet-small')`
-  + `viewportManager.isApplicable(['tablet', 'tablet-small'])`
-- Added next public methods:
-  + `getBreakpoints(context)`: returns object with all registered breakpoints from css property `--breakpoints`. It is possible to pass the `context` of the document as an argument.
-  + `getMediaType(mediaType)`: returns `MediaQueryList` by `mediaType` argument.
-- Removed next public methods:
-  + `getViewport`
-  + `getScreenType`
-  + `getAllowScreenTypes`
-
-### Removed
-
-#### UIBundle
-
-* CSSVariable parser `oroui/js/css-variables-manager` has been removed.
-* CSSVariable module `oroui/js/app/modules/css-variable-module` has been removed.
-
-## UNRELEASED
 ## Changes in the Platform package versions
 
 - [5.1.0](#510-unreleased)
@@ -238,7 +183,51 @@ The current file describes significant changes in the code that may affect the u
 * Entity title is no longer returned in the search results by default, now it has to be manually added to the select section of the query
 * All entities presented in the search index now have proper entity name providers
 
+#### RedisConfigBundle
+* Added the bundle itself to `oro/platform` package. The bundle came from outer package `oro/redis-config` and it was rebuilt to utilize Symfony redis configuration components instead of once from 3rd party package `snc/redis-bundle`.
+
 #### UIBundle
+
+* `oroui/js/app/components/viewport-component` has been changed options from `viewport: {maxScreenType: 'tablet'}` or `viewport: {minScreenType: 'tablet'}` to `viewport: 'tablet'`
+- As a result, you need to update your `html`:
+
+  **view.twig**
+    ```diff
+      {% block _main_menu_container_widget %}
+        {% set attr =  layout_attr_defaults(attr, {
+          '~class': ' main-menu-outer',
+          'data-page-component-module': 'oroui/js/app/components/viewport-component',
+          'data-page-component-options': {
+    -         viewport: {
+    -             maxScreenType: 'tablet',
+    -         },
+              component: 'oroui/js/app/components/view-component',
+              view: 'orocommercemenu/js/app/widgets/menu-traveling-widget'
+          },
+    ```
+    ```diff
+      {% block _main_menu_container_widget %}
+        {% set attr =  layout_attr_defaults(attr, {
+          '~class': ' main-menu-outer',
+          'data-page-component-module': 'oroui/js/app/components/viewport-component',
+          'data-page-component-options': {
+    +         viewport: 'tablet',
+              component: 'oroui/js/app/components/view-component',
+              view: 'orocommercemenu/js/app/widgets/menu-traveling-widget'
+          },
+    ```
+* `oroui/js/viewport-manager` has been update `isApplicable` method. From now on, the method accepts, as arguments, a string or an array of strings of media types.
+- For example:
+  + `viewportManager.isApplicable('tablet')`
+  + `viewportManager.isApplicable('tablet', 'tablet-small')`
+  + `viewportManager.isApplicable(['tablet', 'tablet-small'])`
+- Added next public methods:
+  + `getBreakpoints(context)`: returns object with all registered breakpoints from css property `--breakpoints`. It is possible to pass the `context` of the document as an argument.
+  + `getMediaType(mediaType)`: returns `MediaQueryList` by `mediaType` argument.
+- Removed next public methods:
+  + `getViewport`
+  + `getScreenType`
+  + `getAllowScreenTypes`
 
 The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` were removed, use the `bootstrap-collapse` instead.
 - As a result, you need to update your `html`:
@@ -322,6 +311,9 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 * `title_fields` field from `search.yml` field has been removed
 
 #### UIBundle
+
+* CSSVariable parser `oroui/js/css-variables-manager` has been removed.
+* CSSVariable module `oroui/js/app/modules/css-variable-module` has been removed.
 * Removed `oroui/js/app/views/swipeable-view`, use `oroui/js/app/modules/swipeable-module` instead.
 * `oroui/js/app/views/input-widget/checkbox` was removed; use pure CSS checkbox customization instead.
 * The deprecated `tooltips` translation domain was removed. All translation from this domain were moved to the `messages` domain.
