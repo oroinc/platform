@@ -16,6 +16,9 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Applies field ACL to datagrid and sets column value to null if user is not permitted to view this field value.
+ */
 class FieldAclExtension extends AbstractExtension
 {
     const FIELD_ACL = 'field_acl';
