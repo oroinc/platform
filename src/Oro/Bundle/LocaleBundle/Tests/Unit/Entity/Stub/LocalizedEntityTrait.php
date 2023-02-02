@@ -25,7 +25,7 @@ trait LocalizedEntityTrait
             switch ($setter) {
                 case $defaultSetterName:
                     return $this->setDefaultFallbackValue($this->$propertyName, $value);
-                break;
+                    break;
             }
         }
 

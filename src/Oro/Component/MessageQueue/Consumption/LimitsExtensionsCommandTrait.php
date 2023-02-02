@@ -29,7 +29,7 @@ trait LimitsExtensionsCommandTrait
             ->addOption('object-limit', null, InputOption::VALUE_REQUIRED, 'Exit when objects amount reached')
             ->addOption('gc-limit', null, InputOption::VALUE_REQUIRED, 'Exit when GC calls amount reached')
             ->setHelp(
-            // @codingStandardsIgnoreStart
+                // @codingStandardsIgnoreStart
                 $this->getHelp().<<<'HELP'
 
 The <info>--message-limit</info> option can be used to limit the maximum number of messages
@@ -54,7 +54,7 @@ The <info>--gc-limit</info> option defines the maximum amount GC calls:
 
   <info>php %command.full_name% --gc-limit=<number></info></info> <fg=green;options=underscore>other options and arguments</>
 HELP
-            // @codingStandardsIgnoreEnd
+                // @codingStandardsIgnoreEnd
             )
             ->addUsage('--message-limit=<number> [other options and arguments]')
             ->addUsage('--time-limit=<date-time-string> [other options and arguments]')

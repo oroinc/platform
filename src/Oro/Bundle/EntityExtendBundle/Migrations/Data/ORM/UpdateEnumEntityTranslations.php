@@ -67,7 +67,6 @@ class UpdateEnumEntityTranslations extends AbstractFixture implements VersionedF
         foreach ($entityConfigs as $entityConfig) {
             $fieldConfigs = $extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
             foreach ($fieldConfigs as $fieldConfig) {
-
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
                 $fieldType = $fieldConfigId->getFieldType();

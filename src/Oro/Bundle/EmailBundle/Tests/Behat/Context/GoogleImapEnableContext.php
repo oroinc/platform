@@ -10,7 +10,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
  */
 class GoogleImapEnableContext extends OroFeatureContext
 {
-
     /**
      * @Given /^(?:|I )enable Google IMAP$/
      */

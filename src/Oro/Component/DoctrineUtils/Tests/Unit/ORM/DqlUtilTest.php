@@ -113,7 +113,7 @@ WHERE EXISTS(
     WHERE  p2.id  =  p.id
 )
 DQL
-                        ;
+                    ;
                 },
                 ['p', 'i', 'p2', '_g2'],
             ],

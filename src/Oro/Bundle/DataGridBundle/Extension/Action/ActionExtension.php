@@ -151,7 +151,7 @@ class ActionExtension extends AbstractExtension
                     $entityIdFieldAlias,
                     $organizationIdFieldAlias,
                     $ownerIdFieldAlias
-                    ] = $this->ownershipFields[$entityAlias];
+                ] = $this->ownershipFields[$entityAlias];
 
                 /** @var ResultRecord[] $records */
                 $records = $result->getData();

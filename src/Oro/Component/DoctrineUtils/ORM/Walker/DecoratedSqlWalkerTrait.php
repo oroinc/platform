@@ -12,6 +12,7 @@ use Doctrine\ORM\Query\ParserResult;
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 trait DecoratedSqlWalkerTrait
 {
