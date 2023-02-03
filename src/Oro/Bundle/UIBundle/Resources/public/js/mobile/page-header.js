@@ -57,7 +57,8 @@ define(function(require, exports, module) {
             moreLabel: __('oro.ui.page_header.button.more'),
             minItemQuantity: 1,
             moreButtonAttrs: {
-                'class': 'btn-icon dropdown-toggle--no-caret'
+                'class': 'btn-icon dropdown-toggle--no-caret',
+                'data-fullscreenable': true
             }
         }, config.dropdownButtonProcessorOptions || {});
         const label = $container.find('.btn').slice(0, 2).text().replace(/\s{2,}/g, ' ');
