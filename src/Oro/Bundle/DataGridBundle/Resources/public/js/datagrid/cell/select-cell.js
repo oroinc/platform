@@ -43,12 +43,7 @@ define(function(require) {
                 throw new Error('Column metadata must have choices specified');
             }
             SelectCell.__super__.initialize.call(this, options);
-
-            this.listenTo(this.model, 'change:' + this.column.get('name'), () => {
-                this.enterEditMode();
-
-                this.$el.find('select').inputWidget('create');
-            });
+            this.listenTo(this.model, 'change:' + this.column.get('name'), this.enterEditMode);
         },
 
         /**
@@ -70,8 +65,13 @@ define(function(require) {
          * @inheritdoc
          */
         enterEditMode() {
-            if (this.isEditableColumn() && !this.currentEditor) {
+            if (!this.isEditableColumn()) {
+                return;
+            }
+            const modelValue = this.model.get(this.column.get('name'));
+            if (!this.currentEditor || !_.isEqual(this.currentEditor.$el.val(), modelValue)) {
                 SelectCell.__super__.enterEditMode.call(this);
+                this.$el.find('select').inputWidget('create');
             }
         },
 
