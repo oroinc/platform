@@ -15,7 +15,6 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -55,15 +54,10 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    $this->formType
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->formType], []),
             $this->getValidatorExtension(false),
         ];
     }
@@ -498,7 +492,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             'add_name_field' => true,
             'field_event_listeners' => [
                 'definition' => [
-                    FormEvents::PRE_SET_DATA => function (FormEvent $event) use (&$isCalled) {
+                    FormEvents::PRE_SET_DATA => function () use (&$isCalled) {
                         $isCalled = true;
                     }
                 ]

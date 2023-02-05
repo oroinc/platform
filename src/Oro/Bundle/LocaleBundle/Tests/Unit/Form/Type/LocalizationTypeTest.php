@@ -14,7 +14,7 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueColl
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
@@ -136,7 +136,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $languages = [];
         foreach (self::$languages as $id => $code) {
@@ -151,16 +151,13 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    LocalizationType::class => $this->formType,
+                    $this->formType,
                     LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionTypeStub(),
-                    LanguageSelectType::class => new EntityType($languages, LanguageSelectType::NAME),
+                    LanguageSelectType::class => new EntityTypeStub($languages),
                     FormattingSelectType::class => new FormattingSelectTypeStub(),
-                    LocalizationParentSelectType::class => new EntityType(
-                        [
-                            '1' => $this->getEntity(Localization::class, ['id' => 1])
-                        ],
-                        LocalizationParentSelectType::NAME
-                    ),
+                    LocalizationParentSelectType::class => new EntityTypeStub([
+                        '1' => $this->getEntity(Localization::class, ['id' => 1])
+                    ]),
                 ],
                 [
                     FormType::class => [

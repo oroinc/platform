@@ -407,24 +407,20 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         );
     }
 
-    public function getExtensions(): array
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
-        $subscriber = $this->getMockBuilder(ConfigSubscriber::class)
-            ->onlyMethods(['__construct'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $container = $this->createMock(ContainerInterface::class);
-
-        $formType = new FormType($subscriber, $container);
-        $formFieldType = new FormFieldType();
-        $useParentScope = new ParentScopeCheckbox();
-
         return [
             new PreloadedExtension(
                 [
-                    FormType::class => $formType,
-                    FormFieldType::class => $formFieldType,
-                    ParentScopeCheckbox::class => $useParentScope
+                    new FormType(
+                        new ConfigSubscriber($this->createMock(ConfigManager::class)),
+                        $this->createMock(ContainerInterface::class)
+                    ),
+                    new FormFieldType(),
+                    new ParentScopeCheckbox()
                 ],
                 []
             ),

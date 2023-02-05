@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Testing\Unit\Form\EventListener\Stub;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\EventListener\Stub;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
 
@@ -9,15 +9,12 @@ use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscribe
  */
 class AddressCountryAndRegionSubscriberStub extends AddressCountryAndRegionSubscriber
 {
-    /**
-     * @inheritDoc
-     */
     public function __construct()
     {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {

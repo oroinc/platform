@@ -54,7 +54,7 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
             ->with($file)
             ->willReturn(null);
 
-        $form = $this->factory->create(ConfigFileType::class, null);
+        $form = $this->factory->create(ConfigFileType::class);
         $form->submit(null);
 
         self::assertNull($form->getData());
@@ -85,18 +85,16 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
         self::assertEquals(self::FILE1_ID, $form->getData());
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    FileType::class => new FileType(
-                        new ExternalFileFactory($this->createMock(ClientInterface::class))
-                    ),
-                    ConfigFileType::class => $this->formType
-                ],
-                []
-            ),
+            new PreloadedExtension([
+                $this->formType,
+                new FileType(new ExternalFileFactory($this->createMock(ClientInterface::class)))
+            ], []),
             new ValidatorExtension(Validation::createValidator())
         ];
     }

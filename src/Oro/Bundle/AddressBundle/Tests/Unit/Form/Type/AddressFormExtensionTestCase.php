@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Testing\Unit;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
@@ -8,14 +8,16 @@ use Oro\Bundle\AddressBundle\Form\EventListener\AddressIdentifierSubscriber;
 use Oro\Bundle\AddressBundle\Form\Type\AddressType;
 use Oro\Bundle\AddressBundle\Form\Type\CountryType;
 use Oro\Bundle\AddressBundle\Form\Type\RegionType;
+use Oro\Bundle\AddressBundle\Tests\Unit\Form\EventListener\Stub\AddressCountryAndRegionSubscriberStub;
 use Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension;
 use Oro\Bundle\FormBundle\Tests\Unit\Stub\StripTagsExtensionStub;
-use Oro\Component\Testing\Unit\Form\EventListener\Stub\AddressCountryAndRegionSubscriberStub;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 /**
- * Base extension class for address form
+ * Base class for writing unit tests for address forms.
  */
 abstract class AddressFormExtensionTestCase extends FormIntegrationTestCase
 {
@@ -23,20 +25,14 @@ abstract class AddressFormExtensionTestCase extends FormIntegrationTestCase
     protected const COUNTRY_WITH_REGION = 'RO';
     protected const REGION_WITH_COUNTRY = 'RO-MS';
 
-    /** @var Country */
-    private $validCountry;
-
-    /** @var Country */
-    private $noRegionsCountry;
+    private ?Country $validCountry = null;
+    private ?Country $noRegionsCountry = null;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $countryType = new EntityType($this->getCountryChoices(), 'oro_country', ['configs' => []]);
-        $regionType = new EntityType($this->getRegionChoices(), 'oro_region', ['configs' => []]);
-
         return [
             new PreloadedExtension(
                 [
@@ -44,14 +40,14 @@ abstract class AddressFormExtensionTestCase extends FormIntegrationTestCase
                         new AddressCountryAndRegionSubscriberStub(),
                         new AddressIdentifierSubscriber()
                     ),
-                    CountryType::class => $countryType,
-                    RegionType::class => $regionType
+                    CountryType::class => new EntityTypeStub($this->getCountryChoices(), ['configs' => []]),
+                    RegionType::class => new EntityTypeStub($this->getRegionChoices(), ['configs' => []])
                 ],
                 [
                     FormType::class => [
                         new AdditionalAttrExtension(),
                         new StripTagsExtensionStub($this),
-                    ],
+                    ]
                 ]
             )
         ];

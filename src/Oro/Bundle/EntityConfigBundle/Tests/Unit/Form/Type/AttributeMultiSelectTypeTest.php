@@ -34,15 +34,10 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    AttributeMultiSelectType::class => $this->formType
-                ],
-                []
-            )
+            new PreloadedExtension([$this->formType], [])
         ];
     }
 

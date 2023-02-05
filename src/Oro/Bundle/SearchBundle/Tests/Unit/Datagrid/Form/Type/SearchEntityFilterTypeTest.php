@@ -9,7 +9,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEntityFilterType;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType as EntityTypeStub;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -120,7 +120,7 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $translator = $this->createMock(TranslatorInterface::class);
 
@@ -131,7 +131,7 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
                     new EntityFilterType($translator),
                     new ChoiceFilterType($translator),
                     new FilterType($translator),
-                    EntityType::class => new EntityTypeStub([])
+                    EntityType::class => new EntityTypeStub()
                 ],
                 []
             ),

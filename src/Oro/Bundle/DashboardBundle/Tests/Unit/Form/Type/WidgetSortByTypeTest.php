@@ -20,9 +20,9 @@ class WidgetSortByTypeTest extends TypeTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension([new WidgetSortByType($this->fieldProvider)], [])

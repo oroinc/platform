@@ -69,9 +69,9 @@ class TreeMoveTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension([], [FormType::class => [new AdditionalAttrExtension()]])

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub;
 
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,7 +27,7 @@ class LocalizedFallbackValueTypeStub extends AbstractType
         $builder
             ->add('string', TextType::class)
             ->add('text', TextType::class)
-            ->add('localization', EntityType::class);
+            ->add('localization', EntityTypeStub::class);
     }
 
     /**

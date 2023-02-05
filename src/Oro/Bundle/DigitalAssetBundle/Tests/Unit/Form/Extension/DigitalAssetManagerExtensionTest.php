@@ -47,33 +47,35 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
     private const SAMPLE_CLASS = 'SampleClass';
     private const SAMPLE_FIELD = 'sampleField';
 
-    private AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-        $attachmentEntityConfigProvider;
+    /** @var AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $attachmentEntityConfigProvider;
 
-    private EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject $entityClassNameHelper;
+    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityClassNameHelper;
 
-    private PreviewMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $previewMetadataProvider;
+    /** @var PreviewMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $previewMetadataProvider;
 
-    private EntityToIdTransformer|\PHPUnit\Framework\MockObject\MockObject $digitalAssetToIdTransformer;
+    /** @var EntityToIdTransformer|\PHPUnit\Framework\MockObject\MockObject */
+    private $digitalAssetToIdTransformer;
 
-    private FileReflector|\PHPUnit\Framework\MockObject\MockObject $fileReflector;
+    /** @var FileReflector|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileReflector;
 
-    private DigitalAssetManagerExtension $extension;
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    private FormInterface|\PHPUnit\Framework\MockObject\MockObject $form;
+    /** @var DigitalAssetManagerExtension */
+    private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
         $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
         $this->previewMetadataProvider = $this->createMock(PreviewMetadataProviderInterface::class);
         $this->digitalAssetToIdTransformer = $this->createMock(EntityToIdTransformer::class);
         $this->fileReflector = $this->createMock(FileReflector::class);
+        $this->form = $this->createMock(FormInterface::class);
 
         $this->extension = new DigitalAssetManagerExtension(
             $this->attachmentEntityConfigProvider,
@@ -83,21 +85,30 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             $this->fileReflector
         );
 
-        $this->form = $this->createMock(FormInterface::class);
+        parent::setUp();
     }
 
-    public function getExtensions(): array
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
         $fileType = new FileType(
             new ExternalFileFactory($this->createMock(ClientInterface::class))
         );
         $fileType->setEventSubscriber(new EventSubscriberStub());
 
-        $multipleFileConstraintsProvider = $this->createMock(MultipleFileConstraintsProvider::class);
-        $multiFileType = new MultiFileType(new EventSubscriberStub(), $multipleFileConstraintsProvider);
-
         return [
-            new PreloadedExtension([$fileType, $multiFileType], []),
+            new PreloadedExtension(
+                [
+                    $fileType,
+                    new MultiFileType(
+                        new EventSubscriberStub(),
+                        $this->createMock(MultipleFileConstraintsProvider::class)
+                    )
+                ],
+                []
+            ),
         ];
     }
 
@@ -109,9 +120,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
     public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
-
-        $resolver
-            ->expects($this->once())
+        $resolver->expects($this->once())
             ->method('setDefaults')
             ->willReturnCallback(
                 function (array $defaults) {
@@ -124,11 +133,9 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
                     $this->assertArrayHasKey('validation_groups', $defaults);
                 }
             );
-
         $resolver->expects($this->once())
             ->method('addNormalizer')
             ->with('fileOptions', $this->isType('callable'), true);
-
         $resolver->expects($this->once())
             ->method('setNormalizer')
             ->with('dam_widget_enabled', $this->isType('callable'));
@@ -169,20 +176,17 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         bool $useDam,
         array $expectedGroups
     ): void {
-        $this->form
-            ->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($formConfig = $this->createMock(FormConfigInterface::class));
-
-        $formConfig
-            ->expects($this->once())
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formConfig->expects($this->once())
             ->method('getOptions')
             ->willReturn($options);
 
-        $entityFieldConfig = $this->mockEntityFieldConfig();
+        $this->form->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
 
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig = $this->mockEntityFieldConfig();
+        $entityFieldConfig->expects($this->once())
             ->method('is')
             ->with('use_dam')
             ->willReturn($useDam);
@@ -208,15 +212,14 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testValidationGroupsCallbackWhenNotCheckEmptyFile(): void
     {
-        $this->form
-            ->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($formConfig = $this->createMock(FormConfigInterface::class));
-
-        $formConfig
-            ->expects($this->once())
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formConfig->expects($this->once())
             ->method('getOptions')
             ->willReturn(['checkEmptyFile' => false]);
+
+        $this->form->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
 
         $this->assertEquals(['Default'], $this->extension->validationGroupsCallback($this->form));
     }
@@ -275,10 +278,13 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testBuildForm(): void
     {
-        $builder = $this->createMock(FormBuilderInterface::class);
+        $digitalAssetForm = $this->createMock(FormBuilderInterface::class);
+        $digitalAssetForm->expects($this->once())
+            ->method('addModelTransformer')
+            ->with($this->digitalAssetToIdTransformer);
 
-        $builder
-            ->expects($this->once())
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects($this->once())
             ->method('add')
             ->with(
                 'digitalAsset',
@@ -290,20 +296,12 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
                     'constraints' => [new NotBlank(['groups' => 'DamWidgetEnabled'])],
                 ]
             );
-
-        $builder
-            ->expects($this->once())
+        $builder->expects($this->once())
             ->method('get')
             ->with('digitalAsset')
-            ->willReturn($digitalAssetForm = $this->createMock(FormBuilderInterface::class));
+            ->willReturn($digitalAssetForm);
 
-        $digitalAssetForm
-            ->expects($this->once())
-            ->method('addModelTransformer')
-            ->with($this->digitalAssetToIdTransformer);
-
-        $builder
-            ->expects($this->once())
+        $builder->expects($this->once())
             ->method('addEventListener')
             ->with(FormEvents::POST_SUBMIT, $this->isType('array'));
 
@@ -342,13 +340,11 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
     public function testPostSubmitWhenNoFile(): void
     {
         $formEvent = $this->createMock(FormEvent::class);
-        $formEvent
-            ->expects($this->once())
+        $formEvent->expects($this->once())
             ->method('getData')
             ->willReturn(null);
 
-        $this->fileReflector
-            ->expects($this->never())
+        $this->fileReflector->expects($this->never())
             ->method('reflectFromDigitalAsset');
 
         $this->extension->postSubmit($formEvent);
@@ -361,18 +357,15 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             ->getMock();
 
         $formEvent = $this->createMock(FormEvent::class);
-        $formEvent
-            ->expects($this->once())
+        $formEvent->expects($this->once())
             ->method('getData')
             ->willReturn($file);
 
-        $file
-            ->expects($this->once())
+        $file->expects($this->once())
             ->method('getDigitalAsset')
             ->willReturn(null);
 
-        $this->fileReflector
-            ->expects($this->never())
+        $this->fileReflector->expects($this->never())
             ->method('reflectFromDigitalAsset');
 
         $this->extension->postSubmit($formEvent);
@@ -385,18 +378,16 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             ->getMock();
 
         $formEvent = $this->createMock(FormEvent::class);
-        $formEvent
-            ->expects($this->once())
+        $formEvent->expects($this->once())
             ->method('getData')
             ->willReturn($file);
 
-        $file
-            ->expects($this->once())
+        $digitalAsset = $this->createMock(DigitalAsset::class);
+        $file->expects($this->once())
             ->method('getDigitalAsset')
-            ->willReturn($digitalAsset = $this->createMock(DigitalAsset::class));
+            ->willReturn($digitalAsset);
 
-        $this->fileReflector
-            ->expects($this->once())
+        $this->fileReflector->expects($this->once())
             ->method('reflectFromDigitalAsset')
             ->with($file, $digitalAsset);
 
@@ -430,8 +421,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testBuildViewWhenNoPropertyPath(): void
     {
-        $this->form
-            ->expects($this->once())
+        $this->form->expects($this->once())
             ->method('getPropertyPath')
             ->willReturn(null);
 
@@ -446,15 +436,14 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testBuildViewWhenMultiplePropertyPath(): void
     {
-        $this->form
-            ->expects($this->once())
-            ->method('getPropertyPath')
-            ->willReturn($propertyPath = $this->createMock(PropertyPathInterface::class));
-
-        $propertyPath
-            ->expects($this->once())
+        $propertyPath = $this->createMock(PropertyPathInterface::class);
+        $propertyPath->expects($this->once())
             ->method('getLength')
             ->willReturn(2);
+
+        $this->form->expects($this->once())
+            ->method('getPropertyPath')
+            ->willReturn($propertyPath);
 
         $this->extension->buildView(
             $formView = new FormView(),
@@ -467,18 +456,15 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testBuildViewWhenNoParent(): void
     {
-        $this->form
-            ->expects($this->once())
-            ->method('getPropertyPath')
-            ->willReturn($propertyPath = $this->createMock(PropertyPathInterface::class));
-
-        $propertyPath
-            ->expects($this->once())
+        $propertyPath = $this->createMock(PropertyPathInterface::class);
+        $propertyPath->expects($this->once())
             ->method('getLength')
             ->willReturn(1);
 
-        $this->form
-            ->expects($this->once())
+        $this->form->expects($this->once())
+            ->method('getPropertyPath')
+            ->willReturn($propertyPath);
+        $this->form->expects($this->once())
             ->method('getParent')
             ->willReturn(null);
 
@@ -493,30 +479,28 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testBuildViewWhenNoParentDataClass(): void
     {
-        $this->form
-            ->expects($this->once())
-            ->method('getPropertyPath')
-            ->willReturn($propertyPath = $this->createMock(PropertyPathInterface::class));
-
-        $propertyPath
-            ->expects($this->once())
+        $propertyPath = $this->createMock(PropertyPathInterface::class);
+        $propertyPath->expects($this->once())
             ->method('getLength')
             ->willReturn(1);
 
-        $this->form
-            ->expects($this->once())
+        $this->form->expects($this->once())
+            ->method('getPropertyPath')
+            ->willReturn($propertyPath);
+
+        $parentForm = $this->createMock(FormInterface::class);
+        $this->form->expects($this->once())
             ->method('getParent')
-            ->willReturn($parentForm = $this->createMock(FormInterface::class));
+            ->willReturn($parentForm);
 
-        $parentForm
-            ->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($parentFormConfig = $this->createMock(FormConfigInterface::class));
-
-        $parentFormConfig
-            ->expects($this->once())
+        $parentFormConfig = $this->createMock(FormConfigInterface::class);
+        $parentFormConfig->expects($this->once())
             ->method('getDataClass')
             ->willReturn(null);
+
+        $parentForm->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($parentFormConfig);
 
         $this->extension->buildView(
             $formView = new FormView(),
@@ -529,35 +513,31 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testBuildViewWhenNoFieldName(): void
     {
-        $this->form
-            ->expects($this->once())
-            ->method('getPropertyPath')
-            ->willReturn($propertyPath = $this->createMock(PropertyPathInterface::class));
-
-        $propertyPath
-            ->expects($this->once())
+        $propertyPath = $this->createMock(PropertyPathInterface::class);
+        $propertyPath->expects($this->once())
             ->method('getLength')
             ->willReturn(1);
+        $propertyPath->expects($this->once())
+            ->method('__toString')
+            ->willReturn('');
 
-        $this->form
-            ->expects($this->once())
+        $this->form->expects($this->once())
+            ->method('getPropertyPath')
+            ->willReturn($propertyPath);
+
+        $parentForm = $this->createMock(FormInterface::class);
+        $this->form->expects($this->once())
             ->method('getParent')
-            ->willReturn($parentForm = $this->createMock(FormInterface::class));
+            ->willReturn($parentForm);
 
-        $parentForm
-            ->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($parentFormConfig = $this->createMock(FormConfigInterface::class));
-
-        $parentFormConfig
-            ->expects($this->once())
+        $parentFormConfig = $this->createMock(FormConfigInterface::class);
+        $parentFormConfig->expects($this->once())
             ->method('getDataClass')
             ->willReturn(self::SAMPLE_CLASS);
 
-        $propertyPath
-            ->expects($this->once())
-            ->method('__toString')
-            ->willReturn('');
+        $parentForm->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($parentFormConfig);
 
         $this->extension->buildView(
             $formView = new FormView(),
@@ -570,39 +550,34 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testBuildViewWhenNoFieldConfig(): void
     {
-        $form = $this->createMock(FormInterface::class);
-        $form
-            ->expects($this->once())
-            ->method('getPropertyPath')
-            ->willReturn($propertyPath = $this->createMock(PropertyPathInterface::class));
-
-        $propertyPath
-            ->expects($this->once())
+        $propertyPath = $this->createMock(PropertyPathInterface::class);
+        $propertyPath->expects($this->once())
             ->method('getLength')
             ->willReturn(1);
-
-        $form
-            ->expects($this->once())
-            ->method('getParent')
-            ->willReturn($parentForm = $this->createMock(FormInterface::class));
-
-        $parentForm
-            ->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($parentFormConfig = $this->createMock(FormConfigInterface::class));
-
-        $parentFormConfig
-            ->expects($this->once())
-            ->method('getDataClass')
-            ->willReturn($entityClass = 'SampleClass');
-
-        $propertyPath
-            ->expects($this->once())
+        $propertyPath->expects($this->once())
             ->method('__toString')
             ->willReturn($fieldName = 'sampleField');
 
-        $this->attachmentEntityConfigProvider
-            ->expects($this->once())
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())
+            ->method('getPropertyPath')
+            ->willReturn($propertyPath);
+
+        $parentForm = $this->createMock(FormInterface::class);
+        $form->expects($this->once())
+            ->method('getParent')
+            ->willReturn($parentForm);
+
+        $parentFormConfig = $this->createMock(FormConfigInterface::class);
+        $parentFormConfig->expects($this->once())
+            ->method('getDataClass')
+            ->willReturn($entityClass = 'SampleClass');
+
+        $parentForm->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($parentFormConfig);
+
+        $this->attachmentEntityConfigProvider->expects($this->once())
             ->method('getFieldConfig')
             ->with($entityClass, $fieldName)
             ->willReturn(null);
@@ -620,8 +595,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
     {
         $entityFieldConfig = $this->mockEntityFieldConfig();
 
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig->expects($this->once())
             ->method('is')
             ->with('use_dam')
             ->willReturn(false);
@@ -635,43 +609,39 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $this->assertArrayNotHasKey('dam_widget', $formView->vars);
     }
 
-    private function mockEntityFieldConfig(): ConfigInterface
+    private function mockEntityFieldConfig(): ConfigInterface|\PHPUnit\Framework\MockObject\MockObject
     {
-        $this->form
-            ->expects($this->once())
-            ->method('getPropertyPath')
-            ->willReturn($propertyPath = $this->createMock(PropertyPathInterface::class));
+        $entityFieldConfig = $this->createMock(ConfigInterface::class);
 
-        $propertyPath
-            ->expects($this->once())
+        $propertyPath = $this->createMock(PropertyPathInterface::class);
+        $propertyPath->expects($this->once())
             ->method('getLength')
             ->willReturn(1);
-
-        $this->form
-            ->expects($this->once())
-            ->method('getParent')
-            ->willReturn($parentForm = $this->createMock(FormInterface::class));
-
-        $parentForm
-            ->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($parentFormConfig = $this->createMock(FormConfigInterface::class));
-
-        $parentFormConfig
-            ->expects($this->once())
-            ->method('getDataClass')
-            ->willReturn(self::SAMPLE_CLASS);
-
-        $propertyPath
-            ->expects($this->once())
+        $propertyPath->expects($this->once())
             ->method('__toString')
             ->willReturn(self::SAMPLE_FIELD);
 
-        $this->attachmentEntityConfigProvider
-            ->expects($this->once())
+        $this->form->expects($this->once())
+            ->method('getPropertyPath')
+            ->willReturn($propertyPath);
+
+        $parentForm = $this->createMock(FormInterface::class);
+        $this->form->expects($this->once())
+            ->method('getParent')
+            ->willReturn($parentForm);
+
+        $parentFormConfig = $this->createMock(FormConfigInterface::class);
+        $parentFormConfig->expects($this->once())
+            ->method('getDataClass')
+            ->willReturn(self::SAMPLE_CLASS);
+        $parentForm->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($parentFormConfig);
+
+        $this->attachmentEntityConfigProvider->expects($this->once())
             ->method('getFieldConfig')
             ->with(self::SAMPLE_CLASS, self::SAMPLE_FIELD)
-            ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
+            ->willReturn($entityFieldConfig);
 
         return $entityFieldConfig;
     }
@@ -680,24 +650,21 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
     {
         $entityFieldConfig = $this->mockEntityFieldConfig();
 
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig->expects($this->once())
             ->method('is')
             ->with('use_dam')
             ->willReturn(true);
 
-        $entityFieldConfig
-            ->expects($this->once())
-            ->method('getId')
-            ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
-
-        $fieldConfigId
-            ->expects($this->once())
+        $fieldConfigId = $this->createMock(FieldConfigId::class);
+        $fieldConfigId->expects($this->once())
             ->method('getFieldType')
             ->willReturn('sampleType');
 
-        $this->form
-            ->expects($this->once())
+        $entityFieldConfig->expects($this->once())
+            ->method('getId')
+            ->willReturn($fieldConfigId);
+
+        $this->form->expects($this->once())
             ->method('getData')
             ->willReturn(null);
 
@@ -732,44 +699,37 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
      */
     public function testBuildViewWhenSubmitted(bool $isValidDigitalAsset): void
     {
-        $entityFieldConfig = $this->mockEntityFieldConfig();
-
-        $entityFieldConfig
-            ->expects($this->once())
-            ->method('is')
-            ->with('use_dam')
-            ->willReturn(true);
-
-        $entityFieldConfig
-            ->expects($this->once())
-            ->method('getId')
-            ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
-
-        $fieldConfigId
-            ->expects($this->once())
+        $fieldConfigId = $this->createMock(FieldConfigId::class);
+        $fieldConfigId->expects($this->once())
             ->method('getFieldType')
             ->willReturn('sampleType');
 
-        $this->form
-            ->expects($this->once())
+        $entityFieldConfig = $this->mockEntityFieldConfig();
+        $entityFieldConfig->expects($this->once())
+            ->method('is')
+            ->with('use_dam')
+            ->willReturn(true);
+        $entityFieldConfig->expects($this->once())
+            ->method('getId')
+            ->willReturn($fieldConfigId);
+
+        $this->form->expects($this->once())
             ->method('getData')
             ->willReturn(null);
 
-        $this->form
-            ->expects($this->once())
+        $this->form->expects($this->once())
             ->method('isSubmitted')
             ->willReturn(true);
 
-        $this->form
-            ->expects($this->once())
-            ->method('get')
-            ->with('digitalAsset')
-            ->willReturn($digitalAssetForm = $this->createMock(FormInterface::class));
-
-        $digitalAssetForm
-            ->expects($this->once())
+        $digitalAssetForm = $this->createMock(FormInterface::class);
+        $digitalAssetForm->expects($this->once())
             ->method('isValid')
             ->willReturn($isValidDigitalAsset);
+
+        $this->form->expects($this->once())
+            ->method('get')
+            ->with('digitalAsset')
+            ->willReturn($digitalAssetForm);
 
         $formView = new FormView();
         $formView->vars['block_prefixes'] = ['sample1', 'sample2'];
@@ -811,39 +771,34 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testBuildViewWhenPreviewMetadata(): void
     {
-        $entityFieldConfig = $this->mockEntityFieldConfig();
-
-        $entityFieldConfig
-            ->expects($this->once())
-            ->method('is')
-            ->with('use_dam')
-            ->willReturn(true);
-
-        $entityFieldConfig
-            ->expects($this->once())
-            ->method('getId')
-            ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
-
-        $fieldConfigId
-            ->expects($this->once())
+        $fieldConfigId = $this->createMock(FieldConfigId::class);
+        $fieldConfigId->expects($this->once())
             ->method('getFieldType')
             ->willReturn('image');
 
-        $this->form
-            ->expects($this->once())
-            ->method('getData')
-            ->willReturn($file = $this->createMock(File::class));
+        $entityFieldConfig = $this->mockEntityFieldConfig();
+        $entityFieldConfig->expects($this->once())
+            ->method('is')
+            ->with('use_dam')
+            ->willReturn(true);
+        $entityFieldConfig->expects($this->once())
+            ->method('getId')
+            ->willReturn($fieldConfigId);
 
-        $file
-            ->expects($this->any())
+        $file = $this->createMock(File::class);
+        $file->expects($this->any())
             ->method('getId')
             ->willReturn(1);
 
-        $this->previewMetadataProvider
-            ->expects($this->once())
+        $this->form->expects($this->once())
+            ->method('getData')
+            ->willReturn($file);
+
+        $previewMetadata = ['sample' => 'metadata'];
+        $this->previewMetadataProvider->expects($this->once())
             ->method('getMetadata')
             ->with($file)
-            ->willReturn($previewMetadata = ['sample' => 'metadata']);
+            ->willReturn($previewMetadata);
 
         $formView = new FormView();
         $formView->vars['block_prefixes'] = ['sample1', 'sample2'];
@@ -876,26 +831,21 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
      */
     public function testBuildViewWhenImage(string $fieldType, bool $isImageType): void
     {
-        $entityFieldConfig = $this->mockEntityFieldConfig();
-
-        $entityFieldConfig
-            ->expects($this->once())
-            ->method('is')
-            ->with('use_dam')
-            ->willReturn(true);
-
-        $entityFieldConfig
-            ->expects($this->once())
-            ->method('getId')
-            ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
-
-        $fieldConfigId
-            ->expects($this->once())
+        $fieldConfigId = $this->createMock(FieldConfigId::class);
+        $fieldConfigId->expects($this->once())
             ->method('getFieldType')
             ->willReturn($fieldType);
 
-        $this->form
-            ->expects($this->once())
+        $entityFieldConfig = $this->mockEntityFieldConfig();
+        $entityFieldConfig->expects($this->once())
+            ->method('is')
+            ->with('use_dam')
+            ->willReturn(true);
+        $entityFieldConfig->expects($this->once())
+            ->method('getId')
+            ->willReturn($fieldConfigId);
+
+        $this->form->expects($this->once())
             ->method('getData')
             ->willReturn(null);
 
@@ -945,8 +895,8 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testBuildViewWhenParentIsLineItem(): void
     {
-        $fileItem = (new FileItem())
-            ->setFile(new File());
+        $fileItem = new FileItem();
+        $fileItem->setFile(new File());
 
         $entity = new EntityWithMultiFile();
         $entity->multiFileField->add($fileItem);
@@ -955,26 +905,24 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
         $fileForm = $form->get('multiFileField')->get(0)->get('file');
 
-        $this->attachmentEntityConfigProvider->expects($this->once())
-            ->method('getFieldConfig')
-            ->with(EntityWithMultiFile::class, 'multiFileField')
-            ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
+        $fieldConfigId = $this->createMock(FieldConfigId::class);
+        $fieldConfigId->expects($this->once())
+            ->method('getFieldType')
+            ->willReturn('image');
 
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig = $this->createMock(ConfigInterface::class);
+        $entityFieldConfig->expects($this->once())
             ->method('is')
             ->with('use_dam')
             ->willReturn(true);
-
-        $entityFieldConfig
-            ->expects($this->once())
+        $entityFieldConfig->expects($this->once())
             ->method('getId')
-            ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
+            ->willReturn($fieldConfigId);
 
-        $fieldConfigId
-            ->expects($this->once())
-            ->method('getFieldType')
-            ->willReturn('image');
+        $this->attachmentEntityConfigProvider->expects($this->once())
+            ->method('getFieldConfig')
+            ->with(EntityWithMultiFile::class, 'multiFileField')
+            ->willReturn($entityFieldConfig);
 
         $formView = new FormView();
         $formView->vars['block_prefixes'] = ['sample1', 'sample2'];
@@ -1004,44 +952,35 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
     public function testBuildViewDefaultRouteParameters(): void
     {
-        $entityFieldConfig = $this->mockEntityFieldConfig();
-
-        $entityFieldConfig
-            ->expects($this->once())
-            ->method('is')
-            ->with('use_dam')
-            ->willReturn(true);
-
-        $entityFieldConfig
-            ->expects($this->once())
-            ->method('getId')
-            ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
-
-        $fieldConfigId
-            ->expects($this->once())
+        $fieldConfigId = $this->createMock(FieldConfigId::class);
+        $fieldConfigId->expects($this->once())
             ->method('getFieldType')
             ->willReturn('image');
-
-        $fieldConfigId
-            ->expects($this->once())
+        $fieldConfigId->expects($this->once())
             ->method('getClassName')
             ->willReturn(self::SAMPLE_CLASS);
-
-        $fieldConfigId
-            ->expects($this->once())
+        $fieldConfigId->expects($this->once())
             ->method('getFieldName')
             ->willReturn(self::SAMPLE_FIELD);
 
-        $this->form
-            ->expects($this->once())
+        $entityFieldConfig = $this->mockEntityFieldConfig();
+        $entityFieldConfig->expects($this->once())
+            ->method('is')
+            ->with('use_dam')
+            ->willReturn(true);
+        $entityFieldConfig->expects($this->once())
+            ->method('getId')
+            ->willReturn($fieldConfigId);
+
+        $this->form->expects($this->once())
             ->method('getData')
             ->willReturn(null);
 
-        $this->entityClassNameHelper
-            ->expects($this->once())
+        $safeEntityClass = 'SafeSampleClass';
+        $this->entityClassNameHelper->expects($this->once())
             ->method('getUrlSafeClassName')
             ->with(self::SAMPLE_CLASS)
-            ->willReturn($safeEntityClass = 'SafeSampleClass');
+            ->willReturn($safeEntityClass);
 
         $formView = new FormView();
         $formView->vars['block_prefixes'] = ['sample1', 'sample2'];

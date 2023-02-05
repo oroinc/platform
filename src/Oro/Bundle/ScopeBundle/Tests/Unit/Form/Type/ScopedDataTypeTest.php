@@ -15,8 +15,7 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /** @var ScopedDataType */
-    private $formType;
+    private ScopedDataType $formType;
 
     protected function setUp(): void
     {
@@ -39,15 +38,15 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension(
                 [
-                    ScopedDataType::class => $this->formType,
-                    StubType::class => new StubType(),
+                    $this->formType,
+                    new StubType(),
                 ],
                 []
             ),

@@ -62,15 +62,12 @@ class WidgetFilterTypeTest extends TypeTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $preLoadedExtension = new PreloadedExtension(
-            [FilterType::class => new FilterType()],
-            []
-        );
-
-        return array_merge(parent::getExtensions(), [$preLoadedExtension]);
+        return array_merge(parent::getExtensions(), [
+            new PreloadedExtension([new FilterType()], [])
+        ]);
     }
 }

@@ -107,15 +107,10 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    OroHiddenNumberType::class => $this->formType
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->formType], [])
         ];
     }
 }
