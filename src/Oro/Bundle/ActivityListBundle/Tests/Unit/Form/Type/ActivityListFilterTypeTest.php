@@ -57,19 +57,15 @@ class ActivityListFilterTypeTest extends TypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-
-        $filterType = new FilterType($translator);
-
         return [
-            new PreloadedExtension(
-                [
-                    $filterType->getName() => $filterType,
-                ],
-                []
-            )
+            new PreloadedExtension([
+                new FilterType($this->createMock(TranslatorInterface::class))
+            ], [])
         ];
     }
 }

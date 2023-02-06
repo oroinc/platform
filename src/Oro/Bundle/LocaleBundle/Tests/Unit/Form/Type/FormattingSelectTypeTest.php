@@ -61,9 +61,9 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $choiceType = $this->createMock(OroChoiceType::class);
         $choiceType->expects($this->any())
@@ -73,8 +73,8 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    FormattingSelectType::class => $this->formType,
-                    OroChoiceType::class => $choiceType
+                    $this->formType,
+                    $choiceType
                 ],
                 []
             )

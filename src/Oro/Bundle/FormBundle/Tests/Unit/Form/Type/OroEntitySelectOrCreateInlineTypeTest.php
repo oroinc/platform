@@ -87,26 +87,20 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $configProvider = $this->createMock(ConfigProvider::class);
         $config = $this->createMock(ConfigInterface::class);
-
-        $configProvider->expects($this->any())
-            ->method('getConfig')
-            ->willReturn($config);
-
         $config->expects($this->any())
             ->method('get')
             ->willReturn('value');
 
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $configProvider->expects($this->any())
+            ->method('getConfig')
+            ->willReturn($config);
+
         return [
-            new PreloadedExtension(
-                [
-                    OroEntitySelectOrCreateInlineType::class => $this->formType
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->formType], []),
             new EntitySelectOrCreateInlineFormExtension(
                 $this->entityManager,
                 $this->searchRegistry,

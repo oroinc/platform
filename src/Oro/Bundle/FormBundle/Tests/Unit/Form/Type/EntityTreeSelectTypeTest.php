@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\FormBundle\Form\Type\EntityTreeSelectType;
-use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\EntityIdentifierType as EntityIdentifierTypeStub;
+use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\EntityIdentifierTypeStub;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -20,18 +20,15 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
         $this->formType = new EntityTreeSelectType();
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
-        $entityIdentifierType = new EntityIdentifierTypeStub(
-            [
-                1 => new TestEntity(1),
-            ]
-        );
-
         return [
             new PreloadedExtension(
                 [
-                    EntityIdentifierType::class => $entityIdentifierType,
+                    EntityIdentifierType::class => new EntityIdentifierTypeStub([1 => new TestEntity(1)])
                 ],
                 []
             ),

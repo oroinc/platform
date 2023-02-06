@@ -22,17 +22,10 @@ class UrlInfoTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $urlInfoType = new UrlInfoType($this->router);
-
         return [
-            new PreloadedExtension(
-                [
-                    UrlInfoType::class => $urlInfoType
-                ],
-                []
-            )
+            new PreloadedExtension([new UrlInfoType($this->router)], [])
         ];
     }
 

@@ -50,17 +50,13 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-
-        $fieldChoiceType = new FieldChoiceType($translator);
-
         return [
             new PreloadedExtension(
                 [
-                    ReportChartSchemaType::class => $this->type,
-                    $fieldChoiceType->getName() => $fieldChoiceType
+                    $this->type,
+                    new FieldChoiceType($this->createMock(TranslatorInterface::class))
                 ],
                 []
             )

@@ -76,15 +76,10 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    OroEntityCreateOrSelectType::class => $this->formType
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->formType], []),
             new EntityCreateSelectFormExtension($this->managerRegistry)
         ];
     }

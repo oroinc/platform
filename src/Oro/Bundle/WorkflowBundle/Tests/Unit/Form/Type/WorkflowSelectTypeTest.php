@@ -40,17 +40,12 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    $this->type
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->type], [])
         ];
     }
 

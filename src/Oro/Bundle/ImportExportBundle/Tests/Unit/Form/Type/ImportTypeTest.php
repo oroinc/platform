@@ -93,17 +93,12 @@ class ImportTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    ImportType::class => $this->type
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->type], []),
             new ValidatorExtension(Validation::createValidator())
         ];
     }

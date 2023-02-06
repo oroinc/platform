@@ -11,6 +11,27 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class UserApiKeyGenTypeTest extends FormIntegrationTestCase
 {
+    private UserApiKeyGenType $formType;
+
+    protected function setUp(): void
+    {
+        $this->formType = new UserApiKeyGenType();
+        parent::setUp();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
+    {
+        return [
+            new PreloadedExtension(
+                [$this->formType, new UserApiKeyGenKeyType()],
+                []
+            )
+        ];
+    }
+
     public function testSubmit()
     {
         $userApi = new UserApi();
@@ -36,43 +57,20 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
 
     public function testDefaultOptions()
     {
-        $expected   = [
+        $expected = [
             'data_class' => UserApi::class,
             'csrf_protection' => ['enabled' => true, 'fieild_name' => 'apikey_token'],
             'csrf_token_id' => UserApiKeyGenType::NAME,
             'apiKeyElementId' => 'user-apikey-gen-elem'
         ];
-        $form       = $this->factory->create(UserApiKeyGenType::class, null, []);
-        $defaults   = array_intersect_key($expected, $form->getConfig()->getOptions());
+        $form = $this->factory->create(UserApiKeyGenType::class, null, []);
+        $defaults = array_intersect_key($expected, $form->getConfig()->getOptions());
 
         $this->assertEquals($expected, $defaults);
     }
 
-    public function testGetName()
-    {
-        $type = new UserApiKeyGenType();
-        $this->assertEquals(UserApiKeyGenType::NAME, $type->getName());
-    }
-
     public function testGetBlockPrefix()
     {
-        $type = new UserApiKeyGenType();
-        $this->assertEquals(UserApiKeyGenType::NAME, $type->getBlockPrefix());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getExtensions()
-    {
-        return [
-            new PreloadedExtension(
-                [
-                    UserApiKeyGenType::class => new UserApiKeyGenType(),
-                    UserApiKeyGenKeyType::class => new UserApiKeyGenKeyType()
-                ],
-                []
-            )
-        ];
+        $this->assertEquals('oro_user_apikey_gen', $this->formType->getBlockPrefix());
     }
 }

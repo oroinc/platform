@@ -59,19 +59,12 @@ class EmailAddressFromTypeTest extends TypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                     EmailAddressFromType::class => new EmailAddressFromType(
-                         $this->tokenAccessor,
-                         $this->relatedEmailsProvider,
-                         $this->mailboxManager
-                     )
-                ],
-                []
-            ),
+            new PreloadedExtension([
+                 new EmailAddressFromType($this->tokenAccessor, $this->relatedEmailsProvider, $this->mailboxManager)
+            ], [])
         ];
     }
 }

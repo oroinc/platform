@@ -18,7 +18,10 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class Select2ChoiceTypeTest extends TypeTestCase
 {
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension([

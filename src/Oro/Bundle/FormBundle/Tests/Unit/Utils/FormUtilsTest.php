@@ -3,7 +3,7 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\FormConfigInterface;
@@ -31,7 +31,7 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
         $formType = $this->createMock(ResolvedFormTypeInterface::class);
         $formType->expects(self::any())
             ->method('getInnerType')
-            ->willReturn(new EntityType([]));
+            ->willReturn(new EntityTypeStub());
 
         $rootForm->expects(self::once())
             ->method('get')
@@ -51,7 +51,7 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
 
         $rootForm->expects(self::once())
             ->method('add')
-            ->with($testFieldName, EntityType::class, $expectedOptions);
+            ->with($testFieldName, EntityTypeStub::class, $expectedOptions);
 
         FormUtils::replaceField($rootForm, $testFieldName, $modifyOptions, $unsetOptions);
     }
@@ -189,7 +189,7 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
     ): void {
         $testFieldName = 'testField';
 
-        $typeStub = new EntityType([], 'test_type');
+        $typeStub = new EntityTypeStub();
         $rootForm = $this->createMock(FormInterface::class);
         $childForm = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
@@ -216,7 +216,7 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
 
         $rootForm->expects(self::once())
             ->method('add')
-            ->with($testFieldName, EntityType::class, $expectedOptions);
+            ->with($testFieldName, EntityTypeStub::class, $expectedOptions);
 
         FormUtils::replaceFieldOptionsRecursive($rootForm, $testFieldName, $replaceOptions);
     }

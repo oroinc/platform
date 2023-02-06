@@ -5,10 +5,8 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\DataAuditBundle\Form\Type\FilterType as AuditFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -33,9 +31,6 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
             ->addTypeExtension(new FormTypeValidatorExtension($validator))
             ->addTypeGuesser($this->createMock(ValidatorTypeGuesser::class))
             ->getFormFactory();
-
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->builder = new FormBuilder(null, null, $dispatcher, $this->factory);
     }
 
     public function testSubmit()
@@ -59,19 +54,15 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-
-        $filterType = new FilterType($translator);
-
         return [
-            new PreloadedExtension(
-                [
-                    $filterType->getName() => $filterType,
-                ],
-                []
-            )
+            new PreloadedExtension([
+                new FilterType($this->createMock(TranslatorInterface::class))
+            ], [])
         ];
     }
 }
