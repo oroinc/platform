@@ -3,19 +3,27 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LoggerBundle\Provider\ErrorLogNotificationRecipientsProvider;
 
 class ErrorLogNotificationRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
+    private ConfigManager&\PHPUnit\Framework\MockObject\MockObject $configManager;
+
+    private ApplicationState&\PHPUnit\Framework\MockObject\MockObject $applicationState;
 
     private ErrorLogNotificationRecipientsProvider $provider;
 
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->provider = new ErrorLogNotificationRecipientsProvider($this->configManager);
+        $this->applicationState = $this->createMock(ApplicationState::class);
+        $this->provider = new ErrorLogNotificationRecipientsProvider(
+            $this->configManager,
+            $this->applicationState
+        );
+        $this->applicationState->method('isInstalled')->willReturn(true);
     }
 
     /**
@@ -33,6 +41,13 @@ class ErrorLogNotificationRecipientsProviderTest extends \PHPUnit\Framework\Test
             ->willReturn($recipients);
 
         self::assertEquals($expected, $this->provider->getRecipientsEmailAddresses());
+    }
+
+    public function testThatEmailListIsEmptyWhenApplicationIsNotInstalled()
+    {
+        $this->applicationState->method('isInstalled')->willReturn(false);
+
+        self::assertEquals([], $this->provider->getRecipientsEmailAddresses());
     }
 
     public function getRecipientsEmailAddressesDataProvider(): array

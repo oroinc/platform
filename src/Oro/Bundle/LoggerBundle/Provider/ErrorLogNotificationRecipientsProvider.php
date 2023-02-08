@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LoggerBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 
 /**
@@ -12,9 +13,12 @@ class ErrorLogNotificationRecipientsProvider
 {
     private ConfigManager $configManager;
 
-    public function __construct(ConfigManager $configManager)
+    private ApplicationState $applicationState;
+
+    public function __construct(ConfigManager $configManager, ApplicationState $applicationState)
     {
         $this->configManager = $configManager;
+        $this->applicationState = $applicationState;
     }
 
     /**
@@ -22,7 +26,11 @@ class ErrorLogNotificationRecipientsProvider
      */
     public function getRecipientsEmailAddresses(): array
     {
-        $recipients = (string) $this->configManager->get(
+        if (!$this->applicationState->isInstalled()) {
+            return [];
+        }
+
+        $recipients = (string)$this->configManager->get(
             Configuration::getFullConfigKey(Configuration::EMAIL_NOTIFICATION_RECIPIENTS)
         );
 

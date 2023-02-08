@@ -44,6 +44,7 @@ services:
             # present only in global config scope; 2) other config scopes might be not working at the moment of logging
             # error (when this provider is intended to be used).
             - '@oro_config.global'
+            - '@oro_distribution.handler.application_status'
 
     oro_logger.processor.log_message:
         class: Monolog\Processor\PsrLogMessageProcessor
