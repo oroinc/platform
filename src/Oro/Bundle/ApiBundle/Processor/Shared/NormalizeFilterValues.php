@@ -29,14 +29,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeFilterValues implements ProcessorInterface
 {
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var EntityIdTransformerRegistry */
-    private $entityIdTransformerRegistry;
-
-    /** @var Context */
-    private $context;
+    private ValueNormalizer $valueNormalizer;
+    private EntityIdTransformerRegistry $entityIdTransformerRegistry;
+    private ?Context $context = null;
 
     public function __construct(
         ValueNormalizer $valueNormalizer,
@@ -49,7 +44,7 @@ class NormalizeFilterValues implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -100,24 +95,14 @@ class NormalizeFilterValues implements ProcessorInterface
         }
     }
 
-    /**
-     * @param RequestType         $requestType
-     * @param StandaloneFilter    $filter
-     * @param string              $path
-     * @param mixed               $value
-     * @param string|null         $operator
-     * @param EntityMetadata|null $metadata
-     *
-     * @return mixed
-     */
     private function normalizeFilterValue(
         RequestType $requestType,
         StandaloneFilter $filter,
         string $path,
-        $value,
+        mixed $value,
         ?string $operator,
         ?EntityMetadata $metadata
-    ) {
+    ): mixed {
         $dataType = $filter->getDataType();
         $isArrayAllowed = $filter->isArrayAllowed($operator);
         $isRangeAllowed = $filter->isRangeAllowed($operator);
@@ -164,24 +149,14 @@ class NormalizeFilterValues implements ProcessorInterface
         );
     }
 
-    /**
-     * @param string         $path
-     * @param mixed          $value
-     * @param bool           $isArrayAllowed
-     * @param bool           $isRangeAllowed
-     * @param RequestType    $requestType
-     * @param EntityMetadata $metadata
-     *
-     * @return mixed
-     */
     private function normalizeIdentifierValue(
         string $path,
-        $value,
+        mixed $value,
         bool $isArrayAllowed,
         bool $isRangeAllowed,
         RequestType $requestType,
         EntityMetadata $metadata
-    ) {
+    ): mixed {
         $value = $this->valueNormalizer->normalizeValue(
             $value,
             DataType::STRING,
@@ -245,12 +220,7 @@ class NormalizeFilterValues implements ProcessorInterface
         return $normalizedId;
     }
 
-    /**
-     * @param EntityMetadata $metadata
-     *
-     * @return mixed
-     */
-    private function getNotExistingEntityIdentifier(EntityMetadata $metadata)
+    private function getNotExistingEntityIdentifier(EntityMetadata $metadata): mixed
     {
         $idFieldNames = $metadata->getIdentifierFieldNames();
         if (\count($idFieldNames) === 1) {
@@ -265,13 +235,7 @@ class NormalizeFilterValues implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param EntityMetadata $metadata
-     * @param string         $idFieldName
-     *
-     * @return mixed
-     */
-    private function getNotExistingIdentifierFieldValue(EntityMetadata $metadata, string $idFieldName)
+    private function getNotExistingIdentifierFieldValue(EntityMetadata $metadata, string $idFieldName): mixed
     {
         return DataType::STRING === $metadata->getProperty($idFieldName)->getDataType()
             ? ''

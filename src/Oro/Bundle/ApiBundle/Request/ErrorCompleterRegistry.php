@@ -11,13 +11,9 @@ use Psr\Container\ContainerInterface;
 class ErrorCompleterRegistry
 {
     /** @var array [[error completer service id, request type expression], ...] */
-    private $errorCompleters;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $errorCompleters;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $errorCompleters [[error completer service id, request type expression], ...]
@@ -43,7 +39,7 @@ class ErrorCompleterRegistry
     public function getErrorCompleter(RequestType $requestType): ErrorCompleterInterface
     {
         $errorCompleterServiceId = null;
-        foreach ($this->errorCompleters as list($serviceId, $expression)) {
+        foreach ($this->errorCompleters as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $errorCompleterServiceId = $serviceId;
                 break;

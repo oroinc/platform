@@ -14,17 +14,10 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class CriteriaConnector
 {
-    /** @var CriteriaNormalizer */
-    private $criteriaNormalizer;
-
-    /** @var CriteriaPlaceholdersResolver */
-    private $placeholdersResolver;
-
-    /** @var QueryExpressionVisitorFactory */
-    private $expressionVisitorFactory;
-
-    /** @var EntityClassResolver */
-    private $entityClassResolver;
+    private CriteriaNormalizer $criteriaNormalizer;
+    private CriteriaPlaceholdersResolver $placeholdersResolver;
+    private QueryExpressionVisitorFactory $expressionVisitorFactory;
+    private EntityClassResolver $entityClassResolver;
 
     public function __construct(
         CriteriaNormalizer $criteriaNormalizer,

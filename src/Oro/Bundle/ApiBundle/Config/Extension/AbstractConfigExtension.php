@@ -10,7 +10,7 @@ abstract class AbstractConfigExtension implements ConfigExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationSections()
+    public function getEntityConfigurationSections(): array
     {
         return [];
     }
@@ -18,7 +18,7 @@ abstract class AbstractConfigExtension implements ConfigExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigureCallbacks()
+    public function getConfigureCallbacks(): array
     {
         return [];
     }
@@ -26,7 +26,7 @@ abstract class AbstractConfigExtension implements ConfigExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getPreProcessCallbacks()
+    public function getPreProcessCallbacks(): array
     {
         return [];
     }
@@ -34,7 +34,7 @@ abstract class AbstractConfigExtension implements ConfigExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getPostProcessCallbacks()
+    public function getPostProcessCallbacks(): array
     {
         return [];
     }
@@ -42,7 +42,7 @@ abstract class AbstractConfigExtension implements ConfigExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationLoaders()
+    public function getEntityConfigurationLoaders(): array
     {
         return [];
     }

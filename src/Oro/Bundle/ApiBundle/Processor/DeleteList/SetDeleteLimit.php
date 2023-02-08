@@ -11,8 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetDeleteLimit implements ProcessorInterface
 {
-    /** @var int */
-    private $maxDeleteEntitiesLimit;
+    private int $maxDeleteEntitiesLimit;
 
     public function __construct(int $maxDeleteEntitiesLimit)
     {
@@ -22,7 +21,7 @@ class SetDeleteLimit implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var DeleteListContext $context */
 

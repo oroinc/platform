@@ -32,7 +32,7 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */
 
@@ -59,20 +59,13 @@ class LoadNormalizedIncludedEntities implements ProcessorInterface
         }
     }
 
-    /**
-     * @param FormContext        $context
-     * @param object             $entity
-     * @param string             $entityClass
-     * @param string             $entityIncludeId
-     * @param IncludedEntityData $entityData
-     */
-    protected function processIncludedEntity(
+    private function processIncludedEntity(
         FormContext $context,
-        $entity,
-        $entityClass,
-        $entityIncludeId,
+        object $entity,
+        string $entityClass,
+        string $entityIncludeId,
         IncludedEntityData $entityData
-    ) {
+    ): void {
         $getProcessor = $this->processorBag->getProcessor(ApiAction::GET);
 
         /** @var GetContext $getContext */

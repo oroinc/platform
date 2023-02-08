@@ -13,7 +13,7 @@ class NormalizePercent100 extends NormalizeNumber
     /**
      * {@inheritdoc}
      */
-    protected function normalizeValue($value)
+    protected function normalizeValue(mixed $value): mixed
     {
         return round(parent::normalizeValue($value) * 100.0, Percent100ToLocalizedStringTransformer::PERCENT_SCALE);
     }

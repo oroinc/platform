@@ -55,17 +55,10 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         FilterOperator::NOT_CONTAINS
     ];
 
-    /** @var string */
-    private $field;
-
-    /** @var bool */
-    private $collection = false;
-
-    /** @var bool */
-    private $caseInsensitive = false;
-
-    /** @var callable|null */
-    private $valueTransformer;
+    private ?string $field = null;
+    private bool $collection = false;
+    private bool $caseInsensitive = false;
+    private mixed $valueTransformer = null;
 
     /**
      * {@inheritdoc}
@@ -139,10 +132,8 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
 
     /**
      * Sets a callable that should be used to transform the filter value.
-     *
-     * @param callable $valueTransformer
      */
-    public function setValueTransformer($valueTransformer): void
+    public function setValueTransformer(callable $valueTransformer): void
     {
         $this->valueTransformer = $valueTransformer;
     }
@@ -180,20 +171,13 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     /**
      * Creates the Expression object that can be used to filter data using the Criteria object.
      *
-     * @param string      $field
-     * @param string      $path
-     * @param string|null $operator
-     * @param mixed       $value
-     *
-     * @return Expression
-     *
      * @throws \InvalidArgumentException
      * @throws InvalidFilterOperatorException
      */
-    protected function buildExpression(string $field, string $path, ?string $operator, $value): Expression
+    protected function buildExpression(string $field, string $path, ?string $operator, mixed $value): Expression
     {
         if (null === $value) {
-            throw new \InvalidArgumentException(\sprintf('The value must not be NULL. Field: "%s".', $field));
+            throw new \InvalidArgumentException(sprintf('The value must not be NULL. Field: "%s".', $field));
         }
 
         if (null === $operator) {
@@ -212,16 +196,9 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     }
 
     /**
-     * @param string $field
-     * @param string $path
-     * @param string $operator
-     * @param mixed  $value
-     *
-     * @return Expression|null
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function doBuildExpression(string $field, string $path, string $operator, $value): ?Expression
+    protected function doBuildExpression(string $field, string $path, string $operator, mixed $value): ?Expression
     {
         switch ($operator) {
             case FilterOperator::EQ:
@@ -257,16 +234,12 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         return null;
     }
 
-    /**
-     * @param string $field
-     * @param string $path
-     * @param string $operator
-     * @param mixed  $value
-     *
-     * @return Expression|null
-     */
-    protected function doBuildCollectionExpression(string $field, string $path, string $operator, $value): ?Expression
-    {
+    protected function doBuildCollectionExpression(
+        string $field,
+        string $path,
+        string $operator,
+        mixed $value
+    ): ?Expression {
         switch ($operator) {
             case FilterOperator::EQ:
                 return $this->buildComparisonExpression($field, Comparison::MEMBER_OF, $value);
@@ -287,13 +260,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         return null;
     }
 
-    /**
-     * @param string $field
-     * @param mixed  $value
-     *
-     * @return Expression
-     */
-    protected function buildEqualToExpression(string $field, $value): Expression
+    protected function buildEqualToExpression(string $field, mixed $value): Expression
     {
         if (\is_array($value)) {
             return $this->buildComparisonExpression($field, Comparison::IN, $value);
@@ -311,13 +278,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         return $this->buildComparisonExpression($field, Comparison::EQ, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed  $value
-     *
-     * @return Expression
-     */
-    protected function buildNotEqualToExpression(string $field, $value): Expression
+    protected function buildNotEqualToExpression(string $field, mixed $value): Expression
     {
         if (\is_array($value)) {
             return $this->buildComparisonExpression($field, Comparison::NIN, $value);
@@ -335,14 +296,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         return $this->buildComparisonExpression($field, Comparison::NEQ, $value);
     }
 
-    /**
-     * @param string $field
-     * @param string $operator
-     * @param mixed  $value
-     *
-     * @return Comparison
-     */
-    protected function buildComparisonExpression(string $field, string $operator, $value): Comparison
+    protected function buildComparisonExpression(string $field, string $operator, mixed $value): Comparison
     {
         if ($this->caseInsensitive) {
             $operator .= '/i';
@@ -359,17 +313,11 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         return new CompositeExpression('NOT', [$expr]);
     }
 
-    /**
-     * @param mixed    $value
-     * @param callable $transformer
-     *
-     * @return mixed
-     */
-    private function transformValue($value, $transformer)
+    private function transformValue(mixed $value, callable $transformer): mixed
     {
         if (null !== $value) {
             if (\is_array($value)) {
-                $value = \array_map($transformer, $value);
+                $value = array_map($transformer, $value);
             } else {
                 $value = $transformer($value);
             }

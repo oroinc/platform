@@ -12,21 +12,12 @@ use Oro\Component\ChainProcessor\ProcessorBagInterface;
  */
 class OptionsProcessor extends NormalizeResultActionProcessor
 {
-    /** @var ConfigProvider */
-    private $configProvider;
+    private ConfigProvider $configProvider;
+    private MetadataProvider $metadataProvider;
 
-    /** @var MetadataProvider */
-    private $metadataProvider;
-
-    /**
-     * @param ProcessorBagInterface $processorBag
-     * @param string                $action
-     * @param ConfigProvider        $configProvider
-     * @param MetadataProvider      $metadataProvider
-     */
     public function __construct(
         ProcessorBagInterface $processorBag,
-        $action,
+        string $action,
         ConfigProvider $configProvider,
         MetadataProvider $metadataProvider
     ) {

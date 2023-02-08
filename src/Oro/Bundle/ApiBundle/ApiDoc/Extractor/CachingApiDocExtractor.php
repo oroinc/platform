@@ -21,25 +21,11 @@ class CachingApiDocExtractor extends BaseExtractor implements
 {
     use ApiDocExtractorTrait;
 
-    /** @var string */
-    protected $cacheFile;
-
-    /** @var bool */
-    protected $debug;
-
+    private string $cacheFile;
+    private bool $debug;
     /** @var Route[]|null */
-    protected $routes;
+    private ?array $routes = null;
 
-    /**
-     * @param ContainerInterface   $container
-     * @param RouterInterface      $router
-     * @param Reader               $reader
-     * @param DocCommentExtractor  $commentExtractor
-     * @param array                $handlers
-     * @param array                $annotationsProviders
-     * @param string               $cacheFile
-     * @param bool                 $debug
-     */
     public function __construct(
         ContainerInterface $container,
         RouterInterface $router,
@@ -47,8 +33,8 @@ class CachingApiDocExtractor extends BaseExtractor implements
         DocCommentExtractor $commentExtractor,
         array $handlers,
         array $annotationsProviders,
-        $cacheFile,
-        $debug = false
+        string $cacheFile,
+        bool $debug = false
     ) {
         parent::__construct(
             $container,
@@ -99,10 +85,8 @@ class CachingApiDocExtractor extends BaseExtractor implements
 
     /**
      * Warms up the API documentation cache.
-     *
-     * @param string $view
      */
-    public function warmUp($view = ApiDoc::DEFAULT_VIEW)
+    public function warmUp(string $view = ApiDoc::DEFAULT_VIEW): void
     {
         $this->clear($view);
 
@@ -126,10 +110,8 @@ class CachingApiDocExtractor extends BaseExtractor implements
 
     /**
      * Clears the API documentation cache.
-     *
-     * @param string $view
      */
-    public function clear($view = ApiDoc::DEFAULT_VIEW)
+    public function clear(string $view = ApiDoc::DEFAULT_VIEW): void
     {
         $cacheFilePath = $this->cacheFile . '.' . $view;
         if (is_file($cacheFilePath)) {

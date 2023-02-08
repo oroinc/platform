@@ -12,7 +12,7 @@ class ArrayAccessor implements ObjectAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getClassName($object): ?string
+    public function getClassName(mixed $object): ?string
     {
         return $object[ConfigUtil::CLASS_NAME] ?? null;
     }
@@ -20,7 +20,7 @@ class ArrayAccessor implements ObjectAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue($object, string $propertyName)
+    public function getValue(mixed $object, string $propertyName): mixed
     {
         if (!$this->hasProperty($object, $propertyName)) {
             throw new \OutOfBoundsException(sprintf('The "%s" property does not exist.', $propertyName));
@@ -32,7 +32,7 @@ class ArrayAccessor implements ObjectAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function hasProperty($object, string $propertyName): bool
+    public function hasProperty(mixed $object, string $propertyName): bool
     {
         // ignore "metadata" items
         if (ConfigUtil::CLASS_NAME === $propertyName) {
@@ -45,7 +45,7 @@ class ArrayAccessor implements ObjectAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function toArray($object): array
+    public function toArray(mixed $object): array
     {
         // remove "metadata" items
         unset($object[ConfigUtil::CLASS_NAME]);

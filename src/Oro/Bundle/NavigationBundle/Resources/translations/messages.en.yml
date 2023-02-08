@@ -67,6 +67,7 @@ oro:
             validation_error_message: Validation error. Please contact system administrator.
             divider: Divider
             custom.label: Is Custom
+            synthetic.label: Is Synthetic
             divider.label: Is Divider
             icon.label: Icon
             descriptions.label: Description

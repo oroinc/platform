@@ -14,15 +14,14 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class CompleteObjectDefinitionHelper
 {
-    /** @var CompleteAssociationHelper */
-    private $associationHelper;
+    private CompleteAssociationHelper $associationHelper;
 
     public function __construct(CompleteAssociationHelper $associationHelper)
     {
         $this->associationHelper = $associationHelper;
     }
 
-    public function completeDefinition(EntityDefinitionConfig $definition, ConfigContext $context)
+    public function completeDefinition(EntityDefinitionConfig $definition, ConfigContext $context): void
     {
         if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
             $this->removeObjectNonIdentifierFields($definition);
@@ -31,12 +30,12 @@ class CompleteObjectDefinitionHelper
         }
     }
 
-    private function removeObjectNonIdentifierFields(EntityDefinitionConfig $definition)
+    private function removeObjectNonIdentifierFields(EntityDefinitionConfig $definition): void
     {
         $idFieldNames = $definition->getIdentifierFieldNames();
         $fieldNames = array_keys($definition->getFields());
         foreach ($fieldNames as $fieldName) {
-            if (!in_array($fieldName, $idFieldNames, true)
+            if (!\in_array($fieldName, $idFieldNames, true)
                 && !$definition->getField($fieldName)->isMetaProperty()
             ) {
                 $definition->removeField($fieldName);
@@ -44,36 +43,24 @@ class CompleteObjectDefinitionHelper
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $version
-     * @param RequestType            $requestType
-     */
     private function completeObjectAssociations(
         EntityDefinitionConfig $definition,
-        $version,
+        string $version,
         RequestType $requestType
-    ) {
+    ): void {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $this->completeObjectAssociation($definition, $fieldName, $field, $version, $requestType);
         }
     }
 
-    /**
-     * @param string                      $fieldName
-     * @param EntityDefinitionConfig      $definition
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $version
-     * @param RequestType                 $requestType
-     */
     private function completeObjectAssociation(
         EntityDefinitionConfig $definition,
-        $fieldName,
+        string $fieldName,
         EntityDefinitionFieldConfig $field,
-        $version,
+        string $version,
         RequestType $requestType
-    ) {
+    ): void {
         $dataType = $field->getDataType();
         if (DataType::isNestedObject($dataType)) {
             $this->associationHelper->completeNestedObject($fieldName, $field);

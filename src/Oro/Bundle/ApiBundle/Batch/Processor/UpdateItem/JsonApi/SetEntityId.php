@@ -15,14 +15,14 @@ class SetEntityId implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateItemContext $context */
 
         $requestData = $context->getRequestData();
-        if (is_array($requestData) && array_key_exists(JsonApiDoc::DATA, $requestData)) {
+        if (\is_array($requestData) && \array_key_exists(JsonApiDoc::DATA, $requestData)) {
             $data = $requestData[JsonApiDoc::DATA];
-            if (is_array($data) && array_key_exists(JsonApiDoc::ID, $data)) {
+            if (\is_array($data) && \array_key_exists(JsonApiDoc::ID, $data)) {
                 $context->setId($data[JsonApiDoc::ID]);
             }
         }

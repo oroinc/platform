@@ -37,9 +37,6 @@ class ImportVisitor implements VisitorInterface
     /** @var array */
     private $updates = [];
 
-    /** @var string */
-    private $rootName = 'root';
-
     public function __construct(
         LayoutUpdateLoaderInterface $loader,
         DependencyInitializer $dependencyInitializer,
@@ -52,35 +49,27 @@ class ImportVisitor implements VisitorInterface
         $this->themeManager = $themeManager;
     }
 
-    public function setRootName(string $rootName): void
-    {
-        $this->rootName = $rootName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function walkUpdates(array &$updates, ContextInterface $context)
     {
         $this->updates = &$updates;
 
-        foreach ($updates as $group) {
-            foreach ($group as $update) {
-                if ($update instanceof ImportsAwareLayoutUpdateInterface) {
-                    $this->loadImportUpdate($update, $context);
+        foreach ($updates as $layoutItemId => $layoutUpdates) {
+            foreach ($layoutUpdates as $layoutUpdate) {
+                if ($layoutUpdate instanceof ImportsAwareLayoutUpdateInterface) {
+                    $this->loadImports($layoutItemId, $layoutUpdate, $context);
                 }
             }
         }
     }
 
     /**
-     * @param ImportsAwareLayoutUpdateInterface $parentUpdate
-     * @param ContextInterface $context
-     *
      * @throws LogicException
      */
-    private function loadImportUpdate($parentUpdate, ContextInterface $context)
-    {
+    private function loadImports(
+        string $layoutItemId,
+        ImportsAwareLayoutUpdateInterface $parentUpdate,
+        ContextInterface $context
+    ): void {
         if ($parentUpdate instanceof IsApplicableLayoutUpdateInterface && !$parentUpdate->isApplicable($context)) {
             return;
         }
@@ -107,12 +96,12 @@ class ImportVisitor implements VisitorInterface
                     $update->setParentUpdate($parentUpdate);
                 }
 
-                $this->insertUpdate($parentUpdate, $update);
+                $this->insertUpdate($layoutItemId, $parentUpdate, $update);
 
                 $this->dependencyInitializer->initialize($update);
 
                 if ($update instanceof ImportsAwareLayoutUpdateInterface) {
-                    $this->loadImportUpdate($update, $context);
+                    $this->loadImports($layoutItemId, $update, $context);
                 }
             }
         }
@@ -124,13 +113,16 @@ class ImportVisitor implements VisitorInterface
      * @param ImportsAwareLayoutUpdateInterface $parentUpdate
      * @param LayoutUpdateImportInterface $update
      */
-    private function insertUpdate($parentUpdate, $update)
-    {
+    private function insertUpdate(
+        string $layoutItemId,
+        ImportsAwareLayoutUpdateInterface $parentUpdate,
+        LayoutUpdateImportInterface $update
+    ): void {
         $el = $update instanceof ElementDependentLayoutUpdateInterface
             ? $update->getElement()
-            : $this->rootName;
+            : $layoutItemId;
 
-        $parentUpdateIndex = array_search($parentUpdate, $this->updates[$el]);
+        $parentUpdateIndex = array_search($parentUpdate, $this->updates[$el], false);
 
         $this->updates[$el] = array_merge(
             array_slice($this->updates[$el], 0, $parentUpdateIndex, true),

@@ -12,7 +12,7 @@ class OrCompositeExpression implements CompositeExpressionInterface
     /**
      * {@inheritdoc}
      */
-    public function walkCompositeExpression(array $expressions)
+    public function walkCompositeExpression(array $expressions): mixed
     {
         return new Expr\Orx($expressions);
     }

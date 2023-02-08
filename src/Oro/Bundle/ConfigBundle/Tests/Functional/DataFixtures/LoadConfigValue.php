@@ -2,29 +2,23 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Functional\DataFixtures;
 
-use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
 use Symfony\Component\Yaml\Yaml;
 
-class LoadConfigValue extends AbstractFixture implements ContainerAwareInterface
+class LoadConfigValue extends AbstractFixture
 {
-    use ContainerAwareTrait;
-
     const FILENAME = 'config_value.yml';
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(ObjectManager $manager)
     {
-        // Config uses non-default manager
-        $manager = $this->container->get('doctrine')->getManagerForClass(Config::class);
+        $config = $this->getConfig(
+            $this->getObjectManagerForClass(Config::class)
+        );
 
-        $config = $this->getConfig($manager);
+        $configValueObjectManager = $this->getObjectManagerForClass(ConfigValue::class);
 
         foreach ($this->getConfigValuesData() as $name => $data) {
             $configValue = new ConfigValue();
@@ -33,11 +27,11 @@ class LoadConfigValue extends AbstractFixture implements ContainerAwareInterface
                 ->setSection($data['section'])
                 ->setValue($data['value']);
 
-            $manager->persist($configValue);
-            $this->addReference($name, $configValue);
+            $configValueObjectManager->persist($configValue);
+            $this->setReference($name, $configValue);
         }
 
-        $manager->flush();
+        $configValueObjectManager->flush();
     }
 
     /**

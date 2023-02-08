@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Entity\Role;
@@ -39,7 +39,7 @@ class RoleListener
             return;
         }
 
-        $repository = $eventArgs->getEntityManager()->getRepository(Role::class);
+        $repository = $eventArgs->getObjectManager()->getRepository(Role::class);
         $attemptCount = 0;
         do {
             $attemptCount++;

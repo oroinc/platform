@@ -14,16 +14,11 @@ use Symfony\Contracts\Service\ResetInterface;
 class ConfigBagRegistry implements ResetInterface
 {
     /** @var array [[config bag service id, request type expression], ...] */
-    private $configBags;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
-
+    private array $configBags;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
     /** @var ConfigBagInterface[] [request type => ConfigBagInterface, ...] */
-    private $cache = [];
+    private array $cache = [];
 
     /**
      * @param array                    $configBags [[config bag service id, request type expression], ...]
@@ -74,7 +69,7 @@ class ConfigBagRegistry implements ResetInterface
     /**
      * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         foreach ($this->cache as $configBag) {
             if ($configBag instanceof ResetInterface) {

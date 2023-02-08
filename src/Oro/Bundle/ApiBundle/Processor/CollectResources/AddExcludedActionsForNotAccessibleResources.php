@@ -11,8 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class AddExcludedActionsForNotAccessibleResources implements ProcessorInterface
 {
-    /** @var ActionProcessorBagInterface */
-    protected $actionProcessorBag;
+    private ActionProcessorBagInterface $actionProcessorBag;
 
     public function __construct(ActionProcessorBagInterface $actionProcessorBag)
     {
@@ -22,7 +21,7 @@ class AddExcludedActionsForNotAccessibleResources implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */
 

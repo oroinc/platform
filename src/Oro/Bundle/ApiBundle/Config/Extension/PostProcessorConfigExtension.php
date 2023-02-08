@@ -11,8 +11,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class PostProcessorConfigExtension extends AbstractConfigExtension
 {
-    /** @var PostProcessorRegistry */
-    private $postProcessorRegistry;
+    private PostProcessorRegistry $postProcessorRegistry;
 
     public function __construct(PostProcessorRegistry $postProcessorRegistry)
     {
@@ -22,7 +21,7 @@ class PostProcessorConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritDoc}
      */
-    public function getConfigureCallbacks()
+    public function getConfigureCallbacks(): array
     {
         return [
             'entities.entity.field'                 => function (NodeBuilder $node) {

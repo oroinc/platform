@@ -17,7 +17,7 @@ class SimpleFilterFactoryCompilerPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $filters = [];
         $factories = [];
@@ -56,7 +56,7 @@ class SimpleFilterFactoryCompilerPass implements CompilerPassInterface
             || !$refl->getMethod($factoryMethod)->isPublic()
             || 1 !== $refl->getMethod($factoryMethod)->getNumberOfParameters()
         ) {
-            throw new \LogicException(\sprintf(
+            throw new \LogicException(sprintf(
                 'The "%s($dataType)" public method must be declared in the "%s" class.',
                 $factoryMethod,
                 $factoryClass

@@ -28,7 +28,7 @@ class CriteriaPlaceholdersResolver
         if ($criteria instanceof Criteria) {
             $joins = $criteria->getJoins();
             foreach ($joins as $path => $join) {
-                $placeholders[\sprintf(Criteria::PLACEHOLDER_TEMPLATE, $path)] = $join->getAlias();
+                $placeholders[sprintf(Criteria::PLACEHOLDER_TEMPLATE, $path)] = $join->getAlias();
             }
         }
 
@@ -40,11 +40,11 @@ class CriteriaPlaceholdersResolver
         $joins = $criteria->getJoins();
         foreach ($joins as $join) {
             $alias = $join->getAlias();
-            $joinPlaceholders = \array_merge($placeholders, [Criteria::ENTITY_ALIAS_PLACEHOLDER => $alias]);
-            $join->setJoin(\strtr($join->getJoin(), $joinPlaceholders));
+            $joinPlaceholders = array_merge($placeholders, [Criteria::ENTITY_ALIAS_PLACEHOLDER => $alias]);
+            $join->setJoin(strtr($join->getJoin(), $joinPlaceholders));
             $condition = $join->getCondition();
             if ($condition) {
-                $join->setCondition(\strtr($condition, $joinPlaceholders));
+                $join->setCondition(strtr($condition, $joinPlaceholders));
             }
         }
     }

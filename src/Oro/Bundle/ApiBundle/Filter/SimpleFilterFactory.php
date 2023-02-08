@@ -12,20 +12,13 @@ class SimpleFilterFactory implements FilterFactoryInterface
 {
     private const SUPPORTED_OPERATORS_OPTION = 'supported_operators';
 
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
-
-    /** @var FilterOperatorRegistry */
-    private $filterOperatorRegistry;
-
+    private PropertyAccessorInterface $propertyAccessor;
+    private FilterOperatorRegistry $filterOperatorRegistry;
     /** @var array [filter type => [class name, parameters], ...] */
-    private $filters = [];
-
+    private array $filters;
     /** @var array [filter type => [factory service id, factory method, parameters], ...] */
-    private $factories = [];
-
-    /** @var ContainerInterface */
-    private $factoryContainer;
+    private array $factories;
+    private ContainerInterface $factoryContainer;
 
     /**
      * @param array                     $filters         [filter type => [class name, params], ...]
@@ -57,7 +50,7 @@ class SimpleFilterFactory implements FilterFactoryInterface
             return null;
         }
 
-        $options = \array_replace($this->getFilterParameters($filterType), $options);
+        $options = array_replace($this->getFilterParameters($filterType), $options);
         $dataType = $filterType;
         if (\array_key_exists(self::DATA_TYPE_OPTION, $options)) {
             $dataType = $options[self::DATA_TYPE_OPTION];
@@ -83,7 +76,7 @@ class SimpleFilterFactory implements FilterFactoryInterface
     private function instantiateFilter(string $filterType, string $dataType): StandaloneFilter
     {
         if (isset($this->factories[$filterType])) {
-            list($factoryId, $factoryMethod) = $this->factories[$filterType];
+            [$factoryId, $factoryMethod] = $this->factories[$filterType];
             $factory = $this->factoryContainer->get($factoryId);
             $filter = $factory->$factoryMethod($dataType);
         } else {
@@ -91,11 +84,11 @@ class SimpleFilterFactory implements FilterFactoryInterface
             $filter = new $filterClass($dataType);
         }
         if (!$filter instanceof StandaloneFilter) {
-            throw new \LogicException(\sprintf(
+            throw new \LogicException(sprintf(
                 'The filter "%s" must be an instance of %s, got %s.',
                 $filterType,
                 StandaloneFilter::class,
-                get_class($filter)
+                \get_class($filter)
             ));
         }
 

@@ -13,7 +13,7 @@ class NormalizeInteger extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypeString()
+    protected function getDataTypeString(): string
     {
         return 'integer';
     }
@@ -21,7 +21,7 @@ class NormalizeInteger extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypePluralString()
+    protected function getDataTypePluralString(): string
     {
         return 'integers';
     }
@@ -29,7 +29,7 @@ class NormalizeInteger extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getRequirement()
+    protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
@@ -37,7 +37,7 @@ class NormalizeInteger extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function normalizeValue($value)
+    protected function normalizeValue(mixed $value): mixed
     {
         $normalizedValue = (int)$value;
         if (((string)$normalizedValue) !== $value) {

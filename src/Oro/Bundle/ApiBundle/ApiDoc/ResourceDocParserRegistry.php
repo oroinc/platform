@@ -12,13 +12,9 @@ use Psr\Container\ContainerInterface;
 class ResourceDocParserRegistry
 {
     /** @var array [[parser service id, request type expression], ...] */
-    private $parsers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $parsers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $parsers [[parser service id, request type expression], ...]
@@ -41,7 +37,7 @@ class ResourceDocParserRegistry
     public function getParser(RequestType $requestType): ResourceDocParserInterface
     {
         $parserServiceId = null;
-        foreach ($this->parsers as list($serviceId, $expression)) {
+        foreach ($this->parsers as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $parserServiceId = $serviceId;
                 break;

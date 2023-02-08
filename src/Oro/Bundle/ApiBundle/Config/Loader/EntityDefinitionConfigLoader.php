@@ -29,13 +29,12 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         ConfigUtil::FORM_EVENT_SUBSCRIBER   => 'setFormEventSubscribers'
     ];
 
-    /** @var ConfigLoaderFactory */
-    protected $factory;
+    private ConfigLoaderFactory $factory;
 
     /**
      * {@inheritdoc}
      */
-    public function setConfigLoaderFactory(ConfigLoaderFactory $factory)
+    public function setConfigLoaderFactory(ConfigLoaderFactory $factory): void
     {
         $this->factory = $factory;
     }
@@ -43,7 +42,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
     /**
      * {@inheritdoc}
      */
-    public function load(array $config)
+    public function load(array $config): mixed
     {
         $definition = new EntityDefinitionConfig();
         $this->loadDefinition($definition, $config);
@@ -51,7 +50,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         return $definition;
     }
 
-    protected function loadDefinition(EntityDefinitionConfig $definition, array $config = null)
+    private function loadDefinition(EntityDefinitionConfig $definition, ?array $config): void
     {
         if (empty($config)) {
             return;
@@ -68,7 +67,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         }
     }
 
-    protected function loadFields(EntityDefinitionConfig $definition, array $fields = null)
+    private function loadFields(EntityDefinitionConfig $definition, ?array $fields): void
     {
         if (!empty($fields)) {
             foreach ($fields as $name => $config) {
@@ -80,18 +79,12 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param ConfigLoaderInterface  $loader
-     * @param string                 $sectionName
-     * @param array|null             $config
-     */
-    protected function loadSection(
+    private function loadSection(
         EntityDefinitionConfig $definition,
         ConfigLoaderInterface $loader,
-        $sectionName,
-        array $config = null
-    ) {
+        string $sectionName,
+        ?array $config
+    ): void {
         if (!empty($config)) {
             $section = $loader->load($config);
             $isEmpty = false;

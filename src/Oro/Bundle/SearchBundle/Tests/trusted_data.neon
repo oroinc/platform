@@ -21,6 +21,10 @@ trusted_data:
                 field: true
             runMultiInserts:
                 data: true
+            runUpdates:
+                record: true
+            processItems:
+                data: true
             applyWhereToQB:
                 whereCondition: true
         Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql:

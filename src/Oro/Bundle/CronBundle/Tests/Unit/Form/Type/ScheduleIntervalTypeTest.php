@@ -12,17 +12,12 @@ use Oro\Component\Testing\Unit\PreloadedExtension;
 class ScheduleIntervalTypeTest extends FormIntegrationTestCase
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    OroDateTimeType::class => new OroDateTimeType()
-                ],
-                []
-            )
+            new PreloadedExtension([new OroDateTimeType()], [])
         ];
     }
 

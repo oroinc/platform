@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 
+/**
+ * Listens to WorkflowItem Entity events
+ */
 class WorkflowItemListener
 {
     /** @var DoctrineHelper */
@@ -63,7 +66,7 @@ class WorkflowItemListener
             $entityClass = $this->doctrineHelper->getEntityClass($entity);
             $workflowItem->setEntityClass($entityClass);
 
-            $unitOfWork = $args->getEntityManager()->getUnitOfWork();
+            $unitOfWork = $args->getObjectManager()->getUnitOfWork();
             $unitOfWork->scheduleExtraUpdate(
                 $workflowItem,
                 [
@@ -88,7 +91,7 @@ class WorkflowItemListener
         $workflowItems = $this->workflowManagerRegistry->getManager('system')->getWorkflowItemsByEntity($entity);
 
         if (count($workflowItems) > 0) {
-            $em = $args->getEntityManager();
+            $em = $args->getObjectManager();
             foreach ($workflowItems as $workflowItem) {
                 $em->remove($workflowItem);
             }

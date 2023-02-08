@@ -3,10 +3,14 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DataCollector;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LayoutBundle\DataCollector\DataCollectorLayoutNameProviderInterface;
 use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
-use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
+use Oro\Bundle\LayoutBundle\Event\LayoutBuildAfterEvent;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
+use Oro\Component\Layout\Layout;
+use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\Tests\Unit\Stubs\ContextItemStub;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,38 +19,49 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutContextHolder|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextHolder;
+    private DataCollectorLayoutNameProviderInterface|\PHPUnit\Framework\MockObject\MockObject $layoutNameProvider;
 
-    /** @var LayoutDataCollector */
-    private $dataCollector;
+    private PathProviderInterface|\PHPUnit\Framework\MockObject\MockObject $pathProvider;
+
+    private LayoutDataCollector $dataCollector;
 
     protected function setUp(): void
     {
-        $this->contextHolder = $this->createMock(LayoutContextHolder::class);
+        $this->layoutNameProvider = $this->createMock(DataCollectorLayoutNameProviderInterface::class);
+        $this->pathProvider = $this->createMock(PathProviderInterface::class);
 
         $configs = [
             'oro_layout.debug_developer_toolbar' => true,
         ];
 
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects($this->any())
+        $configManager
+            ->expects(self::any())
             ->method('get')
-            ->willReturnCallback(function ($code) use ($configs) {
-                return $configs[$code];
-            });
+            ->willReturnCallback(static fn ($code) => $configs[$code]);
 
-        $this->dataCollector = new LayoutDataCollector($this->contextHolder, $configManager, true);
+        $this->dataCollector = new LayoutDataCollector(
+            $this->layoutNameProvider,
+            $configManager,
+            $this->pathProvider,
+            true
+        );
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
-        $this->assertEquals(LayoutDataCollector::NAME, $this->dataCollector->getName());
+        self::assertEquals('layout', $this->dataCollector->getName());
     }
 
-    public function testCollect()
+    public function testCollect(): void
     {
-        $context = new LayoutContext();
+        $paths = ['default/', 'default/sample_route'];
+        $this->pathProvider
+            ->expects(self::once())
+            ->method('getPaths')
+            ->willReturn($paths);
+
+        $context = new LayoutContext([], ['string', 'array', 'ContextItemInterface']);
 
         $contextItemInterface = new ContextItemStub();
         $contextItems = [
@@ -68,11 +83,16 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
         foreach ($contextData as $name => $item) {
             $context->data()->set($name, $item);
         }
+        $context->resolve();
 
-        $this->contextHolder->expects($this->once())
-            ->method('getContext')
-            ->willReturn($context);
-        $notAppliedActions =  [
+        $name = 'Sample Name';
+        $this->layoutNameProvider
+            ->expects(self::once())
+            ->method('getNameByContext')
+            ->with($context)
+            ->willReturn($name);
+
+        $notAppliedActions = [
             [
                 'name' => 'add',
                 'args' => [
@@ -81,7 +101,7 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
                     'blockType' => 'link',
                     'options' => [
                         'visible' => 'true',
-                        'attr' => ['class'=> 'btn'],
+                        'attr' => ['class' => 'btn'],
                     ],
                     'siblingId' => 'customer_sidebar_sign_out',
                     'prepend' => true,
@@ -92,23 +112,44 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
                 'args' => [
                     'id' => 'categories_main_menu',
                 ],
-            ]
+            ],
         ];
-        $this->dataCollector->setNotAppliedActions($notAppliedActions);
+        $layout = $this->createMock(Layout::class);
+        $layout
+            ->expects(self::once())
+            ->method('getContext')
+            ->willReturn($context);
+        $layoutBuilder = $this->createMock(LayoutBuilderInterface::class);
+        $layoutBuilder
+            ->expects(self::once())
+            ->method('getNotAppliedActions')
+            ->willReturn($notAppliedActions);
+        $this->dataCollector->onBuildAfter(new LayoutBuildAfterEvent($layout, $layoutBuilder));
         $this->dataCollector->collect($this->createMock(Request::class), $this->createMock(Response::class));
 
-        $this->assertEquals($contextItems, $this->dataCollector->getData()['context']['items']);
-        $this->assertArrayHasKey('views', $this->dataCollector->getData());
-        $this->assertEquals(0, $this->dataCollector->getData()['count']);
-        $this->assertEquals(2, $this->dataCollector->getData()['not_applied_actions_count']);
-        $this->assertEquals($notAppliedActions, $this->dataCollector->getData()['not_applied_actions']);
-        foreach ($this->dataCollector->getData()['context']['data'] as $datum) {
-            $this->assertInstanceOf(Data::class, $datum);
+        $hash = $context->getHash();
+        $data = $this->dataCollector->getData();
+        self::assertArrayHasKey($hash, $data);
+        self::assertEquals($contextItems, $data[$hash]['context']['items']);
+        self::assertArrayHasKey('views', $data[$hash]);
+        self::assertEquals(0, $data[$hash]['count']);
+        self::assertEquals(2, $data[$hash]['not_applied_actions_count']);
+        self::assertEquals($notAppliedActions, $data[$hash]['not_applied_actions']);
+        foreach ($data[$hash]['context']['data'] as $datum) {
+            self::assertInstanceOf(Data::class, $datum);
         }
+        self::assertEquals($paths, $data[$hash]['paths']);
+        self::assertEquals($name, $data[$hash]['name']);
     }
 
-    public function testCollectBuildViews()
+    public function testCollectBuildViews(): void
     {
+        $paths = ['default/', 'default/sample_route'];
+        $this->pathProvider
+            ->expects(self::once())
+            ->method('getPaths')
+            ->willReturn($paths);
+
         $options = [
             'root' => [
                 'id' => 'root',
@@ -148,6 +189,16 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
+        $context = new LayoutContext();
+        $context->resolve();
+
+        $name = 'Sample Name';
+        $this->layoutNameProvider
+            ->expects(self::once())
+            ->method('getNameByContext')
+            ->with($context)
+            ->willReturn($name);
+
         $rootBlock = new BlockView();
         $rootBlock->vars['id'] = key($tree);
         $blockViews = $this->getBlockViews($rootBlock, current($tree));
@@ -156,29 +207,44 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
             $blockView->vars = $options[$blockView->vars['id']];
 
             $block = $this->createMock(BlockInterface::class);
-            $block->expects($this->any())
+            $block->expects(self::any())
+                ->method('getContext')
+                ->willReturn($context);
+            $block->expects(self::any())
                 ->method('getId')
                 ->willReturn($blockView->vars['id']);
 
             $this->dataCollector->collectBlockView($block, $blockView);
         }
 
-        $this->contextHolder->expects($this->once())
+        $layout = $this->createMock(Layout::class);
+        $layout
+            ->expects(self::once())
             ->method('getContext')
-            ->willReturn(new LayoutContext());
+            ->willReturn($context);
+        $layoutBuilder = $this->createMock(LayoutBuilderInterface::class);
+        $layoutBuilder
+            ->expects(self::once())
+            ->method('getNotAppliedActions')
+            ->willReturn([]);
+        $this->dataCollector->onBuildAfter(new LayoutBuildAfterEvent($layout, $layoutBuilder));
 
         $this->dataCollector->collect($this->createMock(Request::class), $this->createMock(Response::class));
 
+        $hash = $context->getHash();
         $data = $this->dataCollector->getData();
-        $this->assertEquals('root', $data['views']['root']['id']);
-        $this->assertCount(7, $data['views']['root']['view_vars']);
-        $this->assertEquals(['root', '_root'], $data['views']['root']['block_prefixes']);
-        $this->assertCount(2, $data['views']['root']['children']);
+        self::assertArrayHasKey($hash, $data);
+        self::assertEquals('root', $data[$hash]['views']['root']['id']);
+        self::assertCount(7, $data[$hash]['views']['root']['view_vars']);
+        self::assertEquals(['root', '_root'], $data[$hash]['views']['root']['block_prefixes']);
+        self::assertCount(2, $data[$hash]['views']['root']['children']);
+        self::assertEquals($paths, $data[$hash]['paths']);
+        self::assertEquals($name, $data[$hash]['name']);
     }
 
     /**
-     * @param BlockView   $rootBlock
-     * @param array       $tree
+     * @param BlockView $rootBlock
+     * @param array $tree
      * @param BlockView[] $blockViews
      *
      * @return BlockView[]

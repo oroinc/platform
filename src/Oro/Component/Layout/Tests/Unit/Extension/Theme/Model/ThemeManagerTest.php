@@ -16,8 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 class ThemeManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ThemeFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $factory;
+    private ThemeFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $factory;
 
     protected function setUp(): void
     {
@@ -30,10 +29,10 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         array $enabledThemes = []
     ): ThemeManager {
         $themeDefinitionBag = $this->createMock(ThemeDefinitionBagInterface::class);
-        $themeDefinitionBag->expects($this->any())
+        $themeDefinitionBag->expects(self::any())
             ->method('getThemeNames')
             ->willReturn(array_keys($definitions));
-        $themeDefinitionBag->expects($this->any())
+        $themeDefinitionBag->expects(self::any())
             ->method('getThemeDefinition')
             ->willReturnCallback(function ($themeName) use ($definitions) {
                 return $definitions[$themeName] ?? null;
@@ -42,20 +41,20 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         return new ThemeManager($factory ?? $this->factory, $themeDefinitionBag, $enabledThemes);
     }
 
-    public function testManagerWorkWithoutKnownThemes()
+    public function testManagerWorkWithoutKnownThemes(): void
     {
         $manager = $this->createManager();
 
-        $this->assertEmpty($manager->getThemeNames());
-        $this->assertEmpty($manager->getAllThemes());
+        self::assertEmpty($manager->getThemeNames());
+        self::assertEmpty($manager->getAllThemes());
 
-        $this->assertIsArray($manager->getThemeNames());
-        $this->assertIsArray($manager->getAllThemes());
+        self::assertIsArray($manager->getThemeNames());
+        self::assertIsArray($manager->getAllThemes());
 
-        $this->assertFalse($manager->hasTheme('unknown'));
+        self::assertFalse($manager->hasTheme('unknown'));
     }
 
-    public function testTryingToGetUnknownThemeModel()
+    public function testTryingToGetUnknownThemeModel(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Unable to retrieve definition for theme "unknown"');
@@ -65,9 +64,9 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $manager->getTheme('unknown');
     }
 
-    public function testGenOnlyEnabledThemes()
+    public function testGenOnlyEnabledThemes(): void
     {
-        $this->factory->expects($this->any())
+        $this->factory->expects(self::any())
             ->method('create')
             ->willReturn($this->createMock(Theme::class));
 
@@ -75,18 +74,18 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
             [
                 'base' => [],
                 'default' => [],
-                'custom' => []
+                'custom' => [],
             ],
             null,
             ['default', 'base']
         );
 
-        $this->assertCount(2, $manager->getEnabledThemes());
+        self::assertCount(2, $manager->getEnabledThemes());
     }
 
-    public function testEmptyEnabledThemes()
+    public function testEmptyEnabledThemes(): void
     {
-        $this->factory->expects($this->any())
+        $this->factory->expects(self::any())
             ->method('create')
             ->willReturn($this->createMock(Theme::class));
 
@@ -94,16 +93,16 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
             [
                 'base' => [],
                 'default' => [],
-                'custom' => []
+                'custom' => [],
             ]
         );
 
-        $this->assertCount(3, $manager->getEnabledThemes());
+        self::assertCount(3, $manager->getEnabledThemes());
     }
 
-    public function testEnabledThemesWithWrongNames()
+    public function testEnabledThemesWithWrongNames(): void
     {
-        $this->factory->expects($this->any())
+        $this->factory->expects(self::any())
             ->method('create')
             ->willReturn($this->createMock(Theme::class));
 
@@ -111,31 +110,31 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
             [
                 'base' => [],
                 'default' => [],
-                'custom' => []
+                'custom' => [],
             ],
             null,
             ['theme1', 'theme2']
         );
 
-        $this->assertCount(3, $manager->getEnabledThemes());
+        self::assertCount(3, $manager->getEnabledThemes());
     }
 
-    public function testGetThemeObject()
+    public function testGetThemeObject(): void
     {
         $manager = $this->createManager(['base' => ['label' => 'Oro Base theme']]);
 
         $themeMock = $this->createMock(Theme::class);
 
-        $this->factory->expects($this->once())
+        $this->factory->expects(self::once())
             ->method('create')
             ->with('base', ['label' => 'Oro Base theme'])
             ->willReturn($themeMock);
 
-        $this->assertSame($themeMock, $manager->getTheme('base'));
-        $this->assertSame($themeMock, $manager->getTheme('base'), 'Should instantiate model once');
+        self::assertSame($themeMock, $manager->getTheme('base'));
+        self::assertSame($themeMock, $manager->getTheme('base'), 'Should instantiate model once');
     }
 
-    public function testGetThemeShouldThrowExceptionIfThemeNameIsEmpty()
+    public function testGetThemeShouldThrowExceptionIfThemeNameIsEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The theme name must not be empty.');
@@ -144,58 +143,58 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $manager->getTheme('');
     }
 
-    public function testGetThemeNames()
+    public function testGetThemeNames(): void
     {
         $manager = $this->createManager(['base' => [], 'oro-black' => []]);
 
-        $this->assertSame(['base', 'oro-black'], $manager->getThemeNames());
+        self::assertSame(['base', 'oro-black'], $manager->getThemeNames());
     }
 
-    public function testHasTheme()
+    public function testHasTheme(): void
     {
         $manager = $this->createManager(['base' => [], 'oro-black' => []]);
 
-        $this->assertTrue($manager->hasTheme('base'), 'Has base theme');
-        $this->assertTrue($manager->hasTheme('oro-black'), 'Has black theme');
-        $this->assertFalse($manager->hasTheme('unknown'), 'Does not have unknown theme');
+        self::assertTrue($manager->hasTheme('base'), 'Has base theme');
+        self::assertTrue($manager->hasTheme('oro-black'), 'Has black theme');
+        self::assertFalse($manager->hasTheme('unknown'), 'Does not have unknown theme');
     }
 
-    public function testGetAllThemes()
+    public function testGetAllThemes(): void
     {
         $manager = $this->createManager(['base' => [], 'oro-black' => []]);
 
         $theme1Mock = $this->createMock(Theme::class);
         $theme2Mock = $this->createMock(Theme::class);
 
-        $this->factory->expects($this->exactly(2))
+        $this->factory->expects(self::exactly(2))
             ->method('create')
             ->willReturnOnConsecutiveCalls($theme1Mock, $theme2Mock);
 
-        $this->assertSame(['base' => $theme1Mock, 'oro-black' => $theme2Mock], $manager->getAllThemes());
+        self::assertSame(['base' => $theme1Mock, 'oro-black' => $theme2Mock], $manager->getAllThemes());
     }
 
-    public function testGetAllByGroupThemes()
+    public function testGetAllByGroupThemes(): void
     {
         $manager = $this->createManager(['base' => [], 'oro-black' => []]);
 
         $theme1Mock = $this->createMock(Theme::class);
-        $theme1Mock->expects($this->any())
+        $theme1Mock->expects(self::any())
             ->method('getGroups')
             ->willReturn(['base', 'frontend']);
         $theme2Mock = $this->createMock(Theme::class);
-        $theme2Mock->expects($this->any())
+        $theme2Mock->expects(self::any())
             ->method('getGroups')
             ->willReturn(['frontend']);
 
-        $this->factory->expects($this->exactly(2))
+        $this->factory->expects(self::exactly(2))
             ->method('create')
             ->willReturnOnConsecutiveCalls($theme1Mock, $theme2Mock);
 
-        $this->assertCount(2, $manager->getAllThemes());
-        $this->assertCount(1, $manager->getAllThemes('base'));
-        $this->assertCount(2, $manager->getAllThemes('frontend'));
-        $this->assertCount(1, $manager->getAllThemes(['base', 'embedded']));
-        $this->assertCount(2, $manager->getAllThemes(['base', 'frontend']));
+        self::assertCount(2, $manager->getAllThemes());
+        self::assertCount(1, $manager->getAllThemes('base'));
+        self::assertCount(2, $manager->getAllThemes('frontend'));
+        self::assertCount(1, $manager->getAllThemes(['base', 'embedded']));
+        self::assertCount(2, $manager->getAllThemes(['base', 'frontend']));
     }
 
     /**
@@ -206,15 +205,15 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         array $themesDefinitions,
         ArrayCollection $expectedResult,
         array $expectedTitlesResult
-    ) {
+    ): void {
         $manager = $this->createManager(
             $themesDefinitions,
             new ThemeFactory(PropertyAccess::createPropertyAccessor())
         );
         $theme = $manager->getTheme($childThemeKey);
 
-        $this->assertEquals($expectedResult, $theme->getPageTemplates());
-        $this->assertEquals($expectedTitlesResult, $theme->getPageTemplateTitles());
+        self::assertEquals($expectedResult, $theme->getPageTemplates());
+        self::assertEquals($expectedTitlesResult, $theme->getPageTemplateTitles());
     }
 
     public function pageTemplatesDataProvider(): array
@@ -285,7 +284,7 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
                 'themesDefinitions' => [
                     'child_theme' => $childThemeDefinition,
                     'parent_theme' => $parentThemeDefinition,
-                    'upper_theme' => $upperThemeDefinition
+                    'upper_theme' => $upperThemeDefinition,
                 ],
                 'expectedResult' => new ArrayCollection([
                     'child_1_child_route_1' => new PageTemplate('Child Page 1', 'child_1', 'child_route_1'),
@@ -299,7 +298,7 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
                     'upper_route_1' => 'Upper Route 1',
                     'upper_route_2' => 'Upper Route 2',
                 ],
-            ]
+            ],
         ];
     }
 
@@ -318,8 +317,46 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
             'label' => $label,
             'parent' => $parent,
             'config' => [
-                'page_templates' => $pageTemplates
-            ]
+                'page_templates' => $pageTemplates,
+            ],
         ];
+    }
+
+    public function testGetThemesHierarchyWhenNoTheme(): void
+    {
+        $themeName = 'sample_theme';
+        $this->expectExceptionObject(
+            new \LogicException(sprintf('Unable to retrieve definition for theme "%s".', $themeName))
+        );
+
+        $this->createManager()->getThemesHierarchy($themeName);
+    }
+
+    public function testGetThemesHierarchyWhenNoParentTheme(): void
+    {
+        $themeName = 'sample_theme';
+        $theme = new Theme($themeName);
+
+        $this->factory->expects(self::once())
+            ->method('create')
+            ->willReturn($theme);
+
+        $themeManager = $this->createManager([$themeName => []]);
+        self::assertEquals([$theme], $themeManager->getThemesHierarchy($themeName));
+    }
+
+    public function testGetThemesHierarchyWhenHasParentTheme(): void
+    {
+        $themeName = 'sample_theme';
+        $parentName = 'parent_theme';
+        $theme = new Theme($themeName, $parentName);
+        $parentTheme = new Theme($parentName);
+
+        $this->factory->expects(self::exactly(2))
+            ->method('create')
+            ->willReturnOnConsecutiveCalls($theme, $parentTheme);
+
+        $themeManager = $this->createManager([$themeName => [], $parentName => []]);
+        self::assertEquals([$parentTheme, $theme], $themeManager->getThemesHierarchy($themeName));
     }
 }

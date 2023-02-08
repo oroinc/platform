@@ -26,11 +26,8 @@ use Doctrine\Common\Collections\Expr\Expression;
  */
 class PrimaryFieldFilter extends ComparisonFilter
 {
-    /** @var string */
-    private $dataField;
-
-    /** @var string */
-    private $primaryFlagField;
+    private ?string $dataField = null;
+    private ?string $primaryFlagField = null;
 
     /**
      * Gets a field that contains a data value.

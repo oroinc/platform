@@ -18,8 +18,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeParentEntityId implements ProcessorInterface
 {
-    /** @var EntityIdTransformerRegistry */
-    private $entityIdTransformerRegistry;
+    private EntityIdTransformerRegistry $entityIdTransformerRegistry;
 
     public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {
@@ -29,7 +28,7 @@ class NormalizeParentEntityId implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */
 

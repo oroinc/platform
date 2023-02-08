@@ -3,8 +3,8 @@
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\FileDeleteListener as BaseFileDeleteListener;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;

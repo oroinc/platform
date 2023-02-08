@@ -7,7 +7,6 @@ use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -36,9 +35,14 @@ class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
             'polling_interval' => 1000,
         ];
 
-        $connectionId = $this->dbalTransportFactory->create($container, $config);
-        self::assertEquals('oro_message_queue.transport.dbal.connection', $connectionId);
+        $this->dbalTransportFactory->create($container, $config);
         self::assertEquals($pidFileDir, $container->getParameter('oro_message_queue.dbal.pid_file_dir'));
+        self::assertEquals($config['connection'], $container->getParameter('oro_message_queue.dbal.connection'));
+        self::assertEquals($config['table'], $container->getParameter('oro_message_queue.dbal.table'));
+        self::assertEquals(
+            ['polling_interval' => $config['polling_interval']],
+            $container->getParameter('oro_message_queue.dbal.options')
+        );
 
         self::assertEquals(
             DbalPidFileManager::class,
@@ -70,11 +74,6 @@ class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
             ['oro_message_queue.consumption.extension' => [[]]],
             $container->getDefinition('oro_message_queue.consumption.dbal.reject_message_on_exception_extension')
                 ->getTags()
-        );
-
-        self::assertEquals(
-            DbalLazyConnection::class,
-            $container->getDefinition('oro_message_queue.transport.dbal.connection')->getClass()
         );
     }
 

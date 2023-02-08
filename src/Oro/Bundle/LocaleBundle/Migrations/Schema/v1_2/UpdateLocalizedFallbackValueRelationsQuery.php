@@ -59,7 +59,6 @@ class UpdateLocalizedFallbackValueRelationsQuery extends AbstractEntityConfigQue
         }
 
         foreach ($data['extend']['relation'] as $relation) {
-
             /** @var FieldConfigId $fieldConfig */
             $fieldConfig = $relation['field_id'];
             if (!$fieldConfig) {

@@ -13,8 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetEntityId implements ProcessorInterface
 {
-    /** @var EntityIdHelper */
-    protected $entityIdHelper;
+    private EntityIdHelper $entityIdHelper;
 
     public function __construct(EntityIdHelper $entityIdHelper)
     {
@@ -24,7 +23,7 @@ class SetEntityId implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */
 
@@ -35,7 +34,7 @@ class SetEntityId implements ProcessorInterface
         }
 
         $entity = $context->getResult();
-        if (!is_object($entity)) {
+        if (!\is_object($entity)) {
             // an entity does not exist or has an unexpected type
             return;
         }

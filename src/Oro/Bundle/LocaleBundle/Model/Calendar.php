@@ -118,11 +118,11 @@ class Calendar
             case self::WIDTH_SHORT:
                 $pattern = 'LLL';
                 break;
-            // S
+                // S
             case self::WIDTH_NARROW:
                 $pattern = 'LLLLL';
                 break;
-            // September
+                // September
             case self::WIDTH_WIDE:
             default:
                 $pattern = 'LLLL';
@@ -158,15 +158,15 @@ class Calendar
             case self::WIDTH_ABBREVIATED:
                 $pattern = 'ccc';
                 break;
-            // Tu
+                // Tu
             case self::WIDTH_SHORT:
                 $pattern = 'cccccc';
                 break;
-            // T
+                // T
             case self::WIDTH_NARROW:
                 $pattern = 'ccccc';
                 break;
-            // Tuesday
+                // Tuesday
             case self::WIDTH_WIDE:
             default:
                 $pattern = 'cccc';

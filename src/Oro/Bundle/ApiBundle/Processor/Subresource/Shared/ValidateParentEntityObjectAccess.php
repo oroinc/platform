@@ -14,19 +14,12 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class ValidateParentEntityObjectAccess implements ProcessorInterface
 {
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private string $permission;
 
-    /** @var string */
-    private $permission;
-
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param string                        $permission
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
-        $permission
+        string $permission
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->permission = $permission;
@@ -35,7 +28,7 @@ class ValidateParentEntityObjectAccess implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */
 

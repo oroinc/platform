@@ -18,8 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class BuildFormBuilder implements ProcessorInterface
 {
-    /** @var FormHelper */
-    protected $formHelper;
+    private FormHelper $formHelper;
 
     public function __construct(FormHelper $formHelper)
     {
@@ -29,7 +28,7 @@ class BuildFormBuilder implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */
 
@@ -52,12 +51,7 @@ class BuildFormBuilder implements ProcessorInterface
         $context->setFormBuilder($this->getFormBuilder($context));
     }
 
-    /**
-     * @param ChangeRelationshipContext $context
-     *
-     * @return FormBuilderInterface
-     */
-    protected function getFormBuilder(ChangeRelationshipContext $context)
+    protected function getFormBuilder(ChangeRelationshipContext $context): FormBuilderInterface
     {
         $parentConfig = $context->getParentConfig();
         $associationName = $context->getAssociationName();
@@ -82,13 +76,7 @@ class BuildFormBuilder implements ProcessorInterface
         return $formBuilder;
     }
 
-    /**
-     * @param ChangeRelationshipContext $context
-     * @param EntityDefinitionConfig    $parentConfig
-     *
-     * @return array
-     */
-    protected function getFormOptions(ChangeRelationshipContext $context, EntityDefinitionConfig $parentConfig)
+    protected function getFormOptions(ChangeRelationshipContext $context, EntityDefinitionConfig $parentConfig): array
     {
         $options = $parentConfig->getFormOptions();
         if (null === $options) {

@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class DeleteTargetFileIfAsyncOperationNotStarted implements ProcessorInterface
 {
-    /** @var FileManager */
-    private $fileManager;
+    private FileManager $fileManager;
 
     public function __construct(FileManager $fileManager)
     {
@@ -23,7 +22,7 @@ class DeleteTargetFileIfAsyncOperationNotStarted implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */
 

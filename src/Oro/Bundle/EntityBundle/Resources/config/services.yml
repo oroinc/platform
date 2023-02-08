@@ -291,8 +291,6 @@ services:
 
     oro_entity.listener.orm.generated_value_strategy_listener:
         class: Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener
-        arguments:
-            - '%database_driver%'
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata }
 

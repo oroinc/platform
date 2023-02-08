@@ -36,7 +36,7 @@ class testClassName implements Oro\Component\Layout\LayoutUpdateInterface
 {
     public function updateLayout(
         Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator,
-        Oro\Component\Layout\LayoutItemInterface $item
+        Oro\Component\Layout\LayoutItemInterface $item,
     ) {
         echo 123;
     }
@@ -70,7 +70,7 @@ class testClassName implements Oro\Component\Layout\LayoutUpdateInterface
 {
     public function updateLayout(
         Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator,
-        Oro\Component\Layout\LayoutItemInterface $item
+        Oro\Component\Layout\LayoutItemInterface $item,
     ) {
         if (true) {
             echo 123;

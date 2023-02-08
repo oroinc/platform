@@ -30,12 +30,12 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension([
-                EntityChangesetType::class => $this->type,
-                DataChangesetType::class => new DataChangesetType()
+                $this->type,
+                new DataChangesetType()
             ], [])
         ];
     }

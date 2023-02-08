@@ -36,7 +36,7 @@ security:
                 path:                       oro_user_security_logout
             organization-remember-me:
                 token_provider:             oro_security.token.provider.rememberme
-                secret:                     '%secret%'
+                secret:                     '%kernel.secret%'
                 # More info about remember me cookie configuration can be found at
                 # https://doc.oroinc.com/backend/setup/post-install/cookies-configuration/#back-office-remember-me-cookie
                 name:                       BAPRM

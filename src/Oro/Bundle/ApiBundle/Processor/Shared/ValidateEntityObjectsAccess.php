@@ -14,19 +14,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class ValidateEntityObjectsAccess implements ProcessorInterface
 {
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private string $permission;
 
-    /** @var string */
-    private $permission;
-
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param string                        $permission
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
-        $permission
+        string $permission
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->permission = $permission;
@@ -35,12 +28,12 @@ class ValidateEntityObjectsAccess implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
         $entities = $context->getResult();
-        if (!is_array($entities) && !$entities instanceof \Traversable) {
+        if (!\is_array($entities) && !$entities instanceof \Traversable) {
             return;
         }
 

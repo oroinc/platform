@@ -14,7 +14,7 @@ class ValidateEntityExists implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         if (!$context->hasResult() || null === $context->getResult()) {
             throw new NotFoundHttpException('An entity with the requested identifier does not exist.');

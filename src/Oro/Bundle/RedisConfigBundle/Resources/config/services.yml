@@ -1,0 +1,51 @@
+services:
+    oro.redis_config.ip_address_provider:
+        class: Oro\Bundle\RedisConfigBundle\Predis\Configuration\IpAddressProvider
+        arguments:
+            - "@=container.hasParameter('server_ip_address') ? parameter('server_ip_address') : null"
+
+    oro.redis_config.client_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: true
+        arguments:
+            -
+                oro.cache.redis_provider: '@?oro.cache.redis_provider'
+                oro.cache.doctrine.redis_provider: '@?oro.cache.doctrine.redis_provider'
+                oro_redis_config.session.redis_connection: '@?oro_redis_config.session.redis_connection'
+                oro.cache.layout.redis_provider: '@?oro.cache.layout.redis_provider'
+        tags: ['container.service_locator']
+
+    Oro\Bundle\RedisConfigBundle\Provider\RedisRequirementsProvider:
+        class: Oro\Bundle\RedisConfigBundle\Provider\RedisRequirementsProvider
+        arguments:
+            [
+                oro.cache.redis_provider: '@?oro.cache.redis_provider',
+                oro.cache.doctrine.redis_provider: '@?oro.cache.doctrine.redis_provider',
+                oro_redis_config.session.redis_connection: '@?oro_redis_config.session.redis_connection',
+                oro.cache.layout.redis_provider: '@?oro.cache.layout.redis_provider'
+            ]
+        tags:
+            - { name: oro.requirements_provider }
+
+    oro_redis_config.redis_connection_factory:
+        class: Oro\Bundle\RedisConfigBundle\Factory\RedisConnectionFactory
+        arguments:
+            - '@oro.redis_config.ip_address_provider'
+
+    oro_redis_config.session.redis_connection:
+        class: 'Symfony\Component\Cache\Adapter\RedisAdapter'
+        factory: '@oro_redis_config.redis_connection_factory'
+        public: true
+        arguments:
+            - '%session_handler_dsn%'
+
+    oro_redis_config.session_handler.redis:
+        class: Oro\Bundle\RedisConfigBundle\Session\Storage\Handler\RedisLockingSessionHandler
+        lazy: true
+        arguments:
+            - '@oro_redis_config.session.redis_connection'
+        calls:
+            - ['setLogger', ['@logger']]
+        tags:
+            - { name: 'oro_session_handler', alias: 'redis'}
+            - { name: 'oro_session_handler', alias: 'rediss'}

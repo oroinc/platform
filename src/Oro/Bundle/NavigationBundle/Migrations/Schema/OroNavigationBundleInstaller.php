@@ -13,7 +13,7 @@ class OroNavigationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_10';
+        return 'v1_11';
     }
 
     /**
@@ -133,6 +133,7 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('is_active', 'boolean', []);
         $table->addColumn('is_divider', 'boolean', []);
         $table->addColumn('is_custom', 'boolean', []);
+        $table->addColumn('is_synthetic', 'boolean', ['notnull' => true, 'default' => false]);
         $table->addColumn('priority', 'integer', ['notnull' => false]);
         $table->addColumn('scope_id', 'integer', ['notnull' => true]);
         $table->setPrimaryKey(['id']);

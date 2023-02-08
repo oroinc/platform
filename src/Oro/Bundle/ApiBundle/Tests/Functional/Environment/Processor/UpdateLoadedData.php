@@ -8,8 +8,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class UpdateLoadedData implements ProcessorInterface
 {
-    /** @var string */
-    private $suffix;
+    private string $suffix;
 
     public function __construct(string $suffix = '')
     {
@@ -19,12 +18,12 @@ class UpdateLoadedData implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */
 
         $data = $context->getData();
-        if (array_key_exists('computedName', $data) || !array_key_exists('name', $data)) {
+        if (\array_key_exists('computedName', $data) || !\array_key_exists('name', $data)) {
             return;
         }
 

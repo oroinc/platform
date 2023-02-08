@@ -60,7 +60,8 @@ class EntityTreeSelectType extends AbstractType
             'key' => $options['tree_key'],
             'data' => $treeData,
             'nodeId' => $form->getData() ? $form->getData()->getId() : null,
-            'fieldSelector' => '#' . $view->vars['id']
+            'fieldSelector' => '#' . $view->vars['id'],
+            'disabled' => $options['disabled'],
         ], $options['page_component_options']);
     }
 

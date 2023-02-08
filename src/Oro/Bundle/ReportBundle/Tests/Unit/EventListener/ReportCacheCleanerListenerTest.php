@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\EventListener\ReportCacheCleanerListener;
 use Oro\Component\Testing\Unit\EntityTrait;

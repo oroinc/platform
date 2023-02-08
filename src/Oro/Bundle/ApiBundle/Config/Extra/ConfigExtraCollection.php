@@ -7,8 +7,7 @@ namespace Oro\Bundle\ApiBundle\Config\Extra;
  */
 class ConfigExtraCollection
 {
-    /** @var ConfigExtraInterface[] */
-    private $extras = [];
+    private array $extras = [];
 
     /**
      * Indicates whether the collection is empty.

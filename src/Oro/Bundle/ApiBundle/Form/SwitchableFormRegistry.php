@@ -17,16 +17,11 @@ use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
 class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitcherInterface
 {
     public const DEFAULT_EXTENSION = 'default';
-    public const API_EXTENSION     = 'api';
+    public const API_EXTENSION = 'api';
 
-    /** @var SwitchableDependencyInjectionExtension */
-    protected $extension;
-
-    /** @var FormExtensionState */
-    protected $extensionState;
-
-    /** @var int */
-    private $switchCounter = 0;
+    private SwitchableDependencyInjectionExtension $extension;
+    private FormExtensionState $extensionState;
+    private int $switchCounter = 0;
 
     /**
      * @param FormExtensionInterface[]         $extensions
@@ -43,21 +38,22 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
         if (\count($extensions) !== 1) {
             throw new \InvalidArgumentException('Expected only one form extension.');
         }
-        $this->extension = \reset($extensions);
-        if (!$this->extension instanceof SwitchableDependencyInjectionExtension) {
-            throw new \InvalidArgumentException(\sprintf(
+        $extension = reset($extensions);
+        if (!$extension instanceof SwitchableDependencyInjectionExtension) {
+            throw new \InvalidArgumentException(sprintf(
                 'Expected type of form extension is "%s", "%s" given.',
                 SwitchableDependencyInjectionExtension::class,
-                \get_class($this->extension)
+                \get_class($extension)
             ));
         }
+        $this->extension = $extension;
         $this->extensionState = $extensionState;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function switchToDefaultFormExtension()
+    public function switchToDefaultFormExtension(): void
     {
         if ($this->switchCounter > 0) {
             $this->switchCounter--;
@@ -71,7 +67,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
     /**
      * {@inheritdoc}
      */
-    public function switchToApiFormExtension()
+    public function switchToApiFormExtension(): void
     {
         if (0 === $this->switchCounter) {
             $this->switchFormExtension(self::API_EXTENSION);
@@ -80,10 +76,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
         $this->switchCounter++;
     }
 
-    /**
-     * @param string $extensionName
-     */
-    protected function switchFormExtension($extensionName)
+    private function switchFormExtension(string $extensionName): void
     {
         $this->extension->switchFormExtension($extensionName);
         // clear local cache
@@ -109,7 +102,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
                 }
             }
             if (!$isKnownType) {
-                throw new InvalidArgumentException(\sprintf(
+                throw new InvalidArgumentException(sprintf(
                     'The form type "%s" is not configured to be used in API.',
                     $name
                 ));
@@ -119,15 +112,11 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
         return parent::getType($name);
     }
 
-    /**
-     * @param string $propertyName
-     * @param mixed  $value
-     */
-    private function setPrivatePropertyValue($propertyName, $value)
+    private function setPrivatePropertyValue(string $propertyName, mixed $value): void
     {
         $r = new \ReflectionClass(FormRegistry::class);
         if (!$r->hasProperty($propertyName)) {
-            throw new \RuntimeException(\sprintf('The "%s" property does not exist.', $propertyName));
+            throw new \RuntimeException(sprintf('The "%s" property does not exist.', $propertyName));
         }
         $p = $r->getProperty($propertyName);
         $p->setAccessible(true);

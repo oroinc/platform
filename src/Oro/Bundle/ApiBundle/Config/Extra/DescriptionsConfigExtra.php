@@ -15,7 +15,7 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -23,7 +23,7 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(ConfigContext $context)
+    public function configureContext(ConfigContext $context): void
     {
         // no any modifications of the ConfigContext is required
     }
@@ -31,7 +31,7 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function isPropagable()
+    public function isPropagable(): bool
     {
         return false;
     }
@@ -39,7 +39,7 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         return self::NAME;
     }

@@ -8,7 +8,6 @@ namespace Oro\Bundle\DataAuditBundle\Strategy\Processor;
  */
 interface EntityAuditStrategyProcessorInterface
 {
-
     /**
      * This method supposes to be called in AuditChangedEntitiesProcessor,
      * it runs specific strategy for entities before data auditing standalone.

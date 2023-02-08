@@ -12,13 +12,9 @@ use Psr\Container\ContainerInterface;
 class DataEncoderRegistry
 {
     /** @var array [[encoder service id, request type expression], ...] */
-    private $encoders;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $encoders;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $encoders [[encoder service id, request type expression], ...]

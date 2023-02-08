@@ -23,11 +23,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class HandleFieldsFilter implements ProcessorInterface
 {
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
-
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
+    private FilterNamesRegistry $filterNamesRegistry;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct(FilterNamesRegistry $filterNamesRegistry, ValueNormalizer $valueNormalizer)
     {
@@ -38,7 +35,7 @@ class HandleFieldsFilter implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -92,13 +89,7 @@ class HandleFieldsFilter implements ProcessorInterface
         $context->addConfigExtra(new FilterFieldsConfigExtra($fields));
     }
 
-    /**
-     * @param FilterValue $filterValue
-     * @param RequestType $requestType
-     *
-     * @return mixed
-     */
-    private function normalizeFilterValue(FilterValue $filterValue, RequestType $requestType)
+    private function normalizeFilterValue(FilterValue $filterValue, RequestType $requestType): mixed
     {
         $value = $filterValue->getValue();
         if ('' === $value) {

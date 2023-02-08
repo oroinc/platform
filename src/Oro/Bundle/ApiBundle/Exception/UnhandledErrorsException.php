@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 class UnhandledErrorsException extends RuntimeException
 {
     /** @var Error[] */
-    private $errors;
+    private array $errors;
 
     /**
      * @param Error[] $errors

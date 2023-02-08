@@ -41,7 +41,7 @@ class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
         if ($themeName) {
             $themePaths = [];
 
-            $themes = $this->getThemesHierarchy($themeName);
+            $themes = $this->themeManager->getThemesHierarchy($themeName);
             foreach ($themes as $theme) {
                 $existingPaths[] = $themePaths[] = $theme->getDirectory();
             }
@@ -62,7 +62,7 @@ class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
 
             $pageTemplate = $this->context->getOr('page_template');
             if ($pageTemplate) {
-                $theme = $this->themeManager->getTheme($themeName);
+                $theme = end($themes);
                 if ($theme->getPageTemplate($this->context->getOr('page_template'), $routeName)) {
                     foreach ($themePaths as $path) {
                         $existingPaths[] =
@@ -73,26 +73,5 @@ class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
         }
 
         return $existingPaths;
-    }
-
-    /**
-     * Returns theme inheritance hierarchy with root theme as first item
-     *
-     * @param string $themeName
-     *
-     * @return Theme[]
-     */
-    protected function getThemesHierarchy($themeName)
-    {
-        $hierarchy = [];
-
-        while (null !== $themeName) {
-            $theme = $this->themeManager->getTheme($themeName);
-
-            $hierarchy[] = $theme;
-            $themeName   = $theme->getParentTheme();
-        }
-
-        return array_reverse($hierarchy);
     }
 }

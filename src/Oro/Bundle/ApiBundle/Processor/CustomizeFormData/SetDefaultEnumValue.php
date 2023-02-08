@@ -14,20 +14,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class SetDefaultEnumValue implements ProcessorInterface
 {
-    /** @var EnumValueProvider */
-    private $enumValueProvider;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
-
-    /** @var string */
-    private $enumFieldName;
-
-    /** @var string */
-    private $enumCode;
+    private EnumValueProvider $enumValueProvider;
+    private DoctrineHelper $doctrineHelper;
+    private PropertyAccessorInterface $propertyAccessor;
+    private string $enumFieldName;
+    private string $enumCode;
 
     public function __construct(
         EnumValueProvider $enumValueProvider,
@@ -46,7 +37,7 @@ class SetDefaultEnumValue implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
 

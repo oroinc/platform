@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Batch\JsonUtil;
  */
 class JsonDataEncoder implements DataEncoderInterface
 {
-    /** @var string|null */
-    private $headerSectionName;
+    private ?string $headerSectionName = null;
 
     /**
      * {@inheritDoc}
@@ -22,7 +21,7 @@ class JsonDataEncoder implements DataEncoderInterface
             $headerSectionData = null;
             if (null !== $this->headerSectionName) {
                 $firstItem = reset($items);
-                if (array_key_exists($this->headerSectionName, $firstItem)) {
+                if (\array_key_exists($this->headerSectionName, $firstItem)) {
                     $headerSectionData = [$this->headerSectionName => $firstItem[$this->headerSectionName]];
                 }
             }

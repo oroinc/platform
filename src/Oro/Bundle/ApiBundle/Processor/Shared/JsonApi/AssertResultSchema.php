@@ -15,7 +15,7 @@ class AssertResultSchema implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         if (!$context->hasResult()) {
             // exit because a result was not set in the context
@@ -23,12 +23,12 @@ class AssertResultSchema implements ProcessorInterface
         }
 
         $result = $context->getResult();
-        if (!is_array($result)) {
+        if (!\is_array($result)) {
             throw new RuntimeException('The result must be an array.');
         }
 
         $rootSections = [JsonApiDoc::DATA, JsonApiDoc::ERRORS, JsonApiDoc::META];
-        if (count(array_intersect(array_keys($result), $rootSections)) === 0) {
+        if (\count(array_intersect(array_keys($result), $rootSections)) === 0) {
             throw new RuntimeException(
                 sprintf(
                     'The result must contain at least one of the following sections: %s.',
@@ -37,7 +37,7 @@ class AssertResultSchema implements ProcessorInterface
             );
         }
 
-        if (array_key_exists(JsonApiDoc::DATA, $result) && array_key_exists(JsonApiDoc::ERRORS, $result)) {
+        if (\array_key_exists(JsonApiDoc::DATA, $result) && \array_key_exists(JsonApiDoc::ERRORS, $result)) {
             throw new RuntimeException(
                 sprintf(
                     'The sections "%s" and "%s" must not coexist in the result.',
@@ -47,7 +47,7 @@ class AssertResultSchema implements ProcessorInterface
             );
         }
 
-        if (array_key_exists(JsonApiDoc::INCLUDED, $result) && !array_key_exists(JsonApiDoc::DATA, $result)) {
+        if (\array_key_exists(JsonApiDoc::INCLUDED, $result) && !\array_key_exists(JsonApiDoc::DATA, $result)) {
             throw new RuntimeException(
                 sprintf(
                     'The result can contain the "%s" section only together with the "%s" section.',

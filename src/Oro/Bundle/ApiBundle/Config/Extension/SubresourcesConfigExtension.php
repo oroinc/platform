@@ -13,11 +13,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class SubresourcesConfigExtension extends AbstractConfigExtension
 {
-    /** @var ActionProcessorBagInterface */
-    private $actionProcessorBag;
-
-    /** @var FilterOperatorRegistry */
-    private $filterOperatorRegistry;
+    private ActionProcessorBagInterface $actionProcessorBag;
+    private FilterOperatorRegistry $filterOperatorRegistry;
 
     public function __construct(
         ActionProcessorBagInterface $actionProcessorBag,
@@ -30,7 +27,7 @@ class SubresourcesConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationSections()
+    public function getEntityConfigurationSections(): array
     {
         return [
             ConfigUtil::SUBRESOURCES => new SubresourcesConfiguration(
@@ -43,7 +40,7 @@ class SubresourcesConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationLoaders()
+    public function getEntityConfigurationLoaders(): array
     {
         return [ConfigUtil::SUBRESOURCES => new SubresourcesConfigLoader()];
     }

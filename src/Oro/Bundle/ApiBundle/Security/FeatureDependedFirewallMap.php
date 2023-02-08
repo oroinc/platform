@@ -16,14 +16,10 @@ use Symfony\Component\Security\Http\Firewall\AccessListener;
  */
 class FeatureDependedFirewallMap extends FirewallMap
 {
-    /** @var FeatureChecker */
-    private $featureChecker;
-
-    /** @var FeatureAccessListener */
-    private $featureAccessListener;
-
+    private FeatureChecker $featureChecker;
+    private FeatureAccessListener $featureAccessListener;
     /** @var array [firewall name => ['feature_name' => name, 'feature_firewall_listeners' => [class, ...]], ...] */
-    private $featureDependedFirewalls;
+    private array $featureDependedFirewalls;
 
     public function __construct(
         ContainerInterface $container,
@@ -81,7 +77,7 @@ class FeatureDependedFirewallMap extends FirewallMap
      */
     private function getApplicableListeners(iterable $listeners, array $excludedListenerClasses): iterable
     {
-        if (count($listeners) > 0) {
+        if (\count($listeners) > 0) {
             $applicableListeners = [];
             foreach ($listeners as $listener) {
                 if ($this->isApplicableListener($listener, $excludedListenerClasses)) {
@@ -95,20 +91,14 @@ class FeatureDependedFirewallMap extends FirewallMap
             return $applicableListeners;
         }
 
-        if (count($excludedListenerClasses) === 0) {
+        if (\count($excludedListenerClasses) === 0) {
             return [$this->featureAccessListener];
         }
 
         return $listeners;
     }
 
-    /**
-     * @param object   $listener
-     * @param string[] $excludedListenerClasses
-     *
-     * @return bool
-     */
-    private function isApplicableListener($listener, array $excludedListenerClasses): bool
+    private function isApplicableListener(object $listener, array $excludedListenerClasses): bool
     {
         foreach ($excludedListenerClasses as $listenerClass) {
             if (is_a($listener, $listenerClass)) {

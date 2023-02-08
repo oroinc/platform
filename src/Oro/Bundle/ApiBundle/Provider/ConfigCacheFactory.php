@@ -9,17 +9,11 @@ use Oro\Component\Config\Cache\ConfigCacheStateInterface;
  */
 class ConfigCacheFactory
 {
-    /** @var string */
-    private $cacheDir;
-
-    /** @var bool */
-    private $debug;
-
-    /** @var ConfigCacheWarmer */
-    private $configCacheWarmer;
-
+    private string $cacheDir;
+    private bool $debug;
+    private ConfigCacheWarmer $configCacheWarmer;
     /** @var ConfigCacheStateInterface[]|null */
-    private $dependencies;
+    private ?array $dependencies = null;
 
     public function __construct(string $cacheDir, bool $debug)
     {

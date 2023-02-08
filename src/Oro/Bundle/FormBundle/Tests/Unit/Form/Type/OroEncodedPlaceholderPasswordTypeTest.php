@@ -26,17 +26,12 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    OroEncodedPlaceholderPasswordType::class => $this->formType
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->formType], [])
         ];
     }
 

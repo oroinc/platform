@@ -17,23 +17,17 @@ use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathPr
 
 class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ChainPathProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $pathProvider;
+    private ChainPathProvider|\PHPUnit\Framework\MockObject\MockObject $pathProvider;
 
-    /** @var DriverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $phpDriver;
+    private DriverInterface|\PHPUnit\Framework\MockObject\MockObject $phpDriver;
 
-    /** @var DriverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $yamlDriver;
+    private DriverInterface|\PHPUnit\Framework\MockObject\MockObject $yamlDriver;
 
-    /** @var DependencyInitializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $dependencyInitializer;
+    private DependencyInitializer|\PHPUnit\Framework\MockObject\MockObject $dependencyInitializer;
 
-    /** @var ResourceProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourceProvider;
+    private ResourceProviderInterface|\PHPUnit\Framework\MockObject\MockObject $resourceProvider;
 
-    /** @var ThemeExtension */
-    private $extension;
+    private ThemeExtension $extension;
 
     protected function setUp(): void
     {
@@ -55,101 +49,162 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLayoutUpdates()
+    public function testGetLayoutUpdatesWhenNoUpdates(): void
     {
         $themeName = 'my-theme';
-        $this->pathProvider->expects($this->once())
+        $this->pathProvider->expects(self::once())
             ->method('getPaths')
             ->willReturn([$themeName]);
 
-        $this->resourceProvider->expects($this->any())
+        $this->resourceProvider->expects(self::any())
             ->method('findApplicableResources')
             ->with([$themeName])
             ->willReturn([
                 'oro-default/resource1.yml',
                 'oro-default/page/resource2.yml',
-                'oro-default/page/resource3.php'
+                'oro-default/page/resource3.php',
             ]);
 
         $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
-        $this->assertEquals([], $result);
+        self::assertEquals([], $result);
     }
 
-    public function testThemeUpdatesFoundWithOneSkipped()
+    public function testGetLayoutWhenFoundUpdates(): void
     {
         $themeName = 'oro-default';
-        $this->pathProvider->expects($this->once())
+        $this->pathProvider->expects(self::once())
             ->method('getPaths')
             ->willReturn([$themeName]);
 
-        $this->resourceProvider->expects($this->any())
+        $this->resourceProvider->expects(self::any())
             ->method('findApplicableResources')
             ->with([$themeName])
             ->willReturn([
                 'oro-default/resource1.yml',
-                'oro-default/page/resource3.php'
+                'oro-default/page/resource3.php',
             ]);
 
         $updateMock = $this->createMock(LayoutUpdateInterface::class);
         $update2Mock = $this->createMock(LayoutUpdateInterface::class);
 
-        $this->yamlDriver->expects($this->once())
+        $this->yamlDriver->expects(self::once())
             ->method('load')
             ->with('oro-default/resource1.yml')
             ->willReturn($updateMock);
-        $this->phpDriver->expects($this->once())
+        $this->phpDriver->expects(self::once())
             ->method('load')
             ->with('oro-default/page/resource3.php')
             ->willReturn($update2Mock);
 
         $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
-        $this->assertContains($updateMock, $result);
-        $this->assertContains($update2Mock, $result);
+        self::assertContains($updateMock, $result);
+        self::assertContains($update2Mock, $result);
     }
 
-    public function testShouldPassDependenciesToUpdateInstance()
+    public function testGetLayoutWhenFoundDifferentContext(): void
+    {
+        $themeName1 = 'oro-default';
+        $themeName2 = 'oro-custom';
+        $item1 = $this->getLayoutItem('root', $themeName1);
+        $item2 = $this->getLayoutItem('custom_root', $themeName2);
+
+        $this->pathProvider->expects(self::exactly(2))
+            ->method('setContext')
+            ->withConsecutive([$item1->getContext()], [$item2->getContext()]);
+
+        $this->pathProvider->expects(self::exactly(2))
+            ->method('getPaths')
+            ->willReturnOnConsecutiveCalls([$themeName1], [$themeName2]);
+
+        $this->resourceProvider->expects(self::any())
+            ->method('findApplicableResources')
+            ->willReturnMap([
+                [
+                    [$themeName1],
+                    ['oro-default/resource1.yml'],
+                ],
+                [
+                    [$themeName2],
+                    [
+                        'oro-default/resource1.yml',
+                        'oro-default/page/resource3.php',
+                    ],
+                ],
+            ]);
+
+        $updateMock = $this->createMock(LayoutUpdateInterface::class);
+        $update2Mock = $this->createMock(LayoutUpdateInterface::class);
+
+        $this->yamlDriver->expects(self::exactly(2))
+            ->method('load')
+            ->with('oro-default/resource1.yml')
+            ->willReturn($updateMock);
+        $this->phpDriver->expects(self::once())
+            ->method('load')
+            ->with('oro-default/page/resource3.php')
+            ->willReturn($update2Mock);
+
+        $result = $this->extension->getLayoutUpdates($item1);
+        self::assertContains($updateMock, $result);
+        self::assertNotContains($update2Mock, $result);
+
+        $result = $this->extension->getLayoutUpdates($item2);
+        self::assertContains($updateMock, $result);
+        self::assertContains($update2Mock, $result);
+
+        // Checks local cache.
+        $result = $this->extension->getLayoutUpdates($item1);
+        self::assertContains($updateMock, $result);
+        self::assertNotContains($update2Mock, $result);
+
+        $result = $this->extension->getLayoutUpdates($item2);
+        self::assertContains($updateMock, $result);
+        self::assertContains($update2Mock, $result);
+    }
+
+    public function testShouldPassDependenciesToUpdateInstance(): void
     {
         $themeName = 'oro-gold';
         $update = $this->createMock(LayoutUpdateInterface::class);
-        $this->pathProvider->expects($this->once())
+        $this->pathProvider->expects(self::once())
             ->method('getPaths')
             ->willReturn([$themeName]);
 
-        $this->resourceProvider->expects($this->any())
+        $this->resourceProvider->expects(self::any())
             ->method('findApplicableResources')
             ->with([$themeName])
             ->willReturn([
-                'oro-default/resource1.yml'
+                'oro-default/resource1.yml',
             ]);
 
-        $this->yamlDriver->expects($this->once())
+        $this->yamlDriver->expects(self::once())
             ->method('load')
             ->willReturn($update);
 
-        $this->dependencyInitializer->expects($this->once())
+        $this->dependencyInitializer->expects(self::once())
             ->method('initialize')
-            ->with($this->identicalTo($update));
+            ->with(self::identicalTo($update));
 
         $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
     }
 
-    public function testShouldPassContextInContextAwareProvider()
+    public function testShouldPassContextInContextAwareProvider(): void
     {
         $themeName = 'my-theme';
-        $this->pathProvider->expects($this->once())
+        $this->pathProvider->expects(self::once())
             ->method('getPaths')
             ->willReturn([$themeName]);
 
-        $this->resourceProvider->expects($this->any())
+        $this->resourceProvider->expects(self::any())
             ->method('findApplicableResources')
             ->with([$themeName])
             ->willReturn([
                 'oro-default/resource1.yml',
                 'oro-default/page/resource2.yml',
-                'oro-default/page/resource3.php'
+                'oro-default/page/resource3.php',
             ]);
 
-        $this->pathProvider->expects($this->once())
+        $this->pathProvider->expects(self::once())
             ->method('setContext');
 
         $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
@@ -157,8 +212,9 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
 
     private function getLayoutItem(string $id, string $theme = null): LayoutItemInterface
     {
-        $context = new LayoutContext();
+        $context = new LayoutContext([], ['theme']);
         $context->set('theme', $theme);
+        $context->resolve();
         $layoutItem = (new LayoutItem(new RawLayoutBuilder(), $context));
         $layoutItem->initialize($id);
 

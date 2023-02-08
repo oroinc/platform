@@ -11,17 +11,10 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class EntityConfiguration
 {
-    /** @var string */
-    protected $sectionName;
-
-    /** @var ConfigurationSectionInterface */
-    protected $definitionSection;
-
-    /** @var ConfigurationSettingsInterface */
-    protected $settings;
-
-    /** @var int */
-    protected $maxNestingLevel;
+    private string $sectionName;
+    private ConfigurationSectionInterface $definitionSection;
+    private ConfigurationSettingsInterface $settings;
+    private int $maxNestingLevel;
 
     public function __construct(
         string $sectionName,
@@ -29,10 +22,10 @@ class EntityConfiguration
         ConfigurationSettingsInterface $settings,
         int $maxNestingLevel
     ) {
-        $this->sectionName       = $sectionName;
+        $this->sectionName = $sectionName;
         $this->definitionSection = $definitionSection;
-        $this->settings          = $settings;
-        $this->maxNestingLevel   = $maxNestingLevel;
+        $this->settings = $settings;
+        $this->maxNestingLevel = $maxNestingLevel;
 
         $definitionSection->setParentSectionName($sectionName);
 
@@ -76,7 +69,7 @@ class EntityConfiguration
     /**
      * Builds the definition of an entity configuration.
      */
-    protected function configureEntity(NodeBuilder $node, string $currentSectionName): void
+    private function configureEntity(NodeBuilder $node, string $currentSectionName): void
     {
         $this->definitionSection->configure($node);
         $definitionSectionName = $this->definitionSection->getSectionName();
@@ -100,7 +93,7 @@ class EntityConfiguration
             );
     }
 
-    protected function postProcessConfig(array $config): array
+    private function postProcessConfig(array $config): array
     {
         $extraSections = $this->settings->getExtraSections();
         foreach ($extraSections as $name => $configuration) {

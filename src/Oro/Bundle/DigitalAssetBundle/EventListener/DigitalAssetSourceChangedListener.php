@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
@@ -26,7 +26,7 @@ class DigitalAssetSourceChangedListener
             return;
         }
 
-        $entityManager = $args->getEntityManager();
+        $entityManager = $args->getObjectManager();
         $digitalAssetRepository = $entityManager->getRepository(DigitalAsset::class);
 
         $childFiles = $digitalAssetRepository->findChildFilesByDigitalAssetId($file->getParentEntityId());

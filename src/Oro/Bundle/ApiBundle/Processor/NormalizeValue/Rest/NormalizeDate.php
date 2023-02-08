@@ -15,7 +15,7 @@ class NormalizeDate extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypeString()
+    protected function getDataTypeString(): string
     {
         return 'date';
     }
@@ -23,7 +23,7 @@ class NormalizeDate extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getDataTypePluralString()
+    protected function getDataTypePluralString(): string
     {
         return 'dates';
     }
@@ -31,7 +31,7 @@ class NormalizeDate extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function getRequirement()
+    protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
@@ -39,7 +39,7 @@ class NormalizeDate extends AbstractProcessor
     /**
      * {@inheritdoc}
      */
-    protected function normalizeValue($value)
+    protected function normalizeValue(mixed $value): mixed
     {
         return new \DateTime($value, new \DateTimeZone('UTC'));
     }

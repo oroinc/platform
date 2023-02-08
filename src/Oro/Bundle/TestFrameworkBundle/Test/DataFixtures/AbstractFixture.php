@@ -3,6 +3,8 @@
 namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture as BaseAbstractFixture;
+use Doctrine\Common\DataFixtures\ReferenceRepository;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -11,6 +13,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * This base fixture clas can be used in functional tests to make the code of fixture more lightweight.
+ * Convenient way to use several reference repositories in fixtures.
+ * Entities can have different object managers that's why we need to use several $referenceRepositories
  */
 abstract class AbstractFixture extends BaseAbstractFixture implements ContainerAwareInterface
 {
@@ -23,6 +27,9 @@ abstract class AbstractFixture extends BaseAbstractFixture implements ContainerA
      * @var PropertyAccessor
      */
     protected $propertyAccessor = false;
+
+    /** @var ReferenceRepository[] $referenceRepositories */
+    private array $referenceRepositories = [];
 
     /**
      * Sets $entity object properties with values from $data array using property accessor
@@ -50,6 +57,35 @@ abstract class AbstractFixture extends BaseAbstractFixture implements ContainerA
             }
             $this->getPropertyAccessor()->setValue($entity, $property, $value);
         }
+    }
+
+    /** {@inheritdoc} */
+    public function setReference($name, $object)
+    {
+        $this->getReferenceRepositoryByClass(get_class($object))->setReference($name, $object);
+    }
+
+    /** {@inheritdoc} */
+    public function addReference($name, $object)
+    {
+        $this->getReferenceRepositoryByClass(get_class($object))->addReference($name, $object);
+    }
+
+    /** {@inheritdoc} */
+    public function getReference($name, string $class = null)
+    {
+        return $this->getReferenceRepositoryByClass($class)->getReference($name, $class);
+    }
+
+    /** {@inheritdoc} */
+    public function hasReference($name, ?string $class = null)
+    {
+        return $this->getReferenceRepositoryByClass($class)->hasReference($name, $class);
+    }
+
+    protected function getObjectManagerForClass(?string $className): ObjectManager
+    {
+        return $this->getReferenceRepositoryByClass($className)->getManager();
     }
 
     /**
@@ -185,10 +221,50 @@ abstract class AbstractFixture extends BaseAbstractFixture implements ContainerA
     }
 
     /**
+     * @throws \Exception
+     */
+    private function getReferenceRepositoryByClass(?string $className): ReferenceRepository
+    {
+        if (is_null($className)) {
+            return $this->referenceRepository;
+        }
+
+        foreach ($this->referenceRepositories as $referenceRepository) {
+            $manager = $referenceRepository->getManager();
+
+            if ($manager->getMetadataFactory()->hasMetadataFor($className)) {
+                $className = $manager->getClassMetadata($className)->getName();
+            }
+
+            if (!$manager->getMetadataFactory()->isTransient($className)) {
+                return $referenceRepository;
+            }
+        }
+
+        throw new \Exception(
+            sprintf(
+                "There is no object manager for the %s class or ReferenceRepository is not initialized",
+                $className
+            )
+        );
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
+    }
+
+    /**
+     * Fills fixture with all initialized ReferenceRepositories for correct
+     * object managers and reference repositories usage
+     *
+     * @param ReferenceRepository[] $referenceRepositories
+     */
+    public function setReferenceRepositories(array $referenceRepositories): void
+    {
+        $this->referenceRepositories = $referenceRepositories;
     }
 }

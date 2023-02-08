@@ -9,14 +9,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class MergeSubresourceConfigHelper
 {
-    /** @var MergeActionConfigHelper */
-    private $mergeActionConfigHelper;
-
-    /** @var MergeFilterConfigHelper */
-    private $mergeFilterConfigHelper;
-
-    /** @var MergeSorterConfigHelper */
-    private $mergeSorterConfigHelper;
+    private MergeActionConfigHelper $mergeActionConfigHelper;
+    private MergeFilterConfigHelper $mergeFilterConfigHelper;
+    private MergeSorterConfigHelper $mergeSorterConfigHelper;
 
     public function __construct(
         MergeActionConfigHelper $mergeActionConfigHelper,
@@ -28,24 +23,14 @@ class MergeSubresourceConfigHelper
         $this->mergeSorterConfigHelper = $mergeSorterConfigHelper;
     }
 
-    /**
-     * @param array  $config
-     * @param array  $subresourceConfig
-     * @param string $action
-     * @param bool   $withStatusCodes
-     * @param bool   $withFilters
-     * @param bool   $withSorters
-     *
-     * @return array
-     */
     public function mergeSubresourcesConfig(
         array $config,
         array $subresourceConfig,
-        $action,
-        $withStatusCodes,
-        $withFilters,
-        $withSorters
-    ) {
+        string $action,
+        bool $withStatusCodes,
+        bool $withFilters,
+        bool $withSorters
+    ): array {
         if (!empty($subresourceConfig[ConfigUtil::ACTIONS][$action])) {
             $config = $this->mergeActionConfigHelper->mergeActionConfig(
                 $config,

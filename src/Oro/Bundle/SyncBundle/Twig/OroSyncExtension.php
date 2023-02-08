@@ -4,6 +4,7 @@ namespace Oro\Bundle\SyncBundle\Twig;
 
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
+use Oro\Bundle\SyncBundle\Provider\WebsocketClientParametersProvider;
 use Psr\Container\ContainerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
@@ -41,12 +42,21 @@ class OroSyncExtension extends AbstractExtension implements ServiceSubscriberInt
     }
 
     /**
+     * @return WebsocketClientParametersProvider
+     */
+    protected function getWsConfigurationProvider()
+    {
+        return $this->container->get('oro_sync.client.frontend_websocket_parameters.provider');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFunctions()
     {
         return [
             new TwigFunction('check_ws', [$this, 'checkWsConnected']),
+            new TwigFunction('get_ws_config', [$this, 'getWsConfig']),
             new TwigFunction('oro_sync_get_content_tags', [$this, 'generate'])
         ];
     }
@@ -75,6 +85,20 @@ class OroSyncExtension extends AbstractExtension implements ServiceSubscriberInt
     }
 
     /**
+     * @return array
+     */
+    public function getWsConfig()
+    {
+        $configProvider = $this->getWsConfigurationProvider();
+
+        return [
+            'host' => $configProvider->getHost(),
+            'port' => $configProvider->getPort(),
+            'path' => $configProvider->getPath()
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedServices()
@@ -82,6 +106,7 @@ class OroSyncExtension extends AbstractExtension implements ServiceSubscriberInt
         return [
             'oro_sync.content.tag_generator' => TagGeneratorInterface::class,
             'oro_sync.client.connection_checker' => ConnectionChecker::class,
+            'oro_sync.client.frontend_websocket_parameters.provider' => WebsocketClientParametersProvider::class
         ];
     }
 }

@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadAccessibleResources implements ProcessorInterface
 {
-    /** @var EntityOverrideProviderRegistry */
-    private $entityOverrideProviderRegistry;
+    private EntityOverrideProviderRegistry $entityOverrideProviderRegistry;
 
     public function __construct(EntityOverrideProviderRegistry $entityOverrideProviderRegistry)
     {
@@ -23,7 +22,7 @@ class LoadAccessibleResources implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */
 

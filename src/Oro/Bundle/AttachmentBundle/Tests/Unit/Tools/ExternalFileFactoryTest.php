@@ -22,6 +22,8 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
     private const URL = 'http://example.org/image.png';
     private const HTTP_OPTIONS = ['sample_key' => 'sample_value'];
 
+    private array $httpOptions;
+
     private ClientInterface|\PHPUnit\Framework\MockObject\MockObject $httpClient;
 
     private LoggerInterface $logger;

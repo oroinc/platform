@@ -20,26 +20,19 @@ use Oro\Component\EntitySerializer\FieldConfigInterface;
  */
 abstract class NormalizeSection implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param EntityConfigInterface  $section
-     * @param string                 $sectionName
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $definition
-     */
     protected function normalize(
         EntityConfigInterface $section,
-        $sectionName,
-        $entityClass,
+        string $sectionName,
+        string $entityClass,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         if ($section->hasFields()) {
             $this->removeExcludedFieldsAndUpdatePropertyPath($section, $definition);
         }
@@ -49,10 +42,10 @@ abstract class NormalizeSection implements ProcessorInterface
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function removeExcludedFieldsAndUpdatePropertyPath(
+    private function removeExcludedFieldsAndUpdatePropertyPath(
         EntityConfigInterface $section,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         $fields = $section->getFields();
         $toRemoveFieldNames = [];
         $toAddFields = [];
@@ -86,18 +79,12 @@ abstract class NormalizeSection implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityConfigInterface  $section
-     * @param string                 $sectionName
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $definition
-     */
-    protected function collect(
+    private function collect(
         EntityConfigInterface $section,
-        $sectionName,
-        $entityClass,
+        string $sectionName,
+        string $entityClass,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($field->hasTargetEntity()) {
@@ -118,22 +105,16 @@ abstract class NormalizeSection implements ProcessorInterface
     }
 
     /**
-     * @param EntityConfigInterface  $section
-     * @param string                 $sectionName
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $fieldPrefix
-     * @param string                 $pathPrefix
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function collectNested(
+    private function collectNested(
         EntityConfigInterface $section,
-        $sectionName,
-        $entityClass,
+        string $sectionName,
+        string $entityClass,
         EntityDefinitionConfig $definition,
-        $fieldPrefix,
-        $pathPrefix
-    ) {
+        string $fieldPrefix,
+        string $pathPrefix
+    ): void {
         /** @var FieldConfigInterface[] $sectionFields */
         $sectionFields = $definition->get($sectionName)->getFields();
         if (empty($sectionFields)) {
@@ -191,18 +172,11 @@ abstract class NormalizeSection implements ProcessorInterface
         }
     }
 
-    /**
-     * @param FieldConfigInterface             $sectionField
-     * @param string                           $fieldName
-     * @param EntityDefinitionFieldConfig|null $field
-     *
-     * @return string
-     */
-    protected function getPropertyPath(
+    private function getPropertyPath(
         FieldConfigInterface $sectionField,
-        $fieldName,
+        string $fieldName,
         EntityDefinitionFieldConfig $field = null
-    ) {
+    ): string {
         $propertyPath = $fieldName;
         if ($sectionField->hasPropertyPath()) {
             $propertyPath = $sectionField->getPropertyPath();
@@ -213,24 +187,12 @@ abstract class NormalizeSection implements ProcessorInterface
         return $propertyPath;
     }
 
-    /**
-     * @param string      $name
-     * @param string|null $currentPrefix
-     *
-     * @return string
-     */
-    protected function buildPrefix($name, $currentPrefix = null)
+    private function buildPrefix(string $name, ?string $currentPrefix = null): string
     {
         return (null !== $currentPrefix ? $currentPrefix . $name : $name) . ConfigUtil::PATH_DELIMITER;
     }
 
-    /**
-     * @param ClassMetadata|null $metadata
-     * @param string             $fieldName
-     *
-     * @return bool
-     */
-    protected function isCollectionValuedAssociation($metadata, $fieldName)
+    private function isCollectionValuedAssociation(?ClassMetadata $metadata, string $fieldName): bool
     {
         return
             null !== $metadata
@@ -238,13 +200,7 @@ abstract class NormalizeSection implements ProcessorInterface
             && $metadata->isCollectionValuedAssociation($fieldName);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $propertyPath
-     *
-     * @return ClassMetadata|null
-     */
-    protected function getEntityMetadata($entityClass, $propertyPath)
+    private function getEntityMetadata(string $entityClass, string $propertyPath): ?ClassMetadata
     {
         $metadata = null;
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
@@ -258,12 +214,7 @@ abstract class NormalizeSection implements ProcessorInterface
         return $metadata;
     }
 
-    /**
-     * @param string $propertyPath
-     *
-     * @return string
-     */
-    protected function getLastFieldName($propertyPath)
+    private function getLastFieldName(string $propertyPath): string
     {
         $path = ConfigUtil::explodePropertyPath($propertyPath);
 

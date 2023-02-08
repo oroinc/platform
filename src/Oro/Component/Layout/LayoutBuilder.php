@@ -15,28 +15,21 @@ class LayoutBuilder implements LayoutBuilderInterface
     private const BLOCK_THEMES = '_blockThemes';
     private const FORM_THEMES = '_formThemes';
 
-    /** @var LayoutRegistryInterface */
-    protected $registry;
+    protected LayoutRegistryInterface $registry;
 
-    /** @var RawLayoutBuilderInterface */
-    protected $rawLayoutBuilder;
+    protected RawLayoutBuilderInterface $rawLayoutBuilder;
 
-    /** @var DeferredLayoutManipulatorInterface */
-    protected $layoutManipulator;
+    protected DeferredLayoutManipulatorInterface $layoutManipulator;
 
-    /** @var BlockFactoryInterface */
-    protected $blockFactory;
+    protected BlockFactoryInterface $blockFactory;
 
-    /** @var LayoutRendererRegistryInterface */
-    protected $rendererRegistry;
+    protected LayoutRendererRegistryInterface $rendererRegistry;
 
-    /** @var ExpressionProcessor */
-    protected $expressionProcessor;
+    protected ExpressionProcessor $expressionProcessor;
 
-    /**
-     * @var BlockViewCache
-     */
-    private $blockViewCache;
+    protected LayoutContextStack $layoutContextStack;
+
+    private ?BlockViewCache $blockViewCache;
 
     public function __construct(
         LayoutRegistryInterface $registry,
@@ -45,6 +38,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         BlockFactoryInterface $blockFactory,
         LayoutRendererRegistryInterface $rendererRegistry,
         ExpressionProcessor $expressionProcessor,
+        LayoutContextStack $layoutContextStack,
         BlockViewCache $blockViewCache = null
     ) {
         $this->registry            = $registry;
@@ -53,6 +47,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         $this->blockFactory        = $blockFactory;
         $this->rendererRegistry    = $rendererRegistry;
         $this->expressionProcessor = $expressionProcessor;
+        $this->layoutContextStack  = $layoutContextStack;
         $this->blockViewCache      = $blockViewCache;
     }
 
@@ -242,7 +237,7 @@ class LayoutBuilder implements LayoutBuilderInterface
             );
         }
 
-        $layout = $this->createLayout($rootView);
+        $layout = $this->createLayout($rootView, $context);
 
         foreach ($blockThemes as $blockId => $themes) {
             $layout->setBlockTheme($themes, $blockId !== $rootBlockId ? $blockId : null);
@@ -269,9 +264,9 @@ class LayoutBuilder implements LayoutBuilderInterface
      *
      * @return Layout
      */
-    protected function createLayout(BlockView $rootView)
+    protected function createLayout(BlockView $rootView, ContextInterface $context)
     {
-        return new Layout($rootView, $this->rendererRegistry);
+        return new Layout($rootView, $this->rendererRegistry, $context, $this->layoutContextStack);
     }
 
     /**
@@ -353,6 +348,10 @@ class LayoutBuilder implements LayoutBuilderInterface
      */
     private function findBlockById(BlockView $blockView, $id)
     {
+        if ($blockView->getId() === $id) {
+            return $blockView;
+        }
+
         foreach ($blockView->children as $childView) {
             if ($childView->getId() === $id) {
                 return $childView;
@@ -373,5 +372,10 @@ class LayoutBuilder implements LayoutBuilderInterface
     public function getNotAppliedActions()
     {
         return $this->layoutManipulator->getNotAppliedActions();
+    }
+
+    public function getLayoutContextStack(): LayoutContextStack
+    {
+        return $this->layoutContextStack;
     }
 }

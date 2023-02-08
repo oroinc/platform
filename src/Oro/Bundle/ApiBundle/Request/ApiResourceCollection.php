@@ -8,28 +8,20 @@ namespace Oro\Bundle\ApiBundle\Request;
 class ApiResourceCollection implements \Countable, \IteratorAggregate
 {
     /** @var ApiResource[] [entity class => ApiResource, ...] */
-    private $resources = [];
+    private array $resources = [];
 
     /**
      * Checks whether a resource for a given entity exists in the collection.
-     *
-     * @param string $entityClass
-     *
-     * @return bool
      */
-    public function has($entityClass)
+    public function has(string $entityClass): bool
     {
         return isset($this->resources[$entityClass]);
     }
 
     /**
      * Gets the resource by entity class name.
-     *
-     * @param string $entityClass
-     *
-     * @return ApiResource|null
      */
-    public function get($entityClass)
+    public function get(string $entityClass): ?ApiResource
     {
         return $this->resources[$entityClass] ?? null;
     }
@@ -39,11 +31,11 @@ class ApiResourceCollection implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException if a resource for the same entity already exists in the collection
      */
-    public function add(ApiResource $resource)
+    public function add(ApiResource $resource): void
     {
         $entityClass = $resource->getEntityClass();
         if (isset($this->resources[$entityClass])) {
-            throw new \InvalidArgumentException(\sprintf('A resource for "%s" already exists.', $entityClass));
+            throw new \InvalidArgumentException(sprintf('A resource for "%s" already exists.', $entityClass));
         }
         $this->resources[$entityClass] = $resource;
     }
@@ -55,7 +47,7 @@ class ApiResourceCollection implements \Countable, \IteratorAggregate
      *
      * @return ApiResource|null The removed resource or NULL, if the collection did not contain the resource.
      */
-    public function remove($entityClass)
+    public function remove(string $entityClass): ?ApiResource
     {
         $removedResource = null;
         if (isset($this->resources[$entityClass])) {
@@ -68,20 +60,16 @@ class ApiResourceCollection implements \Countable, \IteratorAggregate
 
     /**
      * Checks whether the collection is empty (contains no elements).
-     *
-     * @return boolean TRUE if the collection is empty, FALSE otherwise.
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return empty($this->resources);
     }
 
     /**
      * Clears the collection, removing all elements.
-     *
-     * @return void
      */
-    public function clear()
+    public function clear(): void
     {
         $this->resources = [];
     }
@@ -91,7 +79,7 @@ class ApiResourceCollection implements \Countable, \IteratorAggregate
      *
      * @return ApiResource[] [entity class => ApiResource, ...]
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->resources;
     }

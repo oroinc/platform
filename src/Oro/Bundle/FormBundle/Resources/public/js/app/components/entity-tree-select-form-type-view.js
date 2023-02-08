@@ -38,6 +38,9 @@ define(function(require) {
 
             this.$tree.on('select_node.jstree', this.onSelect.bind(this));
             this.$tree.on('deselect_node.jstree', this.onDeselect.bind(this));
+
+            this.$fieldSelector.on('disable', this.onDisable.bind(this));
+            this.$fieldSelector.on('enable', this.onEnable.bind(this));
         },
 
         /**
@@ -55,6 +58,14 @@ define(function(require) {
          */
         onDeselect: function() {
             this.$fieldSelector.val('');
+        },
+
+        onDisable: function() {
+            this.toggleDisable(true);
+        },
+
+        onEnable: function() {
+            this.toggleDisable(false);
         }
     });
 

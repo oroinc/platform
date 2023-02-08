@@ -20,11 +20,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 abstract class LoadSubresources implements ProcessorInterface
 {
-    /** @var ConfigProvider */
-    private $configProvider;
-
-    /** @var MetadataProvider */
-    private $metadataProvider;
+    private ConfigProvider $configProvider;
+    private MetadataProvider $metadataProvider;
 
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {

@@ -10,16 +10,6 @@ use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
 class DraftSourceListenerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testPlatformNotSupported(): void
-    {
-        $event = $this->createMock(LoadClassMetadataEventArgs::class);
-        $event->expects($this->never())
-            ->method('getClassMetadata');
-
-        $listener = new DraftSourceListener('not_pgsql');
-        $listener->loadClassMetadata($event);
-    }
-
     /**
      * @dataProvider getSupportedPlatformDataProvider
      */

@@ -20,11 +20,7 @@ function createConnection(): \Doctrine\DBAL\Connection
     $configParams = $configParams['parameters'];
 
     return \Doctrine\DBAL\DriverManager::getConnection([
-        'dbname' => $configParams['database_name'],
-        'user' => $configParams['database_user'],
-        'password' => $configParams['database_password'],
-        'host' => $configParams['database_host'],
-        'driver' => $configParams['database_driver']
+        'url' => $configParams['database_dsn'],
     ], $config);
 }
 

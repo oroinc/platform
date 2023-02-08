@@ -24,7 +24,7 @@ use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclMultiSelectType;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType as EntityTypeStub;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -173,18 +173,15 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
                     $this->formType,
                     EmailNotificationEntityChoiceType::class => new EntityTypeStub(
                         ['user' => User::class, 'stdClass' => \stdClass::class],
-                        EmailNotificationEntityChoiceType::NAME,
                         ['configs' => []]
                     ),
                     Select2TranslatableEntityType::class => new Select2TranslatableEntityTypeStub(
                         [200 => new EmailTemplate('test')],
-                        'oro_select2_translatable_entity',
                         ['configs' => []]
                     ),
-                    EntityType::class => new EntityTypeStub([1 => new Group()], 'entity', ['property' => null]),
+                    EntityType::class => new EntityTypeStub([1 => new Group()], ['property' => null]),
                     OrganizationUserAclMultiSelectType::class => new EntityTypeStub(
                         [null => new ArrayCollection(), 3 => new ArrayCollection([$this->getUser()])],
-                        'oro_user_organization_acl_multiselect',
                         ['configs' => []]
                     ),
                     new RecipientListType()

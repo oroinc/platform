@@ -9,9 +9,14 @@ use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface;
 use Oro\Component\Layout\Extension\Theme\Visitor\VisitorInterface;
+use Oro\Component\Layout\LayoutItemInterface;
+use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 
+/**
+ * Provides layout updates for the theme found in context.
+ */
 class ThemeExtension extends AbstractExtension
 {
     const THEME_KEY = 'theme';
@@ -54,39 +59,45 @@ class ThemeExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    protected function loadLayoutUpdates(ContextInterface $context)
+    protected function loadLayoutUpdates(LayoutItemInterface $item)
     {
+        $idOrAlias = $item->getAlias() ? : $item->getId();
+        $context = $item->getContext();
+        $contextHash = $context->getHash();
+        $this->updates[$contextHash] = [];
         if ($context->getOr(self::THEME_KEY)) {
+            $rootId = $item->getRootId() ?: $idOrAlias;
             $paths = $this->getPaths($context);
             $files = $this->resourceProvider->findApplicableResources($paths);
             foreach ($files as $file) {
-                $this->loadLayoutUpdate($file);
+                $layoutUpdate = $this->loadLayoutUpdate($file);
+                if (!$layoutUpdate) {
+                    continue;
+                }
+
+                $layoutItemId = $layoutUpdate instanceof ElementDependentLayoutUpdateInterface
+                    ? $layoutUpdate->getElement()
+                    : $rootId;
+
+                $this->updates[$contextHash][$layoutItemId][] = $layoutUpdate;
             }
         }
 
         foreach ($this->visitors as $visitor) {
-            $visitor->walkUpdates($this->updates, $context);
+            $visitor->walkUpdates($this->updates[$contextHash], $context);
         }
 
-        return $this->updates;
+        return $this->updates[$contextHash];
     }
 
-    /**
-     * @param string $file
-     *
-     * @return array
-     */
-    protected function loadLayoutUpdate($file)
+    protected function loadLayoutUpdate(string $file): ?LayoutUpdateInterface
     {
         $update = $this->loader->load($file);
         if ($update) {
-            $el = $update instanceof ElementDependentLayoutUpdateInterface
-                ? $update->getElement()
-                : 'root';
-            $this->updates[$el][] = $update;
-
             $this->dependencyInitializer->initialize($update);
         }
+
+        return $update;
     }
 
     /**

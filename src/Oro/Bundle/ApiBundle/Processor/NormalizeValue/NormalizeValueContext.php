@@ -19,23 +19,12 @@ class NormalizeValueContext extends Context
     /** a data-type of a value */
     private const DATA_TYPE = 'dataType';
 
-    /** @var bool */
-    private $processed = false;
-
-    /** @var string|null */
-    private $requirement;
-
-    /** @var bool */
-    private $arrayAllowed = false;
-
-    /** @var bool */
-    private $rangeAllowed = false;
-
-    /** @var string */
-    private $arrayDelimiter = ',';
-
-    /** @var string */
-    private $rangeDelimiter = '..';
+    private bool $processed = false;
+    private ?string $requirement = null;
+    private bool $arrayAllowed = false;
+    private bool $rangeAllowed = false;
+    private string $arrayDelimiter = ',';
+    private string $rangeDelimiter = '..';
 
     public function __construct()
     {

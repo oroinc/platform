@@ -19,14 +19,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class CreateEntity implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var EntityLoader */
-    protected $entityLoader;
-
-    /** @var EntityInstantiator */
-    protected $entityInstantiator;
+    private DoctrineHelper $doctrineHelper;
+    private EntityLoader $entityLoader;
+    private EntityInstantiator $entityInstantiator;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -41,7 +36,7 @@ class CreateEntity implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */
 
@@ -73,14 +68,7 @@ class CreateEntity implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string              $entityClass
-     * @param mixed               $entityId
-     * @param EntityMetadata|null $metadata
-     *
-     * @return bool
-     */
-    private function isEntityExist($entityClass, $entityId, ?EntityMetadata $metadata)
+    private function isEntityExist(string $entityClass, mixed $entityId, ?EntityMetadata $metadata): bool
     {
         return
             null !== $metadata

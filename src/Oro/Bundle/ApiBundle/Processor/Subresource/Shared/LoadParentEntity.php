@@ -20,14 +20,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class LoadParentEntity implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityIdHelper */
-    private $entityIdHelper;
-
-    /** @var QueryAclHelper */
-    private $queryAclHelper;
+    private DoctrineHelper $doctrineHelper;
+    private EntityIdHelper $entityIdHelper;
+    private QueryAclHelper $queryAclHelper;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -42,7 +37,7 @@ class LoadParentEntity implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */
 
@@ -81,22 +76,13 @@ class LoadParentEntity implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string                    $parentEntityClass
-     * @param mixed                     $parentEntityId
-     * @param EntityDefinitionConfig    $parentConfig
-     * @param EntityIdMetadataInterface $parentMetadata
-     * @param RequestType               $requestType
-     *
-     * @return object|null
-     */
     private function loadParentEntity(
         string $parentEntityClass,
-        $parentEntityId,
+        mixed $parentEntityId,
         EntityDefinitionConfig $parentConfig,
         EntityIdMetadataInterface $parentMetadata,
         RequestType $requestType
-    ) {
+    ): ?object {
         // try to load an entity by ACL protected query
         $parentEntity = $this->queryAclHelper
             ->protectQuery(
@@ -121,16 +107,9 @@ class LoadParentEntity implements ProcessorInterface
         return $parentEntity;
     }
 
-    /**
-     * @param string                    $parentEntityClass
-     * @param mixed                     $parentEntityId
-     * @param EntityIdMetadataInterface $parentMetadata
-     *
-     * @return QueryBuilder
-     */
     private function getQueryBuilder(
         string $parentEntityClass,
-        $parentEntityId,
+        mixed $parentEntityId,
         EntityIdMetadataInterface $parentMetadata
     ): QueryBuilder {
         $qb = $this->doctrineHelper->createQueryBuilder($parentEntityClass, 'e');

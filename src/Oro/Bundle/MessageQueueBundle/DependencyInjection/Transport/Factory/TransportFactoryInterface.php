@@ -12,11 +12,12 @@ interface TransportFactoryInterface
 {
     /**
      * Configures the container services for message queue transport.
+     * The method must return a connection service id.
      *
      * @param ContainerBuilder $container
      * @param array $config
      *
-     * @return string The method must return a connection service id.
+     * @return string
      */
     public function create(ContainerBuilder $container, array $config);
 

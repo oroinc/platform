@@ -12,13 +12,9 @@ use Psr\Container\ContainerInterface;
 class FileSplitterRegistry
 {
     /** @var array [[splitter service id, request type expression], ...] */
-    private $splitters;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $splitters;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $splitters [[splitter service id, request type expression], ...]
@@ -37,7 +33,7 @@ class FileSplitterRegistry
      */
     public function getSplitter(RequestType $requestType): ?FileSplitterInterface
     {
-        foreach ($this->splitters as list($serviceId, $expression)) {
+        foreach ($this->splitters as [$serviceId, $expression]) {
             if ($this->matcher->matchValue($expression, $requestType)) {
                 return $this->container->get($serviceId);
             }

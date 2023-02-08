@@ -6,6 +6,7 @@ $finder = PhpCsFixer\Finder::create()
     ->files()
     ->name('*.php')
     ->notName('*.php.twig')
+    ->notName('ClientController.php') // braces rule, multiline function declaration ending with "): callable {"
     ->notName('OroKernel.php');
 
 // https://github.com/mlocati/php-cs-fixer-configurator

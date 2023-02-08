@@ -11,8 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class UpdateSummaryErrorCounter implements ProcessorInterface
 {
-    /** @var RetryHelper */
-    private $retryHelper;
+    private RetryHelper $retryHelper;
 
     public function __construct(RetryHelper $retryHelper)
     {
@@ -22,12 +21,12 @@ class UpdateSummaryErrorCounter implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */
 
         $summary = $context->getSummary();
-        $summary->incrementErrorCount(count($context->getErrors()));
+        $summary->incrementErrorCount(\count($context->getErrors()));
         $items = $context->getBatchItems();
         if ($items) {
             $processedItemStatuses = $context->getProcessedItemStatuses() ?? [];
@@ -37,7 +36,7 @@ class UpdateSummaryErrorCounter implements ProcessorInterface
             );
             foreach ($items as $item) {
                 if ($this->retryHelper->hasItemErrorsToSave($item, $hasItemsToRetry, $processedItemStatuses)) {
-                    $summary->incrementErrorCount(count($item->getContext()->getErrors()));
+                    $summary->incrementErrorCount(\count($item->getContext()->getErrors()));
                 }
             }
         }

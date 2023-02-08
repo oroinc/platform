@@ -6,8 +6,10 @@ use Oro\Bundle\LayoutBundle\Cache\RenderCache;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\DeferredLayoutManipulatorInterface;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
+use Oro\Component\Layout\LayoutContextStack;
 use Oro\Component\Layout\LayoutFactoryInterface;
 use Oro\Component\Layout\RawLayoutBuilderInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Overrides(decorates) base component's LayoutFactory to override
@@ -15,36 +17,32 @@ use Oro\Component\Layout\RawLayoutBuilderInterface;
  */
 class CacheLayoutFactory implements LayoutFactoryInterface
 {
-    /**
-     * @var LayoutFactoryInterface
-     */
-    private $baseLayoutFactory;
+    private LayoutFactoryInterface $baseLayoutFactory;
 
-    /**
-     * @var ExpressionProcessor
-     */
-    private $expressionProcessor;
+    private LayoutContextStack $layoutContextStack;
 
-    /**
-     * @var BlockViewCache|null
-     */
-    private $blockViewCache;
+    private ExpressionProcessor $expressionProcessor;
 
-    /**
-     * @var RenderCache
-     */
-    private $renderCache;
+    private RenderCache $renderCache;
+
+    private EventDispatcherInterface $eventDispatcher;
+
+    private ?BlockViewCache $blockViewCache;
 
     public function __construct(
         LayoutFactoryInterface $baseLayoutFactory,
+        LayoutContextStack $layoutContextStack,
         ExpressionProcessor $expressionProcessor,
         RenderCache $renderCache,
+        EventDispatcherInterface $eventDispatcher,
         BlockViewCache $blockViewCache = null
     ) {
         $this->baseLayoutFactory = $baseLayoutFactory;
+        $this->layoutContextStack = $layoutContextStack;
         $this->expressionProcessor = $expressionProcessor;
-        $this->blockViewCache = $blockViewCache;
         $this->renderCache = $renderCache;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->blockViewCache = $blockViewCache;
     }
 
     /**
@@ -102,15 +100,19 @@ class CacheLayoutFactory implements LayoutFactoryInterface
     {
         $rawLayoutBuilder = $this->createRawLayoutBuilder();
         $layoutManipulator = $this->createLayoutManipulator($rawLayoutBuilder);
-        return new CacheLayoutBuilder(
+        $builder = new CacheLayoutBuilder(
             $this->getRegistry(),
             $rawLayoutBuilder,
             $layoutManipulator,
             $this->createBlockFactory($layoutManipulator),
             $this->getRendererRegistry(),
             $this->expressionProcessor,
+            $this->layoutContextStack,
             $this->renderCache,
             $this->blockViewCache
         );
+        $builder->setEventDispatcher($this->eventDispatcher);
+
+        return $builder;
     }
 }

@@ -15,7 +15,7 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
     public const NAME = 'meta_properties';
 
     /** @var array[] [property name => data type, ...] */
-    private $metaProperties = [];
+    private array $metaProperties = [];
 
     /**
      * Gets names of all meta properties.
@@ -76,7 +76,7 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -84,7 +84,7 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(ConfigContext $context)
+    public function configureContext(ConfigContext $context): void
     {
         $context->set(self::NAME, $this->metaProperties);
     }
@@ -92,7 +92,7 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function isPropagable()
+    public function isPropagable(): bool
     {
         return true;
     }
@@ -100,7 +100,7 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         return 'meta_properties:' . implode(',', array_keys($this->metaProperties));
     }

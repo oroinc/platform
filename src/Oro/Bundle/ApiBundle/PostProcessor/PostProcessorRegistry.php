@@ -13,13 +13,9 @@ use Psr\Container\ContainerInterface;
 class PostProcessorRegistry
 {
     /** @var array [name => [[post processor service id, request type expression], ...], ...] */
-    private $postProcessors;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $postProcessors;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $postProcessors [name => [[service id, request type expression], ...], ...]

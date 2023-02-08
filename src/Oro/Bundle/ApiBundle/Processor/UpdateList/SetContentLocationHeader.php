@@ -18,14 +18,9 @@ class SetContentLocationHeader implements ProcessorInterface
 {
     public const RESPONSE_HEADER_NAME = 'Content-Location';
 
-    /** @var RestRoutesRegistry */
-    private $routesRegistry;
-
-    /** @var RouterInterface */
-    private $router;
-
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
+    private RestRoutesRegistry $routesRegistry;
+    private RouterInterface $router;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct(
         RestRoutesRegistry $routesRegistry,
@@ -40,7 +35,7 @@ class SetContentLocationHeader implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */
 

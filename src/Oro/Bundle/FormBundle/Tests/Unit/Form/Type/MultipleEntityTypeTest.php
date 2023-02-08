@@ -50,15 +50,13 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $types = [
-            MultipleEntityType::class   => new MultipleEntityType($this->doctrineHelper, $this->authorizationChecker),
-            EntityIdentifierType::class => new EntityIdentifierType($this->registry)
-        ];
-
         return [
-            new PreloadedExtension($types, [])
+            new PreloadedExtension([
+                new MultipleEntityType($this->doctrineHelper, $this->authorizationChecker),
+                new EntityIdentifierType($this->registry)
+            ], [])
         ];
     }
 

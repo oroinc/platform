@@ -12,7 +12,7 @@ class ComputePercent100RoundType implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */
 
@@ -23,13 +23,10 @@ class ComputePercent100RoundType implements ProcessorInterface
             return;
         }
 
-        $context->setData($this->processCustomTypes($data, $config, $context->getClassName()));
+        $context->setData($this->processCustomTypes($data, $config));
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
-    private function processCustomTypes(array $data, EntityDefinitionConfig $config, string $entityClass): array
+    private function processCustomTypes(array $data, EntityDefinitionConfig $config): array
     {
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {

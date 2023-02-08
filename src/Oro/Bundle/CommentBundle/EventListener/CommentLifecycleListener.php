@@ -3,12 +3,15 @@
 namespace Oro\Bundle\CommentBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Listens to Comment Entity events and generates date stamps
+ */
 class CommentLifecycleListener
 {
     /** @var TokenAccessorInterface */

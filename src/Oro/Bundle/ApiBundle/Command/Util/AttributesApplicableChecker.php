@@ -5,10 +5,14 @@ namespace Oro\Bundle\ApiBundle\Command\Util;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\MatchApplicableChecker;
 
+/**
+ * This applicable checker allows to check whether specifies attributes
+ * is matched to corresponding options in the context.
+ */
 class AttributesApplicableChecker extends MatchApplicableChecker
 {
     /** @var string[] */
-    protected $attributes;
+    private array $attributes;
 
     public function __construct(array $attributes)
     {
@@ -19,12 +23,12 @@ class AttributesApplicableChecker extends MatchApplicableChecker
     /**
      * {@inheritdoc}
      */
-    public function isApplicable(ContextInterface $context, array $processorAttributes)
+    public function isApplicable(ContextInterface $context, array $processorAttributes): bool
     {
         $result = self::ABSTAIN;
 
         foreach ($this->attributes as $attrName) {
-            if (array_key_exists($attrName, $processorAttributes) && $context->has($attrName)
+            if (\array_key_exists($attrName, $processorAttributes) && $context->has($attrName)
                 && !$this->isMatch($processorAttributes[$attrName], $context->get($attrName), $attrName)
             ) {
                 $result = self::NOT_APPLICABLE;

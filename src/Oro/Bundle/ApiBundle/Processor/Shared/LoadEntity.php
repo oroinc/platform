@@ -20,14 +20,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class LoadEntity implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityIdHelper */
-    private $entityIdHelper;
-
-    /** @var QueryAclHelper */
-    private $queryAclHelper;
+    private DoctrineHelper $doctrineHelper;
+    private EntityIdHelper $entityIdHelper;
+    private QueryAclHelper $queryAclHelper;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -42,7 +37,7 @@ class LoadEntity implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */
 
@@ -81,22 +76,13 @@ class LoadEntity implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string                    $entityClass
-     * @param mixed                     $entityId
-     * @param EntityDefinitionConfig    $config
-     * @param EntityIdMetadataInterface $metadata
-     * @param RequestType               $requestType
-     *
-     * @return object|null
-     */
     private function loadEntity(
         string $entityClass,
-        $entityId,
+        mixed $entityId,
         EntityDefinitionConfig $config,
         EntityIdMetadataInterface $metadata,
         RequestType $requestType
-    ) {
+    ): ?object {
         // try to load an entity by ACL protected query
         $entity = $this->queryAclHelper
             ->protectQuery(
@@ -121,16 +107,9 @@ class LoadEntity implements ProcessorInterface
         return $entity;
     }
 
-    /**
-     * @param string                    $entityClass
-     * @param mixed                     $entityId
-     * @param EntityIdMetadataInterface $metadata
-     *
-     * @return QueryBuilder
-     */
     private function getQueryBuilder(
         string $entityClass,
-        $entityId,
+        mixed $entityId,
         EntityIdMetadataInterface $metadata
     ): QueryBuilder {
         $qb = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');

@@ -20,20 +20,15 @@ use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\NotApplicableImportAwa
 
 class ImportVisitorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutUpdateLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $loader;
+    private LayoutUpdateLoaderInterface|\PHPUnit\Framework\MockObject\MockObject $loader;
 
-    /** @var DependencyInitializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $dependencyInitializer;
+    private DependencyInitializer|\PHPUnit\Framework\MockObject\MockObject $dependencyInitializer;
 
-    /** @var ResourceProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourceProvider;
+    private ResourceProviderInterface|\PHPUnit\Framework\MockObject\MockObject $resourceProvider;
 
-    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $themeManager;
+    private ThemeManager|\PHPUnit\Framework\MockObject\MockObject $themeManager;
 
-    /** @var ImportVisitor */
-    private $visitor;
+    private ImportVisitor $visitor;
 
     protected function setUp(): void
     {
@@ -50,43 +45,43 @@ class ImportVisitorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWalkUpdatesWithoutImports()
+    public function testWalkUpdatesWithoutImports(): void
     {
         $context = $this->createMock(ContextInterface::class);
 
         $updates = ['root' => [$this->createMock(LayoutUpdateInterface::class)]];
 
         $this->visitor->walkUpdates($updates, $context);
-        $this->assertEquals($updates, $updates);
+        self::assertEquals($updates, $updates);
     }
 
-    public function testWalkUpdatesWithImports()
+    public function testWalkUpdatesWithImports(): void
     {
         $themeName = 'oro-import';
 
         $context = $this->createMock(ContextInterface::class);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('get')
             ->with(ThemeExtension::THEME_KEY)
             ->willReturn($themeName);
 
         $update = $this->createMock(LayoutUpdateWithImports::class);
-        $update->expects($this->once())
+        $update->expects(self::once())
             ->method('getImports')
             ->willReturn([
                 [
                     ImportsAwareLayoutUpdateInterface::ID_KEY => 'import_id',
                     ImportsAwareLayoutUpdateInterface::ROOT_KEY => 'root_block_id',
-                    ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace'
-                ]
+                    ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace',
+                ],
             ]);
 
         $theme = $this->getMockBuilder(Theme::class)->setConstructorArgs([$themeName])->getMock();
-        $theme->expects($this->any())
+        $theme->expects(self::any())
             ->method('getName')
             ->willReturn($themeName);
 
-        $this->themeManager->expects($this->any())
+        $this->themeManager->expects(self::any())
             ->method('getTheme')
             ->with($themeName)
             ->willReturn($theme);
@@ -96,19 +91,19 @@ class ImportVisitorTest extends \PHPUnit\Framework\TestCase
             [$theme->getName(), ImportVisitor::IMPORT_FOLDER, 'import_id']
         );
 
-        $this->resourceProvider->expects($this->once())
+        $this->resourceProvider->expects(self::once())
             ->method('findApplicableResources')
             ->with([$path])
             ->willReturn(['import/file']);
 
         $importUpdate = $this->createMock(ImportedLayoutUpdate::class);
 
-        $this->loader->expects($this->once())
+        $this->loader->expects(self::once())
             ->method('load')
             ->with('import/file')
             ->willReturn($importUpdate);
 
-        $this->dependencyInitializer->expects($this->once())
+        $this->dependencyInitializer->expects(self::once())
             ->method('initialize')
             ->with($importUpdate);
 
@@ -118,49 +113,49 @@ class ImportVisitorTest extends \PHPUnit\Framework\TestCase
         array_unshift($expectedResult['root'], $importUpdate);
 
         $this->visitor->walkUpdates($updates, $context);
-        $this->assertEquals($expectedResult, $updates);
+        self::assertEquals($expectedResult, $updates);
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testWalkUpdatesWithMultipleImportsOrdering()
+    public function testWalkUpdatesWithMultipleImportsOrdering(): void
     {
         $themeName = 'oro-import';
 
         $context = $this->createMock(ContextInterface::class);
-        $context->expects($this->exactly(2))
+        $context->expects(self::exactly(2))
             ->method('get')
             ->with(ThemeExtension::THEME_KEY)
             ->willReturn($themeName);
 
         $updateWithImports = $this->createMock(LayoutUpdateWithImports::class);
-        $updateWithImports->expects($this->once())
+        $updateWithImports->expects(self::once())
             ->method('getImports')
             ->willReturn([
                 [
                     ImportsAwareLayoutUpdateInterface::ID_KEY => 'first_import',
                     ImportsAwareLayoutUpdateInterface::ROOT_KEY => 'root_block_id',
-                    ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace'
+                    ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace',
                 ],
                 [
                     ImportsAwareLayoutUpdateInterface::ID_KEY => 'second_import',
                     ImportsAwareLayoutUpdateInterface::ROOT_KEY => 'root_block_id',
-                    ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace'
-                ]
+                    ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace',
+                ],
             ]);
 
         $updateWithoutImports = $this->createMock(LayoutUpdateWithImports::class);
-        $updateWithoutImports->expects($this->once())
+        $updateWithoutImports->expects(self::once())
             ->method('getImports')
             ->willReturn([]);
 
         $theme = $this->getMockBuilder(Theme::class)->setConstructorArgs([$themeName])->getMock();
-        $theme->expects($this->any())
+        $theme->expects(self::any())
             ->method('getName')
             ->willReturn($themeName);
 
-        $this->themeManager->expects($this->any())
+        $this->themeManager->expects(self::any())
             ->method('getTheme')
             ->with($themeName)
             ->willReturn($theme);
@@ -173,58 +168,62 @@ class ImportVisitorTest extends \PHPUnit\Framework\TestCase
             DIRECTORY_SEPARATOR,
             [$theme->getName(), ImportVisitor::IMPORT_FOLDER, 'second_import']
         );
-        $this->resourceProvider->expects($this->exactly(2))
+        $this->resourceProvider->expects(self::exactly(2))
             ->method('findApplicableResources')
             ->withConsecutive([[$secondImportPath]], [[$firstImportPath]])
             ->willReturnOnConsecutiveCalls(['import/second_file'], ['import/first_file']);
 
         $firstImportUpdate = $this->createMock(ImportedLayoutUpdate::class);
         $secondImportUpdate = $this->createMock(ImportedLayoutUpdate::class);
-        $this->loader->expects($this->exactly(2))
+        $this->loader->expects(self::exactly(2))
             ->method('load')
             ->withConsecutive(['import/second_file'], ['import/first_file'])
             ->willReturnOnConsecutiveCalls($secondImportUpdate, $firstImportUpdate);
-        $this->dependencyInitializer->expects($this->exactly(2))
+        $this->dependencyInitializer->expects(self::exactly(2))
             ->method('initialize')
             ->withConsecutive([$secondImportUpdate], [$firstImportUpdate]);
 
-        $updates = ['root' => [
-            $updateWithImports,
-            $updateWithoutImports
-        ]];
+        $updates = [
+            'root' => [
+                $updateWithImports,
+                $updateWithoutImports,
+            ],
+        ];
 
-        $expectedResult = ['root' => [
-            $secondImportUpdate,
-            $firstImportUpdate,
-            $updateWithImports,
-            $updateWithoutImports
-        ]];
+        $expectedResult = [
+            'root' => [
+                $secondImportUpdate,
+                $firstImportUpdate,
+                $updateWithImports,
+                $updateWithoutImports,
+            ],
+        ];
 
         $this->visitor->walkUpdates($updates, $context);
-        $this->assertSame($expectedResult, $updates);
+        self::assertSame($expectedResult, $updates);
     }
 
-    public function testWalkUpdatesWithImportsContainedMultipleUpdates()
+    public function testWalkUpdatesWithImportsContainedMultipleUpdates(): void
     {
         $themeName = 'oro-import';
 
         $context = $this->createMock(ContextInterface::class);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('get')
             ->with(ThemeExtension::THEME_KEY)
             ->willReturn($themeName);
 
         $update = $this->createMock(LayoutUpdateWithImports::class);
-        $update->expects($this->once())
+        $update->expects(self::once())
             ->method('getImports')
             ->willReturn(['import_id']);
 
         $theme = $this->getMockBuilder(Theme::class)->setConstructorArgs([$themeName])->getMock();
-        $theme->expects($this->any())
+        $theme->expects(self::any())
             ->method('getName')
             ->willReturn($themeName);
 
-        $this->themeManager->expects($this->any())
+        $this->themeManager->expects(self::any())
             ->method('getTheme')
             ->with($themeName)
             ->willReturn($theme);
@@ -234,22 +233,22 @@ class ImportVisitorTest extends \PHPUnit\Framework\TestCase
             [$theme->getName(), ImportVisitor::IMPORT_FOLDER, 'import_id']
         );
 
-        $this->resourceProvider->expects($this->once())
+        $this->resourceProvider->expects(self::once())
             ->method('findApplicableResources')
             ->with([$path])
             ->willReturn(['import/file']);
 
         $importUpdate = $this->createMock(ImportedLayoutUpdateWithImports::class);
-        $importUpdate->expects($this->once())
+        $importUpdate->expects(self::once())
             ->method('getImports')
             ->willReturn([]);
 
-        $this->loader->expects($this->once())
+        $this->loader->expects(self::once())
             ->method('load')
             ->with('import/file')
             ->willReturn($importUpdate);
 
-        $this->dependencyInitializer->expects($this->once())
+        $this->dependencyInitializer->expects(self::once())
             ->method('initialize')
             ->with($importUpdate);
 
@@ -259,10 +258,10 @@ class ImportVisitorTest extends \PHPUnit\Framework\TestCase
         array_unshift($expectedResult['root'], $importUpdate);
 
         $this->visitor->walkUpdates($updates, $context);
-        $this->assertEquals($expectedResult, $updates);
+        self::assertEquals($expectedResult, $updates);
     }
 
-    public function testWalkUpdatesWithNonArrayImports()
+    public function testWalkUpdatesWithNonArrayImports(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Imports statement should be an array, string given');
@@ -270,7 +269,7 @@ class ImportVisitorTest extends \PHPUnit\Framework\TestCase
         $context = $this->createMock(ContextInterface::class);
 
         $update = $this->createMock(LayoutUpdateWithImports::class);
-        $update->expects($this->once())
+        $update->expects(self::once())
             ->method('getImports')
             ->willReturn('string');
 
@@ -279,16 +278,77 @@ class ImportVisitorTest extends \PHPUnit\Framework\TestCase
         $this->visitor->walkUpdates($updates, $context);
     }
 
-    public function testImportsAreNotLoadedIfUpdateIsNotApplicable()
+    public function testImportsAreNotLoadedIfUpdateIsNotApplicable(): void
     {
         $update = new NotApplicableImportAwareLayoutUpdateStub();
         $updates = ['root' => [$update]];
 
         $context = $this->createMock(ContextInterface::class);
 
-        $this->themeManager->expects($this->never())
+        $this->themeManager->expects(self::never())
             ->method('getTheme');
 
         $this->visitor->walkUpdates($updates, $context);
+    }
+
+    public function testWalkUpdatesWithImportsAndCustomRoot(): void
+    {
+        $themeName = 'oro-import';
+
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::once())
+            ->method('get')
+            ->with(ThemeExtension::THEME_KEY)
+            ->willReturn($themeName);
+
+        $update = $this->createMock(LayoutUpdateWithImports::class);
+        $update->expects(self::once())
+            ->method('getImports')
+            ->willReturn([
+                [
+                    ImportsAwareLayoutUpdateInterface::ID_KEY => 'import_id',
+                    ImportsAwareLayoutUpdateInterface::ROOT_KEY => 'root_block_id',
+                    ImportsAwareLayoutUpdateInterface::NAMESPACE_KEY => 'import_namespace',
+                ],
+            ]);
+
+        $theme = $this->getMockBuilder(Theme::class)->setConstructorArgs([$themeName])->getMock();
+        $theme->expects(self::any())
+            ->method('getName')
+            ->willReturn($themeName);
+
+        $this->themeManager->expects(self::any())
+            ->method('getTheme')
+            ->with($themeName)
+            ->willReturn($theme);
+
+        $path = implode(
+            DIRECTORY_SEPARATOR,
+            [$theme->getName(), ImportVisitor::IMPORT_FOLDER, 'import_id']
+        );
+
+        $this->resourceProvider->expects(self::once())
+            ->method('findApplicableResources')
+            ->with([$path])
+            ->willReturn(['import/file']);
+
+        $importUpdate = $this->createMock(ImportedLayoutUpdate::class);
+
+        $this->loader->expects(self::once())
+            ->method('load')
+            ->with('import/file')
+            ->willReturn($importUpdate);
+
+        $this->dependencyInitializer->expects(self::once())
+            ->method('initialize')
+            ->with($importUpdate);
+
+        $updates = ['custom_root' => [$update]];
+
+        $expectedResult = $updates;
+        array_unshift($expectedResult['custom_root'], $importUpdate);
+
+        $this->visitor->walkUpdates($updates, $context);
+        self::assertEquals($expectedResult, $updates);
     }
 }

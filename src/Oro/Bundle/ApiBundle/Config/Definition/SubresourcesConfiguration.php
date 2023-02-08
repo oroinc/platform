@@ -12,14 +12,9 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class SubresourcesConfiguration extends AbstractConfigurationSection
 {
-    /** @var ActionsConfiguration */
-    private $actionsConfiguration;
-
-    /** @var FiltersConfiguration */
-    private $filtersConfiguration;
-
-    /** @var SortersConfiguration */
-    private $sortersConfiguration;
+    private ActionsConfiguration $actionsConfiguration;
+    private FiltersConfiguration $filtersConfiguration;
+    private SortersConfiguration $sortersConfiguration;
 
     /**
      * @param string[]               $permissibleActions

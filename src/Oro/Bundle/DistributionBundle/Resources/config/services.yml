@@ -62,14 +62,6 @@ services:
         arguments:
           - '%oro_distribution.composer_json%'
 
-    oro_distribution.event_listener.install_command_deployment_type:
-        class: Oro\Bundle\DistributionBundle\EventListener\InstallCommandDeploymentTypeListener
-        arguments:
-            - '%kernel.project_dir%'
-            - '%deployment_type%'
-        tags:
-            - { name: kernel.event_listener, event: installer.database_preparation.before, method: afterDatabasePreparation }
-
     oro_distribution.handler.application_status:
         public: true
         class: Oro\Bundle\DistributionBundle\Handler\ApplicationState
