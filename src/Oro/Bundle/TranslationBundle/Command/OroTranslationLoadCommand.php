@@ -19,8 +19,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class OroTranslationLoadCommand extends Command
 {
-    public const BATCH_INSERT_ROWS_COUNT = 50;
-
     /** @var string */
     protected static $defaultName = 'oro:translation:load';
 
