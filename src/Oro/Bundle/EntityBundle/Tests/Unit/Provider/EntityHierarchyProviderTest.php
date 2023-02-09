@@ -28,10 +28,7 @@ class EntityHierarchyProviderTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->emMock = $this->getTestEntityManager();
-        $this->emMock->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            self::ENTITY_NAMESPACE
-        ));
+        $this->emMock->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->extendConfigProvider = $this->getExtendConfigMock();
     }

@@ -36,6 +36,7 @@ use Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity\CmsUser;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -340,19 +341,10 @@ class SegmentFilterTest extends OrmTestCase
         self::assertEquals(self::TEST_PARAM_VALUE, $params[0]->getValue());
     }
 
-    /**
-     * @return \Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock
-     */
-    private function getEntityManager()
+    private function getEntityManager(): EntityManagerMock
     {
         $em = $this->getTestEntityManager();
-        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity'
-        ));
-        $em->getConfiguration()->setEntityNamespaces([
-            'OroSegmentBundle' => 'Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity'
-        ]);
+        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         return $em;
     }
