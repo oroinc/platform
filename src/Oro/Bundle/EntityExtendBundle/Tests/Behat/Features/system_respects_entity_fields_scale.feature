@@ -1,3 +1,5 @@
+@skip
+# @todo: Unskip when BAP-21877 will be resolved
 @regression
 @ticket-BB-20273
 
