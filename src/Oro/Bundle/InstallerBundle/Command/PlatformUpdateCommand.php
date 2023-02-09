@@ -3,10 +3,17 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\PlatformUpdateCheckerInterface;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Component\PhpUtils\PhpIniUtil;
@@ -25,12 +32,20 @@ class PlatformUpdateCommand extends AbstractCommand
     protected static $defaultName = 'oro:platform:update';
 
     private PlatformUpdateCheckerInterface $platformUpdateChecker;
+    private ConfigManager $configManager;
+    private ManagerRegistry $doctrine;
 
-    public function __construct(ContainerInterface $container, PlatformUpdateCheckerInterface $platformUpdateChecker)
-    {
+    public function __construct(
+        ContainerInterface $container,
+        PlatformUpdateCheckerInterface $platformUpdateChecker,
+        ConfigManager $configManager,
+        ManagerRegistry $doctrine
+    ) {
         parent::__construct($container);
 
         $this->platformUpdateChecker = $platformUpdateChecker;
+        $this->configManager = $configManager;
+        $this->doctrine = $doctrine;
     }
 
     protected function configure()
@@ -108,7 +123,11 @@ HELP
 
                 $this->finalStep($commandExecutor, $output, $input);
             } catch (\Exception $exception) {
-                return $commandExecutor->getLastCommandExitCode();
+                $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
+                // Exceptions may originate in the command executor and in PlatformUpdateCommand code itself
+                return (0 != $commandExecutor->getLastCommandExitCode())
+                    ? $commandExecutor->getLastCommandExitCode()
+                    : 1;
             }
         } else {
             $output->writeln(
@@ -130,6 +149,9 @@ HELP
     /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
     protected function loadDataStep(CommandExecutor $commandExecutor, OutputInterface $output): self
     {
+        ['formatting_code' => $formattingCode, 'language_code' => $languageCode] =
+            $this->getDefaultFormattingCodeAndLanguageCode();
+
         $commandExecutor
             ->runCommand(
                 'oro:migration:load',
@@ -143,12 +165,46 @@ HELP
             ->runCommand('oro:cron:definitions:load', ['--process-isolation' => true])
             ->runCommand('oro:workflow:definitions:load', ['--process-isolation' => true])
             ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
-            ->runCommand('oro:migration:data:load', ['--process-isolation' => true])
+            ->runCommand(
+                LoadDataFixturesCommand::getDefaultName(),
+                [
+                    '--process-isolation' => true,
+                    '--formatting-code' => $formattingCode,
+                    '--language' => $languageCode,
+                ]
+            )
             ->runCommand('router:cache:clear', ['--process-isolation' => true])
             ->runCommand('oro:message-queue:create-queues', ['--process-isolation' => true])
         ;
 
         return $this;
+    }
+
+    /**
+     * @return array ['formatting_code' => string, 'language_code' => string]
+     */
+    protected function getDefaultFormattingCodeAndLanguageCode(): array
+    {
+        $defaultLocalizationId = $this->configManager->get(
+            Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION),
+        );
+
+        // Loading localization data without warming Doctrine metadata, as warming it too early
+        // may break entity extended functionality for some entities and produce exceptions similar to
+        // "Extend entity Oro\Bundle\OrganizationBundle\Entity\Organization autoloaded before initialization."
+        $sql = 'SELECT loc.formatting_code AS formatting_code, lang.code AS language_code'
+            . ' FROM oro_localization AS loc'
+            . ' INNER JOIN oro_language AS lang ON lang.id = loc.language_id'
+            . ' WHERE loc.id = :localizationId'
+        ;
+        /** @var Connection $conn */
+        $conn = $this->doctrine->getManagerForClass(Localization::class)->getConnection();
+        $stmt = $conn->executeQuery(
+            $sql,
+            ['localizationId' => $defaultLocalizationId],
+            ['localizationId' => ParameterType::INTEGER]
+        );
+        return $stmt->fetchAssociative();
     }
 
     /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */

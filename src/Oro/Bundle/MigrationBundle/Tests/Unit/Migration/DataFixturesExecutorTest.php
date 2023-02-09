@@ -11,22 +11,18 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutor;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\LocalizedDataFixture;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
+    private EntityManager|MockObject $em;
+    private Connection|MockObject $connection;
+    private EventDispatcherInterface|MockObject $eventDispatcher;
 
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var DataFixturesExecutor */
-    private $dataFixturesExecutor;
+    private DataFixturesExecutor $dataFixturesExecutor;
 
     protected function setUp(): void
     {
@@ -39,7 +35,7 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
         $eventManager = $this->createMock(EventManager::class);
         $this->em->method('getEventManager')->willReturn($eventManager);
 
-        $this->dataFixturesExecutor = new DataFixturesExecutor($this->em, $this->eventDispatcher);
+        $this->dataFixturesExecutor = new DataFixturesExecutor($this->em, $this->eventDispatcher, 'en_US', 'en_US');
     }
 
     public function testExecute(): void
@@ -191,5 +187,18 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
 
         self::assertIsNumeric($resultMemory);
         self::assertIsNumeric($resultDuration);
+    }
+
+    public function testExecuteWithLocalizationOptions(): void
+    {
+        $fixture = new LocalizedDataFixture();
+
+        $this->dataFixturesExecutor->setLanguage('so_ME');
+        $this->dataFixturesExecutor->setFormattingCode('te_ST');
+
+        $this->dataFixturesExecutor->execute([$fixture], 'test');
+
+        static::assertSame('so_ME', $fixture->getLanguage());
+        static::assertSame('te_ST', $fixture->getFormattingCode());
     }
 }

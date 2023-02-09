@@ -25,6 +25,8 @@ services:
         arguments:
             - '@oro_migration.data_fixture.entity_manager'
             - '@event_dispatcher'
+            - '%oro_locale.language%'
+            - '%oro_locale.formatting_code%'
 
     oro_migration.migrations.loader:
         class: Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader
