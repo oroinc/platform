@@ -69,6 +69,21 @@ class InputOptionProvider
         return $value;
     }
 
+    public function getCommandParametersFromOptions(array $options): array
+    {
+        $commandParameters = [];
+        foreach ($options as $optionName => $optionData) {
+            $commandParameters['--' . $optionName] = $this->get(
+                $optionName,
+                $optionData['label'],
+                $optionData['defaultValue'],
+                $optionData['options']
+            );
+        }
+
+        return $commandParameters;
+    }
+
     private function isConfirmationQuestion(array $options): bool
     {
         if (!isset($options['class'])) {
