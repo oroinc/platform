@@ -1,0 +1,14 @@
+<%
+const rootExtraClass = data.length === 1 ? 'single' : 'stack';
+let message = data.map(item => item.sku).join(', ');
+if (data.length === 1) {
+    message = [data[0]['sku'], data[0]['name']].join(' - ');
+}
+%>
+<div class="sorting-helper <%- rootExtraClass %>">
+    <div class="sorting-helper__content">
+        <div class="sorting-helper__icon" aria-hidden="true"><span class="<%- iconClasses %>"></span></div>
+        <div class="sorting-helper__message"><%- message %></div>
+        <div class="sorting-helper__count"><%- _.__('oro.datagrid.drag_n_drop.helper', {count: data.length}, data.length) %></div>
+    </div>
+</div>

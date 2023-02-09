@@ -67,7 +67,7 @@
             themeOptions: renderParams.themeOptions|default({}),
             toolbarOptions: renderParams.toolbarOptions|default({}),
             gridViewsOptions: renderParams.gridViewsOptions|default({}),
-            gridBuildersOptions: renderParams.gridBuildersOptions|default({}),
+            gridBuildersOptions: metaData.options.gridBuildersOptions|default({})|merge(renderParams.gridBuildersOptions|default({})),
         } %}
         <div id="{{ gridId }}"
              data-page-component-module="{{ renderParams.datagridComponent|default("orodatagrid/js/app/components/datagrid-component") }}"
