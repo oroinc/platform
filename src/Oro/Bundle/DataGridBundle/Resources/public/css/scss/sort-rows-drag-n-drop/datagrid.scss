@@ -1,0 +1,38 @@
+/* @theme: admin.oro; */
+
+.oro-datagrid .sort-icon-cell {
+    width: $sort-datagrid-icon-cell-width;
+    text-align: $sort-datagrid-icon-cell-text-align;
+}
+
+.row-has-sort-order {
+    background-color: $primary-900;
+}
+
+.drag-n-drop-start {
+    .grid-row.selected {
+        display: none;
+    }
+}
+
+.drag-n-drop-enabled {
+    .grid-container {
+        position: relative;
+    }
+
+    .grid-scrollable-container {
+        overflow: initial;
+    }
+
+    .grid-row.selected {
+        background-color: $extra-300;
+
+        &:hover {
+            background-color: $extra-300;
+        }
+    }
+
+    .ui-sortable-handle {
+        cursor: default;
+    }
+}

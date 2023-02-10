@@ -193,3 +193,7 @@ oro:
                 placeholder: 'N/A'
             action_header:
                 aria_label: 'Row actions'
+        drag_n_drop:
+            helper: '{1}1 item|]1,Inf[{{ count }} items'
+            items_selected: '{{ count }} items selected'
+            unselect_all: 'Unselect All'
