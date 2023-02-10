@@ -207,6 +207,11 @@ class FieldHelper
             );
     }
 
+    public function isSingleDynamicAttribute(array $field): bool
+    {
+        return 'enum' === ($field['type'] ?? '');
+    }
+
     /**
      * @param array $field
      * @return bool
