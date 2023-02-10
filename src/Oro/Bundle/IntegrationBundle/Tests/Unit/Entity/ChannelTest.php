@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
-use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -16,15 +15,7 @@ class ChannelTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var Channel */
-    private $entity;
-
-    protected function setUp(): void
-    {
-        $this->entity = new Channel();
-    }
-
-    public function testProperties()
+    public function testProperties(): void
     {
         $transport = $this->createMock(Transport::class);
 
@@ -42,32 +33,29 @@ class ChannelTest extends \PHPUnit\Framework\TestCase
             ['editMode', Channel::EDIT_MODE_ALLOW, false],
         ];
 
-        $this->assertPropertyAccessors(new Channel(), $properties);
+        self::assertPropertyAccessors(new Channel(), $properties);
     }
 
     /**
      * @dataProvider integrationSettingFieldsProvider
-     *
-     * @param string $fieldName
      */
-    public function testIntegrationSettings($fieldName)
+    public function testIntegrationSettings(string $fieldName): void
     {
+        $entity = new Channel();
+
         $accessor = PropertyAccess::createPropertyAccessor();
-        $referenceGetter = (new InflectorFactory())->build()->camelize('get_' . $fieldName . '_reference');
-        $this->assertTrue(method_exists($this->entity, $referenceGetter));
+        $referenceGetter = 'get' . ucfirst($fieldName) . 'Reference';
+        self::assertTrue(method_exists($entity, $referenceGetter));
 
-        $value = $accessor->getValue($this->entity, $fieldName);
-        $this->assertNotEmpty($value);
+        $value = $accessor->getValue($entity, $fieldName);
+        self::assertInstanceOf(ConfigObject::class, $value);
 
-        $this->assertInstanceOf(ConfigObject::class, $value);
-
-        $newValue = ConfigObject::create([]);
-        $accessor->setValue($this->entity, $fieldName, $newValue);
-        $this->assertNotSame($value, $this->entity->$referenceGetter());
-
-        $this->assertEquals($newValue, $accessor->getValue($this->entity, $fieldName));
-        $this->assertNotSame($newValue, $accessor->getValue($this->entity, $fieldName));
-        $this->assertSame($newValue, $this->entity->$referenceGetter());
+        $newValue = ConfigObject::create(['key' => 'val']);
+        $accessor->setValue($entity, $fieldName, $newValue);
+        self::assertNotSame($value, $entity->$referenceGetter());
+        self::assertEquals($newValue, $accessor->getValue($entity, $fieldName));
+        self::assertNotSame($newValue, $accessor->getValue($entity, $fieldName));
+        self::assertSame($newValue, $entity->$referenceGetter());
     }
 
     public function integrationSettingFieldsProvider(): array

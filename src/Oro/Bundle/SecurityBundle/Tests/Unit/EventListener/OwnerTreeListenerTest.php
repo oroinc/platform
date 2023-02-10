@@ -30,10 +30,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            self::ENTITY_NAMESPACE
-        ));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->ownerTreeProvider = $this->createMock(OwnerTreeProviderInterface::class);
 
