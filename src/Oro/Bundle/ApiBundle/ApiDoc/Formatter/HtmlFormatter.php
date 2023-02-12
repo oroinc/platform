@@ -17,185 +17,117 @@ use Twig\Environment;
  */
 class HtmlFormatter extends AbstractFormatter
 {
-    /** @var SecurityContextInterface */
-    protected $securityContext;
+    protected SecurityContextInterface $securityContext;
+    protected FileLocatorInterface $fileLocator;
+    protected Environment $twig;
+    protected string $apiName;
+    protected ?string $endpoint;
+    protected bool $enableSandbox;
+    protected array $requestFormats;
+    protected string $requestFormatMethod;
+    protected string $defaultRequestFormat;
+    protected ?string $acceptType;
+    protected array $bodyFormats;
+    protected string $defaultBodyFormat;
+    protected ?array $authentication;
+    protected string $motdTemplate;
+    protected bool $defaultSectionsOpened;
+    protected string $rootRoute;
+    protected array $views;
+    protected ?DocumentationProviderInterface $documentationProvider = null;
 
-    /** @var FileLocatorInterface */
-    protected $fileLocator;
-
-    /** @var Environment */
-    protected $twig;
-
-    /** @var string */
-    protected $apiName;
-
-    /** @var string */
-    protected $endpoint;
-
-    /** @var bool */
-    protected $enableSandbox;
-
-    /** @var array */
-    protected $requestFormats;
-
-    /** @var string */
-    protected $requestFormatMethod;
-
-    /** @var string */
-    protected $defaultRequestFormat;
-
-    /** @var string */
-    protected $acceptType;
-
-    /** @var array */
-    protected $bodyFormats;
-
-    /** @var string */
-    protected $defaultBodyFormat;
-
-    /** @var array */
-    protected $authentication;
-
-    /** @var string */
-    protected $motdTemplate;
-
-    /** @var bool */
-    protected $defaultSectionsOpened;
-
-    /** @var string */
-    protected $rootRoute;
-
-    /** @var array */
-    protected $views;
-
-    /** @var DocumentationProviderInterface|null */
-    protected $documentationProvider;
-
-    public function setSecurityContext(SecurityContextInterface $securityContext)
+    public function setSecurityContext(SecurityContextInterface $securityContext): void
     {
         $this->securityContext = $securityContext;
     }
 
-    public function setFileLocator(FileLocatorInterface $fileLocator)
+    public function setFileLocator(FileLocatorInterface $fileLocator): void
     {
         $this->fileLocator = $fileLocator;
     }
 
-    public function setTwig(Environment $twig)
+    public function setTwig(Environment $twig): void
     {
         $this->twig = $twig;
     }
 
-    /**
-     * @param string $apiName
-     */
-    public function setApiName($apiName)
+    public function setApiName(string $apiName): void
     {
         $this->apiName = $apiName;
     }
 
-    /**
-     * @param string $endpoint
-     */
-    public function setEndpoint($endpoint)
+    public function setEndpoint(?string $endpoint): void
     {
         $this->endpoint = $endpoint;
     }
 
-    /**
-     * @param bool $enableSandbox
-     */
-    public function setEnableSandbox($enableSandbox)
+    public function setEnableSandbox(bool $enableSandbox): void
     {
         $this->enableSandbox = $enableSandbox;
     }
 
-    public function setRequestFormats(array $formats)
+    public function setRequestFormats(array $formats): void
     {
         $this->requestFormats = $formats;
     }
 
-    /**
-     * @param string $method
-     */
-    public function setRequestFormatMethod($method)
+    public function setRequestFormatMethod(string $method): void
     {
         $this->requestFormatMethod = $method;
     }
 
-    /**
-     * @param string $format
-     */
-    public function setDefaultRequestFormat($format)
+    public function setDefaultRequestFormat(string $format): void
     {
         $this->defaultRequestFormat = $format;
     }
 
-    /**
-     * @param string $acceptType
-     */
-    public function setAcceptType($acceptType)
+    public function setAcceptType(?string $acceptType): void
     {
         $this->acceptType = $acceptType;
     }
 
-    public function setBodyFormats(array $bodyFormats)
+    public function setBodyFormats(array $bodyFormats): void
     {
         $this->bodyFormats = $bodyFormats;
     }
 
-    /**
-     * @param string $defaultBodyFormat
-     */
-    public function setDefaultBodyFormat($defaultBodyFormat)
+    public function setDefaultBodyFormat(string $defaultBodyFormat): void
     {
         $this->defaultBodyFormat = $defaultBodyFormat;
     }
 
-    /**
-     * @param array $authentication
-     */
-    public function setAuthentication(array $authentication = null)
+    public function setAuthentication(?array $authentication): void
     {
         $this->authentication = $authentication;
     }
 
-    /**
-     * @param string $motdTemplate
-     */
-    public function setMotdTemplate($motdTemplate)
+    public function setMotdTemplate(string $motdTemplate): void
     {
         $this->motdTemplate = $motdTemplate;
     }
 
-    /**
-     * @param bool $defaultSectionsOpened
-     */
-    public function setDefaultSectionsOpened($defaultSectionsOpened)
+    public function setDefaultSectionsOpened(bool $defaultSectionsOpened): void
     {
         $this->defaultSectionsOpened = $defaultSectionsOpened;
     }
 
-    /**
-     * @param string $rootRoute
-     */
-    public function setRootRoute($rootRoute)
+    public function setRootRoute(string $rootRoute): void
     {
         $this->rootRoute = $rootRoute;
     }
 
-    public function setViews(array $views)
+    public function setViews(array $views): void
     {
         $this->views = $views;
     }
 
-    public function setDocumentationProvider(DocumentationProviderInterface $documentationProvider)
+    public function setDocumentationProvider(DocumentationProviderInterface $documentationProvider): void
     {
         $this->documentationProvider = $documentationProvider;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function renderOne(array $data)
     {
@@ -209,7 +141,7 @@ class HtmlFormatter extends AbstractFormatter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function render(array $collection)
     {
@@ -221,10 +153,7 @@ class HtmlFormatter extends AbstractFormatter
         ));
     }
 
-    /**
-     * @return array
-     */
-    protected function getGlobalVars()
+    protected function getGlobalVars(): array
     {
         return [
             'apiName'                 => $this->apiName,
@@ -258,18 +187,12 @@ class HtmlFormatter extends AbstractFormatter
         ];
     }
 
-    /**
-     * @return string
-     */
-    protected function getCss()
+    protected function getCss(): string
     {
         return $this->getFileContent('@NelmioApiDocBundle/Resources/public/css/screen.css');
     }
 
-    /**
-     * @return string
-     */
-    protected function getJs()
+    protected function getJs(): string
     {
         $result = $this->getFileContent('@NelmioApiDocBundle/Resources/public/js/all.js');
         $result .= "\n" . $this->getFileContent('@OroApiBundle/Resources/public/lib/jquery.bind-first-0.2.3.min.js');
@@ -280,20 +203,12 @@ class HtmlFormatter extends AbstractFormatter
         return $result;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    protected function getFileContent($path)
+    protected function getFileContent(string $path): string
     {
         return file_get_contents($this->fileLocator->locate($path));
     }
 
-    /**
-     * @return array
-     */
-    protected function getViews()
+    protected function getViews(): array
     {
         if (null === $this->documentationProvider) {
             return $this->views;
@@ -315,10 +230,7 @@ class HtmlFormatter extends AbstractFormatter
         return $views;
     }
 
-    /**
-     * @return string
-     */
-    protected function getDefaultView()
+    protected function getDefaultView(): string
     {
         $result = '';
         foreach ($this->views as $name => $view) {

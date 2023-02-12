@@ -30,7 +30,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     protected ?LoggerInterface $logger = null;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setLogger(LoggerInterface $logger): void
     {
@@ -38,7 +38,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function executeProcessors(ComponentContextInterface $context): void
     {

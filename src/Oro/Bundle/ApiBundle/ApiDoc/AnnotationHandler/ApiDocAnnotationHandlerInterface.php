@@ -14,5 +14,5 @@ interface ApiDocAnnotationHandlerInterface
     /**
      * Updates ApiDoc annotation before it will be processed by ApiDocExtractor.
      */
-    public function handle(ApiDoc $annotation, Route $route);
+    public function handle(ApiDoc $annotation, Route $route): void;
 }

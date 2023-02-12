@@ -19,13 +19,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ValidationExtension extends FormTypeValidatorExtension
 {
-    public const ENABLE_VALIDATION      = 'enable_validation';
+    public const ENABLE_VALIDATION = 'enable_validation';
     public const ENABLE_FULL_VALIDATION = 'enable_full_validation';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options[self::ENABLE_VALIDATION]) {
             parent::buildForm($builder, $options);
@@ -33,9 +33,9 @@ class ValidationExtension extends FormTypeValidatorExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 

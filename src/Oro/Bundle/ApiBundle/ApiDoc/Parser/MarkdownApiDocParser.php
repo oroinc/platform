@@ -17,9 +17,8 @@ use Symfony\Component\Config\FileLocatorInterface;
  */
 class MarkdownApiDocParser implements ResourceDocParserInterface
 {
+    private FileLocatorInterface $fileLocator;
     /**
-     * @var array
-     *
      * [
      *  class name => [
      *      "actions" => [
@@ -48,13 +47,8 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
      *  ...
      * ]
      */
-    private $loadedData = [];
-
-    /** @var FileLocatorInterface */
-    private $fileLocator;
-
-    /** @var string[] */
-    private $parsedFiles = [];
+    private array $loadedData = [];
+    private array $parsedFiles = [];
 
     public function __construct(FileLocatorInterface $fileLocator)
     {
@@ -62,7 +56,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getActionDocumentation(string $className, string $actionName): ?string
     {
@@ -70,7 +64,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getFieldDocumentation(
         string $className,
@@ -81,7 +75,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getFilterDocumentation(string $className, string $filterName): ?string
     {
@@ -89,7 +83,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getSubresourceDocumentation(
         string $className,
@@ -100,22 +94,22 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function registerDocumentationResource(string $resource): bool
     {
-        $pos = \strrpos($resource, '.md');
+        $pos = strrpos($resource, '.md');
         if (false === $pos) {
             // unsupported resource
             return false;
         }
 
         /** @var string $filePath */
-        $filePath = $this->fileLocator->locate(\substr($resource, 0, $pos + 3));
+        $filePath = $this->fileLocator->locate(substr($resource, 0, $pos + 3));
         if (!isset($this->parsedFiles[$filePath])) {
             $existingData = $this->loadedData;
             $this->loadedData = [];
-            $this->parseDocumentation(\file_get_contents($filePath));
+            $this->parseDocumentation(file_get_contents($filePath));
             if (!empty($existingData)) {
                 $newData = $this->loadedData;
                 $this->loadedData = $existingData;
@@ -176,7 +170,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
         $html = $parser->transform($fileContent);
 
         $doc = new \DOMDocument();
-        // suppress warnings like "Document is empty"
+        /** @noinspection PhpUsageOfSilenceOperatorInspection suppress warnings like "Document is empty" */
         @$doc->loadHTML($html);
 
         $rootNodes = $doc->getElementsByTagName('body');
@@ -216,7 +210,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
     private function normalizeLoadedData(): void
     {
         // strip whitespace from the beginning and end of descriptions
-        \array_walk_recursive($this->loadedData, function (&$element) {
+        array_walk_recursive($this->loadedData, function (&$element) {
             if (\is_string($element) && $element) {
                 $element = trim($element);
             }
@@ -250,8 +244,8 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
                 if (!$subElement) {
                     $subElement = 'common';
                 }
-                foreach (\explode(',', $subElement) as $action) {
-                    $action = \trim($action);
+                foreach (explode(',', $subElement) as $action) {
+                    $action = trim($action);
                     if (!isset($this->loadedData[$className][$section][$element][$action])) {
                         $this->loadedData[$className][$section][$element][$action] = '';
                     }
@@ -277,13 +271,13 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
             $classData = $this->loadedData[$className];
             if (isset($classData[$section])) {
                 $sectionData = $classData[$section];
-                $element = \strtolower($element);
+                $element = strtolower($element);
                 if (isset($sectionData[$element])) {
                     $elementData = $sectionData[$element];
                     if (!\is_array($elementData)) {
                         $result = $elementData;
                     } elseif ($subElement) {
-                        $subElement = \strtolower($subElement);
+                        $subElement = strtolower($subElement);
                         if (isset($elementData[$subElement])) {
                             $result = $elementData[$subElement];
                         }

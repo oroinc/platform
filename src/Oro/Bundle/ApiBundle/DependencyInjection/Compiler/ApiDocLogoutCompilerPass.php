@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class ApiDocLogoutCompilerPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContainerBuilder $container): void
     {
@@ -34,8 +34,8 @@ class ApiDocLogoutCompilerPass implements CompilerPassInterface
     private function isLogoutFirewall(array $firewallConfig): bool
     {
         return
-            array_key_exists('logout', $firewallConfig)
-            && is_array($firewallConfig['logout'])
+            \array_key_exists('logout', $firewallConfig)
+            && \is_array($firewallConfig['logout'])
             && !empty($firewallConfig['logout']['path']);
     }
 

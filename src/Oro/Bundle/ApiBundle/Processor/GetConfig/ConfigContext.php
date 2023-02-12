@@ -41,15 +41,14 @@ class ConfigContext extends ApiContext
     private const REQUESTED_EXCLUSION_POLICY = 'requested_exclusion_policy';
 
     /** @var ConfigExtraInterface[] */
-    private $extras = [];
-
+    private array $extras = [];
     /** @var string[]|null */
-    private $explicitlyConfiguredFieldNames;
+    private ?array $explicitlyConfiguredFieldNames = null;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         parent::initialize();
         $this->set(self::EXTRA, []);
@@ -58,120 +57,96 @@ class ConfigContext extends ApiContext
 
     /**
      * Gets FQCN of an entity.
-     *
-     * @return string
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->get(self::CLASS_NAME);
     }
 
     /**
      * Sets FQCN of an entity.
-     *
-     * @param string $className
      */
-    public function setClassName($className)
+    public function setClassName(string $className): void
     {
         $this->set(self::CLASS_NAME, $className);
     }
 
     /**
      * Gets the name of the action for which the configuration is built
-     *
-     * @return string|null
      */
-    public function getTargetAction()
+    public function getTargetAction(): ?string
     {
         return $this->get(self::TARGET_ACTION);
     }
 
     /**
      * Sets the name of the action for which the configuration is built
-     *
-     * @param string $action
      */
-    public function setTargetAction($action)
+    public function setTargetAction(string $action): void
     {
         $this->set(self::TARGET_ACTION, $action);
     }
 
     /**
      * Indicates whether a configuration is requested for a list of entities or a single entity.
-     *
-     * @return bool TRUE for a list of entities resource, FALSE for a single entity resource
      */
-    public function isCollection()
+    public function isCollection(): bool
     {
         return (bool)$this->get(self::COLLECTION);
     }
 
     /**
      * Sets a flag indicates whether a configuration is requested for a list of entities or a single entity.
-     *
-     * @param bool $value TRUE for a list of entities resource, FALSE for a single entity resource
      */
-    public function setIsCollection($value)
+    public function setIsCollection(bool $value): void
     {
         $this->set(self::COLLECTION, $value);
     }
 
     /**
      * Gets FQCN of the parent entity if a configuration is requested for a sub-resource.
-     *
-     * @return string
      */
-    public function getParentClassName()
+    public function getParentClassName(): ?string
     {
         return $this->get(self::PARENT_CLASS_NAME);
     }
 
     /**
      * Sets FQCN of the parent entity if a configuration is requested for a sub-resource.
-     *
-     * @param string $parentClassName
      */
-    public function setParentClassName($parentClassName)
+    public function setParentClassName(string $parentClassName): void
     {
         $this->set(self::PARENT_CLASS_NAME, $parentClassName);
     }
 
     /**
      * Gets the association name if a configuration is requested for a sub-resource.
-     *
-     * @return string
      */
-    public function getAssociationName()
+    public function getAssociationName(): ?string
     {
         return $this->get(self::ASSOCIATION);
     }
 
     /**
      * Sets the association name if a configuration is requested for a sub-resource.
-     *
-     * @param string $associationName
      */
-    public function setAssociationName($associationName)
+    public function setAssociationName(string $associationName): void
     {
         $this->set(self::ASSOCIATION, $associationName);
     }
 
     /**
      * Gets the maximum number of related entities that can be retrieved
-     *
-     * @return int|null
      */
-    public function getMaxRelatedEntities()
+    public function getMaxRelatedEntities(): ?int
     {
         return $this->get(self::MAX_RELATED_ENTITIES);
     }
 
     /**
      * Sets the maximum number of related entities that can be retrieved
-     *
-     * @param int|null $limit
      */
-    public function setMaxRelatedEntities($limit = null)
+    public function setMaxRelatedEntities(?int $limit): void
     {
         if (null === $limit) {
             $this->remove(self::MAX_RELATED_ENTITIES);
@@ -182,20 +157,16 @@ class ConfigContext extends ApiContext
 
     /**
      * Gets the exclusion policy that was before CompleteDefinition processor is set it to "all".
-     *
-     * @return string|null
      */
-    public function getRequestedExclusionPolicy()
+    public function getRequestedExclusionPolicy(): ?string
     {
         return $this->get(self::REQUESTED_EXCLUSION_POLICY);
     }
 
     /**
      * Sets the exclusion policy that was before CompleteDefinition processor is set it to "all".
-     *
-     * @param string|null $exclusionPolicy
      */
-    public function setRequestedExclusionPolicy($exclusionPolicy)
+    public function setRequestedExclusionPolicy(?string $exclusionPolicy): void
     {
         $this->set(self::REQUESTED_EXCLUSION_POLICY, $exclusionPolicy ?: null);
     }
@@ -222,24 +193,16 @@ class ConfigContext extends ApiContext
 
     /**
      * Checks whether some configuration data is requested.
-     *
-     * @param string $extraName
-     *
-     * @return bool
      */
-    public function hasExtra($extraName)
+    public function hasExtra(string $extraName): bool
     {
         return \in_array($extraName, $this->get(self::EXTRA), true);
     }
 
     /**
      * Gets a request for configuration data.
-     *
-     * @param string $extraName
-     *
-     * @return ConfigExtraInterface|null
      */
-    public function getExtra($extraName)
+    public function getExtra(string $extraName): ?ConfigExtraInterface
     {
         $result = null;
         foreach ($this->extras as $extra) {
@@ -257,7 +220,7 @@ class ConfigContext extends ApiContext
      *
      * @return ConfigExtraInterface[]
      */
-    public function getExtras()
+    public function getExtras(): array
     {
         return $this->extras;
     }
@@ -269,7 +232,7 @@ class ConfigContext extends ApiContext
      *
      * @throws \InvalidArgumentException if $extras has invalid elements
      */
-    public function setExtras(array $extras)
+    public function setExtras(array $extras): void
     {
         $names = [];
         foreach ($extras as $extra) {
@@ -289,7 +252,7 @@ class ConfigContext extends ApiContext
     /**
      * Removes a request for some configuration data.
      */
-    public function removeExtra(string $extraName)
+    public function removeExtra(string $extraName): void
     {
         $keys = array_keys($this->extras);
         foreach ($keys as $key) {
@@ -313,7 +276,7 @@ class ConfigContext extends ApiContext
      *
      * @return ConfigExtraInterface[]
      */
-    public function getPropagableExtras()
+    public function getPropagableExtras(): array
     {
         $result = [];
         foreach ($this->extras as $extra) {
@@ -327,20 +290,16 @@ class ConfigContext extends ApiContext
 
     /**
      * Checks whether a definition of filters exists.
-     *
-     * @return bool
      */
-    public function hasFilters()
+    public function hasFilters(): bool
     {
         return $this->has(FiltersConfigExtra::NAME);
     }
 
     /**
      * Gets a definition of filters.
-     *
-     * @return FiltersConfig|null
      */
-    public function getFilters()
+    public function getFilters(): ?FiltersConfig
     {
         return $this->get(FiltersConfigExtra::NAME);
     }
@@ -348,27 +307,23 @@ class ConfigContext extends ApiContext
     /**
      * Sets a definition of filters.
      */
-    public function setFilters(FiltersConfig $filters = null)
+    public function setFilters(?FiltersConfig $filters): void
     {
         $this->set(FiltersConfigExtra::NAME, $filters);
     }
 
     /**
      * Checks whether a definition of sorters exists.
-     *
-     * @return bool
      */
-    public function hasSorters()
+    public function hasSorters(): bool
     {
         return $this->has(SortersConfigExtra::NAME);
     }
 
     /**
      * Gets a definition of sorters.
-     *
-     * @return SortersConfig|null
      */
-    public function getSorters()
+    public function getSorters(): ?SortersConfig
     {
         return $this->get(SortersConfigExtra::NAME);
     }
@@ -376,7 +331,7 @@ class ConfigContext extends ApiContext
     /**
      * Sets a definition of sorters.
      */
-    public function setSorters(SortersConfig $sorters = null)
+    public function setSorters(?SortersConfig $sorters): void
     {
         $this->set(SortersConfigExtra::NAME, $sorters);
     }

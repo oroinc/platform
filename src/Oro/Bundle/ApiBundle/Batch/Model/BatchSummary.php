@@ -7,20 +7,11 @@ namespace Oro\Bundle\ApiBundle\Batch\Model;
  */
 final class BatchSummary
 {
-    /** @var int */
-    private $readCount = 0;
-
-    /** @var int */
-    private $writeCount = 0;
-
-    /** @var int */
-    private $errorCount = 0;
-
-    /** @var int */
-    private $createCount = 0;
-
-    /** @var int */
-    private $updateCount = 0;
+    private int $readCount = 0;
+    private int $writeCount = 0;
+    private int $errorCount = 0;
+    private int $createCount = 0;
+    private int $updateCount = 0;
 
     /**
      * Gets the number of items that have been successfully read.

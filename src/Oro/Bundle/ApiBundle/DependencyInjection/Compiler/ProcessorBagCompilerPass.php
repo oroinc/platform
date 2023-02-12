@@ -43,23 +43,23 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     private const PROCESSOR_BAG_CONFIG_PROVIDER_SERVICE_ID = 'oro_api.processor_bag_config_provider';
 
     private const CUSTOMIZE_LOADED_DATA_ACTION = 'customize_loaded_data';
-    private const CUSTOMIZE_FORM_DATA_ACTION   = 'customize_form_data';
-    private const GET_CONFIG_ACTION            = 'get_config';
-    private const GET_METADATA_ACTION          = 'get_metadata';
-    private const NORMALIZE_VALUE_ACTION       = 'normalize_value';
+    private const CUSTOMIZE_FORM_DATA_ACTION = 'customize_form_data';
+    private const GET_CONFIG_ACTION = 'get_config';
+    private const GET_METADATA_ACTION = 'get_metadata';
+    private const NORMALIZE_VALUE_ACTION = 'normalize_value';
 
-    private const DATA_TYPE_ATTRIBUTE       = 'dataType';
+    private const DATA_TYPE_ATTRIBUTE = 'dataType';
     private const IDENTIFIER_ONLY_ATTRIBUTE = 'identifier_only';
-    private const EXTRA_ATTRIBUTE           = 'extra';
-    private const GROUP_ATTRIBUTE           = 'group';
-    private const COLLECTION_ATTRIBUTE      = 'collection';
-    private const EVENT_ATTRIBUTE           = 'event';
+    private const EXTRA_ATTRIBUTE = 'extra';
+    private const GROUP_ATTRIBUTE = 'group';
+    private const COLLECTION_ATTRIBUTE = 'collection';
+    private const EVENT_ATTRIBUTE = 'event';
 
-    private const ITEM_GROUP       = 'item';
+    private const ITEM_GROUP = 'item';
     private const COLLECTION_GROUP = 'collection';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContainerBuilder $container): void
     {
@@ -296,7 +296,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
                             }
                             if (null !== $identifierFieldsOnly) {
                                 unset($item[1][self::EXTRA_ATTRIBUTE][Matcher::OPERATOR_AND][$k]);
-                                if (count($item[1][self::EXTRA_ATTRIBUTE][Matcher::OPERATOR_AND]) === 1) {
+                                if (\count($item[1][self::EXTRA_ATTRIBUTE][Matcher::OPERATOR_AND]) === 1) {
                                     $processors[$key][1][self::EXTRA_ATTRIBUTE] = reset(
                                         $item[1][self::EXTRA_ATTRIBUTE][Matcher::OPERATOR_AND]
                                     );

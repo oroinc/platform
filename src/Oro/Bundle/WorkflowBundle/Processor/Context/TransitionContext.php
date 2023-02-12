@@ -14,46 +14,29 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class TransitionContext extends Context
 {
-    const WORKFLOW_NAME = 'workflowName';
-    const TRANSITION_NAME = 'transitionName';
-    const IS_START = 'isStart';
-    const CUSTOM_FORM = 'customForm';
-    const HAS_INIT_OPTIONS = 'hasInitOptions';
-    const SAVED = 'saved';
-    const STATE = 'state';
-    const STATE_OK = 'ok';
-    const STATE_FAILURE = 'failure';
-    const INIT_DATA = 'initData';
-    const PROCESSED = 'processed';
-    const RESULT_TYPE = 'resultType';
-    const ENTITY_ID = 'entityId';
+    public const WORKFLOW_NAME = 'workflowName';
+    public const TRANSITION_NAME = 'transitionName';
+    public const IS_START = 'isStart';
+    public const CUSTOM_FORM = 'customForm';
+    public const HAS_INIT_OPTIONS = 'hasInitOptions';
+    public const SAVED = 'saved';
+    public const STATE = 'state';
+    public const STATE_OK = 'ok';
+    public const STATE_FAILURE = 'failure';
+    public const INIT_DATA = 'initData';
+    public const PROCESSED = 'processed';
+    public const RESULT_TYPE = 'resultType';
+    public const ENTITY_ID = 'entityId';
 
-    /** @var Workflow */
-    protected $workflow;
-
-    /** @var Transition */
-    protected $transition;
-
-    /** @var WorkflowItem */
-    protected $workflowItem;
-
-    /** @var Request */
-    protected $request;
-
-    /** @var TransitActionResultTypeInterface */
-    protected $resultType;
-
-    /** @var FormInterface */
-    protected $form;
-
-    /** @var mixed */
-    protected $formData;
-
-    /** @var array */
-    protected $formOptions = [];
-
-    /** @var \Throwable */
-    protected $error;
+    private Workflow $workflow;
+    private Transition $transition;
+    private ?WorkflowItem $workflowItem = null;
+    private Request $request;
+    private TransitActionResultTypeInterface $resultType;
+    private FormInterface $form;
+    private mixed $formData = null;
+    private array $formOptions = [];
+    private ?\Throwable $error = null;
 
     public function __construct()
     {
@@ -61,9 +44,9 @@ class TransitionContext extends Context
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function clear()
+    public function clear(): void
     {
         parent::clear();
         $this->set(self::IS_START, false);
@@ -72,11 +55,9 @@ class TransitionContext extends Context
         $this->set(self::STATE, self::STATE_OK);
     }
 
-    public function setTransitionName(string $transitionName): TransitionContext
+    public function setTransitionName(string $transitionName): void
     {
         $this->set(self::TRANSITION_NAME, $transitionName);
-
-        return $this;
     }
 
     public function getTransitionName(): string
@@ -84,11 +65,9 @@ class TransitionContext extends Context
         return $this->get(self::TRANSITION_NAME);
     }
 
-    public function setWorkflowName(string $workflowName): TransitionContext
+    public function setWorkflowName(string $workflowName): void
     {
         $this->set(self::WORKFLOW_NAME, $workflowName);
-
-        return $this;
     }
 
     public function getWorkflowName(): string
@@ -101,11 +80,9 @@ class TransitionContext extends Context
         return $this->transition;
     }
 
-    public function setTransition(Transition $transition): TransitionContext
+    public function setTransition(Transition $transition): void
     {
         $this->transition = $transition;
-
-        return $this;
     }
 
     public function getWorkflow(): Workflow
@@ -113,18 +90,14 @@ class TransitionContext extends Context
         return $this->workflow;
     }
 
-    public function setWorkflow(Workflow $workflow): TransitionContext
+    public function setWorkflow(Workflow $workflow): void
     {
         $this->workflow = $workflow;
-
-        return $this;
     }
 
-    public function setIsStartTransition(bool $isStartTransition): TransitionContext
+    public function setIsStartTransition(bool $isStartTransition): void
     {
         $this->set(self::IS_START, $isStartTransition);
-
-        return $this;
     }
 
     public function isStartTransition(): bool
@@ -142,13 +115,10 @@ class TransitionContext extends Context
         return $this->workflowItem;
     }
 
-    public function setWorkflowItem(WorkflowItem $workflowItem): TransitionContext
+    public function setWorkflowItem(WorkflowItem $workflowItem): void
     {
         $this->workflowItem = $workflowItem;
-
         $this->setWorkflowName($workflowItem->getWorkflowName());
-
-        return $this;
     }
 
     public function getRequest(): Request
@@ -156,19 +126,15 @@ class TransitionContext extends Context
         return $this->request;
     }
 
-    public function setRequest(Request $request): TransitionContext
+    public function setRequest(Request $request): void
     {
         $this->request = $request;
-
-        return $this;
     }
 
-    public function setResultType(TransitActionResultTypeInterface $resultType): TransitionContext
+    public function setResultType(TransitActionResultTypeInterface $resultType): void
     {
         $this->resultType = $resultType;
         $this->set(self::RESULT_TYPE, $resultType->getName());
-
-        return $this;
     }
 
     public function getResultType(): TransitActionResultTypeInterface
@@ -181,18 +147,14 @@ class TransitionContext extends Context
         return $this->form;
     }
 
-    public function setForm(FormInterface $form): TransitionContext
+    public function setForm(FormInterface $form): void
     {
         $this->form = $form;
-
-        return $this;
     }
 
-    public function setIsCustomForm(bool $isCustomForm): TransitionContext
+    public function setIsCustomForm(bool $isCustomForm): void
     {
         $this->set(self::CUSTOM_FORM, $isCustomForm);
-
-        return $this;
     }
 
     public function isCustomForm(): bool
@@ -205,18 +167,14 @@ class TransitionContext extends Context
         return $this->get(self::SAVED);
     }
 
-    public function setSaved(bool $saved): TransitionContext
+    public function setSaved(bool $saved): void
     {
         $this->set(self::SAVED, $saved);
-
-        return $this;
     }
 
-    public function setProcessed(bool $isProcessed): TransitionContext
+    public function setProcessed(bool $isProcessed): void
     {
         $this->set(self::PROCESSED, $isProcessed);
-
-        return $this;
     }
 
     public function isProcessed(): bool
@@ -224,23 +182,14 @@ class TransitionContext extends Context
         return $this->get(self::PROCESSED);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFormData()
+    public function getFormData(): mixed
     {
         return $this->formData;
     }
 
-    /**
-     * @param mixed $formData
-     * @return TransitionContext
-     */
-    public function setFormData($formData): TransitionContext
+    public function setFormData(mixed $formData): void
     {
         $this->formData = $formData;
-
-        return $this;
     }
 
     public function getFormOptions(): array
@@ -248,11 +197,9 @@ class TransitionContext extends Context
         return $this->formOptions;
     }
 
-    public function setFormOptions(array $formOptions): TransitionContext
+    public function setFormOptions(array $formOptions): void
     {
         $this->formOptions = $formOptions;
-
-        return $this;
     }
 
     public function getError(): \Throwable
@@ -260,12 +207,10 @@ class TransitionContext extends Context
         return $this->error;
     }
 
-    public function setError(\Throwable $error): TransitionContext
+    public function setError(\Throwable $error): void
     {
         $this->error = $error;
         $this->set(self::STATE, self::STATE_FAILURE);
-
-        return $this;
     }
 
     public function hasError(): bool

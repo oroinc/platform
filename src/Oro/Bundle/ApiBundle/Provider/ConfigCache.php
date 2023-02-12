@@ -10,31 +10,18 @@ use Symfony\Component\Filesystem\Exception\IOException;
  */
 class ConfigCache implements ConfigCacheStateInterface
 {
-    /** @var string */
-    private $configKey;
-
-    /** @var bool */
-    private $debug;
-
-    /** @var ConfigCacheFactory */
-    private $configCacheFactory;
-
-    /** @var array|null */
-    private $data;
-
-    /** @var ConfigCacheFile|null */
-    private $cache;
-
+    private string $configKey;
+    private bool $debug;
+    private ConfigCacheFactory $configCacheFactory;
+    private ?array $data = null;
+    private ?ConfigCacheFile $cache = null;
     /**
-     * @var int|bool|null
      * * FALSE if the timestamp is not retrieved yet
      * * NULL if cache file does not exist
      * * an integer for the timestamp of existing cache file
      */
-    private $cacheTimestamp = false;
-
-    /** @var bool|null */
-    private $cacheFresh;
+    private int|null|false $cacheTimestamp = false;
+    private ?bool $cacheFresh = null;
 
     public function __construct(
         string $configKey,
@@ -88,7 +75,7 @@ class ConfigCache implements ConfigCacheStateInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isCacheFresh(?int $timestamp): bool
     {
@@ -109,7 +96,7 @@ class ConfigCache implements ConfigCacheStateInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getCacheTimestamp(): ?int
     {
@@ -129,12 +116,7 @@ class ConfigCache implements ConfigCacheStateInterface
         return $this->cacheTimestamp;
     }
 
-    /**
-     * @param string $section
-     *
-     * @return mixed
-     */
-    private function getSection(string $section)
+    private function getSection(string $section): mixed
     {
         $data = $this->getData();
 

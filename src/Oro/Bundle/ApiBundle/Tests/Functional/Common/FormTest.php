@@ -36,7 +36,7 @@ class FormTest extends WebTestCase
     protected function tearDown(): void
     {
         $this->switchToDefaultFormExtension();
-        $this->setMetadataAccessor();
+        $this->setMetadataAccessor(null);
         parent::tearDown();
     }
 
@@ -289,7 +289,7 @@ class FormTest extends WebTestCase
         $formExtensionSwitcher->switchToApiFormExtension();
     }
 
-    private function setMetadataAccessor(MetadataAccessorInterface $metadataAccessor = null): void
+    private function setMetadataAccessor(?MetadataAccessorInterface $metadataAccessor): void
     {
         /** @var MetadataTypeGuesser $metadataTypeGuesser */
         $metadataTypeGuesser = self::getContainer()->get('oro_api.form.guesser.metadata');

@@ -15,11 +15,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class SecurityContext implements SecurityContextInterface
 {
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var RequestStack|null */
-    private $requestStack;
+    private TokenStorageInterface $tokenStorage;
+    private ?RequestStack $requestStack;
 
     public function __construct(TokenStorageInterface $tokenStorage, RequestStack $requestStack = null)
     {
@@ -28,7 +25,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasSecurityToken(): bool
     {
@@ -36,7 +33,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getOrganizations(): array
     {
@@ -60,7 +57,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getOrganization(): ?string
     {
@@ -78,7 +75,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getUserName(): ?string
     {
@@ -96,7 +93,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getApiKey(): ?string
     {
@@ -128,7 +125,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getApiKeyGenerationHint(): ?string
     {
@@ -139,7 +136,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getCsrfCookieName(): ?string
     {
@@ -158,7 +155,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getSwitchOrganizationRoute(): ?string
     {
@@ -166,7 +163,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getLoginRoute(): ?string
     {
@@ -174,7 +171,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getLogoutRoute(): ?string
     {

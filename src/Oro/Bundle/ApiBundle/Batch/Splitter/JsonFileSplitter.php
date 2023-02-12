@@ -21,43 +21,28 @@ use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 class JsonFileSplitter implements FileSplitterInterface
 {
     /** @var string|null The name of the current first level section */
-    protected $sectionName;
-
+    protected ?string $sectionName = null;
     /** @var array|null The header section data */
-    protected $headerSectionData;
-
+    protected ?array $headerSectionData = null;
     /** @var int Internal counter of files that were saved during split operation */
-    protected $targetFileIndex = 0;
-
+    protected int $targetFileIndex = 0;
     /** @var int Internal counter of records in files that were saved during split operation */
-    protected $targetFileFirstRecordOffset = 0;
-
-    /** @var string|null */
-    private $headerSectionName;
-
+    protected int $targetFileFirstRecordOffset = 0;
+    private ?string $headerSectionName = null;
     /** @var string[] */
-    private $sectionNamesToSplit = [];
-
-    /** @var int */
-    private $chunkSize = 100;
-
+    private array $sectionNamesToSplit = [];
+    private int $chunkSize = 100;
     /** @var array [section name => chunk size, ...] */
-    private $chunkSizePerSection = [];
-
-    /** @var string|null */
-    private $chunkFileNameTemplate;
-
-    /** @var FileManager */
-    private $destFileManager;
-
+    private array $chunkSizePerSection = [];
+    private ?string $chunkFileNameTemplate = null;
+    private ?FileManager $destFileManager = null;
     /** @var array Internal buffer of parsed objects */
-    private $buffer = [];
-
+    private array $buffer = [];
     /** @var ChunkFile[] Chunk files that were saved during split operation */
-    private $targetFiles = [];
+    private array $targetFiles = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getChunkSize(): int
     {
@@ -65,7 +50,7 @@ class JsonFileSplitter implements FileSplitterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setChunkSize(int $size): void
     {
@@ -73,7 +58,7 @@ class JsonFileSplitter implements FileSplitterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getChunkSizePerSection(): array
     {
@@ -81,7 +66,7 @@ class JsonFileSplitter implements FileSplitterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setChunkSizePerSection(array $sizes): void
     {
@@ -89,7 +74,7 @@ class JsonFileSplitter implements FileSplitterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getChunkFileNameTemplate(): ?string
     {
@@ -97,7 +82,7 @@ class JsonFileSplitter implements FileSplitterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setChunkFileNameTemplate(?string $template): void
     {
@@ -105,7 +90,7 @@ class JsonFileSplitter implements FileSplitterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getHeaderSectionName(): ?string
     {
@@ -113,7 +98,7 @@ class JsonFileSplitter implements FileSplitterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setHeaderSectionName(?string $name): void
     {
@@ -121,7 +106,7 @@ class JsonFileSplitter implements FileSplitterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getSectionNamesToSplit(): array
     {
@@ -129,7 +114,7 @@ class JsonFileSplitter implements FileSplitterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setSectionNamesToSplit(array $names): void
     {
@@ -137,7 +122,7 @@ class JsonFileSplitter implements FileSplitterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function splitFile(string $fileName, FileManager $srcFileManager, FileManager $destFileManager): array
     {
@@ -166,9 +151,7 @@ class JsonFileSplitter implements FileSplitterInterface
             $this->targetFiles = [];
             $this->targetFileIndex = 0;
             $this->targetFileFirstRecordOffset = 0;
-            if (null !== $stream) {
-                $stream->close();
-            }
+            $stream?->close();
         }
     }
 
@@ -223,20 +206,17 @@ class JsonFileSplitter implements FileSplitterInterface
         $this->sectionName = $item;
     }
 
-    /**
-     * @param mixed $item
-     */
-    protected function processItem($item): void
+    protected function processItem(mixed $item): void
     {
         if ($this->sectionName
             && !empty($this->sectionNamesToSplit)
-            && !in_array($this->sectionName, $this->sectionNamesToSplit, true)
+            && !\in_array($this->sectionName, $this->sectionNamesToSplit, true)
         ) {
             return;
         }
 
         $this->buffer[] = $item;
-        if (!empty($this->buffer) && (count($this->buffer) % $this->getChunkSizeForSection() === 0)) {
+        if (!empty($this->buffer) && (\count($this->buffer) % $this->getChunkSizeForSection() === 0)) {
             $this->saveChunk();
         }
     }
@@ -246,9 +226,6 @@ class JsonFileSplitter implements FileSplitterInterface
         $this->headerSectionData = $header;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getChunkSizeForSection(): int
     {
         if (!$this->sectionName) {

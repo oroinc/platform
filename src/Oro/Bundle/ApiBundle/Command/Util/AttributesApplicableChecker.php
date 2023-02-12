@@ -21,9 +21,9 @@ class AttributesApplicableChecker extends MatchApplicableChecker
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isApplicable(ContextInterface $context, array $processorAttributes): bool
+    public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         $result = self::ABSTAIN;
 

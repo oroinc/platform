@@ -18,11 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EntityType extends AbstractType
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var EntityLoader */
-    protected $entityLoader;
+    private DoctrineHelper $doctrineHelper;
+    private EntityLoader $entityLoader;
 
     public function __construct(DoctrineHelper $doctrineHelper, EntityLoader $entityLoader)
     {
@@ -31,9 +28,9 @@ class EntityType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var AssociationMetadata $metadata */
         $metadata = $options['metadata'];
@@ -69,9 +66,9 @@ class EntityType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefault('compound', false)

@@ -62,7 +62,7 @@ class PrimaryFieldFilter extends ComparisonFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function createExpression(FilterValue $value = null): ?Expression
     {

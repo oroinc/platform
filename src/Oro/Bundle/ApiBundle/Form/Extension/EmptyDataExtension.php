@@ -17,8 +17,7 @@ use Symfony\Component\Form\Util\FormUtil;
  */
 class EmptyDataExtension extends AbstractTypeExtension
 {
-    /** @var EntityInstantiator */
-    private $entityInstantiator;
+    private EntityInstantiator $entityInstantiator;
 
     public function __construct(EntityInstantiator $entityInstantiator)
     {
@@ -26,9 +25,9 @@ class EmptyDataExtension extends AbstractTypeExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $dataClass = $options['data_class'];
         $emptyData = $options['empty_data'] ?? null;
@@ -39,19 +38,14 @@ class EmptyDataExtension extends AbstractTypeExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];
     }
 
-    /**
-     * @param mixed $emptyData
-     *
-     * @return \Closure
-     */
-    private function getEmptyData($emptyData)
+    private function getEmptyData(mixed $emptyData): \Closure
     {
         return function (FormInterface $form, $viewData) use ($emptyData) {
             if ($emptyData instanceof \Closure) {
@@ -66,13 +60,7 @@ class EmptyDataExtension extends AbstractTypeExtension
         };
     }
 
-    /**
-     * @param mixed $dataClass
-     * @param mixed $emptyData
-     *
-     * @return \Closure
-     */
-    private function getEmptyDataForDataClass($dataClass, $emptyData)
+    private function getEmptyDataForDataClass(mixed $dataClass, mixed $emptyData): \Closure
     {
         return function (FormInterface $form, $viewData) use ($dataClass, $emptyData) {
             $result = null;

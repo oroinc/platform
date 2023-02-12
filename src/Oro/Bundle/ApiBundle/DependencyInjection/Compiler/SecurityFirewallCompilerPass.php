@@ -22,7 +22,7 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
     private array $contextListeners = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContainerBuilder $container): void
     {

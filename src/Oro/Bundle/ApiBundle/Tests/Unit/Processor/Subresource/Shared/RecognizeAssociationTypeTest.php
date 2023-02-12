@@ -38,8 +38,9 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenAssociationNameIsNotSet()
+    public function testProcessWhenAssociationNameIsEmpty()
     {
+        $this->context->setAssociationName('');
         $this->processor->process($this->context);
 
         self::assertEquals(

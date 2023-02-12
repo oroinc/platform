@@ -226,6 +226,10 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setClassName('test');
         self::assertEquals('test', $this->context->getClassName());
         self::assertEquals('test', $this->context->get('class'));
+
+        $this->context->setClassName(null);
+        self::assertNull($this->context->getClassName());
+        self::assertFalse($this->context->has('class'));
     }
 
     public function testGetConfigSections()
@@ -549,14 +553,12 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configSectionProvider
      */
-    public function testLoadKnownSectionConfigByGetConfigOf(string $configSection)
+    public function testLoadKnownSectionConfigByGetConfigOf(string $configSection, object $sectionConfig)
     {
         $mainConfig = new EntityDefinitionConfig();
-        $sectionConfig = [];
 
         $mainConfig->addField('field1');
         $mainConfig->addField('field2');
-        $sectionConfig[ConfigUtil::FIELDS]['field1'] = null;
 
         $config = $this->getConfig(
             [
@@ -583,7 +585,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         }
 
         $suffix = lcfirst($configSection);
-        self::assertEquals($sectionConfig, $this->context->{'getConfigOf' . $suffix}()); // load config
+        self::assertSame($sectionConfig, $this->context->{'getConfigOf' . $suffix}()); // load config
         self::assertTrue($this->context->{'hasConfigOf' . $suffix}());
 
         self::assertTrue($this->context->hasConfig());
@@ -613,7 +615,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->{'setConfigOf' . $suffix}($sectionConfig);
 
         self::assertTrue($this->context->{'hasConfigOf' . $suffix}());
-        self::assertEquals($sectionConfig, $this->context->{'getConfigOf' . $suffix}());
+        self::assertSame($sectionConfig, $this->context->{'getConfigOf' . $suffix}());
 
         foreach ($this->context->getConfigExtras() as $configExtra) {
             if ($configExtra instanceof ConfigExtraSectionInterface && $configExtra->getName() !== $configSection) {
@@ -1322,7 +1324,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setCriteria($criteria);
         self::assertSame($criteria, $this->context->getCriteria());
 
-        $this->context->setCriteria();
+        $this->context->setCriteria(null);
         self::assertNull($this->context->getCriteria());
     }
 }

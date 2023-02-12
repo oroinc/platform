@@ -13,36 +13,20 @@ use Symfony\Component\Form\FormInterface;
  */
 trait FormContextTrait
 {
-    /** @var array */
-    private $requestData;
-
-    /** @var array */
-    private $includedData;
-
-    /** @var IncludedEntityCollection|null */
-    private $includedEntities;
-
+    private array $requestData = [];
+    private ?array $includedData = null;
+    private ?IncludedEntityCollection $includedEntities = null;
     /** @var array [entity hash => entity, ...] */
-    private $additionalEntities = [];
-
-    /** @var EntityMapper|null */
-    private $entityMapper;
-
-    /** @var FormBuilderInterface|null */
-    private $formBuilder;
-
-    /** @var FormInterface|null */
-    private $form;
-
-    /** @var bool */
-    private $skipFormValidation = false;
+    private array $additionalEntities = [];
+    private ?EntityMapper $entityMapper = null;
+    private ?FormBuilderInterface $formBuilder = null;
+    private ?FormInterface $form = null;
+    private bool $skipFormValidation = false;
 
     /**
      * Returns request data.
-     *
-     * @return array
      */
-    public function getRequestData()
+    public function getRequestData(): array
     {
         return $this->requestData;
     }
@@ -50,17 +34,15 @@ trait FormContextTrait
     /**
      * Sets request data to the context.
      */
-    public function setRequestData(array $requestData)
+    public function setRequestData(array $requestData): void
     {
         $this->requestData = $requestData;
     }
 
     /**
      * Returns additional data included into the request.
-     *
-     * @return array
      */
-    public function getIncludedData()
+    public function getIncludedData(): ?array
     {
         return $this->includedData;
     }
@@ -68,17 +50,15 @@ trait FormContextTrait
     /**
      * Sets additional data included into the request.
      */
-    public function setIncludedData(array $includedData)
+    public function setIncludedData(?array $includedData): void
     {
         $this->includedData = $includedData;
     }
 
     /**
      * Returns a collection contains additional entities included into the request data.
-     *
-     * @return IncludedEntityCollection|null
      */
-    public function getIncludedEntities()
+    public function getIncludedEntities(): ?IncludedEntityCollection
     {
         return $this->includedEntities;
     }
@@ -86,7 +66,7 @@ trait FormContextTrait
     /**
      * Sets a collection contains additional entities included into the request data.
      */
-    public function setIncludedEntities(IncludedEntityCollection $includedEntities = null)
+    public function setIncludedEntities(?IncludedEntityCollection $includedEntities): void
     {
         $this->includedEntities = $includedEntities;
     }
@@ -106,30 +86,24 @@ trait FormContextTrait
      * For example when an association is represented as a field,
      * a target entity of this association does not exist in the list of included entities
      * and need to be persisted manually, so, it should be added to the list of additional entities.
-     *
-     * @param object $entity
      */
-    public function addAdditionalEntity($entity): void
+    public function addAdditionalEntity(object $entity): void
     {
         $this->additionalEntities[spl_object_hash($entity)] = $entity;
     }
 
     /**
      * Removes an entity from the list of additional entities involved to the request processing.
-     *
-     * @param object $entity
      */
-    public function removeAdditionalEntity($entity): void
+    public function removeAdditionalEntity(object $entity): void
     {
         unset($this->additionalEntities[spl_object_hash($entity)]);
     }
 
     /**
      * Gets a service that can be used to convert an entity object to a model object and vise versa.
-     *
-     * @return EntityMapper|null
      */
-    public function getEntityMapper()
+    public function getEntityMapper(): ?EntityMapper
     {
         return $this->entityMapper;
     }
@@ -137,27 +111,23 @@ trait FormContextTrait
     /**
      * Sets a service that can be used to convert an entity object to a model object and vise versa.
      */
-    public function setEntityMapper(EntityMapper $entityMapper = null)
+    public function setEntityMapper(?EntityMapper $entityMapper): void
     {
         $this->entityMapper = $entityMapper;
     }
 
     /**
      * Checks whether the form builder exists.
-     *
-     * @return bool
      */
-    public function hasFormBuilder()
+    public function hasFormBuilder(): bool
     {
         return null !== $this->formBuilder;
     }
 
     /**
      * Gets the form builder.
-     *
-     * @return FormBuilderInterface|null
      */
-    public function getFormBuilder()
+    public function getFormBuilder(): ?FormBuilderInterface
     {
         return $this->formBuilder;
     }
@@ -165,27 +135,23 @@ trait FormContextTrait
     /**
      * Sets the form builder.
      */
-    public function setFormBuilder(FormBuilderInterface $formBuilder = null)
+    public function setFormBuilder(?FormBuilderInterface $formBuilder): void
     {
         $this->formBuilder = $formBuilder;
     }
 
     /**
      * Checks whether the form exists.
-     *
-     * @return bool
      */
-    public function hasForm()
+    public function hasForm(): bool
     {
         return null !== $this->form;
     }
 
     /**
      * Gets the form.
-     *
-     * @return FormInterface|null
      */
-    public function getForm()
+    public function getForm(): ?FormInterface
     {
         return $this->form;
     }
@@ -193,27 +159,23 @@ trait FormContextTrait
     /**
      * Sets the form.
      */
-    public function setForm(FormInterface $form = null)
+    public function setForm(?FormInterface $form): void
     {
         $this->form = $form;
     }
 
     /**
      * Indicates whether the validation of the form should be skipped or not.
-     *
-     * @return bool
      */
-    public function isFormValidationSkipped()
+    public function isFormValidationSkipped(): bool
     {
         return $this->skipFormValidation;
     }
 
     /**
      * Sets a flag indicates whether the validation of the form should be skipped or not.
-     *
-     * @param bool $skipFormValidation
      */
-    public function skipFormValidation($skipFormValidation)
+    public function skipFormValidation(bool $skipFormValidation): void
     {
         $this->skipFormValidation = $skipFormValidation;
     }

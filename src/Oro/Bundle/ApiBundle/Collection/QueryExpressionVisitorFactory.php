@@ -12,13 +12,10 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 class QueryExpressionVisitorFactory
 {
     /** @var CompositeExpressionInterface[] */
-    private $compositeExpressions;
-
+    private array $compositeExpressions;
     /** @var ComparisonExpressionInterface[] */
-    private $comparisonExpressions;
-
-    /** @var EntityClassResolver */
-    private $entityClassResolver;
+    private array $comparisonExpressions;
+    private EntityClassResolver $entityClassResolver;
 
     /**
      * @param CompositeExpressionInterface[]  $compositeExpressions  [type => expression, ...]
@@ -37,10 +34,8 @@ class QueryExpressionVisitorFactory
 
     /**
      * Creates a new instance of QueryExpressionVisitor.
-     *
-     * @return QueryExpressionVisitor
      */
-    public function createExpressionVisitor()
+    public function createExpressionVisitor(): QueryExpressionVisitor
     {
         return new QueryExpressionVisitor(
             $this->compositeExpressions,

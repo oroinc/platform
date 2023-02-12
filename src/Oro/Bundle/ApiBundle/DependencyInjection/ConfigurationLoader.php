@@ -32,22 +32,21 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ConfigurationLoader
 {
-    private const CONFIG_BAG_REGISTRY_SERVICE_ID                = 'oro_api.config_bag_registry';
-    private const CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID        = 'oro_api.config_cache_state_registry';
-    private const ENTITY_ALIAS_RESOLVER_REGISTRY_SERVICE_ID     = 'oro_api.entity_alias_resolver_registry';
+    private const CONFIG_BAG_REGISTRY_SERVICE_ID = 'oro_api.config_bag_registry';
+    private const CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID = 'oro_api.config_cache_state_registry';
+    private const ENTITY_ALIAS_RESOLVER_REGISTRY_SERVICE_ID = 'oro_api.entity_alias_resolver_registry';
     private const ENTITY_EXCLUSION_PROVIDER_REGISTRY_SERVICE_ID = 'oro_api.entity_exclusion_provider_registry';
-    private const SHARED_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID   = 'oro_api.entity_exclusion_provider.shared';
-    private const ENTITY_OVERRIDE_PROVIDER_REGISTRY_SERVICE_ID  = 'oro_api.entity_override_provider_registry';
+    private const SHARED_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID = 'oro_api.entity_exclusion_provider.shared';
+    private const ENTITY_OVERRIDE_PROVIDER_REGISTRY_SERVICE_ID = 'oro_api.entity_override_provider_registry';
 
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
     public function __construct(ContainerBuilder $container)
     {
         $this->container = $container;
     }
 
-    public function load(array $config)
+    public function load(array $config): void
     {
         if ($this->container->getParameter('kernel.debug')) {
             $this->container
@@ -126,7 +125,7 @@ class ConfigurationLoader
      */
     private function configureApi(string $configKey, array $fileNames): array
     {
-        return count($fileNames) === 1
+        return \count($fileNames) === 1
             ? $this->configureSingleFileApi($configKey, $fileNames[0])
             : $this->configureMultiFileApi($configKey, $fileNames);
     }

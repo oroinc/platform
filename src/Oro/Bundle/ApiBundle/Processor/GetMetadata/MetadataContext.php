@@ -26,15 +26,13 @@ class MetadataContext extends ApiContext
     private const WITH_EXCLUDED_PROPERTIES = 'withExcludedProperties';
 
     /** @var MetadataExtraInterface[] */
-    private $extras = [];
-
-    /** @var EntityDefinitionConfig */
-    private $config;
+    private array $extras = [];
+    private EntityDefinitionConfig $config;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         parent::initialize();
         $this->set(self::EXTRA, []);
@@ -42,40 +40,32 @@ class MetadataContext extends ApiContext
 
     /**
      * Gets FQCN of an entity.
-     *
-     * @return string
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->get(self::CLASS_NAME);
     }
 
     /**
      * Sets FQCN of an entity.
-     *
-     * @param string $className
      */
-    public function setClassName($className)
+    public function setClassName(string $className): void
     {
         $this->set(self::CLASS_NAME, $className);
     }
 
     /**
      * Gets the name of the action for which the metadata is built
-     *
-     * @return string|null
      */
-    public function getTargetAction()
+    public function getTargetAction(): ?string
     {
         return $this->get(self::TARGET_ACTION);
     }
 
     /**
      * Sets the name of the action for which the metadata is built
-     *
-     * @param string|null $action
      */
-    public function setTargetAction($action)
+    public function setTargetAction(?string  $action): void
     {
         if ($action) {
             $this->set(self::TARGET_ACTION, $action);
@@ -86,10 +76,8 @@ class MetadataContext extends ApiContext
 
     /**
      * Gets the configuration of an entity.
-     *
-     * @return EntityDefinitionConfig
      */
-    public function getConfig()
+    public function getConfig(): EntityDefinitionConfig
     {
         return $this->config;
     }
@@ -97,31 +85,23 @@ class MetadataContext extends ApiContext
     /**
      * Sets the configuration of an entity.
      */
-    public function setConfig(EntityDefinitionConfig $definition)
+    public function setConfig(EntityDefinitionConfig $definition): void
     {
         $this->config = $definition;
     }
 
     /**
      * Checks if the specified additional metadata is requested.
-     *
-     * @param string $extraName
-     *
-     * @return bool
      */
-    public function hasExtra($extraName)
+    public function hasExtra(string $extraName): bool
     {
         return \in_array($extraName, $this->get(self::EXTRA), true);
     }
 
     /**
      * Gets additional metadata if it was requested.
-     *
-     * @param string $extraName
-     *
-     * @return MetadataExtraInterface|null
      */
-    public function getExtra($extraName)
+    public function getExtra(string $extraName): ?MetadataExtraInterface
     {
         $result = null;
         foreach ($this->extras as $extra) {
@@ -138,7 +118,7 @@ class MetadataContext extends ApiContext
      *
      * @return MetadataExtraInterface[]
      */
-    public function getExtras()
+    public function getExtras(): array
     {
         return $this->extras;
     }
@@ -150,7 +130,7 @@ class MetadataContext extends ApiContext
      *
      * @throws \InvalidArgumentException if $extras has invalid elements
      */
-    public function setExtras(array $extras)
+    public function setExtras(array $extras): void
     {
         $names = [];
         foreach ($extras as $extra) {
@@ -170,20 +150,16 @@ class MetadataContext extends ApiContext
 
     /**
      * Gets a flag indicates whether excluded fields and associations should not be removed.
-     *
-     * @return bool
      */
-    public function getWithExcludedProperties()
+    public function getWithExcludedProperties(): bool
     {
         return (bool)$this->get(self::WITH_EXCLUDED_PROPERTIES);
     }
 
     /**
      * Sets a flag indicates whether excluded fields and associations should not be removed.
-     *
-     * @param bool $flag
      */
-    public function setWithExcludedProperties($flag)
+    public function setWithExcludedProperties(bool $flag): void
     {
         $this->set(self::WITH_EXCLUDED_PROPERTIES, $flag);
     }

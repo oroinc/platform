@@ -67,7 +67,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static function getSubscribedTopics(): array
     {
@@ -75,7 +75,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(MessageInterface $message, SessionInterface $session): string
     {

@@ -10,14 +10,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Suppressing for stubs and mock classes
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class TransitionContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TransitionContext */
-    private $context;
+    private TransitionContext $context;
 
     protected function setUp(): void
     {

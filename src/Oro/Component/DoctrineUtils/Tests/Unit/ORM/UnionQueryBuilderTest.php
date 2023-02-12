@@ -4,7 +4,7 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity;
@@ -16,8 +16,7 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
  */
 class UnionQueryBuilderTest extends OrmTestCase
 {
-    /** @var EntityManager */
-    private $em;
+    private EntityManagerInterface $em;
 
     protected function setUp(): void
     {

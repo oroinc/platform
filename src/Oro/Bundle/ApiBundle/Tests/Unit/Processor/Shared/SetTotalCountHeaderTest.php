@@ -76,16 +76,6 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessWithWrongTotalCallback()
-    {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Expected callable for "totalCount", "stdClass" given.');
-
-        $this->context->setTotalCountCallback(new \stdClass());
-        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
-        $this->processor->process($this->context);
-    }
-
     public function testProcessWithWrongTotalCallbackResult()
     {
         $this->expectException(\RuntimeException::class);

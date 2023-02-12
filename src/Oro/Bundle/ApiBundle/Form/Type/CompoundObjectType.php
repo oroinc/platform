@@ -21,8 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CompoundObjectType extends AbstractType
 {
-    /** @var FormHelper */
-    private $formHelper;
+    private FormHelper $formHelper;
 
     public function __construct(FormHelper $formHelper)
     {
@@ -30,9 +29,9 @@ class CompoundObjectType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var EntityMetadata $metadata */
         $metadata = $options['metadata'];
@@ -56,9 +55,9 @@ class CompoundObjectType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setRequired(['metadata', 'config'])

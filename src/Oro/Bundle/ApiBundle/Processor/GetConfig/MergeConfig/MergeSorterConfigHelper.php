@@ -9,13 +9,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class MergeSorterConfigHelper
 {
-    /**
-     * @param array $config
-     * @param array $sortersConfig
-     *
-     * @return array
-     */
-    public function mergeSortersConfig(array $config, array $sortersConfig)
+    public function mergeSortersConfig(array $config, array $sortersConfig): array
     {
         if (ConfigUtil::isExcludeAll($sortersConfig) || !\array_key_exists(ConfigUtil::SORTERS, $config)) {
             $config[ConfigUtil::SORTERS] = $sortersConfig;

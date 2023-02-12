@@ -22,5 +22,5 @@ interface EntityIdResolverInterface
      *
      * @return mixed The identifier of an entity or NULL if it cannot be resolved
      */
-    public function resolve();
+    public function resolve(): mixed;
 }

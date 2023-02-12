@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 class ChainEntityOverrideProvider implements EntityOverrideProviderInterface
 {
     /** @var EntityOverrideProviderInterface[] */
-    private $providers;
+    private array $providers;
 
     /**
      * @param EntityOverrideProviderInterface[] $providers
@@ -19,7 +19,7 @@ class ChainEntityOverrideProvider implements EntityOverrideProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getSubstituteEntityClass(string $entityClass): ?string
     {
@@ -34,7 +34,7 @@ class ChainEntityOverrideProvider implements EntityOverrideProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getEntityClass(string $substituteClass): ?string
     {

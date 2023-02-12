@@ -12,7 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class BuildForm implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -30,6 +30,6 @@ class BuildForm implements ProcessorInterface
         // build the form and add it to the context
         $context->setForm($context->getFormBuilder()->getForm());
         // remove the form builder from the context
-        $context->setFormBuilder();
+        $context->setFormBuilder(null);
     }
 }

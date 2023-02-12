@@ -20,17 +20,10 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class UnidirectionalAssociationHandler
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
-
-    /** @var EntityIdHelper */
-    private $entityIdHelper;
-
-    /** @var EntityOverrideProviderRegistry */
-    private $entityOverrideProviderRegistry;
+    private DoctrineHelper $doctrineHelper;
+    private PropertyAccessorInterface $propertyAccessor;
+    private EntityIdHelper $entityIdHelper;
+    private EntityOverrideProviderRegistry $entityOverrideProviderRegistry;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -187,15 +180,8 @@ class UnidirectionalAssociationHandler
         }
     }
 
-    /**
-     * @param object        $entity
-     * @param array         $previousTargetEntities
-     * @param FormInterface $fieldForm
-     * @param string        $targetEntityClass
-     * @param string        $targetAssociationName
-     */
     private function updateCollectionValuedAssociation(
-        $entity,
+        object $entity,
         array $previousTargetEntities,
         FormInterface $fieldForm,
         string $targetEntityClass,
@@ -219,14 +205,8 @@ class UnidirectionalAssociationHandler
         }
     }
 
-    /**
-     * @param object        $entity
-     * @param array         $previousTargetEntities
-     * @param FormInterface $fieldForm
-     * @param string        $targetAssociationName
-     */
     private function updateSingleValuedAssociation(
-        $entity,
+        object $entity,
         array $previousTargetEntities,
         FormInterface $fieldForm,
         string $targetAssociationName
@@ -245,14 +225,8 @@ class UnidirectionalAssociationHandler
         }
     }
 
-    /**
-     * @param object        $entity
-     * @param FormInterface $fieldForm
-     * @param string        $targetEntityClass
-     * @param string        $targetAssociationName
-     */
     private function addToCollectionValuedAssociation(
-        $entity,
+        object $entity,
         FormInterface $fieldForm,
         string $targetEntityClass,
         string $targetAssociationName
@@ -267,13 +241,8 @@ class UnidirectionalAssociationHandler
         }
     }
 
-    /**
-     * @param object        $entity
-     * @param FormInterface $fieldForm
-     * @param string        $targetAssociationName
-     */
     private function addToSingleValuedAssociation(
-        $entity,
+        object $entity,
         FormInterface $fieldForm,
         string $targetAssociationName
     ): void {
@@ -286,15 +255,8 @@ class UnidirectionalAssociationHandler
         }
     }
 
-    /**
-     * @param object        $entity
-     * @param array         $previousTargetEntities
-     * @param FormInterface $fieldForm
-     * @param string        $targetEntityClass
-     * @param string        $targetAssociationName
-     */
     private function deleteFromCollectionValuedAssociation(
-        $entity,
+        object $entity,
         array $previousTargetEntities,
         FormInterface $fieldForm,
         string $targetEntityClass,
@@ -322,15 +284,8 @@ class UnidirectionalAssociationHandler
         }
     }
 
-    /**
-     * @param object                    $entity
-     * @param QueryBuilder              $associationQuery
-     * @param EntityIdMetadataInterface $metadata
-     *
-     * @return object[]
-     */
     private function getPreviousTargetEntities(
-        $entity,
+        object $entity,
         QueryBuilder $associationQuery,
         EntityIdMetadataInterface $metadata
     ): array {
@@ -346,13 +301,7 @@ class UnidirectionalAssociationHandler
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * @param object            $entity
-     * @param iterable|object[] $entities
-     *
-     * @return bool
-     */
-    private function hasEntity($entity, $entities): bool
+    private function hasEntity(object $entity, iterable $entities): bool
     {
         foreach ($entities as $e) {
             if ($entity === $e) {

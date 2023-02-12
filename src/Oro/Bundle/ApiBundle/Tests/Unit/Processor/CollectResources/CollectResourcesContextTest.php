@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
 
 class CollectResourcesContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CollectResourcesContext */
-    private $context;
+    private CollectResourcesContext $context;
 
     protected function setUp(): void
     {

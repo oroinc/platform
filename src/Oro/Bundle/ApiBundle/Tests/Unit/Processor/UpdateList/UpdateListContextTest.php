@@ -8,8 +8,7 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 
 class UpdateListContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var UpdateListContext */
-    private $context;
+    private UpdateListContext $context;
 
     protected function setUp(): void
     {

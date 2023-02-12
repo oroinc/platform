@@ -18,46 +18,26 @@ use Oro\Component\ChainProcessor\ParameterBagInterface;
  */
 class BatchUpdateContext extends ByStepNormalizeResultContext
 {
-    /** @var int|null */
-    private $operationId;
-
-    /** @var BatchSummary */
-    private $summary;
-
-    /** @var bool */
-    private $hasUnexpectedErrors = false;
-
-    /** @var string|null */
-    private $retryReason;
-
-    /** @var FileManager|null */
-    private $fileManager;
-
-    /** @var ChunkFile|null */
-    private $file;
-
+    private ?int $operationId = null;
+    private BatchSummary $summary;
+    private bool $hasUnexpectedErrors = false;
+    private ?string $retryReason = null;
+    private ?FileManager $fileManager = null;
+    private ?ChunkFile $file = null;
     /** @var string[] */
-    private $supportedEntityClasses = [];
-
-    /** @var IncludedData|null */
-    private $includedData;
-
-    /** @var BatchUpdateItem[] */
-    private $batchItems;
-
-    /** @var int[] */
-    private $processedItemStatuses;
-
-    /** @var BatchFlushDataHandlerInterface|null */
-    private $flushDataHandler;
-
-    /** @var ParameterBagInterface|null */
-    private $sharedData;
+    private array $supportedEntityClasses = [];
+    private ?IncludedData $includedData = null;
+    /** @var BatchUpdateItem[]|null */
+    private ?array $batchItems = null;
+    /** @var int[]|null */
+    private ?array $processedItemStatuses = null;
+    private ?BatchFlushDataHandlerInterface $flushDataHandler = null;
+    private ?ParameterBagInterface $sharedData = null;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         parent::initialize();
         $this->summary = new BatchSummary();
@@ -191,7 +171,7 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
     /**
      * Sets included data.
      */
-    public function setIncludedData(IncludedData $includedData = null): void
+    public function setIncludedData(?IncludedData $includedData): void
     {
         $this->includedData = $includedData;
     }
@@ -227,7 +207,7 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
     /**
      * Gets items were processed by this batch operation without any errors.
      *
-     * @return BatchUpdateItem[]|iterable
+     * @return iterable<BatchUpdateItem>
      */
     public function getBatchItemsProcessedWithoutErrors(): iterable
     {
@@ -266,7 +246,7 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
      *
      * @param int[]|null $statuses [batch item index => status, ...]
      */
-    public function setProcessedItemStatuses(array $statuses = null): void
+    public function setProcessedItemStatuses(?array $statuses): void
     {
         $this->processedItemStatuses = $statuses;
     }
@@ -282,7 +262,7 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
     /**
      * Sets a handler that was used to flush data in this batch operation.
      */
-    public function setFlushDataHandler(BatchFlushDataHandlerInterface $flushDataHandler = null): void
+    public function setFlushDataHandler(?BatchFlushDataHandlerInterface $flushDataHandler): void
     {
         $this->flushDataHandler = $flushDataHandler;
     }

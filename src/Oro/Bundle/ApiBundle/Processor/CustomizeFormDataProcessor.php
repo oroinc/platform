@@ -10,9 +10,9 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 class CustomizeFormDataProcessor extends ByStepActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): CustomizeFormDataContext
     {
         return new CustomizeFormDataContext();
     }

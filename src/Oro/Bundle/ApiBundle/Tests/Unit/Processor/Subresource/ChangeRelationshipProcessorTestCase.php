@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -33,6 +34,7 @@ class ChangeRelationshipProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->context = new ChangeRelationshipContext($this->configProvider, $this->metadataProvider);
+        $this->context->setAction(ApiAction::UPDATE_RELATIONSHIP);
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
     }

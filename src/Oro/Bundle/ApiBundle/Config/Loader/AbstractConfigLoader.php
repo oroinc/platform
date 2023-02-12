@@ -12,7 +12,7 @@ abstract class AbstractConfigLoader implements ConfigLoaderInterface
      * @param string|string[] $method
      * @param mixed           $value
      */
-    protected function callSetter($config, $method, $value)
+    protected function callSetter(object $config, string|array $method, mixed $value): void
     {
         if (\is_array($method)) {
             $config->{$method[$value ? 0 : 1]}();
@@ -21,12 +21,7 @@ abstract class AbstractConfigLoader implements ConfigLoaderInterface
         }
     }
 
-    /**
-     * @param object $config
-     * @param string $key
-     * @param mixed  $value
-     */
-    protected function setValue($config, $key, $value)
+    protected function setValue(object $config, string $key, mixed $value): void
     {
         $config->set($key, $value);
     }
@@ -38,7 +33,7 @@ abstract class AbstractConfigLoader implements ConfigLoaderInterface
      *
      * @return string|string[]|null
      */
-    protected function getSetter($config, $key, array $methodMap)
+    protected function getSetter(object $config, string $key, array $methodMap): string|array|null
     {
         if (isset($methodMap[$key])) {
             return $methodMap[$key];
@@ -46,18 +41,12 @@ abstract class AbstractConfigLoader implements ConfigLoaderInterface
 
         $setter = 'set' . $this->camelize($key);
 
-        return \method_exists($config, $setter)
+        return method_exists($config, $setter)
             ? $setter
             : null;
     }
 
-    /**
-     * @param object $config
-     * @param string $key
-     * @param mixed  $value
-     * @param array  $methodMap
-     */
-    protected function loadConfigValue($config, $key, $value, array $methodMap = [])
+    protected function loadConfigValue(object $config, string $key, mixed $value, array $methodMap = []): void
     {
         $setter = $this->getSetter($config, $key, $methodMap);
         if (null !== $setter) {
@@ -67,13 +56,8 @@ abstract class AbstractConfigLoader implements ConfigLoaderInterface
         }
     }
 
-    /**
-     * @param string $string
-     *
-     * @return string
-     */
-    protected function camelize($string)
+    protected function camelize(string $string): string
     {
-        return strtr(\ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
+        return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
     }
 }

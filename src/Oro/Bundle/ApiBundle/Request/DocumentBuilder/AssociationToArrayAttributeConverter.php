@@ -11,11 +11,8 @@ use Oro\Bundle\ApiBundle\Metadata\TargetMetadataProvider;
  */
 class AssociationToArrayAttributeConverter
 {
-    /** @var ObjectAccessorInterface */
-    private $objectAccessor;
-
-    /** @var TargetMetadataProvider */
-    private $targetMetadataProvider;
+    private ObjectAccessorInterface $objectAccessor;
+    private TargetMetadataProvider $targetMetadataProvider;
 
     public function __construct(
         ObjectAccessorInterface $objectAccessor,
@@ -32,7 +29,7 @@ class AssociationToArrayAttributeConverter
      * @return mixed The result can be an array, a scalar or NULL
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function convertObjectToArray($object, AssociationMetadata $association = null)
+    public function convertObjectToArray(mixed $object, AssociationMetadata $association = null): mixed
     {
         if (null === $object || \is_scalar($object)) {
             return $object;
@@ -49,7 +46,7 @@ class AssociationToArrayAttributeConverter
                 if ($metadata->hasIdentifierFieldsOnly()) {
                     $idFieldNames = $metadata->getIdentifierFieldNames();
                     if (1 === \count($idFieldNames)) {
-                        $fieldName = \reset($idFieldNames);
+                        $fieldName = reset($idFieldNames);
                         $result = $data[$fieldName] ?? null;
                     } else {
                         $result = [];
@@ -64,13 +61,8 @@ class AssociationToArrayAttributeConverter
                     $this->addMeta($result, $data, $metadata);
                     $this->addAttributes($result, $data, $metadata);
                     $this->addRelationships($result, $data, $metadata);
-                    if ($association->isCollapsed()) {
-                        $count = \count($result);
-                        if (1 === $count) {
-                            $result = \reset($result);
-                        } elseif (1 === $count) {
-                            $result = null;
-                        }
+                    if ($association->isCollapsed() && 1 === \count($result)) {
+                        $result = reset($result);
                     }
                 }
             }
@@ -79,13 +71,7 @@ class AssociationToArrayAttributeConverter
         return $result;
     }
 
-    /**
-     * @param array|\Traversable       $collection
-     * @param AssociationMetadata|null $association
-     *
-     * @return array
-     */
-    public function convertCollectionToArray($collection, AssociationMetadata $association = null): array
+    public function convertCollectionToArray(iterable $collection, AssociationMetadata $association = null): array
     {
         $result = [];
         foreach ($collection as $object) {
@@ -135,13 +121,7 @@ class AssociationToArrayAttributeConverter
         }
     }
 
-    /**
-     * @param mixed $value
-     * @param bool  $isCollection
-     *
-     * @return bool
-     */
-    private function isEmptyRelationship($value, bool $isCollection): bool
+    private function isEmptyRelationship(mixed $value, bool $isCollection): bool
     {
         return $isCollection
             ? empty($value)

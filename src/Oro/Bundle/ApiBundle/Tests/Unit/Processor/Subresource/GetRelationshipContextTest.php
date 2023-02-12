@@ -1,18 +1,18 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource;
 
-use Oro\Bundle\ApiBundle\Processor\ListContext;
+use Oro\Bundle\ApiBundle\Processor\Subresource\GetRelationship\GetRelationshipContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 
-class ListContextTest extends \PHPUnit\Framework\TestCase
+class GetRelationshipContextTest extends \PHPUnit\Framework\TestCase
 {
-    private ListContext $context;
+    private GetRelationshipContext $context;
 
     protected function setUp(): void
     {
-        $this->context = new ListContext(
+        $this->context = new GetRelationshipContext(
             $this->createMock(ConfigProvider::class),
             $this->createMock(MetadataProvider::class)
         );

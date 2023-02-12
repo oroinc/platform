@@ -20,17 +20,10 @@ class ConfigProvider implements ResetInterface
 {
     private const KEY_DELIMITER = '|';
 
-    /** @var ActionProcessorInterface */
-    private $processor;
-
-    /** @var array */
-    private $cache = [];
-
-    /** @var array */
-    private $processing = [];
-
-    /** @var bool */
-    private $fullConfigsCacheDisabled = false;
+    private ActionProcessorInterface $processor;
+    private array $cache = [];
+    private array $processing = [];
+    private bool $fullConfigsCacheDisabled = false;
 
     public function __construct(ActionProcessorInterface $processor)
     {
@@ -95,9 +88,9 @@ class ConfigProvider implements ResetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->cache = [];
     }
@@ -147,10 +140,7 @@ class ConfigProvider implements ResetInterface
         $config = $this->buildResult($context);
 
         if ($identifierFieldsOnly || !$this->fullConfigsCacheDisabled) {
-            $definition = $config->getDefinition();
-            if (null !== $definition) {
-                $definition->setKey($this->buildConfigKey($className, $extras));
-            }
+            $config->getDefinition()?->setKey($this->buildConfigKey($className, $extras));
         }
 
         return $config;

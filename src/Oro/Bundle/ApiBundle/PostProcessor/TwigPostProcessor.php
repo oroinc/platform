@@ -19,7 +19,7 @@ class TwigPostProcessor implements PostProcessorInterface
     /**
      * {@inheritDoc}
      */
-    public function process($value, array $options)
+    public function process(mixed $value, array $options): mixed
     {
         if (null === $value) {
             return null;

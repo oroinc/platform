@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
+use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 /**
@@ -16,9 +20,9 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('oro_api');
         $rootNode = $treeBuilder->getRootNode();
@@ -51,7 +55,7 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    private function appendOptions(NodeBuilder $node)
+    private function appendOptions(NodeBuilder $node): void
     {
         $node
             ->scalarNode('rest_api_prefix')
@@ -104,7 +108,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendConfigFilesNode(NodeBuilder $node)
+    private function appendConfigFilesNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('config_files')
@@ -174,7 +178,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    private function appendApiDocViewsNode(NodeBuilder $node)
+    private function appendApiDocViewsNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('api_doc_views')
@@ -300,7 +304,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private static function assertUnderlyingView(array $views, string $underlyingViewName, string $viewName)
+    private static function assertUnderlyingView(array $views, string $underlyingViewName, string $viewName): void
     {
         if (empty($views[$underlyingViewName])) {
             throw new \LogicException(sprintf(
@@ -354,7 +358,7 @@ class Configuration implements ConfigurationInterface
         return $view;
     }
 
-    private function appendApiDocCacheNode(NodeBuilder $node)
+    private function appendApiDocCacheNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('api_doc_cache')
@@ -379,7 +383,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendConfigExtensionsNode(NodeBuilder $node)
+    private function appendConfigExtensionsNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('config_extensions')
@@ -390,7 +394,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendActionsNode(NodeBuilder $node)
+    private function appendActionsNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('actions')
@@ -449,7 +453,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendFilterOperatorsNode(NodeBuilder $node)
+    private function appendFilterOperatorsNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('filter_operators')
@@ -468,7 +472,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendFiltersNode(NodeBuilder $node)
+    private function appendFiltersNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('filters')
@@ -479,7 +483,7 @@ class Configuration implements ConfigurationInterface
                             'supported_operators' => ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
                         ],
                         'primaryField' => [
-                            'class' => 'Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter'
+                            'class' => PrimaryFieldFilter::class
                         ],
                         'association' => [
                             'factory' => ['@oro_api.filter_factory.association', 'createFilter']
@@ -493,7 +497,7 @@ class Configuration implements ConfigurationInterface
                             if (empty($value['factory'])) {
                                 unset($value['factory']);
                                 if (empty($value['class'])) {
-                                    $value['class'] = 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter';
+                                    $value['class'] = ComparisonFilter::class;
                                 }
                             }
 
@@ -513,7 +517,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('factory')
                             ->validate()
                                 ->ifTrue(function ($value) {
-                                    return count($value) !== 2 || 0 !== strncmp($value[0], '@', 1);
+                                    return \count($value) !== 2 || 0 !== strncmp($value[0], '@', 1);
                                 })
                                 ->thenInvalid('Expected [\'@serviceId\', \'methodName\']')
                             ->end()
@@ -529,13 +533,13 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendFormTypesNode(NodeBuilder $node)
+    private function appendFormTypesNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('form_types')
                 ->info('The form types that can be reused in API.')
                 ->example([
-                    'Symfony\Component\Form\Extension\Core\Type\FormType',
+                    FormType::class,
                     'oro_api.form.type.entity'
                 ])
                 ->prototype('scalar')
@@ -543,7 +547,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendFormTypeExtensionsNode(NodeBuilder $node)
+    private function appendFormTypeExtensionsNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('form_type_extensions')
@@ -554,7 +558,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendFormTypeGuessersNode(NodeBuilder $node)
+    private function appendFormTypeGuessersNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('form_type_guessers')
@@ -565,7 +569,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendFormTypeGuessesNode(NodeBuilder $node)
+    private function appendFormTypeGuessesNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('form_type_guesses')
@@ -597,7 +601,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendErrorTitleOverrideNode(NodeBuilder $node)
+    private function appendErrorTitleOverrideNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('error_title_overrides')
@@ -609,7 +613,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendCorsNode(NodeBuilder $node)
+    private function appendCorsNode(NodeBuilder $node): void
     {
         $node
             ->arrayNode('cors')
@@ -644,7 +648,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendFeatureDependedFirewalls(NodeBuilder $node)
+    private function appendFeatureDependedFirewalls(NodeBuilder $node): void
     {
         $node
             ->arrayNode('api_firewalls')
@@ -669,7 +673,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function appendBatchApiNode(NodeBuilder $node)
+    private function appendBatchApiNode(NodeBuilder $node): void
     {
         $batchApiNode = $node
             ->arrayNode('batch_api')
@@ -722,7 +726,7 @@ class Configuration implements ConfigurationInterface
                     . 'The null value can be used to revert already configured chunk size'
                     . ' for a specific entity type and use the default chunk size for it.'
                 )
-                ->example(['Oro\Bundle\UserBundle\Entity\User' => 10]);
+                ->example([User::class => 10]);
         $this->configureChunkSizePerEntity($chunkSizePerEntityNode);
 
         $includedDataChunkSizePerEntityNode = $batchApiNode
@@ -734,11 +738,11 @@ class Configuration implements ConfigurationInterface
                     . 'The null value can be used to revert already configured chunk size'
                     . ' for a specific entity type and use the default chunk size for it.'
                 )
-                ->example(['Oro\Bundle\UserBundle\Entity\User' => 20]);
+                ->example([User::class => 20]);
         $this->configureChunkSizePerEntity($includedDataChunkSizePerEntityNode);
     }
 
-    private function configureChunkSizePerEntity(ArrayNodeDefinition $node)
+    private function configureChunkSizePerEntity(ArrayNodeDefinition $node): void
     {
         $node
             ->useAttributeAsKey('name')
@@ -768,12 +772,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return bool
-     */
-    private static function isValidConfigFileName($value)
+    private static function isValidConfigFileName(mixed $value): bool
     {
         $isValid = false;
         if (\is_string($value)) {
@@ -791,13 +790,7 @@ class Configuration implements ConfigurationInterface
         return $isValid;
     }
 
-    /**
-     * @param array $requestType1
-     * @param array $requestType2
-     *
-     * @return bool
-     */
-    private static function areRequestTypesEqual(array $requestType1, array $requestType2)
+    private static function areRequestTypesEqual(array $requestType1, array $requestType2): bool
     {
         sort($requestType1, SORT_STRING);
         sort($requestType2, SORT_STRING);
@@ -805,11 +798,6 @@ class Configuration implements ConfigurationInterface
         return implode(',', $requestType1) === implode(',', $requestType2);
     }
 
-    /**
-     * @param array $value
-     *
-     * @return string[]
-     */
     private static function getRequestType(array $value): array
     {
         $requestType = $value['request_type'] ?? '';

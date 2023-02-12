@@ -13,7 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ComponentContextInterface $context): void
     {
@@ -36,7 +36,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function executeProcessors(ComponentContextInterface $context): void
@@ -83,7 +83,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function handleErrors(NormalizeResultContext $context, string $processorId, ?string $group): void
     {
@@ -97,7 +97,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function handleException(
         \Exception $e,
@@ -115,7 +115,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function isNormalizeResultEnabled(NormalizeResultContext $context): bool
     {
@@ -123,7 +123,7 @@ class ByStepNormalizeResultActionProcessor extends NormalizeResultActionProcesso
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function executeNormalizeResultProcessors(NormalizeResultContext $context): void
     {

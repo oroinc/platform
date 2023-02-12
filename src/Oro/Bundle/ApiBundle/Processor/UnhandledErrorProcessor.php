@@ -8,9 +8,9 @@ namespace Oro\Bundle\ApiBundle\Processor;
 class UnhandledErrorProcessor extends RequestActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): Context
     {
         return new Context($this->configProvider, $this->metadataProvider);
     }

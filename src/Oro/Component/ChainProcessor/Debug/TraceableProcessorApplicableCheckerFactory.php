@@ -2,15 +2,17 @@
 
 namespace Oro\Component\ChainProcessor\Debug;
 
+use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\ProcessorApplicableCheckerFactoryInterface;
 
+/**
+ * Decorates a chain applicable checker factory to decorate created chain applicable checker
+ * with TraceableChainApplicableChecker class that logs information about execution of child checkers.
+ */
 class TraceableProcessorApplicableCheckerFactory implements ProcessorApplicableCheckerFactoryInterface
 {
-    /** @var ProcessorApplicableCheckerFactoryInterface */
-    protected $applicableCheckerFactory;
-
-    /** @var TraceLogger */
-    protected $logger;
+    private ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory;
+    private TraceLogger $logger;
 
     public function __construct(
         ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory,
@@ -21,9 +23,9 @@ class TraceableProcessorApplicableCheckerFactory implements ProcessorApplicableC
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function createApplicableChecker()
+    public function createApplicableChecker(): ChainApplicableChecker
     {
         $traceableChecker = new TraceableChainApplicableChecker($this->logger);
         $innerChecker = $this->applicableCheckerFactory->createApplicableChecker();

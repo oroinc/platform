@@ -76,11 +76,11 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
         $this->extractors[0]->expects(self::once())
             ->method('getConstraintCode')
             ->with(self::identicalTo($constraint))
-            ->willReturn(645);
+            ->willReturn('code1');
         $this->extractors[1]->expects(self::never())
             ->method('getConstraintCode');
 
-        self::assertEquals(645, $this->extractor->getConstraintCode($constraint));
+        self::assertEquals('code1', $this->extractor->getConstraintCode($constraint));
     }
 
     public function testGetConstraintCodeBySecondExtractor()
@@ -94,9 +94,9 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
         $this->extractors[1]->expects(self::once())
             ->method('getConstraintCode')
             ->with(self::identicalTo($constraint))
-            ->willReturn(8456);
+            ->willReturn('code2');
 
-        self::assertEquals(8456, $this->extractor->getConstraintCode($constraint));
+        self::assertEquals('code2', $this->extractor->getConstraintCode($constraint));
     }
 
     public function testGetConstraintCodeWithNullResult()

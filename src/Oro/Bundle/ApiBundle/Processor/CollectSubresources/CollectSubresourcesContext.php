@@ -14,15 +14,14 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection;
 class CollectSubresourcesContext extends ApiContext
 {
     /** @var ApiResource[] [entity class => ApiResource, ... ] */
-    private $resources = [];
-
+    private array $resources = [];
     /** @var string[] */
-    private $accessibleResources = [];
+    private array $accessibleResources = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         parent::initialize();
         $this->setResult(new ApiResourceSubresourcesCollection());
@@ -30,24 +29,16 @@ class CollectSubresourcesContext extends ApiContext
 
     /**
      * Indicates whether API resource for a given entity class is available through API.
-     *
-     * @param string $entityClass
-     *
-     * @return bool
      */
-    public function hasResource($entityClass)
+    public function hasResource(string $entityClass): bool
     {
         return isset($this->resources[$entityClass]);
     }
 
     /**
      * Gets API resources for a given entity class.
-     *
-     * @param string $entityClass
-     *
-     * @return ApiResource|null
      */
-    public function getResource($entityClass)
+    public function getResource(string $entityClass): ?ApiResource
     {
         return $this->resources[$entityClass] ?? null;
     }
@@ -57,7 +48,7 @@ class CollectSubresourcesContext extends ApiContext
      *
      * @return ApiResource[] [entity class => ApiResource, ... ]
      */
-    public function getResources()
+    public function getResources(): array
     {
         return $this->resources;
     }
@@ -67,7 +58,7 @@ class CollectSubresourcesContext extends ApiContext
      *
      * @param ApiResource[] $resources
      */
-    public function setResources(array $resources)
+    public function setResources(array $resources): void
     {
         $this->resources = [];
         foreach ($resources as $resource) {
@@ -80,7 +71,7 @@ class CollectSubresourcesContext extends ApiContext
      *
      * @return string[] The list of class names
      */
-    public function getAccessibleResources()
+    public function getAccessibleResources(): array
     {
         return $this->accessibleResources;
     }
@@ -90,7 +81,7 @@ class CollectSubresourcesContext extends ApiContext
      *
      * @param string[] $classNames
      */
-    public function setAccessibleResources(array $classNames)
+    public function setAccessibleResources(array $classNames): void
     {
         $this->accessibleResources = $classNames;
     }

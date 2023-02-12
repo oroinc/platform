@@ -9,11 +9,9 @@ namespace Oro\Bundle\ApiBundle\Filter;
  */
 class StandaloneFilterWithDefaultValue extends StandaloneFilter
 {
-    /** @var mixed|null */
-    private $defaultValue;
-
+    private mixed $defaultValue;
     /** @var callable|null */
-    private $defaultValueToStringConverter;
+    private mixed $defaultValueToStringConverter;
 
     /**
      * @param string              $dataType
@@ -24,8 +22,8 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
     public function __construct(
         string $dataType,
         string $description = null,
-        $defaultValue = null,
-        $defaultValueToStringConverter = null
+        mixed $defaultValue = null,
+        ?callable $defaultValueToStringConverter = null
     ) {
         parent::__construct($dataType, $description);
         $this->defaultValue = $defaultValue;
@@ -42,10 +40,8 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
 
     /**
      * Gets the filter default value.
-     *
-     * @return mixed|null
      */
-    public function getDefaultValue()
+    public function getDefaultValue(): mixed
     {
         if (\is_callable($this->defaultValue)) {
             return \call_user_func($this->defaultValue);
@@ -59,7 +55,7 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
      *
      * @param mixed|callable|null $defaultValue
      */
-    public function setDefaultValue($defaultValue): void
+    public function setDefaultValue(mixed $defaultValue): void
     {
         $this->defaultValue = $defaultValue;
     }
@@ -79,10 +75,8 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
 
     /**
      * Sets a function that should be used to convert the filter default value to a string.
-     *
-     * @param callable|null $converter
      */
-    public function setDefaultValueToStringConverter($converter): void
+    public function setDefaultValueToStringConverter(?callable $converter): void
     {
         $this->defaultValueToStringConverter = $converter;
     }
