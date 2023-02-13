@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import BasePlugin from 'oroui/js/app/plugins/base/plugin';
-import placeholderTemplate from 'tpl-loader!orodatagrid/templates/sort-rows-drag-n-drop/helper.html';
+import helperTemplate from 'tpl-loader!orodatagrid/templates/sort-rows-drag-n-drop/helper.html';
 import SelectionStateHintView from 'orodatagrid/js/sort-rows-drag-n-drop/selection-state-hint-view';
 
 import 'jquery-ui/widgets/sortable';
@@ -25,12 +25,22 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     /**
      * @property {Function}
      */
-    placeholderTemplate: placeholderTemplate,
+    helperTemplate,
 
     /**
      * @property {number}
      */
     ORDER_STEP: 10,
+
+    SORTABLE_DEFAULTS: {
+        cursor: 'grabbing',
+        placeholder: 'sorting-placeholder',
+        forceHelperSize: false,
+        forcePlaceholderSize: true,
+        items: '.grid-row'
+    },
+
+    SEPARATOR_ROW_SELECTOR: '.draggable-separator',
 
     /**
      * @inheritdoc
@@ -158,16 +168,19 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Event} e
      */
     onMouseDown(e) {
-        if (e.shiftKey && this._lastClickedIndex !== void 0) {
+        const currentEL = $(e.currentTarget);
+        if (currentEL.is(this.SEPARATOR_ROW_SELECTOR)) {
+            // ignore selection if it's a separator row
+        } else if (e.shiftKey && this._lastClickedIndex !== void 0) {
             let from = this._lastClickedIndex;
-            let to = $(e.currentTarget).index();
+            let to = currentEL.index();
 
             if (from > to) {
                 [from, to] = [to, from];
             }
 
             this._resetSelectedModels();
-            const selectedModels = this.main.collection.models.slice(from, to + 1);
+            const selectedModels = this.main.collection.slice(from, to + 1);
 
             selectedModels.forEach(model => {
                 const index = this.main.collection.indexOf(model);
@@ -175,7 +188,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                 model.set('_selected', selected);
             });
         } else if (e.ctrlKey || e.metaKey) {
-            const modelId = $(e.currentTarget).data('modelId');
+            const modelId = currentEL.data('modelId');
             const model = this.main.collection.get(modelId);
 
             model.set('_selected', !model.get('_selected'));
@@ -188,11 +201,12 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Event} e
      */
     onClick(e) {
-        if (e.shiftKey || e.ctrlKey || e.metaKey) {
+        const currentEL = $(e.currentTarget);
+        if (e.shiftKey || e.ctrlKey || e.metaKey || currentEL.is(this.SEPARATOR_ROW_SELECTOR)) {
             return;
         }
 
-        const modelId = $(e.currentTarget).data('modelId');
+        const modelId = currentEL.data('modelId');
         const model = this.main.collection.get(modelId);
 
         this._resetSelectedModels();
@@ -202,49 +216,19 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
 
     initSortable() {
         this.main.body.$el.sortable({
+            ...this.SORTABLE_DEFAULTS,
             appendTo: this.main.$el.parent(),
             cancel: this.preventsSortingSelector,
             containment: this.main.el,
-            cursor: 'grabbing',
-            placeholder: 'sorting-placeholder',
-            forceHelperSize: false,
-            forcePlaceholderSize: true,
-            items: '.grid-row',
-            helper: (e, currentEL) => {
-                this._selectRowBeforeDragStart(e, currentEL);
-                return this._createSortableHelper(e, currentEL);
-            },
-            start: (e, ui) => {
-                this.main.$el.addClass(this.startDragClass);
-                this.onStartSortable(e, ui);
-            },
-            beforeDrop: (e, ui) => {
-                $(e.target).data('helperReact', ui.helper[0].getBoundingClientRect());
-                this.main.$el.removeClass(this.startDragClass);
-            },
-            stop: (e, ui) => {
-                const helperReact = $(e.target).data('helperReact');
-                const tableReact = e.target.getBoundingClientRect();
-                const isDropOutOfTable = (
-                    helperReact.top > tableReact.bottom ||
-                    helperReact.right < tableReact.left ||
-                    helperReact.bottom < tableReact.top ||
-                    helperReact.left > tableReact.right
-                );
-                $(e.target).data('helperReact', null);
-
-                if (isDropOutOfTable) {
-                    $(e.target).sortable('cancel');
-                    this.onStopSortableCancel(e, ui);
-                } else {
-                    this.onStopSortableSuccess(e, ui);
-                }
-            }
+            helper: this._createSortableHelper.bind(this),
+            beforePick: this.beforeItemPick.bind(this),
+            start: this.onStartSortable.bind(this),
+            beforeDrop: this.beforeItemDrop.bind(this),
+            stop: this.onStopSortable.bind(this),
+            change: this.onChangeSortable.bind(this)
         });
 
-        const selection = document.getSelection();
-
-        selection.removeAllRanges();
+        document.getSelection().removeAllRanges();
         this.main.body.$el.disableSelection();
     },
 
@@ -259,13 +243,182 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Event} e
      * @param {Object} ui
      */
-    onStartSortable(e, ui) {},
+    beforeItemPick(e, ui) {
+        const isSeparator = ui.item.is(this.SEPARATOR_ROW_SELECTOR);
+        if (isSeparator) {
+            this._resetSelectedModels();
+        } else {
+            this._selectRowBeforeDragStart(e, ui.item);
+        }
+
+        const {cursor, forcePlaceholderSize} = this.SORTABLE_DEFAULTS;
+        this.main.body.$el.sortable('option', 'cursor', !isSeparator ? cursor : 'row-resize');
+        this.main.body.$el.sortable('option', 'forcePlaceholderSize', !isSeparator ? forcePlaceholderSize : false);
+    },
 
     /**
      * @param {Event} e
      * @param {Object} ui
      */
-    onStopSortableSuccess(e, ui) {},
+    onStartSortable(e, ui) {
+        const isSeparator = ui.item.is(this.SEPARATOR_ROW_SELECTOR);
+        ui.placeholder.toggleClass('separator', isSeparator);
+        this.main.$el.addClass(this.startDragClass);
+    },
+
+    /**
+     * @param {Event} e
+     * @param {Object} ui
+     */
+    beforeItemDrop(e, ui) {
+        $(e.target).data('helperReact', ui.helper[0].getBoundingClientRect());
+        this.main.$el.removeClass(this.startDragClass);
+    },
+
+    /**
+     * @param {Event} e
+     * @param {Object} ui
+     */
+    onStopSortable(e, ui) {
+        const helperReact = $(e.target).data('helperReact');
+        const tableReact = e.target.getBoundingClientRect();
+        const isDropOutOfTable = (
+            helperReact.top > tableReact.bottom ||
+            helperReact.right < tableReact.left ||
+            helperReact.bottom < tableReact.top ||
+            helperReact.left > tableReact.right
+        );
+        $(e.target).data('helperReact', null);
+        this.main.collection.forEach(model => model.set('_changed', false));
+
+        if (isDropOutOfTable && !ui.item.is(this.SEPARATOR_ROW_SELECTOR)) {
+            $(e.target).sortable('cancel');
+            this.onStopSortableCancel(e, ui);
+        } else {
+            this.onStopSortableSuccess(e, ui);
+        }
+    },
+
+    /**
+     * @param {Event} e
+     * @param {Object} ui
+     */
+    onChangeSortable(e, ui) {
+        const isSeparator = ui.item.is(this.SEPARATOR_ROW_SELECTOR);
+        if (!isSeparator) {
+            return;
+        }
+
+        this.main.body.$('tr').not(ui.item).toArray()
+            .forEach((el, rowIndex) => {
+                if (el === ui.placeholder[0]) {
+                    return;
+                }
+                const modelId = $(el).data('modelId');
+                const model = this.main.collection.get(modelId);
+                const modelIndex = this.main.collection.indexOf(model);
+                model.set('_changed', modelIndex !== rowIndex);
+            });
+    },
+
+    /**
+     * @param {Event} e
+     * @param {Object} ui
+     */
+    onStopSortableSuccess(e, ui) {
+        this._completeDOMUpdate(ui);
+
+        {
+            // @todo develop animation
+            const selectedRows = this.main.collection.filter('_selected')
+                .map(model => this.main.body.rows.find(row => row.model === model).el);
+            $(selectedRows).addClass('info');
+            setTimeout(() => $(selectedRows).removeClass('info'), 1000);
+        }
+
+        const changedModels = this._updateSortOrder();
+
+        {
+            // @todo develop animation
+            const changedRows = changedModels
+                .map(model => this.main.body.rows.find(row => row.model === model).el);
+            $(changedRows).addClass('success');
+            setTimeout(() => $(changedRows).removeClass('success'), 1000);
+        }
+
+        this.main.collection.sort();
+
+        this._resetSelectedModels();
+    },
+
+    /**
+     * Multiple rows were selected.
+     * The last selected row is moved by sortable,
+     * rest of rows have to be relocated beside of `ui.item` manually
+     *
+     * @param ui
+     * @protected
+     */
+    _completeDOMUpdate(ui) {
+        const {body: gridBody, collection} = this.main;
+        const movedModelId = ui.item.data('modelId');
+        const selectedModels = collection.filter('_selected');
+        const movedModel = collection.get(movedModelId);
+
+        if (!movedModel.isSeparator() && selectedModels.length > 1) {
+            const movedModelIndex = selectedModels.indexOf(movedModel);
+            const elems = selectedModels.map(model => gridBody.rows.find(row => row.model === model).el);
+            ui.item.before(...elems.slice(0, movedModelIndex));
+            ui.item.after(...elems.slice(movedModelIndex + 1));
+        }
+    },
+
+    /**
+     * Collect models with changed row index in DOM, and swaps current sortOrder values between those models
+     *
+     * @protected
+     */
+    _updateSortOrder() {
+        const {collection} = this.main;
+
+        let maxSortOrder = collection.reduce((maxValue, model) => {
+            const sortOrder = model.isSeparator() ? void 0 : model.get('_sortOrder');
+            return sortOrder > maxValue ? sortOrder : (maxValue ?? sortOrder);
+        }, void 0) || 0;
+
+        const changedModels = this.main.body.$('tr').toArray()
+            .map((el, rowIndex) => {
+                const modelId = $(el).data('modelId');
+                const model = collection.get(modelId);
+                const modelIndex = collection.indexOf(model);
+                // separator has to be always within changed models to have reference of sorting edge
+                return modelIndex !== rowIndex || model.isSeparator() ? model : null;
+            })
+            .filter(item => item);
+
+        let withinSorted = true;
+        const sortOrderList = changedModels
+            .map(model => {
+                let sortOrder;
+                if (model.isSeparator()) {
+                    withinSorted = false;
+                    sortOrder = model.get('_sortOrder');
+                } else if (withinSorted) {
+                    sortOrder = model.get('_sortOrder') ?? (maxSortOrder = maxSortOrder + this.ORDER_STEP);
+                }
+                return sortOrder;
+            })
+            .sort();
+
+        changedModels
+            .forEach((model, index) => {
+                if (!model.isSeparator()) {
+                    model.set('_sortOrder', sortOrderList[index]);
+                }
+            });
+
+        return changedModels;
+    },
 
     /**
      * @param {Event} e
@@ -281,11 +434,12 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      */
     _createSortableHelper(e, currentEL) {
         const templateData = {
+            isSeparator: currentEL.is(this.SEPARATOR_ROW_SELECTOR),
             data: this._getSelectedModelsData(),
             iconClasses: currentEL.find('.sort-icon').attr('class')
         };
 
-        return $(this.placeholderTemplate(templateData));
+        return $(this.helperTemplate(templateData));
     },
 
     /**
@@ -296,10 +450,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      */
     _selectRowBeforeDragStart(e, $el) {
         const model = this.main.collection.models[$el.index()];
-
-        if (!model.get('_selected')) {
-            model.set('_selected', true);
-        }
+        model.set('_selected', true);
     },
 
     /**
@@ -318,7 +469,6 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      */
     _resetSelectedModels() {
         this.main.collection
-            .filter('_selected')
             .forEach(model => model.set('_selected', false));
     }
 });

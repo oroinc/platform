@@ -55,6 +55,21 @@ export default {
             model: SortRowsDragNDropModel
         });
 
+        const updateData = data => {
+            data.push({
+                id: SortRowsDragNDropModel.SEPARATOR_ID,
+                [sortOrderColumnName]: Infinity
+            });
+            return data;
+        };
+
+        options.data.data = updateData(options.data.data);
+        Object.assign(options.metadata.options, {
+            parseResponseModels: resp => {
+                return 'data' in resp ? updateData(resp.data) : resp;
+            }
+        });
+
         deferred.resolve();
         return deferred;
     },

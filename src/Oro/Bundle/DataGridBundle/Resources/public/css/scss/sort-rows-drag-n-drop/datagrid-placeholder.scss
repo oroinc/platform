@@ -5,4 +5,8 @@
         border-top: 1px solid $primary-800;
         border-bottom: 2px solid $primary-800;
     }
+
+    &.separator {
+        @extend %draggable-separator;
+    }
 }

@@ -62,7 +62,18 @@ const SortRowsDragNDropModel = BaseModel.extend({
      */
     set__sortOrder(value) {
         return this.set(this.sortOrderAttrName, value !== void 0 ? value : null);
+    },
+
+    /**
+     * Check if its model for a separator row
+     *
+     * @returns {boolean}
+     */
+    isSeparator() {
+        return this.id === SortRowsDragNDropModel.SEPARATOR_ID;
     }
+}, {
+    SEPARATOR_ID: 'separator'
 });
 
 export default SortRowsDragNDropModel;

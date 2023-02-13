@@ -118,6 +118,11 @@ $.widget('ui.sortable', $.ui.sortable, {
         return true;
     },
 
+    _mouseStart(...args) {
+        this._trigger('beforePick', args[0], this._uiHash());
+        return this._superApply(args);
+    },
+
     _clear(...args) {
         this._trigger('beforeDrop', args[0], this._uiHash());
         return this._superApply(args);

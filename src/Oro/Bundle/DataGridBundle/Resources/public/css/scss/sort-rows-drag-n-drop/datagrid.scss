@@ -1,4 +1,6 @@
 /* @theme: admin.oro; */
+$grid-effect-success: $success !default;
+$grid-effect-info: $info !default;
 
 .oro-datagrid .sort-icon-cell {
     width: $sort-datagrid-icon-cell-width;
@@ -6,7 +8,7 @@
 }
 
 .row-has-sort-order {
-    background-color: $primary-900;
+    background-color: $sort-datagrid-sorted-row-bg-color;
 }
 
 .drag-n-drop-start {
@@ -24,15 +26,88 @@
         overflow: initial;
     }
 
-    .grid-row.selected {
-        background-color: $extra-300;
+    .grid-row {
+        &.selected,
+        &.changed {
+            background-color: $sort-datagrid-selected-row-bg-color;
 
-        &:hover {
-            background-color: $extra-300;
+            &:hover {
+                background-color: $sort-datagrid-selected-row-bg-color;
+            }
         }
     }
 
     .ui-sortable-handle {
         cursor: default;
+    }
+
+    .success {
+        // @todo develop animation
+        animation: success-pulse 1s cubic-bezier(.92, 1.07, .93, .42);
+        background-color: $grid-effect-success;
+    }
+
+    .info {
+        // @todo develop animation
+        animation: info-pulse 1s cubic-bezier(.92, 1.07, .93, .42);
+        background-color: $grid-effect-info;
+    }
+}
+
+@include keyframe('success-pulse') {
+    0% {
+        background: rgba($grid-effect-success, 0);
+        box-shadow: inset 0 0 0 0 $grid-effect-success;
+    }
+
+    45% {
+        transform: scale(1.005);
+    }
+
+    50% {
+        transform: scale(1);
+        background: rgba($grid-effect-success, .8);
+        box-shadow: inset 0 0 0 0 $grid-effect-success;
+    }
+
+    50.5% {
+        transform: scale(1);
+        background: rgba($grid-effect-success, 1);
+        box-shadow: 0 0 0 0 $grid-effect-success;
+    }
+
+    100% {
+        transform: scale(1);
+        background: rgba($grid-effect-success, 1);
+        box-shadow: 0 0 0 30px rgba($grid-effect-success, 0);
+    }
+}
+
+@include keyframe('info-pulse') {
+    0% {
+        background: rgba($grid-effect-info, 0);
+        box-shadow: inset 0 0 0 0 $grid-effect-info;
+    }
+
+    45% {
+        transform: scale(1.005);
+    }
+
+    50% {
+        transform: scale(1);
+        background: rgba($grid-effect-info, .8);
+        box-shadow: inset 0 0 0 0 $grid-effect-info;
+    }
+
+    50.5% {
+        transform: scale(1);
+        background: rgba($grid-effect-info, 1);
+        box-shadow: 0 0 0 0 $grid-effect-info;
+    }
+
+    100% {
+        transform: scale(1);
+        background: rgba($grid-effect-info, 1);
+        box-shadow: 0 0 0 30px rgba($grid-effect-info, 0);
     }
 }

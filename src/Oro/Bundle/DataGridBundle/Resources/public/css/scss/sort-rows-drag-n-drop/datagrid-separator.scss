@@ -1,0 +1,38 @@
+%draggable-separator {
+    td {
+        line-height: 0;
+        height: 8px;
+        padding: 0;
+        border: 0;
+        position: relative;
+        z-index: 1;
+        background-color: $sort-datagrid-sorted-row-bg-color;
+
+        &::before {
+            content: '';
+            display: block;
+            margin: 2px auto 1px;
+            width: 21px;
+            height: 3px;
+            border-color: $additional-lighten;
+            border-width: 1px 0;
+            border-style: solid;
+        }
+
+        &::after {
+            content: '';
+            display: block;
+            width: 100%;
+            margin-bottom: 2px;
+            box-shadow: 0 2px 1px 0 $sort-datagrid-separator-shadow-color,
+                0 1px 0 0 $sort-datagrid-separator-shadow-color;
+            height: 1px;
+        }
+    }
+}
+
+.oro-datagrid {
+    .draggable-separator {
+        @extend %draggable-separator;
+    }
+}
