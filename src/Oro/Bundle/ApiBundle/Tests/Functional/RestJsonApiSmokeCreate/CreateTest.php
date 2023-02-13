@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiSmoke;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiSmokeCreate;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
-use Oro\Bundle\ApiBundle\Tests\Functional\Environment\SkippedEntityProviderInterface;
+use Oro\Bundle\ApiBundle\Tests\Functional\CheckSkippedEntityTrait;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
@@ -14,16 +14,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
  */
 class CreateTest extends RestJsonApiTestCase
 {
-    private function isSkippedEntity(string $entityClass, string $entityType): bool
-    {
-        /** @var SkippedEntityProviderInterface $provider */
-        $provider = self::getContainer()->get('oro_api.tests.skipped_entity_provider');
-
-        return
-            is_a($entityClass, TestFrameworkEntityInterface::class, true)
-            || str_starts_with($entityType, 'testapi')
-            || $provider->isSkippedEntity($entityClass, ApiAction::CREATE);
-    }
+    use CheckSkippedEntityTrait;
 
     public function testCreateWithEmptyData()
     {
@@ -33,7 +24,10 @@ class CreateTest extends RestJsonApiTestCase
             }
 
             $entityType = $this->getEntityType($entityClass);
-            if ($this->isSkippedEntity($entityClass, $entityType)) {
+            if (is_a($entityClass, TestFrameworkEntityInterface::class, true)
+                || str_starts_with($entityType, 'testapi')
+                || $this->isSkippedEntity($entityClass, ApiAction::CREATE)
+            ) {
                 return;
             }
 
