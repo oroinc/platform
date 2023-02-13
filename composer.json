@@ -110,7 +110,7 @@
         "ocramius/proxy-manager": "~2.11.1",
         "knplabs/knp-gaufrette-bundle": "~0.7.1",
         "oro/doctrine-extensions": "~2.0.1",
-        "ezyang/htmlpurifier": "~4.14.0",
+        "ezyang/htmlpurifier": "~4.16.0",
         "xemlock/htmlpurifier-html5": "0.1.10",
         "hwi/oauth-bundle": "~1.4.2",
         "kriswallsmith/buzz": "~1.2.0",
