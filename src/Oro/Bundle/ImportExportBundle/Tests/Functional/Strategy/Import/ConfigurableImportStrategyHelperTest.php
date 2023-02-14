@@ -362,6 +362,34 @@ class ConfigurableImportStrategyHelperTest extends WebTestCase
         );
     }
 
+    public function testZeroLeadingString(): void
+    {
+        $family1 = new AttributeFamily();
+        $family1->setCode('0000123');
+        $family2 = new AttributeFamily();
+        $family2->setCode('00123');
+
+        $this->helper->importEntity($family1, $family2);
+
+        $this->assertIsString($family1->getCode());
+        $this->assertEquals('00123', $family1->getCode());
+
+        $this->assertTrue(
+            $this->logger->hasRecord(
+                [
+                    'message' => 'Property changed during import.',
+                    'context' => [
+                        'databaseEntityClass' => AttributeFamily::class,
+                        'propertyName' => 'code',
+                        'databaseValue' => serialize('0000123'),
+                        'importedValue' => serialize('00123'),
+                    ],
+                ],
+                LogLevel::DEBUG
+            )
+        );
+    }
+
     public function testDenormalizedPropertyAwareImport()
     {
         $dbEntity = new Product();

@@ -113,7 +113,10 @@ class ConfigurableImportStrategyHelper extends ImportStrategyHelper
             }
 
             if ((null !== $importedValue && null !== $databaseValue)
-                && $importedValue !== $databaseValue && $importedValue == $databaseValue) {
+                && $importedValue !== $databaseValue
+                && $importedValue == $databaseValue
+                && gettype($importedValue) !== gettype($databaseValue)
+            ) {
                 $this->logger->debug(
                     'Property not changed during import, but type does not match.',
                     [
