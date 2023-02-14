@@ -8,16 +8,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\Options;
 
 /**
- * Adds route_name and is_xml_http_request to layout context
+ * Adds route_name to layout context
  */
 class RouteContextConfigurator implements ContextConfiguratorInterface
 {
-    /** @var RequestStack */
-    protected $requestStack;
-
-    public function __construct(RequestStack $requestStack)
+    public function __construct(private RequestStack $requestStack)
     {
-        $this->requestStack = $requestStack;
     }
 
     /**
@@ -40,20 +36,9 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
                         }
 
                         return $value;
-                    },
-                    'is_xml_http_request' => function (Options $options, $value) {
-                        if (null === $value) {
-                            $request = $this->requestStack->getCurrentRequest();
-                            if ($request) {
-                                $value = $request->isXmlHttpRequest();
-                            }
-                        }
-
-                        return (bool) $value;
-                    },
+                    }
                 ]
             )
-            ->setAllowedTypes('route_name', ['string', 'null'])
-            ->setAllowedTypes('is_xml_http_request', ['bool']);
+            ->setAllowedTypes('route_name', ['string', 'null']);
     }
 }

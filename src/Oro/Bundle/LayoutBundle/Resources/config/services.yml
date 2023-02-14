@@ -134,6 +134,13 @@ services:
         tags:
             - { name: layout.context_configurator }
 
+    oro_layout.layout_context_configurator.is_xml_http_request:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\XmlHttpRequestConfigurator
+        arguments:
+            - '@request_stack'
+        tags:
+            - { name: layout.context_configurator }
+
     oro_layout.block_type_extension.data_collector:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\DataCollectorExtension
         arguments:
