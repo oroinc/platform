@@ -1,0 +1,29 @@
+/* @theme: admin.oro; */
+
+.drop-zones-menu {
+    width: $drop-zones-menu-box-width;
+    z-index: $zindex-dropdown;
+    border: 1px dashed $primary-700;
+    background-color: $primary-900;
+    box-shadow: $drop-zones-menu-box-shadow;
+
+    &__item {
+        padding: 26px 12px;
+        font-size: 18px;
+        text-align: center;
+        color: $primary-200;
+
+        &:not(:first-child) {
+            border-top: 1px dashed $primary-700;
+        }
+
+        &.hover {
+            background-color: $secondary;
+            color: $primary-inverse;
+        }
+    }
+
+    &:not(.show) {
+        display: none;
+    }
+}

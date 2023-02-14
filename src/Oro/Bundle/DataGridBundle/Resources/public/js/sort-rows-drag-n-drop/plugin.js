@@ -1,7 +1,10 @@
 import $ from 'jquery';
+import __ from 'orotranslation/js/translator';
+import {isMobile} from 'underscore';
 import BasePlugin from 'oroui/js/app/plugins/base/plugin';
 import helperTemplate from 'tpl-loader!orodatagrid/templates/sort-rows-drag-n-drop/helper.html';
 import SelectionStateHintView from 'orodatagrid/js/sort-rows-drag-n-drop/selection-state-hint-view';
+import DropZoneMenuViev from 'orodatagrid/js/sort-rows-drag-n-drop/drop-zone-menu-view';
 
 import 'jquery-ui/widgets/sortable';
 import 'jquery-ui/disable-selection';
@@ -107,6 +110,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         this.listenTo(this.selectionStateHintView, 'reset', this._resetSelectedModels);
 
         this.delegateEvents();
+        this.initDroppableZones();
         this.initSortable();
 
         SortRowsDragNDropPlugin.__super__.enable.call(this);
@@ -120,15 +124,16 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             return;
         }
 
+        this.undelegateEvents();
+        this.stopListening(this.selectionStateHintView);
         this.main.$el.removeClass(this.enabledClass);
         if (this.selectionStateHintView) {
             this.selectionStateHintView.dispose();
             delete this.selectionStateHintView;
         }
-        this.destroySortable();
-        this.undelegateEvents();
 
-        this.stopListening(this.main.body);
+        this.destroyDroppableZones();
+        this.destroySortable();
 
         // do not call parent disable method, it stops listeners and the plugin what be auto-enabled again
         this.enabled = false;
@@ -141,18 +146,10 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     delegateEvents() {
         SortRowsDragNDropPlugin.__super__.delegateEvents.call(this);
 
-        this.main.body.$el.on(`mousedown${this.ownEventNamespace()}`, 'tr', e => {
-            if ($(e.target).is(this.preventsSortingSelector)) {
-                return;
-            }
-            this.onMouseDown(e);
-        });
-        this.main.body.$el.on(`click${this.ownEventNamespace()}`, 'tr', e => {
-            if ($(e.target).is(this.preventsSortingSelector)) {
-                return;
-            }
-            this.onClick(e);
-        });
+        this.main.body.$el.on(`mousedown${this.ownEventNamespace()}`, 'tr', this.onMouseDown.bind(this));
+        this.main.body.$el.on(`click${this.ownEventNamespace()}`, 'tr', this.onClick.bind(this));
+        $(document.body).on(`keydown${this.ownEventNamespace()}`, this.onKeyDown.bind(this));
+        $(document.body).on(`keyup${this.ownEventNamespace()}`, this.onKeyUp.bind(this));
     },
 
     /**
@@ -161,6 +158,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     undelegateEvents() {
         SortRowsDragNDropPlugin.__super__.undelegateEvents.call(this);
         this.main.body.$el.off(this.ownEventNamespace());
+        $(document.body).off(this.ownEventNamespace());
     },
 
     /**
@@ -214,6 +212,115 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         this._lastClickedIndex = this.main.collection.indexOf(model);
     },
 
+    /**
+     * Handler for body keydown
+     * Prevent drag-n-drop if specific key is pressed
+     * @param {Event} e
+     */
+    onKeyDown(e) {
+        if (e.shiftKey || e.ctrlKey || e.metaKey) {
+            this.disableSortable();
+        }
+    },
+
+    /**
+     * Handler for body keyup
+     * @param {Event} e
+     */
+    onKeyUp(e) {
+        this.enableSortable();
+    },
+
+    initDroppableZones() {
+        if (isMobile()) {
+            return;
+        }
+        const droppableZones = {
+            toTop: {
+                title: __('oro.datagrid.drop_zones.move_to_top'),
+                order: 10,
+                dropCallback: this.moveSelectedToTop.bind(this)
+            },
+            toBottom: {
+                title: __('oro.datagrid.drop_zones.mode_to_bottom'),
+                order: 20,
+                dropCallback: this.moveSelectedToBottom.bind(this),
+                enabled: this.main.body.$el.find(this.SEPARATOR_ROW_SELECTOR).length > 0
+            },
+            removeSortOrder: {
+                title: __('oro.datagrid.drop_zones.remove_sort_order'),
+                order: 30,
+                dropCallback: this.removeSortOrderForSelected.bind(this)
+            }
+        };
+
+        this.dropZoneMenuView = new DropZoneMenuViev({
+            autoRender: true,
+            datagrid: this.main,
+            dropZones: $.extend(true, {}, droppableZones, this.options.dropZones || {})
+        });
+        this.dropZoneMenuView.listenTo(this, {
+            'sortable:start': (e, ui) => {
+                if (ui.item.is(this.SEPARATOR_ROW_SELECTOR)) {
+                    return;
+                }
+                this.dropZoneMenuView.show();
+            },
+            'sortable:stop': this.dropZoneMenuView.hide.bind(this.dropZoneMenuView)
+        });
+        this.dropZoneMenuView.$el.insertBefore(this.main.$el);
+        this.listenTo(this.dropZoneMenuView, {
+            drop: () => this._dropDone = true,
+            dropout: () => {
+                delete this._dropDone;
+            }
+        });
+    },
+
+    destroyDroppableZones() {
+        if (this.dropZoneMenuView) {
+            this.stopListening(this.dropZoneMenuView);
+            this.dropZoneMenuView.dispose();
+            delete this.dropZoneMenuView;
+        }
+    },
+
+    moveSelectedToTop() {
+        const models = this.main.collection.filter('_selected');
+        const modelsIds = models.map(model => model.id);
+
+        const $rows = this.main.body.$('tr').filter((i, el) => {
+            return modelsIds.includes($(el).data('modelId'));
+        });
+        this.main.body.$el.prepend($rows.detach());
+        this._updateSortOrder();
+        this.main.collection.sort();
+        this._resetSelectedModels();
+    },
+
+    moveSelectedToBottom() {
+        const models = this.main.collection.filter('_selected');
+        const modelsIds = models.map(model => model.id);
+        const $rows = this.main.body.$('tr').filter((i, el) => {
+            return modelsIds.includes($(el).data('modelId'));
+        });
+        const $separator = this.main.body.$el.find(this.SEPARATOR_ROW_SELECTOR);
+
+        $separator.before($rows.detach());
+
+        this._updateSortOrder();
+        this.main.collection.sort();
+        this._resetSelectedModels();
+    },
+
+    removeSortOrderForSelected() {
+        const models = this.main.collection.filter('_selected');
+
+        models.forEach(model => model.set('_sortOrder', null));
+        this.main.collection.sort();
+        this._resetSelectedModels();
+    },
+
     initSortable() {
         this.main.body.$el.sortable({
             ...this.SORTABLE_DEFAULTS,
@@ -239,6 +346,26 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         }
     },
 
+    enableSortable() {
+        if (
+            this.main.body.$el.data('uiSortable') &&
+            this.main.body.$el.sortable('widget').is('.ui-sortable-disabled') === true
+        ) {
+            this.main.body.$el.enableSelection();
+            this.main.body.$el.sortable('enable');
+        }
+    },
+
+    disableSortable() {
+        if (
+            this.main.body.$el.data('uiSortable') &&
+            this.main.body.$el.sortable('widget').is('.ui-sortable-disabled') === false
+        ) {
+            this.main.body.$el.disableSelection();
+            this.main.body.$el.sortable('disable');
+        }
+    },
+
     /**
      * @param {Event} e
      * @param {Object} ui
@@ -254,6 +381,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         const {cursor, forcePlaceholderSize} = this.SORTABLE_DEFAULTS;
         this.main.body.$el.sortable('option', 'cursor', !isSeparator ? cursor : 'row-resize');
         this.main.body.$el.sortable('option', 'forcePlaceholderSize', !isSeparator ? forcePlaceholderSize : false);
+        this.trigger('sortable:beforePick', e, ui);
     },
 
     /**
@@ -264,6 +392,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         const isSeparator = ui.item.is(this.SEPARATOR_ROW_SELECTOR);
         ui.placeholder.toggleClass('separator', isSeparator);
         this.main.$el.addClass(this.startDragClass);
+        this.trigger('sortable:start', e, ui);
     },
 
     /**
@@ -273,6 +402,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     beforeItemDrop(e, ui) {
         $(e.target).data('helperReact', ui.helper[0].getBoundingClientRect());
         this.main.$el.removeClass(this.startDragClass);
+        this.trigger('sortable:beforeDrop', e, ui);
     },
 
     /**
@@ -280,6 +410,12 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Object} ui
      */
     onStopSortable(e, ui) {
+        this.trigger('sortable:stop', e, ui);
+        // Drop was done in other place like droppable zone
+        if (this._dropDone) {
+            return;
+        }
+
         const helperReact = $(e.target).data('helperReact');
         const tableReact = e.target.getBoundingClientRect();
         const isDropOutOfTable = (
@@ -304,6 +440,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Object} ui
      */
     onChangeSortable(e, ui) {
+        this.trigger('sortable:change');
         const isSeparator = ui.item.is(this.SEPARATOR_ROW_SELECTOR);
         if (!isSeparator) {
             return;

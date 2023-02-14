@@ -2,16 +2,23 @@ import SortRowsDragNDropPlugin from 'orodatagrid/js/sort-rows-drag-n-drop/plugin
 import SortRowsDragNDropRow from 'orodatagrid/js/sort-rows-drag-n-drop/row';
 import SortRowsDragNDropModel from 'orodatagrid/js/sort-rows-drag-n-drop/model';
 
+import loadModules from 'oroui/js/app/services/load-modules';
+
 export default {
     processDatagridOptions(deferred, options) {
         const {sortRowsDragNDropBuilder = {}} = options.gridBuildersOptions;
         const {
             sortOrderColumnName,
-            renderIconColumn: addIconColumn = true
+            renderIconColumn: addIconColumn = true,
+            dropZones = {}
         } = sortRowsDragNDropBuilder;
 
         if (sortOrderColumnName === void 0) {
             throw new Error('Options "sortOrderColumnName" is required');
+        }
+
+        if (!options.metadata.plugins) {
+            options.metadata.plugins = [];
         }
 
         if (addIconColumn) {
@@ -28,17 +35,6 @@ export default {
 
             options.metadata.columns.push(iconColumn);
         }
-
-        if (!options.metadata.plugins) {
-            options.metadata.plugins = [];
-        }
-
-        options.metadata.plugins.push({
-            constructor: SortRowsDragNDropPlugin,
-            options: {
-                $rootEL: options.$el.scrollParent()
-            }
-        });
 
         options.themeOptions = {
             ...options.themeOptions,
@@ -70,7 +66,25 @@ export default {
             }
         });
 
-        deferred.resolve();
+        const modulesToLoad = {};
+        Object.entries(dropZones).forEach(([key, val]) => {
+            if (typeof val === 'string') {
+                modulesToLoad[key] = val;
+                delete dropZones[key];
+            }
+        });
+
+        loadModules(modulesToLoad).then(modules => {
+            options.metadata.plugins.push({
+                constructor: SortRowsDragNDropPlugin,
+                options: {
+                    $rootEL: options.$el.scrollParent(),
+                    dropZones: {...dropZones, ...modules}
+                }
+            });
+            deferred.resolve();
+        });
+
         return deferred;
     },
 

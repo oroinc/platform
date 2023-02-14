@@ -7,6 +7,7 @@ css:
         # Variables
         - 'bundles/orodatagrid/css/scss/variables/sort-rows-drag-n-drop/datagrid-config.scss'
         - 'bundles/orodatagrid/css/scss/variables/sort-rows-drag-n-drop/selection-state-hint-config.scss'
+        - 'bundles/orodatagrid/css/scss/variables/sort-rows-drag-n-drop/drop-zones-menu-config.scss'
 
         # Styles
         - 'bundles/orodatagrid/css/scss/main.scss'
@@ -17,4 +18,5 @@ css:
         - 'bundles/orodatagrid/css/scss/sort-rows-drag-n-drop/datagrid-separator.scss'
         - 'bundles/orodatagrid/css/scss/sort-rows-drag-n-drop/datagrid-placeholder.scss'
         - 'bundles/orodatagrid/css/scss/sort-rows-drag-n-drop/selection-state-hint.scss'
+        - 'bundles/orodatagrid/css/scss/sort-rows-drag-n-drop/drop-zones-menu.scss'
         # - 'bundles/orodatagrid/css/scss/inline-editing-help.scss' component temporary not in use

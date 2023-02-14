@@ -197,3 +197,7 @@ oro:
             helper: '{1}1 item|]1,Inf[{{ count }} items'
             items_selected: '{{ count }} items selected'
             unselect_all: 'Unselect All'
+        drop_zones:
+            move_to_top: 'Move to Top'
+            mode_to_bottom: 'Move to Bottom'
+            remove_sort_order: 'Remove from Sorted'
