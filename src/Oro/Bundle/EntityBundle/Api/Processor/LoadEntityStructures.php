@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadEntityStructures implements ProcessorInterface
 {
-    /** @var EntityStructureDataProvider */
-    private $entityStructureProvider;
+    private EntityStructureDataProvider $entityStructureProvider;
 
     public function __construct(EntityStructureDataProvider $entityStructureProvider)
     {
@@ -23,7 +22,7 @@ class LoadEntityStructures implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var GetListContext $context */
 

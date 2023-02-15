@@ -13,14 +13,9 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class SetCurrency implements ProcessorInterface
 {
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
-
-    /** @var LocaleSettings */
-    private $localeSettings;
-
-    /** @var string */
-    private $currencyFieldName;
+    private PropertyAccessorInterface $propertyAccessor;
+    private LocaleSettings $localeSettings;
+    private string $currencyFieldName;
 
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
@@ -35,7 +30,7 @@ class SetCurrency implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
 
@@ -60,10 +55,8 @@ class SetCurrency implements ProcessorInterface
      * Sets a currency returned by getCurrency() method to the given entity.
      * The entity's currency property will not be changed if the getCurrency() method returns NULL
      * or a currency is already set to the entity.
-     *
-     * @param object $entity
      */
-    private function setCurrency($entity): void
+    private function setCurrency(object $entity): void
     {
         $entityCurrency = $this->propertyAccessor->getValue($entity, $this->currencyFieldName);
         if (null === $entityCurrency) {

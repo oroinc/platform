@@ -20,14 +20,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ComputeLocalizedFallbackValues implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var LocalizationHelper */
-    private $localizationHelper;
-
-    /** @var LocalizedFallbackValueExtractorInterface */
-    private $valueExtractor;
+    private DoctrineHelper $doctrineHelper;
+    private LocalizationHelper $localizationHelper;
+    private LocalizedFallbackValueExtractorInterface $valueExtractor;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -42,7 +37,7 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */
 
