@@ -136,12 +136,20 @@ const DropZoneMenuView = BaseView.extend({
     },
 
     show() {
-        this.$el.fadeIn('fast', () => this.$el.addClass('show'));
+        this.$el.fadeIn('fast', () => {
+            if (!this.disposed) {
+                this.$el.addClass('show');
+            }
+        });
         this.updatePosition();
     },
 
     hide() {
-        this.$el.fadeOut('fast', () => this.$el.removeClass('show'));
+        this.$el.fadeOut('fast', () => {
+            if (!this.disposed) {
+                this.$el.removeClass('show');
+            }
+        });
     },
 
     /**

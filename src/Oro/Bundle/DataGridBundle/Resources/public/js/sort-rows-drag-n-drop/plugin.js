@@ -21,11 +21,6 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     enabledClass: 'drag-n-drop-enabled',
 
     /**
-     * @property {string}
-     */
-    preventsSortingSelector: '[data-ignore-drag]',
-
-    /**
      * @property {Function}
      */
     helperTemplate,
@@ -148,8 +143,10 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
 
         this.main.body.$el.on(`mousedown${this.ownEventNamespace()}`, 'tr', this.onMouseDown.bind(this));
         this.main.body.$el.on(`click${this.ownEventNamespace()}`, 'tr', this.onClick.bind(this));
-        $(document.body).on(`keydown${this.ownEventNamespace()}`, this.onKeyDown.bind(this));
-        $(document.body).on(`keyup${this.ownEventNamespace()}`, this.onKeyUp.bind(this));
+        const $rootElement = this.main.body.$el.closest('[role="dialog"]') || $(document.body);
+        $rootElement
+            .bindFirst(`keydown${this.ownEventNamespace()}`, this.onKeyDown.bind(this))
+            .on(`keyup${this.ownEventNamespace()}`, this.onKeyUp.bind(this));
     },
 
     /**
@@ -158,7 +155,8 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     undelegateEvents() {
         SortRowsDragNDropPlugin.__super__.undelegateEvents.call(this);
         this.main.body.$el.off(this.ownEventNamespace());
-        $(document.body).off(this.ownEventNamespace());
+        const $rootElement = this.main.body.$el.closest('[role="dialog"]') || $(document.body);
+        $rootElement.off(this.ownEventNamespace());
     },
 
     /**
@@ -218,6 +216,10 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Event} e
      */
     onKeyDown(e) {
+        if (e.key === 'Escape' && this.main.$el.hasClass(this.startDragClass)) {
+            this.main.body.$el.sortable('cancel');
+            e.stopImmediatePropagation();
+        }
         if (e.shiftKey || e.ctrlKey || e.metaKey) {
             this.disableSortable();
         }
@@ -325,7 +327,6 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         this.main.body.$el.sortable({
             ...this.SORTABLE_DEFAULTS,
             appendTo: this.main.$el.parent(),
-            cancel: this.preventsSortingSelector,
             containment: this.main.el,
             helper: this._createSortableHelper.bind(this),
             beforePick: this.beforeItemPick.bind(this),
@@ -427,7 +428,10 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         $(e.target).data('helperReact', null);
         this.main.collection.forEach(model => model.set('_changed', false));
 
-        if (isDropOutOfTable && !ui.item.is(this.SEPARATOR_ROW_SELECTOR)) {
+        if (e.originalEvent.target === null) {
+            // event was canceled during drag action
+            this.onStopSortableCancel(e, ui);
+        } else if (isDropOutOfTable && !ui.item.is(this.SEPARATOR_ROW_SELECTOR)) {
             $(e.target).sortable('cancel');
             this.onStopSortableCancel(e, ui);
         } else {

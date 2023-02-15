@@ -510,6 +510,7 @@ define(function(require, exports, module) {
             _.delay(() => {
                 if (!this.disposed) {
                     this.widget.dialog('widget').removeClass('invisible');
+                    this.focusContent();
                 }
             }, 50);
         },
