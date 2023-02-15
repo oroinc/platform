@@ -3,7 +3,7 @@
 {% block toolbar %}
     {% set layout_data = collector.data|first %}
 
-    {% if layout_data.views|length %}
+    {% if layout_data.views|default([]) %}
         {% set status_color = layout_data.not_applied_actions_count ? 'yellow' : '' %}
         {% set icon %}
             <span class="icon">
@@ -53,18 +53,19 @@
 
 {% block menu %}
     {% set layout_data = collector.data|first %}
+    {% set not_applied_actions_count = layout_data.not_applied_actions_count|default(0) %}
 
     <span class="label
-                {{ layout_data.not_applied_actions_count ? 'label-status-error' : '' }}
-                {{ layout_data.views is empty ? 'disabled' }}"
+                {{ not_applied_actions_count ? 'label-status-error' : '' }}
+                {{ layout_data.views|default([]) is empty ? 'disabled' }}"
     >
         <span class="icon">
             {{ include('@OroLayout/Collector/layout-icon.svg') }}
         </span>
         <strong>Layouts</strong>
-        {% if layout_data.not_applied_actions_count %}
+        {% if not_applied_actions_count %}
             <span class="count">
-                <span>{{ layout_data.not_applied_actions_count }}</span>
+                <span>{{ not_applied_actions_count }}</span>
             </span>
         {% endif %}
     </span>
@@ -206,344 +207,350 @@
     {% import _self as tree %}
 
     <h2>Layouts</h2>
-    <div id="layout-profiler" class="sf-tabs">
-        {% for hash, layout_data in collector.data %}
-            <div class="tab">
-                <h3 class="tab-title">
-                    {{ layout_data.name|default('Layout ' ~ loop.index) }}
-                </h3>
-                <div id="layout-data-{{ hash }}" class="tab-content">
-                    {% if layout_data.context.items.theme is defined %}
-                        <h4>Layout updates in the
-                            <strong>{{ layout_data.context.items.theme }}</strong> theme can be added to:</h4>
-                        <table>
-                            {% for path in layout_data.paths %}
-                                <tr>
-                                    <td>
-                                        <span>Resources/views/layouts/{{ path }}</span>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    {% endif %}
-                    <div class="sf-tabs">
-                        <div class="tab">
-                            <h3 class="tab-title">
-                                Layout Tree
-                                <span class="badge">{{ layout_data.count }} blocks</span>
-                            </h3>
-                            <div class="tab-content">
-                                {% if layout_data.views|length %}
-                                    <div id="tree-menu-{{ hash }}" class="tree tree-menu">
-                                        <div class="tree-menu-wrapper">
-                                            <div class="expand-all">
-                                                <a id="expand-all-{{ hash }}" href="#" data-collapsed-title="Collapse All">Expand All</a>
+    {% if collector.data %}
+        <div id="layout-profiler" class="sf-tabs">
+            {% for hash, layout_data in collector.data %}
+                <div class="tab">
+                    <h3 class="tab-title">
+                        {{ layout_data.name|default('Layout ' ~ loop.index) }}
+                    </h3>
+                    <div id="layout-data-{{ hash }}" class="tab-content">
+                        {% if layout_data.context.items.theme is defined %}
+                            <h4>Layout updates in the
+                                <strong>{{ layout_data.context.items.theme }}</strong> theme can be added to:</h4>
+                            <table>
+                                {% for path in layout_data.paths %}
+                                    <tr>
+                                        <td>
+                                            <span>Resources/views/layouts/{{ path }}</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endif %}
+                        <div class="sf-tabs">
+                            <div class="tab">
+                                <h3 class="tab-title">
+                                    Layout Tree
+                                    <span class="badge">{{ layout_data.count }} blocks</span>
+                                </h3>
+                                <div class="tab-content">
+                                    {% if layout_data.views|length %}
+                                        <div id="tree-menu-{{ hash }}" class="tree tree-menu">
+                                            <div class="tree-menu-wrapper">
+                                                <div class="expand-all">
+                                                    <a id="expand-all-{{ hash }}" href="#" data-collapsed-title="Collapse All">Expand All</a>
+                                                </div>
+                                                <ul>
+                                                    {% for viewId, viewData in layout_data.views %}
+                                                        {{ tree.view_tree_entry(hash, viewId, viewData, true) }}
+                                                    {% endfor %}
+                                                </ul>
                                             </div>
-                                            <ul>
-                                                {% for viewId, viewData in layout_data.views %}
-                                                    {{ tree.view_tree_entry(hash, viewId, viewData, true) }}
-                                                {% endfor %}
-                                            </ul>
                                         </div>
-                                    </div>
-                                    <div class="tree-details-container" id="tree-details-container-{{ hash }}">
-                                        {% for viewId, viewData in layout_data.views %}
-                                            {{ tree.view_tree_details(hash, viewId, viewData) }}
-                                        {% endfor %}
-                                    </div>
-                                {% else %}
-                                    <div class="empty">
-                                        <p>No views were found for this request.</p>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="tab">
-                            <h3 class="tab-title">
-                                Not Applied Actions
-                                <span class="badge">{{ layout_data.not_applied_actions_count }}</span>
-                            </h3>
-                            <div class="tab-content">
-                                {% if layout_data.not_applied_actions_count > 0 %}
-                                    {{ tree.not_applied_actions_tab(layout_data.not_applied_actions) }}
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="tab">
-                            <h3 class="tab-title">Context</h3>
-                            <div class="tab-content">
-                                <div class="tree-details">
-                                    {% if layout_data.context.items|length %}
-                                        {{ tree.view_block_details('context-' ~ hash, 'Context', {'Items': layout_data.context.items}) }}
+                                        <div class="tree-details-container" id="tree-details-container-{{ hash }}">
+                                            {% for viewId, viewData in layout_data.views %}
+                                                {{ tree.view_tree_details(hash, viewId, viewData) }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="empty">
+                                            <p>No views were found for this request.</p>
+                                        </div>
                                     {% endif %}
+                                </div>
+                            </div>
+                            <div class="tab">
+                                <h3 class="tab-title">
+                                    Not Applied Actions
+                                    <span class="badge">{{ layout_data.not_applied_actions_count }}</span>
+                                </h3>
+                                <div class="tab-content">
+                                    {% if layout_data.not_applied_actions_count > 0 %}
+                                        {{ tree.not_applied_actions_tab(layout_data.not_applied_actions) }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="tab">
+                                <h3 class="tab-title">Context</h3>
+                                <div class="tab-content">
+                                    <div class="tree-details">
+                                        {% if layout_data.context.items|length %}
+                                            {{ tree.view_block_details('context-' ~ hash, 'Context', {'Items': layout_data.context.items}) }}
+                                        {% endif %}
 
-                                    {% if layout_data.context.data|length %}
-                                        {{ tree.view_block_details('context-data-' ~ hash, 'Context Data', {'Items': layout_data.context.data}, true) }}
-                                    {% endif %}
+                                        {% if layout_data.context.data|length %}
+                                            {{ tree.view_block_details('context-data-' ~ hash, 'Context Data', {'Items': layout_data.context.data}, true) }}
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <script>
-                (function () {
-                    function Toggler(storage) {
-                        "use strict";
+                <script>
+                    (function () {
+                        function Toggler(storage) {
+                            "use strict";
 
-                        var STORAGE_KEY = 'sf_toggle_data_{{ hash }}';
-                        var states = {};
+                            var STORAGE_KEY = 'sf_toggle_data_{{ hash }}';
+                            var states = {};
 
-                        var isCollapsed = function (button) {
-                            return Sfjs.hasClass(button, 'closed');
-                        };
+                            var isCollapsed = function (button) {
+                                return Sfjs.hasClass(button, 'closed');
+                            };
 
-                        var isExpanded = function (button) {
-                            return !isCollapsed(button);
-                        };
+                            var isExpanded = function (button) {
+                                return !isCollapsed(button);
+                            };
 
-                        var expand = function (button) {
-                            var targetId = button.dataset.toggleTargetId;
-                            var target = document.getElementById(targetId);
-
-                            if (!target) {
-                                throw "Toggle target " + targetId + " does not exist";
-                            }
-
-                            if (isCollapsed(button)) {
-                                Sfjs.removeClass(button, 'closed');
-                                Sfjs.removeClass(target, 'hidden');
-
-                                states[targetId] = 1;
-                                storage.setItem(STORAGE_KEY, states);
-                            }
-                        };
-
-                        var collapse = function (button) {
-                            var targetId = button.dataset.toggleTargetId;
-                            var target = document.getElementById(targetId);
-
-                            if (!target) {
-                                throw "Toggle target " + targetId + " does not exist";
-                            }
-
-                            if (isExpanded(button)) {
-                                Sfjs.addClass(button, 'closed');
-                                Sfjs.addClass(target, 'hidden');
-
-                                states[targetId] = 0;
-                                storage.setItem(STORAGE_KEY, states);
-                            }
-                        };
-
-                        var toggle = function (button) {
-                            if (Sfjs.hasClass(button, 'closed')) {
-                                expand(button);
-                            } else {
-                                collapse(button);
-                            }
-                        };
-
-                        var initButtons = function (buttons) {
-                            states = storage.getItem(STORAGE_KEY, {});
-
-                            // must be an object, not an array or anything else
-                            // `typeof` returns "object" also for arrays, so the following
-                            // check must be done
-                            // see http://stackoverflow.com/questions/4775722/check-if-object-is-array
-                            if ('[object Object]' !== Object.prototype.toString.call(states)) {
-                                states = {};
-                            }
-
-                            for (var i = 0, l = buttons.length; i < l; ++i) {
-                                var targetId = buttons[i].dataset.toggleTargetId;
+                            var expand = function (button) {
+                                var targetId = button.dataset.toggleTargetId;
                                 var target = document.getElementById(targetId);
 
                                 if (!target) {
                                     throw "Toggle target " + targetId + " does not exist";
                                 }
 
-                                // correct the initial state of the button
-                                if (Sfjs.hasClass(target, 'hidden')) {
-                                    Sfjs.addClass(buttons[i], 'closed');
+                                if (isCollapsed(button)) {
+                                    Sfjs.removeClass(button, 'closed');
+                                    Sfjs.removeClass(target, 'hidden');
+
+                                    states[targetId] = 1;
+                                    storage.setItem(STORAGE_KEY, states);
+                                }
+                            };
+
+                            var collapse = function (button) {
+                                var targetId = button.dataset.toggleTargetId;
+                                var target = document.getElementById(targetId);
+
+                                if (!target) {
+                                    throw "Toggle target " + targetId + " does not exist";
                                 }
 
-                                // attach listener for expanding/collapsing the target
-                                clickHandler(buttons[i], toggle);
+                                if (isExpanded(button)) {
+                                    Sfjs.addClass(button, 'closed');
+                                    Sfjs.addClass(target, 'hidden');
 
-                                if (states.hasOwnProperty(targetId)) {
-                                    // open or collapse based on stored data
-                                    if (0 === states[targetId]) {
-                                        collapse(buttons[i]);
-                                    } else {
-                                        expand(buttons[i]);
+                                    states[targetId] = 0;
+                                    storage.setItem(STORAGE_KEY, states);
+                                }
+                            };
+
+                            var toggle = function (button) {
+                                if (Sfjs.hasClass(button, 'closed')) {
+                                    expand(button);
+                                } else {
+                                    collapse(button);
+                                }
+                            };
+
+                            var initButtons = function (buttons) {
+                                states = storage.getItem(STORAGE_KEY, {});
+
+                                // must be an object, not an array or anything else
+                                // `typeof` returns "object" also for arrays, so the following
+                                // check must be done
+                                // see http://stackoverflow.com/questions/4775722/check-if-object-is-array
+                                if ('[object Object]' !== Object.prototype.toString.call(states)) {
+                                    states = {};
+                                }
+
+                                for (var i = 0, l = buttons.length; i < l; ++i) {
+                                    var targetId = buttons[i].dataset.toggleTargetId;
+                                    var target = document.getElementById(targetId);
+
+                                    if (!target) {
+                                        throw "Toggle target " + targetId + " does not exist";
+                                    }
+
+                                    // correct the initial state of the button
+                                    if (Sfjs.hasClass(target, 'hidden')) {
+                                        Sfjs.addClass(buttons[i], 'closed');
+                                    }
+
+                                    // attach listener for expanding/collapsing the target
+                                    clickHandler(buttons[i], toggle);
+
+                                    if (states.hasOwnProperty(targetId)) {
+                                        // open or collapse based on stored data
+                                        if (0 === states[targetId]) {
+                                            collapse(buttons[i]);
+                                        } else {
+                                            expand(buttons[i]);
+                                        }
                                     }
                                 }
-                            }
-                        };
+                            };
 
-                        return {
-                            initButtons: initButtons,
-                            toggle: toggle,
-                            isExpanded: isExpanded,
-                            isCollapsed: isCollapsed,
-                            expand: expand,
-                            collapse: collapse,
-                        };
-                    }
+                            return {
+                                initButtons: initButtons,
+                                toggle: toggle,
+                                isExpanded: isExpanded,
+                                isCollapsed: isCollapsed,
+                                expand: expand,
+                                collapse: collapse,
+                            };
+                        }
 
-                    function JsonStorage(storage) {
-                        var setItem = function (key, data) {
-                            storage.setItem(key, JSON.stringify(data));
-                        };
+                        function JsonStorage(storage) {
+                            var setItem = function (key, data) {
+                                storage.setItem(key, JSON.stringify(data));
+                            };
 
-                        var getItem = function (key, defaultValue) {
-                            var data = storage.getItem(key);
+                            var getItem = function (key, defaultValue) {
+                                var data = storage.getItem(key);
 
-                            if (null !== data) {
-                                try {
-                                    return JSON.parse(data);
-                                } catch (e) {
+                                if (null !== data) {
+                                    try {
+                                        return JSON.parse(data);
+                                    } catch (e) {
+                                    }
                                 }
-                            }
 
-                            return defaultValue;
-                        };
+                                return defaultValue;
+                            };
 
-                        return {
-                            setItem: setItem,
-                            getItem: getItem
-                        };
-                    }
+                            return {
+                                setItem: setItem,
+                                getItem: getItem
+                            };
+                        }
 
-                    function TabView() {
-                        "use strict";
+                        function TabView() {
+                            "use strict";
 
-                        var activeTab = null;
-                        var activeTarget = null;
+                            var activeTab = null;
+                            var activeTarget = null;
 
-                        var select = function (tab) {
-                            var targetId = tab.dataset.tabTargetId;
-                            var target = document.getElementById(targetId);
-
-                            if (!target) {
-                                throw "Tab target " + targetId + " does not exist";
-                            }
-
-                            if (activeTab) {
-                                Sfjs.removeClass(activeTab, 'active');
-                            }
-
-                            if (activeTarget) {
-                                Sfjs.addClass(activeTarget, 'hidden');
-                            }
-
-                            Sfjs.addClass(tab, 'active');
-                            Sfjs.removeClass(target, 'hidden');
-
-                            activeTab = tab;
-                            activeTarget = target;
-                        };
-
-                        var initTabs = function (tabs) {
-                            for (var i = 0, l = tabs.length; i < l; ++i) {
-                                var targetId = tabs[i].dataset.tabTargetId;
+                            var select = function (tab) {
+                                var targetId = tab.dataset.tabTargetId;
                                 var target = document.getElementById(targetId);
 
                                 if (!target) {
                                     throw "Tab target " + targetId + " does not exist";
                                 }
 
-                                clickHandler(tabs[i], select);
+                                if (activeTab) {
+                                    Sfjs.removeClass(activeTab, 'active');
+                                }
 
-                                Sfjs.addClass(target, 'hidden');
-                            }
+                                if (activeTarget) {
+                                    Sfjs.addClass(activeTarget, 'hidden');
+                                }
 
-                            select(tabs[0]);
-                        };
+                                Sfjs.addClass(tab, 'active');
+                                Sfjs.removeClass(target, 'hidden');
 
-                        return {
-                            initTabs: initTabs,
-                            select: select
-                        };
-                    }
+                                activeTab = tab;
+                                activeTarget = target;
+                            };
 
-                    var tabTarget = new TabView();
-                    var storage = new JsonStorage(sessionStorage);
-                    var toggler = new Toggler(storage);
-                    var clickHandler = function (element, callback) {
-                        Sfjs.addEventListener(element, 'click', function (e) {
-                            if (!e) {
-                                e = window.event;
-                            }
+                            var initTabs = function (tabs) {
+                                for (var i = 0, l = tabs.length; i < l; ++i) {
+                                    var targetId = tabs[i].dataset.tabTargetId;
+                                    var target = document.getElementById(targetId);
 
-                            callback(this);
+                                    if (!target) {
+                                        throw "Tab target " + targetId + " does not exist";
+                                    }
 
-                            if (e.preventDefault) {
-                                e.preventDefault();
-                            } else {
-                                e.returnValue = false;
-                            }
+                                    clickHandler(tabs[i], select);
 
-                            e.stopPropagation();
+                                    Sfjs.addClass(target, 'hidden');
+                                }
 
-                            return false;
-                        });
-                    };
+                                select(tabs[0]);
+                            };
 
-                    tabTarget.initTabs(document.querySelectorAll('#layout-data-{{ hash }} .tree .tree-inner'));
-                    toggler.initButtons(document.querySelectorAll('#layout-data-{{ hash }} a.toggle-button'));
-
-                    (function () {
-                        var STORAGE_KEY = 'sf_toggle_all_data_{{ hash }}';
-                        var buttons = document.querySelectorAll('#layout-data-{{ hash }} .tree-inner a.toggle-button');
-                        var target = document.getElementById('expand-all-{{ hash }}');
-                        var isExpanded = storage.getItem(STORAGE_KEY, false);
-
-                        var changeTitle = function (target) {
-                            var title = target.getAttribute('data-collapsed-title');
-                            target.setAttribute('data-collapsed-title', target.text);
-                            target.text = title;
-                        };
-
-                        if (isExpanded) {
-                            changeTitle(target);
+                            return {
+                                initTabs: initTabs,
+                                select: select
+                            };
                         }
 
-                        var toggleAll = function () {
-                            var isExpanded = storage.getItem(STORAGE_KEY, false);
-                            for (var i = 0; i < buttons.length; i++) {
-                                if (isExpanded) {
-                                    toggler.collapse(buttons[i]);
+                        var tabTarget = new TabView();
+                        var storage = new JsonStorage(sessionStorage);
+                        var toggler = new Toggler(storage);
+                        var clickHandler = function (element, callback) {
+                            Sfjs.addEventListener(element, 'click', function (e) {
+                                if (!e) {
+                                    e = window.event;
+                                }
+
+                                callback(this);
+
+                                if (e.preventDefault) {
+                                    e.preventDefault();
                                 } else {
-                                    toggler.expand(buttons[i]);
+                                    e.returnValue = false;
+                                }
+
+                                e.stopPropagation();
+
+                                return false;
+                            });
+                        };
+
+                        tabTarget.initTabs(document.querySelectorAll('#layout-data-{{ hash }} .tree .tree-inner'));
+                        toggler.initButtons(document.querySelectorAll('#layout-data-{{ hash }} a.toggle-button'));
+
+                        (function () {
+                            var STORAGE_KEY = 'sf_toggle_all_data_{{ hash }}';
+                            var buttons = document.querySelectorAll('#layout-data-{{ hash }} .tree-inner a.toggle-button');
+                            var target = document.getElementById('expand-all-{{ hash }}');
+                            var isExpanded = storage.getItem(STORAGE_KEY, false);
+
+                            var changeTitle = function (target) {
+                                var title = target.getAttribute('data-collapsed-title');
+                                target.setAttribute('data-collapsed-title', target.text);
+                                target.text = title;
+                            };
+
+                            if (isExpanded) {
+                                changeTitle(target);
+                            }
+
+                            var toggleAll = function () {
+                                var isExpanded = storage.getItem(STORAGE_KEY, false);
+                                for (var i = 0; i < buttons.length; i++) {
+                                    if (isExpanded) {
+                                        toggler.collapse(buttons[i]);
+                                    } else {
+                                        toggler.expand(buttons[i]);
+                                    }
+                                }
+                                changeTitle(target);
+                                storage.setItem(STORAGE_KEY, !isExpanded);
+                            };
+
+                            clickHandler(target, toggleAll);
+
+                            function fitDetailsContainer() {
+                                var container = document.getElementById('tree-details-container-{{ hash }}');
+
+                                if (window.scrollY > 375) {
+                                    Sfjs.addClass(document.getElementById('tree-details-container-{{ hash }}'), 'fixed');
+                                    container.style.maxHeight = window.innerHeight - container.offsetTop + 'px';
+                                } else {
+                                    Sfjs.removeClass(document.getElementById('tree-details-container-{{ hash }}'), 'fixed');
+                                    container.style.maxHeight = '';
                                 }
                             }
-                            changeTitle(target);
-                            storage.setItem(STORAGE_KEY, !isExpanded);
-                        };
-
-                        clickHandler(target, toggleAll);
-
-                        function fitDetailsContainer() {
-                            var container = document.getElementById('tree-details-container-{{ hash }}');
-
-                            if (window.scrollY > 375) {
-                                Sfjs.addClass(document.getElementById('tree-details-container-{{ hash }}'), 'fixed');
-                                container.style.maxHeight = window.innerHeight - container.offsetTop + 'px';
-                            } else {
-                                Sfjs.removeClass(document.getElementById('tree-details-container-{{ hash }}'), 'fixed');
-                                container.style.maxHeight = '';
-                            }
-                        }
-                        window.addEventListener('scroll', fitDetailsContainer);
-                        fitDetailsContainer();
-                    })();
-                }());
-            </script>
-        {% endfor %}
-    </div>
+                            window.addEventListener('scroll', fitDetailsContainer);
+                            fitDetailsContainer();
+                        })();
+                    }());
+                </script>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            <p>No layouts were rendered.</p>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% macro view_tree_entry(hash, name, data, expanded) %}

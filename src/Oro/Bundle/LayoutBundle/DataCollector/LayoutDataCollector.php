@@ -73,15 +73,7 @@ class LayoutDataCollector extends DataCollector
 
     public function getData(): array
     {
-        return $this->data ?: [
-            [
-                'context' => [
-                    'items' => [],
-                    'data' => [],
-                ],
-                'views' => [],
-            ],
-        ];
+        return $this->data;
     }
 
     /**
