@@ -1535,7 +1535,7 @@ JS;
                     $controlLabel
                 );
 
-                if (true === $controlLabel->compareValues(Form::normalizeValue($value, $label))) {
+                if (true === $controlLabel->compareValues(Form::normalizeValue($value))) {
                     continue 2;
                 }
             }
