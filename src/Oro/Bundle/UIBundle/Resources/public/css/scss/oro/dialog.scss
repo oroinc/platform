@@ -102,6 +102,11 @@
             position: $dialog-content-widget-content-position;
             margin: $dialog-content-inner-offset;
 
+            &.disable-scroll {
+                overflow: hidden;
+                height: calc(100% - $dialog-content-inner-offset * 2);
+            }
+
             .flash-messages {
                 max-width: $dialog-content-flash-messages-max-width;
                 min-width: $dialog-content-flash-messages-min-width;

@@ -22,10 +22,6 @@ $grid-effect-info: $info !default;
         position: relative;
     }
 
-    .grid-scrollable-container {
-        overflow: initial;
-    }
-
     .grid-row {
         &.selected,
         &.changed {
