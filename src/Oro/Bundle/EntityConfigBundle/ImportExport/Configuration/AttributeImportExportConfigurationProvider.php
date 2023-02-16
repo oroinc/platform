@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Configuration;
 
+use Oro\Bundle\EntityConfigBundle\Async\Topic\AttributePreImportTopic;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
@@ -29,6 +30,7 @@ class AttributeImportExportConfigurationProvider implements ImportExportConfigur
             ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_JOB_NAME => 'entity_export_template_to_csv',
             ImportExportConfiguration::FIELD_EXPORT_TEMPLATE_PROCESSOR_ALIAS =>
                 'oro_entity_config_attribute.export_template',
+            ImportExportConfiguration::FIELD_IMPORT_PROCESSOR_TOPIC_NAME => AttributePreImportTopic::getName(),
         ]);
     }
 }
