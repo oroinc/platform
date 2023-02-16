@@ -101,7 +101,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             referenceEl: this.$rootEl,
             collection: this.main.collection
         });
-        this.selectionStateHintView.$el.insertAfter(this.$rootEl);
+        this.selectionStateHintView.$el.insertAfter(this.main.$el.find('[role="grid"]'));
         this.listenTo(this.selectionStateHintView, 'reset', this._resetSelectedModels);
 
         this.delegateEvents();
@@ -266,15 +266,28 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                 if (ui.item.is(this.SEPARATOR_ROW_SELECTOR)) {
                     return;
                 }
-                this.dropZoneMenuView.show();
+
+                this.dropZoneMenuView.updateShiftProp(
+                    this._cursorOnRightSide(e.pageX)
+                ).show();
             },
             'sortable:stop': this.dropZoneMenuView.hide.bind(this.dropZoneMenuView)
         });
-        this.dropZoneMenuView.$el.insertBefore(this.main.$el);
+        this.dropZoneMenuView.$el.insertBefore(this.main.$el.find('[role="grid"]'));
+
+        // Event "dropout" and "dropover" can be fired in different sequences
+        let droppableEl = null;
         this.listenTo(this.dropZoneMenuView, {
             drop: () => this._dropDone = true,
-            dropout: () => {
+            dropout: (e, ui) => {
+                if (e.target.isSameNode(droppableEl)) {
+                    this.main.$el.find(`.${this.SORTABLE_DEFAULTS.placeholder}`).show();
+                }
                 delete this._dropDone;
+            },
+            dropover: (e, ui) => {
+                droppableEl = e.target;
+                this.main.$el.find(`.${this.SORTABLE_DEFAULTS.placeholder}`).hide();
             }
         });
     },
@@ -377,6 +390,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             this._resetSelectedModels();
         } else {
             this._selectRowBeforeDragStart(e, ui.item);
+            this._adjustHelperPosition(e, ui);
         }
 
         const {cursor, forcePlaceholderSize} = this.SORTABLE_DEFAULTS;
@@ -580,7 +594,43 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             iconClasses: currentEL.find('.sort-icon').attr('class')
         };
 
-        return $(this.helperTemplate(templateData));
+        const $helper = $(this.helperTemplate(templateData));
+
+        if (isMobile()) {
+            return $helper;
+        }
+
+        $helper.css('width', currentEL.width() / 2);
+
+        return $helper;
+    },
+
+    /**
+     * @param {Event} e
+     * @param {Object} ui
+     * @private
+     */
+    _adjustHelperPosition(e, ui) {
+        if (isMobile()) {
+            return;
+        }
+
+        const tableReact = e.target.getBoundingClientRect();
+        const itemReact = ui.item[0].getBoundingClientRect();
+        const cssTop = e.pageY - itemReact.top;
+        let cssLeft = e.pageX - tableReact.left;
+
+        if (this._cursorOnRightSide(e.pageX)) {
+            const helperWidth = ui.item.width() / 2;
+            const delta = $(e.target).width() + tableReact.left - e.pageX;
+
+            cssLeft = helperWidth - delta;
+        }
+
+        $(e.target).sortable('option', 'cursorAt', {
+            top: cssTop,
+            left: Math.max(cssLeft, 0)
+        });
     },
 
     /**
@@ -611,6 +661,16 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     _resetSelectedModels() {
         this.main.collection
             .forEach(model => model.set('_selected', false));
+    },
+
+    /**
+     * Defines if a cursor is on the right side of the window
+     * @param {number} x
+     * @returns {boolean}
+     * @private
+     */
+    _cursorOnRightSide(x) {
+        return x > (window.innerWidth / 2);
     }
 });
 

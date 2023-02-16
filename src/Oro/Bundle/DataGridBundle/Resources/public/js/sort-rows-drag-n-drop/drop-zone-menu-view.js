@@ -3,6 +3,8 @@ import $ from 'jquery';
 import BaseView from 'oroui/js/app/views/base/view';
 import template from 'tpl-loader!orodatagrid/templates/sort-rows-drag-n-drop/drop-zone-menu.html';
 
+import scrollHelper from 'oroui/js/tools/scroll-helper';
+
 import 'jquery-ui/widgets/droppable';
 
 const DropZoneMenuView = BaseView.extend({
@@ -22,6 +24,14 @@ const DropZoneMenuView = BaseView.extend({
     listen: {
         drop: 'hide'
     },
+
+    /**
+     * Defines to shift its position
+     * @property {boolean}
+     */
+    shiftStart: false,
+
+    OFFSET: 20,
 
     /**
      * @inheritdoc
@@ -123,16 +133,37 @@ const DropZoneMenuView = BaseView.extend({
     },
 
     updatePosition() {
-        const $referenceEl = this.datagrid.body.$el;
+        if (!document.contains(this.el)) {
+            return;
+        }
+        const $referenceEl = this.$el.parents('.grid-scrollable-container, body');
+        const parentHeight = $referenceEl[0].clientHeight;
         const offset = $referenceEl.offset();
-        const cssTop = Math.max(offset.top, (offset.top + $referenceEl.visibleHeight() / 2) - this.$el.height() / 2);
-        const cssLeft = (offset.left + $referenceEl.innerWidth() - this.$el.width()) / 2;
+        const cssTop = Math.max(
+            offset.top + this.datagrid.header.$el.height(),
+            (offset.top + parentHeight / 2) - this.$el.height() / 2
+        );
+        let cssLeft = offset.left + $referenceEl.width() / 2 + this.OFFSET;
+
+        if (this.shiftStart) {
+            cssLeft = offset.left + $referenceEl.width() / 2 - this.$el.width() - this.OFFSET;
+
+            if (scrollHelper.hasScroll($referenceEl)) {
+                cssLeft -= scrollHelper.scrollbarWidth();
+            }
+        }
 
         this.$el.css({
             position: 'fixed',
             top: `${cssTop}px`,
             left: `${cssLeft}px`
         });
+        return this;
+    },
+
+    updateShiftProp(value) {
+        this.shiftStart = value;
+        return this;
     },
 
     show() {
@@ -142,6 +173,7 @@ const DropZoneMenuView = BaseView.extend({
             }
         });
         this.updatePosition();
+        return this;
     },
 
     hide() {
@@ -150,6 +182,7 @@ const DropZoneMenuView = BaseView.extend({
                 this.$el.removeClass('show');
             }
         });
+        return this;
     },
 
     /**

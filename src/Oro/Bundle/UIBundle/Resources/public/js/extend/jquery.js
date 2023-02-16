@@ -128,16 +128,6 @@ define(['jquery'], function($) {
             );
         },
 
-        visibleHeight: function() {
-            const scrollTop = this.scrollParent().scrollTop();
-            const scrollBottom = scrollTop + this.scrollParent().height();
-            const elTop = this.offset().top;
-            const elBottom = elTop + this.outerHeight();
-            const visibleTop = elTop < scrollTop ? scrollTop : elTop;
-            const visibleBottom = elBottom > scrollBottom ? scrollBottom : elBottom;
-            return visibleBottom - visibleTop;
-        },
-
         /**
          * source http://stackoverflow.com/questions/13607252/getting-border-width-in-jquery
          */

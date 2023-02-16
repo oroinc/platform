@@ -1,6 +1,8 @@
 /* @theme: admin.oro; */
 
 .sorting-helper {
+    $root: &;
+
     opacity: .7;
 
     &__content {
@@ -19,6 +21,7 @@
 
     &__icon {
         width: $sort-datagrid-icon-cell-width;
+        min-width: $sort-datagrid-icon-cell-width;
         text-align: $sort-datagrid-icon-cell-text-align;
     }
 
@@ -40,7 +43,7 @@
     }
 
     &.single {
-        &__content {
+        #{$root}__content {
             box-shadow: 1px 1px 3px 1px $primary-800;
         }
     }
