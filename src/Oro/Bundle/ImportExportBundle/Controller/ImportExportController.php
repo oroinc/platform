@@ -144,7 +144,8 @@ class ImportExportController extends AbstractController
                     [
                         'processorAlias' => $processorAlias,
                         'fileName' => $fileName,
-                        'originFileName' => $originalFileName
+                        'originFileName' => $originalFileName,
+                        'importProcessorTopicName' => $request->get('importProcessorTopicName'),
                     ],
                     $request->query->all()
                 );
@@ -288,9 +289,10 @@ class ImportExportController extends AbstractController
         $jobName = $request->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
+        $importProcessorTopicName  = $request->get('importProcessorTopicName') ?: PreImportTopic::getName();
 
         $this->get(MessageProducerInterface::class)->send(
-            PreImportTopic::getName(),
+            $importProcessorTopicName,
             [
                 'fileName' => $fileName,
                 'process' => ProcessorRegistry::TYPE_IMPORT,

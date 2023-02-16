@@ -4,6 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\Configuration;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 
+/**
+ * Import/Export configuration holder
+ */
 class ImportExportConfiguration extends ParameterBag implements ImportExportConfigurationInterface
 {
     const FIELD_ROUTE_OPTIONS = 'routeOptions';
@@ -28,6 +31,7 @@ class ImportExportConfiguration extends ParameterBag implements ImportExportConf
     const FIELD_IMPORT_VALIDATION_JOB_NAME = 'importValidationJobName';
     const FIELD_IMPORT_VALIDATION_BUTTON_LABEL = 'importValidationButtonLabel';
     const FIELD_IMPORT_ADDITIONAL_NOTICES = 'importAdditionalNotices';
+    const FIELD_IMPORT_PROCESSOR_TOPIC_NAME = 'importProcessorTopicName';
 
     /**
      * {@inheritDoc}
@@ -163,5 +167,10 @@ class ImportExportConfiguration extends ParameterBag implements ImportExportConf
     public function getImportAdditionalNotices(): array
     {
         return $this->get(self::FIELD_IMPORT_ADDITIONAL_NOTICES, []);
+    }
+
+    public function getImportProcessorTopicName(): ?string
+    {
+        return $this->get(self::FIELD_IMPORT_PROCESSOR_TOPIC_NAME);
     }
 }
