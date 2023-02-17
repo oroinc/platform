@@ -8,5 +8,7 @@
 
     &.separator {
         @extend %draggable-separator;
+
+        background-color: $sort-datagrid-sorted-row-hovered-bg-color;
     }
 }

@@ -6,7 +6,6 @@
         border: 0;
         position: relative;
         z-index: 1;
-        background-color: $sort-datagrid-sorted-row-bg-color;
 
         &::before {
             content: '';
@@ -34,5 +33,11 @@
 .oro-datagrid {
     .draggable-separator {
         @extend %draggable-separator;
+
+        background-color: $sort-datagrid-sorted-row-bg-color;
+
+        &:hover {
+            background-color: $sort-datagrid-sorted-row-hovered-bg-color;
+        }
     }
 }

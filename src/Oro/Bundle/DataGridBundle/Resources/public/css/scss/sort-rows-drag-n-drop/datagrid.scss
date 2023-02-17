@@ -2,18 +2,30 @@
 $grid-effect-success: $success !default;
 $grid-effect-info: $info !default;
 
-.oro-datagrid .sort-icon-cell {
-    width: $sort-datagrid-icon-cell-width;
-    text-align: $sort-datagrid-icon-cell-text-align;
+.oro-datagrid {
+    .sort-icon-cell {
+        width: $sort-datagrid-icon-cell-width;
+        text-align: $sort-datagrid-icon-cell-text-align;
+    }
+
+    .row-has-sort-order {
+        background-color: $sort-datagrid-sorted-row-bg-color;
+
+        &:hover {
+            background-color: $sort-datagrid-sorted-row-hovered-bg-color;
+        }
+    }
 }
 
-.row-has-sort-order {
-    background-color: $sort-datagrid-sorted-row-bg-color;
-}
 
 .drag-n-drop-start {
     .grid-row.selected {
         display: none;
+    }
+
+    .row-has-sort-order:hover {
+        // sorted rows under drag action should not be highlighted on hover
+        background-color: $sort-datagrid-sorted-row-bg-color;
     }
 }
 
