@@ -31,7 +31,7 @@ class SetTestCurrentDepartmentEntityId implements ProcessorInterface
             ->setParameter('name', 'Current Department')
             ->getQuery()
             ->getArrayResult();
-        if (!empty($rows)) {
+        if ($rows) {
             $context->setId((string)$rows[0]['id']);
         }
     }

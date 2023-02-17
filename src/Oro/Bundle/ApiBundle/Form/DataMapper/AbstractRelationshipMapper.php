@@ -30,12 +30,12 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
     /**
      * {@inheritDoc}
      */
-    public function mapDataToForms($data, $forms)
+    public function mapDataToForms($viewData, $forms): void
     {
-        $empty = null === $data;
+        $empty = null === $viewData;
 
-        if (!$empty && !is_object($data)) {
-            throw new UnexpectedTypeException($data, 'object or empty');
+        if (!$empty && !\is_object($viewData)) {
+            throw new UnexpectedTypeException($viewData, 'object or empty');
         }
 
         foreach ($forms as $form) {
@@ -43,7 +43,7 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
             $config = $form->getConfig();
 
             if (!$empty && null !== $propertyPath && $config->getMapped()) {
-                $this->mapDataToFormField($data, $form, $propertyPath);
+                $this->mapDataToFormField($viewData, $form, $propertyPath);
             } else {
                 $form->setData($form->getConfig()->getData());
             }
@@ -53,13 +53,13 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
     /**
      * {@inheritDoc}
      */
-    public function mapFormsToData($forms, &$data)
+    public function mapFormsToData($forms, &$viewData): void
     {
-        if (null === $data) {
+        if (null === $viewData) {
             return;
         }
-        if (!\is_object($data)) {
-            throw new UnexpectedTypeException($data, 'object or empty');
+        if (!\is_object($viewData)) {
+            throw new UnexpectedTypeException($viewData, 'object or empty');
         }
 
         foreach ($forms as $form) {
@@ -74,7 +74,7 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
                 && $form->isSynchronized()
                 && !$form->isDisabled()
             ) {
-                $this->mapFormFieldToData($data, $form, $config, $propertyPath);
+                $this->mapFormFieldToData($viewData, $form, $config, $propertyPath);
             }
         }
     }

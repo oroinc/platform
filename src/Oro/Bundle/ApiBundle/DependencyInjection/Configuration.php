@@ -333,7 +333,7 @@ class Configuration implements ConfigurationInterface
             if (!\array_key_exists($key, $view)) {
                 $view[$key] = $val;
             } elseif ('headers' === $key) {
-                foreach ($underlyingView[$key] as $headerName => $headerValues) {
+                foreach ($val as $headerName => $headerValues) {
                     $existingHeaderValues = [];
                     if (!empty($view[$key][$headerName])) {
                         foreach ($view[$key][$headerName] as $headerValue) {
@@ -347,7 +347,7 @@ class Configuration implements ConfigurationInterface
                     }
                 }
             } elseif ('data_types' === $key) {
-                foreach ($underlyingView[$key] as $dataType => $docDataType) {
+                foreach ($val as $dataType => $docDataType) {
                     if (!isset($view[$key][$dataType])) {
                         $view[$key][$dataType] = $docDataType;
                     }

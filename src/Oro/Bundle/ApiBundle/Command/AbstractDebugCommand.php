@@ -28,7 +28,7 @@ abstract class AbstractDebugCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
@@ -73,51 +73,49 @@ HELP
     protected function getRequestType(InputInterface $input): RequestType
     {
         $value = $input->getOption('request-type');
-        if (count($value) === 1 && 'any' === $value[0]) {
+        if (\count($value) === 1 && 'any' === $value[0]) {
             $value = [];
         }
 
         return new RequestType($value);
     }
 
-    /**
-     * @param mixed $value
-     */
-    protected function convertValueToString($value): string
+    protected function convertValueToString(mixed $value): string
     {
         if (null === $value) {
             return 'NULL';
-        } elseif (is_bool($value)) {
+        }
+        if (\is_bool($value)) {
             return $value ? 'true' : 'false';
-        } elseif (is_array($value)) {
+        }
+        if (\is_array($value)) {
             return '[' . implode(', ', $value) . ']';
         }
 
         return (string)$value;
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    protected function getTypedValue($value)
+    protected function getTypedValue(mixed $value): mixed
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             return $value;
         }
 
-        if (in_array($value, ['NULL', 'null', '~'], true)) {
+        if (\in_array($value, ['NULL', 'null', '~'], true)) {
             return null;
-        } elseif ('true' === $value) {
+        }
+        if ('true' === $value) {
             return true;
-        } elseif ('false' === $value) {
+        }
+        if ('false' === $value) {
             return false;
-        } elseif (is_numeric($value)) {
+        }
+        if (is_numeric($value)) {
             return $value == (int)$value
                 ? (int)$value
                 : (float)$value;
-        } elseif (str_starts_with($value, '[') && str_ends_with($value, ']')) {
+        }
+        if (str_starts_with($value, '[') && str_ends_with($value, ']')) {
             return explode(',', substr($value, 1, -1));
         }
 

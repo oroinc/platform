@@ -32,7 +32,7 @@ abstract class AbstractConfigurationSection implements ConfigurationSectionInter
     {
         $callbacks = $this->settings->getConfigureCallbacks($section);
         foreach ($callbacks as $callback) {
-            \call_user_func($callback, $node);
+            $callback($node);
         }
     }
 
@@ -46,11 +46,11 @@ abstract class AbstractConfigurationSection implements ConfigurationSectionInter
             ->always(
                 function ($value) use ($section, $customPreProcessCallback) {
                     if (null !== $customPreProcessCallback) {
-                        $value = \call_user_func($customPreProcessCallback, $value);
+                        $value = $customPreProcessCallback($value);
                     }
                     $callbacks = $this->settings->getPreProcessCallbacks($section);
                     foreach ($callbacks as $callback) {
-                        $value = \call_user_func($callback, $value);
+                        $value = $callback($value);
                     }
 
                     return $value;
@@ -68,11 +68,11 @@ abstract class AbstractConfigurationSection implements ConfigurationSectionInter
             ->always(
                 function ($value) use ($section, $customPostProcessCallback) {
                     if (null !== $customPostProcessCallback) {
-                        $value = \call_user_func($customPostProcessCallback, $value);
+                        $value = $customPostProcessCallback($value);
                     }
                     $callbacks = $this->settings->getPostProcessCallbacks($section);
                     foreach ($callbacks as $callback) {
-                        $value = \call_user_func($callback, $value);
+                        $value = $callback($value);
                     }
 
                     return $value;

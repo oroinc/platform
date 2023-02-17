@@ -21,7 +21,7 @@ class FieldVisitor extends ExpressionVisitor
      */
     public function getFields(): array
     {
-        return \array_keys($this->fields);
+        return array_keys($this->fields);
     }
 
     /**

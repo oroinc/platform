@@ -21,10 +21,8 @@ class DocCacheClearCommand extends Command
     protected static $defaultName = 'oro:api:doc:cache:clear';
 
     private CacheManager $cacheManager;
-
     /** @var string[] */
     private array $allApiDocViews;
-
     private string $environment;
 
     /**
@@ -44,13 +42,14 @@ class DocCacheClearCommand extends Command
         $this->environment = $environment;
     }
 
-    public function isEnabled()
+    /** @noinspection PhpMissingParentCallCommonInspection */
+    public function isEnabled(): bool
     {
         return $this->cacheManager->isApiDocCacheEnabled() && parent::isEnabled();
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
@@ -84,14 +83,14 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
         $views = $input->getOption('view');
         $noWarmup = $input->getOption('no-warmup');
 
-        if (1 === count($views) && self::ALL_VIEWS === reset($views)) {
+        if (1 === \count($views) && self::ALL_VIEWS === reset($views)) {
             $views = $this->allApiDocViews;
         }
 

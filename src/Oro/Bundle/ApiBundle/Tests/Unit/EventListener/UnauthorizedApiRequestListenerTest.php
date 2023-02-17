@@ -44,7 +44,7 @@ class UnauthorizedApiRequestListenerTest extends \PHPUnit\Framework\TestCase
         return new ResponseEvent(
             $this->createMock(HttpKernelInterface::class),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            HttpKernelInterface::MAIN_REQUEST,
             $response
         );
     }

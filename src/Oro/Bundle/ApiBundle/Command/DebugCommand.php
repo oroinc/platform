@@ -48,9 +48,6 @@ class DebugCommand extends AbstractDebugCommand
         $this->processorBag = $processorBag;
     }
 
-    /**
-     * {@inheritdoc }
-     */
     protected function configure(): void
     {
         $this
@@ -131,17 +128,13 @@ HELP
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc }
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function getDefaultRequestType(): array
     {
         return ['any'];
     }
 
-    /**
-     * {@inheritdoc }
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $showProcessors = $input->getOption('processors');
@@ -193,7 +186,7 @@ HELP
         foreach ($this->processorBag->getActions() as $action) {
             $processorIds = $this->getProcessorIds($action);
             $allProcessorsIds[] = $processorIds;
-            $numberOfProcessors = count($processorIds);
+            $numberOfProcessors = \count($processorIds);
             $totalNumberOfProcessors += $numberOfProcessors;
             $processorInfo = [
                 $numberOfProcessors,
@@ -201,7 +194,7 @@ HELP
                     ? $this->processorBag->getActionGroups($action)
                     : []
             ];
-            if (in_array($action, $publicActions, true)) {
+            if (\in_array($action, $publicActions, true)) {
                 $processorsForPublicActions[$action] = $processorInfo;
             } else {
                 $processorsForOtherActions[$action] = $processorInfo;
@@ -228,7 +221,7 @@ HELP
         $output->writeln(sprintf(
             '<info>Total number of processor instances'
             . ' (the same processor can be re-used in several actions or groups):</info> %s',
-            count($allProcessorsIds)
+            \count($allProcessorsIds)
         ));
 
         $output->writeln('<info>Public Actions:</info>');
@@ -290,11 +283,11 @@ HELP
                 if ($processor instanceof TraceableProcessor) {
                     $processor = $processor->getProcessor();
                 }
-                $className = get_class($processor);
+                $className = \get_class($processor);
                 if (!isset($processorsMap[$className])) {
                     $processorsMap[$className] = [];
                 }
-                if (!in_array($action, $processorsMap[$className], true)) {
+                if (!\in_array($action, $processorsMap[$className], true)) {
                     $processorsMap[$className][] = $action;
                 }
             }
@@ -327,7 +320,7 @@ HELP
                 if ($processor instanceof TraceableProcessor) {
                     $processor = $processor->getProcessor();
                 }
-                $processorClasses[] = get_class($processor);
+                $processorClasses[] = \get_class($processor);
             }
         }
         $processorClasses = array_unique($processorClasses);
@@ -353,7 +346,7 @@ HELP
         RequestType $requestType,
         array $attributes,
         bool $noDocs
-    ) {
+    ): void {
         $output->writeln('The processors are displayed in the order they are executed.');
 
         $table = new Table($output);
@@ -395,10 +388,10 @@ HELP
                 '<comment>%s</comment>%s%s',
                 $processors->getProcessorId(),
                 PHP_EOL,
-                get_class($processor)
+                \get_class($processor)
             );
             if (!$noDocs) {
-                $processorDescription = $this->getClassDocComment(get_class($processor));
+                $processorDescription = $this->getClassDocComment(\get_class($processor));
                 if (!empty($processorDescription)) {
                     $processorColumn .= PHP_EOL . $processorDescription;
                 }
@@ -435,7 +428,7 @@ HELP
     {
         $rows = [];
 
-        if (array_key_exists('group', $attributes)) {
+        if (\array_key_exists('group', $attributes)) {
             $group = $attributes['group'];
             if ('customize_loaded_data' === $action) {
                 $rows[] = $this->formatProcessorAttribute('collection', 'collection' === $group, true);
@@ -448,11 +441,11 @@ HELP
             }
             unset($attributes['group']);
         }
-        if ('get_config' === $action && array_key_exists(FilterIdentifierFieldsConfigExtra::NAME, $attributes)) {
+        if ('get_config' === $action && \array_key_exists(FilterIdentifierFieldsConfigExtra::NAME, $attributes)) {
             $identifierFieldsOnly = $attributes[FilterIdentifierFieldsConfigExtra::NAME];
-            if (array_key_exists('extra', $attributes)) {
+            if (\array_key_exists('extra', $attributes)) {
                 $extra = $attributes['extra'];
-                if (is_string($extra) || key($extra) === Matcher::OPERATOR_NOT) {
+                if (\is_string($extra) || key($extra) === Matcher::OPERATOR_NOT) {
                     $extra = [Matcher::OPERATOR_AND => [$extra]];
                 }
                 if ($identifierFieldsOnly) {
@@ -478,14 +471,7 @@ HELP
         return implode(PHP_EOL, $rows);
     }
 
-    /**
-     * @param string $name
-     * @param mixed  $value
-     * @param bool   $bold
-     *
-     * @return string
-     */
-    private function formatProcessorAttribute(string $name, $value, $bold = false): string
+    private function formatProcessorAttribute(string $name, mixed $value, bool $bold = false): string
     {
         $stringValue = $this->convertProcessorAttributeValueToString($value);
         if ($bold) {
@@ -496,24 +482,20 @@ HELP
     }
 
     /**
-     * @param mixed $value
-     *
-     * @return string
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function convertProcessorAttributeValueToString($value): string
+    private function convertProcessorAttributeValueToString(mixed $value): string
     {
         if (null === $value) {
             return '<comment>!exists</comment>';
         }
 
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             return $this->convertValueToString($value);
         }
 
         $items = reset($value);
-        if (!is_array($items)) {
+        if (!\is_array($items)) {
             if (null === $items && key($value) === Matcher::OPERATOR_NOT) {
                 return '<comment>exists</comment>';
             }
@@ -524,7 +506,7 @@ HELP
         $delimiter = sprintf(' <comment>%s</comment> ', key($value));
         $items = array_map(
             function ($val) {
-                if (is_array($val)) {
+                if (\is_array($val)) {
                     $item = reset($val);
 
                     return sprintf('<comment>%s</comment>%s', key($val), $item);

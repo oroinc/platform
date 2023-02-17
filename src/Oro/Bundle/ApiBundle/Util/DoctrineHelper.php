@@ -17,7 +17,7 @@ class DoctrineHelper extends BaseHelper
     /**
      * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         parent::reset();
         $this->manageableEntityClasses = [];

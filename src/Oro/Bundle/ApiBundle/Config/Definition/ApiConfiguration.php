@@ -32,7 +32,7 @@ class ApiConfiguration implements ConfigurationInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -71,7 +71,7 @@ class ApiConfiguration implements ConfigurationInterface
         );
     }
 
-    private function addEntityAliasesSection(NodeBuilder $parentNode): NodeBuilder
+    private function addEntityAliasesSection(NodeBuilder $parentNode): void
     {
         $node = $parentNode
             ->arrayNode(self::ENTITY_ALIASES_SECTION)
@@ -80,8 +80,6 @@ class ApiConfiguration implements ConfigurationInterface
                 ->children();
         $configuration = new EntityAliasesConfiguration();
         $configuration->configure($node);
-
-        return $node;
     }
 
     private function addEntitySection(NodeBuilder $parentNode, EntityConfiguration $configuration): NodeBuilder

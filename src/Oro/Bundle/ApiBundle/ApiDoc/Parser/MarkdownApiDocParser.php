@@ -185,14 +185,14 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
                 if ('h1' === $node->tagName) {
                     $state->setClassName($node->nodeValue);
                 } elseif ('h2' === $node->tagName && $state->hasClass()) {
-                    $state->setSection(\strtolower($node->nodeValue));
+                    $state->setSection(strtolower($node->nodeValue));
                 } elseif ('h3' === $node->tagName && $state->hasSection()) {
-                    $state->setElement(\strtolower($node->nodeValue));
+                    $state->setElement(strtolower($node->nodeValue));
                     $section = $state->getSection();
                     $state->setHasSubElements($this->hasSubElements($section));
                 } elseif ($state->hasElement()) {
                     if ('h4' === $node->tagName && $state->hasSubElements()) {
-                        $state->setSubElement(\strtolower($node->nodeValue));
+                        $state->setSubElement(strtolower($node->nodeValue));
                     } else {
                         $this->saveElement($doc, $node, $state);
                     }

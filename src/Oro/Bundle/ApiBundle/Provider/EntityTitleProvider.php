@@ -60,27 +60,21 @@ class EntityTitleProvider
         foreach ($groups as $idFieldType => $group) {
             if ('array' === $idFieldType) {
                 foreach ($group as $entityClass => [$idFieldName, $ids]) {
-                    $result = array_merge(
-                        $result,
-                        $this->executeQueryWithCompositeId(
-                            $this->getNameQuery($em, $entityClass, $idFieldName, $ids),
-                            $idFieldName
-                        )
+                    $result[] = $this->executeQueryWithCompositeId(
+                        $this->getNameQuery($em, $entityClass, $idFieldName, $ids),
+                        $idFieldName
                     );
                 }
-            } elseif (count($group) === 1) {
+            } elseif (\count($group) === 1) {
                 [$idFieldName, $ids] = reset($group);
                 $entityClass = key($group);
-                $result = array_merge(
-                    $result,
-                    $this->getNameQuery($em, $entityClass, $idFieldName, $ids)->getArrayResult()
-                );
+                $result[] = $this->getNameQuery($em, $entityClass, $idFieldName, $ids)->getArrayResult();
             } else {
-                $result = array_merge(
-                    $result,
-                    $this->getNameUnionQuery($em, $group, $idFieldType)->getArrayResult()
-                );
+                $result[] = $this->getNameUnionQuery($em, $group, $idFieldType)->getArrayResult();
             }
+        }
+        if ($result) {
+            $result = array_merge(...$result);
         }
 
         return $result;

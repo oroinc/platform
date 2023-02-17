@@ -128,7 +128,7 @@ class EntityDescriptionProvider
             $result = $this->humanizePropertyName($propertyPath);
         }
         if ($result) {
-            $result = \strtolower($result);
+            $result = strtolower($result);
         }
         $this->cache[$entityClass][self::FIELDS][$propertyPath][self::DESCRIPTION] = $result;
 

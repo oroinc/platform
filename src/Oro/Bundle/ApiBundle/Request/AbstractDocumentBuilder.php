@@ -327,7 +327,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
             ConfigUtil::CLASS_NAME === $propertyPath
             && (
                 $metadata->isInheritedType()
-                || \is_a($metadata->getClassName(), EntityIdentifier::class, true)
+                || is_a($metadata->getClassName(), EntityIdentifier::class, true)
             );
     }
 

@@ -66,7 +66,7 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
                 }
             }
         }
-        $resourceDocParsers = \array_merge($defaultResourceDocParsers, $resourceDocParsers);
+        $resourceDocParsers = array_merge($defaultResourceDocParsers, $resourceDocParsers);
 
         // register
         $container->getDefinition(self::RESOURCE_DOC_PARSER_REGISTRY_SERVICE_ID)
