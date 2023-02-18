@@ -45,7 +45,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
             : [];
 
         $result = !empty($data[JsonApiDoc::ATTRIBUTES])
-            ? \array_merge($data[JsonApiDoc::ATTRIBUTES], $relations)
+            ? array_merge($data[JsonApiDoc::ATTRIBUTES], $relations)
             : $relations;
 
         if (null !== $metadata && !empty($data[JsonApiDoc::META])) {

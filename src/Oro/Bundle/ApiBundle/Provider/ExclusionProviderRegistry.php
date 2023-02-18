@@ -54,9 +54,10 @@ class ExclusionProviderRegistry
             }
         }
         if (null === $exclusionProviderServiceId) {
-            throw new \LogicException(
-                sprintf('Cannot find an exclusion provider for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find an exclusion provider for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         /** @var ExclusionProviderInterface $exclusionProvider */

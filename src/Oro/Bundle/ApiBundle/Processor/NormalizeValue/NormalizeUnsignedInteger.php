@@ -41,9 +41,11 @@ class NormalizeUnsignedInteger extends AbstractProcessor
     {
         $normalizedValue = (int)$value;
         if (((string)$normalizedValue) !== $value || $normalizedValue < 0) {
-            throw new \UnexpectedValueException(
-                sprintf('Expected %s value. Given "%s".', $this->getDataTypeString(), $value)
-            );
+            throw new \UnexpectedValueException(sprintf(
+                'Expected %s value. Given "%s".',
+                $this->getDataTypeString(),
+                $value
+            ));
         }
 
         return $normalizedValue;

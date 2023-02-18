@@ -29,7 +29,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
 
     protected function normalizeData(array $data, EntityMetadata $metadata): array
     {
-        $fieldNames = \array_keys($data);
+        $fieldNames = array_keys($data);
         foreach ($fieldNames as $fieldName) {
             $associationMetadata = $metadata->getAssociation($fieldName);
             if (null !== $associationMetadata) {

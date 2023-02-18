@@ -40,7 +40,7 @@ class MatchApplicableChecker extends BaseMatchApplicableChecker
     protected function isMatchScalars(mixed $value, mixed $contextValue, string $name): bool
     {
         return isset($this->classAttributes[$name]) && \is_string($value) && $value
-            ? \is_a($contextValue, $value, true)
+            ? is_a($contextValue, $value, true)
             : parent::isMatchScalars($value, $contextValue, $name);
     }
 }

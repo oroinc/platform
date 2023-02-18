@@ -29,32 +29,26 @@ class AssertResultSchema implements ProcessorInterface
 
         $rootSections = [JsonApiDoc::DATA, JsonApiDoc::ERRORS, JsonApiDoc::META];
         if (\count(array_intersect(array_keys($result), $rootSections)) === 0) {
-            throw new RuntimeException(
-                sprintf(
-                    'The result must contain at least one of the following sections: %s.',
-                    implode(', ', $rootSections)
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'The result must contain at least one of the following sections: %s.',
+                implode(', ', $rootSections)
+            ));
         }
 
         if (\array_key_exists(JsonApiDoc::DATA, $result) && \array_key_exists(JsonApiDoc::ERRORS, $result)) {
-            throw new RuntimeException(
-                sprintf(
-                    'The sections "%s" and "%s" must not coexist in the result.',
-                    JsonApiDoc::DATA,
-                    JsonApiDoc::ERRORS
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'The sections "%s" and "%s" must not coexist in the result.',
+                JsonApiDoc::DATA,
+                JsonApiDoc::ERRORS
+            ));
         }
 
         if (\array_key_exists(JsonApiDoc::INCLUDED, $result) && !\array_key_exists(JsonApiDoc::DATA, $result)) {
-            throw new RuntimeException(
-                sprintf(
-                    'The result can contain the "%s" section only together with the "%s" section.',
-                    JsonApiDoc::INCLUDED,
-                    JsonApiDoc::DATA
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'The result can contain the "%s" section only together with the "%s" section.',
+                JsonApiDoc::INCLUDED,
+                JsonApiDoc::DATA
+            ));
         }
     }
 }

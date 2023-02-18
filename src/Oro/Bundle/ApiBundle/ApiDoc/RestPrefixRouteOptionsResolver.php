@@ -47,7 +47,7 @@ class RestPrefixRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     private function resolvePrefix(string $value): string
     {
-        return \str_replace(
+        return str_replace(
             self::PREFIX,
             $this->container->getParameter(OroApiExtension::REST_API_PREFIX_PARAMETER_NAME),
             $value

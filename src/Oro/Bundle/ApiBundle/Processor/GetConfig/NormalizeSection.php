@@ -136,7 +136,7 @@ abstract class NormalizeSection implements ProcessorInterface
             $targetMetadata = $this->getEntityMetadata($entityClass, $fieldPath);
             $targetFieldName = $this->getLastFieldName($fieldPath);
             if (null !== $targetMetadata
-                && in_array($targetFieldName, $targetMetadata->getIdentifierFieldNames(), true)
+                && \in_array($targetFieldName, $targetMetadata->getIdentifierFieldNames(), true)
             ) {
                 continue;
             }
@@ -218,6 +218,6 @@ abstract class NormalizeSection implements ProcessorInterface
     {
         $path = ConfigUtil::explodePropertyPath($propertyPath);
 
-        return array_pop($path);
+        return end($path);
     }
 }

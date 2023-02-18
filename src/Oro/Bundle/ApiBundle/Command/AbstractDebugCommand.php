@@ -138,9 +138,7 @@ HELP
         }
 
         if (!$this->resourcesProvider->isResourceKnown($entityClass, $version, $requestType)) {
-            throw new \RuntimeException(
-                sprintf('The "%s" entity is not configured to be used in API.', $entityClass)
-            );
+            throw new \RuntimeException(sprintf('The "%s" entity is not configured to be used in API.', $entityClass));
         }
 
         return $entityClass;

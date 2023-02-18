@@ -133,8 +133,7 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface, 
         if (\is_array($value)) {
             if (ArrayUtil::isAssoc($value) || \count($value) !== 2) {
                 throw new \InvalidArgumentException(
-                    'The array value must contains 2 elements,'
-                    . ' an entity class and an array of API actions.'
+                    'The array value must contains 2 elements, an entity class and an array of API actions.'
                 );
             }
             if (!\is_string($value[0])) {
@@ -143,9 +142,7 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface, 
                 );
             }
             if (!\is_array($value[1]) || !$value[1]) {
-                throw new \InvalidArgumentException(
-                    'The second element of the array must not be an empty array.'
-                );
+                throw new \InvalidArgumentException('The second element of the array must not be an empty array.');
             }
             $actions = $this->actionProcessorBag->getActions();
             foreach ($value[1] as $action) {

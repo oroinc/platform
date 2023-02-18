@@ -24,7 +24,7 @@ class SetHttpResponseStatusCode implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -50,9 +50,6 @@ class SetHttpResponseStatusCode implements ProcessorInterface
         return $statusCode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private function isResponseWithoutContent(int $statusCode): bool
     {
         return
@@ -70,7 +67,7 @@ class SetHttpResponseStatusCode implements ProcessorInterface
         $groupedCodes = [];
         foreach ($errors as $error) {
             $code = $error->getStatusCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR;
-            $groupCode = (int)\floor($code / 100) * 100;
+            $groupCode = (int)floor($code / 100) * 100;
 
             if (!\array_key_exists($groupCode, $groupedCodes)
                 || !\in_array($code, $groupedCodes[$groupCode], true)
@@ -84,7 +81,7 @@ class SetHttpResponseStatusCode implements ProcessorInterface
             $maxGroup = max(array_keys($groupedCodes));
             $statusCode = $maxGroup;
             if (\count($groupedCodes[$maxGroup]) === 1) {
-                $statusCode = array_pop($groupedCodes[$maxGroup]);
+                $statusCode = reset($groupedCodes[$maxGroup]);
             }
         }
 

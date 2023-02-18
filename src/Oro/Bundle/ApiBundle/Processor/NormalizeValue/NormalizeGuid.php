@@ -57,9 +57,7 @@ class NormalizeGuid implements ProcessorInterface
     private function validateValue(string $value): void
     {
         if (!$this->isValidGuid($value)) {
-            throw new \UnexpectedValueException(
-                sprintf('Expected GUID value. Given "%s".', $value)
-            );
+            throw new \UnexpectedValueException(sprintf('Expected GUID value. Given "%s".', $value));
         }
     }
 

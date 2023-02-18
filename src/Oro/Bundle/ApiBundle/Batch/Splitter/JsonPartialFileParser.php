@@ -114,7 +114,7 @@ class JsonPartialFileParser extends Parser
             $startPos = ftell($stream);
             $line = stream_get_line($stream, $bufferSize, $lineEnding);
             $endPos = ftell($stream);
-            $ended = (bool)($endPos - strlen($line) - $startPos);
+            $ended = (bool)($endPos - \strlen($line) - $startPos);
             // if we're still at the same place after stream_get_line, we're done
             $eof = $endPos === $startPos;
 

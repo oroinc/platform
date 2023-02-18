@@ -275,7 +275,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
             $messageId,
             $jobName,
             function (JobRunner $jobRunner, Job $job) use ($operationId, $jobName, $body, $chunkFiles, $delayed) {
-                $chunkFileCount = count($chunkFiles);
+                $chunkFileCount = \count($chunkFiles);
                 $rootJob = $job->getRootJob();
                 $this->saveOperationIdToJob($operationId, $rootJob);
                 $this->createOperationInfoFile($operationId, $chunkFileCount);

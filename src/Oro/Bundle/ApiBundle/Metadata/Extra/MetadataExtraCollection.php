@@ -45,7 +45,7 @@ class MetadataExtraCollection
                 ));
             }
         }
-        $this->extras = \array_values($extras);
+        $this->extras = array_values($extras);
     }
 
     /**

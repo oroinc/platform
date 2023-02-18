@@ -275,7 +275,7 @@ class ExpandRelatedEntities implements ProcessorInterface
         $result = [];
         foreach ($expandedEntities as $expandedEntity) {
             $path = ConfigUtil::explodePropertyPath($expandedEntity);
-            if (count($path) === 1) {
+            if (\count($path) === 1) {
                 $result[$expandedEntity] = [];
             } else {
                 $fieldName = array_shift($path);

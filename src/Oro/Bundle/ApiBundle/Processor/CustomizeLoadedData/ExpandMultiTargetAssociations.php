@@ -54,7 +54,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         $entityIdFieldNames = $config->getIdentifierFieldNames();
         $entityIdFieldName = reset($entityIdFieldNames);
 
-        if (\is_a($context->getClassName(), EntityIdentifier::class, true)) {
+        if (is_a($context->getClassName(), EntityIdentifier::class, true)) {
             return $this->loadExpandedEntities($data, $entityIdFieldName, $context);
         }
 
@@ -130,7 +130,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
                         return [$subresourceAssociationName => $associationConfig];
                     }
                     $targetClass = AssociationConfigUtil::getAssociationTargetClass($associationConfig, $config);
-                    if ($targetClass && \is_a($targetClass, EntityIdentifier::class, true)) {
+                    if ($targetClass && is_a($targetClass, EntityIdentifier::class, true)) {
                         return [$subresourceAssociationName => $associationConfig];
                     }
                 }
@@ -159,7 +159,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
                     continue;
                 }
                 $targetClass = AssociationConfigUtil::getAssociationTargetClass($field, $config);
-                if (!$targetClass || !\is_a($targetClass, EntityIdentifier::class, true)) {
+                if (!$targetClass || !is_a($targetClass, EntityIdentifier::class, true)) {
                     continue;
                 }
                 if ($field->isCollectionValuedAssociation()
@@ -229,7 +229,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         $result = [];
         foreach ($allIds as $associationName => $associationData) {
             foreach ($associationData as $entityClass => $ids) {
-                $result[$associationName][$entityClass] = \array_unique($ids);
+                $result[$associationName][$entityClass] = array_unique($ids);
             }
         }
 

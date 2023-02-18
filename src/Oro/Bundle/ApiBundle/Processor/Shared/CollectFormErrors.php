@@ -255,10 +255,10 @@ class CollectFormErrors implements ProcessorInterface
                 $path[] = $parent->getName();
                 $parent = $parent->getParent();
             }
-            $path = \array_reverse($path);
+            $path = array_reverse($path);
         }
 
-        return \implode(ConfigUtil::PATH_DELIMITER, $path);
+        return implode(ConfigUtil::PATH_DELIMITER, $path);
     }
 
     /**
@@ -284,7 +284,7 @@ class CollectFormErrors implements ProcessorInterface
         }
 
         // check if the path represents a property of an item in a collection, e.g. collection.1.field
-        if (\count($path) <= 2 || !\is_numeric($path[1])) {
+        if (\count($path) <= 2 || !is_numeric($path[1])) {
             return $path;
         }
 
@@ -335,7 +335,7 @@ class CollectFormErrors implements ProcessorInterface
         $path = $this->getConstraintViolationPath($constraintViolation);
 
         return !empty($path)
-            ? \implode(ConfigUtil::PATH_DELIMITER, $path)
+            ? implode(ConfigUtil::PATH_DELIMITER, $path)
             : null;
     }
 
@@ -374,7 +374,7 @@ class CollectFormErrors implements ProcessorInterface
             $field = $field->getParent();
         }
 
-        return \array_reverse($path);
+        return array_reverse($path);
     }
 
     protected function isCompoundForm(FormInterface $field): bool

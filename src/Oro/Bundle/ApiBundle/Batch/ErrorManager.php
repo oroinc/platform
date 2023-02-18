@@ -155,7 +155,7 @@ class ErrorManager
             if ($chunkFileIndex < 0) {
                 $foundDataItemIndex = $this->searchInErrorsIndex($errorsIndex, $chunkErrorsFileName);
                 if (null !== $foundDataItemIndex) {
-                    $errorsIndex[$foundDataItemIndex][self::ITEM_ERRORS_COUNT] += count($errors);
+                    $errorsIndex[$foundDataItemIndex][self::ITEM_ERRORS_COUNT] += \count($errors);
                     $serializedErrors = array_merge(
                         JsonUtil::decode($fileManager->getFileContent($chunkErrorsFileName)),
                         $serializedErrors
@@ -164,7 +164,7 @@ class ErrorManager
                 }
             }
             if (!$updated) {
-                $errorsIndex[] = [$chunkErrorsFileName, $chunkFileIndex, count($errors)];
+                $errorsIndex[] = [$chunkErrorsFileName, $chunkFileIndex, \count($errors)];
             }
             $fileManager->writeToStorage(JsonUtil::encode($serializedErrors), $chunkErrorsFileName);
             $fileManager->writeToStorage(JsonUtil::encode($errorsIndex), $indexFileName);

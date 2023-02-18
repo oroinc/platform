@@ -160,7 +160,7 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
             return true;
         }
 
-        return $this->doTryGetValue(\explode('.', $propertyPath), $value);
+        return $this->doTryGetValue(explode('.', $propertyPath), $value);
     }
 
     /**

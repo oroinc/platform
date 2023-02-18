@@ -20,20 +20,19 @@ class MakeTimestampableFieldsReadOnly implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
-        if (!$definition->isExcludeAll()) {
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
             // expected completed config
             return;
         }
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+        if (!$this->doctrineHelper->isManageableEntityClass($context->getClassName())) {
             // only manageable entities are supported
             return;
         }

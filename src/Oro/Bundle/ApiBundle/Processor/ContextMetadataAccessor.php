@@ -23,7 +23,7 @@ class ContextMetadataAccessor implements MetadataAccessorInterface
      */
     public function getMetadata(string $className): ?EntityMetadata
     {
-        return \is_a($this->context->getClassName(), $className, true)
+        return is_a($this->context->getClassName(), $className, true)
             ? $this->context->getMetadata()
             : null;
     }

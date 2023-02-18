@@ -84,7 +84,7 @@ trait ApiDocExtractorTrait
             if (!$route instanceof Route) {
                 throw new \InvalidArgumentException(sprintf(
                     'All elements of $routes must be instances of Route. "%s" given',
-                    \gettype($route)
+                    get_debug_type($route)
                 ));
             }
 

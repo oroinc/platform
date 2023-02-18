@@ -57,14 +57,13 @@ class NumberToStringTransformer implements DataTransformerInterface
     {
         if (0 === $this->scale) {
             if (!preg_match('/^-?\d+$/', $value)) {
-                throw new TransformationFailedException(
-                    sprintf('"%s" cannot be converted to an integer number.', $value)
-                );
+                throw new TransformationFailedException(sprintf(
+                    '"%s" cannot be converted to an integer number.',
+                    $value
+                ));
             }
         } elseif (!preg_match('/^-?\d*\.?\d+$/', $value)) {
-            throw new TransformationFailedException(
-                sprintf('"%s" cannot be converted to a number.', $value)
-            );
+            throw new TransformationFailedException(sprintf('"%s" cannot be converted to a number.', $value));
         }
 
         $delimiter = strpos($value, '.');

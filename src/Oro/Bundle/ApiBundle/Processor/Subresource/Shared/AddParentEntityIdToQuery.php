@@ -107,7 +107,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
     ): string {
         $parentJoinAlias = $queryRootAlias;
         $path = ConfigUtil::explodePropertyPath($associationName);
-        $pathLength = count($path);
+        $pathLength = \count($path);
         for ($i = 1; $i <= $pathLength; $i++) {
             $joinFieldName = $path[$pathLength - $i];
             $joinAlias = sprintf('parent_entity%d', $i);
