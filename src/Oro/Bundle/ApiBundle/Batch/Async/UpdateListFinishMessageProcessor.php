@@ -19,20 +19,11 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
  */
 class UpdateListFinishMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /** @var UpdateListProcessingHelper */
-    private $processingHelper;
-
-    /** @var AsyncOperationManager */
-    private $operationManager;
-
-    /** @var FileManager */
-    private $fileManager;
-
-    /** @var IncludeMapManager */
-    private $includeMapManager;
-
-    /** @var FileNameProvider */
-    private $fileNameProvider;
+    private UpdateListProcessingHelper $processingHelper;
+    private AsyncOperationManager $operationManager;
+    private FileManager $fileManager;
+    private IncludeMapManager $includeMapManager;
+    private FileNameProvider $fileNameProvider;
 
     public function __construct(
         UpdateListProcessingHelper $processingHelper,
@@ -49,17 +40,17 @@ class UpdateListFinishMessageProcessor implements MessageProcessorInterface, Top
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [UpdateListFinishTopic::getName()];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
         $startTimestamp = microtime(true);
         $messageBody = $message->getBody();

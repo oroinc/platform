@@ -3,37 +3,40 @@
 namespace Oro\Bundle\WorkflowBundle\Processor;
 
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
-use Oro\Bundle\WorkflowBundle\Processor\Context\ValidateTransitionContextTrait;
 use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
+/**
+ * The main processor for "transit" action.
+ */
 class TransitActionProcessor extends ActionProcessor
 {
-    use ValidateTransitionContextTrait;
+    private LoggerInterface $logger;
 
-    const ACTION = 'transit';
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    public function __construct(ProcessorBagInterface $processorBag, LoggerInterface $logger = null)
+    public function __construct(ProcessorBagInterface $processorBag, LoggerInterface $logger)
     {
-        parent::__construct($processorBag, self::ACTION);
-
-        $this->logger = $logger ?: new NullLogger();
+        parent::__construct($processorBag, 'transit');
+        $this->logger = $logger;
     }
 
     /**
-     * @param ContextInterface|TransitionContext $context
+     * {@inheritDoc}
      */
-    protected function executeProcessors(ContextInterface $context)
+    protected function createContextObject(): TransitionContext
     {
-        $this->validateContextType($context);
+        return new TransitionContext();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function executeProcessors(ContextInterface $context): void
+    {
+        /** TransitionContext $context */
 
         $processors = $this->processorBag->getProcessors($context);
 
@@ -60,13 +63,5 @@ class TransitActionProcessor extends ActionProcessor
                 );
             }
         }
-    }
-
-    /**
-     * @return ContextInterface|TransitionContext
-     */
-    protected function createContextObject(): ContextInterface
-    {
-        return new TransitionContext();
     }
 }

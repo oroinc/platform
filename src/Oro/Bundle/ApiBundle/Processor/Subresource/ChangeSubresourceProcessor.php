@@ -8,9 +8,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource;
 class ChangeSubresourceProcessor extends SubresourceProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): ChangeSubresourceContext
     {
         return new ChangeSubresourceContext($this->configProvider, $this->metadataProvider);
     }

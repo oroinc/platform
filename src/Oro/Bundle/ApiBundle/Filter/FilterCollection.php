@@ -152,7 +152,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetExists($offset): bool
     {
@@ -160,7 +160,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetGet($offset): ?FilterInterface
     {
@@ -168,7 +168,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetSet($offset, $value): void
     {
@@ -176,7 +176,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetUnset($offset): void
     {
@@ -184,7 +184,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function count(): int
     {
@@ -192,7 +192,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getIterator(): \Traversable
     {

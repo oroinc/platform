@@ -8,19 +8,14 @@ namespace Oro\Component\ChainProcessor;
  */
 class GroupRangeApplicableChecker implements ApplicableCheckerInterface, ProcessorBagAwareApplicableCheckerInterface
 {
-    /** @var ProcessorBagInterface|null */
-    protected $processorBag;
-
-    /** @var string|null */
-    protected $action;
-
-    /** @var array|null */
-    protected $groups;
+    private ?ProcessorBagInterface $processorBag = null;
+    private ?string $action = null;
+    private ?array $groups = null;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setProcessorBag(ProcessorBagInterface $processorBag = null)
+    public function setProcessorBag(ProcessorBagInterface $processorBag): void
     {
         $this->processorBag = $processorBag;
         $this->action = null;
@@ -28,10 +23,10 @@ class GroupRangeApplicableChecker implements ApplicableCheckerInterface, Process
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function isApplicable(ContextInterface $context, array $processorAttributes)
+    public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         if (null === $this->processorBag
             || empty($processorAttributes['group'])
@@ -59,16 +54,11 @@ class GroupRangeApplicableChecker implements ApplicableCheckerInterface, Process
         return self::ABSTAIN;
     }
 
-    /**
-     * Makes sure groups are loaded
-     *
-     * @param string $action
-     */
-    protected function ensureGroupsLoaded($action)
+    private function ensureGroupsLoaded(string $action): void
     {
         if ($action !== $this->action) {
             $this->action = $action;
-            $this->groups = \array_flip($this->processorBag->getActionGroups($action));
+            $this->groups = array_flip($this->processorBag->getActionGroups($action));
         }
     }
 }

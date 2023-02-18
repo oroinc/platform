@@ -12,8 +12,7 @@ use Symfony\Component\Form\DataTransformerInterface;
  */
 final class NullTransformer implements DataTransformerInterface
 {
-    /** @var NullTransformer|null */
-    private static $instance;
+    private static ?NullTransformer $instance = null;
 
     /**
      * A private constructor to prevent create an instance of this class explicitly
@@ -22,10 +21,7 @@ final class NullTransformer implements DataTransformerInterface
     {
     }
 
-    /**
-     * @return NullTransformer
-     */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (null === self::$instance) {
             self::$instance = new self();
@@ -35,7 +31,7 @@ final class NullTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function transform($value)
     {
@@ -43,7 +39,7 @@ final class NullTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function reverseTransform($value)
     {

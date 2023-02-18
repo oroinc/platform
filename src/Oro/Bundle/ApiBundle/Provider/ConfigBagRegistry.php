@@ -56,9 +56,10 @@ class ConfigBagRegistry implements ResetInterface
             }
         }
         if (null === $configBag) {
-            throw new \LogicException(
-                sprintf('Cannot find a config bag for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find a config bag for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         $this->cache[$cacheKey] = $configBag;

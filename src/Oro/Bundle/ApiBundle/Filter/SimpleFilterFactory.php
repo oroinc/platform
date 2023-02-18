@@ -42,7 +42,7 @@ class SimpleFilterFactory implements FilterFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function createFilter(string $filterType, array $options = []): ?StandaloneFilter
     {

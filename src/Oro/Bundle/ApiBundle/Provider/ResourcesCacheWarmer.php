@@ -11,14 +11,9 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
  */
 class ResourcesCacheWarmer implements CacheWarmerInterface
 {
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var SubresourcesProvider */
-    private $subresourcesProvider;
-
-    /** @var array */
-    private $requestTypes;
+    private ResourcesProvider $resourcesProvider;
+    private SubresourcesProvider $subresourcesProvider;
+    private array $requestTypes;
 
     public function __construct(
         ResourcesProvider $resourcesProvider,
@@ -31,7 +26,7 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function warmUp($cacheDir)
     {
@@ -39,9 +34,9 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }
@@ -49,7 +44,7 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
     /**
      * Clears the cache.
      */
-    public function clearCache()
+    public function clearCache(): void
     {
         $this->resourcesProvider->clearCache();
     }
@@ -57,7 +52,7 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
     /**
      * Warms up the cache.
      */
-    public function warmUpCache()
+    public function warmUpCache(): void
     {
         $this->resourcesProvider->clearCache();
         foreach ($this->requestTypes as $aspects) {

@@ -20,7 +20,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_1';
     }
@@ -36,7 +36,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroApiAsyncOperationTable($schema);
@@ -50,7 +50,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
     /**
      * Create oro_api_async_operation table
      */
-    protected function createOroApiAsyncOperationTable(Schema $schema)
+    private function createOroApiAsyncOperationTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_api_async_operation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -75,7 +75,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
     /**
      * Create oro_api_async_data table
      */
-    protected function createOroApiAsyncDataTable(Schema $schema)
+    private function createOroApiAsyncDataTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_api_async_data');
         $table->addColumn('name', 'string', ['length' => 255]);
@@ -104,7 +104,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
     /**
      * Add oro_api_async_operation foreign keys.
      */
-    protected function addOroApiAsyncOperationForeignKeys(Schema $schema)
+    private function addOroApiAsyncOperationForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_api_async_operation');
         $table->addForeignKeyConstraint(

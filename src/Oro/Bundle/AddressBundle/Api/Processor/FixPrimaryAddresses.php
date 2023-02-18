@@ -17,13 +17,9 @@ class FixPrimaryAddresses implements ProcessorInterface
     /**
      * The property path to collection of all addresses
      * (e.g. "owner.addresses" means $address->getOwner()->getAddresses())
-     *
-     * @var string
      */
-    private $addressesPropertyPath;
-
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
+    private string $addressesPropertyPath;
+    private PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(string $addressesPropertyPath, PropertyAccessorInterface $propertyAccessor)
     {
@@ -34,7 +30,7 @@ class FixPrimaryAddresses implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
 

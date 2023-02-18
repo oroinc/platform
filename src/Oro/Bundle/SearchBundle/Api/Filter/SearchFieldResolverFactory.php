@@ -9,8 +9,7 @@ use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
  */
 class SearchFieldResolverFactory
 {
-    /** @var AbstractSearchMappingProvider */
-    private $searchMappingProvider;
+    private AbstractSearchMappingProvider $searchMappingProvider;
 
     public function __construct(AbstractSearchMappingProvider $searchMappingProvider)
     {

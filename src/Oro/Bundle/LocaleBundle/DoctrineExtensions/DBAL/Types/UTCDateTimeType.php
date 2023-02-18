@@ -11,7 +11,7 @@ use Doctrine\DBAL\Types\DateTimeType;
  */
 class UTCDateTimeType extends DateTimeType
 {
-    /** @var null| \DateTimeZone  */
+    /** @var null|\DateTimeZone */
     private static $utc = null;
 
     /**
@@ -45,6 +45,7 @@ class UTCDateTimeType extends DateTimeType
 
         if ($value instanceof \DateTimeInterface && $value->getTimezone() !== $timezone) {
             $value->setTimezone($timezone);
+
             return $value;
         }
 
@@ -56,7 +57,7 @@ class UTCDateTimeType extends DateTimeType
 
         $errors = $val->getLastErrors();
         // date was parsed to completely not valid value
-        if (false !== $errors && $errors['warning_count'] > 0 && (int)$val->format('Y') < 0) {
+        if ($errors && $errors['warning_count'] > 0 && (int)$val->format('Y') < 0) {
             return null;
         }
 

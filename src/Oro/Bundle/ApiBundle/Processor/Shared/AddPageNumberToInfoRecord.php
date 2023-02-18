@@ -47,11 +47,7 @@ class AddPageNumberToInfoRecord implements ProcessorInterface
 
     protected function getPageNumber(FilterValueAccessorInterface $filterValues, string $pageNumberFilterName): int
     {
-        $pageNumber = null;
-        $pageNumberFilterValue = $filterValues->get($pageNumberFilterName);
-        if (null !== $pageNumberFilterValue) {
-            $pageNumber = $pageNumberFilterValue->getValue();
-        }
+        $pageNumber = $filterValues->get($pageNumberFilterName)?->getValue();
         if (null === $pageNumber) {
             $pageNumber = 1;
         }

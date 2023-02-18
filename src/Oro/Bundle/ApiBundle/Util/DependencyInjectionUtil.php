@@ -87,7 +87,7 @@ class DependencyInjectionUtil
     private static function addRequestTypeToTag(array $tag, string $value): array
     {
         $extraAttrName = 'extra';
-        if (array_key_exists('extra', $tag)) {
+        if (\array_key_exists('extra', $tag)) {
             $attributes = [];
             foreach ($tag as $attrName => $attrVal) {
                 $attributes[$attrName] = $attrVal;

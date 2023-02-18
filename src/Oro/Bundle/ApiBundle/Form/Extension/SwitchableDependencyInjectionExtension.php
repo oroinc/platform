@@ -5,19 +5,17 @@ namespace Oro\Bundle\ApiBundle\Form\Extension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormExtensionInterface;
 
+/**
+ * Provides functionality to switch between API and regular form types, form type extensions and a form type guesser.
+ */
 class SwitchableDependencyInjectionExtension implements FormExtensionInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    /** @var string */
-    protected $currentExtensionName;
-
+    private ContainerInterface $container;
+    private ?string $currentExtensionName = null;
     /** @var string[] [extension name => service id, ...] */
-    protected $extensionIds = [];
-
+    private array $extensionIds = [];
     /** @var FormExtensionInterface[] [extension name => FormExtensionInterface, ...] */
-    protected $extensions = [];
+    private array $extensions = [];
 
     public function __construct(ContainerInterface $container)
     {
@@ -26,11 +24,8 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
 
     /**
      * Registers new form extension.
-     *
-     * @param string $extensionName
-     * @param string $extensionServiceId
      */
-    public function addExtension($extensionName, $extensionServiceId)
+    public function addExtension(string $extensionName, string $extensionServiceId): void
     {
         $this->extensionIds[$extensionName] = $extensionServiceId;
     }
@@ -38,24 +33,20 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
     /**
      * Switches to another form extension.
      *
-     * @param string $extensionName
-     *
      * @throws \InvalidArgumentException if unknown extension name is provided
      */
-    public function switchFormExtension($extensionName)
+    public function switchFormExtension(string $extensionName): void
     {
         $this->ensureInitialized();
         if (!isset($this->extensionIds[$extensionName])) {
-            throw new \InvalidArgumentException(
-                sprintf('Unknown extension: %s.', $extensionName)
-            );
+            throw new \InvalidArgumentException(sprintf('Unknown extension: %s.', $extensionName));
         }
 
         $this->currentExtensionName = $extensionName;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasType($name)
     {
@@ -63,7 +54,7 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getType($name)
     {
@@ -71,7 +62,7 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasTypeExtensions($name)
     {
@@ -79,7 +70,7 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getTypeExtensions($name)
     {
@@ -87,17 +78,14 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getTypeGuesser()
     {
         return $this->getExtension()->getTypeGuesser();
     }
 
-    /**
-     * @return FormExtensionInterface
-     */
-    protected function getExtension()
+    private function getExtension(): FormExtensionInterface
     {
         $this->ensureInitialized();
         if (!isset($this->extensions[$this->currentExtensionName])) {
@@ -108,7 +96,7 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
         return $this->extensions[$this->currentExtensionName];
     }
 
-    protected function ensureInitialized()
+    private function ensureInitialized(): void
     {
         if (null === $this->currentExtensionName) {
             if (empty($this->extensionIds)) {

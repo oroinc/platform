@@ -15,8 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ObjectType extends AbstractType
 {
-    /** @var FormHelper */
-    protected $formHelper;
+    private FormHelper $formHelper;
 
     public function __construct(FormHelper $formHelper)
     {
@@ -24,9 +23,9 @@ class ObjectType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var EntityMetadata $metadata */
         $metadata = $options['metadata'];
@@ -37,13 +36,13 @@ class ObjectType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setRequired(['metadata', 'config'])
-            ->setAllowedTypes('metadata', ['Oro\Bundle\ApiBundle\Metadata\EntityMetadata'])
-            ->setAllowedTypes('config', ['Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig']);
+            ->setAllowedTypes('metadata', [EntityMetadata::class])
+            ->setAllowedTypes('config', [EntityDefinitionConfig::class]);
     }
 }

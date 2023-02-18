@@ -11,9 +11,9 @@ use Symfony\Component\Routing\Route;
 class TestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function resolve(Route $route, RouteCollectionAccessor $routes)
+    public function resolve(Route $route, RouteCollectionAccessor $routes): void
     {
         if ('rest_api' !== $route->getOption(RestRouteOptionsResolver::GROUP_OPTION)) {
             return;
@@ -25,7 +25,7 @@ class TestRouteOptionsResolver implements RouteOptionsResolverInterface
         $this->addTestRoutes($routes);
     }
 
-    private function addTestRoutes(RouteCollectionAccessor $routes)
+    private function addTestRoutes(RouteCollectionAccessor $routes): void
     {
         $routes->append(
             'oro_rest_tests_override_path',

@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
 
 class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,7 +28,10 @@ class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->processor = $this->createMock(CollectSubresourcesProcessor::class);
+        $this->processor = $this->getMockBuilder(CollectSubresourcesProcessor::class)
+            ->onlyMethods(['process'])
+            ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'collect_subresources'])
+            ->getMock();
         $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
         $this->resourcesCache = $this->createMock(ResourcesCache::class);
 

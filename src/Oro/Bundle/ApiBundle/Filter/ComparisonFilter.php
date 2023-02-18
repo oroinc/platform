@@ -61,7 +61,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     private mixed $valueTransformer = null;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setField(string $field): void
     {
@@ -69,7 +69,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getField(): ?string
     {
@@ -85,7 +85,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setCollection(bool $collection): void
     {
@@ -93,7 +93,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isArrayAllowed(string $operator = null): bool
     {
@@ -110,7 +110,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isRangeAllowed(string $operator = null): bool
     {
@@ -139,7 +139,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {

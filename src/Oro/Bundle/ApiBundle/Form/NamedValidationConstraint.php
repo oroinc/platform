@@ -14,11 +14,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class NamedValidationConstraint extends Constraint implements ConstraintWithStatusCodeInterface
 {
-    /** @var string */
-    private $constraintType;
-
-    /** @var int|null */
-    private $statusCode;
+    private string $constraintType;
+    private ?int $statusCode;
 
     /**
      * @param string   $constraintType The type of violated constraint.

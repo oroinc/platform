@@ -17,9 +17,9 @@ class RequestTypeApplicableChecker extends MatchApplicableChecker
     private const REQUEST_TYPE = 'requestType';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isApplicable(ContextInterface $context, array $processorAttributes)
+    public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         $result = self::ABSTAIN;
         if (!empty($processorAttributes[self::REQUEST_TYPE]) && $context->has(self::REQUEST_TYPE)) {

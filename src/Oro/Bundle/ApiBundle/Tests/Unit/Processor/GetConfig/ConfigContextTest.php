@@ -16,8 +16,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class ConfigContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigContext */
-    private $context;
+    private ConfigContext $context;
 
     protected function setUp(): void
     {
@@ -26,8 +25,6 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
 
     public function testClassName()
     {
-        self::assertNull($this->context->getClassName());
-
         $this->context->setClassName('test');
         self::assertEquals('test', $this->context->getClassName());
         self::assertEquals('test', $this->context->get('class'));
@@ -77,7 +74,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(123, $this->context->getMaxRelatedEntities());
         self::assertEquals(123, $this->context->get('maxRelatedEntities'));
 
-        $this->context->setMaxRelatedEntities();
+        $this->context->setMaxRelatedEntities(null);
         self::assertNull($this->context->getMaxRelatedEntities());
         self::assertFalse($this->context->has('maxRelatedEntities'));
     }

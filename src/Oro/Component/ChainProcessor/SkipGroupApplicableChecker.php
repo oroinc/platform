@@ -9,9 +9,9 @@ namespace Oro\Component\ChainProcessor;
 class SkipGroupApplicableChecker implements ApplicableCheckerInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isApplicable(ContextInterface $context, array $processorAttributes)
+    public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         if (empty($processorAttributes['group']) || !$context->hasSkippedGroups()) {
             return self::ABSTAIN;

@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesWithoutIdentifierLoader;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -37,7 +38,10 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->processor = $this->createMock(CollectResourcesProcessor::class);
+        $this->processor = $this->getMockBuilder(CollectResourcesProcessor::class)
+            ->onlyMethods(['process'])
+            ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'collect_resources'])
+            ->getMock();
         $this->resourcesCache = $this->createMock(ResourcesCache::class);
         $this->resourcesWithoutIdentifierLoader = $this->createMock(ResourcesWithoutIdentifierLoader::class);
         $this->resourceChecker = $this->createMock(ResourceCheckerInterface::class);

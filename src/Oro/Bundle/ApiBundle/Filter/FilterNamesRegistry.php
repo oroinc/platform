@@ -40,8 +40,9 @@ class FilterNamesRegistry
             }
         }
 
-        throw new \LogicException(
-            sprintf('Cannot find a filter names provider for the request "%s".', (string)$requestType)
-        );
+        throw new \LogicException(sprintf(
+            'Cannot find a filter names provider for the request "%s".',
+            (string)$requestType
+        ));
     }
 }

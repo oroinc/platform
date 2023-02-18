@@ -11,9 +11,9 @@ use Oro\Component\ChainProcessor\ActionProcessor;
 class MetadataProcessor extends ActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): MetadataContext
     {
         return new MetadataContext();
     }

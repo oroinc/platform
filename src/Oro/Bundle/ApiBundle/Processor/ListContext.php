@@ -13,20 +13,16 @@ class ListContext extends Context
 
     /**
      * Gets a callback that can be used to calculate the total number of records in a list of entities
-     *
-     * @return callable|null
      */
-    public function getTotalCountCallback()
+    public function getTotalCountCallback(): ?callable
     {
         return $this->get(self::TOTAL_COUNT_CALLBACK);
     }
 
     /**
      * Sets a callback that can be used to calculate the total number of records in a list of entities
-     *
-     * @param callable|null $totalCount
      */
-    public function setTotalCountCallback($totalCount)
+    public function setTotalCountCallback(?callable $totalCount): void
     {
         $this->set(self::TOTAL_COUNT_CALLBACK, $totalCount);
     }

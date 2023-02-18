@@ -38,7 +38,7 @@ class SetTotalCountHeader implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -77,15 +77,8 @@ class SetTotalCountHeader implements ProcessorInterface
         }
     }
 
-    private function executeTotalCountCallback(mixed $callback): int
+    private function executeTotalCountCallback(callable $callback): int
     {
-        if (!\is_callable($callback)) {
-            throw new \RuntimeException(sprintf(
-                'Expected callable for "totalCount", "%s" given.',
-                get_debug_type($callback)
-            ));
-        }
-
         $totalCount = $callback();
         if (!\is_int($totalCount)) {
             throw new \RuntimeException(sprintf(

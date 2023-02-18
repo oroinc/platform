@@ -29,29 +29,24 @@ abstract class SwitchFormExtension
         $this->metadataTypeGuesser = $metadataTypeGuesser;
     }
 
-    /**
-     * @param FormContext $context
-     *
-     * @return bool
-     */
-    protected function isApiFormExtensionActivated(FormContext $context)
+    protected function isApiFormExtensionActivated(FormContext $context): bool
     {
         return (bool)$context->get(self::API_FORM_EXTENSION_ACTIVATED);
     }
 
-    protected function switchToApiFormExtension(FormContext $context)
+    protected function switchToApiFormExtension(FormContext $context): void
     {
         $this->formExtensionSwitcher->switchToApiFormExtension();
         $context->set(self::API_FORM_EXTENSION_ACTIVATED, true);
     }
 
-    protected function switchToDefaultFormExtension(FormContext $context)
+    protected function switchToDefaultFormExtension(FormContext $context): void
     {
         $this->formExtensionSwitcher->switchToDefaultFormExtension();
         $context->remove(self::API_FORM_EXTENSION_ACTIVATED);
     }
 
-    protected function rememberContext(FormContext $context)
+    protected function rememberContext(FormContext $context): void
     {
         // remember current metadata type guesser context as an action can be nested
         // and this context should be restored when the current action is finished
@@ -77,7 +72,7 @@ abstract class SwitchFormExtension
         );
     }
 
-    protected function restoreContext(FormContext $context)
+    protected function restoreContext(FormContext $context): void
     {
         $this->metadataTypeGuesser->setEntityMapper($context->get(self::PREVIOUS_ENTITY_MAPPER));
         $this->metadataTypeGuesser->setIncludedEntities($context->get(self::PREVIOUS_INCLUDED_ENTITIES));
@@ -90,12 +85,7 @@ abstract class SwitchFormExtension
         $context->remove(self::PREVIOUS_CONFIG_ACCESSOR);
     }
 
-    /**
-     * @param FormContext $context
-     * @param string      $contextKey
-     * @param mixed       $currentValue
-     */
-    protected function rememberValue(FormContext $context, $contextKey, $currentValue)
+    protected function rememberValue(FormContext $context, string $contextKey, mixed $currentValue): void
     {
         if (null !== $currentValue) {
             $context->set($contextKey, $currentValue);

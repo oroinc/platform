@@ -264,4 +264,12 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
 
         return $blockViews;
     }
+
+    public function testCollectWhenNoLayouts(): void
+    {
+        $this->dataCollector->collect($this->createMock(Request::class), $this->createMock(Response::class));
+
+        $data = $this->dataCollector->getData();
+        self::assertEmpty($data);
+    }
 }

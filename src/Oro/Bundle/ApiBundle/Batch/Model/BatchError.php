@@ -9,11 +9,8 @@ use Oro\Bundle\ApiBundle\Model\Error;
  */
 final class BatchError extends Error
 {
-    /** @var string|null */
-    private $id;
-
-    /** @var int|null */
-    private $itemIndex;
+    private ?string $id = null;
+    private ?int $itemIndex = null;
 
     /**
      * Gets an unique identifier of this error.
@@ -25,12 +22,8 @@ final class BatchError extends Error
 
     /**
      * Sets an unique identifier of this error.
-     *
-     * @param string|null $id
-     *
-     * @return $this
      */
-    public function setId(?string $id): BatchError
+    public function setId(?string $id): self
     {
         $this->id = $id;
 
@@ -47,12 +40,8 @@ final class BatchError extends Error
 
     /**
      * Sets the index of the source record caused this error.
-     *
-     * @param int|null $itemIndex
-     *
-     * @return $this
      */
-    public function setItemIndex(?int $itemIndex): BatchError
+    public function setItemIndex(?int $itemIndex): self
     {
         $this->itemIndex = $itemIndex;
 

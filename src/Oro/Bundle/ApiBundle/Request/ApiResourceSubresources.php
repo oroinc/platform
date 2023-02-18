@@ -7,33 +7,27 @@ namespace Oro\Bundle\ApiBundle\Request;
  */
 class ApiResourceSubresources
 {
-    /** @var string */
-    private $entityClass;
-
+    private string $entityClass;
     /** @var ApiSubresource[] */
-    private $subresources = [];
+    private array $subresources = [];
 
-    public function __construct($entityClass)
+    public function __construct(string $entityClass)
     {
         $this->entityClass = $entityClass;
     }
 
     /**
      * Gets the class name of the entity.
-     *
-     * @return string
      */
-    public function getEntityClass()
+    public function getEntityClass(): string
     {
         return $this->entityClass;
     }
 
     /**
      * Checks if at least one sub-resource exists in this collection.
-     *
-     * @return bool
      */
-    public function hasSubresources()
+    public function hasSubresources(): bool
     {
         return !empty($this->subresources);
     }
@@ -43,32 +37,23 @@ class ApiResourceSubresources
      *
      * @return ApiSubresource[] [association name => ApiSubresource, ...]
      */
-    public function getSubresources()
+    public function getSubresources(): array
     {
         return $this->subresources;
     }
 
     /**
      * Gets a sub-resource.
-     *
-     * @param string $associationName
-     *
-     * @return ApiSubresource|null
      */
-    public function getSubresource($associationName)
+    public function getSubresource(string $associationName): ?ApiSubresource
     {
         return $this->subresources[$associationName] ?? null;
     }
 
     /**
      * Adds a sub-resource.
-     *
-     * @param string              $associationName
-     * @param ApiSubresource|null $subresource
-     *
-     * @return ApiSubresource
      */
-    public function addSubresource($associationName, ApiSubresource $subresource = null)
+    public function addSubresource(string $associationName, ApiSubresource $subresource = null): ApiSubresource
     {
         if (null === $subresource) {
             $subresource = new ApiSubresource();
@@ -80,10 +65,8 @@ class ApiResourceSubresources
 
     /**
      * Removes a sub-resource.
-     *
-     * @param string $associationName
      */
-    public function removeSubresource($associationName)
+    public function removeSubresource(string $associationName): void
     {
         unset($this->subresources[$associationName]);
     }

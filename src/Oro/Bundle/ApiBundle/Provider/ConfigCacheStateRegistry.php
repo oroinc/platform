@@ -48,9 +48,10 @@ class ConfigCacheStateRegistry
             }
         }
         if (null === $state) {
-            throw new \LogicException(
-                sprintf('Cannot find a config cache state service for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find a config cache state service for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         $this->cache[$cacheKey] = $state;

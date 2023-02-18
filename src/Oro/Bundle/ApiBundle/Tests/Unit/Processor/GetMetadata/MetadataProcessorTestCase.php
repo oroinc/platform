@@ -27,6 +27,7 @@ class MetadataProcessorTestCase extends \PHPUnit\Framework\TestCase
     {
         $this->context = new MetadataContext();
         $this->context->setClassName(self::TEST_CLASS_NAME);
+        $this->context->setAction('get_metadata');
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 

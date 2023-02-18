@@ -13,8 +13,7 @@ use Symfony\Component\Form\FormEvents;
  */
 class CollectionListener implements EventSubscriberInterface
 {
-    /** @var CollectionEntryFactory */
-    protected $entryFactory;
+    private CollectionEntryFactory $entryFactory;
 
     public function __construct(CollectionEntryFactory $entryFactory)
     {
@@ -22,9 +21,9 @@ class CollectionListener implements EventSubscriberInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA => 'preSetData',
@@ -34,7 +33,7 @@ class CollectionListener implements EventSubscriberInterface
         ];
     }
 
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -59,7 +58,7 @@ class CollectionListener implements EventSubscriberInterface
         }
     }
 
-    public function preSubmit(FormEvent $event)
+    public function preSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -84,7 +83,7 @@ class CollectionListener implements EventSubscriberInterface
         }
     }
 
-    public function onSubmit(FormEvent $event)
+    public function onSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -115,13 +114,8 @@ class CollectionListener implements EventSubscriberInterface
         $event->setData($data);
     }
 
-    /**
-     * @param mixed $data
-     *
-     * @return bool
-     */
-    protected function isSupportedData($data)
+    private function isSupportedData(mixed $data): bool
     {
-        return is_array($data) || ($data instanceof \Traversable && $data instanceof \ArrayAccess);
+        return \is_array($data) || ($data instanceof \Traversable && $data instanceof \ArrayAccess);
     }
 }

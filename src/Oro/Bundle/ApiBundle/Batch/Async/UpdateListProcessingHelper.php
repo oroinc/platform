@@ -20,17 +20,10 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateListProcessingHelper
 {
-    /** @var FileManager */
-    private $fileManager;
-
-    /** @var FileNameProvider */
-    private $fileNameProvider;
-
-    /** @var MessageProducerInterface */
-    private $producer;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private FileManager $fileManager;
+    private FileNameProvider $fileNameProvider;
+    private MessageProducerInterface $producer;
+    private LoggerInterface $logger;
 
     public function __construct(
         FileManager $fileManager,
@@ -98,7 +91,7 @@ class UpdateListProcessingHelper
     {
         $indexFileName = $this->fileNameProvider->getChunkIndexFileName($operationId);
 
-        return count(JsonUtil::decode($this->fileManager->getFileContent($indexFileName)));
+        return \count(JsonUtil::decode($this->fileManager->getFileContent($indexFileName)));
     }
 
     /**

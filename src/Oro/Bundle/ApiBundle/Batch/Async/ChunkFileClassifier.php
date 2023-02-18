@@ -9,11 +9,8 @@ use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
  */
 class ChunkFileClassifier implements ChunkFileClassifierInterface
 {
-    /** @var string */
-    private $primaryDataSectionName;
-
-    /** @var string */
-    private $includedDataSectionName;
+    private string $primaryDataSectionName;
+    private ?string $includedDataSectionName;
 
     public function __construct(string $primaryDataSectionName, string $includedDataSectionName = null)
     {

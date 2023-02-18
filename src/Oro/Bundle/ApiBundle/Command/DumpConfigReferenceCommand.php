@@ -30,7 +30,7 @@ class DumpConfigReferenceCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
@@ -58,7 +58,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output = new SymfonyStyle($input, $output);
 
@@ -68,12 +68,10 @@ HELP
         } else {
             $maxNestingLevel = (int)$maxNestingLevel;
             if ($maxNestingLevel < 0 || $maxNestingLevel > $this->configExtensionRegistry->getMaxNestingLevel()) {
-                throw new \LogicException(
-                    sprintf(
-                        'The "max-nesting-level" should be a positive number less than or equal to %d.',
-                        $this->configExtensionRegistry->getMaxNestingLevel()
-                    )
-                );
+                throw new \LogicException(sprintf(
+                    'The "max-nesting-level" should be a positive number less than or equal to %d.',
+                    $this->configExtensionRegistry->getMaxNestingLevel()
+                ));
             }
         }
 

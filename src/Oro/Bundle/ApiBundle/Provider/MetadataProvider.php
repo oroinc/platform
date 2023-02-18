@@ -17,11 +17,8 @@ class MetadataProvider implements ResetInterface
 {
     private const KEY_DELIMITER = '|';
 
-    /** @var ActionProcessorInterface */
-    private $processor;
-
-    /** @var array */
-    private $cache = [];
+    private ActionProcessorInterface $processor;
+    private array $cache = [];
 
     public function __construct(ActionProcessorInterface $processor)
     {
@@ -95,9 +92,9 @@ class MetadataProvider implements ResetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->cache = [];
     }

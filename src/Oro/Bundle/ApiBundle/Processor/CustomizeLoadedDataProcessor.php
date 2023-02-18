@@ -10,9 +10,9 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContex
 class CustomizeLoadedDataProcessor extends ByStepActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): CustomizeLoadedDataContext
     {
         return new CustomizeLoadedDataContext();
     }

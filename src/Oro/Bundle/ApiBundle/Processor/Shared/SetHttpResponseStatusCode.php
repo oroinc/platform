@@ -81,10 +81,10 @@ class SetHttpResponseStatusCode implements ProcessorInterface
 
         $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
         if (!empty($groupedCodes)) {
-            $maxGroup = \max(\array_keys($groupedCodes));
+            $maxGroup = max(array_keys($groupedCodes));
             $statusCode = $maxGroup;
             if (\count($groupedCodes[$maxGroup]) === 1) {
-                $statusCode = \array_pop($groupedCodes[$maxGroup]);
+                $statusCode = array_pop($groupedCodes[$maxGroup]);
             }
         }
 

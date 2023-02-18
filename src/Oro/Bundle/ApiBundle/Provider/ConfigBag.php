@@ -11,14 +11,9 @@ class ConfigBag implements ConfigBagInterface, ResetInterface
 {
     private const ENTITIES = 'entities';
 
-    /** @var ConfigCache */
-    private $configCache;
-
-    /** @var string */
-    private $configFile;
-
-    /** @var array */
-    private $config;
+    private ConfigCache $configCache;
+    private string $configFile;
+    private ?array $config = null;
 
     public function __construct(ConfigCache $configCache, string $configFile)
     {
@@ -27,7 +22,7 @@ class ConfigBag implements ConfigBagInterface, ResetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getClassNames(string $version): array
     {
@@ -41,7 +36,7 @@ class ConfigBag implements ConfigBagInterface, ResetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getConfig(string $className, string $version): ?array
     {
@@ -51,9 +46,9 @@ class ConfigBag implements ConfigBagInterface, ResetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->config = null;
     }

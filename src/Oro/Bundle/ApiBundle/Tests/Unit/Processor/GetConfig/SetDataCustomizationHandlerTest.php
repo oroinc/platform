@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\SetDataCustomizationHandler;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
@@ -24,7 +25,10 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->customizationProcessor = $this->createMock(CustomizeLoadedDataProcessor::class);
+        $this->customizationProcessor = $this->getMockBuilder(CustomizeLoadedDataProcessor::class)
+            ->onlyMethods(['process'])
+            ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'customize_loaded_data'])
+            ->getMock();
 
         $this->processor = new SetDataCustomizationHandler($this->customizationProcessor);
     }

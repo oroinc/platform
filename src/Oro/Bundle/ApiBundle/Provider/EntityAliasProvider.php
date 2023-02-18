@@ -12,14 +12,9 @@ use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
  */
 class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassProviderInterface
 {
-    /** @var ConfigCache */
-    private $configCache;
-
-    /** @var array */
-    private $entityAliases;
-
-    /** @var array */
-    private $exclusions;
+    private ConfigCache $configCache;
+    private ?array $entityAliases = null;
+    private array $exclusions;
 
     public function __construct(ConfigCache $configCache)
     {
@@ -27,7 +22,7 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getEntityAlias($entityClass)
     {
@@ -50,16 +45,16 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getClassNames()
+    public function getClassNames(): array
     {
         $this->ensureInitialized();
 
         return array_keys($this->entityAliases);
     }
 
-    private function ensureInitialized()
+    private function ensureInitialized(): void
     {
         if (null === $this->entityAliases) {
             $this->entityAliases = $this->configCache->getAliases();

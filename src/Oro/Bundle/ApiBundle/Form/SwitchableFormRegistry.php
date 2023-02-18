@@ -51,7 +51,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function switchToDefaultFormExtension(): void
     {
@@ -65,7 +65,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function switchToApiFormExtension(): void
     {
@@ -87,7 +87,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getType($name)
     {

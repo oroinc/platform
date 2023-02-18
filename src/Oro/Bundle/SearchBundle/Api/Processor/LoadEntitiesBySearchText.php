@@ -41,7 +41,7 @@ class LoadEntitiesBySearchText implements ProcessorInterface
     /**
      * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */
 

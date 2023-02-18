@@ -30,7 +30,7 @@ class AddFileContentFormListener implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */
 
@@ -43,14 +43,14 @@ class AddFileContentFormListener implements ProcessorInterface
         $formBuilder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
     }
 
-    public function onPreSubmit(FormEvent $event)
+    public function onPreSubmit(FormEvent $event): void
     {
         $data = $event->getData();
-        if (!$data || !array_key_exists(self::CONTENT_FIELD_NAME, $data)) {
+        if (!$data || !\array_key_exists(self::CONTENT_FIELD_NAME, $data)) {
             return;
         }
 
-        if (!array_key_exists(self::ORIGINAL_FILE_NAME_FIELD_NAME, $data)) {
+        if (!\array_key_exists(self::ORIGINAL_FILE_NAME_FIELD_NAME, $data)) {
             FormUtil::addFormError(
                 $event->getForm(),
                 sprintf(

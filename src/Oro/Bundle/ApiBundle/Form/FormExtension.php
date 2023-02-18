@@ -39,7 +39,7 @@ class FormExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getType($name)
     {
@@ -73,7 +73,7 @@ class FormExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasType($name)
     {
@@ -81,7 +81,7 @@ class FormExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getTypeExtensions($name)
     {
@@ -109,7 +109,7 @@ class FormExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasTypeExtensions($name)
     {
@@ -117,7 +117,7 @@ class FormExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getTypeGuesser()
     {

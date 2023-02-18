@@ -14,8 +14,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class LoadEntityStructure implements ProcessorInterface
 {
-    /** @var EntityStructureDataProvider */
-    private $entityStructureProvider;
+    private EntityStructureDataProvider $entityStructureProvider;
 
     public function __construct(EntityStructureDataProvider $entityStructureProvider)
     {
@@ -25,7 +24,7 @@ class LoadEntityStructure implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var GetContext $context */
 

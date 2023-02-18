@@ -8,21 +8,14 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 
 class ChangeRelationshipContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var ChangeRelationshipContext */
-    private $context;
+    private ChangeRelationshipContext $context;
 
     protected function setUp(): void
     {
-        $this->configProvider = $this->createMock(ConfigProvider::class);
-        $this->metadataProvider = $this->createMock(MetadataProvider::class);
-
-        $this->context = new ChangeRelationshipContext($this->configProvider, $this->metadataProvider);
+        $this->context = new ChangeRelationshipContext(
+            $this->createMock(ConfigProvider::class),
+            $this->createMock(MetadataProvider::class)
+        );
     }
 
     public function testParentEntity()

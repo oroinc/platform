@@ -17,7 +17,7 @@ class EnableApiFeature extends AbstractFixture implements ContainerAwareInterfac
     /**
      * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $configManager = $this->container->get('oro_config.global');
         $configManager->set('oro_api.web_api', true);

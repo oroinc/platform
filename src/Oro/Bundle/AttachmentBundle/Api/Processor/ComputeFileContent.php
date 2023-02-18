@@ -16,11 +16,8 @@ class ComputeFileContent implements ProcessorInterface
 {
     private const CONTENT_FIELD_NAME = 'content';
 
-    /** @var FileManager */
-    private $fileManager;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private FileManager $fileManager;
+    private LoggerInterface $logger;
 
     public function __construct(FileManager $fileManager, LoggerInterface $logger)
     {
@@ -31,7 +28,7 @@ class ComputeFileContent implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */
 

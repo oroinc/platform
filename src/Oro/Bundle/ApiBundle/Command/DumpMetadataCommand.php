@@ -47,7 +47,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
         $this->configProvider = $configProvider;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('entity', InputArgument::REQUIRED, 'Entity class name or alias')
@@ -86,7 +86,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $requestType = $this->getRequestType($input);
         // API version is not supported for now
@@ -121,7 +121,7 @@ HELP
             $metadataExtras[] = new HateoasMetadataExtra(new FilterValueAccessor());
         }
 
-        $config   = $this->configProvider->getConfig($entityClass, $version, $requestType, $configExtras);
+        $config = $this->configProvider->getConfig($entityClass, $version, $requestType, $configExtras);
         $metadata = $this->metadataProvider->getMetadata(
             $entityClass,
             $version,
@@ -131,7 +131,7 @@ HELP
         );
 
         return [
-            $entityClass => null !== $metadata ? $metadata->toArray() : null
+            $entityClass => $metadata?->toArray()
         ];
     }
 }

@@ -28,11 +28,8 @@ class ErrorCompleter extends AbstractErrorCompleter
 {
     private const POINTER_DELIMITER = '/';
 
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
+    private ValueNormalizer $valueNormalizer;
+    private FilterNamesRegistry $filterNamesRegistry;
 
     public function __construct(
         ErrorTitleOverrideProvider $errorTitleOverrideProvider,
@@ -100,13 +97,13 @@ class ErrorCompleter extends AbstractErrorCompleter
             $propertyPath = $source->getPropertyPath();
             if (null === $metadata) {
                 $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
-                $error->setSource();
+                $error->setSource(null);
             } else {
                 [$normalizedPropertyPath, $path, $pointerPrefix] = $this->normalizePropertyPath($propertyPath);
                 $pointer = $this->getPointer($metadata, $normalizedPropertyPath, $path);
                 if (empty($pointer)) {
                     $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
-                    $error->setSource();
+                    $error->setSource(null);
                 } else {
                     $dataSection = $metadata->hasIdentifierFields()
                         ? JsonApiDoc::DATA

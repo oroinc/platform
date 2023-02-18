@@ -17,17 +17,10 @@ use Psr\Log\LoggerInterface;
  */
 class AsyncOperationManager
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var FileManager */
-    private $fileManager;
-
-    /** @var ErrorManager */
-    private $errorManager;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private ManagerRegistry $doctrine;
+    private FileManager $fileManager;
+    private ErrorManager $errorManager;
+    private LoggerInterface $logger;
 
     public function __construct(
         ManagerRegistry $doctrine,

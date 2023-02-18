@@ -11,23 +11,13 @@ use Oro\Bundle\GaufretteBundle\FileManager;
  */
 class BatchUpdateRequest
 {
-    /** @var string */
-    private $version;
-
-    /** @var RequestType */
-    private $requestType;
-
-    /** @var int */
-    private $operationId;
-
+    private string $version;
+    private RequestType $requestType;
+    private int $operationId;
     /** @var string[] */
-    private $supportedEntityClasses;
-
-    /** @var ChunkFile */
-    private $file;
-
-    /** @var FileManager */
-    private $fileManager;
+    private array $supportedEntityClasses;
+    private ChunkFile $file;
+    private FileManager $fileManager;
 
     /**
      * @param string      $version                The API version

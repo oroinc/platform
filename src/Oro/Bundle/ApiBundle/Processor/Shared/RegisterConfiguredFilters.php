@@ -144,9 +144,9 @@ class RegisterConfiguredFilters extends RegisterFilters
         FieldAwareFilterInterface|StandaloneFilter $filter,
         ?EntityDefinitionFieldConfig $config
     ): void {
-        if ($config) {
+        if (null !== $config) {
             $path = $filter->getField();
-            $singleIdName = $this->getSingleIdentifierFieldName($config?->getTargetEntity());
+            $singleIdName = $this->getSingleIdentifierFieldName($config->getTargetEntity());
             if ($singleIdName) {
                 $targetEntityConfig = $config->getTargetEntity();
                 $pathProperty = $targetEntityConfig?->getField($singleIdName)?->getPropertyPath();

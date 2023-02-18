@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Collection;
 
 use Doctrine\ORM\Query\Expr\Join as BaseJoin;
 
+/**
+ * The expression class for DQL join with some additional methods required to build API DQL expressions.
+ */
 class Join extends BaseJoin
 {
     /**
@@ -13,8 +16,13 @@ class Join extends BaseJoin
      * @param string|null $condition     The condition for the join.
      * @param string|null $indexBy       The index for the join.
      */
-    public function __construct($joinType, $join, $conditionType = null, $condition = null, $indexBy = null)
-    {
+    public function __construct(
+        string $joinType,
+        string $join,
+        ?string $conditionType = null,
+        ?string $condition = null,
+        ?string $indexBy = null
+    ) {
         // normalize parameters
         if (null !== $conditionType && !$conditionType) {
             $conditionType = null;
@@ -32,34 +40,22 @@ class Join extends BaseJoin
         parent::__construct($joinType, $join, null, $conditionType, $condition, $indexBy);
     }
 
-    /**
-     * @param string $join
-     */
-    public function setJoin($join)
+    public function setJoin(string $join): void
     {
         $this->join = $join;
     }
 
-    /**
-     * @param string $joinType
-     */
-    public function setJoinType($joinType)
+    public function setJoinType(string $joinType): void
     {
         $this->joinType = $joinType;
     }
 
-    /**
-     * @param string $condition
-     */
-    public function setCondition($condition)
+    public function setCondition(string $condition): void
     {
         $this->condition = $condition;
     }
 
-    /**
-     * @param string $alias
-     */
-    public function setAlias($alias)
+    public function setAlias(string $alias): void
     {
         $this->alias = $alias;
     }
@@ -67,12 +63,8 @@ class Join extends BaseJoin
     /**
      * Determines whether the given join object represents the same join statement as the current one.
      * Please note that the join type is not a part of the comparison.
-     *
-     * @param Join $join
-     *
-     * @return bool
      */
-    public function equals(Join $join)
+    public function equals(Join $join): bool
     {
         return
             $this->getJoin() === $join->getJoin()

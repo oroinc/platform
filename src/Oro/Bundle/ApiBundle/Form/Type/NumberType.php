@@ -14,20 +14,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class NumberType extends AbstractType
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addViewTransformer(new NumberToStringTransformer($options['scale']));
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            ->setDefaults(['scale' => null, 'compound' => false])
+            ->setDefault('scale', null)
+            ->setDefault('compound', false)
             ->setAllowedTypes('scale', ['null', 'int']);
     }
 }

@@ -13,20 +13,12 @@ use Oro\Bundle\EntityBundle\Provider\EntityRuleMatcher;
  */
 class ConfigExclusionProvider extends ChainExclusionProvider
 {
-    /** @var EntityHierarchyProviderInterface */
-    private $entityHierarchyProvider;
+    private EntityHierarchyProviderInterface $entityHierarchyProvider;
+    private ConfigCache $configCache;
 
-    /** @var ConfigCache */
-    private $configCache;
-
-    /** @var EntityRuleMatcher */
-    private $excludeMatcher;
-
-    /** @var EntityRuleMatcher */
-    private $includeMatcher;
-
-    /** @var array */
-    private $cache = [];
+    private ?EntityRuleMatcher $excludeMatcher = null;
+    private ?EntityRuleMatcher $includeMatcher = null;
+    private array $cache = [];
 
     public function __construct(
         EntityHierarchyProviderInterface $entityHierarchyProvider,
@@ -37,7 +29,7 @@ class ConfigExclusionProvider extends ChainExclusionProvider
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isIgnoredEntity($className)
     {
@@ -52,7 +44,7 @@ class ConfigExclusionProvider extends ChainExclusionProvider
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
@@ -72,7 +64,7 @@ class ConfigExclusionProvider extends ChainExclusionProvider
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {

@@ -61,10 +61,10 @@ class RequestType implements ToArrayInterface
      */
     public function remove(string $aspect): void
     {
-        $key = \array_search($aspect, $this->aspects, true);
+        $key = array_search($aspect, $this->aspects, true);
         if (false !== $key) {
             unset($this->aspects[$key]);
-            $this->aspects = \array_values($this->aspects);
+            $this->aspects = array_values($this->aspects);
             $this->str = null;
         }
     }

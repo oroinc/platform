@@ -18,20 +18,11 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var AsyncOperationManager */
-    private $operationManager;
-
-    /** @var UpdateListProcessingHelper */
-    private $processingHelper;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var int */
-    private $batchSize = 3000;
+    private ManagerRegistry $doctrine;
+    private AsyncOperationManager $operationManager;
+    private UpdateListProcessingHelper $processingHelper;
+    private LoggerInterface $logger;
+    private int $batchSize = 3000;
 
     public function __construct(
         ManagerRegistry $doctrine,
@@ -46,9 +37,9 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [UpdateListStartChunkJobsTopic::getName()];
     }
@@ -62,9 +53,9 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
         $startTimestamp = microtime(true);
         $messageBody = $message->getBody();
@@ -80,7 +71,7 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
         $firstChunkFileIndex = $messageBody['firstChunkFileIndex'];
         $chunkFiles = $this->processingHelper->loadChunkIndex($operationId);
         $chunkFileToJobIdMap = $this->processingHelper->loadChunkJobIndex($operationId);
-        $maxChunkFileIndex = count($chunkFiles) - 1;
+        $maxChunkFileIndex = \count($chunkFiles) - 1;
         $lastChunkFileIndex = $firstChunkFileIndex + $this->batchSize - 1;
         if ($lastChunkFileIndex > $maxChunkFileIndex) {
             $lastChunkFileIndex = $maxChunkFileIndex;

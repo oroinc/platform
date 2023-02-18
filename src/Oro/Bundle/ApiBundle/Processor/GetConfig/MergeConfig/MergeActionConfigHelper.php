@@ -11,14 +11,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class MergeActionConfigHelper
 {
-    /**
-     * @param array $config
-     * @param array $actionConfig
-     * @param bool  $withStatusCodes
-     *
-     * @return array
-     */
-    public function mergeActionConfig(array $config, array $actionConfig, $withStatusCodes)
+    public function mergeActionConfig(array $config, array $actionConfig, bool $withStatusCodes): array
     {
         if ($withStatusCodes && !empty($actionConfig[ConfigUtil::STATUS_CODES])) {
             $config = $this->mergeStatusCodes(
@@ -26,9 +19,8 @@ class MergeActionConfigHelper
                 $this->loadStatusCodes($actionConfig[ConfigUtil::STATUS_CODES])
             );
         }
-        unset($actionConfig[ConfigUtil::STATUS_CODES]);
+        unset($actionConfig[ConfigUtil::STATUS_CODES], $actionConfig[ConfigUtil::EXCLUDE]);
 
-        unset($actionConfig[ConfigUtil::EXCLUDE]);
         $actionFields = null;
         if (\array_key_exists(ConfigUtil::FIELDS, $actionConfig)) {
             $actionFields = $actionConfig[ConfigUtil::FIELDS];
@@ -46,40 +38,28 @@ class MergeActionConfigHelper
         return $config;
     }
 
-    /**
-     * @param array $config
-     * @param array $actionConfig
-     *
-     * @return array
-     */
-    protected function mergeActionConfigValues(array $config, array $actionConfig)
+    protected function mergeActionConfigValues(array $config, array $actionConfig): array
     {
         // merge form options and event subscribers only if form type is not changed
         if (empty($actionConfig[ConfigUtil::FORM_TYPE])) {
             $mergeKeys = [ConfigUtil::FORM_OPTIONS, ConfigUtil::FORM_EVENT_SUBSCRIBER];
             foreach ($mergeKeys as $mergeKey) {
                 if (\array_key_exists($mergeKey, $actionConfig) && \array_key_exists($mergeKey, $config)) {
-                    $actionConfig[$mergeKey] = \array_merge($config[$mergeKey], $actionConfig[$mergeKey]);
+                    $actionConfig[$mergeKey] = array_merge($config[$mergeKey], $actionConfig[$mergeKey]);
                     unset($config[$mergeKey]);
                 }
             }
         }
 
-        return \array_merge($config, $actionConfig);
+        return array_merge($config, $actionConfig);
     }
 
-    /**
-     * @param array $fields
-     * @param array $actionFields
-     *
-     * @return array
-     */
-    protected function mergeActionFields(array $fields, array $actionFields)
+    protected function mergeActionFields(array $fields, array $actionFields): array
     {
         foreach ($actionFields as $key => $value) {
             if (!empty($fields[$key])) {
                 if (!empty($value)) {
-                    $fields[$key] = \array_merge($fields[$key], $value);
+                    $fields[$key] = array_merge($fields[$key], $value);
                 }
             } else {
                 $fields[$key] = $value;
@@ -89,25 +69,12 @@ class MergeActionConfigHelper
         return $fields;
     }
 
-    /**
-     * @param array $statusCodesConfig
-     *
-     * @return StatusCodesConfig
-     */
-    protected function loadStatusCodes(array $statusCodesConfig)
+    protected function loadStatusCodes(array $statusCodesConfig): StatusCodesConfig
     {
-        $statusCodesLoader = new StatusCodesConfigLoader();
-
-        return $statusCodesLoader->load($statusCodesConfig);
+        return (new StatusCodesConfigLoader())->load($statusCodesConfig);
     }
 
-    /**
-     * @param array             $config
-     * @param StatusCodesConfig $statusCodes
-     *
-     * @return array
-     */
-    protected function mergeStatusCodes(array $config, StatusCodesConfig $statusCodes)
+    protected function mergeStatusCodes(array $config, StatusCodesConfig $statusCodes): array
     {
         if (!\array_key_exists(ConfigUtil::STATUS_CODES, $config)) {
             $config[ConfigUtil::STATUS_CODES] = $statusCodes;

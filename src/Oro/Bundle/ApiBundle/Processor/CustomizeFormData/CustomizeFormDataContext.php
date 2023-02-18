@@ -82,17 +82,10 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     /** the name of the action which causes this action, e.g. "create" or "update" */
     private const PARENT_ACTION = 'parentAction';
 
-    /** @var FormInterface */
-    private $form;
-
-    /** @var mixed */
-    private $data;
-
-    /** @var IncludedEntityCollection|null */
-    private $includedEntities;
-
-    /** @var EntityMapper|null */
-    private $entityMapper;
+    private ?FormInterface $form = null;
+    private mixed $data = null;
+    private ?IncludedEntityCollection $includedEntities = null;
+    private ?EntityMapper $entityMapper = null;
 
     /**
      * Checks if the context is already initialized.
@@ -126,20 +119,16 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * Gets the name of the action which causes this action, e.g. "create" or "update".
-     *
-     * @return string|null
      */
-    public function getParentAction()
+    public function getParentAction(): ?string
     {
         return $this->get(self::PARENT_ACTION);
     }
 
     /**
      * Sets the name of the action which causes this action, e.g. "create" or "update".
-     *
-     * @param string|null $action
      */
-    public function setParentAction($action)
+    public function setParentAction(?string $action): void
     {
         if ($action) {
             $this->set(self::PARENT_ACTION, $action);
@@ -158,12 +147,8 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * Gets a form object related to the given entity.
-     *
-     * @param object $entity
-     *
-     * @return FormInterface|null
      */
-    public function findForm($entity): ?FormInterface
+    public function findForm(object $entity): ?FormInterface
     {
         if ($this->form->getData() === $entity) {
             return $this->form;
@@ -183,26 +168,16 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * Finds a form field by its property path.
-     *
-     * @param string             $propertyPath The name of an entity field
-     * @param FormInterface|null $form         The parent form of the searching child form
-     *
-     * @return FormInterface|null
      */
-    public function findFormField(string $propertyPath, FormInterface $form = null): ?FormInterface
+    public function findFormField(string $propertyPath, ?FormInterface $form = null): ?FormInterface
     {
         return FormUtil::findFormFieldByPropertyPath($form ?? $this->getForm(), $propertyPath);
     }
 
     /**
      * Finds the name of a form field by its property path.
-     *
-     * @param string             $propertyPath The name of an entity field
-     * @param FormInterface|null $form         The parent form of the searching child form
-     *
-     * @return string|null
      */
-    public function findFormFieldName(string $propertyPath, FormInterface $form = null): ?string
+    public function findFormFieldName(string $propertyPath, ?FormInterface $form = null): ?string
     {
         $fieldForm = $this->findFormField($propertyPath, $form);
         if (null === $fieldForm) {
@@ -225,20 +200,16 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
      * For "pre_submit" event it is the submitted data.
      * For "submit" event it is the norm data.
      * For other events it is the view data.
-     *
-     * @return mixed
      */
-    public function getData()
+    public function getData(): mixed
     {
         return $this->data;
     }
 
     /**
      * Sets the data associated with the form event.
-     *
-     * @param mixed $data
      */
-    public function setData($data): void
+    public function setData(mixed $data): void
     {
         $this->data = $data;
     }
@@ -295,46 +266,40 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * This method is just an alias for getData.
-     *
-     * @return mixed
      */
-    public function getResult()
+    public function getResult(): mixed
     {
         return $this->data;
     }
 
     /**
      * This method is just an alias for setData.
-     *
-     * @param mixed $data
      */
-    public function setResult($data)
+    public function setResult(mixed $data): void
     {
         $this->data = $data;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function hasResult()
+    public function hasResult(): bool
     {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function removeResult()
+    public function removeResult(): void
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
     /**
      * Gets a service that can be used to convert an entity object to a model object and vise versa.
-     *
-     * @return EntityMapper|null
      */
-    public function getEntityMapper()
+    public function getEntityMapper(): ?EntityMapper
     {
         return $this->entityMapper;
     }
@@ -342,7 +307,7 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     /**
      * Sets a service that can be used to convert an entity object to a model object and vise versa.
      */
-    public function setEntityMapper(EntityMapper $entityMapper = null)
+    public function setEntityMapper(?EntityMapper $entityMapper): void
     {
         $this->entityMapper = $entityMapper;
     }

@@ -292,12 +292,13 @@ HELP
         $filesystem = new Filesystem();
 
         $migrationFile = $migrationFolder.'/'.$this->className.'.php';
-        if ($migrationExists = $filesystem->exists($migrationFile)) {
+        $migrationExists = $filesystem->exists($migrationFile);
+        if ($migrationExists) {
             if ($this->isOverwriteMigration($migrationFile)) {
                 $filesystem->remove($migrationFile);
             } else {
                 $this->writeCancelMessage();
-                return ;
+                return;
             }
         }
 

@@ -59,7 +59,7 @@ class DumpConfigCommand extends AbstractDebugCommand
         $this->configProvider = $configProvider;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument(
@@ -129,7 +129,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $requestType = $this->getRequestType($input);
         // API version is not supported for now
@@ -240,13 +240,13 @@ HELP
         }
         unset($data[ConfigUtil::DEFINITION]);
         foreach ([ConfigUtil::FILTERS, ConfigUtil::SORTERS] as $sectionName) {
-            if (array_key_exists($sectionName, $data)) {
+            if (\array_key_exists($sectionName, $data)) {
                 $result[$sectionName] = $data[$sectionName];
             }
         }
         // add other sections
         foreach ($data as $sectionName => $sectionConfig) {
-            if (!array_key_exists($sectionName, $result)) {
+            if (!\array_key_exists($sectionName, $result)) {
                 $result[$sectionName] = $sectionConfig;
             }
         }
@@ -261,32 +261,27 @@ HELP
     {
         $result = [];
         foreach (self::KNOWN_EXTRAS as $className) {
-            $result[constant($className . '::NAME')] = $className;
+            $result[\constant($className . '::NAME')] = $className;
         }
 
         return $result;
     }
 
-    /**
-     * @param mixed $val
-     *
-     * @return mixed
-     */
-    protected function convertConfigValueToHumanReadableRepresentation($val)
+    protected function convertConfigValueToHumanReadableRepresentation(mixed $val): mixed
     {
         if ($val instanceof \Closure) {
             $val = sprintf(
                 'closure from %s',
                 (new \ReflectionFunction($val))->getClosureScopeClass()->getName()
             );
-        } elseif (is_object($val)) {
+        } elseif (\is_object($val)) {
             if ($val instanceof VirtualProxyInterface) {
                 if (!$val->isProxyInitialized()) {
                     $val->initializeProxy();
                 }
                 $val = $val->getWrappedValueHolderValue();
             }
-            $val = sprintf('instance of %s', get_class($val));
+            $val = sprintf('instance of %s', \get_class($val));
         }
 
         return $val;
@@ -309,7 +304,7 @@ HELP
         $entityClass = reset($keys);
         $config = $config[$entityClass];
         $documentationResource = [];
-        if (array_key_exists(ConfigUtil::DOCUMENTATION_RESOURCE, $config)) {
+        if (\array_key_exists(ConfigUtil::DOCUMENTATION_RESOURCE, $config)) {
             $documentationResource = $config[ConfigUtil::DOCUMENTATION_RESOURCE];
         }
 

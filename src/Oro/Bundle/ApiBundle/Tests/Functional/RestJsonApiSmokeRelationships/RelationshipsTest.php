@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiSmokeSubresources;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiSmokeRelationships;
 
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;

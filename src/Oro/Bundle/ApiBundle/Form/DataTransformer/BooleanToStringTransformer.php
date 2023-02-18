@@ -11,7 +11,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class BooleanToStringTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function transform($value)
     {
@@ -27,7 +27,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function reverseTransform($value)
     {
@@ -43,13 +43,9 @@ class BooleanToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param string $value
-     *
-     * @return bool
-     *
      * @throws TransformationFailedException if the given string cannot be converted to a boolean
      */
-    protected function transformStringToBoolean($value)
+    private function transformStringToBoolean(string $value): bool
     {
         switch ($value) {
             case 'true':

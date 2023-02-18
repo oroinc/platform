@@ -35,20 +35,20 @@ class EntityWithoutOverrideTest extends RestJsonApiTestCase
      */
     private function assertToManyAssociation(array $expectedEntities, Collection $association)
     {
-        $associationIds = \array_map(
+        $associationIds = array_map(
             function ($entity) {
                 return $entity->id;
             },
             $association->toArray()
         );
-        \sort($associationIds);
-        $expectedIds = \array_map(
+        sort($associationIds);
+        $expectedIds = array_map(
             function ($referenceName) {
                 return $this->getReference($referenceName)->id;
             },
             $expectedEntities
         );
-        \sort($expectedIds);
+        sort($expectedIds);
         self::assertEquals($expectedIds, $associationIds);
     }
 
@@ -255,7 +255,7 @@ class EntityWithoutOverrideTest extends RestJsonApiTestCase
         $responseContent = self::jsonToArray($response->getContent());
         self::assertCount(2, $responseContent['included'], 'included');
         foreach ($responseContent['included'] as $key => $item) {
-            self::assertArrayNotHasKey('meta', $responseContent['included'][$key], sprintf('included[$s]', $key));
+            self::assertArrayNotHasKey('meta', $responseContent['included'][$key], sprintf('included[%s]', $key));
         }
     }
 

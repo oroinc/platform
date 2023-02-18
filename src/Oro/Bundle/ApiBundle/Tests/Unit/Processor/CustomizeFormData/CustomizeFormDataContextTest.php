@@ -20,8 +20,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  */
 class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CustomizeFormDataContext */
-    private $context;
+    private CustomizeFormDataContext $context;
 
     protected function setUp(): void
     {
@@ -72,8 +71,6 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 
     public function testClassName()
     {
-        self::assertNull($this->context->getClassName());
-
         $className = 'Test\Class';
         $this->context->setClassName($className);
         self::assertEquals($className, $this->context->getClassName());
@@ -434,7 +431,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setEntityMapper($entityMapper);
         self::assertSame($entityMapper, $this->context->getEntityMapper());
 
-        $this->context->setEntityMapper();
+        $this->context->setEntityMapper(null);
         self::assertNull($this->context->getEntityMapper());
     }
 }

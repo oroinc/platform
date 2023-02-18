@@ -17,7 +17,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class ValidateRequestTypeAndVersion implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -31,7 +31,7 @@ class ValidateRequestTypeAndVersion implements ProcessorInterface
                 )
             );
         } else {
-            $context->setVersion(Version::normalizeVersion($context->getVersion()));
+            $context->setVersion(Version::normalizeVersion($context->getVersion() ?: null));
         }
     }
 }

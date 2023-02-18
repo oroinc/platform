@@ -12,24 +12,24 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 class AppendRelationshipMapper extends AbstractRelationshipMapper
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function mapDataToCollectionFormField(
-        $data,
+        object $data,
         FormInterface $formField,
         PropertyPathInterface $propertyPath
-    ) {
+    ): void {
         // do nothing here because only input collection items should be processed by the form
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function mapCollectionFormFieldToData(
-        $data,
+        object $data,
         FormInterface $formField,
         PropertyPathInterface $propertyPath
-    ) {
+    ): void {
         $methods = $this->findAdderAndRemover($data, (string)$propertyPath);
         if ($methods) {
             $formData = $formField->getData();

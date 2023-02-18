@@ -13,11 +13,8 @@ use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
  */
 class BatchUpdateHandler
 {
-    /** @var StepExecutor */
-    private $stepExecutor;
-
-    /** @var BatchUpdateItemProcessor */
-    private $itemProcessor;
+    private StepExecutor $stepExecutor;
+    private BatchUpdateItemProcessor $itemProcessor;
 
     public function __construct(BatchUpdateProcessor $processor, BatchUpdateItemProcessor $itemProcessor)
     {

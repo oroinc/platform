@@ -13,35 +13,28 @@ class ChangeRelationshipContext extends SubresourceContext implements FormContex
 {
     use FormContextTrait;
 
-    /** @var object|null */
-    private $parentEntity;
+    private ?object $parentEntity = null;
 
     /**
      * Checks whether the parent entity exists.
-     *
-     * @return bool
      */
-    public function hasParentEntity()
+    public function hasParentEntity(): bool
     {
         return null !== $this->parentEntity;
     }
 
     /**
      * Gets the parent entity object.
-     *
-     * @return object|null
      */
-    public function getParentEntity()
+    public function getParentEntity(): ?object
     {
         return $this->parentEntity;
     }
 
     /**
      * Sets the parent entity object.
-     *
-     * @param object|null $parentEntity
      */
-    public function setParentEntity($parentEntity)
+    public function setParentEntity(?object $parentEntity): void
     {
         $this->parentEntity = $parentEntity;
     }

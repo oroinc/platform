@@ -12,27 +12,18 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class RestDocViewDetector implements ResetInterface
 {
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var string|null */
-    private $view;
-
-    /** @var string|null */
-    private $version;
-
-    /** @var RequestType|null */
-    private $requestType;
-
-    /** @var iterable|RequestTypeProviderInterface[] */
-    private $requestTypeProviders;
-
+    private RequestStack $requestStack;
+    /** @var iterable<RequestTypeProviderInterface> */
+    private iterable $requestTypeProviders;
+    private ?string $view = null;
+    private ?string $version = null;
+    private ?RequestType $requestType = null;
     /** @var array [request type provider hash => bool, ...] */
-    private $initializedRequestTypeProviders = [];
+    private array $initializedRequestTypeProviders = [];
 
     /**
-     * @param RequestStack                            $requestStack
-     * @param iterable|RequestTypeProviderInterface[] $requestTypeProviders
+     * @param RequestStack                           $requestStack
+     * @param iterable<RequestTypeProviderInterface> $requestTypeProviders
      */
     public function __construct(RequestStack $requestStack, iterable $requestTypeProviders)
     {

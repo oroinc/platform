@@ -31,7 +31,7 @@ class SetTestCurrentDepartmentEntityIdForSubresource implements ProcessorInterfa
             ->setParameter('name', 'Current Department')
             ->getQuery()
             ->getArrayResult();
-        if (!empty($rows)) {
+        if ($rows) {
             $context->setParentId((string)$rows[0]['id']);
         }
     }

@@ -127,7 +127,7 @@ class AddExcludedActions implements ProcessorInterface
 
     private function isInherit(?array $config): bool
     {
-        if (null !== $config && array_key_exists(ConfigUtil::INHERIT, $config)) {
+        if (null !== $config && \array_key_exists(ConfigUtil::INHERIT, $config)) {
             return $config[ConfigUtil::INHERIT];
         }
 

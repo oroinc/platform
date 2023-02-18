@@ -7,31 +7,26 @@ namespace Oro\Component\ChainProcessor;
  */
 class ActionProcessor extends ChainProcessor implements ActionProcessorInterface
 {
-    /** @var string */
-    protected $action;
+    private string $action;
 
-    /**
-     * @param ProcessorBagInterface $processorBag
-     * @param string                $action
-     */
-    public function __construct(ProcessorBagInterface $processorBag, $action)
+    public function __construct(ProcessorBagInterface $processorBag, string $action)
     {
         parent::__construct($processorBag);
         $this->action = $action;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getAction()
+    public function getAction(): string
     {
         return $this->action;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    final public function createContext()
+    final public function createContext(): Context
     {
         $context = $this->createContextObject();
         $this->initializeContextObject($context);
@@ -41,10 +36,8 @@ class ActionProcessor extends ChainProcessor implements ActionProcessorInterface
 
     /**
      * Creates new Context object.
-     *
-     * @return Context
      */
-    protected function createContextObject()
+    protected function createContextObject(): Context
     {
         return new Context();
     }
@@ -52,7 +45,7 @@ class ActionProcessor extends ChainProcessor implements ActionProcessorInterface
     /**
      * Initializes new Context object.
      */
-    protected function initializeContextObject(Context $context)
+    protected function initializeContextObject(Context $context): void
     {
         $context->setAction($this->action);
     }
