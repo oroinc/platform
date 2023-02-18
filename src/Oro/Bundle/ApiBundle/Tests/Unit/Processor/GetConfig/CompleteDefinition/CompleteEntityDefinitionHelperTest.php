@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\CompleteDefinition
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteAssociationHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteCustomDataTypeHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteEntityDefinitionHelper;
@@ -32,6 +31,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCase
 {
@@ -1739,6 +1739,38 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWhenIdFieldIsExcluded()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The identifier field "id" for "Test\Class" entity must not be excluded.');
+
+        $config = $this->createConfigObject([
+            'fields' => [
+                'id'    => [
+                    'exclude' => true
+                ],
+                'field' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+        $context->setExtras([new FilterIdentifierFieldsConfigExtra()]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+    }
+
     public function testCompleteDefinitionForTableInheritanceEntity()
     {
         $config = $this->createConfigObject([]);
@@ -1974,7 +2006,6 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-
         $rootEntityMetadata->expects(self::any())
             ->method('usesIdGenerator')
             ->willReturn($usesIdGenerator);
@@ -2111,6 +2142,87 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         ];
     }
 
+    public function testCompleteCustomIdentifierWhenIdFieldIsExcluded()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The identifier field "field" for "Test\Class" entity must not be excluded.');
+
+        $config = $this->createConfigObject([
+            'identifier_field_names' => ['field'],
+            'fields'                 => [
+                'id'    => null,
+                'field' => [
+                    'exclude' => true
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setTargetAction(ApiAction::GET);
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'field']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+    }
+
+    public function testCompleteCustomIdentifierWhenIdFieldIsNotDefined()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The identifier field "unknownField" for "Test\Class" entity is not defined.');
+
+        $config = $this->createConfigObject([
+            'identifier_field_names' => ['unknownField'],
+            'fields'                 => [
+                'id' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setTargetAction(ApiAction::GET);
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'field']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+    }
+
     public function testShouldThrowCorrectExceptionWhenDependsOnNameOfUndefinedPropertyAndGetConfigThrowException()
     {
         $config = $this->createConfigObject([
@@ -2150,7 +2262,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(self::TEST_CLASS_NAME, $context->getVersion(), $context->getRequestType())
-            ->willThrowException(new RuntimeException('circular dependency detected'));
+            ->willThrowException(new \RuntimeException('circular dependency detected'));
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -2201,7 +2313,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(self::TEST_CLASS_NAME, $context->getVersion(), $context->getRequestType())
-            ->willThrowException(new RuntimeException('circular dependency detected'));
+            ->willThrowException(new \RuntimeException('circular dependency detected'));
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -2256,7 +2368,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(self::TEST_CLASS_NAME, $context->getVersion(), $context->getRequestType())
-            ->willThrowException(new RuntimeException('circular dependency detected'));
+            ->willThrowException(new \RuntimeException('circular dependency detected'));
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
