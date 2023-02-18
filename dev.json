@@ -323,5 +323,10 @@
         "exclude-from-classmap": [
             "/Tests/"
         ]
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": false
+        }
     }
 }
