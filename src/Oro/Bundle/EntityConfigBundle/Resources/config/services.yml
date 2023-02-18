@@ -599,3 +599,36 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Tools\AttributeValidator
         arguments:
             - "@doctrine"
+
+    oro_entity_config.async.attribute_pre_import:
+        class: Oro\Bundle\EntityConfigBundle\Async\AttributePreImportMessageProcessor
+        arguments:
+            - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_message_queue.job.dependent_job_service'
+            - '@oro_importexport.file.file_manager'
+            - '@oro_importexport.handler.import'
+            - '@oro_importexport.writer.writer_chain'
+            - '@oro_notification.model.notification_settings'
+            - '@doctrine'
+            - '@event_dispatcher'
+            - '%oro_importexport.import.size_of_batch%'
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_entity_config.async.attribute_import:
+        class: Oro\Bundle\EntityConfigBundle\Async\AttributeImportMessageProcessor
+        arguments:
+            - '@oro_message_queue.job.runner'
+            - '@oro_importexport.async.import_export_result_summarizer'
+            - '@logger'
+            - '@oro_importexport.file.file_manager'
+            - '@oro_importexport.handler.import'
+            - '@oro_importexport.handler.postpone'
+        calls:
+            - ['setMessageProducer', ['@oro_message_queue.client.message_producer']]
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+        lazy: true

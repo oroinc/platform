@@ -28,7 +28,7 @@
         box-shadow: $input-box-shadow-focus-state;
     }
 
-    &.focus-visible {
+    &.focus-visible:focus {
         border-color: $input-border-color-focus-state;
     }
 

@@ -26,7 +26,9 @@ class TimePicker extends Element
 
         /** @var NodeElement $li */
         foreach ($timeSelect->findAll('css', 'li') as $li) {
-            if ($time == $this->formatTime(new \DateTime($li->getText()))) {
+            # Replace non-breaking space with regular space
+            $selectTime = str_replace("\xE2\x80\xAF", ' ', $li->getText());
+            if ($time == $this->formatTime(new \DateTime($selectTime))) {
                 $li->mouseOver();
                 $this->spin(function () use ($li) {
                     $li->click();
