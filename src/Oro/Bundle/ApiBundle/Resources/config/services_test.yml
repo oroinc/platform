@@ -31,6 +31,17 @@ services:
         tags:
             - { name: routing.options_resolver }
 
+    oro_api.tests.twig_state:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestTwigState
+        public: true
+
+    oro_api.tests.twig.test_extension:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestTwigExtension
+        arguments:
+            - '@oro_api.tests.twig_state'
+        tags:
+            - { name: twig.extension }
+
     oro_api.tests.test_session_listener:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestSessionListener
         tags:
