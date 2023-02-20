@@ -176,10 +176,7 @@ class FlushData implements ProcessorInterface
     {
         $flushHandler = $this->flushDataHandlerFactoryRegistry->getFactory($entityClass)->createHandler($entityClass);
         if (null === $flushHandler) {
-            throw new \LogicException(sprintf(
-                'The flush data handler is not registered for %s.',
-                $entityClass
-            ));
+            throw new \LogicException(sprintf('The flush data handler is not registered for %s.', $entityClass));
         }
 
         return $flushHandler;

@@ -116,7 +116,7 @@ abstract class AbstractBaseRequestDataValidator
                     sprintf('The \'%s\' property should be a string', $property)
                 );
                 $isValid = false;
-            } elseif ('' === \trim($value)) {
+            } elseif ('' === trim($value)) {
                 $this->addError(
                     $this->buildPointer($pointer, $property),
                     sprintf('The \'%s\' property should not be blank', $property)

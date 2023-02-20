@@ -35,7 +35,7 @@ class MergeFilterConfigHelper
                     $options = $config[$filterName][$key];
                     foreach ($val as $k => $v) {
                         if (isset($options[$k]) && \is_array($options[$k]) && \is_array($v)) {
-                            $v = \array_merge($options[$k], $v);
+                            $v = array_merge($options[$k], $v);
                         }
                         $options[$k] = $v;
                     }

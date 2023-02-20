@@ -81,7 +81,7 @@ class AssociationHandler extends EntityHandler
         return
             $handler instanceof self
             && $this->propertyPath === $handler->propertyPath
-            && \is_a($this->rootEntityClass, $handler->rootEntityClass, true)
+            && is_a($this->rootEntityClass, $handler->rootEntityClass, true)
             && parent::isRedundantHandler($handler);
     }
 

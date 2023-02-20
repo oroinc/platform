@@ -17,7 +17,7 @@ class MergeSorterConfigHelper
             if (!\array_key_exists(ConfigUtil::FIELDS, $config[ConfigUtil::SORTERS])) {
                 $config[ConfigUtil::SORTERS][ConfigUtil::FIELDS] = $sortersConfig[ConfigUtil::FIELDS];
             } else {
-                $config[ConfigUtil::SORTERS][ConfigUtil::FIELDS] = \array_merge(
+                $config[ConfigUtil::SORTERS][ConfigUtil::FIELDS] = array_merge(
                     $config[ConfigUtil::SORTERS][ConfigUtil::FIELDS],
                     $sortersConfig[ConfigUtil::FIELDS]
                 );

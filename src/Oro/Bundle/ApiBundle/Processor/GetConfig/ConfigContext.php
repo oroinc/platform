@@ -237,9 +237,7 @@ class ConfigContext extends ApiContext
         $names = [];
         foreach ($extras as $extra) {
             if (!$extra instanceof ConfigExtraInterface) {
-                throw new \InvalidArgumentException(
-                    'Expected an array of "Oro\Bundle\ApiBundle\Config\ConfigExtraInterface".'
-                );
+                throw new \InvalidArgumentException(sprintf('Expected an array of "%s".', ConfigExtraInterface::class));
             }
             $names[] = $extra->getName();
             $extra->configureContext($this);

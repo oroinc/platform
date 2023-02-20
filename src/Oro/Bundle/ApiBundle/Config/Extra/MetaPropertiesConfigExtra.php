@@ -108,9 +108,7 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
     private function assertMetaPropertyExists(string $name): void
     {
         if (!\array_key_exists($name, $this->metaProperties)) {
-            throw new \InvalidArgumentException(
-                sprintf('The "%s" meta property does not exist.', $name)
-            );
+            throw new \InvalidArgumentException(sprintf('The "%s" meta property does not exist.', $name));
         }
     }
 }

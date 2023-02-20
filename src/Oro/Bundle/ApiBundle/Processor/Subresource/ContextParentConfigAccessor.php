@@ -23,7 +23,7 @@ class ContextParentConfigAccessor implements ConfigAccessorInterface
      */
     public function getConfig(string $className): ?EntityDefinitionConfig
     {
-        return \is_a($this->context->getParentClassName(), $className, true)
+        return is_a($this->context->getParentClassName(), $className, true)
             ? $this->context->getParentConfig()
             : null;
     }

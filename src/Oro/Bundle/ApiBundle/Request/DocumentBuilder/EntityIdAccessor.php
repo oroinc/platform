@@ -35,12 +35,12 @@ class EntityIdAccessor
         $idFieldNamesCount = \count($idFieldNames);
 
         if (null !== $entity && !\is_array($entity) && !\is_object($entity) && $idFieldNamesCount === 1) {
-            $fieldName = \reset($idFieldNames);
+            $fieldName = reset($idFieldNames);
             $entity = [$fieldName => $entity];
         }
 
         if ($idFieldNamesCount === 1) {
-            $fieldName = \reset($idFieldNames);
+            $fieldName = reset($idFieldNames);
             if (!$this->propertyAccessor->hasProperty($entity, $fieldName)) {
                 throw new RuntimeException(sprintf(
                     'An object of the type "%s" does not have the identifier property "%s".',

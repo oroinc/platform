@@ -56,9 +56,10 @@ class EntityAliasResolverRegistry implements WarmableConfigCacheInterface, Clear
             }
         }
         if (null === $entityAliasResolverServiceId) {
-            throw new \LogicException(
-                sprintf('Cannot find an entity alias resolver for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find an entity alias resolver for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         /** @var EntityAliasResolver $entityAliasResolver */

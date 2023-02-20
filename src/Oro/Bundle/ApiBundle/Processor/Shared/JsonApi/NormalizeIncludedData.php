@@ -152,20 +152,22 @@ class NormalizeIncludedData implements ProcessorInterface
     private function getDataProperty(mixed $data, string $pointer): array
     {
         if (!\is_array($data)) {
-            throw new RuntimeException(
-                sprintf('The "%s" element should be an array.', $pointer)
-            );
+            throw new RuntimeException(sprintf('The "%s" element should be an array.', $pointer));
         }
         if (!\array_key_exists(JsonApiDoc::DATA, $data)) {
-            throw new RuntimeException(
-                sprintf('The "%s" element should have "%s" property.', $pointer, JsonApiDoc::DATA)
-            );
+            throw new RuntimeException(sprintf(
+                'The "%s" element should have "%s" property.',
+                $pointer,
+                JsonApiDoc::DATA
+            ));
         }
         $data = $data[JsonApiDoc::DATA];
         if (!\is_array($data)) {
-            throw new RuntimeException(
-                sprintf('The "%s" property of "%s" element should be an array.', JsonApiDoc::DATA, $pointer)
-            );
+            throw new RuntimeException(sprintf(
+                'The "%s" property of "%s" element should be an array.',
+                JsonApiDoc::DATA,
+                $pointer
+            ));
         }
 
         return $data;

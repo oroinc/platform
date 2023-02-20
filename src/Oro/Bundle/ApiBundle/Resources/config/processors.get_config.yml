@@ -250,11 +250,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: 'sorters&!identifier_fields_only', priority: -130 }
 
-    oro_api.get_config.complete_composite_identifier_filter:
-        class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteCompositeIdentifierFilter
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: 'filters&!identifier_fields_only', priority: -140 }
-
     oro_api.get_config.set_has_more:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\SetHasMore
         tags:

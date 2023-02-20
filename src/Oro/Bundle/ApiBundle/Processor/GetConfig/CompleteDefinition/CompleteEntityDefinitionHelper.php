@@ -120,6 +120,7 @@ class CompleteEntityDefinitionHelper
         } else {
             $this->completeCustomIdentifier($definition, $metadata, $context->getTargetAction());
         }
+        $this->assertIdentifierFieldsValid($definition, $entityClass);
         // make sure "class name" meta field is added for entity with table inheritance
         if (!$metadata->isInheritanceTypeNone()) {
             $this->addClassNameField($definition);
@@ -184,6 +185,28 @@ class CompleteEntityDefinitionHelper
                         $field->setFormOptions($formOptions);
                     }
                 }
+            }
+        }
+    }
+
+    private function assertIdentifierFieldsValid(EntityDefinitionConfig $definition, string $entityClass): void
+    {
+        $idFieldNames = $definition->getIdentifierFieldNames();
+        foreach ($idFieldNames as $fieldName) {
+            $field = $definition->getField($fieldName);
+            if (null === $field) {
+                throw new \RuntimeException(sprintf(
+                    'The identifier field "%s" for "%s" entity is not defined.',
+                    $fieldName,
+                    $entityClass
+                ));
+            }
+            if ($field->isExcluded()) {
+                throw new \RuntimeException(sprintf(
+                    'The identifier field "%s" for "%s" entity must not be excluded.',
+                    $fieldName,
+                    $entityClass
+                ));
             }
         }
     }

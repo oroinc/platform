@@ -333,10 +333,11 @@ services:
         class: Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener
         arguments:
             - '@security.token_storage'
-            - '@twig'
             - '%kernel.debug%'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onResponse }
+            - { name: container.service_subscriber }
 
     oro_navigation.twig.hash_nav_extension:
         class: Oro\Bundle\NavigationBundle\Twig\HashNavExtension

@@ -134,7 +134,7 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
         }
 
         $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
-        $targetAssociationName = \substr($dataType, \strlen(self::UNIDIRECTIONAL_ASSOCIATION_PREFIX));
+        $targetAssociationName = substr($dataType, \strlen(self::UNIDIRECTIONAL_ASSOCIATION_PREFIX));
         if (!$targetMetadata->hasAssociation($targetAssociationName)) {
             throw new \RuntimeException(sprintf(
                 'The target entity "%s" for the unidirectional association "%s::%s" must have the association "%s".',

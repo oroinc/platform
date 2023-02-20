@@ -137,7 +137,7 @@ class AsyncOperationManager
             new ChunkFile($dataFileName, -1, 0)
         );
 
-        $errorCountToAdd = count($errors);
+        $errorCountToAdd = \count($errors);
         if (null === $summary) {
             $summary = [
                 'aggregateTime' => 0,

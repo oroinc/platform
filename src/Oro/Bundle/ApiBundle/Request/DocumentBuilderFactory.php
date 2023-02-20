@@ -46,9 +46,10 @@ class DocumentBuilderFactory
             }
         }
         if (null === $documentBuilderServiceId) {
-            throw new \LogicException(
-                sprintf('Cannot find a document builder for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find a document builder for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         return $this->container->get($documentBuilderServiceId);

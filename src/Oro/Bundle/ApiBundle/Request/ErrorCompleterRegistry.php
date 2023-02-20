@@ -46,9 +46,10 @@ class ErrorCompleterRegistry
             }
         }
         if (null === $errorCompleterServiceId) {
-            throw new \LogicException(
-                sprintf('Cannot find an error completer for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find an error completer for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         return $this->container->get($errorCompleterServiceId);

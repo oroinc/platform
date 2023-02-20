@@ -97,9 +97,9 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
                     break;
                 }
                 $map[$path] = true;
-                $lastDelimiter = \strrpos($path, ConfigUtil::PATH_DELIMITER);
+                $lastDelimiter = strrpos($path, ConfigUtil::PATH_DELIMITER);
                 $path = false !== $lastDelimiter
-                    ? \substr($path, 0, $lastDelimiter)
+                    ? substr($path, 0, $lastDelimiter)
                     : null;
             } while ($path);
         }

@@ -55,7 +55,7 @@ class BatchUpdateHandler
 
         $records = $context->getResult();
         if ($records) {
-            $context->getSummary()->incrementReadCount(count($records));
+            $context->getSummary()->incrementReadCount(\count($records));
             $context->setBatchItems($this->processRecords($records, $context));
             $this->stepExecutor->executeStep(ApiActionGroup::SAVE_DATA, $context);
             if ($context->hasErrors() || $context->isRetryAgain()) {

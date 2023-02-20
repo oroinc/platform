@@ -58,8 +58,6 @@ class BooleanToStringTransformer implements DataTransformerInterface
                 return false;
         }
 
-        throw new TransformationFailedException(
-            sprintf('"%s" cannot be converted to a boolean.', $value)
-        );
+        throw new TransformationFailedException(sprintf('"%s" cannot be converted to a boolean.', $value));
     }
 }

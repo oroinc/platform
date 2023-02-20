@@ -31,7 +31,7 @@ class AssociationToArrayAttributeConverter
      */
     public function convertObjectToArray(mixed $object, AssociationMetadata $association = null): mixed
     {
-        if (null === $object || \is_scalar($object)) {
+        if (null === $object || is_scalar($object)) {
             return $object;
         }
 

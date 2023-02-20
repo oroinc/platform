@@ -44,7 +44,7 @@ class ConfigExtraCollection
                 ));
             }
         }
-        $this->extras = \array_values($extras);
+        $this->extras = array_values($extras);
     }
 
     /**
@@ -96,13 +96,13 @@ class ConfigExtraCollection
      */
     public function removeConfigExtra(string $extraName): void
     {
-        $keys = \array_keys($this->extras);
+        $keys = array_keys($this->extras);
         foreach ($keys as $key) {
             if ($this->extras[$key]->getName() === $extraName) {
                 unset($this->extras[$key]);
             }
         }
-        $this->extras = \array_values($this->extras);
+        $this->extras = array_values($this->extras);
     }
 
     /**

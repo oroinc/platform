@@ -346,7 +346,7 @@ define(function(require) {
                     .find('input, textarea, select')
                     .not(':input[type=button],   :input[type=submit], :input[type=reset], ' +
                          ':input[type=password], :input[type=file],   :input[name$="[_token]"], ' +
-                         '.select2[type=hidden]');
+                         '.select2[type=hidden], [data-ignore-form-state-change] :input');
 
                 data[index] = items.serializeArray();
 

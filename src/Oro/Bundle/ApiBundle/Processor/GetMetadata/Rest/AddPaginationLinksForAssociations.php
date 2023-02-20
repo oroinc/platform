@@ -39,7 +39,7 @@ class AddPaginationLinksForAssociations implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -83,29 +83,19 @@ class AddPaginationLinksForAssociations implements ProcessorInterface
             if (!$association->hasRelationshipLink(ApiDoc::LINK_NEXT)
                 && !$subresource->isExcludedAction(ApiAction::GET_RELATIONSHIP)
             ) {
-                $association->addRelationshipLink(
-                    ApiDoc::LINK_NEXT,
-                    new NextPageLinkMetadata(
-                        $this->getRelationshipLinkMetadata($relationshipRouteName, $associationName),
-                        $pageNumberFilterName
-                    )
-                );
+                $association->addRelationshipLink(ApiDoc::LINK_NEXT, new NextPageLinkMetadata(
+                    new RouteLinkMetadata(
+                        $this->urlGenerator,
+                        $relationshipRouteName,
+                        [
+                            'entity' => DataAccessorInterface::OWNER_ENTITY_TYPE,
+                            'id'     => DataAccessorInterface::OWNER_ENTITY_ID
+                        ],
+                        ['association' => $associationName]
+                    ),
+                    $pageNumberFilterName
+                ));
             }
         }
-    }
-
-    private function getRelationshipLinkMetadata(
-        string $relationshipRouteName,
-        string $associationName
-    ): RouteLinkMetadata {
-        return new RouteLinkMetadata(
-            $this->urlGenerator,
-            $relationshipRouteName,
-            [
-                'entity' => DataAccessorInterface::OWNER_ENTITY_TYPE,
-                'id'     => DataAccessorInterface::OWNER_ENTITY_ID
-            ],
-            ['association' => $associationName]
-        );
     }
 }

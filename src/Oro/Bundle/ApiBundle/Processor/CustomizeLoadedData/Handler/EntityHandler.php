@@ -107,7 +107,7 @@ class EntityHandler
             $handler instanceof self
             && $this->version === $handler->version
             && (string)$this->requestType === (string)$handler->requestType
-            && \is_a($this->entityClass, $handler->entityClass, true);
+            && is_a($this->entityClass, $handler->entityClass, true);
     }
 
     private function adjustPropertyPath(CustomizeLoadedDataContext $customizationContext): void

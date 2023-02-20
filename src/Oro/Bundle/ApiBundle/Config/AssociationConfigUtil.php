@@ -62,7 +62,7 @@ class AssociationConfigUtil
             return null;
         }
         if (1 === $numberOfFields) {
-            return \reset($fieldNames);
+            return reset($fieldNames);
         }
 
         return $fieldNames;

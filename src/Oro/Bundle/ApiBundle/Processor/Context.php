@@ -663,9 +663,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         if (!$entityClass) {
             $this->processLoadedConfig(null);
 
-            throw new RuntimeException(
-                'A class name must be set in the context before a configuration is loaded.'
-            );
+            throw new RuntimeException('A class name must be set in the context before a configuration is loaded.');
         }
 
         try {
