@@ -21,6 +21,11 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     enabledClass: 'drag-n-drop-enabled',
 
     /**
+     * @property {string}
+     */
+    finishedClass: 'drag-n-drop-finished',
+
+    /**
      * @property {Function}
      */
     helperTemplate,
@@ -30,8 +35,13 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      */
     ORDER_STEP: 10,
 
+    /**
+     * @property {number}
+     */
+    ANIMATION_TIMEOUT: 500,
+
     SORTABLE_DEFAULTS: {
-        cursor: 'grabbing',
+        cursor: 'move',
         placeholder: 'sorting-placeholder',
         forceHelperSize: false,
         forcePlaceholderSize: true,
@@ -61,6 +71,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             disable: this.disable,
             enable: this.enable
         });
+        this.listenTo(this, 'before:unsetModelsAttr', this._runAnimation);
 
         this.listenToOnce(this.main, 'rendered', () => {
             // enable plugin only when the grid table is rendered
@@ -102,7 +113,8 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             collection: this.main.collection
         });
         this.selectionStateHintView.$el.insertAfter(this.main.$el.find('[role="grid"]'));
-        this.listenTo(this.selectionStateHintView, 'reset', this._resetSelectedModels);
+        this.listenTo(this.selectionStateHintView, 'reset',
+            this._unsetModelsAttr.bind(this, '_selected', {ignoreAnimation: true}));
 
         this.delegateEvents();
         this.initDroppableZones();
@@ -175,7 +187,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                 [from, to] = [to, from];
             }
 
-            this._resetSelectedModels();
+            this._unsetModelsAttr('_selected', {ignoreAnimation: true});
             const selectedModels = this.main.collection.slice(from, to + 1);
 
             selectedModels.forEach(model => {
@@ -205,7 +217,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         const modelId = currentEL.data('modelId');
         const model = this.main.collection.get(modelId);
 
-        this._resetSelectedModels();
+        this._unsetModelsAttr('_selected', {ignoreAnimation: true});
         model.set('_selected', true);
         this._lastClickedIndex = this.main.collection.indexOf(model);
     },
@@ -246,13 +258,18 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             toBottom: {
                 title: __('oro.datagrid.drop_zones.mode_to_bottom'),
                 order: 20,
-                dropCallback: this.moveSelectedToBottom.bind(this),
-                enabled: this.main.body.$el.find(this.SEPARATOR_ROW_SELECTOR).length > 0
+                dropCallback: this.moveSelectedToBottom.bind(this)
             },
             removeSortOrder: {
                 title: __('oro.datagrid.drop_zones.remove_sort_order'),
                 order: 30,
-                dropCallback: this.removeSortOrderForSelected.bind(this)
+                dropCallback: this.removeSortOrderForSelected.bind(this),
+                enabled: () => {
+                    const isSeparator = this.main.body.$el.find(this.SEPARATOR_ROW_SELECTOR).length > 0;
+                    return isSeparator && this.main.collection.filter(model => {
+                        return model.get('_selected') && model.get('_sortOrder');
+                    }).length > 0;
+                }
             }
         };
 
@@ -278,12 +295,10 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         // Event "dropout" and "dropover" can be fired in different sequences
         let droppableEl = null;
         this.listenTo(this.dropZoneMenuView, {
-            drop: () => this._dropDone = true,
             dropout: (e, ui) => {
                 if (e.target.isSameNode(droppableEl)) {
                     this.main.$el.find(`.${this.SORTABLE_DEFAULTS.placeholder}`).show();
                 }
-                delete this._dropDone;
             },
             dropover: (e, ui) => {
                 droppableEl = e.target;
@@ -310,7 +325,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         this.main.body.$el.prepend($rows.detach());
         this._updateSortOrder();
         this.main.collection.sort();
-        this._resetSelectedModels();
+        this._unsetModelsAttr('_selected');
     },
 
     moveSelectedToBottom() {
@@ -321,11 +336,15 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         });
         const $separator = this.main.body.$el.find(this.SEPARATOR_ROW_SELECTOR);
 
-        $separator.before($rows.detach());
+        if ($separator.length) {
+            $separator.before($rows.detach());
+        } else {
+            this.main.body.$el.append($rows.detach());
+        }
 
         this._updateSortOrder();
         this.main.collection.sort();
-        this._resetSelectedModels();
+        this._unsetModelsAttr('_selected');
     },
 
     removeSortOrderForSelected() {
@@ -333,7 +352,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
 
         models.forEach(model => model.set('_sortOrder', null));
         this.main.collection.sort();
-        this._resetSelectedModels();
+        this._unsetModelsAttr('_selected');
     },
 
     initSortable() {
@@ -387,7 +406,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     beforeItemPick(e, ui) {
         const isSeparator = ui.item.is(this.SEPARATOR_ROW_SELECTOR);
         if (isSeparator) {
-            this._resetSelectedModels();
+            this._unsetModelsAttr('_selected', {ignoreAnimation: true});
         } else {
             this._selectRowBeforeDragStart(e, ui.item);
             this._adjustHelperPosition(e, ui);
@@ -427,7 +446,8 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     onStopSortable(e, ui) {
         this.trigger('sortable:stop', e, ui);
         // Drop was done in other place like droppable zone
-        if (this._dropDone) {
+        if (ui.item.data('dropDone')) {
+            ui.item.data('dropDone', null);
             return;
         }
 
@@ -440,7 +460,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             helperReact.left > tableReact.right
         );
         $(e.target).data('helperReact', null);
-        this.main.collection.forEach(model => model.set('_changed', false));
+        this._unsetModelsAttr('_changed');
 
         if (e.originalEvent.target === null) {
             // event was canceled during drag action
@@ -482,28 +502,25 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      */
     onStopSortableSuccess(e, ui) {
         this._completeDOMUpdate(ui);
-
-        {
-            // @todo develop animation
-            const selectedRows = this.main.collection.filter('_selected')
-                .map(model => this.main.body.rows.find(row => row.model === model).el);
-            $(selectedRows).addClass('info');
-            setTimeout(() => $(selectedRows).removeClass('info'), 1000);
-        }
-
-        const changedModels = this._updateSortOrder();
-
-        {
-            // @todo develop animation
-            const changedRows = changedModels
-                .map(model => this.main.body.rows.find(row => row.model === model).el);
-            $(changedRows).addClass('success');
-            setTimeout(() => $(changedRows).removeClass('success'), 1000);
-        }
-
+        this._updateSortOrder();
         this.main.collection.sort();
+        this._unsetModelsAttr('_selected');
+    },
 
-        this._resetSelectedModels();
+    /**
+     * Find appropriate rows by mode's property and run animation for them
+     * @param {string} attr
+     * @param {Object} [options]
+     * @protected
+     */
+    _runAnimation(attr = '_selected', options = {}) {
+        if (options.ignoreAnimation) {
+            return;
+        }
+        this.main.collection .filter(attr)
+            .map(model => this.main.body.rows.find(row => row.model === model))
+            .forEach(row => row.$el.addClassTemporarily('animate', this.ANIMATION_TIMEOUT));
+        this.main.$el.addClassTemporarily(this.finishedClass, this.ANIMATION_TIMEOUT);
     },
 
     /**
@@ -656,11 +673,17 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     },
 
     /**
-     * @private
+     * Unset specific model's attribute
+     * @param {string} attr
+     * @param {Object} [options]
+     * @protected
      */
-    _resetSelectedModels() {
-        this.main.collection
-            .forEach(model => model.set('_selected', false));
+    _unsetModelsAttr(attr, options = {}) {
+        if (!options.silent) {
+            this.trigger('before:unsetModelsAttr', attr, options);
+        }
+
+        this.main.collection.forEach(model => model.unset(attr, options));
     },
 
     /**

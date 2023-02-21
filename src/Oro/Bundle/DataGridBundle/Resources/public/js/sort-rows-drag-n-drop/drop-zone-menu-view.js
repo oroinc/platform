@@ -16,7 +16,7 @@ const DropZoneMenuView = BaseView.extend({
     /**
      * @inheritdoc
      */
-    noWrap: true,
+    className: 'drop-zones-menu',
 
     /**
      * @inheritdoc
@@ -49,6 +49,7 @@ const DropZoneMenuView = BaseView.extend({
         if (this.datagrid === void 0) {
             throw new Error('Option "datagrid" is required for DropZoneMenuView');
         }
+
         this.zones = options.dropZones;
 
         DropZoneMenuView.__super__.initialize.call(this, options);
@@ -76,7 +77,12 @@ const DropZoneMenuView = BaseView.extend({
                 value._type = key;
                 return value;
             })
-            .filter(zone => zone.enabled !== false);
+            .filter(zone => {
+                if (typeof zone.enabled === 'function') {
+                    return zone.enabled(this.datagrid);
+                }
+                return zone.enabled !== false;
+            });
 
         data.zones = sortBy(zones, 'order');
         return data;
@@ -117,6 +123,7 @@ const DropZoneMenuView = BaseView.extend({
                     runCallback(e, ui);
                 },
                 drop: (e, ui) => {
+                    ui.draggable.data('dropDone', true);
                     this.trigger(e.type, e, ui);
                     runCallback(e, ui);
                 }
@@ -167,12 +174,12 @@ const DropZoneMenuView = BaseView.extend({
     },
 
     show() {
+        this.render();
         this.$el.fadeIn('fast', () => {
             if (!this.disposed) {
                 this.$el.addClass('show');
             }
         });
-        this.updatePosition();
         return this;
     },
 

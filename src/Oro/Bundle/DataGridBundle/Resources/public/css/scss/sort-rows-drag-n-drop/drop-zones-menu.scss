@@ -5,6 +5,7 @@
     z-index: $zindex-dropdown;
     border: 1px dashed $primary-700;
     background-color: $primary-900;
+    border-radius: 4px;
     box-shadow: $drop-zones-menu-box-shadow;
 
     &__item {
@@ -12,6 +13,18 @@
         font-size: 18px;
         text-align: center;
         color: $primary-200;
+
+        &:first-child {
+            border-radius: 4px 4px 0 0;
+        }
+
+        &:last-child {
+            border-radius: 0 0 4px 4px;
+        }
+
+        &:only-child {
+            border-radius: 4px;
+        }
 
         &:not(:first-child) {
             border-top: 1px dashed $primary-700;

@@ -74,11 +74,15 @@ export default {
             }
         });
 
+        let $rootEl = options.$el;
+        if ($rootEl.parents('[role="dialog"]').length) {
+            $rootEl = $rootEl.parents('.ui-dialog-content');
+        }
         loadModules(modulesToLoad).then(modules => {
             options.metadata.plugins.push({
                 constructor: SortRowsDragNDropPlugin,
                 options: {
-                    $rootEL: options.$el.scrollParent(),
+                    $rootEL: $rootEl,
                     dropZones: {...dropZones, ...modules}
                 }
             });

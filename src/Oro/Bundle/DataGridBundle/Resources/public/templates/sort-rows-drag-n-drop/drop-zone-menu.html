@@ -1,7 +1,5 @@
 <% if (obj.zones && zones.length) { %>
-<div class="drop-zones-menu">
     <% _.each(zones, zone => { %>
         <div class="drop-zones-menu__item" data-zone="<%- zone._type %>"><%- zone.title %></div>
     <% }) %>
-</div>
 <% } %>

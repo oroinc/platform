@@ -1,6 +1,4 @@
 /* @theme: admin.oro; */
-$grid-effect-success: $success !default;
-$grid-effect-info: $info !default;
 
 .oro-datagrid {
     .sort-icon-cell {
@@ -29,6 +27,15 @@ $grid-effect-info: $info !default;
     }
 }
 
+.drag-n-drop-finished {
+    .grid-row {
+        &.animate {
+            background-color: $extra-200;
+            animation: sort-rows-drag-n-drop-animation 800ms linear;
+        }
+    }
+}
+
 .drag-n-drop-enabled {
     .grid-container {
         position: relative;
@@ -48,74 +55,25 @@ $grid-effect-info: $info !default;
     .ui-sortable-handle {
         cursor: default;
     }
-
-    .success {
-        // @todo develop animation
-        animation: success-pulse 1s cubic-bezier(.92, 1.07, .93, .42);
-        background-color: $grid-effect-success;
-    }
-
-    .info {
-        // @todo develop animation
-        animation: info-pulse 1s cubic-bezier(.92, 1.07, .93, .42);
-        background-color: $grid-effect-info;
-    }
 }
 
-@include keyframe('success-pulse') {
+@keyframes sort-rows-drag-n-drop-animation {
     0% {
-        background: rgba($grid-effect-success, 0);
-        box-shadow: inset 0 0 0 0 $grid-effect-success;
+        background-color: rgba($extra-200, 1);
     }
-
-    45% {
-        transform: scale(1.005);
+    20% {
+        background-color: rgba($extra-200, .8);
     }
-
-    50% {
-        transform: scale(1);
-        background: rgba($grid-effect-success, .8);
-        box-shadow: inset 0 0 0 0 $grid-effect-success;
+    40% {
+        background-color: rgba($extra-200, .6);
     }
-
-    50.5% {
-        transform: scale(1);
-        background: rgba($grid-effect-success, 1);
-        box-shadow: 0 0 0 0 $grid-effect-success;
+    60% {
+        background-color: rgba($extra-200, .4);
     }
-
+    80% {
+        background-color: rgba($extra-200, .2);
+    }
     100% {
-        transform: scale(1);
-        background: rgba($grid-effect-success, 1);
-        box-shadow: 0 0 0 30px rgba($grid-effect-success, 0);
-    }
-}
-
-@include keyframe('info-pulse') {
-    0% {
-        background: rgba($grid-effect-info, 0);
-        box-shadow: inset 0 0 0 0 $grid-effect-info;
-    }
-
-    45% {
-        transform: scale(1.005);
-    }
-
-    50% {
-        transform: scale(1);
-        background: rgba($grid-effect-info, .8);
-        box-shadow: inset 0 0 0 0 $grid-effect-info;
-    }
-
-    50.5% {
-        transform: scale(1);
-        background: rgba($grid-effect-info, 1);
-        box-shadow: 0 0 0 0 $grid-effect-info;
-    }
-
-    100% {
-        transform: scale(1);
-        background: rgba($grid-effect-info, 1);
-        box-shadow: 0 0 0 30px rgba($grid-effect-info, 0);
+        background-color: rgba($extra-200, 0);
     }
 }
