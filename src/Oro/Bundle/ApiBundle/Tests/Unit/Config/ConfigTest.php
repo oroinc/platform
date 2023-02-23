@@ -46,7 +46,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($config->hasDefinition());
         self::assertSame($definition, $config->getDefinition());
 
-        $config->setDefinition();
+        $config->setDefinition(null);
         self::assertFalse($config->hasDefinition());
         self::assertNull($config->getDefinition());
     }
@@ -62,7 +62,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($config->hasFilters());
         self::assertSame($filters, $config->getFilters());
 
-        $config->setFilters();
+        $config->setFilters(null);
         self::assertFalse($config->hasFilters());
         self::assertNull($config->getFilters());
     }
@@ -78,7 +78,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($config->hasSorters());
         self::assertSame($sorters, $config->getSorters());
 
-        $config->setSorters();
+        $config->setSorters(null);
         self::assertFalse($config->hasSorters());
         self::assertNull($config->getSorters());
     }
@@ -94,7 +94,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($config->hasActions());
         self::assertSame($actions, $config->getActions());
 
-        $config->setActions();
+        $config->setActions(null);
         self::assertFalse($config->hasActions());
         self::assertNull($config->getActions());
     }
@@ -110,7 +110,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($config->hasSubresources());
         self::assertSame($subresources, $config->getSubresources());
 
-        $config->setSubresources();
+        $config->setSubresources(null);
         self::assertFalse($config->hasSubresources());
         self::assertNull($config->getSubresources());
     }

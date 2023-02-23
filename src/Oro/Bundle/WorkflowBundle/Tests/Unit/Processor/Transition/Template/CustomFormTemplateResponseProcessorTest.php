@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
 /**
- * Suppressing for stubs and mock classes
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase

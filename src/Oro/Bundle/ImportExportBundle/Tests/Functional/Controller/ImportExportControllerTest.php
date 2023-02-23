@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
+use Oro\Bundle\ImportExportBundle\Async\Topic\SaveImportExportResultTopic;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationProviderInterface;
@@ -148,6 +149,45 @@ class ImportExportControllerTest extends WebTestCase
 
         self::assertMessageSent(
             PreImportTopic::getName(),
+            [
+                'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
+                'process' => 'import',
+                'processorAlias' => 'oro_account',
+                'fileName' => 'test_file',
+                'originFileName' => 'test_file_original',
+                'options' => $options,
+                'userId' => $this->getCurrentUser()->getId(),
+            ]
+        );
+    }
+
+    public function testImportProcessActionWithCustomProcessorTopicName()
+    {
+        $importProcessorTopicName = SaveImportExportResultTopic::getName();
+
+        $options = [
+            'first' => 'first value',
+            'second' => 'second value',
+        ];
+        $this->ajaxRequest(
+            'POST',
+            $this->getUrl(
+                'oro_importexport_import_process',
+                [
+                    'processorAlias' => 'oro_account',
+                    'importJob' => JobExecutor::JOB_IMPORT_FROM_CSV,
+                    'fileName' => 'test_file',
+                    'originFileName' => 'test_file_original',
+                    'options' => $options,
+                    'importProcessorTopicName' => $importProcessorTopicName,
+                ]
+            )
+        );
+
+        $this->assertJsonResponseSuccess();
+
+        self::assertMessageSent(
+            $importProcessorTopicName,
             [
                 'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
                 'process' => 'import',

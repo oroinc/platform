@@ -200,7 +200,7 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
     /**
      * Makes sure that aliases for all entities are loaded.
      */
-    private function ensureAllAliasesLoaded()
+    private function ensureAllAliasesLoaded(): void
     {
         if (null === $this->storage) {
             $storage = $this->fetchAliasesFromCache();
@@ -219,7 +219,7 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
         $storage = null;
         $cacheItem = $this->cache->getItem(self::CACHE_KEY);
         if ($cacheItem->isHit()) {
-            list($timestamp, $value) = $cacheItem->get();
+            [$timestamp, $value] = $cacheItem->get();
             if (null === $this->configCacheState || $this->configCacheState->isCacheFresh($timestamp)) {
                 $storage = $value;
             }
@@ -230,17 +230,12 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
 
     private function saveAliasesToCache(EntityAliasStorage $storage): void
     {
-        $timestamp = null === $this->configCacheState
-            ? null
-            : $this->configCacheState->getCacheTimestamp();
+        $timestamp = $this->configCacheState?->getCacheTimestamp();
         $cacheItem = $this->cache->getItem(self::CACHE_KEY);
         $cacheItem->set([$timestamp, $storage]);
         $this->cache->save($cacheItem);
     }
 
-    /**
-     * @return EntityAliasStorage
-     */
     private function loadAliases(): ?EntityAliasStorage
     {
         $storage = $this->createStorage();

@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
-use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
@@ -41,7 +40,7 @@ class DumpCommand extends AbstractDebugCommand
         $this->entityClassProvider = $entityClassProvider;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument(
@@ -94,7 +93,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $isNotAccessible = $input->getOption('not-accessible');
         if ($isNotAccessible) {
@@ -205,13 +204,12 @@ HELP
     {
         $result = [];
 
-        $entityClass = $resource->getEntityClass();
-
-        $result['Entity Type'] = $this->valueNormalizer->normalizeValue(
-            $entityClass,
-            DataType::ENTITY_TYPE,
+        $entityType = ValueNormalizerUtil::tryConvertToEntityType(
+            $this->valueNormalizer,
+            $resource->getEntityClass(),
             $requestType
         );
+        $result['Entity Type'] = $entityType ?? '';
 
         $excludedActions = $resource->getExcludedActions();
         if (!empty($excludedActions)) {

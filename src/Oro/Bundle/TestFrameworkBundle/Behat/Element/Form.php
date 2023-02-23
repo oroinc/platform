@@ -336,6 +336,8 @@ class Form extends Element
         }
 
         $value = trim($value);
+        # Replace non-breaking space with regular space
+        $value = str_replace("\xE2\x80\xAF", ' ', $value);
 
         if (0 === strpos($value, '[')) {
             $value = trim($value, '[]');

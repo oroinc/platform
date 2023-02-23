@@ -50,9 +50,10 @@ class ResourceCheckerRegistry
             }
         }
         if (null === $foundResourceType) {
-            throw new \LogicException(
-                sprintf('Cannot find a resource type for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find a resource type for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         $this->resourceTypes[$cacheKey] = $foundResourceType;
@@ -78,9 +79,10 @@ class ResourceCheckerRegistry
             }
         }
         if (null === $foundResourceCheckerConfigProviderServiceId) {
-            throw new \LogicException(
-                sprintf('Cannot find a resource checker config provider for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find a resource checker config provider for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         /** @var ResourceCheckerConfigProvider $resourceCheckerConfigProvider */
@@ -108,9 +110,10 @@ class ResourceCheckerRegistry
             }
         }
         if (null === $foundResourceCheckerServiceId) {
-            throw new \LogicException(
-                sprintf('Cannot find a resource checker for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find a resource checker for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         /** @var ResourceCheckerInterface $resourceChecker */

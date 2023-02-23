@@ -11,38 +11,38 @@ namespace Oro\Bundle\ApiBundle\Request;
  */
 final class DataType
 {
-    public const INTEGER          = 'integer';
-    public const SMALLINT         = 'smallint';
-    public const BIGINT           = 'bigint';
+    public const INTEGER = 'integer';
+    public const SMALLINT = 'smallint';
+    public const BIGINT = 'bigint';
     public const UNSIGNED_INTEGER = 'unsignedInteger';
-    public const STRING           = 'string';
-    public const BOOLEAN          = 'boolean';
-    public const DECIMAL          = 'decimal';
-    public const FLOAT            = 'float';
-    public const DATETIME         = 'datetime';
-    public const DATE             = 'date';
-    public const TIME             = 'time';
-    public const PERCENT          = 'percent'; // a percentage value, 100% equals to 1
-    public const PERCENT_100      = 'percent_100'; // a percentage value multiplied by 100, 100% equals to 100
-    public const MONEY            = 'money';
-    public const DURATION         = 'duration';
-    public const GUID             = 'guid';
-    public const ARRAY            = 'array';
-    public const OBJECT           = 'object';
-    public const OBJECTS          = 'objects';
-    public const SCALAR           = 'scalar';
-    public const ENTITY_TYPE      = 'entityType';
-    public const ENTITY_CLASS     = 'entityClass';
-    public const ORDER_BY         = 'orderBy';
+    public const STRING = 'string';
+    public const BOOLEAN = 'boolean';
+    public const DECIMAL = 'decimal';
+    public const FLOAT = 'float';
+    public const DATETIME = 'datetime';
+    public const DATE = 'date';
+    public const TIME = 'time';
+    public const PERCENT = 'percent'; // a percentage value, 100% equals to 1
+    public const PERCENT_100 = 'percent_100'; // a percentage value multiplied by 100, 100% equals to 100
+    public const MONEY = 'money';
+    public const DURATION = 'duration';
+    public const GUID = 'guid';
+    public const ARRAY = 'array';
+    public const OBJECT = 'object';
+    public const OBJECTS = 'objects';
+    public const SCALAR = 'scalar';
+    public const ENTITY_TYPE = 'entityType';
+    public const ENTITY_CLASS = 'entityClass';
+    public const ORDER_BY = 'orderBy';
 
-    public const NESTED_OBJECT      = 'nestedObject';
+    public const NESTED_OBJECT = 'nestedObject';
     public const NESTED_ASSOCIATION = 'nestedAssociation';
 
     private const EXTENDED_ASSOCIATION_PREFIX = 'association';
     private const EXTENDED_ASSOCIATION_MARKER = 'association:';
-    private const ASSOCIATION_AS_FIELD_TYPES  = ['array', 'object', 'nestedObject', 'objects', 'strings', 'scalar'];
-    private const ARRAY_TYPES                 = ['array', 'objects', 'strings'];
-    private const ARRAY_SUFFIX                = '[]';
+    private const ASSOCIATION_AS_FIELD_TYPES = ['array', 'object', 'nestedObject', 'objects', 'strings', 'scalar'];
+    private const ARRAY_TYPES = ['array', 'objects', 'strings'];
+    private const ARRAY_SUFFIX = '[]';
 
     /**
      * Checks whether the field represents an array.

@@ -11,23 +11,19 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 class ActionProcessorDataCollector extends DataCollector
 {
-    /** @var TraceLogger */
-    protected $logger;
-
-    /** @var float */
-    protected $totalTime;
+    private TraceLogger $logger;
+    private ?float $totalTime = null;
 
     public function __construct(TraceLogger $logger)
     {
         $this->logger = $logger;
-
         $this->reset();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->data['name'] = $this->logger->getSectionName();
         $this->data['actions'] = $this->logger->getActions();
@@ -36,37 +32,29 @@ class ActionProcessorDataCollector extends DataCollector
 
     /**
      * Whether at least one processor was executed.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return empty($this->data['actions']);
     }
 
     /**
      * Gets executed actions and processors as a tree.
-     *
-     * @return array
      */
-    public function getActionTree()
+    public function getActionTree(): array
     {
         return $this->data['actions'];
     }
 
     /**
      * Gets executed actions.
-     *
-     * @return array
      */
-    public function getActions()
+    public function getActions(): array
     {
         $actions = [];
         foreach ($this->data['actions'] as $action) {
             $name = $action['name'];
-            $time = isset($action['time'])
-                ? $action['time']
-                : 0;
+            $time = $action['time'] ?? 0;
             if (isset($actions[$name])) {
                 $actions[$name]['count'] += 1;
                 $actions[$name]['time'] += $time;
@@ -80,29 +68,23 @@ class ActionProcessorDataCollector extends DataCollector
 
     /**
      * Gets the number of executed actions.
-     *
-     * @return int
      */
-    public function getActionCount()
+    public function getActionCount(): int
     {
-        return count($this->data['actions']);
+        return \count($this->data['actions']);
     }
 
     /**
      * Gets executed processors.
-     *
-     * @return array
      */
-    public function getProcessors()
+    public function getProcessors(): array
     {
         $processors = [];
         foreach ($this->data['actions'] as $action) {
             if (isset($action['processors'])) {
                 foreach ($action['processors'] as $processor) {
                     $id = $processor['id'];
-                    $time = isset($processor['time'])
-                        ? $processor['time']
-                        : 0;
+                    $time = $processor['time'] ?? 0;
                     if (isset($processors[$id])) {
                         $processors[$id]['count'] += 1;
                         $processors[$id]['time'] += $time;
@@ -118,15 +100,13 @@ class ActionProcessorDataCollector extends DataCollector
 
     /**
      * Gets the number of executed processors.
-     *
-     * @return int
      */
-    public function getProcessorCount()
+    public function getProcessorCount(): int
     {
         $count = 0;
         foreach ($this->data['actions'] as $action) {
             if (isset($action['processors'])) {
-                $count += count($action['processors']);
+                $count += \count($action['processors']);
             }
         }
 
@@ -135,23 +115,19 @@ class ActionProcessorDataCollector extends DataCollector
 
     /**
      * Gets executed applicable checkers.
-     *
-     * @return array
      */
-    public function getApplicableCheckers()
+    public function getApplicableCheckers(): array
     {
         return $this->data['applicableCheckers'];
     }
 
     /**
      * Gets the total time of all executed actions.
-     *
-     * @return float
      */
-    public function getTotalTime()
+    public function getTotalTime(): float
     {
         if (null === $this->totalTime) {
-            $this->totalTime = 0;
+            $this->totalTime = 0.0;
             foreach ($this->data['actions'] as $action) {
                 if (isset($action['time'])) {
                     $this->totalTime += $action['time'];
@@ -168,23 +144,23 @@ class ActionProcessorDataCollector extends DataCollector
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getName()
+    public function getName(): string
     {
-        return array_key_exists('name', $this->data)
+        return \array_key_exists('name', $this->data)
             ? $this->data['name']
             : $this->logger->getSectionName();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->data = [
             'actions' => [],
-            'applicableCheckers' => [],
+            'applicableCheckers' => []
         ];
     }
 }

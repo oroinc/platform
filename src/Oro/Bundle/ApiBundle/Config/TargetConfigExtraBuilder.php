@@ -94,7 +94,7 @@ class TargetConfigExtraBuilder
                 $extra = self::buildParentExpandRelatedEntitiesConfigExtra($extra, $associationName);
                 $hasExpandExtra = true;
             } elseif ($extra instanceof FilterFieldsConfigExtra) {
-                $fieldsExtraKey = count($result);
+                $fieldsExtraKey = \count($result);
             } elseif ($extra instanceof RootPathConfigExtra
                 || $extra instanceof FilterIdentifierFieldsConfigExtra
             ) {

@@ -24,6 +24,8 @@ services:
             - '@?oro_migration.data_fixtures.loader'
             - '@?oro_migration.data_fixtures.executor'
             - '@?oro_migration.locator.fixture_path_locator'
+            - '@oro_config.global'
+            - '@doctrine'
         tags:
             - { name: console.command }
 
@@ -31,6 +33,8 @@ services:
         arguments:
             - '@service_container'
             - '@oro_installer.platform_update_checker'
+            - '@oro_config.global'
+            - '@doctrine'
         tags:
             - { name: console.command }
 

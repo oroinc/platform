@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional\RestPlain;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestPlainHateoas;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestPlainApiTestCase;
@@ -10,7 +10,7 @@ use Symfony\Component\Yaml\Yaml;
  * @dbIsolationPerTest
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EnabledHateoasTest extends RestPlainApiTestCase
+class HateoasTest extends RestPlainApiTestCase
 {
     private function loadCustomEntities()
     {

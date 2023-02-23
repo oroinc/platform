@@ -16,7 +16,7 @@ class JsonPartialFileSplitterListener extends JsonFileSplitterListener
         return [
             'level'       => $this->level,
             'objectLevel' => $this->objectLevel,
-            'objectKeys'  => array_slice($this->objectKeys, 0, $this->level, true),
+            'objectKeys'  => \array_slice($this->objectKeys, 0, $this->level, true),
             'stack'       => $this->stack,
         ];
     }
@@ -26,16 +26,16 @@ class JsonPartialFileSplitterListener extends JsonFileSplitterListener
      */
     public function setState(array $data): void
     {
-        if (array_key_exists('level', $data)) {
+        if (\array_key_exists('level', $data)) {
             $this->level = $data['level'];
         }
-        if (array_key_exists('objectLevel', $data)) {
+        if (\array_key_exists('objectLevel', $data)) {
             $this->objectLevel = $data['objectLevel'];
         }
-        if (array_key_exists('objectKeys', $data)) {
+        if (\array_key_exists('objectKeys', $data)) {
             $this->objectKeys = $data['objectKeys'];
         }
-        if (array_key_exists('stack', $data)) {
+        if (\array_key_exists('stack', $data)) {
             $this->stack = $data['stack'];
         }
     }

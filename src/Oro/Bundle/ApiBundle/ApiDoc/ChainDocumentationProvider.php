@@ -46,7 +46,7 @@ class ChainDocumentationProvider implements DocumentationProviderInterface
             return null;
         }
 
-        return \implode("\n\n", $paragraphs);
+        return implode("\n\n", $paragraphs);
     }
 
     private function isMatched(mixed $expression, RequestType $requestType): bool

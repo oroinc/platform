@@ -96,7 +96,7 @@ class LoadParentEntity implements ProcessorInterface
             $qb = $this->getQueryBuilder($parentEntityClass, $parentEntityId, $parentMetadata);
             $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($parentEntityClass);
             if (\count($idFieldNames) !== 0) {
-                $qb->select('e.' . \reset($idFieldNames));
+                $qb->select('e.' . reset($idFieldNames));
             }
             $notAclProtectedData = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
             if ($notAclProtectedData) {

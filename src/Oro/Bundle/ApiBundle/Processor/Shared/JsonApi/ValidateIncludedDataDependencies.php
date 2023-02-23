@@ -30,9 +30,7 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
             return;
         }
         if (!\array_key_exists(JsonApiDoc::DATA, $requestData)) {
-            throw new \LogicException(
-                sprintf('The "%s" section must exist in the request data.', JsonApiDoc::DATA)
-            );
+            throw new \LogicException(sprintf('The "%s" section must exist in the request data.', JsonApiDoc::DATA));
         }
 
         $primaryObject = $requestData[JsonApiDoc::DATA];

@@ -69,7 +69,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function initialize(): void
     {
@@ -79,7 +79,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function normalizeOperator(?string $operator): string
     {

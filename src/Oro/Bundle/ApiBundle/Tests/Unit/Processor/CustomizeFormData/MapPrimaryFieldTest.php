@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\MapPrimaryField;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
@@ -74,6 +75,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         $configProvider = $this->createMock(ConfigProvider::class);
         $metadataProvider = $this->createMock(MetadataProvider::class);
         $this->formContext = new FormContextStub($configProvider, $metadataProvider);
+        $this->formContext->setAction(ApiAction::UPDATE);
         $this->formContext->setVersion('1.1');
         $this->formContext->getRequestType()->add(RequestType::REST);
 

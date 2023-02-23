@@ -8,58 +8,58 @@ namespace Oro\Component\ChainProcessor;
 class ParameterBag extends AbstractParameterBag
 {
     /** @var array [key => value, ...] */
-    private $items = [];
+    private array $items = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function get($key)
+    public function get(string $key): mixed
     {
         return $this->items[$key] ?? null;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         $this->items[$key] = $value;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->items[$key]);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->items;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function clear()
+    public function clear(): void
     {
         $this->items = [];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function count(): int
     {

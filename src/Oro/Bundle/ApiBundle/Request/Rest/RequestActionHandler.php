@@ -20,11 +20,8 @@ use Symfony\Component\Serializer\Encoder\JsonEncode;
  */
 class RequestActionHandler extends BaseRequestActionHandler
 {
-    /** @var ViewHandlerInterface */
-    private $viewHandler;
-
-    /** @var RestFilterValueAccessorFactory */
-    private $filterValueAccessorFactory;
+    private ViewHandlerInterface $viewHandler;
+    private RestFilterValueAccessorFactory $filterValueAccessorFactory;
 
     /**
      * @param string[]                       $requestType

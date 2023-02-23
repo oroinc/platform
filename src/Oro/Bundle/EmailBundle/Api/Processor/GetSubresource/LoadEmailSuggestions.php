@@ -11,10 +11,12 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySuggestionApiEntityManage
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Loads email suggestions.
+ */
 class LoadEmailSuggestions implements ProcessorInterface
 {
-    /** @var EmailActivitySuggestionApiEntityManager */
-    protected $apiEntityManager;
+    protected EmailActivitySuggestionApiEntityManager $apiEntityManager;
 
     public function __construct(EmailActivitySuggestionApiEntityManager $apiEntityManager)
     {
@@ -24,7 +26,7 @@ class LoadEmailSuggestions implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */
 

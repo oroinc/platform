@@ -34,7 +34,7 @@ class TargetMetadataProvider
         mixed $object,
         AssociationMetadata $associationMetadata
     ): ?EntityMetadata {
-        if (null === $object || \is_scalar($object)) {
+        if (null === $object || is_scalar($object)) {
             return $associationMetadata->getTargetMetadata();
         }
 

@@ -26,9 +26,9 @@ class CommentAssociationProvider implements ResetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->commentAssociationNames = [];
     }

@@ -16,13 +16,12 @@ use Symfony\Component\Form\FormEvents;
  */
 class ScalarObjectListener implements EventSubscriberInterface
 {
-    /** @var bool */
-    private $setDataToNull = false;
+    private bool $setDataToNull = false;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SUBMIT  => 'preSubmit',
@@ -64,9 +63,6 @@ class ScalarObjectListener implements EventSubscriberInterface
             return;
         }
 
-        $context = FormUtil::getApiContext($form);
-        if (null !== $context) {
-            $context->addAdditionalEntity($entity);
-        }
+        FormUtil::getApiContext($form)?->addAdditionalEntity($entity);
     }
 }

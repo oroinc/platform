@@ -11,14 +11,13 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class ResourcesCache
 {
-    private const RESOURCES_KEY_PREFIX            = 'resources_';
-    private const SUBRESOURCE_KEY_PREFIX          = 'subresource_';
+    private const RESOURCES_KEY_PREFIX = 'resources_';
+    private const SUBRESOURCE_KEY_PREFIX = 'subresource_';
     private const ACCESSIBLE_RESOURCES_KEY_PREFIX = 'accessible_';
     private const RESOURCES_WITHOUT_ID_KEY_PREFIX = 'resources_wid_';
-    private const EXCLUDED_ACTIONS_KEY_PREFIX     = 'excluded_actions_';
+    private const EXCLUDED_ACTIONS_KEY_PREFIX = 'excluded_actions_';
 
-    /** @var ResourcesCacheAccessor */
-    private $cache;
+    private ResourcesCacheAccessor $cache;
 
     public function __construct(ResourcesCacheAccessor $cache)
     {
@@ -116,7 +115,7 @@ class ResourcesCache
      * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
-     * @return string[] The list of class names or NULL if it is not cached yet
+     * @return string[]|null The list of class names or NULL if it is not cached yet
      */
     public function getResourcesWithoutIdentifier(string $version, RequestType $requestType): ?array
     {

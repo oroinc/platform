@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeAndVersion;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
@@ -41,7 +42,7 @@ class ValidateRequestTypeAndVersionTest extends GetListProcessorTestCase
 
     public function testProcessWhenVersionIsNotSet()
     {
-        $this->context->setVersion(null);
+        $this->context->remove(ApiContext::VERSION);
         $this->processor->process($this->context);
         self::assertEquals('latest', $this->context->getVersion());
     }

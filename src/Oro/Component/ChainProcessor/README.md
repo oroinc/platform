@@ -86,9 +86,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 class TextRepresentationProcessor extends ActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         $context->setAction('get_text_representation');
 
@@ -112,24 +112,14 @@ namespace Acme\Bundle\TextRepresentationBundle;
 
 class ObjectToStringConverter
 {
-    /** @var TextRepresentationProcessor */
-    protected $processor;
+    private TextRepresentationProcessor $processor;
 
-    /**
-     * @param TextRepresentationProcessor $processor
-     */
     public function __construct(TextRepresentationProcessor $processor)
     {
         $this->processor = $processor;
     }
 
-    /**
-     * @param object      $object
-     * @param string|null $representationType
-     *
-     * @return string
-     */
-    public function convertObjectToString($object, $representationType = null)
+    public function convertObjectToString(object $object, ?string $representationType = null): string
     {
         $context = $this->processor->createContext();
         $context->set('object', $object);
@@ -202,9 +192,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class GetObjectId implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         if ($context->has('objectId')) {
             // object id is already retrieved
@@ -239,9 +229,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class FormatClassNameIdPair implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         if ($context->hasResult()) {
             // already formatted
@@ -283,9 +273,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class GetObjectIdForTestEntity implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         if ($context->has('objectId')) {
             return;
@@ -317,9 +307,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class DecorateClassNameIdPair implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         $context->setResult(sprintf('[%s]', $context->getResult()));
     }

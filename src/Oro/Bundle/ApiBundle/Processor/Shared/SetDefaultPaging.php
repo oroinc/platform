@@ -37,11 +37,7 @@ class SetDefaultPaging implements ProcessorInterface
             return;
         }
 
-        $pageSize = null;
-        $config = $context->getConfig();
-        if (null !== $config) {
-            $pageSize = $config->getPageSize();
-        }
+        $pageSize = $context->getConfig()?->getPageSize();
         if (-1 === $pageSize) {
             // the paging is disabled
             return;

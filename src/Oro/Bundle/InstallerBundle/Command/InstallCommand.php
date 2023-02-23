@@ -14,8 +14,10 @@ use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
+use Oro\Bundle\LocaleBundle\Command\LocalizationOptionsCommandTrait;
 use Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand;
 use Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension;
+use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
@@ -26,7 +28,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Intl\Locales;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Validator\Constraints\Url;
 
@@ -37,6 +38,8 @@ use Symfony\Component\Validator\Constraints\Url;
  */
 class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
+    use LocalizationOptionsCommandTrait;
+
     /** @var string */
     protected static $defaultName = 'oro:install';
 
@@ -74,8 +77,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'Admin user last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'Admin user password')
             ->addOption('sample-data', null, InputOption::VALUE_OPTIONAL, 'Load sample data')
-            ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Localization language code')
-            ->addOption('formatting-code', null, InputOption::VALUE_OPTIONAL, 'Localization formatting code')
+        ;
+        $this->addLocalizationOptions();
+        $this
             ->addOption('skip-download-translations', null, InputOption::VALUE_NONE, 'Skip downloading translations')
             ->addOption('skip-translations', null, InputOption::VALUE_NONE, 'Skip applying translations')
             ->addOption('drop-database', null, InputOption::VALUE_NONE, 'Delete all existing data')
@@ -115,13 +119,9 @@ should be loaded after the installation:
 
   <info>php %command.full_name% --sample-data=y</info>
   <info>php %command.full_name% --sample-data=n</info>
-
-The <info>--language</info> and <info>--formatting</info> code options should be used to specify
-the localization language and the localization formatting setting that are used
-by the application:
-
-  <info>php %command.full_name% --language=<language-code> --formatting-code=<formatting-code></info>
-  <info>php %command.full_name% --language=en --formatting-code=en_US</info>
+HELP
+            . $this->getLocalizationOptionsHelp()
+            . <<<'HELP'
 
 The <info>--skip-download-translations</info> and <info>--skip-translations</info> options can be used
 to skip the step of downloading translations (already downloaded translations
@@ -164,7 +164,7 @@ HELP
             ->addUsage('--user-name=<username> --user-email=<email> --user-firstname=<firstname> --user-lastname=<lastname> --user-password=<password>')
             ->addUsage('--sample-data=y')
             ->addUsage('--sample-data=n')
-            ->addUsage('--language=en --formatting-code=en_US')
+            ->addLocalizationOptionsUsage()
             ->addUsage('--skip-download-translations')
             ->addUsage('--skip-translations')
             ->addUsage('--drop-database')
@@ -195,6 +195,7 @@ HELP
         $this->validateApplicationUrl($input->getOption('application-url'));
         if (false === $input->isInteractive()) {
             $this->validate($input);
+            $this->validateLocalizationOptions($input);
         }
 
         if ($this->isInstalled() && !$input->getOption('drop-database')) {
@@ -231,8 +232,8 @@ HELP
             $this->clearCache($commandExecutor, $input);
         } catch (\Exception $exception) {
             $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
-
-            return $commandExecutor->getLastCommandExitCode();
+            // Exceptions may originate in the command executor and in InstallCommand code itself
+            return (0 != $commandExecutor->getLastCommandExitCode()) ? $commandExecutor->getLastCommandExitCode() : 1;
         }
 
         $this->successfullyInstalledMessageShow($input, $output);
@@ -309,8 +310,6 @@ HELP
                 )
             );
         }
-
-        $this->validateLocalizationOptions($input);
     }
 
     protected function checkRequirements(CommandExecutor $commandExecutor): int
@@ -403,7 +402,7 @@ HELP
                     'user-name'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
                     '--process-isolation' => true
                 ],
-                $this->getCommandParametersFromOptions($options)
+                $this->inputOptionProvider->getCommandParametersFromOptions($options)
             )
         );
     }
@@ -442,7 +441,7 @@ HELP
                     'organization-name' => 'default',
                     '--process-isolation' => true,
                 ],
-                $this->getCommandParametersFromOptions($options)
+                $this->inputOptionProvider->getCommandParametersFromOptions($options)
             )
         );
     }
@@ -501,7 +500,8 @@ HELP
     protected function loadDataStep(CommandExecutor $commandExecutor, OutputInterface $output): self
     {
         $output->writeln('<info>Setting up database.</info>');
-
+        $formattingCode = $this->getContainer()->getParameter(OroLocaleExtension::PARAMETER_FORMATTING_CODE);
+        $language = $this->getContainer()->getParameter(OroLocaleExtension::PARAMETER_LANGUAGE);
         $commandExecutor
             ->runCommand(
                 'oro:migration:load',
@@ -515,7 +515,16 @@ HELP
             ->runCommand('oro:cron:definitions:load', ['--process-isolation' => true])
             ->runCommand('oro:workflow:definitions:load', ['--process-isolation' => true])
             ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
-            ->runCommand('oro:migration:data:load', ['--process-isolation' => true, '--no-interaction' => true]);
+            ->runCommand(
+                LoadDataFixturesCommand::getDefaultName(),
+                \array_merge(
+                    [
+                        '--process-isolation' => true,
+                        '--no-interaction' => true,
+                    ],
+                    $this->getLocalizationParametersFromOptions($formattingCode, $language)
+                )
+            );
 
         $output->writeln('');
         $output->writeln('<info>Administration setup.</info>');
@@ -616,92 +625,13 @@ HELP
         $formattingCode = $this->getContainer()->getParameter(OroLocaleExtension::PARAMETER_FORMATTING_CODE);
         $language = $this->getContainer()->getParameter(OroLocaleExtension::PARAMETER_LANGUAGE);
 
-        $options = [
-            'formatting-code' => [
-                'label' => 'Formatting Code',
-                'options' => [
-                    'constructorArgs' => [$formattingCode],
-                    'settings' => [
-                        'validator' => [
-                            function ($value) {
-                                $this->validateFormattingCode($value);
-                                return $value;
-                            }
-                        ]
-                    ]
-                ],
-                'defaultValue' => $formattingCode
-            ],
-            'language' => [
-                'label' => 'Language',
-                'options' => [
-                    'constructorArgs' => [$language],
-                    'settings' => [
-                        'validator' => [
-                            function ($value) {
-                                $this->validateLanguage($value);
-                                return $value;
-                            }
-                        ]
-                    ]
-                ],
-                'defaultValue' => $language
-            ]
-        ];
-
         $commandExecutor->runCommand(
             UpdateLocalizationCommand::getDefaultName(),
             array_merge(
                 ['--process-isolation' => true],
-                $this->getCommandParametersFromOptions($options)
+                $this->getLocalizationParametersFromOptions($formattingCode, $language)
             )
         );
-    }
-
-    private function validateLocalizationOptions(InputInterface $input): void
-    {
-        $formattingCode = $input->getOption('formatting-code');
-        if ($formattingCode) {
-            $this->validateFormattingCode($formattingCode);
-        }
-
-        $language = (string)$input->getOption('language');
-        if ($language) {
-            $this->validateLanguage($language);
-        }
-    }
-
-    /**
-     * @throws \InvalidArgumentException
-     */
-    private function validateFormattingCode(string $locale): void
-    {
-        $locales = array_keys(Locales::getNames());
-        if (!in_array($locale, $locales, true)) {
-            throw new \InvalidArgumentException($this->getExceptionMessage('formatting', $locale, $locales));
-        }
-    }
-
-    /**
-     * @throws \InvalidArgumentException
-     */
-    private function validateLanguage(string $language): void
-    {
-        $locales = Locales::getLocales();
-        if (!in_array($language, $locales, true)) {
-            throw new \InvalidArgumentException($this->getExceptionMessage('language', $language, $locales));
-        }
-    }
-
-    private function getExceptionMessage(string $optionName, string $localeCode, array $availableLocaleCodes):string
-    {
-        $exceptionMessage = sprintf('"%s" is not a valid %s code!', $localeCode, $optionName);
-        $alternatives = $this->getAlternatives($localeCode, $availableLocaleCodes);
-        if ($alternatives) {
-            $exceptionMessage .= sprintf("\nDid you mean %s?\n", $alternatives);
-        }
-
-        return $exceptionMessage;
     }
 
     private function validateApplicationUrl(?string $applicationUrl): void
@@ -721,35 +651,6 @@ HELP
         throw new \InvalidArgumentException(
             'The value of the "application-url" parameter is invalid. ' . $violations->get(0)->getMessage()
         );
-    }
-
-    private function getCommandParametersFromOptions(array $options): array
-    {
-        $commandParameters = [];
-        foreach ($options as $optionName => $optionData) {
-            $commandParameters['--' . $optionName] = $this->inputOptionProvider->get(
-                $optionName,
-                $optionData['label'],
-                $optionData['defaultValue'],
-                $optionData['options']
-            );
-        }
-
-        return $commandParameters;
-    }
-
-    private function getAlternatives(string $name, array $items): string
-    {
-        $alternatives = [];
-        foreach ($items as $item) {
-            $lev = levenshtein($name, $item);
-            if ($lev <= \strlen($name) / 2 || str_contains($item, $name)) {
-                $alternatives[$item] = $lev;
-            }
-        }
-        asort($alternatives);
-
-        return implode(', ', array_keys($alternatives));
     }
 
     /**

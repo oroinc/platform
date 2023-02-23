@@ -20,20 +20,12 @@ use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
  */
 class SearchQueryFilter extends StandaloneFilter implements FieldFilterInterface
 {
-    /** @var AbstractSearchMappingProvider */
-    private $searchMappingProvider;
-
-    /** @var SearchFieldResolverFactory */
-    private $searchFieldResolverFactory;
-
-    /** @var ExpressionVisitor|null */
-    private $searchQueryCriteriaVisitor;
-
-    /** @var string */
-    private $entityClass;
-
+    private AbstractSearchMappingProvider $searchMappingProvider;
+    private SearchFieldResolverFactory $searchFieldResolverFactory;
+    private ?ExpressionVisitor $searchQueryCriteriaVisitor = null;
+    private ?string $entityClass = null;
     /** @var array [field name => field name in search index, ...] */
-    private $fieldMappings = [];
+    private array $fieldMappings = [];
 
     public function setSearchMappingProvider(AbstractSearchMappingProvider $searchMappingProvider): void
     {

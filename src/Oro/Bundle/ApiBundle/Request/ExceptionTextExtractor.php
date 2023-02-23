@@ -20,17 +20,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ExceptionTextExtractor implements ExceptionTextExtractorInterface
 {
-    /** @var bool */
-    private $debug;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
+    private bool $debug;
+    private TranslatorInterface $translator;
     /** @var string[] */
-    private $safeExceptions;
-
+    private array $safeExceptions;
     /** @var string[] */
-    private $safeExceptionExclusions;
+    private array $safeExceptionExclusions;
 
     /**
      * @param bool                $debug
@@ -39,7 +34,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      * @param string[]            $safeExceptionExclusions
      */
     public function __construct(
-        $debug,
+        bool $debug,
         TranslatorInterface $translator,
         array $safeExceptions,
         array $safeExceptionExclusions = []
@@ -55,9 +50,9 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getExceptionStatusCode(\Exception $exception)
+    public function getExceptionStatusCode(\Exception $exception): ?int
     {
         $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
         if ($underlyingException instanceof HttpExceptionInterface) {
@@ -84,17 +79,17 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getExceptionCode(\Exception $exception)
+    public function getExceptionCode(\Exception $exception): ?string
     {
         return null;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getExceptionType(\Exception $exception)
+    public function getExceptionType(\Exception $exception): ?string
     {
         $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
 
@@ -118,10 +113,10 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function getExceptionText(\Exception $exception)
+    public function getExceptionText(\Exception $exception): ?string
     {
         $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
         $text = null;

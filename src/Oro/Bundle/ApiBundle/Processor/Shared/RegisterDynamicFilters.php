@@ -231,7 +231,7 @@ class RegisterDynamicFilters extends RegisterFilters
 
         $path = explode('.', $propertyPath);
         if (\count($path) > 1) {
-            $fieldName = \array_pop($path);
+            $fieldName = array_pop($path);
             $associationInfo = $this->getAssociationInfo($path, $context, $metadata);
             if (null !== $associationInfo) {
                 [$filtersConfig, $associationPropertyPath] = $associationInfo;

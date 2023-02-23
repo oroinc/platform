@@ -33,20 +33,20 @@ class EntityOverrideTest extends RestJsonApiTestCase
      */
     private function assertToManyAssociation(array $expectedEntities, Collection $association)
     {
-        $associationIds = \array_map(
+        $associationIds = array_map(
             function ($entity) {
                 return $entity->id;
             },
             $association->toArray()
         );
-        \sort($associationIds);
-        $expectedIds = \array_map(
+        sort($associationIds);
+        $expectedIds = array_map(
             function ($referenceName) {
                 return $this->getReference($referenceName)->id;
             },
             $expectedEntities
         );
-        \sort($expectedIds);
+        sort($expectedIds);
         self::assertEquals($expectedIds, $associationIds);
     }
 

@@ -37,13 +37,13 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         if (!\array_key_exists($rootSection, $data)) {
             $this->addError(
                 $this->buildPointer(self::ROOT_POINTER, $rootSection),
-                sprintf('The primary %s object should exist', \strtolower($rootSection))
+                sprintf('The primary %s object should exist', strtolower($rootSection))
             );
             $isValid = false;
         } elseif (empty($data[$rootSection])) {
             $this->addError(
                 $this->buildPointer(self::ROOT_POINTER, $rootSection),
-                sprintf('The primary %s object should not be empty', \strtolower($rootSection))
+                sprintf('The primary %s object should not be empty', strtolower($rootSection))
             );
             $isValid = false;
         }
@@ -56,7 +56,7 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         $isValid = true;
 
         if (!\array_key_exists(0, $data)) {
-            $invalidProperties = \array_diff(\array_keys($data), $this->getResourceObjectProperties());
+            $invalidProperties = array_diff(array_keys($data), $this->getResourceObjectProperties());
             if (!empty($invalidProperties)) {
                 foreach ($invalidProperties as $invalidProperty) {
                     $this->addError(
@@ -97,13 +97,13 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         if (!\array_key_exists($rootSection, $data)) {
             $this->addError(
                 $this->buildPointer(self::ROOT_POINTER, $rootSection),
-                sprintf('The primary %s object collection should exist', \strtolower($rootSection))
+                sprintf('The primary %s object collection should exist', strtolower($rootSection))
             );
             $isValid = false;
         } elseif (empty($data[$rootSection])) {
             $this->addError(
                 $this->buildPointer(self::ROOT_POINTER, $rootSection),
-                sprintf('The primary %s object collection should not be empty', \strtolower($rootSection))
+                sprintf('The primary %s object collection should not be empty', strtolower($rootSection))
             );
             $isValid = false;
         }

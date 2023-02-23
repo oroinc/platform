@@ -177,4 +177,22 @@ class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
     }
+
+    public function testProcessWhenFileHasExternalUrl()
+    {
+        $externalUrl = 'http://example.org/test.txt';
+        $config = new EntityDefinitionConfig();
+        $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $config->addField('filename')->setExcluded();
+        $config->addField('externalUrl')->setExcluded();
+
+        $this->context->setResult(['filename' => 'test.txt', 'externalUrl' => $externalUrl]);
+        $this->context->setConfig($config);
+
+        $this->fileManager->expects(self::never())
+            ->method('getContent')
+            ->with($externalUrl, true);
+
+        $this->processor->process($this->context);
+    }
 }

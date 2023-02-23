@@ -34,7 +34,7 @@ class ObjectMetadataFactory
     {
         $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames($config->getIdentifierFieldNames());
-        if (\is_a($entityClass, EntityIdentifier::class, true)) {
+        if (is_a($entityClass, EntityIdentifier::class, true)) {
             $entityMetadata->setInheritedType(true);
         }
 
@@ -179,7 +179,7 @@ class ObjectMetadataFactory
         if ($targetEntity) {
             $associationDataType = DataType::STRING;
             $targetIdFieldNames = $targetEntity->getIdentifierFieldNames();
-            if (1 === count($targetIdFieldNames)) {
+            if (1 === \count($targetIdFieldNames)) {
                 $targetIdField = $targetEntity->getField(reset($targetIdFieldNames));
                 if ($targetIdField) {
                     $associationDataType = $targetIdField->getDataType();

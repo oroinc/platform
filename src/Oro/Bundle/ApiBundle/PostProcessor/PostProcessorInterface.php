@@ -9,11 +9,6 @@ interface PostProcessorInterface
 {
     /**
      * Prepares the given value for serialization.
-     *
-     * @param mixed $value
-     * @param array $options
-     *
-     * @return mixed
      */
-    public function process($value, array $options);
+    public function process(mixed $value, array $options): mixed;
 }

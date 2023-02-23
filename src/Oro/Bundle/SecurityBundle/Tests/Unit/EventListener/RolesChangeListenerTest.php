@@ -29,10 +29,7 @@ class RolesChangeListenerTest extends OrmTestCase
         $this->cache = $this->createMock(AdapterInterface::class);
         $this->em = $this->getTestEntityManager();
 
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            self::ENTITY_NAMESPACE
-        ));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $listener = new RolesChangeListener('organizations');
         $listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser');

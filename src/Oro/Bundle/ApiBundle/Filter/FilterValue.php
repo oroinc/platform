@@ -7,27 +7,13 @@ namespace Oro\Bundle\ApiBundle\Filter;
  */
 final class FilterValue
 {
-    /** @var string */
-    private $path;
+    private string $path;
+    private mixed $value;
+    private ?string $operator;
+    private ?string $sourceKey = null;
+    private ?string $sourceValue = null;
 
-    /** @var mixed */
-    private $value;
-
-    /** @var string|null */
-    private $operator;
-
-    /** @var string|null */
-    private $sourceKey;
-
-    /** @var string|null */
-    private $sourceValue;
-
-    /**
-     * @param string      $path
-     * @param mixed       $value
-     * @param string|null $operator
-     */
-    public function __construct(string $path, $value, string $operator = null)
+    public function __construct(string $path, mixed $value, ?string $operator = null)
     {
         $this->path = $path;
         $this->value = $value;
@@ -39,7 +25,7 @@ final class FilterValue
         string $path,
         string $value,
         string $operator = null
-    ): FilterValue {
+    ): self {
         $filterValue = new FilterValue($path, $value, $operator);
         $filterValue->sourceKey = $sourceKey;
         $filterValue->sourceValue = $value;
@@ -71,20 +57,16 @@ final class FilterValue
 
     /**
      * Gets a value of a filter.
-     *
-     * @return mixed
      */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
 
     /**
      * Sets a value of a filter.
-     *
-     * @param mixed $value
      */
-    public function setValue($value): void
+    public function setValue(mixed $value): void
     {
         $this->value = $value;
     }

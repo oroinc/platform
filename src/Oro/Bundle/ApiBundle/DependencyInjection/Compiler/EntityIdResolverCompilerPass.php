@@ -15,12 +15,12 @@ class EntityIdResolverCompilerPass implements CompilerPassInterface
     use ApiTaggedServiceTrait;
 
     private const RESOLVER_REGISTRY_SERVICE_ID = 'oro_api.entity_id_resolver_registry';
-    private const RESOLVER_TAG                 = 'oro.api.entity_id_resolver';
+    private const RESOLVER_TAG = 'oro.api.entity_id_resolver';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $services = [];
         $resolvers = [];
@@ -42,7 +42,7 @@ class EntityIdResolverCompilerPass implements CompilerPassInterface
             // [entity id => [entity class => [resolver service id, request type expression], ...], ...]
             $resolvers = $this->sortByPriorityAndFlatten($resolvers);
             $restructured = [];
-            foreach ($resolvers as list($serviceId, $requestTypeExpr, $entityId, $entityClass)) {
+            foreach ($resolvers as [$serviceId, $requestTypeExpr, $entityId, $entityClass]) {
                 $restructured[$entityId][$entityClass][] = [$serviceId, $requestTypeExpr];
             }
             $resolvers = $restructured;

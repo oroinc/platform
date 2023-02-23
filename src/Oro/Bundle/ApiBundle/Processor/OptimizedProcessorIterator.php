@@ -16,10 +16,9 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 class OptimizedProcessorIterator extends ProcessorIterator
 {
     /** @var array [group name => group index, ...] */
-    private $groups;
-
+    private array $groups;
     /** @var array [processor index => group name, ...] */
-    private $processorGroups;
+    private array $processorGroups;
 
     /**
      * @param array                      $processors      [[processor id, [attr name => attr value, ...]], ...]
@@ -43,9 +42,9 @@ class OptimizedProcessorIterator extends ProcessorIterator
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getGroup()
+    public function getGroup(): ?string
     {
         if (-1 === $this->index || !$this->valid()) {
             return null;
@@ -55,9 +54,9 @@ class OptimizedProcessorIterator extends ProcessorIterator
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getProcessorAttributes()
+    public function getProcessorAttributes(): ?array
     {
         $attributes = parent::getProcessorAttributes();
         if (null !== $attributes) {
@@ -71,9 +70,9 @@ class OptimizedProcessorIterator extends ProcessorIterator
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function nextApplicable()
+    protected function nextApplicable(): void
     {
         while ($this->index <= $this->maxIndex) {
             if ($this->tryMoveToNextApplicable()) {
@@ -83,11 +82,11 @@ class OptimizedProcessorIterator extends ProcessorIterator
     }
 
     /**
-     * Tries to move to the next processor that can be executed
+     * Tries to move to the next processor that can be executed.
      *
      * @return bool TRUE if a processor was found; otherwise, FALSE
      */
-    protected function tryMoveToNextApplicable()
+    protected function tryMoveToNextApplicable(): bool
     {
         $skippedGroups = $this->context->getSkippedGroups();
         if (!empty($skippedGroups)) {
@@ -118,11 +117,11 @@ class OptimizedProcessorIterator extends ProcessorIterator
     }
 
     /**
-     * Skips all processors which belong to skipped groups
+     * Skips all processors which belong to skipped groups.
      *
      * @param string[] $skippedGroups
      */
-    protected function processSkippedGroups($skippedGroups)
+    protected function processSkippedGroups(array $skippedGroups): void
     {
         $index = $this->index + 1;
         while ($index <= $this->maxIndex && \in_array($this->processorGroups[$index], $skippedGroups, true)) {
@@ -131,10 +130,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
         $this->index = $index - 1;
     }
 
-    /**
-     * @param string $firstGroup
-     */
-    protected function processFirstGroup($firstGroup)
+    protected function processFirstGroup(string $firstGroup): void
     {
         if (!isset($this->groups[$firstGroup])) {
             return;
@@ -152,10 +148,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
         $this->index = $index - 1;
     }
 
-    /**
-     * @param string $lastGroup
-     */
-    protected function processLastGroup($lastGroup)
+    protected function processLastGroup(string $lastGroup): void
     {
         $index = $this->index + 1;
         if ($index > $this->maxIndex) {
@@ -178,13 +171,9 @@ class OptimizedProcessorIterator extends ProcessorIterator
     }
 
     /**
-     * Returns the index of ungrouped processor
-     *
-     * @param int $index
-     *
-     * @return int
+     * Returns the index of ungrouped processor.
      */
-    protected function getIndexOfUngroupedProcessor($index)
+    protected function getIndexOfUngroupedProcessor(int $index): int
     {
         $i = $this->maxIndex;
         while ($i > $index) {

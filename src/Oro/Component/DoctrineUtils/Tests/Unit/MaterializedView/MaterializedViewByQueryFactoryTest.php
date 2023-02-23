@@ -13,23 +13,20 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class MaterializedViewByQueryFactoryTest extends OrmTestCase
 {
-    private EntityManagerMock $entityManager;
-
+    private EntityManagerMock $em;
     private MaterializedViewByQueryFactory $factory;
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->getTestEntityManager();
-        $this->entityManager
-            ->getConfiguration()
-            ->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em = $this->getTestEntityManager();
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->factory = new MaterializedViewByQueryFactory();
     }
 
     public function testCreateByQuery(): void
     {
-        $query = $this->entityManager->createQuery('SELECT e.id, e.name FROM ' . Item::class . ' e WHERE e.id = :id');
+        $query = $this->em->createQuery('SELECT e.id, e.name FROM ' . Item::class . ' e WHERE e.id = :id');
         $query
             ->setFirstResult(42)
             ->setMaxResults(142)

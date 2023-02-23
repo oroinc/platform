@@ -6,23 +6,16 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * The factory to create a form for a collection of entities.
+ */
 class CollectionEntryFactory
 {
-    /** @var string */
-    protected $dataClass;
+    private string $dataClass;
+    private string $type;
+    private array $options;
 
-    /** @var string */
-    protected $type;
-
-    /** @var array */
-    protected $options;
-
-    /**
-     * @param string $dataClass
-     * @param string $type
-     * @param array  $options
-     */
-    public function __construct($dataClass, $type, array $options = [])
+    public function __construct(string $dataClass, string $type, array $options = [])
     {
         $this->dataClass = $dataClass;
         $this->type = $type;
@@ -37,7 +30,7 @@ class CollectionEntryFactory
      *
      * @return FormInterface
      */
-    public function createEntry(FormFactoryInterface $factory, $name)
+    public function createEntry(FormFactoryInterface $factory, string $name): FormInterface
     {
         return $factory->createNamed(
             $name,

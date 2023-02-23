@@ -11,28 +11,16 @@ interface ConstraintTextExtractorInterface
 {
     /**
      * Returns the HTTP status code applicable to a given Constraint object.
-     *
-     * @param Validator\Constraint $constraint
-     *
-     * @return int|null
      */
-    public function getConstraintStatusCode(Validator\Constraint $constraint);
+    public function getConstraintStatusCode(Validator\Constraint $constraint): ?int;
 
     /**
      * Returns an application-specific error code for a given Constraint object.
-     *
-     * @param Validator\Constraint $constraint
-     *
-     * @return string|null
      */
-    public function getConstraintCode(Validator\Constraint $constraint);
+    public function getConstraintCode(Validator\Constraint $constraint): ?string;
 
     /**
      * Returns a human-readable representation of the type of a given Constraint object.
-     *
-     * @param Validator\Constraint $constraint
-     *
-     * @return string|null
      */
-    public function getConstraintType(Validator\Constraint $constraint);
+    public function getConstraintType(Validator\Constraint $constraint): ?string;
 }

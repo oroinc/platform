@@ -17,14 +17,9 @@ class RestDocIdentifierHandler
 {
     private const ID_ATTRIBUTE = 'id';
 
-    /** @var RestDocViewDetector */
-    private $docViewDetector;
-
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var ApiDocDataTypeConverter */
-    private $dataTypeConverter;
+    private RestDocViewDetector $docViewDetector;
+    private ValueNormalizer $valueNormalizer;
+    private ApiDocDataTypeConverter $dataTypeConverter;
 
     public function __construct(
         RestDocViewDetector $docViewDetector,
@@ -40,7 +35,7 @@ class RestDocIdentifierHandler
     {
         $idFields = $metadata->getIdentifierFieldNames();
         $dataType = DataType::STRING;
-        if (count($idFields) === 1) {
+        if (\count($idFields) === 1) {
             $field = $metadata->getField(reset($idFields));
             if (!$field) {
                 throw new \RuntimeException(sprintf(
@@ -70,7 +65,7 @@ class RestDocIdentifierHandler
     private function getIdRequirement(EntityMetadata $metadata): string
     {
         $idFields = $metadata->getIdentifierFieldNames();
-        if (count($idFields) === 1) {
+        if (\count($idFields) === 1) {
             // single identifier
             return $this->getIdFieldRequirement($metadata->getField(reset($idFields))->getDataType());
         }

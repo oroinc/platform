@@ -63,7 +63,7 @@ class RestDocFiltersHandler
     private function sortFilters(ApiDoc $annotation): void
     {
         $filters = $annotation->getFilters();
-        if (count($filters) > 1) {
+        if (\count($filters) > 1) {
             $sorter = $this->sorterRegistry->getSorter($this->docViewDetector->getRequestType());
             if (null === $sorter) {
                 ksort($filters);
@@ -177,7 +177,7 @@ class RestDocFiltersHandler
         if (empty($operators)) {
             return $operators;
         }
-        if (count($operators) === 1 && $operators[0] === FilterOperator::EQ) {
+        if (\count($operators) === 1 && $operators[0] === FilterOperator::EQ) {
             return [];
         }
 

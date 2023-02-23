@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class ApiContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ApiContext */
-    private $context;
+    private ApiContext $context;
 
     protected function setUp(): void
     {
@@ -35,7 +34,7 @@ class ApiContextTest extends \PHPUnit\Framework\TestCase
 
     public function testVersion()
     {
-        self::assertNull($this->context->getVersion());
+        self::assertSame('', $this->context->getVersion());
 
         $this->context->setVersion('test');
         self::assertEquals('test', $this->context->getVersion());

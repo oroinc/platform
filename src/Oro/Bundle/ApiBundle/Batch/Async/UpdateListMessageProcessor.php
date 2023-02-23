@@ -36,50 +36,21 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /** @var JobRunner */
-    private $jobRunner;
-
-    /** @var JobManagerInterface */
-    private $jobManager;
-
-    /** @var DependentJobService */
-    private $dependentJob;
-
-    /** @var FileSplitterRegistry */
-    private $splitterRegistry;
-
-    /** @var ChunkFileClassifierRegistry */
-    private $chunkFileClassifierRegistry;
-
-    /** @var IncludeAccessorRegistry */
-    private $includeAccessorRegistry;
-
-    /** @var IncludeMapManager */
-    private $includeMapManager;
-
-    /** @var FileManager */
-    private $sourceDataFileManager;
-
-    /** @var FileManager */
-    private $fileManager;
-
-    /** @var MessageProducerInterface */
-    private $producer;
-
-    /** @var AsyncOperationManager */
-    private $operationManager;
-
-    /** @var UpdateListProcessingHelper */
-    private $processingHelper;
-
-    /** @var FileNameProvider */
-    private $fileNameProvider;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var int */
-    private $splitFileTimeout = 30000; // 30 seconds
+    private JobRunner $jobRunner;
+    private JobManagerInterface $jobManager;
+    private DependentJobService $dependentJob;
+    private FileSplitterRegistry $splitterRegistry;
+    private ChunkFileClassifierRegistry $chunkFileClassifierRegistry;
+    private IncludeAccessorRegistry $includeAccessorRegistry;
+    private IncludeMapManager $includeMapManager;
+    private FileManager $sourceDataFileManager;
+    private FileManager $fileManager;
+    private MessageProducerInterface $producer;
+    private AsyncOperationManager $operationManager;
+    private UpdateListProcessingHelper $processingHelper;
+    private FileNameProvider $fileNameProvider;
+    private LoggerInterface $logger;
+    private int $splitFileTimeout = 30000; // 30 seconds
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -117,9 +88,9 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [UpdateListTopic::getName()];
     }
@@ -135,12 +106,12 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
         $startTimestamp = microtime(true);
         $messageBody = $message->getBody();
@@ -304,7 +275,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
             $messageId,
             $jobName,
             function (JobRunner $jobRunner, Job $job) use ($operationId, $jobName, $body, $chunkFiles, $delayed) {
-                $chunkFileCount = count($chunkFiles);
+                $chunkFileCount = \count($chunkFiles);
                 $rootJob = $job->getRootJob();
                 $this->saveOperationIdToJob($operationId, $rootJob);
                 $this->createOperationInfoFile($operationId, $chunkFileCount);
@@ -406,7 +377,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
     private function getSplitterState(array $body): array
     {
         $splitterState = [];
-        if (array_key_exists('splitterState', $body)) {
+        if (\array_key_exists('splitterState', $body)) {
             $splitterState = $body['splitterState'];
         }
 

@@ -10,19 +10,15 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class NumberToStringTransformer implements DataTransformerInterface
 {
-    /** @var int|null */
-    protected $scale;
+    private ?int $scale;
 
-    /**
-     * @param int|null $scale
-     */
-    public function __construct($scale = null)
+    public function __construct(?int $scale = null)
     {
         $this->scale = $scale;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function transform($value)
     {
@@ -38,7 +34,7 @@ class NumberToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function reverseTransform($value)
     {
@@ -54,25 +50,20 @@ class NumberToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param string $value
-     *
-     * @return string
-     *
      * @throws TransformationFailedException if the given string cannot be converted to a number
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function transformStringToNumber($value)
+    private function transformStringToNumber(string $value): string
     {
         if (0 === $this->scale) {
             if (!preg_match('/^-?\d+$/', $value)) {
-                throw new TransformationFailedException(
-                    sprintf('"%s" cannot be converted to an integer number.', $value)
-                );
+                throw new TransformationFailedException(sprintf(
+                    '"%s" cannot be converted to an integer number.',
+                    $value
+                ));
             }
         } elseif (!preg_match('/^-?\d*\.?\d+$/', $value)) {
-            throw new TransformationFailedException(
-                sprintf('"%s" cannot be converted to a number.', $value)
-            );
+            throw new TransformationFailedException(sprintf('"%s" cannot be converted to a number.', $value));
         }
 
         $delimiter = strpos($value, '.');
@@ -96,12 +87,8 @@ class NumberToStringTransformer implements DataTransformerInterface
 
     /**
      * Rounds a string contains an integer and returns a string contains the rounded value.
-     *
-     * @param string $value
-     *
-     * @return string
      */
-    protected function round($value)
+    private function round(string $value): string
     {
         return (string)floor(round((string)((int)$value / 10), 0, PHP_ROUND_HALF_UP));
     }

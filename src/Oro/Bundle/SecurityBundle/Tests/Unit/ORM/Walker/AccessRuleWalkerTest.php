@@ -35,22 +35,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class AccessRuleWalkerTest extends OrmTestCase
 {
-    /** @var EntityManagerMock */
-    private $em;
-
-    /** @var DynamicAccessRule */
-    private $rule;
-
-    /** @var AccessRuleExecutor */
-    private $accessRuleExecutor;
+    private EntityManagerMock $em;
+    private DynamicAccessRule $rule;
+    private AccessRuleExecutor $accessRuleExecutor;
 
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS'
-        ));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->rule = new DynamicAccessRule();
         $container = $this->createMock(ContainerInterface::class);
@@ -87,8 +79,7 @@ class AccessRuleWalkerTest extends OrmTestCase
 
     public function testWalkerWithEmptyRules()
     {
-        $this->rule->setRule(function (Criteria $criteria) {
-            return;
+        $this->rule->setRule(function () {
         });
 
         $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')

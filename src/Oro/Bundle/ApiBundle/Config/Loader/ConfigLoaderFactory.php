@@ -36,9 +36,10 @@ class ConfigLoaderFactory
     {
         $loader = $this->findLoader($configType);
         if (null === $loader) {
-            throw new \InvalidArgumentException(
-                sprintf('The loader for the "%s" configuration was not found.', $configType)
-            );
+            throw new \InvalidArgumentException(sprintf(
+                'The loader for the "%s" configuration was not found.',
+                $configType
+            ));
         }
 
         return $loader;

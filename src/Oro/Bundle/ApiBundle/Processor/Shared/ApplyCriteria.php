@@ -21,7 +21,7 @@ class ApplyCriteria implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -32,7 +32,7 @@ class ApplyCriteria implements ProcessorInterface
             $query = $context->getQuery();
             if ($query instanceof QueryBuilder) {
                 $this->criteriaConnector->applyCriteria($query, $criteria);
-                $context->setCriteria();
+                $context->setCriteria(null);
             }
         }
     }

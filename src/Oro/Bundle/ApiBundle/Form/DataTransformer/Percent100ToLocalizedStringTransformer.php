@@ -14,7 +14,7 @@ class Percent100ToLocalizedStringTransformer extends NumberToLocalizedStringTran
     public function __construct(
         int $scale = null,
         ?bool $grouping = false,
-        ?int $roundingMode = self::ROUND_HALF_UP,
+        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
         string $locale = null
     ) {
         parent::__construct(($scale ?? self::PERCENT_SCALE) + 2, $grouping, $roundingMode, $locale);
@@ -26,7 +26,7 @@ class Percent100ToLocalizedStringTransformer extends NumberToLocalizedStringTran
     public function transform($value)
     {
         $result = parent::transform(
-            null !== $value && is_numeric($value)
+            is_numeric($value)
                 ? round((float)$value / 100.0, self::PERCENT_SCALE + 2)
                 : $value
         );

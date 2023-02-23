@@ -129,7 +129,7 @@ class CompleteAssociationHelper
                 $entityClass,
                 $version,
                 $requestType,
-                \array_merge($extras, [new EntityDefinitionConfigExtra()])
+                array_merge($extras, [new EntityDefinitionConfigExtra()])
             )
             ->getDefinition();
     }

@@ -15,39 +15,33 @@ interface FormContext extends ContextInterface, ChangeContextInterface
 {
     /**
      * Returns request data.
-     *
-     * @return array
      */
-    public function getRequestData();
+    public function getRequestData(): array;
 
     /**
      * Sets request data.
      */
-    public function setRequestData(array $requestData);
+    public function setRequestData(array $requestData): void;
 
     /**
      * Returns additional data included into the request.
-     *
-     * @return array
      */
-    public function getIncludedData();
+    public function getIncludedData(): ?array;
 
     /**
      * Sets additional data included into the request.
      */
-    public function setIncludedData(array $includedData);
+    public function setIncludedData(?array $includedData): void;
 
     /**
      * Returns a collection contains additional entities included into the request.
-     *
-     * @return IncludedEntityCollection|null
      */
-    public function getIncludedEntities();
+    public function getIncludedEntities(): ?IncludedEntityCollection;
 
     /**
      * Sets a collection contains additional entities included into the request.
      */
-    public function setIncludedEntities(IncludedEntityCollection $includedEntities = null);
+    public function setIncludedEntities(?IncludedEntityCollection $includedEntities): void;
 
     /**
      * Gets the list of additional entities involved to the request processing.
@@ -61,79 +55,61 @@ interface FormContext extends ContextInterface, ChangeContextInterface
      * For example when an association is represented as a field,
      * a target entity of this association does not exist in the list of included entities
      * and need to be persisted manually, so, it should be added to the list of additional entities.
-     *
-     * @param object $entity
      */
-    public function addAdditionalEntity($entity): void;
+    public function addAdditionalEntity(object $entity): void;
 
     /**
      * Removes an entity from the list of additional entities involved to the request processing.
-     *
-     * @param object $entity
      */
-    public function removeAdditionalEntity($entity): void;
+    public function removeAdditionalEntity(object $entity): void;
 
     /**
      * Gets a service that can be used to convert an entity object to a model object and vise versa.
-     *
-     * @return EntityMapper|null
      */
-    public function getEntityMapper();
+    public function getEntityMapper(): ?EntityMapper;
 
     /**
      * Sets a service that can be used to convert an entity object to a model object and vise versa.
      */
-    public function setEntityMapper(EntityMapper $entityMapper = null);
+    public function setEntityMapper(?EntityMapper $entityMapper): void;
 
     /**
      * Checks whether the form builder exists.
-     *
-     * @return bool
      */
-    public function hasFormBuilder();
+    public function hasFormBuilder(): bool;
 
     /**
      * Gets the form builder.
-     *
-     * @return FormBuilderInterface|null
      */
-    public function getFormBuilder();
+    public function getFormBuilder(): ?FormBuilderInterface;
 
     /**
      * Sets the form builder.
      */
-    public function setFormBuilder(FormBuilderInterface $formBuilder = null);
+    public function setFormBuilder(?FormBuilderInterface $formBuilder): void;
 
     /**
      * Checks whether the form exists.
-     *
-     * @return bool
      */
-    public function hasForm();
+    public function hasForm(): bool;
 
     /**
      * Gets the form.
-     *
-     * @return FormInterface|null
      */
-    public function getForm();
+    public function getForm(): ?FormInterface;
 
     /**
      * Sets the form.
      */
-    public function setForm(FormInterface $form = null);
+    public function setForm(?FormInterface $form): void;
 
     /**
      * Indicates whether the validation of the form should be skipped or not.
-     *
-     * @return bool
      */
-    public function isFormValidationSkipped();
+    public function isFormValidationSkipped(): bool;
 
     /**
      * Sets a flag indicates whether the validation of the form should be skipped or not.
-     *
-     * @param bool $skipFormValidation
      */
-    public function skipFormValidation($skipFormValidation);
+    public function skipFormValidation(bool $skipFormValidation): void;
 }

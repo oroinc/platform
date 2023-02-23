@@ -49,10 +49,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
     private function getEntityManager(): EntityManagerInterface
     {
         $config = new Configuration();
-        $config->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\ReportBundle\Tests\Unit\Entity'
-        ));
+        $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
         $config->setProxyDir($this->getTempDir('test_orm_proxies'));
         $config->setProxyNamespace('Doctrine\Tests\Proxies');
         $eventManager = $this->createMock(EventManager::class);

@@ -11,18 +11,14 @@ use Oro\Bundle\ApiBundle\Model\Error;
  */
 class NormalizeResultContext extends ApiContext
 {
-    /** bool */
-    private $softErrorsHandling = false;
-
-    /** @var Error[] */
-    private $errors;
+    private bool $softErrorsHandling = false;
+    /** @var Error[]|null */
+    private ?array $errors = null;
 
     /**
      * Whether any error occurred when processing an action.
-     *
-     * @return bool
      */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return !empty($this->errors);
     }
@@ -32,19 +28,15 @@ class NormalizeResultContext extends ApiContext
      *
      * @return Error[]
      */
-    public function getErrors()
+    public function getErrors(): array
     {
-        if (null === $this->errors) {
-            return [];
-        }
-
-        return $this->errors;
+        return $this->errors ?? [];
     }
 
     /**
      * Registers an error.
      */
-    public function addError(Error $error)
+    public function addError(Error $error): void
     {
         if (null === $this->errors) {
             $this->errors = [];
@@ -55,7 +47,7 @@ class NormalizeResultContext extends ApiContext
     /**
      * Removes all errors.
      */
-    public function resetErrors()
+    public function resetErrors(): void
     {
         $this->errors = null;
     }
@@ -63,10 +55,8 @@ class NormalizeResultContext extends ApiContext
     /**
      * Gets a value indicates whether errors and exceptions should just stop processing
      * or an exception should be thrown is any error or exception occurred.
-     *
-     * @return bool
      */
-    public function isSoftErrorsHandling()
+    public function isSoftErrorsHandling(): bool
     {
         return $this->softErrorsHandling;
     }
@@ -74,10 +64,8 @@ class NormalizeResultContext extends ApiContext
     /**
      * Sets a value indicates whether errors and exceptions should just stop processing
      * or an exception should be thrown is any error or exception occurred.
-     *
-     * @param bool $softErrorsHandling
      */
-    public function setSoftErrorsHandling($softErrorsHandling)
+    public function setSoftErrorsHandling(bool $softErrorsHandling): void
     {
         $this->softErrorsHandling = $softErrorsHandling;
     }

@@ -9,8 +9,7 @@ use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
  */
 class ChainProcessor implements ProcessorInterface
 {
-    /** @var ProcessorBagInterface */
-    protected $processorBag;
+    protected ProcessorBagInterface $processorBag;
 
     public function __construct(ProcessorBagInterface $processorBag)
     {
@@ -18,9 +17,9 @@ class ChainProcessor implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         $this->executeProcessors($context);
     }
@@ -28,7 +27,7 @@ class ChainProcessor implements ProcessorInterface
     /**
      * @throws ExecutionFailedException if some processor fired an exception
      */
-    protected function executeProcessors(ContextInterface $context)
+    protected function executeProcessors(ContextInterface $context): void
     {
         $processors = $this->processorBag->getProcessors($context);
         /** @var ProcessorInterface $processor */

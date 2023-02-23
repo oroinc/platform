@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 
 class MetadataContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MetadataContext */
-    private $context;
+    private MetadataContext $context;
 
     protected function setUp(): void
     {
@@ -27,8 +26,6 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
 
     public function testClassName()
     {
-        self::assertNull($this->context->getClassName());
-
         $this->context->setClassName('test');
         self::assertEquals('test', $this->context->getClassName());
         self::assertEquals('test', $this->context->get('class'));
@@ -45,8 +42,6 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
 
     public function testConfig()
     {
-        self::assertNull($this->context->getConfig());
-
         $config = new EntityDefinitionConfig();
         $this->context->setConfig($config);
         self::assertSame($config, $this->context->getConfig());

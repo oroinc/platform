@@ -9,20 +9,12 @@ use Oro\Bundle\ApiBundle\Batch\Model\BatchSummary;
  */
 class BatchUpdateResponse
 {
-    /** @var array */
-    private $data;
-
+    private array $data;
     /** @var int[] */
-    private $processedItemStatuses;
-
-    /** @var BatchSummary */
-    private $summary;
-
-    /** @var bool */
-    private $hasUnexpectedErrors;
-
-    /** @var string|null */
-    private $retryReason;
+    private array $processedItemStatuses;
+    private BatchSummary $summary;
+    private bool $hasUnexpectedErrors;
+    private ?string $retryReason;
 
     /**
      * @param array        $data
@@ -36,7 +28,7 @@ class BatchUpdateResponse
         array $processedItemStatuses,
         BatchSummary $summary,
         bool $hasUnexpectedErrors,
-        string $retryReason = null
+        ?string $retryReason = null
     ) {
         $this->data = $data;
         $this->processedItemStatuses = $processedItemStatuses;

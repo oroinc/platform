@@ -35,7 +35,7 @@ class FormCompilerPass implements CompilerPassInterface
     private const API_FORM_DATA_TYPE_GUESSER_SERVICE_ID = 'oro_api.form.guesser.data_type';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ContainerBuilder $container): void

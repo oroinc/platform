@@ -3,14 +3,18 @@
 namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Oro\Bundle\LocaleBundle\DataFixtures\LocalizationOptionsAwareInterface;
+use Oro\Bundle\LocaleBundle\DataFixtures\LocalizationOptionsAwareTrait;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * This ORM executor prevents hiding an exception that is happened during executing a data fixture
  * in case the entity manager cannot be closed or the database transaction rollback failed.
  */
-class DataFixturesORMExecutor extends ORMExecutor
+class DataFixturesORMExecutor extends ORMExecutor implements LocalizationOptionsAwareInterface
 {
+    use LocalizationOptionsAwareTrait;
+
     /** @var callable|null */
     private $progressCallback = null;
 
@@ -29,6 +33,10 @@ class DataFixturesORMExecutor extends ORMExecutor
             }
 
             foreach ($fixtures as $fixture) {
+                if ($fixture instanceof LocalizationOptionsAwareInterface) {
+                    $fixture->setFormattingCode($this->formattingCode);
+                    $fixture->setLanguage($this->language);
+                }
                 $name = \get_class($fixture);
                 if (null !== $this->progressCallback) {
                     $stopwatch = new Stopwatch();

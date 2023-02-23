@@ -10,11 +10,11 @@ use Symfony\Component\Routing\Route;
  */
 class ChainApiDocAnnotationHandler implements ApiDocAnnotationHandlerInterface
 {
-    /** @var iterable|ApiDocAnnotationHandlerInterface[] */
-    private $handlers;
+    /** @var iterable<ApiDocAnnotationHandlerInterface> */
+    private iterable $handlers;
 
     /**
-     * @param iterable|ApiDocAnnotationHandlerInterface[] $handlers
+     * @param iterable<ApiDocAnnotationHandlerInterface> $handlers
      */
     public function __construct(iterable $handlers)
     {
@@ -22,9 +22,9 @@ class ChainApiDocAnnotationHandler implements ApiDocAnnotationHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function handle(ApiDoc $annotation, Route $route)
+    public function handle(ApiDoc $annotation, Route $route): void
     {
         foreach ($this->handlers as $handler) {
             $handler->handle($annotation, $route);

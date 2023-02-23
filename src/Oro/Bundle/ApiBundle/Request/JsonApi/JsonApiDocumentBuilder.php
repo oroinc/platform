@@ -440,7 +440,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                     $idOnly = true;
                     $idFieldNames = $targetMetadata->getIdentifierFieldNames();
                     if (\count($idFieldNames) === 1) {
-                        $object = $this->objectAccessor->getValue($object, \reset($idFieldNames));
+                        $object = $this->objectAccessor->getValue($object, reset($idFieldNames));
                     } else {
                         $data = [];
                         foreach ($idFieldNames as $fieldName) {

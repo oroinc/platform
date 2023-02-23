@@ -344,7 +344,7 @@ class ObjectNormalizer
                     $value = $this->normalizeEntity($value, $level, $context);
                 } else {
                     $entityId = $this->doctrineHelper->getEntityIdentifier($value);
-                    $count = count($entityId);
+                    $count = \count($entityId);
                     if ($count === 1) {
                         $value = reset($entityId);
                     } elseif ($count > 1) {

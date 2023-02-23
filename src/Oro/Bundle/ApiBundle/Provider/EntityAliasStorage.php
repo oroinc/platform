@@ -11,7 +11,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage as BaseEntityAliasStorag
 class EntityAliasStorage extends BaseEntityAliasStorage
 {
     /** @var string[] */
-    private $configFiles;
+    private array $configFiles;
 
     /**
      * @param string[] $configFiles
@@ -22,7 +22,7 @@ class EntityAliasStorage extends BaseEntityAliasStorage
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getDuplicateAliasHelpMessage()
     {
@@ -50,7 +50,7 @@ class EntityAliasStorage extends BaseEntityAliasStorage
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function validateAlias($entityClass, $value, $isPluralAlias)
     {

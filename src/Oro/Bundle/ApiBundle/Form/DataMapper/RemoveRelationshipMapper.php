@@ -13,24 +13,24 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 class RemoveRelationshipMapper extends AbstractRelationshipMapper
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function mapDataToCollectionFormField(
-        $data,
+        object $data,
         FormInterface $formField,
         PropertyPathInterface $propertyPath
-    ) {
+    ): void {
         // do nothing here because only input collection items should be processed by the form
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function mapCollectionFormFieldToData(
-        $data,
+        object $data,
         FormInterface $formField,
         PropertyPathInterface $propertyPath
-    ) {
+    ): void {
         /** @var Collection $dataValue */
         $dataValue = $this->propertyAccessor->getValue($data, $propertyPath);
         // initialize collection to avoid real deletion before validation on extra lazy collections.

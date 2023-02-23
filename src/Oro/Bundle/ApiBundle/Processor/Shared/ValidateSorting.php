@@ -102,7 +102,7 @@ class ValidateSorting implements ProcessorInterface
 
         $unsupportedFields = [];
         foreach ($orderBy as $fieldName => $direction) {
-            $path = \explode('.', $fieldName);
+            $path = explode('.', $fieldName);
             $propertyPath = \count($path) > 1
                 ? $this->validateAssociationSorter($path, $context)
                 : $this->validateSorter($fieldName, $sorters);
@@ -166,7 +166,7 @@ class ValidateSorting implements ProcessorInterface
         /** @var ClassMetadata $metadata */
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
-        $targetFieldName = \array_pop($path);
+        $targetFieldName = array_pop($path);
         [$targetSorters, $associations] = $this->getAssociationSorters($path, $context, $metadata);
         $targetFieldName = $this->validateSorter($targetFieldName, $targetSorters);
         if (!$targetFieldName) {

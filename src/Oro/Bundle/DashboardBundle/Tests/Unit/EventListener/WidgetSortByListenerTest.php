@@ -26,12 +26,7 @@ class WidgetSortByListenerTest extends OrmTestCase
             ->willReturn($widgetOptionBag);
 
         $em = $this->getTestEntityManager();
-        $em->getConfiguration()->setMetadataDriverImpl(
-            new AnnotationDriver(
-                new AnnotationReader(),
-                'Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity'
-            )
-        );
+        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $datagrid = $this->createMock(DatagridInterface::class);
 
@@ -76,12 +71,7 @@ class WidgetSortByListenerTest extends OrmTestCase
             ->willReturn($widgetOptionBag);
 
         $em = $this->getTestEntityManager();
-        $em->getConfiguration()->setMetadataDriverImpl(
-            new AnnotationDriver(
-                new AnnotationReader(),
-                'Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity'
-            )
-        );
+        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
         $qb = $em->createQueryBuilder()
             ->select('tc')
             ->from(TestClass::class, 'tc')

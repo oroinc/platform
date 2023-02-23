@@ -5,16 +5,11 @@ namespace Oro\Bundle\ApiBundle\Model;
 /**
  * Represents a reference to an error source.
  */
-class ErrorSource
+final class ErrorSource
 {
-    /** @var string */
-    protected $propertyPath;
-
-    /** @var string */
-    protected $pointer;
-
-    /** @var string */
-    protected $parameter;
+    private ?string $propertyPath = null;
+    private ?string $pointer = null;
+    private ?string $parameter = null;
 
     /**
      * Creates an instance of ErrorSource class represents
@@ -23,9 +18,9 @@ class ErrorSource
      * @param string $propertyPath The property path.
      *                             If it contains several elements they should be separated by the point (.)
      *
-     * @return ErrorSource
+     * @return $this
      */
-    public static function createByPropertyPath($propertyPath)
+    public static function createByPropertyPath(string $propertyPath): self
     {
         $source = new self();
         $source->setPropertyPath($propertyPath);
@@ -42,9 +37,9 @@ class ErrorSource
      *                        e.g. "/data" for a primary data object,
      *                        or "/data/attributes/title" for a specific attribute
      *
-     * @return ErrorSource
+     * @return $this
      */
-    public static function createByPointer($pointer)
+    public static function createByPointer(string $pointer): self
     {
         $source = new self();
         $source->setPointer($pointer);
@@ -58,9 +53,9 @@ class ErrorSource
      *
      * @param string $parameter The name of a parameter.
      *
-     * @return ErrorSource
+     * @return $this
      */
-    public static function createByParameter($parameter)
+    public static function createByParameter(string $parameter): self
     {
         $source = new self();
         $source->setParameter($parameter);
@@ -71,10 +66,8 @@ class ErrorSource
     /**
      * Gets the path to a property caused the error.
      * e.g. "title", or "author.name"
-     *
-     * @return string|null
      */
-    public function getPropertyPath()
+    public function getPropertyPath(): ?string
     {
         return $this->propertyPath;
     }
@@ -82,10 +75,8 @@ class ErrorSource
     /**
      * Sets the path to a property caused the error.
      * e.g. "title", or "author.name"
-     *
-     * @param string|null $propertyPath
      */
-    public function setPropertyPath($propertyPath)
+    public function setPropertyPath(?string $propertyPath): void
     {
         $this->propertyPath = $propertyPath;
     }
@@ -95,10 +86,8 @@ class ErrorSource
      * For JSON documents the pointer conforms RFC 6901.
      * @link https://tools.ietf.org/html/rfc6901
      * e.g. "/data" for a primary data object, or "/data/attributes/title" for a specific attribute
-     *
-     * @return string|null
      */
-    public function getPointer()
+    public function getPointer(): ?string
     {
         return $this->pointer;
     }
@@ -108,30 +97,24 @@ class ErrorSource
      * For JSON documents the pointer must conform RFC 6901.
      * @link https://tools.ietf.org/html/rfc6901
      * e.g. "/data" for a primary data object, or "/data/attributes/title" for a specific attribute
-     *
-     * @param string|null $pointer
      */
-    public function setPointer($pointer)
+    public function setPointer(?string $pointer): void
     {
         $this->pointer = $pointer;
     }
 
     /**
      * Gets URI query parameter caused the error.
-     *
-     * @return string|null
      */
-    public function getParameter()
+    public function getParameter(): ?string
     {
         return $this->parameter;
     }
 
     /**
      * Sets URI query parameter caused the error.
-     *
-     * @param string|null $parameter
      */
-    public function setParameter($parameter)
+    public function setParameter(?string $parameter): void
     {
         $this->parameter = $parameter;
     }

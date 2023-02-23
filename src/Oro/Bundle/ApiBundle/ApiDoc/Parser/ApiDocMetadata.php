@@ -11,26 +11,13 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class ApiDocMetadata
 {
-    /** @var string */
-    protected $action;
+    private string $action;
+    private EntityMetadata $metadata;
+    private EntityDefinitionConfig $config;
+    private RequestType $requestType;
 
-    /** @var EntityMetadata */
-    protected $metadata;
-
-    /** @var EntityDefinitionConfig */
-    protected $config;
-
-    /** @var RequestType */
-    protected $requestType;
-
-    /**
-     * @param string                 $action
-     * @param EntityMetadata         $metadata
-     * @param EntityDefinitionConfig $config
-     * @param RequestType            $requestType
-     */
     public function __construct(
-        $action,
+        string $action,
         EntityMetadata $metadata,
         EntityDefinitionConfig $config,
         RequestType $requestType
@@ -41,34 +28,22 @@ class ApiDocMetadata
         $this->requestType = $requestType;
     }
 
-    /**
-     * @return string
-     */
-    public function getAction()
+    public function getAction(): string
     {
         return $this->action;
     }
 
-    /**
-     * @return EntityMetadata
-     */
-    public function getMetadata()
+    public function getMetadata(): EntityMetadata
     {
         return $this->metadata;
     }
 
-    /**
-     * @return EntityDefinitionConfig
-     */
-    public function getConfig()
+    public function getConfig(): EntityDefinitionConfig
     {
         return $this->config;
     }
 
-    /**
-     * @return RequestType
-     */
-    public function getRequestType()
+    public function getRequestType(): RequestType
     {
         return $this->requestType;
     }

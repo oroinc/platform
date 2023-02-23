@@ -15,10 +15,10 @@ class PostProcessorCompilerPass implements CompilerPassInterface
     use ApiTaggedServiceTrait;
 
     private const POST_PROCESSOR_REGISTRY_SERVICE_ID = 'oro_api.post_processor_registry';
-    private const POST_PROCESSOR_TAG                 = 'oro.api.post_processor';
+    private const POST_PROCESSOR_TAG = 'oro.api.post_processor';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContainerBuilder $container): void
     {

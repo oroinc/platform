@@ -19,11 +19,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ReloadLoggedInUser implements ProcessorInterface
 {
-    /** @var BaseUserManager */
-    private $userManager;
-
-    /** @var TokenAccessorInterface */
-    private $tokenAccessor;
+    private BaseUserManager $userManager;
+    private TokenAccessorInterface $tokenAccessor;
 
     public function __construct(BaseUserManager $userManager, TokenAccessorInterface $tokenAccessor)
     {
@@ -34,7 +31,7 @@ class ReloadLoggedInUser implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
 

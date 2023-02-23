@@ -24,9 +24,7 @@ class AssertResultDataIsArray implements ProcessorInterface
 
         $result = $context->getResult();
         if (\array_key_exists(JsonApiDoc::DATA, $result) && !\is_array($result[JsonApiDoc::DATA])) {
-            throw new RuntimeException(
-                sprintf('The "%s" section must be an array.', JsonApiDoc::DATA)
-            );
+            throw new RuntimeException(sprintf('The "%s" section must be an array.', JsonApiDoc::DATA));
         }
     }
 }

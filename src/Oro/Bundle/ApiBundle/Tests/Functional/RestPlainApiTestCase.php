@@ -44,6 +44,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
         array $server = [],
         string $content = null
     ): Response {
+        $this->checkTwigState();
         $this->checkHateoasHeader($server);
         $this->checkWsseAuthHeader($server);
         $this->checkCsrfHeader($server);

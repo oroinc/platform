@@ -16,12 +16,12 @@ class DocumentBuilderCompilerPass implements CompilerPassInterface
     use ApiTaggedServiceTrait;
 
     private const DOCUMENT_BUILDER_FACTORY_SERVICE_ID = 'oro_api.document_builder_factory';
-    private const DOCUMENT_BUILDER_TAG                = 'oro.api.document_builder';
+    private const DOCUMENT_BUILDER_TAG = 'oro.api.document_builder';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $services = [];
         $documentBuilders = [];

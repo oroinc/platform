@@ -53,9 +53,10 @@ class EntityOverrideProviderRegistry
             }
         }
         if (null === $entityOverrideProviderServiceId) {
-            throw new \LogicException(
-                sprintf('Cannot find an entity override provider for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find an entity override provider for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         /** @var EntityOverrideProviderInterface $entityOverrideProvider */

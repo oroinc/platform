@@ -8,14 +8,14 @@ namespace Oro\Component\ChainProcessor;
 class ProcessorIteratorFactory implements ProcessorIteratorFactoryInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function createProcessorIterator(
         array $processors,
         ContextInterface $context,
         ApplicableCheckerInterface $applicableChecker,
         ProcessorRegistryInterface $processorRegistry
-    ) {
+    ): ProcessorIterator {
         return new ProcessorIterator($processors, $context, $applicableChecker, $processorRegistry);
     }
 }

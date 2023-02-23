@@ -8,31 +8,50 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 
 class ListContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var ListContext */
-    private $context;
+    private ListContext $context;
 
     protected function setUp(): void
     {
-        $this->configProvider = $this->createMock(ConfigProvider::class);
-        $this->metadataProvider = $this->createMock(MetadataProvider::class);
+        $this->context = new ListContext(
+            $this->createMock(ConfigProvider::class),
+            $this->createMock(MetadataProvider::class)
+        );
+    }
 
-        $this->context = new ListContext($this->configProvider, $this->metadataProvider);
+    private function assertTotalCountCallback(callable $totalCountCallback, int $expectedResult): void
+    {
+        $this->context->setTotalCountCallback($totalCountCallback);
+        self::assertSame($totalCountCallback, $this->context->getTotalCountCallback());
+        self::assertSame($totalCountCallback, $this->context->get('totalCountCallback'));
+        self::assertSame($expectedResult, call_user_func($this->context->getTotalCountCallback()));
+    }
+
+    public function calculateTotalCount(): int
+    {
+        return 123;
     }
 
     public function testTotalCountCallback()
     {
         self::assertNull($this->context->getTotalCountCallback());
 
-        $totalCountCallback = [$this, 'calculateTotalCount'];
+        $this->assertTotalCountCallback(
+            function (): int {
+                return 123;
+            },
+            123
+        );
 
-        $this->context->setTotalCountCallback($totalCountCallback);
-        self::assertEquals($totalCountCallback, $this->context->getTotalCountCallback());
-        self::assertEquals($totalCountCallback, $this->context->get('totalCountCallback'));
+        $this->assertTotalCountCallback(
+            new class() {
+                public function __invoke(): int
+                {
+                    return 123;
+                }
+            },
+            123
+        );
+
+        $this->assertTotalCountCallback([$this, 'calculateTotalCount'], 123);
     }
 }

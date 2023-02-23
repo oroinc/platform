@@ -28,6 +28,6 @@ class RequestExpressionMatcher extends AbstractMatcher
             $this->expressions[$expression] = $expr;
         }
 
-        return $this->isMatch($expr, $requestType, null);
+        return $this->isMatch($expr, $requestType, '');
     }
 }

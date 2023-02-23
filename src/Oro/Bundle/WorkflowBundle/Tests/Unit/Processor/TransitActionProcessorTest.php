@@ -12,16 +12,12 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Suppressing for stubs and mock classes
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProcessorBagConfigBuilder */
     private $processorBagConfigBuilder;
-
-    /** @var ProcessorBag */
-    private $processorBag;
 
     /** @var ProcessorRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $processorRegistry;
@@ -34,32 +30,19 @@ class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
         $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
-        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry);
-
-        $this->processor = new TransitActionProcessor($this->processorBag, $this->logger);
+        $this->processor = new TransitActionProcessor(
+            new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry),
+            $this->logger
+        );
     }
 
-    public function testProperContextCreated()
+    public function testCreateContext()
     {
         self::assertInstanceOf(TransitionContext::class, $this->processor->createContext());
-    }
-
-    public function testUnsupportedContextType()
-    {
-        $context = new UnsupportedContextStub();
-
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor supports only ' .
-            'Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext context, but ' .
-            'Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\UnsupportedContextStub given.'
-        );
-
-        $this->processor->process($context);
     }
 
     public function testExecuteProcessors()

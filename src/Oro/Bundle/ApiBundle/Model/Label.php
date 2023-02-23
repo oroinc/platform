@@ -10,17 +10,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class Label
 {
-    /** @var string */
-    private $name;
+    private string $name;
+    private ?string $domain;
 
-    /** @var string */
-    private $domain;
-
-    /**
-     * @param string $name
-     * @param string|null $domain
-     */
-    public function __construct(string $name, string $domain = null)
+    public function __construct(string $name, ?string $domain = null)
     {
         $this->name = $name;
         $this->domain = $domain;
@@ -28,32 +21,24 @@ class Label
 
     /**
      * Gets the translation key.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
      * Sets the translation key.
-     *
-     * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
     /**
      * Translates this label.
-     *
-     * @param TranslatorInterface $translator
-     *
-     * @return string
      */
-    public function trans(TranslatorInterface $translator)
+    public function trans(TranslatorInterface $translator): string
     {
         $result = $translator->trans($this->name, [], $this->domain);
 

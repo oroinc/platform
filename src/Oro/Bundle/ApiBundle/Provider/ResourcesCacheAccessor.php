@@ -42,12 +42,12 @@ class ResourcesCacheAccessor
      *
      * @return mixed The cached data or FALSE, if no cache entry exists for the given ID.
      */
-    public function fetch(string $version, RequestType $requestType, string $id)
+    public function fetch(string $version, RequestType $requestType, string $id): mixed
     {
         $cacheKey = $this->getCacheKey($version, $requestType, $id);
         $cacheItem = $this->cache->getItem($cacheKey);
         if ($cacheItem->isHit()) {
-            list($timestamp, $value) = $cacheItem->get();
+            [$timestamp, $value] = $cacheItem->get();
             if (null === $this->configCacheStateRegistry
                 || $this->getConfigCacheState($requestType)->isCacheFresh($timestamp)
             ) {
@@ -66,7 +66,7 @@ class ResourcesCacheAccessor
      * @param string      $id          The ID of the cache entry
      * @param mixed       $data        The data to be saved
      */
-    public function save(string $version, RequestType $requestType, string $id, $data): void
+    public function save(string $version, RequestType $requestType, string $id, mixed $data): void
     {
         $timestamp = null === $this->configCacheStateRegistry
             ? null

@@ -13,13 +13,10 @@ use Symfony\Contracts\Service\ResetInterface;
 class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface, ResetInterface
 {
     /** @var array [[RouteOptionsResolverInterface, view name], ...] */
-    private $resolvers = [];
-
-    /** @var RestDocViewDetector */
-    private $docViewDetector;
-
+    private array $resolvers;
+    private RestDocViewDetector $docViewDetector;
     /** @var array [view name => underlying view name, ...] */
-    private $underlyingViews;
+    private array $underlyingViews;
 
     /**
      * @param array               $resolvers       [[RouteOptionsResolverInterface, view name], ...]
@@ -39,9 +36,9 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface, Re
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function resolve(Route $route, RouteCollectionAccessor $routes)
+    public function resolve(Route $route, RouteCollectionAccessor $routes): void
     {
         if (empty($this->resolvers)) {
             return;
@@ -54,7 +51,7 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface, Re
 
         $underlyingView = $this->underlyingViews[$view] ?? null;
         /** @var RouteOptionsResolverInterface $resolver */
-        foreach ($this->resolvers as list($resolver, $resolverView)) {
+        foreach ($this->resolvers as [$resolver, $resolverView]) {
             if (null === $resolverView || $resolverView === $view || $resolverView === $underlyingView) {
                 $resolver->resolve($route, $routes);
             }
@@ -62,11 +59,11 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface, Re
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
-        foreach ($this->resolvers as list($resolver, $resolverView)) {
+        foreach ($this->resolvers as [$resolver, $resolverView]) {
             if ($resolver instanceof ResetInterface) {
                 $resolver->reset();
             }

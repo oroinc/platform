@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
@@ -34,12 +35,12 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->processor = $this->getMockBuilder(BatchUpdateProcessor::class)
-            ->disableOriginalConstructor()
             ->onlyMethods(['process'])
+            ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'batch_update'])
             ->getMock();
         $this->itemProcessor = $this->getMockBuilder(BatchUpdateItemProcessor::class)
-            ->disableOriginalConstructor()
             ->onlyMethods(['process'])
+            ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'batch_update_item'])
             ->getMock();
         $this->fileManager = $this->createMock(FileManager::class);
 

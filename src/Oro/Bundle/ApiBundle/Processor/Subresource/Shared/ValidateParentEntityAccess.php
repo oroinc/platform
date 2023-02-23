@@ -118,7 +118,7 @@ class ValidateParentEntityAccess implements ProcessorInterface
         $qb = $this->doctrineHelper->createQueryBuilder($parentEntityClass, 'e');
         $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($parentEntityClass);
         if (\count($idFieldNames) !== 0) {
-            $qb->select('e.' . \reset($idFieldNames));
+            $qb->select('e.' . reset($idFieldNames));
         }
         $this->entityIdHelper->applyEntityIdentifierRestriction(
             $qb,

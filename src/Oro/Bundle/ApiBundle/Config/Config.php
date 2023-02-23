@@ -12,7 +12,7 @@ class Config implements \IteratorAggregate
     private array $items = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getIterator(): \Traversable
     {
@@ -62,7 +62,7 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of an entity.
      */
-    public function setDefinition(EntityDefinitionConfig $definition = null): void
+    public function setDefinition(?EntityDefinitionConfig $definition): void
     {
         $this->set(ConfigUtil::DEFINITION, $definition);
     }
@@ -86,7 +86,7 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of filters.
      */
-    public function setFilters(FiltersConfig $filters = null): void
+    public function setFilters(?FiltersConfig $filters): void
     {
         $this->set(ConfigUtil::FILTERS, $filters);
     }
@@ -110,7 +110,7 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of sorters.
      */
-    public function setSorters(SortersConfig $sorters = null): void
+    public function setSorters(?SortersConfig $sorters): void
     {
         $this->set(ConfigUtil::SORTERS, $sorters);
     }
@@ -134,7 +134,7 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of actions.
      */
-    public function setActions(ActionsConfig $actions = null): void
+    public function setActions(?ActionsConfig $actions): void
     {
         $this->set(ConfigUtil::ACTIONS, $actions);
     }
@@ -158,7 +158,7 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of sub-resources.
      */
-    public function setSubresources(SubresourcesConfig $subresources = null): void
+    public function setSubresources(?SubresourcesConfig $subresources): void
     {
         $this->set(ConfigUtil::SUBRESOURCES, $subresources);
     }

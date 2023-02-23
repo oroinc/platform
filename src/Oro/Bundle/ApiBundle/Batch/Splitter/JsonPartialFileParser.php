@@ -12,14 +12,9 @@ use JsonStreamingParser\Parser;
  */
 class JsonPartialFileParser extends Parser
 {
-    /** @var int */
-    private $offset = 0;
-
-    /** @var \Closure */
-    private $privatePropertyAccessor;
-
-    /** @var \Closure */
-    private $consumeCharAccessor;
+    private int $offset = 0;
+    private \Closure $privatePropertyAccessor;
+    private \Closure $consumeCharAccessor;
 
     /**
      * @param resource                        $stream
@@ -69,22 +64,22 @@ class JsonPartialFileParser extends Parser
      */
     public function setState(array $data): void
     {
-        if (array_key_exists('offset', $data)) {
+        if (\array_key_exists('offset', $data)) {
             $this->offset = $data['offset'];
         }
-        if (array_key_exists('lineNumber', $data)) {
+        if (\array_key_exists('lineNumber', $data)) {
             $this->setPrivateProperty('lineNumber', $data['lineNumber']);
         }
-        if (array_key_exists('charNumber', $data)) {
+        if (\array_key_exists('charNumber', $data)) {
             $this->setPrivateProperty('charNumber', $data['charNumber']);
         }
-        if (array_key_exists('state', $data)) {
+        if (\array_key_exists('state', $data)) {
             $this->setPrivateProperty('state', $data['state']);
         }
-        if (array_key_exists('stack', $data)) {
+        if (\array_key_exists('stack', $data)) {
             $this->setPrivateProperty('stack', $data['stack']);
         }
-        if (array_key_exists('listener', $data)) {
+        if (\array_key_exists('listener', $data)) {
             $this->getListener()->setState($data['listener']);
         }
     }
@@ -119,17 +114,17 @@ class JsonPartialFileParser extends Parser
             $startPos = ftell($stream);
             $line = stream_get_line($stream, $bufferSize, $lineEnding);
             $endPos = ftell($stream);
-            $ended = (bool)($endPos - strlen($line) - $startPos);
+            $ended = (bool)($endPos - \strlen($line) - $startPos);
             // if we're still at the same place after stream_get_line, we're done
             $eof = $endPos === $startPos;
 
-            $byteLen = strlen($line);
+            $byteLen = \strlen($line);
             for ($i = 0; $i < $byteLen; $i++) {
                 if ($listener instanceof PositionAwareInterface) {
                     $listener->setFilePosition($lineNumber, $charNumber);
                 }
                 $this->offset++;
-                call_user_func($this->consumeCharAccessor, $this, $line[$i]);
+                \call_user_func($this->consumeCharAccessor, $this, $line[$i]);
                 $charNumber++;
 
                 if ($stopParsing) {
@@ -150,23 +145,14 @@ class JsonPartialFileParser extends Parser
         return $this->getPrivateProperty('listener');
     }
 
-    /**
-     * @param string $name
-     *
-     * @return mixed
-     */
-    private function getPrivateProperty(string $name)
+    private function getPrivateProperty(string $name): mixed
     {
         $privatePropertyAccessor = $this->privatePropertyAccessor;
 
         return $privatePropertyAccessor($name);
     }
 
-    /**
-     * @param string $name
-     * @param mixed  $value
-     */
-    private function setPrivateProperty(string $name, $value): void
+    private function setPrivateProperty(string $name, mixed $value): void
     {
         $privatePropertyAccessor = $this->privatePropertyAccessor;
         $property = &$privatePropertyAccessor($name);

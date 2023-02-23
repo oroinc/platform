@@ -84,9 +84,6 @@ class FormValidationHandler
 
     private function getValidationListener(): ValidationListener
     {
-        return new ValidationListener(
-            $this->validator,
-            new ViolationMapper()
-        );
+        return new ValidationListener($this->validator, new ViolationMapper());
     }
 }

@@ -14,8 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class UpdateNewUser implements ProcessorInterface
 {
-    /** @var UserManager */
-    private $userManager;
+    private UserManager $userManager;
 
     public function __construct(UserManager $userManager)
     {
@@ -25,7 +24,7 @@ class UpdateNewUser implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
 

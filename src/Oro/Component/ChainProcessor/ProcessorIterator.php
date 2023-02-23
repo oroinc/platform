@@ -8,22 +8,12 @@ namespace Oro\Component\ChainProcessor;
 class ProcessorIterator implements \Iterator
 {
     /** @var array [[processor id, [attribute name => attribute value, ...]], ...] */
-    protected $processors;
-
-    /** @var ContextInterface */
-    protected $context;
-
-    /** @var ApplicableCheckerInterface */
-    protected $applicableChecker;
-
-    /** @var ProcessorRegistryInterface */
-    protected $processorRegistry;
-
-    /** @var int */
-    protected $index;
-
-    /** @var int */
-    protected $maxIndex;
+    protected array $processors;
+    protected ContextInterface $context;
+    protected ApplicableCheckerInterface $applicableChecker;
+    protected ProcessorRegistryInterface $processorRegistry;
+    protected int $index = -1;
+    protected int $maxIndex;
 
     public function __construct(
         array $processors,
@@ -39,10 +29,8 @@ class ProcessorIterator implements \Iterator
 
     /**
      * Gets the applicable checker.
-     *
-     * @return ApplicableCheckerInterface
      */
-    public function getApplicableChecker()
+    public function getApplicableChecker(): ApplicableCheckerInterface
     {
         return $this->applicableChecker;
     }
@@ -50,27 +38,23 @@ class ProcessorIterator implements \Iterator
     /**
      * Replaces existing applicable checker.
      */
-    public function setApplicableChecker(ApplicableCheckerInterface $applicableChecker)
+    public function setApplicableChecker(ApplicableCheckerInterface $applicableChecker): void
     {
         $this->applicableChecker = $applicableChecker;
     }
 
     /**
      * Gets a action the iterator works with.
-     *
-     * @return string
      */
-    public function getAction()
+    public function getAction(): string
     {
         return $this->context->getAction();
     }
 
     /**
      * Gets the name of a group the iterator points to.
-     *
-     * @return string|null
      */
-    public function getGroup()
+    public function getGroup(): ?string
     {
         if (-1 === $this->index || !$this->valid()) {
             return null;
@@ -81,10 +65,8 @@ class ProcessorIterator implements \Iterator
 
     /**
      * Gets the id of a processor the iterator points to.
-     *
-     * @return string|null
      */
-    public function getProcessorId()
+    public function getProcessorId(): ?string
     {
         if (-1 === $this->index || !$this->valid()) {
             return null;
@@ -96,9 +78,9 @@ class ProcessorIterator implements \Iterator
     /**
      * Gets all attributes of a processor the iterator points to.
      *
-     * @return array [key => value, ...]
+     * @return array|null [key => value, ...]
      */
-    public function getProcessorAttributes()
+    public function getProcessorAttributes(): ?array
     {
         if (-1 === $this->index || !$this->valid()) {
             return null;
@@ -108,7 +90,7 @@ class ProcessorIterator implements \Iterator
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function current(): ProcessorInterface
     {
@@ -116,7 +98,7 @@ class ProcessorIterator implements \Iterator
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function next(): void
     {
@@ -124,15 +106,15 @@ class ProcessorIterator implements \Iterator
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function key(): mixed
+    public function key(): int
     {
         return $this->index;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function valid(): bool
     {
@@ -140,7 +122,7 @@ class ProcessorIterator implements \Iterator
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function rewind(): void
     {
@@ -150,9 +132,9 @@ class ProcessorIterator implements \Iterator
     }
 
     /**
-     * Moves forward to next applicable processor
+     * Moves forward to next applicable processor.
      */
-    protected function nextApplicable()
+    protected function nextApplicable(): void
     {
         $this->index++;
         while ($this->index <= $this->maxIndex) {

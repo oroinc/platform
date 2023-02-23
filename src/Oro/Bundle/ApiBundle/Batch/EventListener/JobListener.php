@@ -13,15 +13,15 @@ use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
  */
 class JobListener
 {
-    private const OPERATION_ID   = 'api_operation_id';
-    private const SUMMARY        = 'summary';
-    private const EXTRA_CHUNK    = 'extra_chunk';
+    private const OPERATION_ID = 'api_operation_id';
+    private const SUMMARY = 'summary';
+    private const EXTRA_CHUNK = 'extra_chunk';
     private const AGGREGATE_TIME = 'aggregateTime';
-    private const READ_COUNT     = 'readCount';
-    private const WRITE_COUNT    = 'writeCount';
-    private const ERROR_COUNT    = 'errorCount';
-    private const CREATE_COUNT   = 'createCount';
-    private const UPDATE_COUNT   = 'updateCount';
+    private const READ_COUNT = 'readCount';
+    private const WRITE_COUNT = 'writeCount';
+    private const ERROR_COUNT = 'errorCount';
+    private const CREATE_COUNT = 'createCount';
+    private const UPDATE_COUNT = 'updateCount';
 
     private ManagerRegistry $doctrine;
     private AsyncOperationManager $asyncOperationManager;

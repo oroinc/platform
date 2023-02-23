@@ -53,7 +53,7 @@ class EntityDescriptionHelper implements ResetInterface
     /**
      * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->singularEntityDescriptions = [];
         $this->pluralEntityDescriptions = [];

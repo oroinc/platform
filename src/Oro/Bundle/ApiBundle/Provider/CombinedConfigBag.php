@@ -12,13 +12,10 @@ use Symfony\Contracts\Service\ResetInterface;
 class CombinedConfigBag implements ConfigBagInterface, ResetInterface
 {
     /** @var ConfigBagInterface[] */
-    private $configBags;
-
-    /** @var EntityConfigMerger */
-    private $entityConfigMerger;
-
+    private array $configBags;
+    private EntityConfigMerger $entityConfigMerger;
     /** @var array [class name + version => config, ...] */
-    private $cache = [];
+    private array $cache = [];
 
     /**
      * @param ConfigBagInterface[] $configBags
@@ -42,7 +39,7 @@ class CombinedConfigBag implements ConfigBagInterface, ResetInterface
             $result[] = $configBag->getClassNames($version);
         }
 
-        return \array_unique(\array_merge(...$result));
+        return array_unique(array_merge(...$result));
     }
 
     /**
@@ -65,7 +62,7 @@ class CombinedConfigBag implements ConfigBagInterface, ResetInterface
 
         $result = null;
         if ($configs) {
-            $count = count($configs);
+            $count = \count($configs);
             if (1 === $count) {
                 $result = $configs[0];
             } else {
@@ -86,7 +83,7 @@ class CombinedConfigBag implements ConfigBagInterface, ResetInterface
     /**
      * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         foreach ($this->configBags as $configBag) {
             if ($configBag instanceof ResetInterface) {

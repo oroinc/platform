@@ -12,11 +12,9 @@ use Psr\Log\LoggerInterface;
  */
 class EntityAliasResolver extends BaseEntityAliasResolver
 {
-    /** @var EntityOverrideProviderInterface */
-    private $entityOverrideProvider;
-
+    private EntityOverrideProviderInterface $entityOverrideProvider;
     /** @var string[] */
-    private $configFiles;
+    private array $configFiles;
 
     /**
      * @param EntityAliasLoader               $loader
@@ -38,7 +36,7 @@ class EntityAliasResolver extends BaseEntityAliasResolver
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasAlias($entityClass)
     {
@@ -46,7 +44,7 @@ class EntityAliasResolver extends BaseEntityAliasResolver
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getAlias($entityClass)
     {
@@ -54,7 +52,7 @@ class EntityAliasResolver extends BaseEntityAliasResolver
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getPluralAlias($entityClass)
     {
@@ -62,19 +60,14 @@ class EntityAliasResolver extends BaseEntityAliasResolver
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function createStorage()
     {
         return new EntityAliasStorage($this->configFiles);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return string
-     */
-    private function resolveEntityClass($entityClass)
+    private function resolveEntityClass(string $entityClass): string
     {
         $substituteEntityClass = $this->entityOverrideProvider->getSubstituteEntityClass($entityClass);
         if ($substituteEntityClass) {

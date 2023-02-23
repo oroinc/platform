@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -153,9 +154,13 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->response->getContent());
     }
 
-    private function getListener($isDebug): ResponseHashnavListener
+    private function getListener(bool $debug): ResponseHashnavListener
     {
-        return new ResponseHashnavListener($this->tokenStorage, $this->twig, $isDebug);
+        $container = TestContainerBuilder::create()
+            ->add(Environment::class, $this->twig)
+            ->getContainer($this);
+
+        return new ResponseHashnavListener($this->tokenStorage, $debug, $container);
     }
 
     private function serverErrorHandle(): void

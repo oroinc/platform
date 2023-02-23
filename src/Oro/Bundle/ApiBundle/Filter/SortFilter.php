@@ -11,7 +11,7 @@ use Doctrine\Common\Collections\Criteria;
 class SortFilter extends StandaloneFilterWithDefaultValue
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {

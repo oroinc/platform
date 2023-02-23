@@ -103,7 +103,7 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
             $section = $loader->load($config);
             $isEmpty = false;
             if (\is_object($section)) {
-                if (\method_exists($section, 'isEmpty') && $section->isEmpty()) {
+                if (method_exists($section, 'isEmpty') && $section->isEmpty()) {
                     $isEmpty = true;
                 }
             } elseif (empty($section)) {

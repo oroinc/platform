@@ -102,7 +102,7 @@ class IncludeMapManager
             $firstItemOffset = $file->getFirstRecordOffset();
             $indexData[self::FILES][$fileIndex] = [$fileName, $sectionName, $firstItemOffset];
             foreach ($items as $itemIndex => $item) {
-                if (is_array($item)) {
+                if (\is_array($item)) {
                     $itemIdentifier = null;
                     try {
                         $itemIdentifier = $includeAccessor->getItemIdentifier($item);

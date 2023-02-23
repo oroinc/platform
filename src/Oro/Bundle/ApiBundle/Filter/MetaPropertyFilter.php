@@ -14,7 +14,7 @@ namespace Oro\Bundle\ApiBundle\Filter;
 class MetaPropertyFilter extends StandaloneFilter implements SpecialHandlingFilterInterface
 {
     /** @var array [meta property name => data type or NULL, ...] */
-    private $allowedMetaProperties = [];
+    private array $allowedMetaProperties = [];
 
     /**
      * @return array [meta property name => data type or NULL, ...]

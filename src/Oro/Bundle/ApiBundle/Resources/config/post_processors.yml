@@ -9,6 +9,7 @@ services:
     oro_api.post_processor.twig:
         class: Oro\Bundle\ApiBundle\PostProcessor\TwigPostProcessor
         arguments:
-            - '@twig'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: oro.api.post_processor, alias: twig }
+            - { name: container.service_subscriber }

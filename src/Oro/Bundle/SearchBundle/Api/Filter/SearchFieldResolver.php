@@ -12,13 +12,11 @@ use Oro\Bundle\SearchBundle\Query\Query;
 class SearchFieldResolver implements FieldResolverInterface
 {
     /** @var array [field name in search index => ['type' => field data-type, ...], ...] */
-    private $searchFieldMappings;
-
+    private array $searchFieldMappings;
     /** @var array [field name => field name in search index, ...] */
-    private $fieldMappings;
-
-    /** @var array [field name pattern => field name pattern in search index, ...] */
-    private $placeholderFieldMappings;
+    private array $fieldMappings;
+    /** @var array|null [field name pattern => field name pattern in search index, ...] */
+    private ?array $placeholderFieldMappings = null;
 
     public function __construct(array $searchFieldMappings, array $fieldMappings)
     {

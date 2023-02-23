@@ -1,0 +1,119 @@
+attributes:
+    attribute1:
+        property_path: item.stringValue
+        type: null
+        options: {  }
+        default: null
+        label: oro.workflow.%WORKFLOW%.attribute.attribute1.label
+    attribute2:
+        type: boolean
+        default: false
+        property_path: null
+        options: {  }
+        label: oro.workflow.%WORKFLOW%.attribute.attribute2.label
+steps:
+    step1:
+        allowed_transitions:
+            - transition1
+        order: 0
+        is_final: false
+        _is_start: false
+        entity_acl: {  }
+        position: {  }
+        label: oro.workflow.%WORKFLOW%.step.step1.label
+    step2:
+        allowed_transitions:
+            - transition2
+        order: 0
+        is_final: false
+        _is_start: false
+        entity_acl: {  }
+        position: {  }
+        label: oro.workflow.%WORKFLOW%.step.step2.label
+    step3:
+        order: 0
+        is_final: false
+        _is_start: false
+        entity_acl: {  }
+        allowed_transitions: {  }
+        position: {  }
+        label: oro.workflow.%WORKFLOW%.step.step3.label
+transitions:
+    transition1:
+        step_to: step2
+        transition_definition: definition1
+        form_options:
+            attribute_fields:
+                attribute1:
+                    options:
+                        label: oro.workflow.%WORKFLOW%.transition.transition1.attribute.attribute1.label
+                attribute2:
+                    options:
+                        label: oro.workflow.%WORKFLOW%.transition.transition1.attribute.attribute2.label
+        is_start: false
+        is_hidden: false
+        is_unavailable_hidden: false
+        acl_message: null
+        frontend_options: {  }
+        form_type: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType
+        display_type: dialog
+        destination_page: ''
+        page_template: null
+        dialog_template: null
+        init_entities: {  }
+        init_routes: {  }
+        init_datagrids: {  }
+        init_context_attribute: init_context
+        message_parameters: {  }
+        triggers: {  }
+        label: oro.workflow.%WORKFLOW%.transition.transition1.label
+        button_label: oro.workflow.%WORKFLOW%.transition.transition1.button_label
+        button_title: oro.workflow.%WORKFLOW%.transition.transition1.button_title
+        message: oro.workflow.%WORKFLOW%.transition.transition1.warning_message
+    transition2:
+        step_to: step3
+        transition_definition: definition2
+        form_options:
+            attribute_fields:
+                attribute1:
+                    options:
+                        label: oro.workflow.%WORKFLOW%.transition.transition2.attribute.attribute1.label
+                attribute2:
+                    options:
+                        label: oro.workflow.%WORKFLOW%.transition.transition2.attribute.attribute2.label
+        is_start: false
+        is_hidden: false
+        is_unavailable_hidden: false
+        acl_message: null
+        frontend_options: {  }
+        form_type: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType
+        display_type: dialog
+        destination_page: ''
+        page_template: null
+        dialog_template: null
+        init_entities: {  }
+        init_routes: {  }
+        init_datagrids: {  }
+        init_context_attribute: init_context
+        message_parameters: {  }
+        triggers: {  }
+        label: oro.workflow.%WORKFLOW%.transition.transition2.label
+        button_label: oro.workflow.%WORKFLOW%.transition.transition2.button_label
+        button_title: oro.workflow.%WORKFLOW%.transition.transition2.button_title
+        message: oro.workflow.%WORKFLOW%.transition.transition2.warning_message
+transition_definitions:
+    definition1:
+        preactions: {  }
+        preconditions: {  }
+        conditions: {  }
+        actions: {  }
+    definition2:
+        preactions: {  }
+        preconditions: {  }
+        conditions: {  }
+        actions: {  }
+force_autostart: false
+scopes: {  }
+datagrids: {  }
+disable_operations: {  }
+entity_restrictions: {  }

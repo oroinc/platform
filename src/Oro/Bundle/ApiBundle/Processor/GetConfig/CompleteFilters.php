@@ -37,8 +37,8 @@ class CompleteFilters extends CompleteSection
         array $disallowRangeDataTypes
     ) {
         parent::__construct($doctrineHelper);
-        $this->disallowArrayDataTypes = \array_fill_keys($disallowArrayDataTypes, true);
-        $this->disallowRangeDataTypes = \array_fill_keys($disallowRangeDataTypes, true);
+        $this->disallowArrayDataTypes = array_fill_keys($disallowArrayDataTypes, true);
+        $this->disallowRangeDataTypes = array_fill_keys($disallowRangeDataTypes, true);
     }
 
     /**
@@ -132,7 +132,7 @@ class CompleteFilters extends CompleteSection
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
     ): void {
-        if (\is_subclass_of($metadata->name, AbstractEnumValue::class)) {
+        if (is_subclass_of($metadata->name, AbstractEnumValue::class)) {
             $enumIdFieldName = $this->getEnumIdentifierFieldName($definition);
             if (null !== $enumIdFieldName) {
                 $enumIdFilter = $filters->getOrAddField($enumIdFieldName);
@@ -210,7 +210,7 @@ class CompleteFilters extends CompleteSection
                 if (null !== $targetDefinition) {
                     $targetClass = $field->getTargetClass();
                     $dataType = $this->getExactType($targetDefinition, $targetClass, $dataType);
-                    if ($targetClass && \is_subclass_of($targetClass, AbstractEnumValue::class)) {
+                    if ($targetClass && is_subclass_of($targetClass, AbstractEnumValue::class)) {
                         $enumIdFieldName = $this->getEnumIdentifierFieldName($targetDefinition);
                         if (null !== $enumIdFieldName && !$filter->hasArrayAllowed()) {
                             $filter->setArrayAllowed();
@@ -307,7 +307,7 @@ class CompleteFilters extends CompleteSection
     private function getFieldDataType(ClassMetadata $metadata, string $propertyPath): ?string
     {
         $path = ConfigUtil::explodePropertyPath($propertyPath);
-        $lastFieldName = \array_pop($path);
+        $lastFieldName = array_pop($path);
         if (!empty($path)) {
             $parentMetadata = $this->doctrineHelper->findEntityMetadataByPath($metadata->name, $path);
             if (null === $parentMetadata) {
@@ -322,7 +322,7 @@ class CompleteFilters extends CompleteSection
     private function isCollectionValuedAssociation(ClassMetadata $metadata, string $propertyPath): bool
     {
         $path = ConfigUtil::explodePropertyPath($propertyPath);
-        $lastFieldName = \array_pop($path);
+        $lastFieldName = array_pop($path);
         if (!empty($path)) {
             $parentMetadata = $this->doctrineHelper->findEntityMetadataByPath($metadata->name, $path);
             if (null === $parentMetadata) {

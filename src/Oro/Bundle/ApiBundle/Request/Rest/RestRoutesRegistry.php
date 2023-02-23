@@ -40,8 +40,9 @@ class RestRoutesRegistry
             }
         }
 
-        throw new \LogicException(
-            sprintf('Cannot find a routes provider for the request "%s".', (string)$requestType)
-        );
+        throw new \LogicException(sprintf(
+            'Cannot find a routes provider for the request "%s".',
+            (string)$requestType
+        ));
     }
 }

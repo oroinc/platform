@@ -47,9 +47,11 @@ class NormalizeDecimal extends AbstractProcessor
         }
 
         if (((string)(float)$value) !== $normalizedValue) {
-            throw new \UnexpectedValueException(
-                sprintf('Expected %s value. Given "%s".', $this->getDataTypeString(), $value)
-            );
+            throw new \UnexpectedValueException(sprintf(
+                'Expected %s value. Given "%s".',
+                $this->getDataTypeString(),
+                $value
+            ));
         }
 
         return $normalizedValue;

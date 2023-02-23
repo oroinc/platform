@@ -4,67 +4,45 @@ namespace Oro\Component\ChainProcessor\Debug;
 
 use Symfony\Component\Stopwatch\Stopwatch;
 
+/**
+ * The logger to log information about execution of chain processor services.
+ */
 class TraceLogger
 {
-    /** @var string */
-    protected $sectionName;
+    private string $sectionName;
+    private ?Stopwatch $stopwatch;
+    private array $actions = [];
+    private array $actionStack = [];
+    private int $lastActionIndex = -1;
+    private array $processorStack = [];
+    private array $unclassifiedProcessors = [];
+    private array $applicableCheckers = [];
+    private string $lastApplicableChecker;
 
-    /** @var Stopwatch|null */
-    protected $stopwatch;
-
-    /** @var array */
-    protected $actions = [];
-
-    /** @var array */
-    protected $actionStack = [];
-
-    /** @var string */
-    protected $lastActionIndex = -1;
-
-    /** @var array */
-    protected $processorStack = [];
-
-    /** @var array */
-    protected $unclassifiedProcessors = [];
-
-    /** @var array */
-    protected $applicableCheckers = [];
-
-    /** @var string */
-    protected $lastApplicableChecker;
-
-    /**
-     * @param string         $sectionName
-     * @param Stopwatch|null $stopwatch
-     */
-    public function __construct($sectionName, Stopwatch $stopwatch = null)
+    public function __construct(string $sectionName, Stopwatch $stopwatch = null)
     {
         $this->sectionName = $sectionName;
         $this->stopwatch = $stopwatch;
     }
 
     /**
-     * Gets the name of trace section
-     *
-     * @return string
+     * Gets the name of trace section.
      */
-    public function getSectionName()
+    public function getSectionName(): string
     {
         return $this->sectionName;
     }
 
     /**
-     * Gets all executed actions
-     *
-     * @return array
+     * Gets all executed actions.
      */
-    public function getActions()
+    public function getActions(): array
     {
         $actions = $this->actions;
         if (!empty($this->unclassifiedProcessors)) {
             $time = 0;
             foreach ($this->unclassifiedProcessors as $processor) {
-                if (array_key_exists('time', $processor)) {
+                if (\array_key_exists('time', $processor)) {
                     $time += $processor['time'];
                 }
             }
@@ -79,11 +57,9 @@ class TraceLogger
     }
 
     /**
-     * Gets all executed applicable checkers
-     *
-     * @return array
+     * Gets all executed applicable checkers.
      */
-    public function getApplicableCheckers()
+    public function getApplicableCheckers(): array
     {
         $applicableCheckers = [];
         foreach ($this->applicableCheckers as $className => $applicableChecker) {
@@ -97,11 +73,9 @@ class TraceLogger
     }
 
     /**
-     * Marks an action as started
-     *
-     * @param string $actionName
+     * Marks an action as started.
      */
-    public function startAction($actionName)
+    public function startAction(string $actionName): void
     {
         $startStopwatch = $this->stopwatch && empty($this->actionStack);
 
@@ -113,9 +87,9 @@ class TraceLogger
     }
 
     /**
-     * Marks an action as stopped
+     * Marks an action as stopped.
      */
-    public function stopAction(\Exception $exception = null)
+    public function stopAction(\Exception $exception = null): void
     {
         $action = array_pop($this->actionStack);
         $this->lastActionIndex--;
@@ -133,19 +107,17 @@ class TraceLogger
     }
 
     /**
-     * Marks a processor as started
-     *
-     * @param string $processorId
+     * Marks a processor as started.
      */
-    public function startProcessor($processorId)
+    public function startProcessor(string $processorId): void
     {
         $this->processorStack[] = ['id' => $processorId, 'time' => microtime(true), 'subtrahend' => 0];
     }
 
     /**
-     * Marks a processor as stopped
+     * Marks a processor as stopped.
      */
-    public function stopProcessor(\Exception $exception = null)
+    public function stopProcessor(\Exception $exception = null): void
     {
         $processor = array_pop($this->processorStack);
         $processor['time'] = microtime(true) - $processor['time'] - $processor['subtrahend'];
@@ -155,7 +127,7 @@ class TraceLogger
         unset($processor['subtrahend']);
 
         if (!empty($this->actionStack)) {
-            if (!array_key_exists('processors', $this->actionStack[$this->lastActionIndex])) {
+            if (!\array_key_exists('processors', $this->actionStack[$this->lastActionIndex])) {
                 $this->actionStack[$this->lastActionIndex]['processors'] = [$processor];
             } else {
                 $this->actionStack[$this->lastActionIndex]['processors'][] = $processor;
@@ -166,11 +138,9 @@ class TraceLogger
     }
 
     /**
-     * Marks an applicable checker as started
-     *
-     * @param string $className The class name of an applicable checker
+     * Marks an applicable checker as started.
      */
-    public function startApplicableChecker($className)
+    public function startApplicableChecker(string $className): void
     {
         if (isset($this->applicableCheckers[$className])) {
             $this->applicableCheckers[$className]['startTime'] = microtime(true);
@@ -181,28 +151,21 @@ class TraceLogger
     }
 
     /**
-     * Marks an applicable checker as stopped
+     * Marks an applicable checker as stopped.
      */
-    public function stopApplicableChecker()
+    public function stopApplicableChecker(): void
     {
         $this->applicableCheckers[$this->lastApplicableChecker]['time'] +=
             microtime(true) - $this->applicableCheckers[$this->lastApplicableChecker]['startTime'];
         $this->applicableCheckers[$this->lastApplicableChecker]['count'] += 1;
     }
 
-    /**
-     * @return string
-     */
-    protected function getStopwatchName()
+    private function getStopwatchName(): string
     {
         return $this->sectionName . '.processors';
     }
 
-    /**
-     * @param array  $items
-     * @param number $time
-     */
-    protected function addSubtrahend(array &$items, $time)
+    private function addSubtrahend(array &$items, float $time): void
     {
         foreach ($items as &$item) {
             $item['subtrahend'] += $time;

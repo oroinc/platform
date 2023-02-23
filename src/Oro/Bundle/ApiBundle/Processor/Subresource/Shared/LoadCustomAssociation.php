@@ -159,9 +159,10 @@ abstract class LoadCustomAssociation implements ProcessorInterface
             case RelationType::MULTIPLE_MANY_TO_ONE:
                 return true;
             default:
-                throw new \InvalidArgumentException(
-                    sprintf('Unsupported type of extended association: %s.', $associationType)
-                );
+                throw new \InvalidArgumentException(sprintf(
+                    'Unsupported type of extended association: %s.',
+                    $associationType
+                ));
         }
     }
 

@@ -157,6 +157,6 @@ class TestConfig
      */
     public function keys(): array
     {
-        return \array_keys($this->items);
+        return array_keys($this->items);
     }
 }

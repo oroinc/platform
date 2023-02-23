@@ -33,10 +33,8 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class RequestActionHandler
 {
     /** @var string[] */
-    private $requestType;
-
-    /** @var ActionProcessorBagInterface */
-    private $actionProcessorBag;
+    private array $requestType;
+    private ActionProcessorBagInterface $actionProcessorBag;
 
     /**
      * @param string[]                    $requestType
@@ -512,13 +510,7 @@ abstract class RequestActionHandler
         $context->setAction('not_allowed');
     }
 
-    /**
-     * @param Request $request
-     * @param string  $attributeName
-     *
-     * @return mixed
-     */
-    protected function getRequestParameter(Request $request, string $attributeName)
+    protected function getRequestParameter(Request $request, string $attributeName): mixed
     {
         return $request->attributes->get($attributeName);
     }

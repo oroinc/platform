@@ -9,48 +9,34 @@ interface ParameterBagInterface extends \IteratorAggregate, \Countable, \ArrayAc
 {
     /**
      * Checks whether a parameter with the given name exists in the bag.
-     *
-     * @param string $key The name of a parameter
-     *
-     * @return bool
      */
-    public function has($key);
+    public function has(string $key): bool;
 
     /**
      * Gets a parameter by name from the bag.
-     *
-     * @param string $key The name of a parameter
-     *
-     * @return mixed|null The parameter value or NULL if it does not exist in the bag
+     * When a parameter does not exist the returned value is NULL.
      */
-    public function get($key);
+    public function get(string $key): mixed;
 
     /**
      * Sets a parameter by name into the bag.
-     *
-     * @param string $key   The name of a parameter
-     * @param mixed  $value The value of a parameter
      */
-    public function set($key, $value);
+    public function set(string $key, mixed $value): void;
 
     /**
      * Removes a parameter from the bag.
-     *
-     * @param string $key The name of a parameter
      */
-    public function remove($key);
+    public function remove(string $key): void;
 
     /**
      * Gets a native PHP array representation of the bag.
      *
      * @return array [key => value, ...]
      */
-    public function toArray();
+    public function toArray(): array;
 
     /**
      * Removes all parameters from the bag.
-     *
-     * @return void
      */
-    public function clear();
+    public function clear(): void;
 }

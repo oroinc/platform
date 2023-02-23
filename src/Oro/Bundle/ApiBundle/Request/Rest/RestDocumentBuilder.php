@@ -57,7 +57,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     ): array {
         $result = [];
         foreach ($collection as $object) {
-            $result[] = null === $object || \is_scalar($object)
+            $result[] = null === $object || is_scalar($object)
                 ? $object
                 : $this->convertObjectToArray($object, $requestType, $metadata);
         }
@@ -265,7 +265,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         RequestType $requestType,
         AssociationMetadata $associationMetadata
     ): mixed {
-        if (\is_scalar($object)) {
+        if (is_scalar($object)) {
             return $object;
         }
 
@@ -313,6 +313,6 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
             return $href;
         }
 
-        return \array_merge([self::HREF => $href], $properties);
+        return array_merge([self::HREF => $href], $properties);
     }
 }

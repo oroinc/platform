@@ -16,8 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class FormPropertyAccessor implements PropertyAccessorInterface
 {
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor)
     {
@@ -25,7 +24,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
@@ -43,7 +42,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getValue($objectOrArray, $propertyPath)
     {
@@ -51,7 +50,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isWritable($objectOrArray, $propertyPath)
     {
@@ -59,19 +58,14 @@ class FormPropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isReadable($objectOrArray, $propertyPath)
     {
         return $this->propertyAccessor->isReadable($objectOrArray, $propertyPath);
     }
 
-    /**
-     * @param string|PropertyPathInterface $propertyPath
-     *
-     * @return string|null
-     */
-    private function getPropertyName($propertyPath)
+    private function getPropertyName(string|PropertyPathInterface $propertyPath): ?string
     {
         $path = null;
         if (\is_string($propertyPath)) {
@@ -87,14 +81,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
         return $path;
     }
 
-    /**
-     * @param object $object
-     * @param string $propertyName
-     * @param mixed  $value
-     *
-     * @return bool
-     */
-    private function trySetValueViaReflection($object, $propertyName, $value)
+    private function trySetValueViaReflection(object $object, string $propertyName, mixed $value): bool
     {
         $refl = new \ReflectionClass($object);
         if (!$refl->hasProperty($propertyName)) {

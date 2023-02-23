@@ -11,16 +11,12 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class CurrentUserWalkerTest extends OrmTestCase
 {
-    /** @var EntityManagerMock */
-    private $em;
+    private EntityManagerMock $em;
 
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS'
-        ));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
         $this->em->getConfiguration()->setEntityNamespaces([
             'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS'
         ]);

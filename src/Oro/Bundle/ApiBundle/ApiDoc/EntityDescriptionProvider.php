@@ -16,31 +16,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EntityDescriptionProvider
 {
-    private const DESCRIPTION        = 'description';
+    private const DESCRIPTION = 'description';
     private const PLURAL_DESCRIPTION = 'plural_description';
-    private const DOCUMENTATION      = 'documentation';
-    private const MANAGEABLE         = 'manageable';
-    private const CONFIGURABLE       = 'configurable';
-    private const FIELDS             = 'fields';
+    private const DOCUMENTATION = 'documentation';
+    private const MANAGEABLE = 'manageable';
+    private const CONFIGURABLE = 'configurable';
+    private const FIELDS = 'fields';
 
-    private const SCOPE_ENTITY     = 'entity';
+    private const SCOPE_ENTITY = 'entity';
     private const ATTR_DESCRIPTION = 'description';
-    private const ATTR_LABEL       = 'label';
+    private const ATTR_LABEL = 'label';
 
-    /** @var EntityClassNameProviderInterface */
-    private $entityClassNameProvider;
-
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var TranslatorInterface */
-    private $translator;
+    private EntityClassNameProviderInterface $entityClassNameProvider;
+    private ConfigManager $configManager;
+    private DoctrineHelper $doctrineHelper;
+    private TranslatorInterface $translator;
 
     /**
-     * @var array
      *  [
      *      entity class => [
      *          'description'        => entity description,
@@ -54,7 +46,7 @@ class EntityDescriptionProvider
      *      ...
      *  ]
      */
-    private $cache = [];
+    private array $cache = [];
 
     public function __construct(
         EntityClassNameProviderInterface $entityClassNameProvider,
@@ -136,7 +128,7 @@ class EntityDescriptionProvider
             $result = $this->humanizePropertyName($propertyPath);
         }
         if ($result) {
-            $result = \strtolower($result);
+            $result = strtolower($result);
         }
         $this->cache[$entityClass][self::FIELDS][$propertyPath][self::DESCRIPTION] = $result;
 

@@ -47,7 +47,7 @@ class BuildQuery implements ProcessorInterface
             $query = $context->getQuery();
             if ($query instanceof LoadEntityIdsQueryInterface) {
                 $config = $context->getConfig();
-                if (null === $config || count($config->getIdentifierFieldNames()) !== 1) {
+                if (null === $config || \count($config->getIdentifierFieldNames()) !== 1) {
                     throw new RuntimeException('The entity must have one identifier field.');
                 }
                 $entityIds = $this->getEntityIds($query, $context);

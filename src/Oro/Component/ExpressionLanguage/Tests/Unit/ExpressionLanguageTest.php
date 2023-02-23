@@ -311,6 +311,7 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
             ['expression' => 'items.any(item.value > 0)', $values, true],
             ['expression' => 'items.any(item.value > 42)', $values, true],
             ['expression' => 'items.any(item.value > 4242)', $values, false],
+            ['expression' => 'items.any(item.value = 42)', $values, true],
 
             // {@see \Oro\Component\ExpressionLanguage\Node\CollectionMethodSumNode} cases.
             [

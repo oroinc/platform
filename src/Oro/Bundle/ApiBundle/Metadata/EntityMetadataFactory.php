@@ -123,7 +123,7 @@ class EntityMetadataFactory
             $targetIdFields = $targetMetadata->getIdentifierFieldNames();
             if (\count($targetIdFields) === 1) {
                 $associationMetadata->setDataType(
-                    $this->getFieldType($targetMetadata->getFieldMapping(\reset($targetIdFields)))
+                    $this->getFieldType($targetMetadata->getFieldMapping(reset($targetIdFields)))
                 );
             } else {
                 $associationMetadata->setDataType(DataType::STRING);
@@ -191,7 +191,7 @@ class EntityMetadataFactory
             return [$classMetadata, $propertyPath];
         }
 
-        $fieldName = \array_pop($path);
+        $fieldName = array_pop($path);
         $targetClassMetadata = $classMetadata;
         foreach ($path as $associationName) {
             if (!$targetClassMetadata->hasAssociation($associationName)) {

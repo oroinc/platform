@@ -6,6 +6,7 @@ use Oro\Component\ChainProcessor\ApplicableCheckerInterface;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ProcessorBagAwareIteratorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\ProcessorIteratorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
@@ -16,27 +17,23 @@ class OptimizedProcessorIteratorFactory implements
     ProcessorIteratorFactoryInterface,
     ProcessorBagAwareIteratorFactoryInterface
 {
-    /** @var ProcessorBagInterface|null */
-    private $processorBag;
-
+    private ProcessorBagInterface $processorBag;
     /** @var array [action => [[processor id, [attribute name => attribute value, ...]], ...], ...] */
-    private $processors;
-
+    private array $processors;
     /** @var array [action => [group name => group index, ...], ...] */
-    private $groups;
-
+    private array $groups;
     /** @var array [action => [processor index => group name, ...], ...] */
-    private $processorGroups;
+    private array $processorGroups;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function createProcessorIterator(
         array $processors,
         ComponentContextInterface $context,
         ApplicableCheckerInterface $applicableChecker,
         ProcessorRegistryInterface $processorRegistry
-    ) {
+    ): ProcessorIterator {
         $action = $context->getAction();
         if (!isset($this->processors[$action])) {
             $this->processors[$action] = $processors;
@@ -55,9 +52,9 @@ class OptimizedProcessorIteratorFactory implements
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setProcessorBag(ProcessorBagInterface $processorBag = null)
+    public function setProcessorBag(ProcessorBagInterface $processorBag): void
     {
         $this->processorBag = $processorBag;
         $this->processors = [];

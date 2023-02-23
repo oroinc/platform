@@ -44,9 +44,10 @@ class ResourceDocParserRegistry
             }
         }
         if (null === $parserServiceId) {
-            throw new \LogicException(
-                sprintf('Cannot find a resource documentation parser for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find a resource documentation parser for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         return $this->container->get($parserServiceId);

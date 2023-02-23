@@ -9,11 +9,11 @@ use Symfony\Component\Validator;
  */
 class ChainConstraintTextExtractor implements ConstraintTextExtractorInterface
 {
-    /** @var iterable|ConstraintTextExtractorInterface[] */
-    private $extractors;
+    /** @var iterable<ConstraintTextExtractorInterface> */
+    private iterable $extractors;
 
     /**
-     * @param iterable|ConstraintTextExtractorInterface[] $extractors
+     * @param iterable<ConstraintTextExtractorInterface> $extractors
      */
     public function __construct(iterable $extractors)
     {
@@ -21,9 +21,9 @@ class ChainConstraintTextExtractor implements ConstraintTextExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getConstraintStatusCode(Validator\Constraint $constraint)
+    public function getConstraintStatusCode(Validator\Constraint $constraint): ?int
     {
         $result = null;
         foreach ($this->extractors as $extractor) {
@@ -37,9 +37,9 @@ class ChainConstraintTextExtractor implements ConstraintTextExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getConstraintCode(Validator\Constraint $constraint)
+    public function getConstraintCode(Validator\Constraint $constraint): ?string
     {
         $result = null;
         foreach ($this->extractors as $extractor) {
@@ -53,9 +53,9 @@ class ChainConstraintTextExtractor implements ConstraintTextExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getConstraintType(Validator\Constraint $constraint)
+    public function getConstraintType(Validator\Constraint $constraint): ?string
     {
         $result = null;
         foreach ($this->extractors as $extractor) {

@@ -11,23 +11,12 @@ use Symfony\Component\Form\FormInterface;
  */
 class IncludedEntityData
 {
-    /** @var string */
-    private $path;
-
-    /** @var int */
-    private $index;
-
-    /** @var bool */
-    private $existing;
-
-    /** @var array|null */
-    private $normalizedData;
-
-    /** @var EntityMetadata|null */
-    private $metadata;
-
-    /** @var FormInterface|null */
-    private $form;
+    private string $path;
+    private int $index;
+    private bool $existing;
+    private ?array $normalizedData = null;
+    private ?EntityMetadata $metadata = null;
+    private ?FormInterface $form = null;
 
     /**
      * @param string $path     A path to the entity in the request data
@@ -35,7 +24,7 @@ class IncludedEntityData
      * @param bool   $existing TRUE if an existing entity should be updated;
      *                         FALSE if a new entity should be created
      */
-    public function __construct($path, $index, $existing = false)
+    public function __construct(string $path, int $index, bool $existing = false)
     {
         $this->path = $path;
         $this->index = $index;
@@ -44,60 +33,48 @@ class IncludedEntityData
 
     /**
      * Gets a path to the entity in the request data.
-     *
-     * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
     /**
      * Gets an index of the entity in the included data.
-     *
-     * @return int
      */
-    public function getIndex()
+    public function getIndex(): int
     {
         return $this->index;
     }
 
     /**
      * Gets a value indicates whether an existing entity should be updated or new one should be created.
-     *
-     * @return bool
      */
-    public function isExisting()
+    public function isExisting(): bool
     {
         return $this->existing;
     }
 
     /**
      * Gets a normalized representation of the entity.
-     *
-     * @return array|null
      */
-    public function getNormalizedData()
+    public function getNormalizedData(): ?array
     {
         return $this->normalizedData;
     }
 
     /**
      * Sets a normalized representation of the entity.
-     *
-     * @param array|null $normalizedData
      */
-    public function setNormalizedData($normalizedData)
+    public function setNormalizedData(?array $normalizedData): void
     {
         $this->normalizedData = $normalizedData;
     }
 
     /**
      * Gets metadata of the entity.
-     *
-     * @return EntityMetadata|null
      */
-    public function getMetadata()
+    public function getMetadata(): ?EntityMetadata
     {
         return $this->metadata;
     }
@@ -105,17 +82,15 @@ class IncludedEntityData
     /**
      * Sets metadata of the entity.
      */
-    public function setMetadata(EntityMetadata $metadata = null)
+    public function setMetadata(?EntityMetadata $metadata): void
     {
         $this->metadata = $metadata;
     }
 
     /**
      * Gets the form that is used to transform entity data.
-     *
-     * @return FormInterface|null
      */
-    public function getForm()
+    public function getForm(): ?FormInterface
     {
         return $this->form;
     }
@@ -123,7 +98,7 @@ class IncludedEntityData
     /**
      * Sets the form that is used to transform entity data.
      */
-    public function setForm(FormInterface $form = null)
+    public function setForm(?FormInterface $form): void
     {
         $this->form = $form;
     }

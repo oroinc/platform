@@ -8,13 +8,12 @@ namespace Oro\Bundle\ApiBundle\Form;
  */
 class FormExtensionState implements FormExtensionCheckerInterface
 {
-    /** @var bool */
-    private $isApiFormExtensionActivated = false;
+    private bool $isApiFormExtensionActivated = false;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isApiFormExtensionActivated()
+    public function isApiFormExtensionActivated(): bool
     {
         return $this->isApiFormExtensionActivated;
     }
@@ -22,7 +21,7 @@ class FormExtensionState implements FormExtensionCheckerInterface
     /**
      * Switches to default form extension.
      */
-    public function switchToDefaultFormExtension()
+    public function switchToDefaultFormExtension(): void
     {
         $this->isApiFormExtensionActivated = false;
     }
@@ -30,7 +29,7 @@ class FormExtensionState implements FormExtensionCheckerInterface
     /**
      * Switches to API form extension.
      */
-    public function switchToApiFormExtension()
+    public function switchToApiFormExtension(): void
     {
         $this->isApiFormExtensionActivated = true;
     }

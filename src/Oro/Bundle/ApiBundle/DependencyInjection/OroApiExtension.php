@@ -149,6 +149,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             foreach ($configs as $key => $config) {
                 if (isset($config['format_listener']['rules']) && \is_array($config['format_listener']['rules'])) {
                     // add REST API format listener rule
+                    /** @noinspection PhpArrayAccessCanBeReplacedWithForeachValueInspection */
                     array_unshift(
                         $configs[$key]['format_listener']['rules'],
                         [
@@ -327,20 +328,10 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
     private function registerFilterOperators(ContainerBuilder $container, array $config): void
     {
-        $filterOperatorRegistryDef = DependencyInjectionUtil::findDefinition(
-            $container,
-            self::FILTER_OPERATOR_REGISTRY_SERVICE_ID
-        );
-        if (null !== $filterOperatorRegistryDef) {
-            $filterOperatorRegistryDef->replaceArgument(0, $config['filter_operators']);
-        }
-        $restFilterValueAccessorFactoryDef = DependencyInjectionUtil::findDefinition(
-            $container,
-            self::REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID
-        );
-        if (null !== $restFilterValueAccessorFactoryDef) {
-            $restFilterValueAccessorFactoryDef->replaceArgument(1, $config['filter_operators']);
-        }
+        DependencyInjectionUtil::findDefinition($container, self::FILTER_OPERATOR_REGISTRY_SERVICE_ID)
+            ?->replaceArgument(0, $config['filter_operators']);
+        DependencyInjectionUtil::findDefinition($container, self::REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID)
+            ?->replaceArgument(1, $config['filter_operators']);
     }
 
     private function registerConfigExtensions(ContainerBuilder $container, array $config): void

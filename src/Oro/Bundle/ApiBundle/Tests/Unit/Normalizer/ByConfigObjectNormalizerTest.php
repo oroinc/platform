@@ -64,10 +64,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
             ->willReturn($this->associationAccessExclusionProvider);
 
         $em = $this->getTestEntityManager();
-        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity'
-        ));
+        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
