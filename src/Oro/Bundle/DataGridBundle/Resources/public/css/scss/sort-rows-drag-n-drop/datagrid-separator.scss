@@ -1,7 +1,7 @@
 %draggable-separator {
     td {
         line-height: 0;
-        height: 8px;
+        height: 12px;
         padding: 0;
         border: 0;
         position: relative;
@@ -10,7 +10,7 @@
         &::before {
             content: '';
             display: block;
-            margin: 2px auto 1px;
+            margin: 4px auto 3px;
             width: 21px;
             height: 3px;
             border-color: $additional-lighten;
@@ -22,10 +22,9 @@
             content: '';
             display: block;
             width: 100%;
-            margin-bottom: 2px;
-            box-shadow: 0 2px 1px 0 $sort-datagrid-separator-shadow-color,
-                0 1px 0 0 $sort-datagrid-separator-shadow-color;
-            height: 1px;
+            box-shadow: inset 0 2px 1px 0 $sort-datagrid-separator-shadow-color,
+                        inset 0 1px 0 0 $sort-datagrid-separator-shadow-color;
+            height: 2px;
         }
     }
 }
@@ -35,6 +34,7 @@
         @extend %draggable-separator;
 
         background-color: $sort-datagrid-sorted-row-bg-color;
+        cursor: row-resize;
 
         &:hover {
             background-color: $primary-830;

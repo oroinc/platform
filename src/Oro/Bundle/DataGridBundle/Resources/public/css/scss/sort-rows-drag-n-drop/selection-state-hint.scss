@@ -2,6 +2,7 @@
 
 .selection-state-hint {
     display: flex;
+    z-index: 2;
 
     &__content {
         display: inline-flex;

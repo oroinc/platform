@@ -144,18 +144,35 @@ const DropZoneMenuView = BaseView.extend({
             return;
         }
         const $referenceEl = this.$el.parents('.grid-scrollable-container, body');
-        const parentHeight = $referenceEl[0].clientHeight;
-        const offset = $referenceEl.offset();
-        const cssTop = Math.max(
-            offset.top + this.datagrid.header.$el.height(),
-            (offset.top + parentHeight / 2) - this.$el.height() / 2
-        );
-        let cssLeft = offset.left + $referenceEl.width() / 2 + this.OFFSET;
+        const hasOwnScroll = $referenceEl.is('.scrollbar-is-visible');
+        const referenceHeight = $referenceEl[0].clientHeight;
+        const referenceParentHeight = $referenceEl.scrollParent()[0].clientHeight;
+        const {top: referenceTop, left: referenceLeft} = $referenceEl.offset();
+        const tBodyTop = referenceTop + this.datagrid.header.$el.height();
 
+        let cssTop;
+        // Datagrid has its own scroll or just a few rows
+        if (referenceHeight <= referenceParentHeight) {
+            cssTop = Math.max(
+                tBodyTop,
+                (tBodyTop + (referenceHeight - this.datagrid.header.$el.height()) / 2) - this.$el.height() / 2
+            );
+        } else {
+            cssTop = Math.max(
+                tBodyTop,
+                referenceTop + referenceParentHeight / 2 - this.$el.height() / 2
+            );
+            cssTop += $referenceEl.scrollParent().scrollTop();
+        }
+
+        const referenceWidth = hasOwnScroll
+            ? $referenceEl.width() - scrollHelper.scrollbarWidth() : $referenceEl.width();
+
+        let cssLeft = referenceLeft + referenceWidth / 2 + this.OFFSET;
         if (this.shiftStart) {
-            cssLeft = offset.left + $referenceEl.width() / 2 - this.$el.width() - this.OFFSET;
+            cssLeft = referenceLeft + referenceWidth / 2 - this.$el.width() - this.OFFSET;
 
-            if (scrollHelper.hasScroll($referenceEl)) {
+            if (hasOwnScroll) {
                 cssLeft -= scrollHelper.scrollbarWidth();
             }
         }

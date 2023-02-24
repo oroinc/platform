@@ -41,6 +41,13 @@
         position: relative;
     }
 
+    // Dynamically extend the height in case it is narrow
+    .grid-body::after {
+        content: '';
+        display: table-row;
+        height: var(--sort-rows-drag-n-drop-extend-height, 0);
+    }
+
     .grid-row {
         &.selected,
         &.changed {

@@ -3,8 +3,9 @@ import __ from 'orotranslation/js/translator';
 import {isMobile} from 'underscore';
 import BasePlugin from 'oroui/js/app/plugins/base/plugin';
 import helperTemplate from 'tpl-loader!orodatagrid/templates/sort-rows-drag-n-drop/helper.html';
+import cancelHintTemplate from 'tpl-loader!orodatagrid/templates/sort-rows-drag-n-drop/cancel-hint.html';
 import SelectionStateHintView from 'orodatagrid/js/sort-rows-drag-n-drop/selection-state-hint-view';
-import DropZoneMenuViev from 'orodatagrid/js/sort-rows-drag-n-drop/drop-zone-menu-view';
+import DropZoneMenuView from 'orodatagrid/js/sort-rows-drag-n-drop/drop-zone-menu-view';
 
 import 'jquery-ui/widgets/sortable';
 import 'jquery-ui/disable-selection';
@@ -25,10 +26,17 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      */
     finishedClass: 'drag-n-drop-finished',
 
+    cursorOutClass: 'drag-n-drop-cursor-out',
+
     /**
      * @property {Function}
      */
     helperTemplate,
+
+    /**
+     * @property {Function}
+     */
+    cancelHintTemplate,
 
     /**
      * @property {number}
@@ -40,15 +48,23 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      */
     ANIMATION_TIMEOUT: 500,
 
+    /**
+     * @property {number}
+     */
+    TABLE_BOUNDARY_CLEARANCE: 28,
+
     SORTABLE_DEFAULTS: {
         cursor: 'move',
         placeholder: 'sorting-placeholder',
         forceHelperSize: false,
         forcePlaceholderSize: true,
-        items: '.grid-row'
+        items: '.grid-row',
+        tolerance: 'pointer'
     },
 
     SEPARATOR_ROW_SELECTOR: '.draggable-separator',
+
+    SEPARATOR_PLACEHOLDER_SELECTOR: '.separator',
 
     /**
      * @inheritdoc
@@ -172,6 +188,78 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     },
 
     /**
+     * Listen to document events
+     */
+    observeMouse() {
+        $(document).on(`mousemove.mouseObserver${this.eventNamespace()}`, this.onDocumentMouseMove.bind(this));
+    },
+
+    /**
+     * Stop to listen to document events
+     */
+    stopObservingMouse() {
+        $(document).off(`.mouseObserver${this.eventNamespace()}`);
+    },
+
+    /**
+     * Handler on mouse move
+     * @param {Event} e
+     */
+    onDocumentMouseMove(e) {
+        if (this.disposed) {
+            return;
+        }
+
+        const instance = this.main.body.$el.sortable('instance');
+        const cursorOut = this.isCursorOutOfGridEl(e);
+
+        if (instance._cancelSorting !== cursorOut) {
+            if (cursorOut) {
+                this.main.$el.addClass(this.cursorOutClass);
+                this.renderCancelHint();
+            } else {
+                this.removeCancelHint();
+                this.main.$el.removeClass(this.cursorOutClass);
+            }
+
+            this.trigger('mousemove:out', e, cursorOut);
+            this.extendTableHeight();
+        }
+        instance._cancelSorting = cursorOut;
+    },
+
+    /**
+     * Determines if a sortable placeholder does not have place to move and cursor moves out of grid
+     * @param {Event} e
+     * @returns {boolean}
+     */
+    isCursorOutOfGridEl(e) {
+        const {pageX, pageY} = e;
+        const {placeholder, currentItem} = this.main.body.$el.sortable('instance');
+        const gridReact = this.main.el.getBoundingClientRect();
+
+        if (
+            pageX + this.TABLE_BOUNDARY_CLEARANCE < gridReact.left ||
+            pageX - this.TABLE_BOUNDARY_CLEARANCE > gridReact.right
+        ) {
+            return true;
+        }
+
+        if (
+            (
+                currentItem.is(':first-child') ||
+                placeholder.is(':first-child') ||
+                currentItem.is(':last-child') ||
+                placeholder.is(':last-child')
+            ) && (pageY < gridReact.top || pageY - this.TABLE_BOUNDARY_CLEARANCE > gridReact.bottom)
+        ) {
+            return true;
+        }
+
+        return false;
+    },
+
+    /**
      * Handler for datagrid row mousedown
      * @param {Event} e
      */
@@ -218,7 +306,6 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         const model = this.main.collection.get(modelId);
 
         this._unsetModelsAttr('_selected', {ignoreAnimation: true});
-        model.set('_selected', true);
         this._lastClickedIndex = this.main.collection.indexOf(model);
     },
 
@@ -273,13 +360,13 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             }
         };
 
-        this.dropZoneMenuView = new DropZoneMenuViev({
+        this.dropZoneMenuView = new DropZoneMenuView({
             autoRender: true,
             datagrid: this.main,
             dropZones: $.extend(true, {}, droppableZones, this.options.dropZones || {})
         });
         this.dropZoneMenuView.listenTo(this, {
-            'sortable:start': (e, ui) => {
+            'sortable:beforePick': (e, ui) => {
                 if (ui.item.is(this.SEPARATOR_ROW_SELECTOR)) {
                     return;
                 }
@@ -298,11 +385,13 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             dropout: (e, ui) => {
                 if (e.target.isSameNode(droppableEl)) {
                     this.main.$el.find(`.${this.SORTABLE_DEFAULTS.placeholder}`).show();
+                    this.extendTableHeight();
                 }
             },
             dropover: (e, ui) => {
                 droppableEl = e.target;
                 this.main.$el.find(`.${this.SORTABLE_DEFAULTS.placeholder}`).hide();
+                this.extendTableHeight();
             }
         });
     },
@@ -416,6 +505,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         this.main.body.$el.sortable('option', 'cursor', !isSeparator ? cursor : 'row-resize');
         this.main.body.$el.sortable('option', 'forcePlaceholderSize', !isSeparator ? forcePlaceholderSize : false);
         this.trigger('sortable:beforePick', e, ui);
+        this.extendTableHeight();
     },
 
     /**
@@ -427,6 +517,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         ui.placeholder.toggleClass('separator', isSeparator);
         this.main.$el.addClass(this.startDragClass);
         this.trigger('sortable:start', e, ui);
+        this.observeMouse();
     },
 
     /**
@@ -434,7 +525,6 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Object} ui
      */
     beforeItemDrop(e, ui) {
-        $(e.target).data('helperReact', ui.helper[0].getBoundingClientRect());
         this.main.$el.removeClass(this.startDragClass);
         this.trigger('sortable:beforeDrop', e, ui);
     },
@@ -444,28 +534,23 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Object} ui
      */
     onStopSortable(e, ui) {
+        const {_cancelSorting} = $(e.target).sortable('instance');
+
         this.trigger('sortable:stop', e, ui);
+        this.stopObservingMouse();
+        this.restoreTableHeight();
+        this.removeCancelHint();
         // Drop was done in other place like droppable zone
         if (ui.item.data('dropDone')) {
             ui.item.data('dropDone', null);
             return;
         }
 
-        const helperReact = $(e.target).data('helperReact');
-        const tableReact = e.target.getBoundingClientRect();
-        const isDropOutOfTable = (
-            helperReact.top > tableReact.bottom ||
-            helperReact.right < tableReact.left ||
-            helperReact.bottom < tableReact.top ||
-            helperReact.left > tableReact.right
-        );
-        $(e.target).data('helperReact', null);
         this._unsetModelsAttr('_changed');
-
         if (e.originalEvent.target === null) {
             // event was canceled during drag action
             this.onStopSortableCancel(e, ui);
-        } else if (isDropOutOfTable && !ui.item.is(this.SEPARATOR_ROW_SELECTOR)) {
+        } else if (_cancelSorting) {
             $(e.target).sortable('cancel');
             this.onStopSortableCancel(e, ui);
         } else {
@@ -505,6 +590,52 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         this._updateSortOrder();
         this.main.collection.sort();
         this._unsetModelsAttr('_selected');
+    },
+
+    /**
+     * Extends the height of datagrid's body to have possibility to use Drag Zone actions in case it is narrow
+     */
+    extendTableHeight() {
+        if (this.dropZoneMenuView && this.dropZoneMenuView.$el.is(':hidden')) {
+            return;
+        }
+
+        // Reset a previous value for correct calculation
+        this.restoreTableHeight();
+        const dropZoneMenHeight = this.dropZoneMenuView.$el.outerHeight();
+        const bodyHeight = this.main.body.$el.outerHeight();
+
+        if (dropZoneMenHeight > bodyHeight) {
+            this.main.el.style.setProperty(
+                '--sort-rows-drag-n-drop-extend-height',
+                `${dropZoneMenHeight - bodyHeight}px`
+            );
+        }
+    },
+
+    /**
+     * Restores rid of an adjusted height of datagrid's body
+     */
+    restoreTableHeight() {
+        this.main.el.style.removeProperty('--sort-rows-drag-n-drop-extend-height');
+    },
+
+    renderCancelHint() {
+        this._$cancelHint = $(cancelHintTemplate());
+        this._$cancelHint.insertBefore(this.main.$el.find('[role="grid"]'));
+
+        this._$cancelHint.fadeIn('fast');
+    },
+
+    removeCancelHint() {
+        if (!this._$cancelHint) {
+            return;
+        }
+
+        this._$cancelHint.fadeOut('fast', () => {
+            this._$cancelHint.remove();
+            delete this._$cancelHint;
+        });
     },
 
     /**

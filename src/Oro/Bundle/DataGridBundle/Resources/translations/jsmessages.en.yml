@@ -197,6 +197,7 @@ oro:
             helper: '{1}1 item|]1,Inf[{{ count }} items'
             items_selected: '{{ count }} items selected'
             unselect_all: 'Unselect All'
+            cancel_hint: 'Release the mouse button to cancel Drag-n-Drop'
         drop_zones:
             move_to_top: 'Move to Top'
             mode_to_bottom: 'Move to Bottom'
