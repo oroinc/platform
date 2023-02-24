@@ -40,6 +40,8 @@ define(function(require) {
 
         active: false,
 
+        useMessageLabelWidth: true,
+
         template: require('tpl-loader!oroform/templates/floating-error-message.html'),
 
         /**
@@ -84,7 +86,9 @@ define(function(require) {
 
                 this.labelContainer.append(messageEl);
 
-                messageEl.css({'max-width': Math.ceil(this.label.width())});
+                if (this.useMessageLabelWidth) {
+                    messageEl.css({'max-width': Math.ceil(this.label.width())});
+                }
 
                 const popperReference = this.getPopperReferenceElement();
 
