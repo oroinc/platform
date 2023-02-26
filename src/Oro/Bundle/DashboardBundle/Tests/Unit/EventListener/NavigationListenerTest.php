@@ -90,6 +90,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
             'label'           => $expectedLabel,
             'route'           => 'oro_dashboard_view',
             'extras'          => [
+                'translate_disabled' => true,
                 'position' => 1
             ],
             'routeParameters' => [
@@ -101,6 +102,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
             'label'           => $secondExpectedLabel,
             'route'           => 'oro_dashboard_view',
             'extras'          => [
+                'translate_disabled' => true,
                 'position' => 1
             ],
             'routeParameters' => [

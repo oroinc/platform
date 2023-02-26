@@ -14,22 +14,16 @@ use Oro\Bundle\ReportBundle\Entity\Repository\ReportRepository;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * Adds custom reports to the navigation menu.
+ */
 class NavigationListener
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var ConfigProvider */
-    protected $entityConfigProvider;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var AclHelper */
-    protected $aclHelper;
-
-    /** @var FeatureChecker */
-    protected $featureChecker;
+    protected DoctrineHelper $doctrineHelper;
+    protected ConfigProvider $entityConfigProvider;
+    protected TokenAccessorInterface $tokenAccessor;
+    protected AclHelper $aclHelper;
+    protected FeatureChecker $featureChecker;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -45,7 +39,7 @@ class NavigationListener
         $this->featureChecker = $featureChecker;
     }
 
-    public function onNavigationConfigure(ConfigureMenuEvent $event)
+    public function onNavigationConfigure(ConfigureMenuEvent $event): void
     {
         if (!$this->tokenAccessor->hasUser()) {
             return;
@@ -82,40 +76,24 @@ class NavigationListener
     }
 
     /**
-     * Checks whether an entity with given config could be shown within navigation of reports
-     *
-     * @param ConfigInterface $config
-     *
-     * @return bool
+     * Checks whether an entity with given config could be shown within navigation of reports.
      */
-    protected function checkAvailability(ConfigInterface $config)
+    protected function checkAvailability(ConfigInterface $config): bool
     {
         return true;
     }
 
-    /**
-     * Build report menu
-     *
-     * @param ItemInterface $reportsItem
-     * @param array         $reportData
-     *  key => entity label
-     *  value => array of reports id's and label's
-     */
-    protected function buildReportMenu(ItemInterface $reportsItem, $reportData)
+    protected function buildReportMenu(ItemInterface $reportsItem, array $reportData): void
     {
         foreach ($reportData as $entityLabel => $reports) {
             foreach ($reports as $reportId => $reportLabel) {
                 $this->getEntityMenuItem($reportsItem, $entityLabel)
-                    ->addChild(
-                        $reportLabel . '_report',
-                        [
-                            'label'           => $reportLabel,
-                            'route'           => 'oro_report_view',
-                            'routeParameters' => [
-                                'id' => $reportId
-                            ]
-                        ]
-                    );
+                    ->addChild($reportLabel . '_report', [
+                        'label'           => $reportLabel,
+                        'route'           => 'oro_report_view',
+                        'routeParameters' => ['id' => $reportId],
+                        'extras'          => ['translate_disabled' => true]
+                    ]);
             }
         }
     }
@@ -123,35 +101,28 @@ class NavigationListener
     /**
      * Adds a divider to the given menu
      */
-    protected function addDivider(ItemInterface $menu)
+    protected function addDivider(ItemInterface $menu): void
     {
-        $menu->addChild('divider-' . rand(1, 99999))
+        $menu->addChild('divider-' . random_int(1, 99999))
             ->setLabel('')
             ->setExtra('divider', true)
             ->setExtra('position', 15); // after manage report, we have 10 there
     }
 
     /**
-     * Get entity menu item for report item
-     *
-     * @param ItemInterface $reportItem
-     * @param string        $entityLabel
-     * @return ItemInterface
+     * Gets entity menu item for report item.
      */
-    protected function getEntityMenuItem(ItemInterface $reportItem, $entityLabel)
+    protected function getEntityMenuItem(ItemInterface $reportItem, string $entityLabel): ItemInterface
     {
         $entityItemName = $entityLabel . '_report_tab';
-        $entityItem     = $reportItem->getChild($entityItemName);
+        $entityItem = $reportItem->getChild($entityItemName);
         if (!$entityItem) {
-            $reportItem->addChild(
-                $entityItemName,
-                [
-                    'label' => $entityLabel,
-                    'uri'   => '#',
-                    // after divider, all entities will be added in EntityName:ASC order
-                    'extras'=> ['position' => 20]
-                ]
-            );
+            $reportItem->addChild($entityItemName, [
+                'label' => $entityLabel,
+                'uri'   => '#',
+                // after divider, all entities will be added in EntityName:ASC order
+                'extras'=> ['position' => 20]
+            ]);
             $entityItem = $reportItem->getChild($entityItemName);
         }
 
