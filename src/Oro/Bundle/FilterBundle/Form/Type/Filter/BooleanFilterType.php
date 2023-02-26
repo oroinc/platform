@@ -2,34 +2,34 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class BooleanFilterType extends AbstractChoiceType
+/**
+ * The form type which can be used as a boolean filter.
+ */
+class BooleanFilterType extends AbstractType
 {
-    const TYPE_YES = 1;
-    const TYPE_NO  = 2;
-    const NAME     = 'oro_type_boolean_filter';
+    public const TYPE_YES = 1;
+    public const TYPE_NO = 2;
 
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return self::NAME;
+        $resolver->setDefault('field_options', [
+            'choices' => [
+                'oro.filter.form.label_type_yes' => self::TYPE_YES,
+                'oro.filter.form.label_type_no' => self::TYPE_NO
+            ]
+        ]);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceFilterType::class;
     }
@@ -37,19 +37,8 @@ class BooleanFilterType extends AbstractChoiceType
     /**
      * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function getBlockPrefix(): string
     {
-        $fieldChoices = [
-            $this->translator->trans('oro.filter.form.label_type_yes') => self::TYPE_YES,
-            $this->translator->trans('oro.filter.form.label_type_no') => self::TYPE_NO,
-        ];
-
-        $resolver->setDefaults(
-            [
-                'field_options' => [
-                    'choices' => $fieldChoices,
-                ],
-            ]
-        );
+        return 'oro_type_boolean_filter';
     }
 }

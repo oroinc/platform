@@ -4,21 +4,15 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOpti
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration as Config;
 
 /**
- * Class MultiSelectGuesser
- * @package Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions
+ * Guesses options for "multi-select" columns.
  */
 class MultiSelectGuesser extends ChoicesGuesser
 {
-    /** Frontend type */
-    const MULTI_SELECT = 'multi-select';
-
-    const DEFAULT_EDITOR_VIEW = 'oroform/js/app/views/editor/multi-checkbox-editor-view';
-
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
@@ -30,9 +24,9 @@ class MultiSelectGuesser extends ChoicesGuesser
             $mapping = $metadata->getAssociationMapping($columnName);
             if ($mapping['type'] === ClassMetadata::MANY_TO_MANY) {
                 if ($isEnabledInline) {
-                    $result[Configuration::BASE_CONFIG_KEY] = [Configuration::CONFIG_ENABLE_KEY => true];
+                    $result[Config::BASE_CONFIG_KEY] = [Config::CONFIG_ENABLE_KEY => true];
                 }
-                $result[PropertyInterface::FRONTEND_TYPE_KEY] = self::MULTI_SELECT;
+                $result[PropertyInterface::FRONTEND_TYPE_KEY] = 'multi-select';
                 $result[PropertyInterface::TYPE_KEY] = 'field';
 
                 $targetEntity = $metadata->getAssociationTargetClass($columnName);
@@ -41,14 +35,22 @@ class MultiSelectGuesser extends ChoicesGuesser
                 $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
 
                 $translatable = isset($column['translatable']) && $column['translatable'] === true;
-                $result[Configuration::CHOICES_KEY] = $this->choiceHelper
+                $result[Config::CHOICES_KEY] = $this->choiceHelper
                     ->getChoices($targetEntity, $keyField, $labelField, null, $translatable);
+                if ($translatable) {
+                    $result['translatable_options'] = false;
+                }
 
-                $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
+                $isConfiguredInlineEdit = \array_key_exists(Config::BASE_CONFIG_KEY, $column);
                 $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);
             }
         }
 
         return $result;
+    }
+
+    protected function getDefaultEditorView(): string
+    {
+        return 'oroform/js/app/views/editor/multi-checkbox-editor-view';
     }
 }

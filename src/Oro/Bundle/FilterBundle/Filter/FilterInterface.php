@@ -3,12 +3,13 @@
 namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Represents a filter.
  */
-interface FilterInterface
+interface FilterInterface extends ResetInterface
 {
     /**
      * Initializes the filter.
@@ -28,7 +29,7 @@ interface FilterInterface
     /**
      * Returns a form to be used to validate and normalize the filter data.
      *
-     * @return Form
+     * @return FormInterface
      */
     public function getForm();
 

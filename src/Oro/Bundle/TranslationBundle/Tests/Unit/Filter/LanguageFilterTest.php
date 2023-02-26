@@ -9,6 +9,7 @@ use Oro\Bundle\TranslationBundle\Filter\LanguageFilter;
 use Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 class LanguageFilterTest extends \PHPUnit\Framework\TestCase
 {
@@ -41,7 +42,7 @@ class LanguageFilterTest extends \PHPUnit\Framework\TestCase
                     'field_options' => [
                         'class' => Language::class,
                         'choice_label' => 'code',
-                    ],
+                    ]
                 ],
                 FilterUtility::FRONTEND_TYPE_KEY => 'choice',
             ],
@@ -51,10 +52,13 @@ class LanguageFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetForm()
     {
+        $form = $this->createMock(FormInterface::class);
+
         $this->formFactory->expects(self::once())
             ->method('create')
-            ->with(LanguageFilterType::class);
+            ->with(LanguageFilterType::class)
+            ->willReturn($form);
 
-        $this->filter->getForm();
+        self::assertSame($form, $this->filter->getForm());
     }
 }

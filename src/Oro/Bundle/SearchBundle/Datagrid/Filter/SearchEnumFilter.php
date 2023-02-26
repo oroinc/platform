@@ -45,13 +45,7 @@ class SearchEnumFilter extends EnumFilter
         throw new \BadMethodCallException('Not implemented');
     }
 
-    /**
-     * @param FilterDatasourceAdapterInterface $ds
-     * @param array $data
-     *
-     * @return bool
-     */
-    protected function applyRestrictions(FilterDatasourceAdapterInterface $ds, array $data)
+    protected function applyRestrictions(FilterDatasourceAdapterInterface $ds, array $data): bool
     {
         $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
 
@@ -63,7 +57,7 @@ class SearchEnumFilter extends EnumFilter
     /**
      * {@inheritDoc}
      */
-    protected function getFormType()
+    protected function getFormType(): string
     {
         return SearchEnumFilterType::class;
     }

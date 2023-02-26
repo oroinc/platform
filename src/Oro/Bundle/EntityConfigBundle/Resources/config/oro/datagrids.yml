@@ -170,6 +170,7 @@ datagrids:
                     options:
                         field_options:
                             choices: "@oro_entity_extend.type.field->getTranslatedTypeChoices"
+                            translatable_options: false
                             multiple: true
 
     # Audit entity log grid

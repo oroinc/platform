@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Form\ChoiceList;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -22,46 +22,25 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
 {
     use TranslatableQueryTrait;
 
-    /** @var ChoiceListInterface */
-    private $choiceList;
+    private string $className;
+    private QueryBuilder|\Closure|null $queryBuilder;
+    private ManagerRegistry $doctrine;
+    private ChoiceListFactoryInterface $factory;
+    private ?AclHelper $aclHelper;
+    private array $aclOptions;
+    private ?ChoiceListInterface $choiceList = null;
 
-    /** @var string */
-    private $className;
-
-    /** @var ManagerRegistry */
-    private $registry;
-
-    /** @var QueryBuilder|null */
-    private $queryBuilder;
-
-    /** @var ChoiceListFactoryInterface */
-    private $factory;
-
-    /** @var AclHelper */
-    private $aclHelper;
-
-    /** @var array [check => bool, permission => permission_name, options => [option_name => option_value, ...]] */
-    private $aclOptions;
-
-    /**
-     * @param string $className
-     * @param ManagerRegistry $registry
-     * @param ChoiceListFactoryInterface $factory
-     * @param QueryBuilder|null $queryBuilder
-     * @param AclHelper|null $aclHelper
-     * @param array $aclOptions
-     */
     public function __construct(
         string $className,
-        ManagerRegistry $registry,
+        ManagerRegistry $doctrine,
         ChoiceListFactoryInterface $factory,
-        $queryBuilder,
-        AclHelper $aclHelper = null,
+        QueryBuilder|\Closure|null $queryBuilder,
+        ?AclHelper $aclHelper = null,
         array $aclOptions = []
     ) {
         $this->className = $className;
         $this->queryBuilder = $queryBuilder;
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->factory = $factory;
         $this->aclHelper = $aclHelper;
         $this->aclOptions = $aclOptions;
@@ -72,12 +51,12 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
      */
     public function loadChoiceList($value = null)
     {
-        if ($this->choiceList) {
+        if (null !== $this->choiceList) {
             return $this->choiceList;
         }
 
-        /** @var $entityManager EntityManager */
-        $entityManager = $this->registry->getManager();
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = $this->doctrine->getManager();
 
         // translation must not be selected separately for each entity
         $entityManager->getConfiguration()->addCustomHydrationMode(
@@ -99,9 +78,11 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
         $query->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
 
         // Protects the query with ACL.
-        if ($this->aclHelper && (!isset($this->aclOptions['disable']) || true !== $this->aclOptions['disable'])) {
-            $options = isset($this->aclOptions['options']) ? $this->aclOptions['options'] : [];
-            $permission = isset($this->aclOptions['permission']) ? $this->aclOptions['permission'] : 'VIEW';
+        if (null !== $this->aclHelper
+            && (!isset($this->aclOptions['disable']) || true !== $this->aclOptions['disable'])
+        ) {
+            $options = $this->aclOptions['options'] ?? [];
+            $permission = $this->aclOptions['permission'] ?? 'VIEW';
             $this->aclHelper->apply($query, $permission, $options);
         }
 
@@ -128,18 +109,14 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
         return $this->loadChoiceList($value)->getValuesForChoices($choices);
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    private function resolveQueryBuilder()
+    private function resolveQueryBuilder(): QueryBuilder
     {
-        if ($this->queryBuilder === null) {
-            $repository = $this->registry->getRepository($this->className);
-            return $repository->createQueryBuilder('e');
+        if (null === $this->queryBuilder) {
+            return $this->doctrine->getRepository($this->className)->createQueryBuilder('e');
         }
 
         if ($this->queryBuilder instanceof \Closure) {
-            return \call_user_func($this->queryBuilder, $this->registry->getRepository($this->className));
+            return \call_user_func($this->queryBuilder, $this->doctrine->getRepository($this->className));
         }
 
         return $this->queryBuilder;

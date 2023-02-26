@@ -98,11 +98,6 @@ class EmailTypeTest extends TypeTestCase
      */
     protected function getExtensions(): array
     {
-        $translatableType = $this->createMock(TranslatableEntityType::class);
-        $translatableType->expects($this->any())
-            ->method('getName')
-            ->willReturn(TranslatableEntityType::NAME);
-
         $user = new User();
         $this->tokenAccessor->expects($this->any())
             ->method('getUser')
@@ -149,7 +144,7 @@ class EmailTypeTest extends TypeTestCase
             new PreloadedExtension(
                 [
                     $this->formType,
-                    TranslatableEntityType::class => $translatableType,
+                    TranslatableEntityType::class => $this->createMock(TranslatableEntityType::class),
                     new OroRichTextType(
                         $this->createMock(ConfigManager::class),
                         $htmlTagProvider,

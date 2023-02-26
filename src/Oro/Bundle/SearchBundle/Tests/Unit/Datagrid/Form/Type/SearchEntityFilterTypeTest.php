@@ -50,6 +50,7 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
             ]
         );
 
+        unset($resolvedOptions['field_options']['choice_label']);
         $this->assertEquals(
             [
                 'class' => 'stdClass',
@@ -58,7 +59,6 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
                     'multiple' => true,
                     'class' => 'stdClass',
                     'choices' => ['choice1', 'choice2'],
-                    'choice_label' => [$this->type, 'getLocalizedChoiceLabel'],
                 ],
             ],
             $resolvedOptions
@@ -72,13 +72,13 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
 
         $resolvedOptions = $resolver->resolve([]);
 
+        unset($resolvedOptions['field_options']['choice_label']);
         $this->assertEquals(
             [
                 'field_options' => [
                     'multiple' => true,
                     'class' => null,
                     'choices' => null,
-                    'choice_label' => [$this->type, 'getLocalizedChoiceLabel'],
                 ],
                 'choices' => null,
             ],
@@ -93,10 +93,10 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
             ->method('getCurrentLocalization')
             ->willReturn($localization);
 
-        $entity = (object)['id' => 2, 'label' => 'label2'];
+        $entity = new \stdClass();
         $this->entityNameResolver->expects($this->once())
             ->method('getName')
-            ->with($entity, null, $localization)
+            ->with(self::identicalTo($entity), null, $localization)
             ->willReturn('resolved-label');
 
         $form = $this->factory->create(SearchEntityFilterType::class, [], []);
@@ -109,7 +109,7 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
 
     public function testGetBlockPrefix()
     {
-        $this->assertEquals(SearchEntityFilterType::NAME, $this->type->getBlockPrefix());
+        $this->assertEquals('oro_search_type_entity_filter', $this->type->getBlockPrefix());
     }
 
     public function testGetParent()

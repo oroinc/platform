@@ -26,17 +26,10 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
  */
 abstract class AbstractFieldsExtension extends AbstractExtension
 {
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
-
-    /** @var DatagridGuesser */
-    protected $datagridGuesser;
-
-    /** @var FieldsHelper */
-    protected $fieldsHelper;
+    protected ConfigManager $configManager;
+    protected EntityClassResolver $entityClassResolver;
+    protected DatagridGuesser $datagridGuesser;
+    protected FieldsHelper $fieldsHelper;
 
     public function __construct(
         ConfigManager $configManager,
@@ -51,9 +44,9 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isApplicable(DatagridConfiguration $config)
+    public function isApplicable(DatagridConfiguration $config): bool
     {
         return
             parent::isApplicable($config)
@@ -61,9 +54,9 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function processConfigs(DatagridConfiguration $config)
+    public function processConfigs(DatagridConfiguration $config): void
     {
         $fields = $this->getFields($config);
         if (empty($fields)) {
@@ -131,12 +124,13 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     }
 
     /**
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @param FieldConfigId[] $fields
+     * @param FieldConfigId[]       $fields
      * @param DatagridConfiguration $config
-     * @param string $alias
+     * @param string                $alias
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function buildExpression(array $fields, DatagridConfiguration $config, $alias)
+    public function buildExpression(array $fields, DatagridConfiguration $config, string $alias): void
     {
         $query = $config->getOrmQuery();
         foreach ($fields as $field) {
@@ -223,21 +217,17 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getPriority()
+    public function getPriority(): int
     {
         return 250;
     }
 
     /**
      * Gets a root entity name for which additional fields to be shown
-     *
-     * @param DatagridConfiguration $config
-     *
-     * @return string Entity class name
      */
-    abstract protected function getEntityName(DatagridConfiguration $config);
+    abstract protected function getEntityName(DatagridConfiguration $config): string;
 
     /**
      * Gets a list of fields to show
@@ -246,12 +236,12 @@ abstract class AbstractFieldsExtension extends AbstractExtension
      *
      * @return FieldConfigId[]
      */
-    protected function getFields(DatagridConfiguration $config)
+    protected function getFields(DatagridConfiguration $config): array
     {
         return $this->fieldsHelper->getFields($this->getEntityName($config));
     }
 
-    protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions)
+    protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions): void
     {
         $fieldName = $field->getFieldName();
 
@@ -301,9 +291,9 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                                     'class' => $extendFieldConfig->get('target_entity'),
                                     'choice_label' => $extendFieldConfig->get('target_field'),
                                     'multiple' => true,
-                                ],
-                            ],
-                        ],
+                                ]
+                            ]
+                        ]
                     ],
                     $columnOptions
                 );
@@ -320,13 +310,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         );
     }
 
-    /**
-     * @param string $scope
-     * @param FieldConfigId $fieldId
-     *
-     * @return ConfigInterface
-     */
-    protected function getFieldConfig($scope, FieldConfigId $fieldId)
+    protected function getFieldConfig(string $scope, FieldConfigId $fieldId): ConfigInterface
     {
         return $this->configManager->getProvider($scope)
             ->getConfig($fieldId->getClassName(), $fieldId->getFieldName());

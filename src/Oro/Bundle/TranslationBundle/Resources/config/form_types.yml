@@ -2,9 +2,9 @@ services:
     oro_translation.form.type.translatable_entity:
         class: Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType
         arguments:
-          - "@doctrine"
-          - "@form.choice_list_factory.default"
-          - "@oro_security.acl_helper"
+          - '@doctrine'
+          - '@form.choice_list_factory.default'
+          - '@oro_security.acl_helper'
         tags:
             - { name: form.type, alias: translatable_entity }
 

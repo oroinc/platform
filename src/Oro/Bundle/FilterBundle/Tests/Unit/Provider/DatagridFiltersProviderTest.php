@@ -73,17 +73,62 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
             [
                 'filters' => [
                     'columns' => [
-                        $filter1Name => ['name' => $filter1Name],
-                    ],
+                        $filter1Name => ['name' => $filter1Name]
+                    ]
                 ],
-                'columns' => [$filter1Name => ['label' => $filter1Name]],
+                'columns' => [
+                    $filter1Name => ['label' => $filter1Name]
+                ]
             ]
         );
         $filter1 = $this->createMock(FilterInterface::class);
 
         $this->filterFactory->expects($this->once())
             ->method('createFilter')
-            ->with($filter1Name, ['label' => $filter1Name, 'name' => $filter1Name, 'order' => 1, 'disabled' => null])
+            ->with(
+                $filter1Name,
+                [
+                    'name' => $filter1Name,
+                    'label' => $filter1Name,
+                    'order' => 1,
+                    'disabled' => null
+                ]
+            )
+            ->willReturn($filter1);
+
+        $this->assertEquals([$filter1Name => $filter1], $this->provider->getDatagridFilters($gridConfig));
+    }
+
+    public function testGetDatagridFiltersWhenFilterWithNonTranslatableLabel(): void
+    {
+        $filter1Name = 'sample_filter1';
+        $gridConfig = $this->getGridConfig(
+            OrmDatasource::TYPE,
+            [
+                'filters' => [
+                    'columns' => [
+                        $filter1Name => ['name' => $filter1Name]
+                    ]
+                ],
+                'columns' => [
+                    $filter1Name => ['label' => $filter1Name, 'translatable' => false]
+                ]
+            ]
+        );
+        $filter1 = $this->createMock(FilterInterface::class);
+
+        $this->filterFactory->expects($this->once())
+            ->method('createFilter')
+            ->with(
+                $filter1Name,
+                [
+                    'name' => $filter1Name,
+                    'label' => $filter1Name,
+                    'translatable' => false,
+                    'order' => 1,
+                    'disabled' => null
+                ]
+            )
             ->willReturn($filter1);
 
         $this->assertEquals([$filter1Name => $filter1], $this->provider->getDatagridFilters($gridConfig));

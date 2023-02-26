@@ -13,8 +13,10 @@ use Symfony\Component\Form\FormFactoryInterface;
  */
 class EntityFilter extends ChoiceFilter
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    protected const FIELD_OPTIONS_KEY = 'field_options';
+    protected const CHOICES_KEY = 'choices';
+
+    protected ManagerRegistry $doctrine;
 
     public function __construct(FormFactoryInterface $factory, FilterUtility $util, ManagerRegistry $doctrine)
     {
@@ -23,15 +25,18 @@ class EntityFilter extends ChoiceFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'choice';
         $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
-        if ($this->isLazy() && isset($options['field_options']) && !isset($options['field_options']['choices'])) {
-            $this->params[FilterUtility::FORM_OPTIONS_KEY]['field_options']['choices'] = [];
-            $this->additionalOptions[] = ['field_options', 'choices'];
+        if ($this->isLazy()
+            && isset($options[self::FIELD_OPTIONS_KEY])
+            && !isset($options[self::FIELD_OPTIONS_KEY][self::CHOICES_KEY])
+        ) {
+            $this->params[FilterUtility::FORM_OPTIONS_KEY][self::FIELD_OPTIONS_KEY][self::CHOICES_KEY] = [];
+            $this->additionalOptions[] = [self::FIELD_OPTIONS_KEY, self::CHOICES_KEY];
         }
 
         parent::init($name, $params);
@@ -65,7 +70,7 @@ class EntityFilter extends ChoiceFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getFormType()
     {
@@ -79,17 +84,10 @@ class EntityFilter extends ChoiceFilter
             return null;
         }
 
-        return $options['field_options']['class'] ?? null;
+        return $options[self::FIELD_OPTIONS_KEY]['class'] ?? null;
     }
 
-    /**
-     * @param string $entityClass
-     * @param mixed  $entityId
-     * @param bool   $forceEntityLoad
-     *
-     * @return object|null
-     */
-    protected function getEntity(string $entityClass, $entityId, bool $forceEntityLoad = false)
+    protected function getEntity(string $entityClass, mixed $entityId, bool $forceEntityLoad = false): ?object
     {
         $em = $this->doctrine->getManagerForClass($entityClass);
         if (!$em instanceof EntityManagerInterface) {

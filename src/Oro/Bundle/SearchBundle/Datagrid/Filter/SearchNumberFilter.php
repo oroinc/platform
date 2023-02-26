@@ -16,7 +16,7 @@ use Oro\Component\Exception\UnexpectedTypeException;
 class SearchNumberFilter extends AbstractFilter
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
@@ -82,21 +82,12 @@ class SearchNumberFilter extends AbstractFilter
     }
 
     /**
-     * @param array $data
-     * @return string
-     */
-    protected function getFieldName(array $data)
-    {
-        return $this->get(FilterUtility::DATA_NAME_KEY);
-    }
-
-    /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
-        $formView = $this->getForm()->createView();
+        $formView = $this->getFormView();
         $metadata['formatterOptions'] = $formView->vars['formatter_options'];
         $metadata['arraySeparator'] = $formView->vars['array_separator'];
         $metadata['arrayOperators'] = $formView->vars['array_operators'];
@@ -106,10 +97,15 @@ class SearchNumberFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getFormType()
+    protected function getFormType(): string
     {
         return NumberFilterType::class;
+    }
+
+    protected function getFieldName(array $data): string
+    {
+        return $this->get(FilterUtility::DATA_NAME_KEY);
     }
 }

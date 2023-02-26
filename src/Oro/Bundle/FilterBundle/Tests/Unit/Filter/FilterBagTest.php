@@ -8,7 +8,7 @@ use Psr\Container\ContainerInterface;
 
 class FilterBagTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $filterContainer;
 
     /** @var FilterBag */
@@ -45,6 +45,8 @@ class FilterBagTest extends \PHPUnit\Framework\TestCase
     {
         $filterName = 'filter1';
         $filter = $this->createMock(FilterInterface::class);
+        $filter->expects(self::once())
+            ->method('reset');
 
         $this->filterContainer->expects(self::once())
             ->method('get')

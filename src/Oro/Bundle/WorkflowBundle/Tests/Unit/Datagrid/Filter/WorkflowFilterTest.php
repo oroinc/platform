@@ -50,9 +50,8 @@ class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
             [
                 FilterUtility::FORM_OPTIONS_KEY  => [
                     'field_options' => [
-                        'class'                => WorkflowDefinition::class,
-                        'multiple'             => true,
-                        'translatable_options' => false
+                        'class'    => WorkflowDefinition::class,
+                        'multiple' => true
                     ]
                 ],
                 FilterUtility::FRONTEND_TYPE_KEY => 'choice'

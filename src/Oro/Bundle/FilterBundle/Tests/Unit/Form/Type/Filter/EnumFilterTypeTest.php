@@ -90,6 +90,9 @@ class EnumFilterTypeTest extends TypeTestCase
 
         $resolvedOptions = $resolver->resolve($options);
 
+        if (!isset($expectedOptions['field_options']['translatable_options'])) {
+            $expectedOptions['field_options']['translatable_options'] = false;
+        }
         $this->assertEquals($expectedOptions, $resolvedOptions);
     }
 
