@@ -29,7 +29,7 @@
         @include fa-icon($sort-datagrid-sort-icon);
     }
 
-    .drag-n-drop-with-separator + &.has-sort-order {
+    .drag-n-drop-highlight-sorted + &.has-sort-order {
         .sort-icon {
             @include fa-icon($sort-datagrid-sorted-sort-icon);
         }

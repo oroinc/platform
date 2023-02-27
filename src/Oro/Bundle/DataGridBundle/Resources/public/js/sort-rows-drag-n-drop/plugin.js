@@ -49,6 +49,15 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     cancelHintTemplate,
 
     /**
+     * @property {Object}
+     */
+    defaultOptions: {
+        renderDropZonesMenu: false,
+        highlightSortedItems: true,
+        allowSelectMultiple: true
+    },
+
+    /**
      * @property {number}
      */
     ORDER_STEP: 10,
@@ -80,6 +89,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @inheritdoc
      */
     constructor: function SortRowsDragNDropPlugin(main, manager, options) {
+        options = Object.assign({}, this.defaultOptions, options);
         SortRowsDragNDropPlugin.__super__.constructor.call(this, main, manager, options);
     },
 
@@ -164,8 +174,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         this.main.collection.sort();
 
         this.main.$el.addClass(this.enabledClass);
-        this.main.$el
-            .toggleClass('drag-n-drop-with-separator', Boolean(this.main.$el.has('.draggable-separator').length));
+        this.main.$el.toggleClass('drag-n-drop-highlight-sorted', this.options.highlightSortedItems);
 
         this.selectionStateHintView = new SelectionStateHintView({
             autoRender: true,
@@ -196,7 +205,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         this.undelegateEvents();
         this.stopListening(this.selectionStateHintView);
         this.main.$el.removeClass(this.enabledClass);
-        this.main.$el.removeClass('drag-n-drop-with-separator');
+        this.main.$el.removeClass('drag-n-drop-highlight-sorted');
         if (this.selectionStateHintView) {
             this.selectionStateHintView.dispose();
             delete this.selectionStateHintView;
@@ -312,7 +321,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      */
     onMouseDown(e) {
         const currentEL = $(e.currentTarget);
-        if (currentEL.is(this.SEPARATOR_ROW_SELECTOR)) {
+        if (currentEL.is(this.SEPARATOR_ROW_SELECTOR) || !this.options.allowSelectMultiple) {
             // ignore selection if it's a separator row
         } else if (e.shiftKey && this._lastClickedIndex !== void 0) {
             let from = this._lastClickedIndex;
@@ -401,9 +410,8 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                 order: 30,
                 dropHandler: this.removeSortOrderForSelected.bind(this),
                 enabled: () => {
-                    const isSeparator = this.main.body.$el.find(this.SEPARATOR_ROW_SELECTOR).length > 0;
-                    return isSeparator && this.main.collection.filter(model => {
-                        return model.get('_selected') && model.get('_sortOrder');
+                    return this.main.collection.filter(model => {
+                        return model.get('_selected') && model.get('_sortOrder') !== null;
                     }).length > 0;
                 }
             }
@@ -661,7 +669,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * Extends the height of datagrid's body to have possibility to use Drag Zone actions in case it is narrow
      */
     extendTableHeight() {
-        if (this.dropZoneMenuView && this.dropZoneMenuView.$el.is(':hidden')) {
+        if (!this.dropZoneMenuView || this.dropZoneMenuView.$el.is(':hidden')) {
             return;
         }
 
