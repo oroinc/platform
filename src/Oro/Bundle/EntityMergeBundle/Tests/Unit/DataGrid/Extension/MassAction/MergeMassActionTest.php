@@ -7,14 +7,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Config as EntityConfig;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassAction;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MergeMassActionTest extends \PHPUnit\Framework\TestCase
 {
-    private const MAX_ENTITIES_COUNT = 1;
+    private const ENTITY_CLASS = 'Some\Entity';
+    private const MAX_ENTITIES_COUNT = 10;
 
-    /** @var MergeMassAction */
-    private $target;
+    private MergeMassAction $action;
 
     protected function setUp(): void
     {
@@ -25,12 +24,10 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
         );
         $entityConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->with('SomeEntityClass')
+            ->with(self::ENTITY_CLASS)
             ->willReturn($entityConfig);
 
-        $translator = $this->createMock(TranslatorInterface::class);
-
-        $this->target = new MergeMassAction($entityConfigProvider, $translator);
+        $this->action = new MergeMassAction($entityConfigProvider);
     }
 
     /**
@@ -38,8 +35,8 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetOptions(array $actualOptions, array $expectedOptions)
     {
-        $this->target->setOptions(ActionConfiguration::create($actualOptions));
-        $this->assertEquals($expectedOptions, $this->target->getOptions()->toArray());
+        $this->action->setOptions(ActionConfiguration::create($actualOptions));
+        $this->assertEquals($expectedOptions, $this->action->getOptions()->toArray());
     }
 
     public function getOptionsDataProvider(): array
@@ -47,48 +44,48 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
         return [
             'default_values'  => [
                 'actual'   => [
-                    'entity_name' => 'SomeEntityClass'
+                    'entity_name' => self::ENTITY_CLASS
                 ],
                 'expected' => [
-                    'entity_name'       => 'SomeEntityClass',
-                    'frontend_handle'   => 'redirect',
-                    'handler'           => 'oro_entity_merge.mass_action.data_handler',
-                    'frontend_type'     => 'merge-mass',
-                    'route'             => 'oro_entity_merge_massaction',
-                    'data_identifier'   => 'id',
-                    'max_element_count' => self::MAX_ENTITIES_COUNT,
-                    'label'             => null,
-                    'route_parameters'  => [],
-                    'launcherOptions'   => ['iconClassName' => 'fa-random'],
+                    'entity_name'         => self::ENTITY_CLASS,
+                    'max_element_count'   => self::MAX_ENTITIES_COUNT,
+                    'frontend_handle'     => 'redirect',
+                    'handler'             => 'oro_entity_merge.mass_action.data_handler',
+                    'frontend_type'       => 'merge-mass',
+                    'label'               => 'oro.entity_merge.action.merge',
+                    'route'               => 'oro_entity_merge_massaction',
+                    'route_parameters'    => [],
+                    'data_identifier'     => 'id',
+                    'launcherOptions'     => ['iconClassName' => 'fa-random'],
                     'allowedRequestTypes' => ['GET'],
-                    'requestType'       => 'GET'
+                    'requestType'         => 'GET'
                 ]
             ],
             'override_values' => [
                 'actual'   => [
-                    'entity_name'       => 'SomeEntityClass',
+                    'entity_name'       => self::ENTITY_CLASS,
                     'frontend_handle'   => 'custom_handler',
-                    'handler'           => 'oro_entity_merge.mass_action.data_handler',
+                    'handler'           => 'oro_entity_merge.mass_action.data_handler_custom',
                     'frontend_type'     => 'custom-merge-mass',
                     'data_identifier'   => 'code',
                     'icon'              => 'custom',
-                    'max_element_count' => self::MAX_ENTITIES_COUNT,
-                    'route'             => 'oro_entity_merge_massaction',
-                    'route_parameters'  => []
+                    'label'             => 'acme.action.merge',
+                    'route'             => 'oro_entity_merge_massaction_custom',
+                    'route_parameters'  => ['key' => 'val']
                 ],
                 'expected' => [
-                    'entity_name'       => 'SomeEntityClass',
-                    'frontend_handle'   => 'custom_handler',
-                    'handler'           => 'oro_entity_merge.mass_action.data_handler',
-                    'frontend_type'     => 'custom-merge-mass',
-                    'data_identifier'   => 'code',
-                    'launcherOptions'   => ['iconClassName' => 'fa-custom'],
-                    'max_element_count' => self::MAX_ENTITIES_COUNT,
-                    'route'             => 'oro_entity_merge_massaction',
-                    'route_parameters'  => [],
-                    'label'             => null,
+                    'entity_name'         => self::ENTITY_CLASS,
+                    'max_element_count'   => self::MAX_ENTITIES_COUNT,
+                    'frontend_handle'     => 'custom_handler',
+                    'handler'             => 'oro_entity_merge.mass_action.data_handler_custom',
+                    'frontend_type'       => 'custom-merge-mass',
+                    'data_identifier'     => 'code',
+                    'label'               => 'acme.action.merge',
+                    'route'               => 'oro_entity_merge_massaction_custom',
+                    'route_parameters'    => ['key' => 'val'],
+                    'launcherOptions'     => ['iconClassName' => 'fa-custom'],
                     'allowedRequestTypes' => ['GET'],
-                    'requestType'       => 'GET'
+                    'requestType'         => 'GET'
                 ]
             ]
         ];
@@ -99,6 +96,6 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Trying to get name of unnamed object');
 
-        $this->target->setOptions(ActionConfiguration::create([]));
+        $this->action->setOptions(ActionConfiguration::create([]));
     }
 }
