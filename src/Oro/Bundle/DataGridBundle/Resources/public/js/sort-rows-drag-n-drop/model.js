@@ -71,6 +71,12 @@ const SortRowsDragNDropModel = BaseModel.extend({
      */
     isSeparator() {
         return this.id === SortRowsDragNDropModel.SEPARATOR_ID;
+    },
+
+    sortOrderBackendFormatData() {
+        const sortOrder = this.get('_sortOrder');
+        // sortOrder value has to be either number or null (neither a string nor undefined)
+        return {[this.sortOrderAttrName]: sortOrder !== void 0 ? sortOrder : null};
     }
 }, {
     SEPARATOR_ID: 'separator'

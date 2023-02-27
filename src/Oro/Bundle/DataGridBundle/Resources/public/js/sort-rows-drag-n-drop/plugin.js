@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import {isEqual, difference} from 'underscore';
 import __ from 'orotranslation/js/translator';
 import {isMobile} from 'underscore';
 import BasePlugin from 'oroui/js/app/plugins/base/plugin';
@@ -6,6 +7,7 @@ import helperTemplate from 'tpl-loader!orodatagrid/templates/sort-rows-drag-n-dr
 import cancelHintTemplate from 'tpl-loader!orodatagrid/templates/sort-rows-drag-n-drop/cancel-hint.html';
 import SelectionStateHintView from 'orodatagrid/js/sort-rows-drag-n-drop/selection-state-hint-view';
 import DropZoneMenuView from 'orodatagrid/js/sort-rows-drag-n-drop/drop-zone-menu-view';
+import routing from 'routing';
 
 import 'jquery-ui/widgets/sortable';
 import 'jquery-ui/disable-selection';
@@ -83,10 +85,25 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             throw new Error('Option "$rootEl" is required');
         }
 
+        if (!this.options.formName) {
+            throw new Error('Options "formName" is required');
+        }
+
+        if (!this.options.route) {
+            throw new Error('Options "route" is required');
+        }
+
+        if (!this.options.route_parameters) {
+            throw new Error('Options "route_parameters" is required');
+        }
+
+        this._collectSortOrderData();
+
         this.listenTo(this.main, {
             disable: this.disable,
             enable: this.enable
         });
+        this.listenTo(this.main.collection, 'remove', this._checkIfEmptyCollection);
         this.listenTo(this, 'before:unsetModelsAttr', this._runAnimation);
 
         this.listenToOnce(this.main, 'rendered', () => {
@@ -121,7 +138,26 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             return;
         }
 
+        const {models} = this.main.collection
+        // make sure all models in the collection have unique ascending values
+        for (let index = 1; index < models.length; index++) {
+            const sortOrder = models[index].get('_sortOrder');
+            if (typeof sortOrder !== 'number') {
+                // loop went beyond sorted model, nothing to update after it
+                break;
+            }
+            const prevSortOrder = models[index - 1].get('_sortOrder');
+            if (sortOrder <= prevSortOrder) {
+                // update sort order with minimal step to reduce number of changed models
+                models[index].set('_sortOrder', prevSortOrder + 1);
+            }
+        }
+
+        this.main.collection.sort();
+
         this.main.$el.addClass(this.enabledClass);
+        this.main.$el
+            .toggleClass('drag-n-drop-with-separator', Boolean(this.main.$el.has('.draggable-separator').length));
 
         this.selectionStateHintView = new SelectionStateHintView({
             autoRender: true,
@@ -133,7 +169,9 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             this._unsetModelsAttr.bind(this, '_selected', {ignoreAnimation: true}));
 
         this.delegateEvents();
-        this.initDroppableZones();
+        if (this.options.renderDropZonesMenu) {
+            this.initDroppableZones();
+        }
         this.initSortable();
 
         SortRowsDragNDropPlugin.__super__.enable.call(this);
@@ -150,6 +188,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         this.undelegateEvents();
         this.stopListening(this.selectionStateHintView);
         this.main.$el.removeClass(this.enabledClass);
+        this.main.$el.removeClass('drag-n-drop-with-separator');
         if (this.selectionStateHintView) {
             this.selectionStateHintView.dispose();
             delete this.selectionStateHintView;
@@ -281,7 +320,9 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             selectedModels.forEach(model => {
                 const index = this.main.collection.indexOf(model);
                 const selected = index >= from && index <= to;
-                model.set('_selected', selected);
+                if (!model.isSeparator()) {
+                    model.set('_selected', selected);
+                }
             });
         } else if (e.ctrlKey || e.metaKey) {
             const modelId = currentEL.data('modelId');
@@ -340,17 +381,17 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             toTop: {
                 title: __('oro.datagrid.drop_zones.move_to_top'),
                 order: 10,
-                dropCallback: this.moveSelectedToTop.bind(this)
+                dropHandler: this.moveSelectedToTop.bind(this)
             },
             toBottom: {
                 title: __('oro.datagrid.drop_zones.mode_to_bottom'),
                 order: 20,
-                dropCallback: this.moveSelectedToBottom.bind(this)
+                dropHandler: this.moveSelectedToBottom.bind(this)
             },
             removeSortOrder: {
                 title: __('oro.datagrid.drop_zones.remove_sort_order'),
                 order: 30,
-                dropCallback: this.removeSortOrderForSelected.bind(this),
+                dropHandler: this.removeSortOrderForSelected.bind(this),
                 enabled: () => {
                     const isSeparator = this.main.body.$el.find(this.SEPARATOR_ROW_SELECTOR).length > 0;
                     return isSeparator && this.main.collection.filter(model => {
@@ -365,15 +406,16 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             datagrid: this.main,
             dropZones: $.extend(true, {}, droppableZones, this.options.dropZones || {})
         });
-        this.dropZoneMenuView.listenTo(this, {
+
+        this.listenTo(this, {
             'sortable:beforePick': (e, ui) => {
                 if (ui.item.is(this.SEPARATOR_ROW_SELECTOR)) {
                     return;
                 }
 
-                this.dropZoneMenuView.updateShiftProp(
-                    this._cursorOnRightSide(e.pageX)
-                ).show();
+                this.dropZoneMenuView
+                    .updateShiftProp(this._cursorOnRightSide(e.pageX))
+                    .show();
             },
             'sortable:stop': this.dropZoneMenuView.hide.bind(this.dropZoneMenuView)
         });
@@ -392,6 +434,12 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                 droppableEl = e.target;
                 this.main.$el.find(`.${this.SORTABLE_DEFAULTS.placeholder}`).hide();
                 this.extendTableHeight();
+            },
+            dropdone: () => {
+                this._updateSortOrder();
+                this.main.collection.sort();
+                this._saveChanges();
+                this._unsetModelsAttr('_selected');
             }
         });
     },
@@ -412,9 +460,6 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             return modelsIds.includes($(el).data('modelId'));
         });
         this.main.body.$el.prepend($rows.detach());
-        this._updateSortOrder();
-        this.main.collection.sort();
-        this._unsetModelsAttr('_selected');
     },
 
     moveSelectedToBottom() {
@@ -430,10 +475,6 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         } else {
             this.main.body.$el.append($rows.detach());
         }
-
-        this._updateSortOrder();
-        this.main.collection.sort();
-        this._unsetModelsAttr('_selected');
     },
 
     removeSortOrderForSelected() {
@@ -441,7 +482,6 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
 
         models.forEach(model => model.set('_sortOrder', null));
         this.main.collection.sort();
-        this._unsetModelsAttr('_selected');
     },
 
     initSortable() {
@@ -546,7 +586,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             return;
         }
 
-        this._unsetModelsAttr('_changed');
+        this._unsetModelsAttr('_overturned');
         if (e.originalEvent.target === null) {
             // event was canceled during drag action
             this.onStopSortableCancel(e, ui);
@@ -556,9 +596,16 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         } else {
             this.onStopSortableSuccess(e, ui);
         }
+
+        // there might be a case when a system keys shortcut was pressed (e.g. "Meta+Shift+4") during drag action.
+        // Sortable is disabled on modifier keyDown, but not enabled on keyUp,
+        // because keyboard event on shortcut press is captured by system and not propagated to browser
+        this.enableSortable();
     },
 
     /**
+     * Handles placeholder position change and mark models as overturned once they switched their place with the separator
+     *
      * @param {Event} e
      * @param {Object} ui
      */
@@ -577,7 +624,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                 const modelId = $(el).data('modelId');
                 const model = this.main.collection.get(modelId);
                 const modelIndex = this.main.collection.indexOf(model);
-                model.set('_changed', modelIndex !== rowIndex);
+                model.set('_overturned', modelIndex !== rowIndex);
             });
     },
 
@@ -587,8 +634,10 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      */
     onStopSortableSuccess(e, ui) {
         this._completeDOMUpdate(ui);
+
         this._updateSortOrder();
         this.main.collection.sort();
+        this._saveChanges();
         this._unsetModelsAttr('_selected');
     },
 
@@ -711,7 +760,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                 }
                 return sortOrder;
             })
-            .sort();
+            .sort((a, b) => a - b);
 
         changedModels
             .forEach((model, index) => {
@@ -719,8 +768,82 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                     model.set('_sortOrder', sortOrderList[index]);
                 }
             });
+    },
 
-        return changedModels;
+    /**
+     * Check if there are no other models in collection except separator -- remove separator as well
+     * @protected
+     */
+    _checkIfEmptyCollection() {
+        const separatorOnly = this.main.collection.every(model => model.isSeparator());
+        if (separatorOnly) {
+            const separatorModel = this.main.collection.get('separator');
+            this.main.collection.remove(separatorModel, {alreadySynced: true});
+        }
+    },
+
+    /**
+     * Make a snapshot of sortOrder data
+     * @protected
+     */
+    _collectSortOrderData() {
+        this._sortOrderData = Object.fromEntries(
+            this.main.collection
+                .filter(model => !model.isSeparator())
+                .map(model => [model.get('id'), model.sortOrderBackendFormatData()])
+        );
+    },
+
+    _saveChanges() {
+        const sortOrderData = this.main.collection
+            .filter(model => {
+                const sortOrder = this._sortOrderData[model.get('id')];
+                return !model.isSeparator() && !isEqual(sortOrder, model.sortOrderBackendFormatData());
+            })
+            .map(model => [model.get('id'), model.sortOrderBackendFormatData()]);
+
+        const removeProducts = difference(
+            Object.keys(this._sortOrderData),
+            this.main.collection.map(model => model.get('id'))
+        );
+
+        if (!sortOrderData.length && !removeProducts.length) {
+            // no changed models -- nothing to save
+            return;
+        }
+
+        if (!this._activeAjaxActions) {
+            this._activeAjaxActions = 0;
+        }
+
+        const {route, route_parameters: params, formName} = this.options;
+        $.ajax({
+            url: routing.generate(route, params),
+            type: 'PUT',
+            data: {
+                [formName]: {
+                    sortOrder: JSON.stringify(Object.fromEntries(sortOrderData)),
+                    removeProducts: removeProducts.join(',')
+                }
+            },
+            // to prevent main application loading bar from been shown
+            global: false,
+            beforeSend: () => {
+                this.$rootEl.trigger('ajaxStart');
+                this._activeAjaxActions++;
+            },
+            complete: () => {
+                if (this.disposed) {
+                    return;
+                }
+                this._activeAjaxActions--;
+                if (this._activeAjaxActions === 0) {
+                    this.$rootEl.trigger('ajaxComplete');
+                }
+            }
+        });
+
+        this._collectSortOrderData();
     },
 
     /**
@@ -733,22 +856,20 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Event} e
      * @param {jQuery|HTMLElement} currentEL
      * @returns {jQuery|HTMLElement}
-     * @private
+     * @protected
      */
     _createSortableHelper(e, currentEL) {
         const templateData = {
             isSeparator: currentEL.is(this.SEPARATOR_ROW_SELECTOR),
             data: this._getSelectedModelsData(),
-            iconClasses: currentEL.find('.sort-icon').attr('class')
+            hasSortOrder: currentEL.is('.row-has-sort-order')
         };
 
         const $helper = $(this.helperTemplate(templateData));
 
-        if (isMobile()) {
-            return $helper;
+        if (this.options.renderDropZonesMenu && !isMobile()) {
+            $helper.css('width', currentEL.width() / 2);
         }
-
-        $helper.css('width', currentEL.width() / 2);
 
         return $helper;
     },
@@ -756,7 +877,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     /**
      * @param {Event} e
      * @param {Object} ui
-     * @private
+     * @protected
      */
     _adjustHelperPosition(e, ui) {
         if (isMobile()) {
@@ -785,7 +906,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * Marks row's model as "_selected"
      * @param {Event} e
      * @param {jQuery|HTMLElement} $el
-     * @private
+     * @protected
      */
     _selectRowBeforeDragStart(e, $el) {
         const model = this.main.collection.models[$el.index()];
@@ -795,7 +916,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     /**
      * Gets data of selected models
      * @returns {Array}
-     * @private
+     * @protected
      */
     _getSelectedModelsData() {
         return this.main.collection
@@ -821,7 +942,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * Defines if a cursor is on the right side of the window
      * @param {number} x
      * @returns {boolean}
-     * @private
+     * @protected
      */
     _cursorOnRightSide(x) {
         return x > (window.innerWidth / 2);

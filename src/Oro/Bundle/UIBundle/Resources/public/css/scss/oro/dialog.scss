@@ -23,6 +23,7 @@
         flex-shrink: $dialog-titlebar-flex-shrink;
         align-items: $dialog-titlebar-falign-items;
         display: $dialog-titlebar-display;
+        position: relative;
 
         cursor: $dialog-titlebar-cursor;
 

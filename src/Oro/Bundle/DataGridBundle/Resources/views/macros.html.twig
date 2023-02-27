@@ -50,6 +50,12 @@
         {% else %}
             {% set enableToggleFilters = true %}
         {% endif %}
+        {% set gridBuildersOptions = metaData.options.gridBuildersOptions|default({}) %}
+        {% for builderName, buildersOptions in renderParams.gridBuildersOptions|default({}) %}
+            {% set gridBuildersOptions = gridBuildersOptions|merge({
+                (builderName): gridBuildersOptions[builderName]|default({})|merge(buildersOptions)
+            }) %}
+        {% endfor %}
         {% set options  = {
             el: '#' ~ gridId,
             gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
@@ -67,7 +73,7 @@
             themeOptions: renderParams.themeOptions|default({}),
             toolbarOptions: renderParams.toolbarOptions|default({}),
             gridViewsOptions: renderParams.gridViewsOptions|default({}),
-            gridBuildersOptions: metaData.options.gridBuildersOptions|default({})|merge(renderParams.gridBuildersOptions|default({})),
+            gridBuildersOptions: gridBuildersOptions
         } %}
         <div id="{{ gridId }}"
              data-page-component-module="{{ renderParams.datagridComponent|default("orodatagrid/js/app/components/datagrid-component") }}"

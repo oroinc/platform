@@ -224,6 +224,17 @@ define(function(require, exports, module) {
                     container: this.widget.dialog('instance').uiDialogTitlebar,
                     ajaxLoading: true
                 }));
+
+                this.widget.on({
+                    [`ajaxStart${this.eventNamespace()}`]: e => {
+                        e.stopPropagation();
+                        this.subview('LoadingBarView').showLoader();
+                    },
+                    [`ajaxComplete${this.eventNamespace()}`]: e => {
+                        e.stopPropagation();
+                        this.subview('LoadingBarView').hideLoader();
+                    }
+                });
             }
         },
 

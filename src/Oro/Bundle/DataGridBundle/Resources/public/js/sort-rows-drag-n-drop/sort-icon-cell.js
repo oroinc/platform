@@ -4,18 +4,7 @@ const SortIconCell = HtmlCell.extend({
     /**
      * @inheritdoc
      */
-    optionNames: HtmlCell.prototype.optionNames.concat([
-        'sortedIcon', 'unsortedIcon'
-    ]),
-
-    /**
-     * @inheritdoc
-     */
     className: 'sort-icon-cell',
-
-    sortedIcon: 'fa-anchor',
-
-    unsortedIcon: 'fa-arrows-v',
 
     /**
      * @inheritdoc
@@ -37,13 +26,8 @@ const SortIconCell = HtmlCell.extend({
      */
     render: function() {
         const icon = document.createElement('span');
-        const order = this.model.get('_sortOrder');
-
         icon.setAttribute('aria-hidden', 'true');
-        icon.classList.add(
-            'sort-icon',
-            order === void 0 ? this.unsortedIcon : this.sortedIcon
-        );
+        icon.classList.add('sort-icon');
         this.$el.html(icon);
 
         return this;

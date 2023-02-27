@@ -9,7 +9,7 @@ const SortRowsDragNDropRow = Row.extend({
     /**
      * @property {string}
      */
-    changedClass: 'changed',
+    overturnedClass: 'overturned',
 
     /**
      * @inheritdoc
@@ -25,7 +25,7 @@ const SortRowsDragNDropRow = Row.extend({
         return {
             [`change:${this.model.sortOrderAttrName} model`]: 'toggleOrderClass',
             'change:_selected model': 'toggleSelectedClass',
-            'change:_changed model': 'toggleChangedClass'
+            'change:_overturned model': 'toggleOverturnedClass'
         };
     },
 
@@ -66,11 +66,11 @@ const SortRowsDragNDropRow = Row.extend({
     },
 
     /**
-     * Adds or removes specific class to highlight that the row has changed its position
+     * Adds or removes specific class to highlight that the row has been overturned by separator
      */
-    toggleChangedClass() {
-        const changed = this.model.get('_changed') ?? false;
-        this.$el.toggleClass(this.changedClass, changed);
+    toggleOverturnedClass() {
+        const overturned = this.model.get('_overturned') ?? false;
+        this.$el.toggleClass(this.overturnedClass, overturned);
     }
 });
 

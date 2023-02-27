@@ -9,8 +9,9 @@ export default {
         const {sortRowsDragNDropBuilder = {}} = options.gridBuildersOptions;
         const {
             sortOrderColumnName,
-            renderIconColumn: addIconColumn = true,
-            dropZones = {}
+            renderDraggableSeparator = false,
+            dropZones = {},
+            ...pluginOptions
         } = sortRowsDragNDropBuilder;
 
         if (sortOrderColumnName === void 0) {
@@ -21,20 +22,18 @@ export default {
             options.metadata.plugins = [];
         }
 
-        if (addIconColumn) {
-            const iconColumn = {
-                order: -Infinity,
-                editable: false,
-                label: '',
-                name: 'icon',
-                renderable: true,
-                type: 'sort-icon',
-                manageable: false,
-                notMarkAsBlank: true
-            };
+        const iconColumn = {
+            order: -Infinity,
+            editable: false,
+            label: '',
+            name: 'icon',
+            renderable: true,
+            type: 'sort-icon',
+            manageable: false,
+            notMarkAsBlank: true
+        };
 
-            options.metadata.columns.push(iconColumn);
-        }
+        options.metadata.columns.push(iconColumn);
 
         options.themeOptions = {
             ...options.themeOptions,
@@ -52,10 +51,12 @@ export default {
         });
 
         const updateData = data => {
-            data.push({
-                id: SortRowsDragNDropModel.SEPARATOR_ID,
-                [sortOrderColumnName]: Infinity
-            });
+            if (renderDraggableSeparator && data.length) {
+                data.push({
+                    id: SortRowsDragNDropModel.SEPARATOR_ID,
+                    [sortOrderColumnName]: Infinity
+                });
+            }
             return data;
         };
 
@@ -66,13 +67,10 @@ export default {
             }
         });
 
-        const modulesToLoad = {};
-        Object.entries(dropZones).forEach(([key, val]) => {
-            if (typeof val === 'string') {
-                modulesToLoad[key] = val;
-                delete dropZones[key];
-            }
-        });
+        const modulesToLoad = Object.fromEntries(
+            Object.entries(dropZones)
+                .filter(([, val]) => typeof val === 'string')
+        );
 
         let $rootEl = options.$el;
         if ($rootEl.parents('[role="dialog"]').length) {
@@ -83,6 +81,7 @@ export default {
                 constructor: SortRowsDragNDropPlugin,
                 options: {
                     $rootEL: $rootEl,
+                    ...pluginOptions,
                     dropZones: {...dropZones, ...modules}
                 }
             });

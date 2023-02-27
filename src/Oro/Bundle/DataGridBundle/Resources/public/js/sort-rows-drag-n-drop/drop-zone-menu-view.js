@@ -97,18 +97,8 @@ const DropZoneMenuView = BaseView.extend({
 
         this.$el.find('[data-zone]').each((i, el) => {
             const zoneType = el.getAttribute('data-zone');
-            const runCallback = (e, ui) => {
-                if (
-                    this.zones[zoneType] &&
-                    typeof e.type === 'string' &&
-                    typeof this.zones[zoneType][`${e.type}Callback`] === 'function'
-                ) {
-                    // do not break $.sortable working cycle, let it finish everything it needed
-                    setTimeout(() => {
-                        this.zones[zoneType][`${e.type}Callback`](e, ui, this.datagrid);
-                    }, 0);
-                }
-            };
+            const {dropHandler} = this.zones[zoneType];
+
             $(el).droppable({
                 activeClass: 'active',
                 hoverClass: 'hover',
@@ -116,16 +106,24 @@ const DropZoneMenuView = BaseView.extend({
                 accept: `[data-page-component-name="${this.datagrid.name}"] .grid-row`,
                 over: (e, ui) => {
                     this.trigger(e.type, e, ui);
-                    runCallback(e, ui);
                 },
                 out: (e, ui) => {
                     this.trigger(e.type, e, ui);
-                    runCallback(e, ui);
                 },
                 drop: (e, ui) => {
                     ui.draggable.data('dropDone', true);
                     this.trigger(e.type, e, ui);
-                    runCallback(e, ui);
+                    if (typeof dropHandler !== 'function') {
+                        return;
+                    }
+
+                    // do not break $.sortable working cycle, let it finish everything it needed
+                    setTimeout(() => {
+                        if (!this.disposed) {
+                            const result = dropHandler(e, ui, this.datagrid);
+                            this.trigger('dropdone', zoneType, result);
+                        }
+                    });
                 }
             });
         });
