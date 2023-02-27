@@ -5,7 +5,7 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 
 /**
- * Provides a set of constants for DataGrid Filter
+ * Provides a set of constants for datagrid filters.
  */
 class FilterUtility
 {
@@ -31,7 +31,7 @@ class FilterUtility
     public const CASE_INSENSITIVE_KEY = 'case_insensitive';
     public const VALUE_CONVERSION_KEY = 'value_conversion';
 
-    public function getParamMap()
+    public function getParamMap(): array
     {
         return [
             self::FRONTEND_TYPE_KEY => self::TYPE_KEY,
@@ -39,7 +39,10 @@ class FilterUtility
         ];
     }
 
-    public function getExcludeParams()
+    /**
+     * @return string[]
+     */
+    public function getExcludeParams(): array
     {
         return [self::DATA_NAME_KEY, self::FORM_OPTIONS_KEY];
     }

@@ -246,6 +246,7 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
             [
                 'type' => 'button-widget',
                 'label' => $this->getTranslatedButtonLabel($button),
+                'translatable' => false,
                 'rowAction' => false,
                 'link' => '#',
                 'icon' => $icon,
@@ -285,12 +286,14 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
                     }
                 }
             } elseif (!empty($datagridOptions['mass_action'])) {
-                $actions[$button->getName()] = array_merge(
-                    [
+                if (isset($datagridOptions['mass_action']['label'])) {
+                    $actions[$button->getName()] = $datagridOptions['mass_action'];
+                } else {
+                    $actions[$button->getName()] = array_replace($datagridOptions['mass_action'], [
                         'label' => $this->getTranslatedButtonLabel($button),
-                    ],
-                    $datagridOptions['mass_action']
-                );
+                        'translatable' => false,
+                    ]);
+                }
             }
         }
 

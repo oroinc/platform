@@ -12,32 +12,33 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class AdditionalFieldsExtension extends AbstractFieldsExtension
 {
-    const ENTITY_NAME_CONFIG_PATH       = '[options][entity_name]';
-    const ADDITIONAL_FIELDS_CONFIG_PATH = '[options][additional_fields]';
+    public const ADDITIONAL_FIELDS_CONFIG_PATH = '[options][additional_fields]';
+
+    private const ENTITY_NAME_CONFIG_PATH = '[options][entity_name]';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isApplicable(DatagridConfiguration $config)
+    public function isApplicable(DatagridConfiguration $config): bool
     {
         return
             parent::isApplicable($config)
             && $config->offsetGetByPath(self::ENTITY_NAME_CONFIG_PATH, false) !== false
-            && count($config->offsetGetByPath(self::ADDITIONAL_FIELDS_CONFIG_PATH, [])) > 0;
+            && \count($config->offsetGetByPath(self::ADDITIONAL_FIELDS_CONFIG_PATH, [])) > 0;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getEntityName(DatagridConfiguration $config)
+    protected function getEntityName(DatagridConfiguration $config): string
     {
         return $config->offsetGetByPath(self::ENTITY_NAME_CONFIG_PATH);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getFields(DatagridConfiguration $config)
+    protected function getFields(DatagridConfiguration $config): array
     {
         $entityClassName = $this->entityClassResolver->getEntityClass($this->getEntityName($config));
         if (!$this->configManager->hasConfig($entityClassName)) {
@@ -46,7 +47,7 @@ class AdditionalFieldsExtension extends AbstractFieldsExtension
 
         $fieldNames = $config->offsetGetByPath(self::ADDITIONAL_FIELDS_CONFIG_PATH, []);
 
-        $fields               = [];
+        $fields = [];
         $extendConfigProvider = $this->configManager->getProvider('extend');
         foreach ($fieldNames as $fieldName) {
             if (!$extendConfigProvider->hasConfig($entityClassName, $fieldName)) {
@@ -62,9 +63,9 @@ class AdditionalFieldsExtension extends AbstractFieldsExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions)
+    protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions): void
     {
         parent::prepareColumnOptions($field, $columnOptions);
 

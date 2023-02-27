@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\EventManager;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
@@ -78,7 +78,7 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
             ->method('getListeners')
             ->willReturn([[$translatableListener]]);
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->any())
             ->method('getEventManager')
             ->willReturn($eventManager);
@@ -116,9 +116,9 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    public function testGetName()
+    public function testGetBlockPrefix()
     {
-        $this->assertEquals(TranslatableEntityType::NAME, $this->type->getName());
+        $this->assertEquals('translatable_entity', $this->type->getBlockPrefix());
     }
 
     public function testGetParent()

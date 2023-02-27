@@ -12,7 +12,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterTypeInterface;
 class NumberRangeFilter extends NumberFilter
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getFormType()
     {
@@ -20,7 +20,7 @@ class NumberRangeFilter extends NumberFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
@@ -200,7 +200,7 @@ class NumberRangeFilter extends NumberFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function parseValue(array $data)

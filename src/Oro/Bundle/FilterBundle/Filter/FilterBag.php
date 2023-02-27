@@ -10,10 +10,8 @@ use Psr\Container\ContainerInterface;
 class FilterBag implements FilterBagInterface
 {
     /** @var string[] */
-    private $filterNames;
-
-    /** @var ContainerInterface */
-    private $filterContainer;
+    private array $filterNames;
+    private ContainerInterface $filterContainer;
 
     /**
      * @param string[]           $filterNames
@@ -46,6 +44,10 @@ class FilterBag implements FilterBagInterface
      */
     public function getFilter(string $name): FilterInterface
     {
-        return $this->filterContainer->get($name);
+        /** @var FilterInterface $filter */
+        $filter = $this->filterContainer->get($name);
+        $filter->reset();
+
+        return $filter;
     }
 }

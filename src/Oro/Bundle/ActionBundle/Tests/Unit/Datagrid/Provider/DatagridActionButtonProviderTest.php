@@ -57,7 +57,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
         $massActionProvider = $this->createMock(MassActionProviderInterface::class);
         $massActionProvider->expects($this->any())
             ->method('getActions')
-            ->willReturn(['test_config' => ['label' => 'test_label']]);
+            ->willReturn(['test_config' => ['label' => 'test_label', 'translatable' => false]]);
 
         $massActionProviderRegistry = $this->createMock(MassActionProviderRegistry::class);
         $massActionProviderRegistry->expects($this->any())
@@ -187,7 +187,9 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
                 ),
                 'expected' => true,
                 'expectedConfiguration' => [
-                    'mass_actions' => ['test_operationtest_config' => ['label' => 'test_label']]
+                    'mass_actions' => [
+                        'test_operationtest_config' => ['label' => 'test_label', 'translatable' => false]
+                    ]
                 ]
             ],
             'configure with single mass action' => [
@@ -202,13 +204,15 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
                         $this->createOperationButton(
                             'test_operation',
                             true,
-                            ['mass_action' => ['label' => 'test_mass_action_label']]
+                            ['mass_action' => ['label' => 'test_mass_action_label', 'icon' => 'test_icon']]
                         )
                     ]
                 ),
                 'expected' => true,
                 'expectedConfiguration' => [
-                    'mass_actions' => ['test_operation' => ['label' => 'test_mass_action_label']]
+                    'mass_actions' => [
+                        'test_operation' => ['label' => 'test_mass_action_label', 'icon' => 'test_icon']
+                    ]
                 ]
             ],
             'configure with single action' => [
@@ -242,9 +246,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
                 'config' => DatagridConfiguration::create([
                     'name' => 'datagrid1',
                     'actions' => [
-                        'action3' => [
-                            'label' => 'default action3'
-                        ]
+                        'action3' => ['label' => 'default action3', 'translatable' => false]
                     ],
                     'source' => [
                         'type' => OrmDatasource::TYPE,
@@ -262,14 +264,18 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
                         $this->createOperationButton(
                             'test_operation',
                             true,
-                            ['label' => 'test_mass_action_label', 'aria_label' => 'test_aria_label']
+                            [
+                                'label' => 'test_mass_action_label',
+                                'translatable' => false,
+                                'aria_label' => 'test_aria_label'
+                            ]
                         )
                     ]
                 ),
                 'expected' => true,
                 'expectedConfiguration' => [
                     'actions' => [
-                        'action3' => ['label' => 'default action3'],
+                        'action3' => ['label' => 'default action3', 'translatable' => false],
                         'test_operation' => $this->getRowActionConfig('[trans][/trans]'),
                     ]
                 ]
@@ -496,6 +502,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
         return array_merge([
             'type' => 'button-widget',
             'label' => $label,
+            'translatable' => false,
             'ariaLabel' => 'test_aria_label',
             'rowAction' => false,
             'link' => '#',

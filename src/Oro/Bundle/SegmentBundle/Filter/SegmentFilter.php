@@ -16,23 +16,17 @@ use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * The filter by entities that are included in a segment.
  */
 class SegmentFilter extends EntityFilter
 {
-    /** @var SegmentManager */
-    protected $segmentManager;
-
-    /** @var EntityNameProvider */
-    protected $entityNameProvider;
-
-    /** @var ConfigProvider */
-    protected $entityConfigProvider;
-
-    /** @var ConfigProvider */
-    protected $extendConfigProvider;
+    private SegmentManager $segmentManager;
+    private EntityNameProvider $entityNameProvider;
+    private ConfigProvider $entityConfigProvider;
+    private ConfigProvider $extendConfigProvider;
 
     public function __construct(
         FormFactoryInterface $factory,
@@ -60,9 +54,9 @@ class SegmentFilter extends EntityFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMetadata()
+    public function getMetadata(): array
     {
         $metadata = parent::getMetadata();
 
@@ -87,43 +81,6 @@ class SegmentFilter extends EntityFilter
 
     /**
      * {@inheritDoc}
-     */
-    public function getForm()
-    {
-        if (!$this->form) {
-            $entityName = $this->entityNameProvider->getEntityName();
-
-            // hard coded field, do not allow to pass any option
-            $this->form = $this->formFactory->create(
-                $this->getFormType(),
-                [],
-                [
-                    'csrf_protection' => false,
-                    'field_options'   => [
-                        'class'         => 'OroSegmentBundle:Segment',
-                        'choice_label'  => 'name',
-                        'required'      => true,
-                        'query_builder' => function (EntityRepository $repo) use ($entityName) {
-                            $qb = $repo->createQueryBuilder('s');
-
-                            if ($entityName) {
-                                $qb
-                                    ->where('s.entity = :entity')
-                                    ->setParameter('entity', $entityName);
-                            }
-
-                            return $qb;
-                        }
-                    ]
-                ]
-            );
-        }
-
-        return $this->form;
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
@@ -160,5 +117,37 @@ class SegmentFilter extends EntityFilter
         }
 
         return $data;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function createForm(): FormInterface
+    {
+        $entityName = $this->entityNameProvider->getEntityName();
+
+        // hard coded field, do not allow to pass any option
+        return $this->formFactory->create(
+            $this->getFormType(),
+            [],
+            [
+                'csrf_protection' => false,
+                'field_options'   => [
+                    'class'         => Segment::class,
+                    'choice_label'  => 'name',
+                    'required'      => true,
+                    'query_builder' => function (EntityRepository $repo) use ($entityName) {
+                        $qb = $repo->createQueryBuilder('s');
+                        if ($entityName) {
+                            $qb
+                                ->where('s.entity = :entity')
+                                ->setParameter('entity', $entityName);
+                        }
+
+                        return $qb;
+                    }
+                ]
+            ]
+        );
     }
 }

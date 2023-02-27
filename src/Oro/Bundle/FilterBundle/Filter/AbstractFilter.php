@@ -8,8 +8,9 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 /**
  * The base class for filters.
@@ -23,14 +24,14 @@ abstract class AbstractFilter implements FilterInterface
     /** @var FilterUtility */
     protected $util;
 
+    /** @var array */
+    protected $joinOperators = [];
+
     /** @var string */
     protected $name;
 
     /** @var array */
     protected $params;
-
-    /** @var Form */
-    protected $form;
 
     /** @var array */
     protected $unresolvedOptions = [];
@@ -41,11 +42,11 @@ abstract class AbstractFilter implements FilterInterface
     /** @var array */
     protected $state;
 
-    /** @var array */
-    protected $joinOperators = [];
-
     /** @var string */
     protected $dataFieldName;
+
+    private ?FormInterface $form = null;
+    private ?FormView $formView = null;
 
     public function __construct(FormFactoryInterface $factory, FilterUtility $util)
     {
@@ -56,9 +57,22 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * {@inheritDoc}
      */
+    public function reset(): void
+    {
+        $this->name = null;
+        $this->params = null;
+        $this->unresolvedOptions = [];
+        $this->additionalOptions = [];
+        $this->state = null;
+        $this->dataFieldName = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function init($name, array $params)
     {
-        $this->name   = $name;
+        $this->name = $name;
         $this->params = $params;
 
         $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
@@ -110,12 +124,8 @@ abstract class AbstractFilter implements FilterInterface
      */
     public function getForm()
     {
-        if (!$this->form) {
-            $this->form = $this->formFactory->create(
-                $this->getFormType(),
-                [],
-                array_merge($this->getOr(FilterUtility::FORM_OPTIONS_KEY, []), ['csrf_protection' => false])
-            );
+        if (null === $this->form) {
+            $this->form = $this->createForm();
         }
 
         return $this->form;
@@ -130,17 +140,17 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMetadata()
     {
-        $formView = $this->getForm()->createView();
+        $formView = $this->getFormView();
         $typeView = $formView->children['type'];
 
         $defaultMetadata = [
             'name'    => $this->getName(),
             // use filter name if label not set
-            'label' => $this->name ? ucfirst($this->name) : '',
+            'label'   => $this->name ? ucfirst($this->name) : '',
             'choices' => $typeView->vars['choices'],
         ];
 
@@ -156,7 +166,7 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function resolveOptions()
     {
@@ -180,7 +190,7 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setFilterState($state)
     {
@@ -190,7 +200,7 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getFilterState()
     {
@@ -203,6 +213,24 @@ abstract class AbstractFilter implements FilterInterface
      * @return string
      */
     abstract protected function getFormType();
+
+    protected function createForm(): FormInterface
+    {
+        return $this->formFactory->create(
+            $this->getFormType(),
+            [],
+            array_merge($this->getOr(FilterUtility::FORM_OPTIONS_KEY, []), ['csrf_protection' => false])
+        );
+    }
+
+    public function getFormView(): FormView
+    {
+        if (null === $this->formView) {
+            $this->formView = $this->getForm()->createView();
+        }
+
+        return $this->formView;
+    }
 
     /**
      * @param OrmFilterDatasourceAdapter $ds

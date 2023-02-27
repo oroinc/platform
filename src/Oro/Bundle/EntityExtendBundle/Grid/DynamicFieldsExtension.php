@@ -44,9 +44,9 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isApplicable(DatagridConfiguration $config)
+    public function isApplicable(DatagridConfiguration $config): bool
     {
         if (!parent::isApplicable($config) || !$config->getExtendedEntityClassName()) {
             return false;
@@ -59,15 +59,13 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
             return false;
         }
 
-        $extendConfig = $extendProvider->getConfig($entityClassName);
-
-        return $extendConfig->is('is_extend');
+        return $extendProvider->getConfig($entityClassName)->is('is_extend');
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getPriority()
+    public function getPriority(): int
     {
         return 300;
     }
@@ -75,28 +73,28 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
     /**
      * {@inheritdoc}
      */
-    public function buildExpression(array $fields, DatagridConfiguration $config, $alias)
+    public function buildExpression(array $fields, DatagridConfiguration $config, string $alias): void
     {
         if ($this->selectedFieldsProvider) {
             $selectedFields = $this->selectedFieldsProvider->getSelectedFields($config, $this->getParameters());
             $fields = $this->filterRelevant($fields, $selectedFields);
         }
 
-        return parent::buildExpression($fields, $config, $alias);
+        parent::buildExpression($fields, $config, $alias);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getEntityName(DatagridConfiguration $config)
+    protected function getEntityName(DatagridConfiguration $config): string
     {
         return $config->getExtendedEntityClassName();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions)
+    protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions): void
     {
         parent::prepareColumnOptions($field, $columnOptions);
 
@@ -106,9 +104,9 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getFields(DatagridConfiguration $config)
+    protected function getFields(DatagridConfiguration $config): array
     {
         return $this->excludeDanglingAttributes($config, parent::getFields($config));
     }

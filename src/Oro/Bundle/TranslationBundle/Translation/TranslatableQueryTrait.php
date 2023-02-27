@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Gedmo\Exception\RuntimeException;
 use Gedmo\Translatable\TranslatableListener;
 
@@ -14,25 +14,17 @@ use Gedmo\Translatable\TranslatableListener;
  */
 trait TranslatableQueryTrait
 {
-    private function addTranslatableLocaleHint(AbstractQuery $query, EntityManager $entityManager)
+    private function addTranslatableLocaleHint(AbstractQuery $query, EntityManagerInterface $entityManager): void
     {
-        $locale = $this->getTranslatableListener($entityManager)
-            ->getListenerLocale();
-
-        $query->setHint(TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale);
+        $query->setHint(
+            TranslatableListener::HINT_TRANSLATABLE_LOCALE,
+            $this->getTranslatableListener($entityManager)->getListenerLocale()
+        );
     }
 
-    /**
-     * Get the currently used TranslatableListener
-     *
-     * @param EntityManager $entityManager
-     * @return TranslatableListener
-     */
-    private function getTranslatableListener(EntityManager $entityManager)
+    private function getTranslatableListener(EntityManagerInterface $entityManager): TranslatableListener
     {
-        $allListeners = $entityManager->getEventManager()
-            ->getListeners();
-
+        $allListeners = $entityManager->getEventManager()->getListeners();
         foreach ($allListeners as $eventListeners) {
             foreach ($eventListeners as $listener) {
                 if ($listener instanceof TranslatableListener) {

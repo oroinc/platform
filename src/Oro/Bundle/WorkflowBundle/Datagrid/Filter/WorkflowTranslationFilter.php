@@ -14,19 +14,18 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class WorkflowTranslationFilter extends WorkflowFilter
 {
-    /** @var TranslationKeyGenerator|null */
-    private $generator;
+    private ?TranslationKeyGenerator $generator = null;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getFieldOptions()
+    protected function getFieldOptions(): array
     {
         return array_merge(parent::getFieldOptions(), ['multiple' => false]);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
@@ -52,10 +51,7 @@ class WorkflowTranslationFilter extends WorkflowFilter
         return $expr;
     }
 
-    /**
-     * @return TranslationKeyGenerator
-     */
-    protected function getGenerator()
+    protected function getGenerator(): TranslationKeyGenerator
     {
         if (!$this->generator) {
             $this->generator = new TranslationKeyGenerator();
@@ -65,7 +61,7 @@ class WorkflowTranslationFilter extends WorkflowFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function findRelatedJoin(FilterDatasourceAdapterInterface $ds)
     {

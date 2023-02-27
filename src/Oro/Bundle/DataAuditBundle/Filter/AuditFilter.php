@@ -14,6 +14,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Oro\Component\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * The filter by a modification date of an auditable field.
@@ -55,18 +56,6 @@ class AuditFilter extends EntityFilter
 
     /**
      * {@inheritDoc}
-     */
-    public function getForm()
-    {
-        if (!$this->form) {
-            $this->form = $this->formFactory->create($this->getFormType());
-        }
-
-        return $this->form;
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function getMetadata()
     {
@@ -227,10 +216,18 @@ class AuditFilter extends EntityFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getFormType()
     {
         return FilterType::class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function createForm(): FormInterface
+    {
+        return $this->formFactory->create($this->getFormType());
     }
 }

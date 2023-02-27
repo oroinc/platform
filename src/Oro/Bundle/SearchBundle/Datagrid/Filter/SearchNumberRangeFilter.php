@@ -13,7 +13,7 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 class SearchNumberRangeFilter extends SearchNumberFilter
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function applyRestrictions(FilterDatasourceAdapterInterface $ds, array $data)
     {
@@ -48,9 +48,9 @@ class SearchNumberRangeFilter extends SearchNumberFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getFormType()
+    protected function getFormType(): string
     {
         return NumberRangeFilterType::class;
     }

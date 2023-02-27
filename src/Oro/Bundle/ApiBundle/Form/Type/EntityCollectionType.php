@@ -12,7 +12,7 @@ class EntityCollectionType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getParent(): string
+    public function getParent(): ?string
     {
         return CollectionType::class;
     }

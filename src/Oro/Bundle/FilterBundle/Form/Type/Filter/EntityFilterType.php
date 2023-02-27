@@ -7,24 +7,42 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for filter by an entity.
+ */
 class EntityFilterType extends AbstractChoiceType
 {
-    const NAME = 'oro_type_entity_filter';
-
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        return $this->getBlockPrefix();
-    }
+        $resolver->setDefaults([
+            'field_type'    => EntityType::class,
+            'field_options' => [],
+            'translatable'  => false,
+        ]);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return self::NAME;
+        $resolver->setNormalizer(
+            'field_type',
+            function (Options $options, $value) {
+                if (!empty($options['translatable'])) {
+                    $value = TranslatableEntityType::class;
+                }
+
+                return $value;
+            }
+        );
+        $resolver->setNormalizer(
+            'field_options',
+            function (Options $options, $value) {
+                if (!isset($value['translatable_options'])) {
+                    $value['translatable_options'] = false;
+                }
+
+                return $value;
+            }
+        );
     }
 
     /**
@@ -38,25 +56,8 @@ class EntityFilterType extends AbstractChoiceType
     /**
      * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function getBlockPrefix()
     {
-        $resolver->setDefaults(
-            array(
-                'field_type'    => EntityType::class,
-                'field_options' => array(),
-                'translatable'  => false,
-            )
-        );
-
-        $resolver->setNormalizer(
-            'field_type',
-            function (Options $options, $value) {
-                if (!empty($options['translatable'])) {
-                    $value = TranslatableEntityType::class;
-                }
-
-                return $value;
-            }
-        );
+        return 'oro_type_entity_filter';
     }
 }

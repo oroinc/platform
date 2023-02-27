@@ -4,7 +4,7 @@ oro:
             merged_successful: Entities were successfully merged.
             select_error: Select entities to merge.
         action:
-            merge: Merge {{ label }}
+            merge: Merge
         acl:
             merge: Merge entities
 

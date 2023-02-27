@@ -18,13 +18,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FormatterExtension extends AbstractExtension
 {
     /** @var string[] */
-    private $propertyTypes;
-
-    /** @var ContainerInterface */
-    private $propertyContainer = [];
-
-    /** @var TranslatorInterface */
-    private $translator;
+    private array $propertyTypes;
+    private ContainerInterface $propertyContainer;
+    private TranslatorInterface $translator;
 
     /**
      * @param string[]            $propertyTypes
@@ -44,13 +40,13 @@ class FormatterExtension extends AbstractExtension
     /**
      * {@inheritDoc}
      */
-    public function isApplicable(DatagridConfiguration $config)
+    public function isApplicable(DatagridConfiguration $config): bool
     {
         if (!parent::isApplicable($config)) {
             return false;
         }
 
-        $columns    = $config->offsetGetOr(Configuration::COLUMNS_KEY, []);
+        $columns = $config->offsetGetOr(Configuration::COLUMNS_KEY, []);
         $properties = $config->offsetGetOr(Configuration::PROPERTIES_KEY, []);
         $applicable = $columns || $properties;
         $this->processConfigs($config);
@@ -61,9 +57,9 @@ class FormatterExtension extends AbstractExtension
     /**
      * Validate configs nad fill default values
      */
-    public function processConfigs(DatagridConfiguration $config)
+    public function processConfigs(DatagridConfiguration $config): void
     {
-        $columns    = $config->offsetGetOr(Configuration::COLUMNS_KEY, []);
+        $columns = $config->offsetGetOr(Configuration::COLUMNS_KEY, []);
         $properties = $config->offsetGetOr(Configuration::PROPERTIES_KEY, []);
 
         // validate extension configuration and normalize by setting default values
@@ -78,12 +74,12 @@ class FormatterExtension extends AbstractExtension
     /**
      * {@inheritDoc}
      */
-    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
+    public function visitResult(DatagridConfiguration $config, ResultsObject $result): void
     {
-        $rows       = $result->getData();
-        $columns    = $config->offsetGetOr(Configuration::COLUMNS_KEY, []);
+        $rows = $result->getData();
+        $columns = $config->offsetGetOr(Configuration::COLUMNS_KEY, []);
         $properties = $config->offsetGetOr(Configuration::PROPERTIES_KEY, []);
-        $toProcess  = array_merge($columns, $properties);
+        $toProcess = array_merge($columns, $properties);
 
         foreach ($rows as $key => $row) {
             $currentRow = [];
@@ -100,7 +96,7 @@ class FormatterExtension extends AbstractExtension
     /**
      * {@inheritDoc}
      */
-    public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
+    public function visitMetadata(DatagridConfiguration $config, MetadataObject $data): void
     {
         // get only columns here because columns will be represented on frontend
         $columns = $config->offsetGetOr(Configuration::COLUMNS_KEY, []);
@@ -111,18 +107,15 @@ class FormatterExtension extends AbstractExtension
             $metadata = $this->getPropertyObject($fieldConfig)->getMetadata();
 
             // translate label on backend
-            $metadata['label'] = $metadata[PropertyInterface::TRANSLATABLE_KEY]
-                ? $this->translator->trans($metadata['label'])
-                : $metadata['label'];
+            if ($metadata[PropertyInterface::TRANSLATABLE_KEY] && $metadata['label']) {
+                $metadata['label'] = $this->translator->trans($metadata['label']);
+            }
             $propertiesMetadata[] = $metadata;
         }
 
         $data->offsetAddToArray('columns', $propertiesMetadata);
     }
 
-    /**
-     * Returns prepared property object
-     */
     private function getPropertyObject(PropertyConfiguration $config): PropertyInterface
     {
         $type = (string) $config->offsetGet(Configuration::TYPE_KEY);
@@ -137,15 +130,7 @@ class FormatterExtension extends AbstractExtension
         return $property;
     }
 
-    /**
-     * Validates specified type configuration
-     *
-     * @param array  $config
-     * @param string $type
-     *
-     * @return array
-     */
-    private function validateConfigurationByType($config, $type)
+    private function validateConfigurationByType(array $config, string $type): array
     {
         return $this->validateConfiguration(
             new Configuration($this->propertyTypes, $type),
