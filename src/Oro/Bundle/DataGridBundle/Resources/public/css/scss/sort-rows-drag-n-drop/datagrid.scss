@@ -25,7 +25,6 @@
     }
 }
 
-
 .drag-n-drop-start {
     .grid-row.selected {
         display: none;
@@ -43,6 +42,12 @@
             background-color: $extra-200;
             animation: sort-rows-drag-n-drop-animation 800ms linear;
         }
+    }
+}
+
+.drag-n-drop-from-drop-zone {
+    .grid-row.selected {
+        @extend %hide;
     }
 }
 

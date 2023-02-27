@@ -28,7 +28,15 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      */
     finishedClass: 'drag-n-drop-finished',
 
+    /**
+     * @property {string}
+     */
     cursorOutClass: 'drag-n-drop-cursor-out',
+
+    /**
+     * @property {string}
+     */
+    dropFromDropZoneClass: 'drag-n-drop-from-drop-zone',
 
     /**
      * @property {Function}
@@ -138,7 +146,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             return;
         }
 
-        const {models} = this.main.collection
+        const {models} = this.main.collection;
         // make sure all models in the collection have unique ascending values
         for (let index = 1; index < models.length; index++) {
             const sortOrder = models[index].get('_sortOrder');
@@ -435,9 +443,17 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                 this.main.$el.find(`.${this.SORTABLE_DEFAULTS.placeholder}`).hide();
                 this.extendTableHeight();
             },
+            drop() {
+                this.main.$el.addClass(this.dropFromDropZoneClass);
+            },
             dropdone: () => {
+                const {currentItem} = this.main.body.$el.sortable('instance');
+
                 this._updateSortOrder();
                 this.main.collection.sort();
+                this.main.$el.removeClass(this.dropFromDropZoneClass);
+                // jquery forces to change visibility of this element
+                currentItem.css('display', '');
                 this._saveChanges();
                 this._unsetModelsAttr('_selected');
             }
@@ -670,9 +686,10 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     },
 
     renderCancelHint() {
-        this._$cancelHint = $(cancelHintTemplate());
-        this._$cancelHint.insertBefore(this.main.$el.find('[role="grid"]'));
+        const $continer = this.main.$el.find('.scrollbar-is-visible, [role="grid"]').first();
 
+        this._$cancelHint = $(cancelHintTemplate());
+        this._$cancelHint.insertBefore($continer);
         this._$cancelHint.fadeIn('fast');
     },
 
