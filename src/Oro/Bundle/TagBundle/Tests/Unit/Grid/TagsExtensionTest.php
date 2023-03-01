@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingConfigurator;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Grid\TagsExtension;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
@@ -35,6 +36,9 @@ class TagsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var InlineEditingConfigurator|\PHPUnit\Framework\MockObject\MockObject */
     private $inlineEditingConfigurator;
 
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject  */
+    private $featureChecker;
+
     /** @var TagsExtension */
     private $extension;
 
@@ -46,6 +50,7 @@ class TagsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->inlineEditingConfigurator = $this->createMock(InlineEditingConfigurator::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->extension = new TagsExtension(
             $this->tagManager,
@@ -53,17 +58,18 @@ class TagsExtensionTest extends \PHPUnit\Framework\TestCase
             $this->taggableHelper,
             $this->authorizationChecker,
             $this->tokenStorage,
-            $this->inlineEditingConfigurator
+            $this->inlineEditingConfigurator,
+            $this->featureChecker
         );
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testGetPriority()
+    public function testGetPriority(): void
     {
-        $this->assertEquals(10, $this->extension->getPriority());
+        self::assertEquals(10, $this->extension->getPriority());
     }
 
-    public function testVisitMetadata()
+    public function testVisitMetadata(): void
     {
         $config = DatagridConfiguration::create([
             'extended_entity_name' => 'Test',
@@ -71,13 +77,13 @@ class TagsExtensionTest extends \PHPUnit\Framework\TestCase
         ]);
         $data = MetadataObject::create([]);
 
-        $this->inlineEditingConfigurator->expects($this->once())
+        $this->inlineEditingConfigurator->expects(self::once())
             ->method('isInlineEditingSupported')
             ->with($config)
             ->willReturn(true);
 
         $this->extension->visitMetadata($config, $data);
-        $this->assertEquals(
+        self::assertEquals(
             $config->offsetGet(Configuration::BASE_CONFIG_KEY),
             $data->offsetGet(Configuration::BASE_CONFIG_KEY)
         );
@@ -88,105 +94,98 @@ class TagsExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsApplicable(
         array $parameters,
+        bool $featureEnabled,
         bool $isTaggable,
         bool $isGranted,
         ?TokenInterface $token,
         bool $expected
-    ) {
+    ): void {
         $config = DatagridConfiguration::create($parameters);
         $config->setName('test_grid');
 
-        $this->taggableHelper->expects($this->any())
+        $this->featureChecker->expects(self::any())
+            ->method('isFeatureEnabled')
+            ->with('manage_tags')
+            ->willReturn($featureEnabled);
+
+        $this->taggableHelper->expects(self::any())
             ->method('isTaggable')
             ->with('Test')
             ->willReturn($isTaggable);
-        $this->tokenStorage->expects($this->any())
+        $this->tokenStorage->expects(self::any())
             ->method('getToken')
             ->willReturn($token);
 
-        $this->authorizationChecker->expects($this->any())
+        $this->authorizationChecker->expects(self::any())
             ->method('isGranted')
             ->with('oro_tag_view')
             ->willReturn($isGranted);
 
-        $this->assertEquals($expected, $this->extension->isApplicable($config));
+        self::assertEquals($expected, $this->extension->isApplicable($config));
     }
 
     public function parametersDataProvider(): array
     {
         return [
             [
-                [
-                    'extended_entity_name' => 'Test',
-                    'source' => ['type' => 'orm'],
-                    'properties' => ['id' => 'id']
-                ],
+                ['extended_entity_name' => 'Test', 'source' => ['type' => 'orm'], 'properties' => ['id' => 'id']],
+                true,
                 true,
                 true,
                 $this->createMock(TokenInterface::class),
                 true
             ],
             [
-                [
-                    'extended_entity_name' => 'Test',
-                    'source' => ['type' => 'orm'],
-                    'properties' => ['id' => 'id']
-                ],
+                ['extended_entity_name' => 'Test', 'source' => ['type' => 'orm'], 'properties' => ['id' => 'id']],
+                false,
+                true,
+                true,
+                $this->createMock(TokenInterface::class),
+                false
+            ],
+            [
+                ['extended_entity_name' => 'Test', 'source' => ['type' => 'orm'], 'properties' => ['id' => 'id']],
+                true,
                 false,
                 true,
                 $this->createMock(TokenInterface::class),
                 false
             ],
             [
-                [
-                    'extended_entity_name' => 'Test',
-                    'source' => ['type' => 'orm'],
-                    'properties' => ['id' => 'id']
-                ],
+                ['extended_entity_name' => 'Test', 'source' => ['type' => 'orm'], 'properties' => ['id' => 'id']],
+                true,
                 true,
                 false,
                 $this->createMock(TokenInterface::class),
                 false
             ],
             [
-                [
-                    'extended_entity_name' => 'Test',
-                    'source' => ['type' => 'orm'],
-                    'properties' => ['id' => 'id']
-                ],
+                ['extended_entity_name' => 'Test', 'source' => ['type' => 'orm'], 'properties' => ['id' => 'id']],
+                true,
                 true,
                 true,
                 null,
                 false
             ],
             [
-                [
-                    'extended_entity_name' => null,
-                    'source' => ['type' => 'orm'],
-                    'properties' => ['id' => 'id']
-                ],
+                ['extended_entity_name' => null, 'source' => ['type' => 'orm'], 'properties' => ['id' => 'id']],
+                true,
                 true,
                 true,
                 $this->createMock(TokenInterface::class),
                 false
             ],
             [
-                [
-                    'extended_entity_name' => 'Test',
-                    'source' => ['type' => 'array'],
-                    'properties' => ['id' => 'id']
-                ],
+                ['extended_entity_name' => 'Test', 'source' => ['type' => 'array'], 'properties' => ['id' => 'id']],
+                true,
                 true,
                 true,
                 $this->createMock(TokenInterface::class),
                 false
             ],
             [
-                [
-                    'extended_entity_name' => 'Test',
-                    'source' => ['type' => 'orm'],
-                    'properties' => []
-                ],
+                ['extended_entity_name' => 'Test', 'source' => ['type' => 'orm'], 'properties' => []],
+                true,
                 true,
                 true,
                 $this->createMock(TokenInterface::class),
@@ -195,7 +194,7 @@ class TagsExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testProcessConfigs()
+    public function testProcessConfigs(): void
     {
         $config = DatagridConfiguration::create([
             'extended_entity_name' => 'Test',
@@ -211,22 +210,22 @@ class TagsExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-        $this->inlineEditingConfigurator->expects($this->once())
+        $this->inlineEditingConfigurator->expects(self::once())
             ->method('isInlineEditingSupported')
             ->with($config)
             ->willReturn(true);
-        $this->inlineEditingConfigurator->expects($this->once())
+        $this->inlineEditingConfigurator->expects(self::once())
             ->method('configureInlineEditingForGrid')
             ->with($config);
-        $this->inlineEditingConfigurator->expects($this->once())
+        $this->inlineEditingConfigurator->expects(self::once())
             ->method('configureInlineEditingForColumn')
             ->with($config, 'tags');
 
         $this->extension->processConfigs($config);
 
         $actualParameters = $config->toArray();
-        $this->assertArrayHasKey('tags', $actualParameters['columns']);
-        $this->assertArrayHasKey('tagname', $actualParameters['filters']['columns']);
-        $this->assertTrue($actualParameters['inline_editing']['enable']);
+        self::assertArrayHasKey('tags', $actualParameters['columns']);
+        self::assertArrayHasKey('tagname', $actualParameters['filters']['columns']);
+        self::assertTrue($actualParameters['inline_editing']['enable']);
     }
 }
