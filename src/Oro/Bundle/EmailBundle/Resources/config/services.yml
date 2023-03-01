@@ -1374,6 +1374,8 @@ services:
             - '@oro_email.email_renderer'
             - '@property_accessor'
             - '@logger'
+            - '@stof_doctrine_extensions.listener.translatable'
+            - '@translator'
 
     oro_email.provider.url_provider:
         class: 'Oro\Bundle\EmailBundle\Provider\UrlProvider'
