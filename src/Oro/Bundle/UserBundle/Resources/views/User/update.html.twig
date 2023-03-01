@@ -125,7 +125,7 @@
 
     {% set dataBlocks = dataBlocks|merge(oro_form_additional_data(form, 'Additional'|trans)) %}
 
-    {% set hasGroups = form.groups is defined %}
+    {% set hasGroups = form.groups is defined and feature_enabled('manage_user_groups') %}
     {% set hasRoles = form.userRoles is defined %}
     {% if hasGroups or hasRoles %}
         {% set userGroups %}

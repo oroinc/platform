@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for User entity for API calls.
+ */
 class UserApiType extends UserType
 {
     /** ConfigManager */
@@ -22,9 +25,9 @@ class UserApiType extends UserType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function addEntityFields(FormBuilderInterface $builder)
+    public function addEntityFields(FormBuilderInterface $builder): void
     {
         parent::addEntityFields($builder);
         /**
@@ -44,9 +47,9 @@ class UserApiType extends UserType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
@@ -69,25 +72,17 @@ class UserApiType extends UserType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'user';
     }
 
     /**
-     * Add Invite user fields
+     * {@inheritDoc}
      */
-    protected function addInviteUserField(FormBuilderInterface $builder)
+    protected function addInviteUserField(FormBuilderInterface $builder): void
     {
     }
 }
