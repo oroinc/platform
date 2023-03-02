@@ -740,6 +740,9 @@ define(function(require, exports, module) {
                     refresh: () => {
                         this.selectWidget.onRefresh();
                     },
+                    beforeclose: () => {
+                        return this.ignoreFiltersUpdateEvents === false;
+                    },
                     close: () => {
                         this.selectWidget.onClose();
                     },
