@@ -4,7 +4,7 @@ styles:
         - 'bundles/oroui/css/scss/settings/global-settings.scss'
 
         # Styles
-        - '~slick-carousel/slick/slick.scss'
+        - '~@oroinc/slick-carousel/slick/slick.scss'
         - 'bundles/oroui/css/scss/oro/loading/loading-bar.scss'
         - 'bundles/oroui/css/scss/font-awesome/_core.scss'
         - 'bundles/oroviewswitcher/view-switcher/scss/styles.scss'

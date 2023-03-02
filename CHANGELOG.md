@@ -2,6 +2,11 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+### Changed
+* Updated from `slick-carousel: 1.7.1` to fork `@oroinc/slick-carousel: 1.7.1-oro1` with patched internal `postSlide` method
+* Updated path of styles from `~slick-carousel/slick/slick.scss` to `~@oroinc/slick-carousel/slick/slick.scss`
+  and path of js from `slick-carousel/slick/slick` to `@oroinc/slick-carousel/slick/slick`
+
 ## Changes in the Platform package versions
 
 - [5.1.0](#510-unreleased)

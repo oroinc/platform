@@ -49,7 +49,7 @@ aliases:
     popper$: popper.js/dist/popper
     popper-utils$: popper.js/dist/popper-utils
     scriptjs$: scriptjs/dist/script
-    slick$: slick-carousel/slick/slick
+    slick$: '@oroinc/slick-carousel/slick/slick'
     styled-scroll-bar$: oroui/js/app/plugins/styled-scroll-bar
     underscore$: underscore/underscore
 app-modules:
