@@ -9,20 +9,14 @@ Feature: Password complexity feature
     Given sessions active:
       | Admin | first_session  |
       | Buyer | second_session |
-
-  Scenario: Set up user password complexity
-    Given I proceed as the Admin
-    And I login as administrator
-    And I go to System/Configuration
-    And I follow "System Configuration/General Setup/User Settings" on configuration sidebar
-    And uncheck "Use default" for "Minimal password length" field
-    And I fill in "Minimal Password Length" with "4"
-    And uncheck "Use default" for "Require a special character" field
-    And I check "Require a special character"
-    And I click "Save settings"
+    And I change configuration options:
+      | oro_user.password_min_length    | 4    |
+      | oro_user.password_special_chars | true |
 
   Scenario: Check dashboard user creation with full password complexity
-    Given I go to System/User Management/Users
+    Given I proceed as the Admin
+    And I login as administrator
+    And I go to System/User Management/Users
     And click "Create User"
     And I fill "User Form" with:
       | Enabled             | Enabled          |
