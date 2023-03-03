@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 use Oro\Bundle\SearchBundle\Engine\ExtendedEngineInterface;
@@ -22,7 +23,6 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class IndexerTest extends \PHPUnit\Framework\TestCase
 {

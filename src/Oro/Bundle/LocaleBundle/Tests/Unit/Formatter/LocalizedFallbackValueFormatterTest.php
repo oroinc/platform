@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Formatter\LocalizedFallbackValueFormatter;
@@ -33,7 +34,7 @@ class LocalizedFallbackValueFormatterTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         $this->formatter = new LocalizedFallbackValueFormatter(
             $this->doctrineHelper,

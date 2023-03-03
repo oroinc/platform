@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Converter\RelationCalculator;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -233,9 +234,10 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
             ->method('getUnderlyingTypes')
             ->willReturn([]);
         $fieldTypeHelper = new FieldTypeHelper($entityExtendConfigurationProvider);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
-            ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
+            ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper, $propertyAccessor])
             ->onlyMethods(['getConfigValue', 'getEntityFields', 'processRelationAsScalar', 'setLocale'])
             ->getMock();
 

@@ -32,7 +32,6 @@ class EntityConfigListenerCreateEntityTest extends EntityConfigListenerTestCase
         $this->assertEquals(
             [
                 'is_extend' => true,
-                'extend_class' => 'Extend\Entity\EX_OroEntityExtendBundle_Tests_Unit_Fixtures_TestClass'
             ],
             $entityConfig->all()
         );
@@ -50,12 +49,13 @@ class EntityConfigListenerCreateEntityTest extends EntityConfigListenerTestCase
     {
         $configModel = new EntityConfigModel(TestClass2::class);
         $entityConfig = new Config(new EntityConfigId(TestClass2::class, 'extend'));
+        $entityConfig->set('is_extend', true);
 
         /**
          * value of NEW Config should be empty
          */
         $this->assertEquals(
-            [],
+            ['is_extend' => true],
             $entityConfig->all()
         );
 

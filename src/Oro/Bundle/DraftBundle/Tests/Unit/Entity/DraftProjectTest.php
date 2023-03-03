@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DraftBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\DraftBundle\Entity\DraftProject;
-use Oro\Bundle\DraftBundle\Model\ExtendDraftProject;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
@@ -25,10 +24,5 @@ class DraftProjectTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->assertPropertyAccessors(new DraftProject(), $properties);
-    }
-
-    public function testExtend(): void
-    {
-        $this->assertEquals(get_parent_class(new DraftProject()), ExtendDraftProject::class);
     }
 }

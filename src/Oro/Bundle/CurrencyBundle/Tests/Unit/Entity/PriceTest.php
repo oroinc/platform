@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\CurrencyBundle\Entity\Price;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 
 class PriceTest extends \PHPUnit\Framework\TestCase
 {

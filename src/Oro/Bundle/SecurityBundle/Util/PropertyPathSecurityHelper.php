@@ -6,12 +6,15 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Helper for property path security.
+ */
 class PropertyPathSecurityHelper
 {
     /** @var AuthorizationCheckerInterface */

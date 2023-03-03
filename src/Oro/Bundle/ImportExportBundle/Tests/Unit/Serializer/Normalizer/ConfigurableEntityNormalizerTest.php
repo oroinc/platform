@@ -7,6 +7,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
@@ -15,7 +16,6 @@ use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer\Stub\DenormalizationStub;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
@@ -38,9 +38,10 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
             ->method('getUnderlyingTypes')
             ->willReturn([]);
         $fieldTypeHelper = new FieldTypeHelper($entityExtendConfigurationProvider);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
-            ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
+            ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper, $propertyAccessor])
             ->onlyMethods(['hasConfig', 'getConfigValue', 'getEntityFields', 'getObjectValue'])
             ->getMock();
 

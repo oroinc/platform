@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
@@ -17,7 +18,6 @@ use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -109,7 +109,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->searchHandler->initSearchIndexer($this->indexer, $searchMappingProvider);
         $this->searchHandler->setAclHelper($this->aclHelper);
         $this->searchHandler->setLogger($this->logger);
-        $this->searchHandler->setPropertyAccessor(new PropertyAccessor());
+        $this->searchHandler->setPropertyAccessor(PropertyAccess::createPropertyAccessor());
     }
 
     private function createStdClass(array $properties): \stdClass

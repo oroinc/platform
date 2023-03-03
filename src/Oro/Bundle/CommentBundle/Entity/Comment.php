@@ -3,8 +3,9 @@
 namespace Oro\Bundle\CommentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\CommentBundle\Model\ExtendComment;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 
 /**
  * Represents the written remarks related to specific entity records.
@@ -35,6 +36,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  * )
  */
-class Comment extends ExtendComment
+class Comment extends BaseComment implements ExtendEntityInterface
 {
+    use ExtendEntityTrait;
 }

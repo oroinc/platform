@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Functional\Cron;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
@@ -15,7 +16,6 @@ use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
 use Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadOriginData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -166,7 +166,7 @@ class EmailSyncCommandTest extends WebTestCase
         if ($expectedEmailData) {
             /** @var Email $email */
             $email = $list[0];
-            $propertyAccessor = new PropertyAccessor();
+            $propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
             foreach ($expectedEmailData as $propertyPath => $expectedValue) {
                 if (str_contains($propertyPath, '@')) {
                     [$propertyPath, $extension] = explode('@', $propertyPath);

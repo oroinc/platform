@@ -14,7 +14,7 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Twig\Error\Error;
 
@@ -25,7 +25,7 @@ class EmailTemplateContentProvider
 {
     private ManagerRegistry $doctrine;
     private EmailRenderer $emailRenderer;
-    private PropertyAccessor $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
     private LoggerInterface $logger;
     private TranslatableListener $translatableListener;
     private LocaleAwareInterface $translator;
@@ -34,7 +34,7 @@ class EmailTemplateContentProvider
     public function __construct(
         ManagerRegistry $doctrine,
         EmailRenderer $emailRenderer,
-        PropertyAccessor $propertyAccessor,
+        PropertyAccessorInterface $propertyAccessor,
         LoggerInterface $logger,
         TranslatableListener $translatableListener,
         LocaleAwareInterface $translator,

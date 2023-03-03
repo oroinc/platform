@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
@@ -13,7 +14,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase

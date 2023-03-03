@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,7 +17,6 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * A base class for an enum value selector form types

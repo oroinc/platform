@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**

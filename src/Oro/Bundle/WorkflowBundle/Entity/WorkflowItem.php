@@ -8,9 +8,10 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\EntityAwareInterface;
-use Oro\Bundle\WorkflowBundle\Model\ExtendWorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
@@ -47,8 +48,10 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
+class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var integer
      *
@@ -207,8 +210,6 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
      */
     public function __construct()
     {
-        parent::__construct();
-
         $this->transitionRecords = new ArrayCollection();
         $this->aclIdentities = new ArrayCollection();
         $this->restrictionIdentities = new ArrayCollection();

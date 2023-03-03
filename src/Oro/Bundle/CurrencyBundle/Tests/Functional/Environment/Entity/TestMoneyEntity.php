@@ -3,15 +3,18 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\CurrencyBundle\Tests\Functional\Environment\Model\ExtendTestMoneyEntity;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
  * @ORM\Table(name="oro_test_money_entity")
  * @ORM\Entity
  */
-class TestMoneyEntity extends ExtendTestMoneyEntity implements TestFrameworkEntityInterface
+class TestMoneyEntity implements TestFrameworkEntityInterface, ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var int
      *

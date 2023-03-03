@@ -4,9 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
+use Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -16,7 +18,6 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowNotificationHandler;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\EmailNotificationStub;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -44,6 +45,9 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowNotificationHandler */
     private $handler;
 
+    /** @var WebsiteAwareEntityHelper|\PHPUnit\Framework\MockObject\MockObject  */
+    private $websiteAwareHelper;
+
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
@@ -56,6 +60,7 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->entity);
 
         $this->manager = $this->createMock(EmailNotificationManager::class);
+        $this->websiteAwareHelper = $this->createMock(WebsiteAwareEntityHelper::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
@@ -67,9 +72,10 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new WorkflowNotificationHandler(
             $this->manager,
             $doctrine,
-            new PropertyAccessor(),
+            PropertyAccess::createPropertyAccessor(),
             $this->eventDispatcher,
-            $this->additionalEmailAssociationProvider
+            $this->additionalEmailAssociationProvider,
+            $this->websiteAwareHelper
         );
     }
 
@@ -84,9 +90,10 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
                     $this->entity,
                     $notification,
                     $this->em,
-                    new PropertyAccessor(),
+                    PropertyAccess::createPropertyAccessor(),
                     $this->eventDispatcher,
-                    $this->additionalEmailAssociationProvider
+                    $this->additionalEmailAssociationProvider,
+                    $this->websiteAwareHelper
                 );
             },
             $expected

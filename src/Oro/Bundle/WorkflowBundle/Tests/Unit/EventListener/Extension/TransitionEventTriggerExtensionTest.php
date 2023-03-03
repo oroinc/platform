@@ -117,14 +117,6 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
                 'event' => EventTriggerInterface::EVENT_DELETE,
                 'triggers' => ['delete']
             ],
-            'case when change set contains a field with missed setter' => [
-                'event' => EventTriggerInterface::EVENT_UPDATE,
-                'triggers' => ['updateEntity'],
-                'changeSet' => [
-                    'hiddenProperty' => ['old' => 'hiddenPropertyValue', 'new' => 'hiddenPropertyValueModified'],
-                    self::FIELD => ['old' => 2, 'new' => 2]
-                ]
-            ],
         ];
     }
 

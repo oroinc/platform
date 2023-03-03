@@ -4,19 +4,21 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
 use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
+use Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     public function testHandle()
     {
+        $websiteAware = $this->createMock(WebsiteAwareEntityHelper::class);
         $entity = $this->createMock(\stdClass::class);
         $event = $this->createMock(NotificationEvent::class);
         $event->expects($this->any())
@@ -38,7 +40,8 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
                 $em,
                 PropertyAccess::createPropertyAccessor(),
                 $dispatcher,
-                $additionalEmailAssociationProvider
+                $additionalEmailAssociationProvider,
+                $websiteAware
             )
         ];
 
@@ -57,7 +60,8 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
             $doctrine,
             PropertyAccess::createPropertyAccessor(),
             $dispatcher,
-            $additionalEmailAssociationProvider
+            $additionalEmailAssociationProvider,
+            $websiteAware
         );
         $handler->handle($event, $notifications);
     }

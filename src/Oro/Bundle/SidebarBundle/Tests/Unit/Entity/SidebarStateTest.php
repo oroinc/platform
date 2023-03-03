@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SidebarBundle\Entity\SidebarState;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SidebarStateTest extends \PHPUnit\Framework\TestCase

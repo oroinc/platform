@@ -3,15 +3,18 @@
 namespace Oro\Bundle\EntityBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EntityBundle\Tests\Functional\Environment\Model\ExtendTestDecimalEntity;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
  * @ORM\Table(name="oro_test_decimal_entity")
  * @ORM\Entity
  */
-class TestDecimalEntity extends ExtendTestDecimalEntity implements TestFrameworkEntityInterface
+class TestDecimalEntity implements TestFrameworkEntityInterface, ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var int
      *

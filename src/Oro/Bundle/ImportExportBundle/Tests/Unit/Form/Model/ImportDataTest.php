@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Model;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ImportDataTest extends \PHPUnit\Framework\TestCase
 {

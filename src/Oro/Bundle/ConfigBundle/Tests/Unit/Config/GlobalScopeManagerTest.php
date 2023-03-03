@@ -20,7 +20,7 @@ class GlobalScopeManagerTest extends AbstractScopeManagerTestCase
         ManagerRegistry $doctrine,
         CacheInterface $cache,
         EventDispatcher $eventDispatcher,
-        ConfigBag $configBag
+        ConfigBag $configBag,
     ): GlobalScopeManager {
         return new GlobalScopeManager($doctrine, $cache, $eventDispatcher, $configBag);
     }

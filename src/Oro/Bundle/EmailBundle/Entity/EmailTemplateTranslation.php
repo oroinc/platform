@@ -3,8 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EmailBundle\Model\ExtendEmailTemplateTranslation;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 /**
@@ -14,8 +15,10 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
  * @ORM\Table(name="oro_email_template_localized")
  * @Config()
  */
-class EmailTemplateTranslation extends ExtendEmailTemplateTranslation
+class EmailTemplateTranslation implements ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var int
      *

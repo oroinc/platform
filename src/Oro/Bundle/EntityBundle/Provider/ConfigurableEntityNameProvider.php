@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Inflector\Inflector;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 
 /**
  * The resolver for entity names(titles) that works based on the "oro_entity.entity_name_representation" configuration.
@@ -117,7 +118,7 @@ class ConfigurableEntityNameProvider implements EntityNameProviderInterface
     private function getFieldValue(object $entity, string $fieldName): mixed
     {
         $getterName = 'get' . $this->inflector->classify($fieldName);
-        if (method_exists($entity, $getterName)) {
+        if (EntityPropertyInfo::methodExists($entity, $getterName)) {
             return $entity->{$getterName}();
         }
 

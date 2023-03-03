@@ -3,22 +3,25 @@
 namespace Oro\Bundle\TagBundle\Form\Transformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\TagBundle\Entity\TagManager;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * Form tag transformer.
+ */
 class TagTransformer implements DataTransformerInterface
 {
     /**  @var TagManager */
     protected $tagManager;
 
-    /**  @var PropertyAccessor */
-    protected $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(TagManager $tagManager)
     {
         $this->tagManager = $tagManager;
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
     }
 
     /**

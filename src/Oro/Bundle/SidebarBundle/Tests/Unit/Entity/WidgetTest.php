@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SidebarBundle\Entity\Widget;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class WidgetTest extends \PHPUnit\Framework\TestCase

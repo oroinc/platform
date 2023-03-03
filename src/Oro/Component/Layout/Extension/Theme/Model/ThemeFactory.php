@@ -2,17 +2,17 @@
 
 namespace Oro\Component\Layout\Extension\Theme\Model;
 
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Creates instance of Theme model based on given name and definition.
  */
 class ThemeFactory implements ThemeFactoryInterface
 {
-    /** @var PropertyAccessor */
+    /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
-    public function __construct(PropertyAccessor $propertyAccessor)
+    public function __construct(PropertyAccessorInterface $propertyAccessor)
     {
         $this->propertyAccessor = $propertyAccessor;
     }

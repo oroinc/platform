@@ -5,11 +5,11 @@ namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
@@ -153,6 +153,6 @@ class EntityToIdTransformer implements DataTransformerInterface
 
     protected function createPropertyAccessor()
     {
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
     }
 }

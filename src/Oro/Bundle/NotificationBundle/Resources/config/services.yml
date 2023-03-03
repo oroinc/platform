@@ -111,6 +111,7 @@ services:
             - '@property_accessor'
             - '@event_dispatcher'
             - '@oro_notification.additional_email_association_provider'
+            - '@oro_notification.entity_website_aware_helper'
         tags:
             - { name: notification.handler, alias: email_notification_handler }
 
@@ -207,3 +208,16 @@ services:
         public: true
         arguments:
             - '@translator'
+
+    oro_notification.entity_website_aware_helper:
+        class: Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper
+        arguments:
+            - "@oro_entity_config.config_manager"
+
+    Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper:
+        alias: oro_notification.entity_website_aware_helper
+
+    oro_notification.aware_entity_configuration:
+        class: Oro\Bundle\NotificationBundle\EntityConfig\WebsiteAwareEntityConfiguration
+        tags:
+            - oro_entity_config.validation.entity_config

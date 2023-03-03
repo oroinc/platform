@@ -7,9 +7,9 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class EntityApiBaseHandlerTest extends TestCase
 {
@@ -36,7 +36,11 @@ class EntityApiBaseHandlerTest extends TestCase
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->processor = $this->createMock(EntityApiHandlerProcessor::class);
 
-        $this->handler = new EntityApiBaseHandler($this->doctrine, $this->processor, new PropertyAccessor());
+        $this->handler = new EntityApiBaseHandler(
+            $this->doctrine,
+            $this->processor,
+            PropertyAccess::createPropertyAccessor()
+        );
     }
 
     public function testProcessUnsupportedMethod()

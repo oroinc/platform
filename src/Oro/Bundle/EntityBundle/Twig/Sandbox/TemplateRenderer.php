@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Twig\Sandbox;
 
 use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface as ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Twig\GetAttributeNodeExtension;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\SandboxExtension;
@@ -131,6 +132,8 @@ abstract class TemplateRenderer
         $formatExtension = new EntityFormatExtension();
         $formatExtension->setFormatters($config[ConfigProvider::DEFAULT_FORMATTERS]);
         $this->environment->addExtension($formatExtension);
+        $getAttrNodeExtension = new GetAttributeNodeExtension();
+        $this->environment->addExtension($getAttrNodeExtension);
     }
 
     private function enableToStringMethod(array $configMethods): array

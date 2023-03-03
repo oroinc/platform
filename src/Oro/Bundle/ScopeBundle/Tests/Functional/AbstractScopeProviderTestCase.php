@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Functional;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class AbstractScopeProviderTestCase extends WebTestCase
 {
@@ -36,7 +36,7 @@ class AbstractScopeProviderTestCase extends WebTestCase
     private static function createScope(string $field, mixed $value): Scope
     {
         $scope = new Scope();
-        (new PropertyAccessor())->setValue($scope, $field, $value);
+        (PropertyAccess::createPropertyAccessor())->setValue($scope, $field, $value);
 
         return $scope;
     }

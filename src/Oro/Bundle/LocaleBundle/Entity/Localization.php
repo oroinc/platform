@@ -9,7 +9,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 
 /**
@@ -36,10 +37,14 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
  *          },
  *      }
  * )
+ * @method LocalizedFallbackValue getTitle(Localization $localization = null)
+ * @method LocalizedFallbackValue getDefaultTitle()
+ * @method LocalizedFallbackValue setDefaultTitle($string)
  */
-class Localization extends ExtendLocalization implements DatesAwareInterface
+class Localization implements DatesAwareInterface, ExtendEntityInterface
 {
     use DatesAwareTrait;
+    use ExtendEntityTrait;
 
     const DEFAULT_LOCALIZATION = 'default';
 
@@ -128,8 +133,6 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
      */
     public function __construct()
     {
-        parent::__construct();
-
         $this->childLocalizations = new ArrayCollection();
         $this->titles = new ArrayCollection();
     }

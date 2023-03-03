@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Brick\Math\BigDecimal;
 use NumberFormatter as IntlNumberFormatter;
+use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Tools\NumberFormatterHelper;
@@ -91,6 +92,9 @@ class NumberFormatter
         array $symbols = [],
         $locale = null
     ) {
+        if ($value instanceof MultiCurrency) {
+            $value = $value->getValue();
+        }
         if (!$currencyCode) {
             $currencyCode = $this->localeSettings->getCurrency();
         }

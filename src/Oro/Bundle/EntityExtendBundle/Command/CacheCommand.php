@@ -8,7 +8,6 @@ use Oro\Bundle\CacheBundle\Provider\DirectoryAwareFileCacheInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityProxyGenerator;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Symfony\Bundle\FrameworkBundle\Console\Application as ConsoleApplication;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -76,11 +75,11 @@ abstract class CacheCommand extends Command
     protected function warmupExtendedEntityCache(OutputInterface $output): void
     {
         $output->writeln('Dump the configuration of extended entities to the cache');
+        $this->extendConfigDumper->validateExtendEntityConfig();
 
         $cacheDir = $this->extendConfigDumper->getCacheDir();
         if (empty($this->cacheDir) || $this->cacheDir === $cacheDir) {
             $this->extendConfigDumper->dump();
-            $this->setClassAliases($cacheDir);
         } else {
             $this->extendConfigDumper->setCacheDir($this->cacheDir);
             try {
@@ -90,7 +89,6 @@ abstract class CacheCommand extends Command
                 $this->extendConfigDumper->setCacheDir($cacheDir);
                 throw $e;
             }
-            $this->setClassAliases($this->cacheDir);
         }
     }
 
@@ -173,13 +171,5 @@ abstract class CacheCommand extends Command
     {
         $output->writeln('Warm up entity aliases cache');
         $this->entityAliasResolver->warmUpCache();
-    }
-
-    /**
-     * Sets class aliases for extended entities.
-     */
-    protected function setClassAliases(string $cacheDir): void
-    {
-        ExtendClassLoadingUtils::setAliases($cacheDir);
     }
 }

@@ -10,12 +10,13 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -36,8 +37,7 @@ class DynamicFieldsHelper
     /** @var RouterInterface */
     private $router;
 
-    /** @var PropertyAccessor */
-    private $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
 
     /** @var TranslatorInterface */
     private $translator;
@@ -54,7 +54,7 @@ class DynamicFieldsHelper
         $this->doctrineHelper = $doctrineHelper;
         $this->router = $router;
         $this->translator = $translator;
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
