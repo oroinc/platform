@@ -13,7 +13,5 @@ class SegmentStub extends Segment
         if ($id !== null) {
             $this->id = $id;
         }
-
-        parent::__construct();
     }
 }
