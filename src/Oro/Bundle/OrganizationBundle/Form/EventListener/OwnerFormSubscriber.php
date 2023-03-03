@@ -4,12 +4,16 @@ namespace Oro\Bundle\OrganizationBundle\Form\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Subscriber for post send owner data.
+ */
 class OwnerFormSubscriber implements EventSubscriberInterface
 {
     /** @var DoctrineHelper */
@@ -100,8 +104,11 @@ class OwnerFormSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $accessor = PropertyAccess::createPropertyAccessor();
         $owner = $form->get($this->fieldName)->getData();
-        $ownerData = method_exists($owner, 'getName') ? $owner->getName() : (string)$owner;
+        $ownerData = $accessor->isReadable($owner, 'name')
+            ? $accessor->getValue($owner, 'name')
+            : (string)$owner;
 
         $form->remove($this->fieldName);
         $form->add(

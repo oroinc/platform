@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * The default implementation of a service to access entity data.
  */
 class DefaultAccessor implements AccessorInterface
 {
-    private ?PropertyAccessor $propertyAccessor = null;
+    private ?PropertyAccessorInterface $propertyAccessor = null;
 
     /**
      * {@inheritdoc}
@@ -67,7 +67,7 @@ class DefaultAccessor implements AccessorInterface
             : $metadata->getFieldName();
     }
 
-    protected function getPropertyAccessor(): PropertyAccessor
+    protected function getPropertyAccessor(): PropertyAccessorInterface
     {
         if (!$this->propertyAccessor) {
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();

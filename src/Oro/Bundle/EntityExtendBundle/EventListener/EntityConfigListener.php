@@ -14,6 +14,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Updates entity config state on actions with entities and fields
+ *
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
  */
 class EntityConfigListener
 {
@@ -55,21 +58,24 @@ class EntityConfigListener
         }
     }
 
-    public function updateEntity(EntityConfigEvent $event)
+    public function updateEntity(EntityConfigEvent $event): void
     {
         $className       = $event->getClassName();
         if (!class_exists($className)) {
             # Skip processing if the entity is a custom or enum and the cache file is not generated yet
             return;
         }
+        $isExtendEntity = ExtendHelper::isExtendEntity($className);
         $parentClassName = get_parent_class($className);
-        if (!$parentClassName) {
+        if (!$parentClassName && !$isExtendEntity) {
             return;
         }
 
         if (ExtendHelper::isExtendEntityProxy($parentClassName)) {
             // When application is installed parent class will be replaced (via class_alias)
             $extendClass = $parentClassName;
+        } elseif ($isExtendEntity) {
+            $extendClass = null;
         } else {
             // During install parent class is not replaced (via class_alias)
             $shortClassName = ExtendHelper::getShortClassName($className);
@@ -84,10 +90,6 @@ class EntityConfigListener
         $hasChanges    = false;
         if (!$config->is('is_extend')) {
             $config->set('is_extend', true);
-            $hasChanges = true;
-        }
-        if (!$config->is('extend_class', $extendClass)) {
-            $config->set('extend_class', $extendClass);
             $hasChanges = true;
         }
         if ($hasChanges) {

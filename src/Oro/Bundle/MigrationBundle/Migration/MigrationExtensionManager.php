@@ -4,10 +4,14 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
+/**
+ * Class provides methods to manage migration extension.
+ */
 class MigrationExtensionManager
 {
     const EXTENSION_AWARE_INTERFACE_SUFFIX = 'AwareInterface';
@@ -209,7 +213,7 @@ class MigrationExtensionManager
         $extensionName = substr($className, 0, strlen($className) - strlen(self::EXTENSION_AWARE_INTERFACE_SUFFIX));
         $setMethodName = 'set' . $extensionName;
 
-        if (!method_exists($extensionAwareInterfaceName, $setMethodName)) {
+        if (!EntityPropertyInfo::methodExists($extensionAwareInterfaceName, $setMethodName)) {
             throw new \RuntimeException(
                 sprintf('The method "%s::%s" was not found.', $extensionAwareInterfaceName, $setMethodName)
             );

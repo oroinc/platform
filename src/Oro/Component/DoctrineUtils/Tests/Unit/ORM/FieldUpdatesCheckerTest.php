@@ -6,9 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\DoctrineUtils\ORM\FieldUpdatesChecker;
 use Oro\Component\DoctrineUtils\Tests\Unit\Stub\DummyEntity;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,7 +24,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
 
         $fieldUpdatesChecker = new FieldUpdatesChecker(
             $this->getManagerRegistry([$updatedEntityOne, $updatedEntityTwo]),
-            new PropertyAccessor()
+            PropertyAccess::createPropertyAccessor()
         );
 
         $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
@@ -45,7 +45,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
 
         $fieldUpdatesChecker = new FieldUpdatesChecker(
             $this->getManagerRegistry([$changedEntityOne, $changedEntityThree]),
-            new PropertyAccessor()
+            PropertyAccess::createPropertyAccessor()
         );
 
         $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
@@ -64,7 +64,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
         // unit of work will have only $changedEntityTwo in 'updates'
         $fieldUpdatesChecker = new FieldUpdatesChecker(
             $this->getManagerRegistry([$changedEntityTwo]),
-            new PropertyAccessor()
+            PropertyAccess::createPropertyAccessor()
         );
 
         $this->assertFalse($fieldUpdatesChecker->isRelationFieldChanged(
@@ -96,7 +96,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
             [$insertedEntityOne, $insertedEntityTwo]
         );
 
-        $fieldUpdatesChecker = new FieldUpdatesChecker($manager, new PropertyAccessor());
+        $fieldUpdatesChecker = new FieldUpdatesChecker($manager, PropertyAccess::createPropertyAccessor());
 
         $this->assertTrue($fieldUpdatesChecker->isRelationFieldChanged(
             $updatedEntityTwo,

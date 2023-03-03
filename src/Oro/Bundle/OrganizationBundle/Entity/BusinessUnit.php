@@ -7,7 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\OrganizationBundle\Model\ExtendBusinessUnit;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -50,10 +51,13 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class BusinessUnit extends ExtendBusinessUnit implements
+class BusinessUnit implements
     EmailHolderInterface,
-    BusinessUnitInterface
+    BusinessUnitInterface,
+    ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var integer
      *

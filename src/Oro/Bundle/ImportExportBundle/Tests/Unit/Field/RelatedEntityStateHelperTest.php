@@ -8,12 +8,12 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
 {

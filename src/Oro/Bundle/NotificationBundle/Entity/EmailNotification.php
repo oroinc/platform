@@ -6,7 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\NotificationBundle\Model\ExtendEmailNotification;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 
 /**
  * Represents notification rule.
@@ -33,8 +34,10 @@ use Oro\Bundle\NotificationBundle\Model\ExtendEmailNotification;
  *      }
  * )
  */
-class EmailNotification extends ExtendEmailNotification
+class EmailNotification implements ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var integer
      *

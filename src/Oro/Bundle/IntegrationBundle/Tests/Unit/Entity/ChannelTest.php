@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -9,7 +10,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Config\Common\ConfigObject;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ChannelTest extends \PHPUnit\Framework\TestCase
 {

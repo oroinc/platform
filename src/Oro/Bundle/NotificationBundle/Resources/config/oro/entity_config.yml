@@ -1,0 +1,5 @@
+entity_config:
+    website:
+        entity:
+            items:
+                is_website_aware: ~

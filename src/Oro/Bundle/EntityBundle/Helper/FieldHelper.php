@@ -5,11 +5,14 @@ namespace Oro\Bundle\EntityBundle\Helper;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Doctrine\Persistence\Reflection\ReflectionVirtualProperty;
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
@@ -51,11 +54,13 @@ class FieldHelper
     public function __construct(
         EntityFieldProvider $fieldProvider,
         ConfigProvider $configProvider,
-        FieldTypeHelper $fieldTypeHelper
+        FieldTypeHelper $fieldTypeHelper,
+        PropertyAccessorInterface $propertyAccessor,
     ) {
         $this->fieldProvider   = $fieldProvider;
         $this->configProvider  = $configProvider;
         $this->fieldTypeHelper = $fieldTypeHelper;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -238,7 +243,7 @@ class FieldHelper
     public function getObjectValue($object, $fieldName)
     {
         try {
-            return $this->getPropertyAccessor()->getValue($object, $fieldName);
+            return $this->propertyAccessor->getValue($object, $fieldName);
         } catch (\Exception $e) {
             return $this->getObjectValueWithReflection($object, $fieldName, $e);
         }
@@ -247,7 +252,7 @@ class FieldHelper
     public function getObjectValueWithReflection($object, string $fieldName, \Throwable $exception = null)
     {
         $class = ClassUtils::getClass($object);
-        while ($class && !property_exists($class, $fieldName) && $class = get_parent_class($class)) {
+        while ($class && !EntityPropertyInfo::propertyExists($class, $fieldName) && $class = get_parent_class($class)) {
         }
 
         if ($exception === null) {
@@ -260,7 +265,12 @@ class FieldHelper
             );
         }
 
-        if ($class) {
+        if ($class && ExtendHelper::isExtendEntity($class)) {
+            $reflection = ReflectionVirtualProperty::create($fieldName);
+            $reflection->setAccessible(true);
+
+            return $reflection->getValue($object);
+        } elseif ($class) {
             $reflection = new \ReflectionProperty($class, $fieldName);
             $reflection->setAccessible(true);
 
@@ -281,14 +291,8 @@ class FieldHelper
         $propertyPath = new PropertyPath($fieldName);
 
         try {
-            $this->getPropertyAccessor()->setValue($object, $propertyPath, $value);
-        } catch (NoSuchPropertyException $e) {
-            $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
-        } catch (\TypeError $e) {
-            $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
-        } catch (\ErrorException $e) {
-            $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
-        } catch (InvalidArgumentException $e) {
+            $this->propertyAccessor->setValue($object, $propertyPath, $value);
+        } catch (NoSuchPropertyException|\TypeError|\ErrorException|InvalidArgumentException $e) {
             $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
         }
     }
@@ -410,18 +414,6 @@ class FieldHelper
         }
 
         return $values;
-    }
-
-    /**
-     * @return PropertyAccessor
-     */
-    protected function getPropertyAccessor()
-    {
-        if (!$this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
     }
 
     /**

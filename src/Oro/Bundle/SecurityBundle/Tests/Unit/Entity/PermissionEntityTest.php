@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 use Oro\Component\Testing\ReflectionUtil;
 
@@ -31,7 +32,7 @@ class PermissionEntityTest extends \PHPUnit\Framework\TestCase
     {
         $setter = 'set' . ucfirst($propertyName);
         $getter = 'get' . ucfirst($propertyName);
-        if (!method_exists($this->object, $getter)) {
+        if (!EntityPropertyInfo::methodExists($this->object, $getter)) {
             $getter = 'is' . ucfirst($propertyName);
         }
 

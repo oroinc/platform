@@ -3,9 +3,10 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EmbeddedFormBundle\Model\ExtendEmbeddedForm;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -35,8 +36,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      }
  * )
  */
-class EmbeddedForm extends ExtendEmbeddedForm
+class EmbeddedForm implements ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var integer
      *

@@ -5,8 +5,8 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EmailTest extends \PHPUnit\Framework\TestCase
 {

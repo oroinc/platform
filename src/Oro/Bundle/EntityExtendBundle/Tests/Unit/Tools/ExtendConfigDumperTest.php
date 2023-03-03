@@ -134,11 +134,11 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             true
         );
 
-        $this->configManager->expects($this->exactly(2))
+        $this->configManager->expects($this->once())
             ->method('persist')
             ->withConsecutive(
-                [$this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity1')],
-                [$this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity2')]
+                [$this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity2')],
+                [$this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity1')]
             );
 
         $this->configManager->expects($this->once())
@@ -153,8 +153,6 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
                 'class'   => self::CLASS_NAMESPACE . '\Entity\TestEntity1',
                 'entity'  => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity1',
                 'type'    => 'Extend',
-                'parent'  => self::CLASS_NAMESPACE . '\Model\ExtendEntity1',
-                'inherit' => false
             ],
             $this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity1')->get('schema')
         );
@@ -164,8 +162,8 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
                 'class'   => self::CLASS_NAMESPACE . '\Entity\TestEntity2',
                 'entity'  => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity2',
                 'type'    => 'Extend',
-                'parent'  => self::CLASS_NAMESPACE . '\Model\ExtendEntity2',
-                'inherit' => self::CLASS_NAMESPACE . '\TestAbstractClass'
+                'parent'  => self::CLASS_NAMESPACE . '\TestAbstractClass',
+                'inherit' => false
             ],
             $this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity2')->get('schema')
         );
@@ -180,8 +178,8 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
                     'class'   => self::CLASS_NAMESPACE . '\Entity\TestEntity1',
                     'entity'  => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity1',
                     'type'    => 'Extend',
-                    'parent'  => self::CLASS_NAMESPACE . '\Model\ExtendEntity1',
-                    'inherit' => false
+                    'parent'  => self::CLASS_NAMESPACE . '\TestAbstractClass',
+                    'inherit' => self::CLASS_NAMESPACE . '\TestAbstractClass'
                 ]
             ]
         );
@@ -192,8 +190,8 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
                     'class'   => self::CLASS_NAMESPACE . '\Entity\TestEntity2',
                     'entity'  => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity2',
                     'type'    => 'Extend',
-                    'parent'  => self::CLASS_NAMESPACE . '\Model\ExtendEntity2',
-                    'inherit' => self::CLASS_NAMESPACE . '\TestAbstractClass'
+                    'parent'  => self::CLASS_NAMESPACE . '\TestAbstractClass',
+                    'inherit' => false
                 ]
             ],
             true
@@ -220,7 +218,7 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
         $configId = new EntityConfigId('somescope', 'SomeClass');
         $config = new Config(
             $configId,
-            ['param1' => 'value1', 'upgradeable' => true, 'extend_class' => \stdClass::class]
+            ['param1' => 'value1', 'upgradeable' => true]
         );
 
         $this->extendEntityConfigProvider->expects($this->once())
@@ -260,7 +258,7 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
                     'upgradeable'  => true,
                     'schema'       => [
                         'class'     => 'SomeClass',
-                        'entity'    => \stdClass::class,
+                        'entity'    => 'SomeClass',
                         'type'      => 'Extend',
                         'property'  => [
                             'field1' => [],
@@ -270,8 +268,8 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
                         'default'   => [],
                         'addremove' => [],
                         'doctrine'  => [
-                            \stdClass::class => [
-                                'type'   => 'mappedSuperclass',
+                            'SomeClass' => [
+                                'type'   => 'entity',
                                 'fields' => [
                                     'field1' => [
                                         'column'    => 'field1',
@@ -298,7 +296,6 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
                         'inherit'   => false
                     ],
                     'state'        => ExtendScope::STATE_ACTIVE,
-                    'extend_class' => \stdClass::class
                 ]
             ),
             $config

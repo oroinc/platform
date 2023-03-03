@@ -3,9 +3,10 @@
 namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\AttachmentBundle\Model\ExtendFileItem;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 
 /**
@@ -15,8 +16,10 @@ use Oro\Bundle\FormBundle\Entity\EmptyItem;
  * @ORM\Entity()
  * @Config
  */
-class FileItem extends ExtendFileItem implements EmptyItem
+class FileItem implements EmptyItem, ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var int|null
      *

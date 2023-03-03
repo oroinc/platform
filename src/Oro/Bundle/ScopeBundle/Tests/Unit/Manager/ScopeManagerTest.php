@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException;
 use Oro\Bundle\ScopeBundle\Manager\ScopeCollection;
@@ -17,7 +18,6 @@ use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScope;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScopeCriteriaProvider;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -99,7 +99,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
             $this->doctrine,
             $this->scopeDataAccessor,
             $this->scheduledForInsertScopes,
-            new PropertyAccessor()
+            PropertyAccess::createPropertyAccessor()
         );
     }
 

@@ -5,12 +5,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker\Factory;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\TestFrameworkBundle\Faker\ColumnTypeGuesser;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 

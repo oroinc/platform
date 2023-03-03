@@ -10,7 +10,7 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Provider\Fixtures\DictionaryEntity;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -34,7 +34,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $this->entityNameProvider = new DictionaryEntityNameProvider(
             $this->configManager,
             $this->doctrine,
-            new PropertyAccessor()
+            PropertyAccess::createPropertyAccessor()
         );
     }
 

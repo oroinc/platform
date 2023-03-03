@@ -4,13 +4,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\SetDefaultEnumValue;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEntityWithEnum;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
 {
@@ -38,7 +38,7 @@ class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
         $this->processor = new SetDefaultEnumValue(
             $this->enumValueProvider,
             $this->doctrineHelper,
-            new PropertyAccessor(),
+            PropertyAccess::createPropertyAccessor(),
             'singleEnumField',
             self::ENUM_CODE
         );

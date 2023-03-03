@@ -49,6 +49,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     ): void {
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
         $containerBuilder->setParameter('suite.configurations', $suiteConfig);
+        $containerBuilder->setParameter('paths.base', __DIR__);
 
         $config = [
             'oro_test' => [
@@ -77,6 +78,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $containerBuilder = $this->getContainerBuilder([]);
         $sharedContexts = [OroMainContext::class];
+        $containerBuilder->setParameter('paths.base', __DIR__);
 
         $config = [
             'oro_test' => [
@@ -225,6 +227,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
         $containerBuilder->setParameter('suite.configurations', []);
+        $containerBuilder->setParameter('paths.base', __DIR__);
         $extension = new OroTestFrameworkExtension();
         $extension->load($containerBuilder, $this->processConfig($configExtension));
         $extension->process($containerBuilder);
@@ -265,6 +268,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
         $containerBuilder->setParameter('suite.configurations', []);
+        $containerBuilder->setParameter('paths.base', __DIR__);
         $extension = new OroTestFrameworkExtension();
         $extension->load($containerBuilder, $this->processConfig($configExtension));
 
@@ -349,6 +353,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $containerBuilder = $this->getContainerBuilder([]);
         $containerBuilder->setParameter('suite.configurations', []);
+        $containerBuilder->setParameter('paths.base', __DIR__);
 
         $className = $this->getMockClass(ContextInitializer::class);
         $contextInitializerDef = new Definition($this->getMockClass(ContextInitializer::class));
@@ -387,6 +392,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $containerBuilder = $this->getContainerBuilder([]);
         $containerBuilder->setParameter('suite.configurations', []);
+        $containerBuilder->setParameter('paths.base', __DIR__);
 
         $sampleServiceDef = new Definition(\stdClass::class);
         $containerBuilder->setDefinition(\stdClass::class, $sampleServiceDef);

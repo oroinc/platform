@@ -8,7 +8,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -21,13 +21,13 @@ class LocalizedFallbackValueFormatter implements FormatterInterface
     private DoctrineHelper $doctrineHelper;
     private LocalizationHelper $localizationHelper;
     private TranslatorInterface $translator;
-    private PropertyAccessor $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
         LocalizationHelper $localizationHelper,
         TranslatorInterface $translator,
-        PropertyAccessor $propertyAccessor
+        PropertyAccessorInterface $propertyAccessor
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->translator = $translator;

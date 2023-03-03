@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\Factory\ActivityListFactory;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
@@ -29,30 +30,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ActivityListChainProvider implements ResetInterface
 {
-    /** @var string[] */
-    private $activityClasses;
-
-    /** @var string[] [activity class => activity ACL class, ...] */
-    private $activityAclClasses;
-
-    /** @var ContainerInterface */
-    private $providerContainer;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /** @var EntityRoutingHelper */
-    private $routingHelper;
-
-    /** @var TokenAccessorInterface */
-    private $tokenAccessor;
-
     /** @var array [accessible flag => [class name, ...], ...] */
     private $targetClasses;
 
@@ -73,23 +50,16 @@ class ActivityListChainProvider implements ResetInterface
      * @param TokenAccessorInterface $tokenAccessor
      */
     public function __construct(
-        array $activityClasses,
-        array $activityAclClasses,
-        ContainerInterface $providerContainer,
-        DoctrineHelper $doctrineHelper,
-        ConfigManager $configManager,
-        TranslatorInterface $translator,
-        EntityRoutingHelper $routingHelper,
-        TokenAccessorInterface $tokenAccessor
+        private array $activityClasses,
+        private array $activityAclClasses,
+        private ContainerInterface $providerContainer,
+        private DoctrineHelper $doctrineHelper,
+        private ConfigManager $configManager,
+        private TranslatorInterface $translator,
+        private EntityRoutingHelper $routingHelper,
+        private TokenAccessorInterface $tokenAccessor,
+        private ActivityListFactory $activityListFactory
     ) {
-        $this->activityClasses = $activityClasses;
-        $this->activityAclClasses = $activityAclClasses;
-        $this->providerContainer = $providerContainer;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->configManager = $configManager;
-        $this->translator = $translator;
-        $this->routingHelper = $routingHelper;
-        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -465,7 +435,7 @@ class ActivityListChainProvider implements ResetInterface
         }
 
         if (null === $list) {
-            $list = new ActivityList();
+            $list = $this->activityListFactory->createActivityList();
         }
 
         $list->setSubject($provider->getSubject($entity));

@@ -150,8 +150,8 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function loadBootstrap(ContainerBuilder $container)
     {
         /** @var KernelInterface $kernel */
-        $kernel = $container->get(SymfonyExtension::KERNEL_ID);
-        $bootstrapFile = $kernel->getProjectDir().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'bootstrap_test.php';
+        $projectDir = $container->getParameter('paths.base');
+        $bootstrapFile = $projectDir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'bootstrap_test.php';
         if (file_exists($bootstrapFile)) {
             require_once $bootstrapFile;
         }

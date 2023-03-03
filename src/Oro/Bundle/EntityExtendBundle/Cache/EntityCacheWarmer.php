@@ -7,25 +7,16 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
+/**
+ * Warms cache of entities.
+ */
 class EntityCacheWarmer extends CacheWarmer
 {
-    /** @var ExtendConfigDumper */
-    private $dumper;
-
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var ConfigCacheWarmer */
-    private $configCacheWarmer;
-
     public function __construct(
-        ExtendConfigDumper $dumper,
-        ConfigManager $configManager,
-        ConfigCacheWarmer $configCacheWarmer
+        private ExtendConfigDumper $dumper,
+        private ConfigManager $configManager,
+        private ConfigCacheWarmer $configCacheWarmer,
     ) {
-        $this->dumper            = $dumper;
-        $this->configManager     = $configManager;
-        $this->configCacheWarmer = $configCacheWarmer;
     }
 
     /**

@@ -6,9 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Entity\AuditAdditionalFieldsInterface;
-use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Model\ExtendTestAuditDataChild;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
@@ -16,10 +17,13 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
  * @ORM\Entity
  * @Config(defaultValues={"dataaudit"={"auditable"=true}})
  */
-class TestAuditDataChild extends ExtendTestAuditDataChild implements
+class TestAuditDataChild implements
     TestFrameworkEntityInterface,
-    AuditAdditionalFieldsInterface
+    AuditAdditionalFieldsInterface,
+    ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var int
      *
@@ -91,8 +95,6 @@ class TestAuditDataChild extends ExtendTestAuditDataChild implements
     public function __construct()
     {
         $this->owners = new ArrayCollection();
-
-        parent::__construct();
     }
 
     /**

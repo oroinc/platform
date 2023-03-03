@@ -4,9 +4,12 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\EmailBundle\Model\ExtendEmail;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Symfony\Component\HttpFoundation\AcceptHeader;
 
 /**
@@ -48,8 +51,11 @@ use Symfony\Component\HttpFoundation\AcceptHeader;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyFields)
  */
-class Email extends ExtendEmail
+class Email implements ActivityInterface, ExtendEntityInterface
 {
+    use ExtendActivity;
+    use ExtendEntityTrait;
+
     const LOW_IMPORTANCE    = -1;
     const NORMAL_IMPORTANCE = 0;
     const HIGH_IMPORTANCE   = 1;
@@ -210,8 +216,6 @@ class Email extends ExtendEmail
 
     public function __construct()
     {
-        parent::__construct();
-
         $this->importance = self::NORMAL_IMPORTANCE;
         $this->recipients = new ArrayCollection();
         $this->emailUsers = new ArrayCollection();

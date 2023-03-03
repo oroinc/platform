@@ -2,9 +2,12 @@
 
 namespace Oro\Component\Testing\Unit\PropertyAccess;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\EntityExtendBundle\Decorator\OroPropertyAccessorBuilder;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Common property accessor without custom reflection service for unit tests.
+ */
 trait PropertyAccessTrait
 {
     /**
@@ -18,7 +21,8 @@ trait PropertyAccessTrait
     protected function getPropertyAccessor()
     {
         if (!$this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+            $builder = new OroPropertyAccessorBuilder();
+            $this->propertyAccessor = $builder->getPropertyAccessor();
         }
 
         return $this->propertyAccessor;

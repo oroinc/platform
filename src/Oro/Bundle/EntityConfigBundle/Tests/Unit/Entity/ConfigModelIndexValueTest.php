@@ -5,8 +5,8 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Entity;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Testing\ReflectionUtil;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ConfigModelIndexValueTest extends \PHPUnit\Framework\TestCase
 {

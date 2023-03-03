@@ -12,12 +12,12 @@ use Oro\Bundle\EntityExtendBundle\EntityExtendEvents;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -62,7 +62,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->fieldTypeHelper = $this->createMock(FieldTypeHelper::class);
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $propertyAccessor = new PropertyAccessor();
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->featureChecker->expects($this->any())

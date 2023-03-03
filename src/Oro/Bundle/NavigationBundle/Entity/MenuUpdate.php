@@ -4,7 +4,9 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 /**
  * Menu Update entity
@@ -72,16 +74,25 @@ use Oro\Bundle\NavigationBundle\Model\ExtendMenuUpdate;
  *      }
  * )
  * @ORM\HasLifecycleCallbacks()
+ *
+ * @method MenuUpdate getTitle(Localization $localization = null)
+ * @method MenuUpdate getDefaultTitle()
+ * @method MenuUpdate setDefaultTitle($value)
+ * @method MenuUpdate getDescription(Localization $localization = null)
+ * @method MenuUpdate getDefaultDescription()
+ * @method MenuUpdate setDefaultDescription($value)
  */
-class MenuUpdate extends ExtendMenuUpdate implements MenuUpdateInterface
+class MenuUpdate implements
+    MenuUpdateInterface,
+    ExtendEntityInterface
 {
     use MenuUpdateTrait {
         MenuUpdateTrait::__construct as traitConstructor;
     }
+    use ExtendEntityTrait;
 
     public function __construct()
     {
-        parent::__construct();
         $this->traitConstructor();
     }
 

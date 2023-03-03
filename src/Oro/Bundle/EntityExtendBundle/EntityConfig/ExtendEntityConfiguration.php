@@ -94,9 +94,6 @@ class ExtendEntityConfiguration implements EntityConfigInterface
                 ->info('`boolean` if TRUE then field data will be saved in serialized_data column without doctrine ' .
                 'schema update.')
             ->end()
-            ->scalarNode('extend_class')
-                ->info('`string` extend class name')
-            ->end()
         ;
     }
 }

@@ -4,8 +4,8 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Form\DataTransformer\AddressSameTransformer;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class AddressSameTransformerTest extends \PHPUnit\Framework\TestCase
 {

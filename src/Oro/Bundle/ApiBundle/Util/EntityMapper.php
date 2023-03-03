@@ -9,6 +9,7 @@ use Doctrine\Persistence\Proxy;
 use Oro\Bundle\ApiBundle\Provider\ChainEntityOverrideProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
@@ -158,8 +159,8 @@ class EntityMapper
 
     private function updateModelAssociations(object $model, object $entity): void
     {
-        $modelReflClass = new \ReflectionClass($this->doctrineHelper->getClass($model));
-        $entityReflClass = new \ReflectionClass($this->doctrineHelper->getClass($entity));
+        $modelReflClass = new EntityReflectionClass($this->doctrineHelper->getClass($model));
+        $entityReflClass = new EntityReflectionClass($this->doctrineHelper->getClass($entity));
         $metadata = $this->getEntityMetadata($entityReflClass->getName());
         foreach ($metadata->getAssociationNames() as $name) {
             $value = self::getObjectPropertyValue($entityReflClass, $entity, $name);
@@ -257,12 +258,12 @@ class EntityMapper
         string $modelClass,
         bool $isNewEntity
     ): void {
-        $entityReflClass = new \ReflectionClass($entityClass);
+        $entityReflClass = new EntityReflectionClass($entityClass);
         $metadata = $this->getEntityMetadata($entityClass, $modelClass);
         if ($entity === $model) {
             $this->refreshEntityAssociations($entityReflClass, $metadata, $entity);
         } else {
-            $modelReflClass = new \ReflectionClass($modelClass);
+            $modelReflClass = new EntityReflectionClass($modelClass);
             if (!$isNewEntity) {
                 $this->updateEntityFields($entityReflClass, $modelReflClass, $metadata, $entity, $model);
             }
@@ -408,7 +409,7 @@ class EntityMapper
     private function createObject(string $objectClass, object $source): object
     {
         $object = $this->entityInstantiator->instantiate($objectClass);
-        $objectReflClass = new \ReflectionClass($objectClass);
+        $objectReflClass = new EntityReflectionClass($objectClass);
         $sourceProperties = self::getProperties($this->doctrineHelper->getClass($source));
         foreach ($sourceProperties as $sourceProperty) {
             $objectProperty = ReflectionUtil::getProperty($objectReflClass, $sourceProperty->getName());
@@ -464,8 +465,9 @@ class EntityMapper
      */
     private static function getProperties(string $objectClass): array
     {
-        $reflClass = new \ReflectionClass($objectClass);
+        $reflClass = new EntityReflectionClass($objectClass);
         $properties = $reflClass->getProperties();
+
         $parentClass = $reflClass->getParentClass();
         if ($parentClass) {
             $names = [];

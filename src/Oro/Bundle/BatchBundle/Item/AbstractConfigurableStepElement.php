@@ -3,7 +3,7 @@
 namespace Oro\Bundle\BatchBundle\Item;
 
 use Doctrine\Common\Inflector\Inflector;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 
 /**
  * Define a configurable step element

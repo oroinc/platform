@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 /**
@@ -182,6 +183,9 @@ abstract class AbstractLocalizedFallbackValue
     public function __toString()
     {
         $fields = get_object_vars($this);
+        if (is_subclass_of($this::class, ExtendEntityInterface::class)) {
+            $fields = array_merge($fields, $this->getExtendStorageFields());
+        }
         ksort($fields);
 
         foreach ($fields as $field => $value) {

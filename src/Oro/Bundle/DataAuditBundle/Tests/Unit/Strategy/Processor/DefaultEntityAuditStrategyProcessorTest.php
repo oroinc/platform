@@ -8,7 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Strategy\Processor\DefaultEntityAuditStrategyProcessor;
 use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\CustomFieldStub;
-use Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension;
 use Oro\Component\Testing\Unit\EntityTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -19,14 +18,11 @@ class DefaultEntityAuditStrategyProcessorTest extends TestCase
 
     private ManagerRegistry|MockObject $doctrine;
 
-    private DefaultFallbackGeneratorExtension|MockObject $extension;
-
     private EntityAuditStrategyProcessorInterface $strategyProcessor;
 
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
-        $this->extension = $this->createMock(DefaultFallbackGeneratorExtension::class);
 
         $this->strategyProcessor = new DefaultEntityAuditStrategyProcessor($this->doctrine);
     }

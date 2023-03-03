@@ -22,7 +22,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -81,7 +81,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     /** @var EntityNameResolver */
     private $entityNameResolver;
 
-    /** @var PropertyAccessor */
+    /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
     private ApplicationState $applicationState;
@@ -579,7 +579,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->auditMessageBodyProvider = $auditMessageBodyProvider;
     }
 
-    public function setPropertyAccessor(PropertyAccessor $propertyAccessor)
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
     {
         $this->propertyAccessor = $propertyAccessor;
     }

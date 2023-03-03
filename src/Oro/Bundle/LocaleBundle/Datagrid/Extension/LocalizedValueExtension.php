@@ -15,11 +15,12 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Show localized values in grid according to the current localization
@@ -37,8 +38,8 @@ class LocalizedValueExtension extends AbstractExtension
     /** @var LocalizationHelper */
     protected $localizationHelper;
 
-    /** @var PropertyAccessor */
-    protected $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
+
     private Inflector $inflector;
 
     public function __construct(
@@ -51,7 +52,7 @@ class LocalizedValueExtension extends AbstractExtension
         $this->entityClassResolver = $entityClassResolver;
         $this->localizationHelper = $localizationHelper;
 
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->inflector = $inflector;
     }
 

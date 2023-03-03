@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**

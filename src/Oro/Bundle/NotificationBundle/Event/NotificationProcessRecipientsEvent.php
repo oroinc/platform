@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Event;
 
+use Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -17,6 +18,8 @@ class NotificationProcessRecipientsEvent extends Event
      */
     private $entity;
 
+    private WebsiteAwareEntityHelper $websiteAwareHelper;
+
     /**
      * @var array
      */
@@ -26,10 +29,11 @@ class NotificationProcessRecipientsEvent extends Event
      * @param object $entity
      * @param array $recipients
      */
-    public function __construct($entity, array $recipients)
+    public function __construct($entity, array $recipients, WebsiteAwareEntityHelper $websiteAwareHelper)
     {
         $this->entity = $entity;
         $this->recipients = $recipients;
+        $this->websiteAwareHelper = $websiteAwareHelper;
     }
 
     /**
@@ -54,5 +58,10 @@ class NotificationProcessRecipientsEvent extends Event
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    public function getWebsiteAwareEntityHelper(): WebsiteAwareEntityHelper
+    {
+        return $this->websiteAwareHelper;
     }
 }

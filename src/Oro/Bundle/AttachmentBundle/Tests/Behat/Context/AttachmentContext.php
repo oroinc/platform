@@ -5,9 +5,9 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Behat\Context;
 use GuzzleHttp\Client;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 abstract class AttachmentContext extends OroFeatureContext
 {

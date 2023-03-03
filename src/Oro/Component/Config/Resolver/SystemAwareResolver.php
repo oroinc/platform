@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Config\Resolver;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -282,7 +282,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
     protected function getPropertyAccessor()
     {
         if (!$this->propertyAccessor) {
-            $this->propertyAccessor = new PropertyAccessor();
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
         }
 
         return $this->propertyAccessor;

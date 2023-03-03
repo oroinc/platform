@@ -6,6 +6,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityIdMetadataInterface;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
@@ -35,7 +36,7 @@ class EntityIdHelper
             $entityId = [reset($idFieldNames) => $entityId];
         }
 
-        $reflClass = new \ReflectionClass($entity);
+        $reflClass = new EntityReflectionClass($entity);
         foreach ($entityId as $fieldName => $value) {
             $propertyName = $metadata->getPropertyPath($fieldName);
             if (null === $propertyName) {
@@ -203,7 +204,7 @@ class EntityIdHelper
         }
 
         $identifier = [];
-        $reflClass = new \ReflectionClass($entity);
+        $reflClass = new EntityReflectionClass($entity);
         foreach ($idFieldNames as $fieldName) {
             $getter = $this->getGetter($reflClass, $fieldName);
             if (null !== $getter) {

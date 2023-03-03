@@ -5,9 +5,9 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ContextHelperTest extends \PHPUnit\Framework\TestCase
 {

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\UIBundle\Route;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -19,7 +20,7 @@ class Router
     protected RequestStack $requestStack;
     protected UrlGeneratorInterface $urlGenerator;
     protected AuthorizationCheckerInterface $authorizationChecker;
-    protected PropertyAccessor $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(
         RequestStack $requestStack,
@@ -30,7 +31,7 @@ class Router
         $this->urlGenerator = $urlGenerator;
         $this->authorizationChecker = $authorizationChecker;
 
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
     }
 
     /**

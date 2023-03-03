@@ -5,11 +5,12 @@ namespace Oro\Bundle\ActivityListBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\ActivityListBundle\Model\ExtendActivityList;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -49,9 +50,19 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
+ * @method ActivityList supportActivityListTarget($targetClass)
+ * @method ActivityList removeActivityListTarget($target)
+ * @method ActivityList hasActivityListTarget($target)
+ * @method ActivityList getActivityListTargets($targetClass = null)
+ * @method ActivityList addActivityListTarget($target)
  */
-class ActivityList extends ExtendActivityList implements DatesAwareInterface, UpdatedByAwareInterface
+class ActivityList implements
+    DatesAwareInterface,
+    UpdatedByAwareInterface,
+    ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     const VERB_CREATE = 'create';
     const VERB_UPDATE = 'update';
 
@@ -173,8 +184,6 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
 
     public function __construct()
     {
-        parent::__construct();
-
         $this->activityOwners = new ArrayCollection();
     }
 

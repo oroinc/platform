@@ -15,11 +15,11 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Component\Testing\ReflectionUtil;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Twig\Error\Error;
 
@@ -58,7 +58,7 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new EmailTemplateContentProvider(
             $doctrine,
             $this->emailRenderer,
-            new PropertyAccessor(),
+            PropertyAccess::createPropertyAccessor(),
             $this->logger,
             $this->translatableListener,
             $this->translator

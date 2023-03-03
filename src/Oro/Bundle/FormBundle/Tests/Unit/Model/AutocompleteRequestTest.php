@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class AutocompleteRequestTest extends \PHPUnit\Framework\TestCase
 {

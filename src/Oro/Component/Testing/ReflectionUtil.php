@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Testing;
 
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Component\PhpUtils\ReflectionUtil as PhpReflectionUtil;
 
 /**
@@ -29,7 +30,7 @@ class ReflectionUtil
      */
     public static function setPropertyValue(object $object, string $propertyName, $propertyValue): void
     {
-        $property = self::getProperty(new \ReflectionClass($object), $propertyName);
+        $property = self::getProperty(new EntityReflectionClass($object), $propertyName);
         $property->setAccessible(true);
         $property->setValue($object, $propertyValue);
     }
@@ -44,7 +45,7 @@ class ReflectionUtil
      */
     public static function getPropertyValue(object $object, string $propertyName)
     {
-        $property = self::getProperty(new \ReflectionClass($object), $propertyName);
+        $property = self::getProperty(new EntityReflectionClass($object), $propertyName);
         $property->setAccessible(true);
 
         return $property->getValue($object);

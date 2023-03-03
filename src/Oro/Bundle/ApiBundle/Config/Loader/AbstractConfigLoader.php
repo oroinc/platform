@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Loader;
 
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
+
 /**
  * The base class for configuration section loaders.
  */
@@ -41,7 +43,7 @@ abstract class AbstractConfigLoader implements ConfigLoaderInterface
 
         $setter = 'set' . $this->camelize($key);
 
-        return method_exists($config, $setter)
+        return EntityPropertyInfo::methodExists($config, $setter)
             ? $setter
             : null;
     }

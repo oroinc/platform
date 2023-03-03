@@ -22,7 +22,8 @@ services:
         arguments: ['oro_config.global']
 
     property_accessor:
-        class: Symfony\Component\PropertyAccess\PropertyAccessor
+        class: Symfony\Component\PropertyAccess\PropertyAccessorInterface
+        factory: [ 'Oro\Bundle\EntityExtendBundle\PropertyAccess', createPropertyAccessor ]
 
     doctrine.orm.entity_manager:
         class: Doctrine\ORM\EntityManager

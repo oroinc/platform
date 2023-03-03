@@ -6,9 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Entity\AuditAdditionalFieldsInterface;
-use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Model\ExtendTestAuditDataOwner;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 use Oro\Component\Config\Common\ConfigObject;
 
@@ -22,10 +23,13 @@ use Oro\Component\Config\Common\ConfigObject;
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class TestAuditDataOwner extends ExtendTestAuditDataOwner implements
+class TestAuditDataOwner implements
     TestFrameworkEntityInterface,
-    AuditAdditionalFieldsInterface
+    AuditAdditionalFieldsInterface,
+    ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var int
      *
@@ -370,8 +374,6 @@ class TestAuditDataOwner extends ExtendTestAuditDataOwner implements
         $this->childrenManyToMany = new ArrayCollection();
         $this->childrenOneToMany = new ArrayCollection();
         $this->childrenManyToManyUnidirectional = new ArrayCollection();
-
-        parent::__construct();
     }
 
     /**

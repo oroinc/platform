@@ -23,3 +23,7 @@ entity_config:
                             block:          other
                             required:       true
                             label:          'Ownership Type'
+    global_organization:
+        entity:
+            items:
+                is_global_aware:

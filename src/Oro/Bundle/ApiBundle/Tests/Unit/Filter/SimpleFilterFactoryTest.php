@@ -6,8 +6,8 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -30,10 +30,10 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
             $filters,
             $filterFactories,
             $factoryContainer,
-            new PropertyAccessor(),
+            PropertyAccess::createPropertyAccessor(),
             new FilterOperatorRegistry([
-                FilterOperator::EQ  => '=',
-                FilterOperator::NEQ => '!='
+                FilterOperator::EQ => '=',
+                FilterOperator::NEQ => '!=',
             ])
         );
     }

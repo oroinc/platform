@@ -9,7 +9,9 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\EntityConfigBundle\Model\ExtendAttributeGroup;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 /**
@@ -21,10 +23,13 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
  * @Config(
  *      mode="hidden"
  * )
+ * @method LocalizedFallbackValue getLabel(Localization $localization = null)
+ * @method LocalizedFallbackValue getDefaultLabel()
  */
-class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
+class AttributeGroup implements DatesAwareInterface, ExtendEntityInterface
 {
     use DatesAwareTrait;
+    use ExtendEntityTrait;
 
     /**
      * @var integer
@@ -100,8 +105,6 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
      */
     public function __construct()
     {
-        parent::__construct();
-
         $this->labels = new ArrayCollection();
         $this->attributeRelations = new ArrayCollection();
     }

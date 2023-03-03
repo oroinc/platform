@@ -550,6 +550,7 @@ services:
             - '@oro_entity.entity_field_provider'
             - '@oro_entity_config.provider.importexport'
             - '@oro_entity_extend.extend.field_type_helper'
+            - '@property_accessor'
 
     oro_entity.helper.relation_helper:
         class: 'Oro\Bundle\EntityBundle\Helper\RelationHelper'

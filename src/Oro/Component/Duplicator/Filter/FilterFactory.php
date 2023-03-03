@@ -7,7 +7,9 @@ use Oro\Component\Duplicator\AbstractFactory;
 use Oro\Component\Duplicator\ObjectType;
 
 /**
- * @method BaseFilter create(ObjectType $objectType)
+ * Duplicator Filter factory with interface restrict
+ *
+ * @method BaseFilter create(ObjectType $objectType, array $constructorArgs = [])
  */
 class FilterFactory extends AbstractFactory
 {

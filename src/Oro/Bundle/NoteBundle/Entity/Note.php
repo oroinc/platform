@@ -3,12 +3,15 @@
 namespace Oro\Bundle\NoteBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\NoteBundle\Model\ExtendNote;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -46,10 +49,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *      }
  * )
  */
-class Note extends ExtendNote implements DatesAwareInterface, UpdatedByAwareInterface
+class Note implements
+    DatesAwareInterface,
+    UpdatedByAwareInterface,
+    ActivityInterface,
+    ExtendEntityInterface
 {
     use DatesAwareTrait;
     use UpdatedByAwareTrait;
+    use ExtendActivity;
+    use ExtendEntityTrait;
 
     /**
      * @var integer
