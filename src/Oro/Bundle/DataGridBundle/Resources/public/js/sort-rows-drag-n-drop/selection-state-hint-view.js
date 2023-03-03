@@ -34,7 +34,8 @@ const SelectionStateHintView = BaseView.extend({
      * @inheritdoc
      */
     listen: {
-        'change collection': 'toggle'
+        'change collection': 'toggle',
+        'remove collection': 'toggle'
     },
 
     /**

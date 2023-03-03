@@ -79,6 +79,13 @@
     }
 }
 
+.drag-n-drop-start.with-thin-row-placeholder {
+    .grid-row.selected {
+        opacity: 20%;
+        display: table-row;
+    }
+}
+
 @keyframes sort-rows-drag-n-drop-animation {
     0% {
         background-color: rgba($extra-200, 1);

@@ -54,7 +54,8 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     defaultOptions: {
         renderDropZonesMenu: false,
         highlightSortedItems: true,
-        allowSelectMultiple: true
+        allowSelectMultiple: true,
+        thinRowPlaceholder: true
     },
 
     /**
@@ -76,7 +77,6 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         cursor: 'move',
         placeholder: 'sorting-placeholder',
         forceHelperSize: false,
-        forcePlaceholderSize: true,
         items: '.grid-row',
         tolerance: 'pointer'
     },
@@ -117,6 +117,11 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
 
         this._collectSortOrderData();
 
+        const {eventBus: externalEventBus} = this.options;
+        if (externalEventBus) {
+            // proxy all own events to externalEventBus, if it is provided through options
+            this.listenTo(this, 'all', (eventName, ...args) => externalEventBus.trigger(eventName, ...args));
+        }
         this.listenTo(this.main, {
             disable: this.disable,
             enable: this.enable
@@ -320,12 +325,12 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Event} e
      */
     onMouseDown(e) {
-        const currentEL = $(e.currentTarget);
-        if (currentEL.is(this.SEPARATOR_ROW_SELECTOR) || !this.options.allowSelectMultiple) {
+        const currentItem = $(e.currentTarget);
+        if (currentItem.is(this.SEPARATOR_ROW_SELECTOR) || !this.options.allowSelectMultiple) {
             // ignore selection if it's a separator row
         } else if (e.shiftKey && this._lastClickedIndex !== void 0) {
             let from = this._lastClickedIndex;
-            let to = currentEL.index();
+            let to = currentItem.index();
 
             if (from > to) {
                 [from, to] = [to, from];
@@ -342,7 +347,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                 }
             });
         } else if (e.ctrlKey || e.metaKey) {
-            const modelId = currentEL.data('modelId');
+            const modelId = currentItem.data('modelId');
             const model = this.main.collection.get(modelId);
 
             model.set('_selected', !model.get('_selected'));
@@ -355,12 +360,12 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Event} e
      */
     onClick(e) {
-        const currentEL = $(e.currentTarget);
-        if (e.shiftKey || e.ctrlKey || e.metaKey || currentEL.is(this.SEPARATOR_ROW_SELECTOR)) {
+        const currentItem = $(e.currentTarget);
+        if (e.shiftKey || e.ctrlKey || e.metaKey || currentItem.is(this.SEPARATOR_ROW_SELECTOR)) {
             return;
         }
 
-        const modelId = currentEL.data('modelId');
+        const modelId = currentItem.data('modelId');
         const model = this.main.collection.get(modelId);
 
         this._unsetModelsAttr('_selected', {ignoreAnimation: true});
@@ -560,14 +565,15 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         const isSeparator = ui.item.is(this.SEPARATOR_ROW_SELECTOR);
         if (isSeparator) {
             this._unsetModelsAttr('_selected', {ignoreAnimation: true});
+            this.main.body.$el.sortable('option', 'cursorAt', false);
         } else {
             this._selectRowBeforeDragStart(e, ui.item);
             this._adjustHelperPosition(e, ui);
         }
 
-        const {cursor, forcePlaceholderSize} = this.SORTABLE_DEFAULTS;
+        const {cursor} = this.SORTABLE_DEFAULTS;
         this.main.body.$el.sortable('option', 'cursor', !isSeparator ? cursor : 'row-resize');
-        this.main.body.$el.sortable('option', 'forcePlaceholderSize', !isSeparator ? forcePlaceholderSize : false);
+        this.main.body.$el.sortable('option', 'forcePlaceholderSize', !this.options.thinRowPlaceholder || isSeparator);
         this.trigger('sortable:beforePick', e, ui);
         this.extendTableHeight();
     },
@@ -579,7 +585,9 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     onStartSortable(e, ui) {
         const isSeparator = ui.item.is(this.SEPARATOR_ROW_SELECTOR);
         ui.placeholder.toggleClass('separator', isSeparator);
+        ui.placeholder.toggleClass('row-placeholder', !isSeparator);
         this.main.$el.addClass(this.startDragClass);
+        this.main.$el.toggleClass('with-thin-row-placeholder', this.options.thinRowPlaceholder);
         this.trigger('sortable:start', e, ui);
         this.observeMouse();
     },
@@ -589,6 +597,10 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Object} ui
      */
     beforeItemDrop(e, ui) {
+        if (this._currentItemClone) {
+            this._currentItemClone.remove();
+            delete this._currentItemClone;
+        }
         this.main.$el.removeClass(this.startDragClass);
         this.trigger('sortable:beforeDrop', e, ui);
     },
@@ -842,7 +854,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         }
 
         const {route, route_parameters: params, formName} = this.options;
-        $.ajax({
+        const xhr = $.ajax({
             url: routing.generate(route, params),
             type: 'PUT',
             data: {
@@ -868,6 +880,11 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             }
         });
 
+        this.trigger('saveChanges', xhr, {
+            sortOrder: sortOrderData,
+            removeProducts
+        });
+
         this._collectSortOrderData();
     },
 
@@ -879,21 +896,26 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
 
     /**
      * @param {Event} e
-     * @param {jQuery|HTMLElement} currentEL
+     * @param {jQuery|HTMLElement} currentItem
      * @returns {jQuery|HTMLElement}
      * @protected
      */
-    _createSortableHelper(e, currentEL) {
+    _createSortableHelper(e, currentItem) {
+        const isSeparator = currentItem.is(this.SEPARATOR_ROW_SELECTOR);
         const templateData = {
-            isSeparator: currentEL.is(this.SEPARATOR_ROW_SELECTOR),
+            isSeparator,
             data: this._getSelectedModelsData(),
-            hasSortOrder: currentEL.is('.row-has-sort-order')
+            hasSortOrder: currentItem.is('.row-has-sort-order')
         };
+
+        if (this.options.thinRowPlaceholder && !isSeparator) {
+            this._currentItemClone = currentItem.clone().insertAfter(currentItem);
+        }
 
         const $helper = $(this.helperTemplate(templateData));
 
-        if (this.options.renderDropZonesMenu && !isMobile()) {
-            $helper.css('width', currentEL.width() / 2);
+        if (this.options.renderDropZonesMenu && !isMobile() && !isSeparator) {
+            $helper.css('width', currentItem.width() / 2);
         }
 
         return $helper;

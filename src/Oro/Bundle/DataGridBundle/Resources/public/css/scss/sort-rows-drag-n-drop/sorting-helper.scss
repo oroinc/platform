@@ -84,4 +84,11 @@
             z-index: 1;
         }
     }
+
+    &.separator {
+        opacity: 1;
+        background-color: $primary-830;
+
+        @extend %draggable-separator;
+    }
 }

@@ -8,6 +8,7 @@ css:
         - 'bundles/orodatagrid/css/scss/variables/sort-rows-drag-n-drop/datagrid-config.scss'
         - 'bundles/orodatagrid/css/scss/variables/sort-rows-drag-n-drop/selection-state-hint-config.scss'
         - 'bundles/orodatagrid/css/scss/variables/sort-rows-drag-n-drop/drop-zones-menu-config.scss'
+        - 'bundles/orodatagrid/css/scss/variables/sort-rows-drag-n-drop/datagrid-placeholder-config.scss'
 
         # Styles
         - 'bundles/orodatagrid/css/scss/main.scss'
