@@ -12,7 +12,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStrin
 class NumberFilter extends AbstractFilter
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected $joinOperators = [
         FilterUtility::TYPE_NOT_EMPTY => FilterUtility::TYPE_EMPTY,
@@ -23,7 +23,7 @@ class NumberFilter extends AbstractFilter
     private $valueTransformer;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getFormType()
     {
@@ -31,7 +31,7 @@ class NumberFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
@@ -78,7 +78,7 @@ class NumberFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function parseData($data)
     {
@@ -249,13 +249,13 @@ class NumberFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
 
-        $formView = $this->getForm()->createView();
+        $formView = $this->getFormView();
         $metadata['formatterOptions'] = $formView->vars['formatter_options'];
         $metadata['arraySeparator'] = $formView->vars['array_separator'];
         $metadata['arrayOperators'] = $formView->vars['array_operators'];

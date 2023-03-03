@@ -34,6 +34,7 @@ use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
 use Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity\CmsUser;
+use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
@@ -117,6 +118,7 @@ class SegmentFilterTest extends OrmTestCase
                     )
                 ]
             )
+            ->addTypeExtension(new TranslatableChoiceTypeExtension())
             ->getFormFactory();
 
         $this->em->expects(self::any())
@@ -278,7 +280,7 @@ class SegmentFilterTest extends OrmTestCase
 
         $this->em->expects(self::any())
             ->method('getRepository')
-            ->with(self::equalTo('OroSegmentBundle:Segment'))
+            ->with(Segment::class)
             ->willReturn($repo);
     }
 

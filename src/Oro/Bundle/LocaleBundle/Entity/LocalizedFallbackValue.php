@@ -5,7 +5,8 @@ namespace Oro\Bundle\LocaleBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\LocaleBundle\Model\ExtendLocalizedFallbackValue;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 
 /**
  * Standard entity to store string data related to the some localization.
@@ -26,8 +27,10 @@ use Oro\Bundle\LocaleBundle\Model\ExtendLocalizedFallbackValue;
  *      }
  * )
  */
-class LocalizedFallbackValue extends ExtendLocalizedFallbackValue
+class LocalizedFallbackValue extends AbstractLocalizedFallbackValue implements ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var string|null
      *

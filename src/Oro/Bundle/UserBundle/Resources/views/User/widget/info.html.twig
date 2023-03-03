@@ -32,7 +32,7 @@
                 {{ ui.renderHtmlProperty('oro.user.roles.label'|trans, roles|join('\n')|escape|nl2br) }}
             {% endif %}
 
-            {% if is_granted('oro_user_group_view') %}
+            {% if is_granted('oro_user_group_view') and feature_enabled('manage_user_groups') %}
                 {{ ui.renderHtmlProperty('oro.user.groups.label'|trans, entity.groups|join('\n')|escape|nl2br) }}
             {% endif %}
 

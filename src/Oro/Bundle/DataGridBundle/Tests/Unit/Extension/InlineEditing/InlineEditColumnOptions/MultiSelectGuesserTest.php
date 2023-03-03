@@ -210,7 +210,8 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
                 'choices' => [
                     'a1' => 'A1_t',
                     'a2' => 'A2_t'
-                ]
+                ],
+                'translatable_options' => false
             ],
             $result
         );

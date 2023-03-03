@@ -20,7 +20,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 
 class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -33,7 +33,7 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->listener = new SetsParentEntityOnFlushListener(
-            new PropertyAccessor(),
+            PropertyAccess::createPropertyAccessor(),
             $this->configManager
         );
     }

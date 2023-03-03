@@ -13,8 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class BooleanFilter extends AbstractFilter
 {
-    /** @var TranslatorInterface */
-    protected $translator;
+    protected TranslatorInterface $translator;
 
     public function __construct(FormFactoryInterface $factory, FilterUtility $util, TranslatorInterface $translator)
     {
@@ -23,15 +22,7 @@ class BooleanFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getFormType()
-    {
-        return BooleanFilterType::class;
-    }
-
-    /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function init($name, array $params)
     {
@@ -41,23 +32,11 @@ class BooleanFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
-    {
-        return $this->buildComparisonExpr(
-            $ds,
-            $data['value'],
-            $fieldName
-        );
-    }
-
-    /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMetadata()
     {
-        $formView = $this->getForm()->createView();
+        $formView = $this->getFormView();
         $fieldView = $formView->children['value'];
 
         $choices = array_map(
@@ -93,7 +72,7 @@ class BooleanFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function parseData($data)
     {
@@ -107,6 +86,22 @@ class BooleanFilter extends AbstractFilter
         }
 
         return $data;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
+    {
+        return $this->buildComparisonExpr($ds, $data['value'], $fieldName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getFormType(): string
+    {
+        return BooleanFilterType::class;
     }
 
     /**

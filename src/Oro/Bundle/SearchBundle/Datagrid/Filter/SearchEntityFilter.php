@@ -20,14 +20,6 @@ class SearchEntityFilter extends EntityFilter
     /**
      * {@inheritDoc}
      */
-    protected function getFormType()
-    {
-        return SearchEntityFilterType::class;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function init($name, array $params)
     {
         if (isset($params['class'])) {
@@ -58,14 +50,28 @@ class SearchEntityFilter extends EntityFilter
     {
         throw new \BadMethodCallException('Not implemented');
     }
+    /**
+     * {@inheritDoc}
+     */
+    protected function getFormType(): string
+    {
+        return SearchEntityFilterType::class;
+    }
 
     /**
-     * @param FilterDatasourceAdapterInterface $ds
-     * @param array $data
-     *
-     * @return bool
+     * {@inheritDoc}
      */
-    protected function applyRestrictions(FilterDatasourceAdapterInterface $ds, array $data)
+    protected function getEntityClass(): ?string
+    {
+        $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY);
+        if (!$options) {
+            return null;
+        }
+
+        return $options['class'] ?? null;
+    }
+
+    protected function applyRestrictions(FilterDatasourceAdapterInterface $ds, array $data): bool
     {
         $entityIds = [];
         foreach ($data['value'] as $entity) {
@@ -83,29 +89,14 @@ class SearchEntityFilter extends EntityFilter
         return true;
     }
 
-    protected function getEntityClass(): ?string
-    {
-        $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY);
-        if (!$options) {
-            return null;
-        }
-
-        return $options['class'] ?? null;
-    }
-
-    /**
-     * @param object $entity
-     *
-     * @return mixed
-     */
-    private function getEntityIdentifier($entity)
+    private function getEntityIdentifier(object $entity): mixed
     {
         $result = null;
         $entityClass = ClassUtils::getClass($entity);
         $manager = $this->doctrine->getManagerForClass($entityClass);
         if (null !== $manager) {
             $entityIdentifier = $manager->getClassMetadata($entityClass)->getIdentifierValues($entity);
-            if (count($entityIdentifier) === 1) {
+            if (\count($entityIdentifier) === 1) {
                 $result = reset($entityIdentifier);
             }
         }

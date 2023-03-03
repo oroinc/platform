@@ -7,6 +7,7 @@ use Doctrine\Inflector\Inflector;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
@@ -173,7 +174,7 @@ class EntityNameProvider implements EntityNameProviderInterface
     private function getFieldValue(object $entity, string $fieldName): mixed
     {
         $getterName = 'get' . $this->inflector->classify($fieldName);
-        if (method_exists($entity, $getterName)) {
+        if (EntityPropertyInfo::methodExists($entity, $getterName)) {
             return $entity->{$getterName}();
         }
 

@@ -20,6 +20,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\RenamedNameContainerType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\RestrictedNameContainerType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -29,8 +30,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validation;
@@ -104,7 +103,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         $this->formValidationHandler = new FormValidationHandler(
             $this->validator,
             new CustomizeFormDataEventDispatcher($this->customizationHandler),
-            new PropertyAccessor()
+            PropertyAccess::createPropertyAccessor()
         );
     }
 

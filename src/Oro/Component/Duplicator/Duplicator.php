@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Duplicator;
 
@@ -14,51 +15,49 @@ use Oro\Component\Duplicator\Matcher\MatcherFactory;
  */
 class Duplicator implements DuplicatorInterface
 {
-    /**
-     * @var FilterFactory
-     */
-    protected $filterFactory;
+    protected ?FilterFactory  $filterFactory;
+    protected ?MatcherFactory $matcherFactory;
+    protected array           $defaultRules = [];
 
     /**
-     * @var MatcherFactory
-     */
-    protected $matcherFactory;
-
-    /**
-     * @param object $object
+     * @param mixed $object
      * @param array $settings
      * @return mixed
      */
-    public function duplicate($object, array $settings = [])
+    public function duplicate(mixed $object, array $settings = []): mixed
     {
         $deepCopy = new DeepCopy();
         foreach ($settings as $option) {
             if (!isset($option[0]) || !isset($option[1])) {
                 throw new \InvalidArgumentException('Invalid arguments to clone entity');
             }
-            $filterOptions = $option[0];
+            $filterOptions    = $option[0];
             $matcherArguments = $option[1];
 
             $filter = $this->getFilter($filterOptions);
             $deepCopy->addFilter($filter, $this->getMatcher($matcherArguments));
         }
 
+        foreach ($this->defaultRules as $rule) {
+            $deepCopy->addFilter($this->getFilter($rule[0]), $this->getMatcher($rule[1]));
+        }
+
         return $deepCopy->copy($object);
     }
 
     /**
-     * @param $filterOptions
+     * @param array $filterOptions
      * @return Filter
      * @internal param array|string $filterName
      */
-    protected function getFilter($filterOptions)
+    protected function getFilter(array $filterOptions): Filter
     {
-        $filterName = $filterOptions[0];
-        $filterParameters = isset($filterOptions[1]) ? $filterOptions[1] : null;
+        $filterName       = $filterOptions[0];
+        $filterParameters = $filterOptions[1] ?? null;
         return $this->filterFactory->create(
             $filterName,
             array_filter(
-                [$filterParameters],
+                is_array($filterParameters) ? $filterParameters : [$filterParameters],
                 function ($value) {
                     return $value !== null;
                 }
@@ -67,13 +66,13 @@ class Duplicator implements DuplicatorInterface
     }
 
     /**
-     * @param $matcherArguments
+     * @param array $matcherArguments
      * @return Matcher
      */
-    protected function getMatcher($matcherArguments)
+    protected function getMatcher(array $matcherArguments): Matcher
     {
         $matcherKeyword = $matcherArguments[0];
-        $arguments = $matcherArguments[1];
+        $arguments      = $matcherArguments[1];
 
         return $this->matcherFactory->create($matcherKeyword, $arguments);
     }
@@ -81,7 +80,7 @@ class Duplicator implements DuplicatorInterface
     /**
      * @param FilterFactory $filterFactory
      */
-    public function setFilterFactory($filterFactory)
+    public function setFilterFactory(FilterFactory $filterFactory): void
     {
         $this->filterFactory = $filterFactory;
     }
@@ -89,8 +88,16 @@ class Duplicator implements DuplicatorInterface
     /**
      * @param MatcherFactory $matcherFactory
      */
-    public function setMatcherFactory($matcherFactory)
+    public function setMatcherFactory(MatcherFactory $matcherFactory): void
     {
         $this->matcherFactory = $matcherFactory;
+    }
+
+    /**
+     * @param array $defaultRules
+     */
+    public function setDefaultRules(array $defaultRules): void
+    {
+        $this->defaultRules = $defaultRules;
     }
 }

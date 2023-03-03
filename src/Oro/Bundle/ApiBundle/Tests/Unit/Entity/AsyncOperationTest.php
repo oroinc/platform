@@ -3,10 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class AsyncOperationTest extends \PHPUnit\Framework\TestCase
 {

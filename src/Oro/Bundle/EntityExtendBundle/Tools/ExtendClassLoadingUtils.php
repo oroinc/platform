@@ -70,19 +70,6 @@ class ExtendClassLoadingUtils
     }
 
     /**
-     * Sets class aliases for extended entities.
-     */
-    public static function setAliases(string $cacheDir): void
-    {
-        $aliases = self::getAliases($cacheDir);
-        foreach ($aliases as $className => $alias) {
-            if (class_exists($className) && !class_exists($alias, false)) {
-                class_alias($className, $alias);
-            }
-        }
-    }
-
-    /**
      * Gets class aliases for extended entities.
      */
     public static function getAliases(string $cacheDir): array

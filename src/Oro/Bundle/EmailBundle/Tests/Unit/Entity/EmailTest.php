@@ -9,8 +9,8 @@ use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Testing\ReflectionUtil;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

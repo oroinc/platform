@@ -280,7 +280,11 @@ class ExtendConfigProcessor
      */
     protected function createFieldModel($className, $fieldName, $fieldType, $mode, array $configs, $isExtendEntity)
     {
-        if (!$isExtendEntity && isset($configs['extend']['is_extend']) && $configs['extend']['is_extend']) {
+        if (!$isExtendEntity
+            && isset($configs['extend']['is_extend'])
+            && $configs['extend']['is_extend']
+            && !ExtendHelper::isExtendEntity($className)
+        ) {
             throw new \LogicException(
                 sprintf('An extend field "%s" cannot be added to non extend entity "%s".', $fieldName, $className)
             );

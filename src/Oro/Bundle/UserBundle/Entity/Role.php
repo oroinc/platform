@@ -6,7 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\UserBundle\Model\ExtendRole;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**
  * Role Entity
@@ -31,9 +34,12 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  *          }
  *      }
  * )
+ * @property OrganizationInterface $organization
  */
-class Role extends ExtendRole
+class Role extends AbstractRole implements ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     const PREFIX_ROLE = 'ROLE_';
 
     /**
@@ -175,8 +181,8 @@ class Role extends ExtendRole
     public function __serialize(): array
     {
         $dataForSerialization = [$this->id, $this->role, $this->label];
-        if (property_exists($this, 'organization')) {
-            $dataForSerialization[] =  is_object($this->organization) ? clone $this->organization : $this->organization;
+        if (EntityPropertyInfo::propertyExists($this, 'organization')) {
+            $dataForSerialization[] = is_object($this->organization) ? clone $this->organization : $this->organization;
         }
 
         return $dataForSerialization;
@@ -184,7 +190,7 @@ class Role extends ExtendRole
 
     public function __unserialize(array $serialized): void
     {
-        if (property_exists($this, 'organization')) {
+        if (EntityPropertyInfo::propertyExists($this, 'organization')) {
             [$this->id, $this->role, $this->label, $this->organization] = $serialized;
         } else {
             [$this->id, $this->role, $this->label] = $serialized;

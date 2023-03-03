@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
 use Oro\Bundle\WorkflowBundle\Event\TransitionsAttributeEvent;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
@@ -15,13 +16,13 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -77,10 +78,7 @@ class WorkflowAttributesType extends AbstractType
      */
     protected $translator;
 
-    /**
-     * @var PropertyAccessor
-     */
-    protected $propertyAccessor;
+    protected ?PropertyAccessorInterface $propertyAccessor = null;
 
     /**
      * @param WorkflowRegistry $workflowRegistry
@@ -425,12 +423,12 @@ class WorkflowAttributesType extends AbstractType
     }
 
     /**
-     * @return PropertyAccessor
+     * @return PropertyAccessorInterface
      */
     protected function getPropertyAccessor()
     {
         if ($this->propertyAccessor === null) {
-            $this->propertyAccessor = new PropertyAccessor();
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }
 
         return $this->propertyAccessor;

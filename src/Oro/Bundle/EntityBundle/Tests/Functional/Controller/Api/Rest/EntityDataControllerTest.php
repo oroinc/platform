@@ -6,11 +6,11 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadBusinessUnitData;
 use Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadRoleData;
 use Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures\LoadUserData;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ResponseExtension;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * @dbIsolationPerTest

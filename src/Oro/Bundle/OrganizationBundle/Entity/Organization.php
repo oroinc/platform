@@ -6,7 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -31,12 +32,14 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *          },
  *          "dataaudit"={
  *              "auditable"=true
- *          }
+ *          },
  *      }
  * )
  */
-class Organization extends ExtendOrganization implements OrganizationInterface
+class Organization implements OrganizationInterface, ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var int
      *
@@ -141,8 +144,6 @@ class Organization extends ExtendOrganization implements OrganizationInterface
 
     public function __construct()
     {
-        parent::__construct();
-
         $this->businessUnits = new ArrayCollection();
         $this->users         = new ArrayCollection();
     }

@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
@@ -370,6 +371,11 @@ class ExtendHelper
         }
 
         return sprintf('oro.entityextend.enumvalue.%s.%s', $fieldName, $propertyName);
+    }
+
+    public static function isExtendEntity(object|string $class): bool
+    {
+        return is_subclass_of($class, ExtendEntityInterface::class);
     }
 
     /**

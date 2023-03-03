@@ -211,13 +211,6 @@ class DoctrineListenerTest extends OrmTestCase
                             'child' => $prefix . 'InheritedWithMSInTheMiddle\ChildEntity'
                         ]
                     ],
-                    $prefix . 'InheritedWithMSInTheMiddle\ExtendedChildEntity' => [
-                        null,
-                        [
-                            'base' => $prefix . 'InheritedWithMSInTheMiddle\BaseEntity',
-                            'child' => $prefix . 'InheritedWithMSInTheMiddle\ChildEntity'
-                        ]
-                    ]
                 ]
             ],
             'inherited entities, should raise duplicate exception' => [

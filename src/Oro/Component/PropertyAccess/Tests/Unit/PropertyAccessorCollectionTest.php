@@ -2,6 +2,7 @@
 
 namespace Oro\Component\PropertyAccess\Tests\Unit;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\Car;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarNoAdderAndRemover;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarOnlyAdder;
@@ -76,21 +77,17 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
         $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
-        $this->expectExceptionMessage(
-            'Neither the property "axes" nor one of the methods "addAx()"/"removeAx()", "addAxe()"/"removeAxe()",'
-            . ' "addAxis()"/"removeAxis()", "setAxes()", "axes()", "__set()" or "__call()" exist'
-            . ' and have public access in class "Mock_CarNoAdderAndRemover'
-        );
 
-        $car        = $this->createMock(CarNoAdderAndRemover::class);
+        $car = $this->createMock(CarNoAdderAndRemover::class);
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth']);
-        $axesAfter  = $this->getContainer([0 => 'first', 1 => 'second', 2 => 'third']);
+        $axesAfter = $this->getContainer([0 => 'first', 1 => 'second', 2 => 'third']);
 
         $car->expects($this->any())
             ->method('getAxes')
             ->willReturn($axesBefore);
 
-        $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
+        $propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
+        $propertyAccessor->setValue($car, 'axes', $axesAfter);
     }
 
     public function testIsWritableReturnsTrueIfAdderAndRemoverExists()

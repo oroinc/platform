@@ -6,6 +6,9 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 
+/**
+ * Base context mode aware normalizer.
+ */
 abstract class AbstractContextModeAwareNormalizer implements
     ContextAwareNormalizerInterface,
     ContextAwareDenormalizerInterface

@@ -6,18 +6,16 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * Check if entity field has changes.
+ */
 class FieldUpdatesChecker
 {
     use ChangedEntityGeneratorTrait;
 
-    /**
-     * @var PropertyAccessor
-     */
-    private $propertyAccessor;
-
+    protected PropertyAccessorInterface $propertyAccessor;
     /**
      * @var ManagerRegistry
      */

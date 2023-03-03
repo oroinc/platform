@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -43,7 +46,7 @@ class ReflectionUtil
      */
     public static function findAdderAndRemover(string|object $object, string $property): ?array
     {
-        $reflClass = new \ReflectionClass($object);
+        $reflClass = new EntityReflectionClass($object);
         $camelized = self::camelize($property);
         $singulars = (array)self::getInflector()->singularize($camelized);
         foreach ($singulars as $singular) {
@@ -133,6 +136,10 @@ class ReflectionUtil
      */
     private static function isMethodAccessible(\ReflectionClass $class, string $methodName, int $parameters): bool
     {
+        if (is_subclass_of($class->getName(), ExtendEntityInterface::class)) {
+            return EntityPropertyInfo::methodExists($class->getName(), $methodName);
+        }
+
         if ($class->hasMethod($methodName)) {
             $method = $class->getMethod($methodName);
             if ($method->isPublic()

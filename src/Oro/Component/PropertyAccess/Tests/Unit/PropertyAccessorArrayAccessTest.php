@@ -2,19 +2,22 @@
 
 namespace Oro\Component\PropertyAccess\Tests\Unit;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\Decorator\PropertyAccessorWithDotArraySyntax;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var PropertyAccessor
+     * @var PropertyAccessorWithDotArraySyntax
      */
     protected $propertyAccessor;
 
     protected function setUp(): void
     {
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
+            throw: PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
+        );
     }
 
     abstract protected function getContainer(array $array);
@@ -76,7 +79,7 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
      */
     public function testGetValueThrowsExceptionIfIndexNotFound($collection, $path)
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue($collection, $path);
     }
 
@@ -85,7 +88,9 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
      */
     public function testGetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled($collection, $path)
     {
-        $this->propertyAccessor = new PropertyAccessor(false, true);
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
+            throw: PropertyAccessorWithDotArraySyntax::DO_NOT_THROW
+        );
         $this->assertNull($this->propertyAccessor->getValue($collection, $path));
     }
 

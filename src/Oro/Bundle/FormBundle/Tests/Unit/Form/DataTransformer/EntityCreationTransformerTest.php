@@ -123,7 +123,7 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
             'create empty entity' => [
                 json_encode(['id' => null], JSON_THROW_ON_ERROR),
                 new TestCreationEntity(),
-                'value',
+                'id',
                 true
             ],
             'create entity with value' => [

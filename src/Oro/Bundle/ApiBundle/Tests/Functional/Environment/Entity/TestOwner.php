@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\ExtendTestOwner;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
@@ -14,8 +15,10 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
  * @ORM\Entity
  * @Config
  */
-class TestOwner extends ExtendTestOwner implements TestFrameworkEntityInterface
+class TestOwner implements TestFrameworkEntityInterface, ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var int
      *
@@ -53,8 +56,6 @@ class TestOwner extends ExtendTestOwner implements TestFrameworkEntityInterface
 
     public function __construct()
     {
-        parent::__construct();
-
         $this->targets = new ArrayCollection();
     }
 

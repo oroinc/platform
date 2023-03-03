@@ -8,9 +8,9 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints;
 
 class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase

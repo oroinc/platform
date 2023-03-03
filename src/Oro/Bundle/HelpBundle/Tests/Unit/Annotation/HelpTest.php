@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\HelpBundle\Tests\Unit\Annotation;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\HelpBundle\Annotation\Help;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class HelpTest extends \PHPUnit\Framework\TestCase
 {

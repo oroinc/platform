@@ -3,9 +3,10 @@
 namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -37,8 +38,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * )
  * @SuppressWarnings(PHPMD.TooManyFields)
  */
-class File extends ExtendFile implements FileExtensionInterface
+class File implements FileExtensionInterface, ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var integer
      *
@@ -176,7 +179,6 @@ class File extends ExtendFile implements FileExtensionInterface
 
     public function __construct()
     {
-        parent::__construct();
     }
 
     /**

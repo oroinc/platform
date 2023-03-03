@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**

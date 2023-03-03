@@ -15,84 +15,57 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Entity type that supports translations and ACL protection for choices.
+ * The form type for entities that support translations and ACL protection for choices.
  */
 class TranslatableEntityType extends AbstractType
 {
-    const NAME = 'translatable_entity';
-
-    /** @var ManagerRegistry */
-    protected $registry;
-
-    /** @var ChoiceListFactoryInterface */
-    protected $factory;
-
-    /** @var AclHelper */
-    private $aclHelper;
+    private ManagerRegistry $doctrine;
+    private ChoiceListFactoryInterface $factory;
+    private AclHelper $aclHelper;
 
     public function __construct(
-        ManagerRegistry $registry,
+        ManagerRegistry $doctrine,
         ChoiceListFactoryInterface $choiceListFactory,
         AclHelper $aclHelper
     ) {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->factory = $choiceListFactory;
         $this->aclHelper = $aclHelper;
     }
 
     /**
-     * @return string
+     * {@inheritDoc}
      */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return self::NAME;
-    }
-
-    /**
-     * @return string
-     */
-    public function getParent()
-    {
-        return ChoiceType::class;
-    }
-
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['multiple']) {
-            $builder->addEventSubscriber(new MergeDoctrineCollectionListener())
+            $builder
+                ->addEventSubscriber(new MergeDoctrineCollectionListener())
                 ->addViewTransformer(new CollectionToArrayTransformer(), true);
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    /**
+     * {@inheritDoc}
+     */
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(
-            array(
-                'choice_label'  => null,
-                'query_builder' => null,
-                'choices'       => null,
-                'translatable_options' => false,
-                'acl_options' => ['disable' => true]
-            )
-        );
-
-        $resolver->setRequired(array('class'));
+        $resolver->setDefaults([
+            'query_builder' => null,
+            'choice_label' => null,
+            'choices' => null,
+            'translatable_options' => false,
+            'choice_translation_domain' => false,
+            'acl_options' => ['disable' => true]
+        ]);
+        $resolver->setRequired(['class']);
         $resolver->setNormalizer('choice_value', function (Options $options, $value) {
             if ($value) {
                 return $value;
             }
 
-            return $this->registry->getManager()->getClassMetadata($options['class'])->getSingleIdentifierFieldName();
+            return $this->doctrine->getManager()->getClassMetadata($options['class'])->getSingleIdentifierFieldName();
         });
-
         $resolver->setNormalizer('choice_loader', function (Options $options) {
             if (null !== $options['choices']) {
                 return null;
@@ -100,12 +73,28 @@ class TranslatableEntityType extends AbstractType
 
             return new TranslationChoiceLoader(
                 $options['class'],
-                $this->registry,
+                $this->doctrine,
                 $this->factory,
                 $options['query_builder'],
                 $this->aclHelper,
                 $options['acl_options']
             );
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getParent(): ?string
+    {
+        return ChoiceType::class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getBlockPrefix(): string
+    {
+        return 'translatable_entity';
     }
 }

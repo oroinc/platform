@@ -5,10 +5,10 @@ namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture as BaseAbstractFixture;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**

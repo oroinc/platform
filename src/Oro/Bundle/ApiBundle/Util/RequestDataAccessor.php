@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\Exception as PropertyAccessorException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**

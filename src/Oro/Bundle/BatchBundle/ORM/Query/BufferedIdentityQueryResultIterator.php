@@ -226,6 +226,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
             $this->handleException($e);
         }
 
+
         if ($this->pageLoadedCallback) {
             $this->rows = call_user_func($this->pageLoadedCallback, $this->rows);
         }

@@ -2,7 +2,10 @@
 
 namespace Oro\Component\Testing\Unit;
 
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\Testing\Unit\PropertyAccess\PropertyAccessTrait;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 /**
@@ -44,10 +47,10 @@ trait EntityTrait
         } else {
             $entity = $reflectionClass->newInstanceWithoutConstructor();
         }
-
         foreach ($properties as $property => $value) {
             $this->setValue($entity, $property, $value);
         }
+        $this->cleanExtendEntityStorage($entity);
 
         return $entity;
     }
@@ -64,7 +67,7 @@ trait EntityTrait
         try {
             $this->getPropertyAccessor()->setValue($object, $property, $value);
         } catch (NoSuchPropertyException $e) {
-            $reflectionClass = new \ReflectionClass($object);
+            $reflectionClass = new EntityReflectionClass($object);
 
             // Looking for the property in parent classes
             // because it's impossible to get parent properties from the derived class
@@ -78,6 +81,7 @@ trait EntityTrait
             $method->setAccessible(true);
             $method->setValue($object, $value);
         }
+        $this->cleanExtendEntityStorage($object);
     }
 
     /**
@@ -102,5 +106,13 @@ trait EntityTrait
             array_key_exists('testConstructorArguments', $data) ? $data['testConstructorArguments'] : null;
 
         return $this->getEntity($className, $properties, $constructorArguments);
+    }
+
+    private function cleanExtendEntityStorage(object|string $objectOrClass): void
+    {
+        /** ExtendEntityInterface $objectOrClass */
+        if (!$this instanceof BaseWebTestCase && ExtendHelper::isExtendEntity($objectOrClass)) {
+            $objectOrClass->cleanExtendEntityStorage();
+        }
     }
 }

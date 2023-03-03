@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Helper for cloning workflow definitions

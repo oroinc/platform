@@ -67,7 +67,7 @@ define(function(require) {
             this._bindHeaderEvents();
 
             const events = ['mousedown', 'clearMenus']
-                .map(eventName => `${eventName}.${this._namespaceID}`)
+                .map(eventName => `${eventName}${this._namespaceID}`)
                 .join(' ');
 
             // close each widget when clicking on any other element/anywhere else on the page
@@ -81,7 +81,7 @@ define(function(require) {
             // restored to their defaultValue prop on form reset, and the reset
             // handler fires before the form is actually reset.  delaying it a bit
             // gives the form inputs time to clear.
-            $(this.element[0].form).on(`reset.${this._namespaceID}`, () => {
+            $(this.element[0].form).on(`reset${this._namespaceID}`, () => {
                 setTimeout(this.refresh.bind(this), 10);
             });
         },

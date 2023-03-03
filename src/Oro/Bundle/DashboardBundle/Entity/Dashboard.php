@@ -5,9 +5,10 @@ namespace Oro\Bundle\DashboardBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\DashboardBundle\Model\ExtendDashboard;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -40,8 +41,10 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class Dashboard extends ExtendDashboard
+class Dashboard implements ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var integer
      *
@@ -133,8 +136,6 @@ class Dashboard extends ExtendDashboard
 
     public function __construct()
     {
-        parent::__construct();
-
         $this->widgets = new ArrayCollection();
     }
 

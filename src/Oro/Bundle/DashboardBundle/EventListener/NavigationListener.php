@@ -7,13 +7,13 @@ use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
+/**
+ * Adds dashboards to the navigation menu.
+ */
 class NavigationListener
 {
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var Manager */
-    protected $manager;
+    private TokenAccessorInterface $tokenAccessor;
+    private Manager $manager;
 
     public function __construct(TokenAccessorInterface $tokenAccessor, Manager $manager)
     {
@@ -21,7 +21,7 @@ class NavigationListener
         $this->manager = $manager;
     }
 
-    public function onNavigationConfigure(ConfigureMenuEvent $event)
+    public function onNavigationConfigure(ConfigureMenuEvent $event): void
     {
         if (!$this->tokenAccessor->hasUser()) {
             return;
@@ -42,24 +42,23 @@ class NavigationListener
                 $dashboardId = $dashboard['id'];
 
                 $dashboardLabel = $dashboard['label'];
-                $dashboardLabel = strlen($dashboardLabel) > 50 ? substr($dashboardLabel, 0, 50).'...' : $dashboardLabel;
+                $dashboardLabel = \strlen($dashboardLabel) > 50
+                    ? substr($dashboardLabel, 0, 50) . '...'
+                    : $dashboardLabel;
 
-                $options = [
-                    'label' => $dashboardLabel,
-                    'route' => 'oro_dashboard_view',
-                    'extras' => [
-                        'position' => 1
-                    ],
-                    'routeParameters' => [
-                        'id' => $dashboardId,
-                        'change_dashboard' => true
-                    ]
-                ];
                 $dashboardTab
-                    ->addChild(
-                        $dashboardId . '_dashboard_menu_item',
-                        $options
-                    )
+                    ->addChild($dashboardId . '_dashboard_menu_item', [
+                        'label' => $dashboardLabel,
+                        'route' => 'oro_dashboard_view',
+                        'extras' => [
+                            'translate_disabled' => true,
+                            'position' => 1
+                        ],
+                        'routeParameters' => [
+                            'id' => $dashboardId,
+                            'change_dashboard' => true
+                        ]
+                    ])
                     ->setAttribute('data-menu', $dashboardId);
             }
 

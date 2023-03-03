@@ -3,13 +3,13 @@
 namespace Oro\Bundle\NavigationBundle\Menu\Helper;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Oro\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -23,8 +23,7 @@ class MenuUpdateHelper
     /** @var LocalizationHelper */
     protected $localizationHelper;
 
-    /** @var PropertyAccessor */
-    private $propertyAccessor;
+    protected ?PropertyAccessorInterface $propertyAccessor = null;
 
     public function __construct(TranslatorInterface $translator, LocalizationHelper $localizationHelper)
     {
@@ -83,7 +82,7 @@ class MenuUpdateHelper
     }
 
     /**
-     * @return PropertyAccessor
+     * @return PropertyAccessorInterface
      */
     private function getPropertyAccessor()
     {

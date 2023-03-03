@@ -3,9 +3,9 @@
 namespace Oro\Component\Testing\Unit\PropertyAccess;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**

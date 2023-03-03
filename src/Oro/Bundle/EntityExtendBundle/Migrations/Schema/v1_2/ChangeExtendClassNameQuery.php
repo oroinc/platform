@@ -43,7 +43,7 @@ class ChangeExtendClassNameQuery extends ParametrizedMigrationQuery
             if (!isset($data['extend']['is_extend']) || !$data['extend']['is_extend']) {
                 continue;
             }
-            if (empty($data['extend']['extend_class']) || empty($data['extend']['schema']['parent'])) {
+            if (empty($data['extend']['schema']['parent'])) {
                 continue;
             }
 
@@ -53,13 +53,13 @@ class ChangeExtendClassNameQuery extends ParametrizedMigrationQuery
             }
 
             $parentClass    = $data['extend']['schema']['parent'];
-            $oldExtendClass = $data['extend']['extend_class'];
+            $oldExtendClass = $data['extend']['schema']['entity'];
             $newExtendClass = ExtendHelper::getExtendEntityProxyClassName($parentClass);
             if (!$newExtendClass || $newExtendClass === $oldExtendClass) {
                 continue;
             }
 
-            $data['extend']['extend_class'] = $newExtendClass;
+            $data['extend']['schema']['entity'] = $newExtendClass;
             if (isset($data['extend']['schema']['entity'])) {
                 $data['extend']['schema']['entity'] = $newExtendClass;
             }

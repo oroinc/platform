@@ -104,7 +104,7 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
         ManagerRegistry $doctrine,
         CacheInterface $cache,
         EventDispatcher $eventDispatcher,
-        ConfigBag $configBag
+        ConfigBag $configBag,
     ): UserScopeManager {
         return new UserScopeManager($doctrine, $cache, $eventDispatcher, $configBag);
     }

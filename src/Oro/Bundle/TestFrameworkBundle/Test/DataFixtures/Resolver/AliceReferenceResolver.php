@@ -4,8 +4,8 @@ namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver;
 
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * AliceReferenceResolver parse reference path to return the appropriate value
@@ -59,7 +59,7 @@ class AliceReferenceResolver implements ResolverInterface, ReferencesAwareInterf
 
         $object = $this->references->get($reference);
         $result = $this->actualizeObject($object);
-        $propertyAccessor = new PropertyAccessor();
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         foreach ($refParts as $refPart) {
             if (preg_match('/\(/', $refPart)) {

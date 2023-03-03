@@ -2,11 +2,11 @@
 
 namespace Oro\Component\Config\Loader;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**

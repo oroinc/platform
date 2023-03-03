@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -83,7 +84,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
 
     private function trySetValueViaReflection(object $object, string $propertyName, mixed $value): bool
     {
-        $refl = new \ReflectionClass($object);
+        $refl = new EntityReflectionClass($object);
         if (!$refl->hasProperty($propertyName)) {
             return false;
         }

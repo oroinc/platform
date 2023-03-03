@@ -191,7 +191,7 @@ datagrids:
                 eventName:
                     filter_by_having: true
                     type: choice
-                    data_name: eventName
+                    data_name: e.eventName
                     options:
                         field_options:
                             multiple: true
@@ -208,6 +208,7 @@ datagrids:
                         field_options:
                             multiple: true
                             choices: "@oro_notification.grid_helper->getRecipientUsersChoices"
+                            translatable_options: false
 
                 recipientGroupsList:
                     type: choice
@@ -216,6 +217,7 @@ datagrids:
                         field_options:
                             multiple: true
                             choices: "@oro_notification.grid_helper->getRecipientGroupsChoices"
+                            translatable_options: false
 
                 emailRecipient:
                     type: string

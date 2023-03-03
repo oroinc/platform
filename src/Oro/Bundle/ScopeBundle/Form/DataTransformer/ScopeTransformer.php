@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ScopeBundle\Form\DataTransformer;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * Form data transformer for scope.
+ */
 class ScopeTransformer implements DataTransformerInterface
 {
     /**

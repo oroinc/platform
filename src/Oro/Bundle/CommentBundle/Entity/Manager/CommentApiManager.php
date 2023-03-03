@@ -16,13 +16,13 @@ use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**

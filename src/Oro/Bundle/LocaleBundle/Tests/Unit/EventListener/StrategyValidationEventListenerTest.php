@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Event\StrategyValidationEvent;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\EventListener\StrategyValidationEventListener;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 

@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Tests\Functional\TestMetadataAccessor;
 use Oro\Bundle\ApiBundle\Tests\Functional\TestObject;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
@@ -21,7 +22,6 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -324,7 +324,7 @@ class FormTest extends WebTestCase
 
         return self::getContainer()->get('form.factory')
             ->createBuilder(FormType::class, null, $options)
-            ->setDataMapper(new PropertyPathMapper(new FormPropertyAccessor(new PropertyAccessor())))
+            ->setDataMapper(new PropertyPathMapper(new FormPropertyAccessor(PropertyAccess::createPropertyAccessor())))
             ->getForm();
     }
 

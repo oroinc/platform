@@ -10,7 +10,7 @@ aliases:
     module-config$: oroui/js/app/services/module-config
     oroui/js/app$: oroviewswitcher/js/app/views/demo/demo
     routing$: fosjsrouting/js/router
-    slick$: slick-carousel/slick/slick
+    slick$: '@oroinc/slick-carousel/slick/slick'
     underscore$: underscore/underscore
 configs:
     orotranslation/js/translator: {}

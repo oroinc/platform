@@ -18,15 +18,7 @@ use Oro\Component\Exception\UnexpectedTypeException;
 class SearchBooleanFilter extends BooleanFilter
 {
     /**
-     * {@inheritdoc}
-     */
-    protected function getFormType()
-    {
-        return SearchBooleanFilterType::class;
-    }
-
-    /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function init($name, array $params)
     {
@@ -78,5 +70,13 @@ class SearchBooleanFilter extends BooleanFilter
     public function prepareData(array $data): array
     {
         throw new \BadMethodCallException('Not implemented');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getFormType(): string
+    {
+        return SearchBooleanFilterType::class;
     }
 }

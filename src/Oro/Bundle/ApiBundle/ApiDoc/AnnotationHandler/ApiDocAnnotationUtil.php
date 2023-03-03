@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
@@ -39,7 +40,7 @@ final class ApiDocAnnotationUtil
 
     private static function getReflectionProperty(ApiDoc $annotation, string $propertyName): \ReflectionProperty
     {
-        $property = ReflectionUtil::getProperty(new \ReflectionClass($annotation), $propertyName);
+        $property = ReflectionUtil::getProperty(new EntityReflectionClass($annotation), $propertyName);
         $property->setAccessible(true);
 
         return $property;

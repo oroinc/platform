@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
@@ -24,7 +25,7 @@ class EntityInstantiator
      */
     public function instantiate(string $className): object
     {
-        $reflClass = new \ReflectionClass($className);
+        $reflClass = new EntityReflectionClass($className);
 
         return $this->isInstantiableViaConstructor($reflClass)
             ? $this->instantiateViaConstructor($reflClass)

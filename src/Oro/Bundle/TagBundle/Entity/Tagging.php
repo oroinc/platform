@@ -6,8 +6,9 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-use Oro\Bundle\TagBundle\Model\ExtendTagging;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -38,8 +39,10 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class Tagging extends ExtendTagging
+class Tagging implements ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var integer $id
      *
@@ -94,8 +97,6 @@ class Tagging extends ExtendTagging
      */
     public function __construct(Tag $tag = null, $entity = null)
     {
-        parent::__construct();
-
         if ($tag != null) {
             $this->setTag($tag);
         }

@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ChartBundle\Model\Data;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Provide mapped data.
+ */
 class MappedData implements DataInterface
 {
     /**

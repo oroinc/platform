@@ -58,7 +58,7 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
 
     public function testVerificationBadTypesOperandsOk()
     {
-        $trigger = $this->buildEventTriggerWithExpression('wi.get()[0]', EntityStub::class, EntityStub::class);
+        $trigger = $this->buildEventTriggerWithExpression('wi.get("")[0]', EntityStub::class, EntityStub::class);
 
         $this->verifier->verifyTrigger($trigger);
     }

@@ -1,3 +1,9 @@
 oro_message_queue:
     persistent_services:
         - 'oro_entity_extend.orm.metadata_factory'
+        - 'oro_entity.helper.field_helper'
+        - 'property_accessor'
+        - 'oro_entity_extend.accessor.property_accessor_with_dot_array_syntax'
+        - 'oro_entity_extend.entity_metadata_provider'
+        - 'oro_entity_extend.entity_field_iterator'
+        - 'oro_entity_extend.entity_field.extension'

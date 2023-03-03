@@ -9,6 +9,8 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -109,7 +111,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
 
         $em = $this->doctrine->getManagerForClass($entityClass);
         $metadata = $em->getClassMetadata($entityClass);
-        $reflClass = new \ReflectionClass($entityClass);
+        $reflClass = new EntityReflectionClass($entityClass);
         $entityConfigProvider = $this->configManager->getProvider('entity');
         $fieldConfigs = $this->configManager->getProvider('email')->getConfigs($entityClass);
         foreach ($fieldConfigs as $fieldConfig) {
@@ -163,7 +165,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         $em = $this->doctrine->getManagerForClass($entityClass);
         $metadata = $em->getClassMetadata($entityClass);
         $result = [];
-        $reflClass = new \ReflectionClass($entityClass);
+        $reflClass = new EntityReflectionClass($entityClass);
         $fieldConfigs = $this->configManager->getProvider('email')->getConfigs($entityClass);
         foreach ($fieldConfigs as $fieldConfig) {
             if (!$fieldConfig->is('available_in_template')) {
@@ -187,6 +189,8 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
 
             $result[$varName] = $getter;
         }
+        $extendEntityMethods = EntityPropertyInfo::getExtendedMethods($entityClass);
+        $result = array_merge($result, array_keys($extendEntityMethods));
 
         return $result;
     }

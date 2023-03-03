@@ -6,11 +6,11 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class LoadOriginData extends AbstractFixture implements DependentFixtureInterface
 {

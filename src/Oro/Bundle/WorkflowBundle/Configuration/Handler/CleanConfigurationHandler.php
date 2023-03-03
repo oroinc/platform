@@ -2,17 +2,21 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration\Handler;
 
+use Oro\Bundle\EntityExtendBundle\Decorator\PropertyAccessorWithDotArraySyntax;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * Clean workflow configuration handler.
+ */
 class CleanConfigurationHandler implements ConfigurationHandlerInterface
 {
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var PropertyAccessor */
+    /** @var PropertyAccessorWithDotArraySyntax */
     private $propertyAccessor;
 
     public function __construct(RequestStack $requestStack)
@@ -100,12 +104,12 @@ class CleanConfigurationHandler implements ConfigurationHandlerInterface
     }
 
     /**
-     * @return PropertyAccessor
+     * @return PropertyAccessorWithDotArraySyntax
      */
     private function getPropertyAccessor()
     {
         if (!$this->propertyAccessor) {
-            $this->propertyAccessor = new PropertyAccessor();
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
         }
 
         return $this->propertyAccessor;
