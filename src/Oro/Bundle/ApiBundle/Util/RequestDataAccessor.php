@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\Exception as PropertyAccessorException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -14,8 +14,8 @@ class RequestDataAccessor
     private ?PropertyAccessorInterface $propertyAccessor = null;
 
     /**
-     * @throws PropertyAccessorException\AccessException          If an index does not exist
-     * @throws PropertyAccessorException\UnexpectedTypeException  If a value within the path is not array
+     * @throws PropertyAccessorException\AccessException If an index does not exist
+     * @throws PropertyAccessorException\UnexpectedTypeException If a value within the path is not array
      */
     public function getValue(array $requestData, string $path): mixed
     {
@@ -23,7 +23,7 @@ class RequestDataAccessor
     }
 
     /**
-     * @throws PropertyAccessorException\UnexpectedTypeException  If a value within the path is not array
+     * @throws PropertyAccessorException\UnexpectedTypeException If a value within the path is not array
      */
     public function setValue(array &$requestData, string $path, mixed $value): void
     {
