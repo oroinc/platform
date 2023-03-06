@@ -75,8 +75,11 @@ define(function(require) {
         },
 
         setScrollingContent($scrollingContents) {
-            if (this.$scrollingContent) {
+            if (this.$scrollingContent.length) {
                 this.$scrollingContent.off(this.eventNamespace());
+                this.$scrollingContent
+                    .removeClass('scrolling-trigger-content')
+                    .unwrap();
             }
 
             this.$scrollingContent = $($scrollingContents);
