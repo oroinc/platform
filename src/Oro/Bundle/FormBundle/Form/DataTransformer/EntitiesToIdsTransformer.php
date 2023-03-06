@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -71,7 +72,7 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
         } else {
             $qb = $repository->createQueryBuilder('e');
             $qb->where(sprintf('e.%s IN (:ids)', $this->propertyPath))
-                ->setParameter('ids', $ids);
+                ->setParameter('ids', $ids, Connection::PARAM_INT_ARRAY);
         }
 
         $result = $qb->getQuery()->execute();
