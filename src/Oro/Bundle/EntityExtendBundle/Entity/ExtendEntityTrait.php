@@ -36,8 +36,11 @@ trait ExtendEntityTrait
         $transport->setName($name);
 
         ExtendedEntityFieldsProcessor::executeGet($transport);
+        if ($transport->isProcessed()) {
+            return $transport->getResult();
+        }
 
-        return $transport->getResult();
+        throw new \LogicException('There no dynamic property access: ' . $name . ' Class: ' . static::class);
     }
 
     /**
