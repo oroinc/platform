@@ -6,14 +6,11 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SimpleFilterFactory */
-    private $filterFactory;
-
     private function getFilterFactory(
         array $filters = [],
         array $filterFactories = [],

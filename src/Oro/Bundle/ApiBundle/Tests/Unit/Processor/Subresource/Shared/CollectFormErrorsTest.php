@@ -8,28 +8,22 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints;
 
 class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var ErrorCompleterRegistry */
-    private $errorCompleterRegistry;
-
-    /** @var CollectFormErrors */
-    private $processor;
+    private CollectFormErrors $processor;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->errorCompleterRegistry = $this->createMock(ErrorCompleterRegistry::class);
-
         $this->processor = new CollectFormErrors(
             new ConstraintTextExtractor(),
-            $this->errorCompleterRegistry,
+            $this->createMock(ErrorCompleterRegistry::class),
             PropertyAccess::createPropertyAccessor()
         );
     }

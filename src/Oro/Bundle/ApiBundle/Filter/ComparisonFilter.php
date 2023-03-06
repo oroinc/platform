@@ -35,6 +35,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  * * not starts with
  * * ends with
  * * not ends with
+ * * empty value
+ * * not empty value
  * Also the field value can be:
  * * an array, in this case IN expression will be used
  * * an instance of Range class, in this case BETWEEN expression will be used
@@ -229,6 +231,8 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
                 return $this->buildComparisonExpression($field, Comparison::ENDS_WITH, $value);
             case FilterOperator::NOT_ENDS_WITH:
                 return $this->buildComparisonExpression($field, 'NOT_ENDS_WITH', $value);
+            case FilterOperator::EMPTY_VALUE:
+                return $this->buildEmptyValueComparisonExpression($field, $value);
         }
 
         return null;
@@ -306,6 +310,11 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         }
 
         return new Comparison($field, $operator, new Value($value));
+    }
+
+    protected function buildEmptyValueComparisonExpression(string $field, mixed $value): Comparison
+    {
+        return new Comparison($field, 'EMPTY_VALUE/:' . $this->getDataType(), new Value($value));
     }
 
     protected function buildNotExpression(Expression $expr): Expression

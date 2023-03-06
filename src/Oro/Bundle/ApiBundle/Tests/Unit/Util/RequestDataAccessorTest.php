@@ -8,8 +8,7 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
 class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RequestDataAccessor */
-    private $requestDataAccessor;
+    private RequestDataAccessor $requestDataAccessor;
 
     protected function setUp(): void
     {

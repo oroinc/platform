@@ -47,49 +47,57 @@ class SortersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@TestItem3->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
             ['id' => '<toString(@TestItem1->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
         $expectedRowsSortedByBoolean = [
             ['id' => '<toString(@TestItem2->id)>'],
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
         $expectedRowsSortedByNumber = [
             ['id' => '<toString(@AnotherItem->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
-            ['id' => '<toString(@TestItem1->id)>']
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
         $expectedRowsSortedByDateTime = [
             ['id' => '<toString(@AnotherItem->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
-            ['id' => '<toString(@TestItem1->id)>']
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
         $expectedRowsSortedByDate = [
             ['id' => '<toString(@TestItem3->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
             ['id' => '<toString(@AnotherItem->id)>'],
-            ['id' => '<toString(@TestItem1->id)>']
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
         $expectedRowsSortedByGuid = [
+            ['id' => '<toString(@EmptyItem->id)>'],
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@AnotherItem->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
-            ['id' => '<toString(@TestItem2->id)>']
+            ['id' => '<toString(@TestItem2->id)>'],
         ];
         $expectedRowsSortedByMoney = [
             ['id' => '<toString(@AnotherItem->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
-            ['id' => '<toString(@TestItem1->id)>']
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
         $expectedRowsSortedByCurrency = [
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
 
         return [
@@ -186,7 +194,8 @@ class SortersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@TestItem3->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
             ['id' => '<toString(@TestItem1->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
         $this->prepareExpectedRows($expectedRows, $entityType);
 

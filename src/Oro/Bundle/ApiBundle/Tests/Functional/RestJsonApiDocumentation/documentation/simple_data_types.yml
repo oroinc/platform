@@ -25,6 +25,8 @@ parameters:
         dataType: 'string'
     fieldInt:
         dataType: 'integer'
+    fieldJson:
+        dataType: 'object'
     fieldJsonArray:
         dataType: 'object'
     fieldMoney:
@@ -34,6 +36,10 @@ parameters:
     fieldPercent:
         dataType: 'float'
     fieldPercent100:
+        dataType: 'float'
+    fieldPercentRound:
+        dataType: 'float'
+    fieldPercent100Round:
         dataType: 'float'
     fieldSimpleArray:
         dataType: 'array'
@@ -72,6 +78,8 @@ response:
         dataType: 'string'
     fieldInt:
         dataType: 'integer'
+    fieldJson:
+        dataType: 'object'
     fieldJsonArray:
         dataType: 'object'
     fieldMoney:
@@ -81,6 +89,10 @@ response:
     fieldPercent:
         dataType: 'float'
     fieldPercent100:
+        dataType: 'float'
+    fieldPercentRound:
+        dataType: 'float'
+    fieldPercent100Round:
         dataType: 'float'
     fieldSimpleArray:
         dataType: 'array'

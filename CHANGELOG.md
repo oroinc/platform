@@ -2,11 +2,6 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-### Changed
-* Updated from `slick-carousel: 1.7.1` to fork `@oroinc/slick-carousel: 1.7.1-oro1` with patched internal `postSlide` method
-* Updated path of styles from `~slick-carousel/slick/slick.scss` to `~@oroinc/slick-carousel/slick/slick.scss`
-  and path of js from `slick-carousel/slick/slick` to `@oroinc/slick-carousel/slick/slick`
-
 ## Changes in the Platform package versions
 
 - [5.1.0](#510-unreleased)
@@ -30,7 +25,7 @@ The current file describes significant changes in the code that may affect the u
 
 ## 5.1.0 (UNRELEASED)
 
-[Show detailed list of changes](incompatibilities-5-1-rc-1.md)
+[Show detailed list of changes](incompatibilities-5-1-rc-2.md)
 
 ### Migration of Extended Entities
 
@@ -324,6 +319,10 @@ use ExtendEntityTrait;
 * Added `\Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils::createRecursiveIterator`, `\Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils::flattenMenuItem` for more convenient access to the menu item.
 
 ### Changed
+
+* Updated from `slick-carousel: 1.7.1` to fork `@oroinc/slick-carousel: 1.7.1-oro1` with patched internal `postSlide` method
+* Updated path of styles from `~slick-carousel/slick/slick.scss` to `~@oroinc/slick-carousel/slick/slick.scss`
+  and path of js from `slick-carousel/slick/slick` to `@oroinc/slick-carousel/slick/slick`
 
 #### ApiBundle
 * The parameter `throwException` was removed from the method `convertToEntityType`

@@ -6,15 +6,14 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Form\EventListener\NestedAssociationListener;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Unit\Form\EventListener\Fixtures\ObjectWithNestedAssociation;
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var NestedAssociationListener */
-    private $listener;
+    private NestedAssociationListener $listener;
 
     protected function setUp(): void
     {
