@@ -376,4 +376,25 @@ trait DocumentationTestTrait
 
         return empty($description);
     }
+
+    private static function assertArrayContainsAndSectionKeysEqual(array $expected, array $actual): void
+    {
+        self::assertArrayContains($expected, $actual);
+        foreach ($expected as $sectionName => $sectionData) {
+            $expectedKeys = array_keys($sectionData);
+            sort($expectedKeys);
+            $actualKeys = array_keys($actual[$sectionName]);
+            sort($actualKeys);
+            self::assertEquals(
+                $expectedKeys,
+                $actualKeys,
+                sprintf(
+                    "Section: %s\nExpected keys count: %d\nActual keys count: %d",
+                    $sectionName,
+                    count($expectedKeys),
+                    count($actualKeys)
+                )
+            );
+        }
+    }
 }

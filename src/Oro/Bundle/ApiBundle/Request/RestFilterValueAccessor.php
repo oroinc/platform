@@ -25,14 +25,14 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * Filter syntax for the request body:
  *  * [key => value, ...]
- *  * [key => [operator, value], ...]
- *  * [key => [operator name, value], ...]
+ *  * [key => [operator => value], ...]
+ *  * [key => [operator name => value], ...]
  *  * [group => [key => value, ...], ...]
  * Example:
  * <code>
  *  [
  *      'filter' => [
- *          'name' => ['neq', 'John']
+ *          'name' => ['neq' => 'John']
  *      ],
  *      'sort' => 'name'
  *  ]

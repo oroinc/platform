@@ -41,7 +41,7 @@ class FilterOperatorRegistry
         if (isset($this->shortOperators[$operator])) {
             return $this->shortOperators[$operator];
         }
-        if (isset($this->operators[$operator])) {
+        if (\array_key_exists($operator, $this->operators)) {
             return $operator;
         }
         throw new \InvalidArgumentException(\sprintf('The operator "%s" is not known.', $operator));

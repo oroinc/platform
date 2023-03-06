@@ -45,6 +45,9 @@ class QueryExpressionVisitor extends ExpressionVisitor
     /** @var Expr */
     private $expressionBuilder;
 
+    /** @var string|null */
+    private $fieldDataType = null;
+
     /** @var CompositeExpressionInterface[] */
     private $compositeExpressions;
 
@@ -148,6 +151,14 @@ class QueryExpressionVisitor extends ExpressionVisitor
         }
 
         return $this->expressionBuilder;
+    }
+
+    /**
+     * Gets the data type of a field for which the current comparison expression is being building.
+     */
+    public function getFieldDataType(): ?string
+    {
+        return $this->fieldDataType;
     }
 
     /**
@@ -277,6 +288,8 @@ class QueryExpressionVisitor extends ExpressionVisitor
         $expression = $field;
         if ('i' === $modifier) {
             $expression = sprintf('LOWER(%s)', $expression);
+        } elseif (str_starts_with($modifier, ':')) {
+            $this->fieldDataType = substr($modifier, 1);
         } elseif ($modifier) {
             throw new QueryException(sprintf(
                 'Unknown modifier "%s" for comparison operator "%s".',
@@ -285,7 +298,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
             ));
         }
 
-        return $this->comparisonExpressions[$operator]
+        $expr = $this->comparisonExpressions[$operator]
             ->walkComparisonExpression(
                 $this,
                 $field,
@@ -293,6 +306,9 @@ class QueryExpressionVisitor extends ExpressionVisitor
                 $this->getParameterName($comparison->getField()),
                 $this->walkValue($comparison->getValue())
             );
+        $this->fieldDataType = null;
+
+        return $expr;
     }
 
     /**

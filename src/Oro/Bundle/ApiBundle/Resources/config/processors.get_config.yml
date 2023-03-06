@@ -209,8 +209,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteFilters
         arguments:
             - '@oro_api.doctrine_helper'
-            - ['string', 'boolean', 'datetime', 'date', 'time']
-            - ['string', 'boolean', 'guid', 'currency']
+            - ['string', 'text', 'boolean', 'datetime', 'date', 'time']
+            - ['string', 'text', 'boolean', 'guid', 'currency']
         tags:
             - { name: oro.api.processor, action: get_config, extra: 'filters&!identifier_fields_only', priority: -80 }
 

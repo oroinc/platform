@@ -33,7 +33,8 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
                 FilterOperator::STARTS_WITH     => '^',
                 FilterOperator::NOT_STARTS_WITH => '!^',
                 FilterOperator::ENDS_WITH       => '$',
-                FilterOperator::NOT_ENDS_WITH   => '!$'
+                FilterOperator::NOT_ENDS_WITH   => '!$',
+                FilterOperator::EMPTY_VALUE     => null
             ]
         );
     }
@@ -250,6 +251,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             'prm4[lte]=val4'           => ['prm4', 'lte', 'val4', 'prm4', 'prm4'],
             'prm5[gt]=val5'            => ['prm5', 'gt', 'val5', 'prm5', 'prm5'],
             'prm6[gte]=val6'           => ['prm6', 'gte', 'val6', 'prm6', 'prm6'],
+            'prm7[empty]=yes'          => ['prm7', 'empty', 'yes', 'prm7', 'prm7'],
             'filter[field1][eq]=val1'  => ['filter[field1]', 'eq', 'val1', 'field1', 'filter[field1]'],
             'filter[field2][neq]=val2' => ['filter[field2]', 'neq', 'val2', 'field2', 'filter[field2]'],
             'filter[field3][lt]=val3'  => ['filter[field3]', 'lt', 'val3', 'field3', 'filter[field3]'],
@@ -275,7 +277,8 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             . '&prm3%5Blt%5D=val3'
             . '&prm4%5Blte%5D=val4'
             . '&prm5%5Bgt%5D=val5'
-            . '&prm6%5Bgte%5D=val6',
+            . '&prm6%5Bgte%5D=val6'
+            . '&prm7%5Bempty%5D=yes',
             $accessor->getQueryString()
         );
 
@@ -423,6 +426,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             'prm3'   => ['!=' => 'val3'],
             'prm4'   => null,
             'prm5'   => ['=' => null],
+            'prm6'   => ['empty' => 'yes'],
             'filter' => [
                 'address.country'       => 'US',
                 'address.region'        => ['<>' => 'NY'],
@@ -445,6 +449,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             . '&prm3%5Bneq%5D=val3'
             . '&prm4='
             . '&prm5='
+            . '&prm6%5Bempty%5D=yes'
             . '&filter%5Baddress%5D%5Bcountry%5D=US'
             . '&filter%5Baddress%5D%5Bregion%5D%5Bneq%5D=NY'
             . '&filter%5Baddress%5D%5BdefaultRegion%5D%5Bneq%5D=LA'
@@ -479,6 +484,11 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             'prm5'
         );
         self::assertEquals(
+            $this->getFilterValue('prm6', 'yes', 'empty', 'prm6'),
+            $accessor->get('prm6'),
+            'prm6'
+        );
+        self::assertEquals(
             $this->getFilterValue('address.country', 'US', 'eq', 'filter[address.country]'),
             $accessor->get('filter[address.country]'),
             'filter[address.country]'
@@ -504,7 +514,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             'filter[path2]'
         );
 
-        self::assertCount(10, $accessor->getAll(), 'getAll');
+        self::assertCount(11, $accessor->getAll(), 'getAll');
         self::assertEquals(
             [
                 'prm1' => $this->getFilterValue('prm1', 'val1', 'eq', 'prm1')

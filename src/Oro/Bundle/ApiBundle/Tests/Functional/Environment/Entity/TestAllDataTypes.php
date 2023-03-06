@@ -107,6 +107,13 @@ class TestAllDataTypes implements TestFrameworkEntityInterface
     public $fieldJsonArray;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(name="field_json", type="json", nullable=true)
+     */
+    public $fieldJson;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="field_datetime", type="datetime", nullable=true)
