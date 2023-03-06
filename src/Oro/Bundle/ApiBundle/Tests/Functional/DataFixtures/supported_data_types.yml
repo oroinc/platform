@@ -12,6 +12,7 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldArray: [1, 2, 3]
         fieldSimpleArray: [1, 2, 3]
         fieldJsonArray: {key1: value1}
+        fieldJson: {key1: value1}
         fieldDateTime: <(new DateTime('2010-10-01 10:11:12 UTC'))>
         fieldDate: <(new DateTime('2010-10-01 00:00:00 UTC'))>
         fieldTime: <(new DateTime('1970-01-01 10:11:12 UTC'))>
@@ -34,6 +35,10 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldDecimal: 2.34567891
         fieldDecimalDefault: 234
         fieldFloat: 2.2
+        fieldArray: [2, 3, 4]
+        fieldSimpleArray: [2, 3, 4]
+        fieldJsonArray: {key2: value2}
+        fieldJson: {key2: value2}
         fieldDateTime: <(new DateTime('2010-11-01 10:12:13 UTC'))>
         fieldDate: <(new DateTime('2010-11-01 00:00:00 UTC'))>
         fieldTime: <(new DateTime('1970-01-01 10:12:13 UTC'))>
@@ -56,6 +61,10 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldDecimal: 3.45678912
         fieldDecimalDefault: 345
         fieldFloat: 3.3
+        fieldArray: [3, 4, 5]
+        fieldSimpleArray: [3, 4, 5]
+        fieldJsonArray: {key3: value3}
+        fieldJson: {key3: value3}
         fieldDateTime: <(new DateTime('2010-12-01 10:13:14 UTC'))>
         fieldDate: <(new DateTime('2010-12-01 00:00:00 UTC'))>
         fieldTime: <(new DateTime('1970-01-01 10:13:14 UTC'))>
@@ -78,6 +87,10 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldDecimal: 10.12345678
         fieldDecimalDefault: 12345678
         fieldFloat: 10.10
+        fieldArray: [10, 11, 12]
+        fieldSimpleArray: [10, 11, 12]
+        fieldJsonArray: {key10: value10}
+        fieldJson: {key10: value10}
         fieldDateTime: <(new DateTime('2010-12-10 10:10:10 UTC'))>
         fieldDate: <(new DateTime('2010-10-10 00:00:00 UTC'))>
         fieldTime: <(new DateTime('1970-01-01 10:10:10 UTC'))>
@@ -90,6 +103,32 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldDuration: 10
         fieldMoneyValue: 10.1234
         fieldCurrency: 'CNY'
+    EmptyItem:
+        fieldString: ''
+        fieldText: ''
+        fieldInt: 0
+        fieldSmallInt: 0
+        fieldBigInt: '0'
+        fieldBoolean: false
+        fieldDecimal: 0.0
+        fieldDecimalDefault: 0
+        fieldFloat: 0.0
+        fieldArray: []
+        fieldSimpleArray: []
+        fieldJsonArray: []
+        fieldJson: []
+        fieldDateTime: <(new DateTime('1970-01-01 00:00:00 UTC'))>
+        fieldDate: <(new DateTime('1970-01-01 00:00:00 UTC'))>
+        fieldTime: <(new DateTime('1970-01-01 00:00:00 UTC'))>
+        fieldGuid: 'f21b9af0-c3f9-457b-9ab2-60e104ad2434'
+        fieldPercent: 0.0
+        fieldPercent100: 0.0
+        fieldPercentRound: 0.0
+        fieldPercent100Round: 0.0
+        fieldMoney: 0.0
+        fieldDuration: 0
+        fieldMoneyValue: 0.0
+        fieldCurrency: ''
     NullItem:
         fieldString: ~
         fieldText: ~
@@ -100,6 +139,10 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldDecimal: ~
         fieldDecimalDefault: ~
         fieldFloat: ~
+        fieldArray: ~
+        fieldSimpleArray: ~
+        fieldJsonArray: ~
+        fieldJson: ~
         fieldDateTime: ~
         fieldDate: ~
         fieldTime: ~

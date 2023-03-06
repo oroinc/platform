@@ -35,6 +35,10 @@ oro_api:
         included_data_chunk_size_per_entity:
             Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment: 5
 
+    api_doc_data_types:
+        test_percent_round: float
+        test_percent_100_round: float
+
     form_type_guesses:
         test_percent_round:
             form_type: Symfony\Component\Form\Extension\Core\Type\NumberType

@@ -11,9 +11,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SimpleFilterFactory */
-    private $filterFactory;
-
     private function getFilterFactory(
         array $filters = [],
         array $filterFactories = [],
