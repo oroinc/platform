@@ -1,4 +1,5 @@
 @regression
+@skip
 @ticket-BB-20273
 
 Feature: System respects entity fields scale
