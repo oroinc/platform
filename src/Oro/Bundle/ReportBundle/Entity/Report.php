@@ -147,7 +147,6 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
         $this->id = null;
         $this->createdAt = null;
         $this->updatedAt = null;
-        $this->cloneExtendEntityStorage();
     }
 
     /**

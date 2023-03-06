@@ -514,7 +514,6 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
         foreach ($originalTranslations as $translation) {
             $this->addTranslation(clone $translation);
         }
-        $this->cloneExtendEntityStorage();
     }
 
     /**
