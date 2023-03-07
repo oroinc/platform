@@ -13,8 +13,12 @@ define(function(require) {
             order: 550,
             enabled: false,
             fn(data) {
+                const element = data.instance.popper;
+                const html = element.ownerDocument.documentElement;
+                const relativeOffset = popperUtils.getOffsetRectRelativeToArbitraryNode(element, html);
                 const boundaries = _getBoundaries(data);
-                const availableHeight = Math.floor(boundaries.bottom - data.offsets.reference.bottom);
+                const availableHeight = Math.floor(boundaries.bottom + boundaries.top - relativeOffset.top);
+
                 if (data.popper.height > availableHeight) {
                     data.styles.maxHeight = availableHeight + 'px';
                     data.attributes['x-adjusted-height'] = '';
