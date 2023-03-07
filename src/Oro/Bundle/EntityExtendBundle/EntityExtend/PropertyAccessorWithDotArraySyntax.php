@@ -32,6 +32,7 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
  * but it has the following advantages:
  * * allows to use the same syntax of the property path for objects and arrays
  * * fixes some issues of Symfony's PropertyAccessor, for example working with magic __get __set methods
+ * * access to the properties of the object that inherit \ArrayAccess has been changed
  * New features:
  * * 'remove' method is added to allow to remove items from arrays or objects
  *
@@ -203,13 +204,12 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         $zval = [
             self::VALUE => $objectOrArray,
         ];
-        if (\is_object($objectOrArray) && false === strpbrk((string)$propertyPath, '.[')) {
+        if (\is_object($objectOrArray)
             // customization start
-            $propertyValue = $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty)[self::VALUE];
-            if (null !== $propertyValue) {
-                return $propertyValue;
-            }
-            // customization start
+            && !$objectOrArray instanceof \ArrayAccess
+            // customization end
+            && false === strpbrk((string)$propertyPath, '.[')) {
+            return $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty)[self::VALUE];
         }
 
         $propertyPath = $this->getPropertyPath($propertyPath);
