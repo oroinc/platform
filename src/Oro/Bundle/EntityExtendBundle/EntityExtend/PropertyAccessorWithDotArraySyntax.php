@@ -459,7 +459,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         for ($i = 0; $i < $lastIndex; ++$i) {
             $property = $propertyPath->getElement($i);
             // customization start
-            $isIndex = $this->isIndex($zval);
+            $isIndex = $this->isIndex($zval)
+                && ($zval[self::VALUE] instanceof \ArrayAccess && isset($zval[self::VALUE][$property]));
             // customization end
 
             if ($isIndex) {
