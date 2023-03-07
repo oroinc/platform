@@ -203,12 +203,13 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         $zval = [
             self::VALUE => $objectOrArray,
         ];
-        if (\is_object($objectOrArray)
+        if (\is_object($objectOrArray) && false === strpbrk((string)$propertyPath, '.[')) {
             // customization start
-            && !$objectOrArray instanceof \ArrayAccess
-            // customization end
-            && false === strpbrk((string)$propertyPath, '.[')) {
-            return $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty)[self::VALUE];
+            $propertyValue = $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty)[self::VALUE];
+            if (null !== $propertyValue) {
+                return $propertyValue;
+            }
+            // customization start
         }
 
         $propertyPath = $this->getPropertyPath($propertyPath);
@@ -459,8 +460,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         for ($i = 0; $i < $lastIndex; ++$i) {
             $property = $propertyPath->getElement($i);
             // customization start
-            $isIndex = $this->isIndex($zval)
-                && ($zval[self::VALUE] instanceof \ArrayAccess && isset($zval[self::VALUE][$property]));
+            $isIndex = $this->isIndex($zval);
             // customization end
 
             if ($isIndex) {
