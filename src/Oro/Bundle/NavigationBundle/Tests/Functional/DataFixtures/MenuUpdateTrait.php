@@ -2,19 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures;
 
+use Oro\Bundle\EntityExtendBundle\Decorator\OroPropertyAccessorBuilder;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 trait MenuUpdateTrait
 {
-    use EntityTrait;
-
-    /**
-     * @param array  $data
-     * @param string $entityClass
-     * @return object
-     */
-    protected function getMenuUpdate($data, $entityClass)
+    protected function getMenuUpdate(array $data, string $entityClass): object
     {
         $titles = $data['titles'];
         unset($data['titles']);
@@ -25,8 +18,12 @@ trait MenuUpdateTrait
         $scope = $this->getReference($data['scope']);
         unset($data['scope']);
 
-        $entity = $this->getEntity($entityClass, $data);
+        $entity = new $entityClass();
         $entity->setScope($scope);
+        $propertyAccessor = (new OroPropertyAccessorBuilder())->getPropertyAccessor();
+        foreach ($data as $name => $val) {
+            $propertyAccessor->setValue($entity, $name, $val);
+        }
 
         foreach ($titles as $localization => $title) {
             $fallbackValue = new LocalizedFallbackValue();

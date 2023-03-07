@@ -525,7 +525,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->arrayNode('supported_operators')
                             ->prototype('scalar')->end()
-                            ->requiresAtLeastOneElement()
                             ->defaultValue(['=', '!=', '*', '!*'])
                         ->end()
                     ->end()

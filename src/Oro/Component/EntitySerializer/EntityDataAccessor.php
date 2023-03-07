@@ -93,14 +93,7 @@ class EntityDataAccessor implements DataAccessorInterface
         return $value;
     }
 
-    /**
-     * Gets an instance of \ReflectionClass for the given class name
-     *
-     * @param string $className
-     *
-     * @return \ReflectionClass
-     */
-    protected function getReflectionClass($className)
+    protected function getReflectionClass(string $className): \ReflectionClass
     {
         if (isset($this->reflCache[$className])) {
             return $this->reflCache[$className];

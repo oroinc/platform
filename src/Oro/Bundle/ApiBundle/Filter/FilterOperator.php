@@ -53,4 +53,10 @@ final class FilterOperator
     public const ENDS_WITH = 'ends_with';
     /** "not ends with" (NOT LIKE %value) operator */
     public const NOT_ENDS_WITH = 'not_ends_with';
+    /**
+     * "empty" operator,
+     * value is true = EQUAL TO empty value OR IS NULL,
+     * value is false = NOT EQUAL TO empty value AND NOT IS NULL
+     */
+    public const EMPTY_VALUE = 'empty';
 }
