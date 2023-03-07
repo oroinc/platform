@@ -120,7 +120,8 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         const {eventBus: externalEventBus} = this.options;
         if (externalEventBus) {
             // proxy all own events to externalEventBus, if it is provided through options
-            this.listenTo(this, 'all', (eventName, ...args) => externalEventBus.trigger(eventName, ...args));
+            this.listenTo(this, 'all', (eventName, ...args) => externalEventBus.trigger(eventName, args));
+            externalEventBus.trigger('init', this);
         }
         this.listenTo(this.main, {
             disable: this.disable,
@@ -416,7 +417,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                 dropHandler: this.removeSortOrderForSelected.bind(this),
                 enabled: () => {
                     return this.main.collection.filter(model => {
-                        return model.get('_selected') && model.get('_sortOrder') !== null;
+                        return model.get('_selected') && model.get('_sortOrder') !== void 0;
                     }).length > 0;
                 }
             }

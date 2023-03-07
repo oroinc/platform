@@ -224,7 +224,7 @@ define(function(require) {
          */
         patchInitialState($elem, $form) {
             const formIndex = this.$('form[data-collect=true]').index($form);
-            if (formIndex === -1) {
+            if (formIndex === -1 || !this._initialState || !this._initialState[formIndex]) {
                 // form with traced state is not found
                 return;
             }
