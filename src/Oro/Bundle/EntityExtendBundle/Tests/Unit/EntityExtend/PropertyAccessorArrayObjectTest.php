@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\PropertyAccess\Tests\Unit;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EntityExtend;
 
 class PropertyAccessorArrayObjectTest extends PropertyAccessorCollectionTest
 {

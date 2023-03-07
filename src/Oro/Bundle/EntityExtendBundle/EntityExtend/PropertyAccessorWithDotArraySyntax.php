@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Decorator;
+namespace Oro\Bundle\EntityExtendBundle\EntityExtend;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
@@ -26,7 +26,14 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfo;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 
 /**
- * Custom implementation of @link PropertyAccessorInterface with dot array syntax.
+ * Writes and reads values to/from an object/array graph.
+ *
+ * This class is mostly a copy of {@see \Symfony\Component\PropertyAccess\PropertyAccessor}
+ * but it has the following advantages:
+ * * allows to use the same syntax of the property path for objects and arrays
+ * * fixes some issues of Symfony's PropertyAccessor, for example working with magic __get __set methods
+ * New features:
+ * * 'remove' method is added to allow to remove items from arrays or objects
  *
  * @SuppressWarnings(PHPMD)
  */
