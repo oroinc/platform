@@ -40,7 +40,9 @@ trait ExtendEntityTrait
             return $transport->getResult();
         }
 
-        throw new \LogicException('There no dynamic property access: ' . $name . ' Class: ' . static::class);
+        throw new \LogicException(
+            sprintf('There is no extended property with the name %s in class: %s', $name, static::class)
+        );
     }
 
     /**

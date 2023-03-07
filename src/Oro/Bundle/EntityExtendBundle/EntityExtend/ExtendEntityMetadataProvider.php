@@ -46,7 +46,7 @@ class ExtendEntityMetadataProvider implements ExtendEntityMetadataProviderInterf
                 'fieldType' => $config->getId()->getFieldType(),
                 ...$config->getValues()
             ];
-            if (isset($configItem['is_extend']) && $configItem['is_extend']) {
+            if (!empty($configItem['is_extend'])) {
                 $result[] = $configItem;
             }
         }

@@ -373,14 +373,12 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
                 $exists = $exists
                     || EntityPropertyInfo::isMethodMatchExists(array_keys($methods), $transport->getName());
                 if ($exists) {
-                    break;
+                    $transport->setResult(true);
+                    $transport->setProcessed(true);
+
+                    return;
                 }
             }
-        }
-
-        if ($exists) {
-            $transport->setResult(true);
-            $transport->setProcessed(true);
         }
     }
 
