@@ -158,6 +158,7 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
         $this->lastRun = null;
         $this->createdAt = null;
         $this->updatedAt = null;
+        $this->cloneExtendEntityStorage();
     }
 
     /**
