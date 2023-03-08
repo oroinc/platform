@@ -3,12 +3,12 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -16,8 +16,7 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
  */
 class BufferedQueryResultIteratorTest extends OrmTestCase
 {
-    /** @var EntityManagerMock */
-    private $em;
+    private EntityManagerInterface $em;
 
     protected function setUp(): void
     {

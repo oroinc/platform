@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Component\TestUtils\ORM\Mocks;
+namespace Oro\Component\Testing\Unit\ORM\Mocks;
 
-use Doctrine\ORM\UnitOfWork as BaseUnitOfWork;
+use Doctrine\ORM\UnitOfWork;
 
 /**
  * Special UnitOfWork mock used for testing purposes.
  */
-class UnitOfWork extends BaseUnitOfWork
+class UnitOfWorkMock extends UnitOfWork
 {
     protected $insertions = [];
     protected $deletions = [];

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\TestUtils\ORM\Mocks;
+namespace Oro\Component\Testing\Unit\ORM\Mocks;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;

@@ -12,7 +12,7 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmail;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
-use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
+use Oro\Component\Testing\Unit\ORM\Mocks\UnitOfWorkMock;
 
 class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -156,7 +156,7 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider createEmailAddressDataProvider
      */
-    public function testCreateEmailAddressData(UnitOfWork $uow, $result)
+    public function testCreateEmailAddressData(UnitOfWorkMock $uow, $result)
     {
         $this->assertEquals($result, $this->emailOwnerManager->createEmailAddressData($uow));
     }
@@ -173,11 +173,11 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
 
         return [
             [
-                new UnitOfWork(),
+                new UnitOfWorkMock(),
                 ['updates' => [], 'deletions' => []],
             ],
             [
-                (new UnitOfWork())
+                (new UnitOfWorkMock())
                     ->addInsertion($created1, ['firstName' => [null, 'created1']])
                     ->addInsertion($created2, ['firstName' => [null, 'created2']])
                     ->addInsertion($created3)
