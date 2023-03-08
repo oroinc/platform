@@ -3,6 +3,7 @@
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,13 +21,12 @@ use Oro\Component\EntitySerializer\FieldFilterInterface;
 use Oro\Component\EntitySerializer\QueryFactory;
 use Oro\Component\EntitySerializer\QueryResolver;
 use Oro\Component\EntitySerializer\SerializationHelper;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class EntitySerializerTestCase extends OrmTestCase
 {
-    /** @var EntityManagerMock */
+    /** @var EntityManagerInterface */
     protected $em;
 
     /** @var EntityFieldFilterInterface|\PHPUnit\Framework\MockObject\MockObject */

@@ -24,7 +24,7 @@ class QueryCountCalculatorTest extends OrmTestCase
 {
     private const TEST_COUNT = 42;
 
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface */
     private $em;
 
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */

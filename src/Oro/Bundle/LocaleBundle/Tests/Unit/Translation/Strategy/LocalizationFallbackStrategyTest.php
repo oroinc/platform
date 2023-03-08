@@ -4,11 +4,11 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Translation\Strategy;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Exception\InvalidFieldNameException;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -17,7 +17,7 @@ class LocalizationFallbackStrategyTest extends OrmTestCase
 {
     private const CACHE_KEY = 'localization_fallbacks';
 
-    /** @var EntityManagerMock */
+    /** @var EntityManagerInterface */
     private $em;
 
     /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */

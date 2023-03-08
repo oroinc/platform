@@ -11,7 +11,8 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
  */
 class DatabasePlatformMock extends AbstractPlatform
 {
-    private $sequenceNextValSql = "";
+    private $name = 'mock';
+    private $sequenceNextValSql = '';
     private $prefersIdentityColumns = true;
     private $prefersSequences = false;
 
@@ -107,7 +108,12 @@ class DatabasePlatformMock extends AbstractPlatform
 
     public function getName()
     {
-        return 'mock';
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
     }
 
     protected function initializeDoctrineTypeMappings()

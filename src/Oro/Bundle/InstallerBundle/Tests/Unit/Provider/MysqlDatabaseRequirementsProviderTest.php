@@ -5,21 +5,19 @@ declare(strict_types=1);
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Provider;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\PDO\Connection as DriverConnection;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\InstallerBundle\Enum\DatabasePlatform;
 use Oro\Bundle\InstallerBundle\Provider\MysqlDatabaseRequirementsProvider;
 use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
 use Oro\Component\TestUtils\ORM\Mocks\DatabasePlatformMock;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
-use PHPUnit\Framework\TestCase;
 
-class MysqlDatabaseRequirementsProviderTest extends TestCase
+class MysqlDatabaseRequirementsProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testCollectionSize()
     {
-        $connection = $this->getConnectionMock();
-        $registry = $this->getManagerRegistryMock($connection);
-        $provider = $this->getProvider($registry, []);
+        $provider = $this->getProvider($this->getDoctrine($this->getConnection()), []);
 
         $requirements = $provider->getOroRequirements();
 
@@ -31,9 +29,7 @@ class MysqlDatabaseRequirementsProviderTest extends TestCase
 
     public function testRequiredVersionFulfilled()
     {
-        $connection = $this->getConnectionMock();
-        $registry = $this->getManagerRegistryMock($connection);
-        $provider = $this->getProvider($registry, []);
+        $provider = $this->getProvider($this->getDoctrine($this->getConnection()), []);
 
         $requirements = $provider->getOroRequirements()->all();
 
@@ -43,9 +39,7 @@ class MysqlDatabaseRequirementsProviderTest extends TestCase
 
     public function testRequiredVersionNotFulfilled()
     {
-        $connection = $this->getConnectionMock('1.0');
-        $registry = $this->getManagerRegistryMock($connection);
-        $provider = $this->getProvider($registry, []);
+        $provider = $this->getProvider($this->getDoctrine($this->getConnection('1.0')), []);
 
         $requirements = $provider->getOroRequirements()->all();
 
@@ -55,9 +49,7 @@ class MysqlDatabaseRequirementsProviderTest extends TestCase
 
     public function testRequiredPrivilegesIsGranted()
     {
-        $connection = $this->getConnectionMock();
-        $registry = $this->getManagerRegistryMock($connection);
-        $provider = $this->getProvider($registry, $this->getRequiredPrivileges());
+        $provider = $this->getProvider($this->getDoctrine($this->getConnection()), $this->getRequiredPrivileges());
 
         $requirements = $provider->getOroRequirements()->all();
 
@@ -67,9 +59,7 @@ class MysqlDatabaseRequirementsProviderTest extends TestCase
 
     public function testRequiredPrivilegesIsNotGranted()
     {
-        $connection = $this->getConnectionMock();
-        $registry = $this->getManagerRegistryMock($connection);
-        $provider = $this->getProvider($registry, []);
+        $provider = $this->getProvider($this->getDoctrine($this->getConnection()), []);
 
         $requirements = $provider->getOroRequirements()->all();
 
@@ -77,57 +67,47 @@ class MysqlDatabaseRequirementsProviderTest extends TestCase
         $this->assertFalse($requirement->isFulfilled());
     }
 
-    protected function getManagerRegistryMock(ConnectionMock $connectionMock): ManagerRegistry
+    protected function getDoctrine(ConnectionMock $connection): ManagerRegistry
     {
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry->method('getConnectionNames')->willReturn(['default' => 'doctrine.dbal.default_connection']);
-        $registry->method('getConnections')->willReturn(['default' => $connectionMock]);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getConnectionNames')
+            ->willReturn(['default' => 'doctrine.dbal.default_connection']);
+        $doctrine->expects(self::any())
+            ->method('getConnections')
+            ->willReturn(['default' => $connection]);
 
-        return $registry;
+        return $doctrine;
     }
 
-    protected function getConnectionMock(
+    protected function getConnection(
         string $version = MysqlDatabaseRequirementsProvider::REQUIRED_VERSION
     ): ConnectionMock {
-        $connection = new class([], new DriverMock(), null, null, $version) extends ConnectionMock {
-            protected string $version;
+        $platform = new DatabasePlatformMock();
+        $platform->setName(DatabasePlatform::MYSQL);
 
-            public function __construct(
-                array $params,
-                $driver,
-                $config = null,
-                $eventManager = null,
-                string $version = '1.0'
-            ) {
-                parent::__construct($params, $driver, $config, $eventManager);
+        $driverConnection = $this->createMock(DriverConnection::class);
+        $driverConnection->expects(self::any())
+            ->method('getServerVersion')
+            ->willReturn($version);
 
-                $this->version = $version;
+        $connection = new class([], new DriverMock(), $driverConnection) extends ConnectionMock {
+            private DriverConnection $wrappedConnection;
+
+            public function __construct(array $params, DriverMock $driver, DriverConnection $wrappedConnection)
+            {
+                parent::__construct($params, $driver);
+                $this->wrappedConnection = $wrappedConnection;
             }
 
-            public function getWrappedConnection()
+            public function getWrappedConnection(): DriverConnection
             {
-                return $this;
-            }
-
-            public function getServerVersion(): string
-            {
-                return $this->version;
+                return $this->wrappedConnection;
             }
         };
-
-        $connection->setDatabasePlatform($this->getPlatformMock());
+        $connection->setDatabasePlatform($platform);
 
         return $connection;
-    }
-
-    protected function getPlatformMock(): DatabasePlatformMock
-    {
-        return new class extends DatabasePlatformMock {
-            public function getName(): string
-            {
-                return DatabasePlatform::MYSQL;
-            }
-        };
     }
 
     protected function getRequiredPrivileges(): array
@@ -136,15 +116,15 @@ class MysqlDatabaseRequirementsProviderTest extends TestCase
     }
 
     protected function getProvider(
-        ManagerRegistry $registryMock,
+        ManagerRegistry $doctrine,
         array $grantedPrivileges = []
     ): MysqlDatabaseRequirementsProvider {
-        return new class($registryMock, $grantedPrivileges) extends MysqlDatabaseRequirementsProvider {
+        return new class($doctrine, $grantedPrivileges) extends MysqlDatabaseRequirementsProvider {
             protected array $grantedPrivileges;
 
-            public function __construct(ManagerRegistry $registry, array $grantedPrivileges)
+            public function __construct(ManagerRegistry $doctrine, array $grantedPrivileges)
             {
-                parent::__construct($registry);
+                parent::__construct($doctrine);
 
                 $this->grantedPrivileges = $grantedPrivileges;
             }

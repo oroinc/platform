@@ -24,7 +24,7 @@ use Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
+use Oro\Component\TestUtils\ORM\Mocks\UnitOfWorkMock;
 
 class EntityListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -104,7 +104,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
         $updatedEmailAddresses = [new EmailAddress(1), new EmailAddress(2)];
         $createdEmailAddresses = [new EmailAddress(3)];
 
-        $uow = $this->getMockBuilder(UnitOfWork::class)
+        $uow = $this->getMockBuilder(UnitOfWorkMock::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['computeChangeSet'])
             ->getMock();
@@ -187,7 +187,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
             spl_object_hash($updatedEmailsArray[0]) => $updatedEmailsArray[0],
         ];
 
-        $uow = new UnitOfWork();
+        $uow = new UnitOfWorkMock();
         array_map([$uow, 'addInsertion'], array_merge($contactsArray, $createdEmailsArray));
         array_map([$uow, 'addUpdate'], $updatedEmailsArray);
 
@@ -266,7 +266,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
         $updatedEmailAddresses = [new EmailAddress(1), new EmailAddress(2)];
         $createdEmailAddresses = [new EmailAddress(3)];
 
-        $uow = $this->getMockBuilder(UnitOfWork::class)
+        $uow = $this->getMockBuilder(UnitOfWorkMock::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['computeChangeSet'])
             ->getMock();

@@ -5,6 +5,7 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM\Walker;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 use Oro\Component\DoctrineUtils\ORM\Walker\MaterializedViewOutputResultModifier;
@@ -13,12 +14,11 @@ use Oro\Component\DoctrineUtils\ORM\Walker\OutputResultModifierInterface;
 use Oro\Component\DoctrineUtils\ORM\Walker\PostgreSqlOrderByNullsOutputResultModifier;
 use Oro\Component\DoctrineUtils\ORM\Walker\SqlWalker;
 use Oro\Component\DoctrineUtils\ORM\Walker\UnionOutputResultModifier;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class SqlWalkerTest extends OrmTestCase
 {
-    private EntityManagerMock $em;
+    private EntityManagerInterface $em;
 
     protected function setUp(): void
     {

@@ -4,14 +4,14 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\EventListener\MultipleEntitySubscriber;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ChildEntity;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ParentEntity;
-use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -63,11 +63,10 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function postSetDataProvider(): array
     {
-        $uow = new UnitOfWork();
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())
             ->method('getUnitOfWork')
-            ->willReturn($uow);
+            ->willReturn($this->createMock(UnitOfWork::class));
         $meta = $this->createMock(ClassMetadata::class);
 
         $existing = (object)['$existing' => true];
@@ -268,15 +267,12 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($removed->getParent());
     }
 
-    /**
-     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function getPostSubmitForm(
         ?object $parent,
         Collection $children,
         array $added,
         array $removed
-    ) {
+    ): FormInterface|\PHPUnit\Framework\MockObject\MockObject {
         $form = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
         $parentForm = $this->createMock(FormInterface::class);

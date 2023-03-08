@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Bundle\AddressBundle\Entity\Country;
@@ -12,7 +13,6 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\EventListener\UpdateTranslatableDictionariesListener;
 use Oro\Component\Testing\ReflectionUtil;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class UpdateTranslatableDictionariesListenerTest extends OrmTestCase
@@ -20,11 +20,8 @@ class UpdateTranslatableDictionariesListenerTest extends OrmTestCase
     private const CHANGED = 0;
     private const REMOVED = 1;
 
-    /** @var EntityManagerMock */
-    private $em;
-
-    /** @var UpdateTranslatableDictionariesListener */
-    private $listener;
+    private EntityManagerInterface $em;
+    private UpdateTranslatableDictionariesListener $listener;
 
     protected function setUp(): void
     {

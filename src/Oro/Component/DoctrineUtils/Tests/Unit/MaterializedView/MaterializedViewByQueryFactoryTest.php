@@ -4,16 +4,16 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\MaterializedView;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Component\DoctrineUtils\MaterializedView\MaterializedViewByQueryFactory;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class MaterializedViewByQueryFactoryTest extends OrmTestCase
 {
-    private EntityManagerMock $em;
+    private EntityManagerInterface $em;
     private MaterializedViewByQueryFactory $factory;
 
     protected function setUp(): void
