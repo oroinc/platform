@@ -5,7 +5,6 @@ namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Twig\Environment;
-use Twig\Template;
 
 /**
  * Datagrid property formatter that uses a specified Twig template for rendering the value.
@@ -51,11 +50,19 @@ class TwigTemplateProperty extends AbstractProperty
      */
     public function getRawValue(ResultRecordInterface $record)
     {
+        return $this->render(
+            $record->getValue($this->getOr(self::DATA_NAME_KEY) ?: $this->get(self::NAME_KEY)),
+            $record
+        );
+    }
+
+    public function render(mixed $value, ResultRecordInterface $record): string
+    {
         $context = array_merge(
             $this->getOr(self::CONTEXT_KEY, []),
             [
                 'record' => $record,
-                'value'  => $record->getValue($this->getOr(self::DATA_NAME_KEY) ?: $this->get(self::NAME_KEY)),
+                'value'  => $value,
             ]
         );
 
