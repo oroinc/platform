@@ -26,7 +26,7 @@ use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\UserApi;
 use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\UserEmail;
 use Oro\Bundle\EntityBundle\Helper\RelationHelper;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Oro\ORM\Query\AST\Functions;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

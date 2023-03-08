@@ -9,9 +9,9 @@ use Doctrine\DBAL\Driver\PDO\Connection as DriverConnection;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\InstallerBundle\Enum\DatabasePlatform;
 use Oro\Bundle\InstallerBundle\Provider\MysqlDatabaseRequirementsProvider;
-use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
-use Oro\Component\TestUtils\ORM\Mocks\DatabasePlatformMock;
-use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\ConnectionMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\DatabasePlatformMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\DriverMock;
 
 class MysqlDatabaseRequirementsProviderTest extends \PHPUnit\Framework\TestCase
 {

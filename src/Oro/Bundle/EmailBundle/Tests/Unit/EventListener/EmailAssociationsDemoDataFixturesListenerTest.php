@@ -13,7 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressVisibilityManager;
 use Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListener;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class EmailAssociationsDemoDataFixturesListenerTest extends OrmTestCase
 {

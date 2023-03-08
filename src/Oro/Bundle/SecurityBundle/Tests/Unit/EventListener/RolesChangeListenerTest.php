@@ -9,8 +9,8 @@ use Oro\Bundle\SecurityBundle\EventListener\RolesChangeListener;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestBusinessUnit;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestOrganization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestUser;
-use Oro\Component\TestUtils\ORM\Mocks\StatementMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\Mocks\StatementMock;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 

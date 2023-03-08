@@ -21,7 +21,7 @@ use Oro\Component\EntitySerializer\FieldFilterInterface;
 use Oro\Component\EntitySerializer\QueryFactory;
 use Oro\Component\EntitySerializer\QueryResolver;
 use Oro\Component\EntitySerializer\SerializationHelper;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class EntitySerializerTestCase extends OrmTestCase

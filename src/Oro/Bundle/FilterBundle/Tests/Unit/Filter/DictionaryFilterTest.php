@@ -14,7 +14,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEntity;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Component\Testing\ReflectionUtil;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Test\FormInterface;
 

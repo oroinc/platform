@@ -11,7 +11,7 @@ use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\FormBundle\EventListener\CountQueryOptimizationListener;
 use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\Contact;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CountQueryOptimizationListenerTest extends OrmTestCase

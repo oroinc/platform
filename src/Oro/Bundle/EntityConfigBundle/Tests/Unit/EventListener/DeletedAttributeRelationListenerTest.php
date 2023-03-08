@@ -15,7 +15,7 @@ use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\ReflectionUtil;
-use Oro\Component\TestUtils\ORM\Mocks\UnitOfWorkMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\UnitOfWorkMock;
 
 class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
 {

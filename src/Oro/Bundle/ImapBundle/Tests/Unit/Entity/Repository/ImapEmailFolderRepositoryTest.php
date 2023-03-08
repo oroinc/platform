@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class ImapEmailFolderRepositoryTest extends OrmTestCase
 {

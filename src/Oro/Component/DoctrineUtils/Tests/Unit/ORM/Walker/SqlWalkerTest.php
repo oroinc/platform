@@ -14,7 +14,7 @@ use Oro\Component\DoctrineUtils\ORM\Walker\OutputResultModifierInterface;
 use Oro\Component\DoctrineUtils\ORM\Walker\PostgreSqlOrderByNullsOutputResultModifier;
 use Oro\Component\DoctrineUtils\ORM\Walker\SqlWalker;
 use Oro\Component\DoctrineUtils\ORM\Walker\UnionOutputResultModifier;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class SqlWalkerTest extends OrmTestCase
 {

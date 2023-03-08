@@ -13,7 +13,7 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\TestComment;
 use Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\TestOrder;
 use Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\TestProduct;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class OrmManyRelationBuilderTest extends OrmTestCase
 {

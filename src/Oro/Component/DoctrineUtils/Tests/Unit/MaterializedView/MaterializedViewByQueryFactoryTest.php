@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Component\DoctrineUtils\MaterializedView\MaterializedViewByQueryFactory;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class MaterializedViewByQueryFactoryTest extends OrmTestCase
 {

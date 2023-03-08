@@ -9,7 +9,7 @@ use Doctrine\ORM\Query;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutor;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity\Test as Entity;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class QueryExecutorTest extends OrmTestCase
 {

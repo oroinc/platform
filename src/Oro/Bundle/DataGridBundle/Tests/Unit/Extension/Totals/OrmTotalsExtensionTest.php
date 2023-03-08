@@ -19,7 +19,7 @@ use Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OrmTotalsExtensionTest extends OrmTestCase

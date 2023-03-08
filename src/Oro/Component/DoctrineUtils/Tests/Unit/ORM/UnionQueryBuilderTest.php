@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

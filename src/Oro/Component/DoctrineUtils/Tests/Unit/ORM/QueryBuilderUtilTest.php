@@ -4,7 +4,7 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\QueryException;
@@ -14,7 +14,7 @@ use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -23,8 +23,7 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
  */
 class QueryBuilderUtilTest extends OrmTestCase
 {
-    /** @var EntityManager */
-    private $em;
+    private EntityManagerInterface $em;
 
     protected function setUp(): void
     {
@@ -34,7 +33,7 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     private function getQueryBuilder(): QueryBuilder
     {
-        return new QueryBuilder($this->createMock(EntityManager::class));
+        return new QueryBuilder($this->createMock(EntityManagerInterface::class));
     }
 
     private function getParameter(string|int $name): Parameter
@@ -417,7 +416,7 @@ class QueryBuilderUtilTest extends OrmTestCase
     {
         return [
             'field:manyToOne' => [
-                function (EntityManager $em) {
+                function (EntityManagerInterface $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
                         ->from(Person::class, 'p')
@@ -427,7 +426,7 @@ class QueryBuilderUtilTest extends OrmTestCase
                 Item::class,
             ],
             'field:manyToMany' => [
-                function (EntityManager $em) {
+                function (EntityManagerInterface $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
                         ->from(Person::class, 'p')
@@ -437,7 +436,7 @@ class QueryBuilderUtilTest extends OrmTestCase
                 Group::class,
             ],
             'field:manyToMany.field:manyToMany' => [
-                function (EntityManager $em) {
+                function (EntityManagerInterface $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
                         ->from(Person::class, 'p')
@@ -448,7 +447,7 @@ class QueryBuilderUtilTest extends OrmTestCase
                 Item::class,
             ],
             'class:manyToOne' => [
-                function (EntityManager $em) {
+                function (EntityManagerInterface $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
                         ->from(Person::class, 'p')
@@ -458,7 +457,7 @@ class QueryBuilderUtilTest extends OrmTestCase
                 Item::class,
             ],
             'class:manyToMany' => [
-                function (EntityManager $em) {
+                function (EntityManagerInterface $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
                         ->from(Person::class, 'p')
@@ -468,7 +467,7 @@ class QueryBuilderUtilTest extends OrmTestCase
                 Group::class,
             ],
             'class:manyToMany.class:manyToMany' => [
-                function (EntityManager $em) {
+                function (EntityManagerInterface $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
                         ->from(Person::class, 'p')

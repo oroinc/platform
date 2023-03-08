@@ -8,7 +8,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\EntityDeleteListener;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Stub\FileAwareEntityStub;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Component\TestUtils\ORM\Mocks\UnitOfWorkMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\UnitOfWorkMock;
 
 class EntityDeleteListenerTest extends \PHPUnit\Framework\TestCase
 {

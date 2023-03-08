@@ -13,7 +13,7 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\EventListener\UpdateTranslatableDictionariesListener;
 use Oro\Component\Testing\ReflectionUtil;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class UpdateTranslatableDictionariesListenerTest extends OrmTestCase
 {

@@ -12,7 +12,7 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmail;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
-use Oro\Component\TestUtils\ORM\Mocks\UnitOfWorkMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\UnitOfWorkMock;
 
 class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
 {

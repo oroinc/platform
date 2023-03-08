@@ -23,8 +23,8 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
 use Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\Testing\Unit\ORM\Mocks\UnitOfWorkMock;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Oro\Component\TestUtils\ORM\Mocks\UnitOfWorkMock;
 
 class EntityListenerTest extends \PHPUnit\Framework\TestCase
 {

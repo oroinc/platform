@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\TestUtils\ORM\Mocks;
+namespace Oro\Component\Testing\Unit\ORM\Mocks;
 
 /**
  * This class is a clone of namespace Doctrine\Tests\Mocks\DriverConnectionMock that is excluded from doctrine
