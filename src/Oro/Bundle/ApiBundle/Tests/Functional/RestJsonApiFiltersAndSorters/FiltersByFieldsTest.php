@@ -194,7 +194,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $expectedRows = [
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
 
         return [
@@ -452,12 +453,14 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     {
         $expectedRows1 = [
             ['id' => '<toString(@TestItem1->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
         $expectedRows2 = [
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
 
         return [
@@ -491,7 +494,11 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ],
             'by date field'            => [
                 ['fieldDate' => '2010-10-02..2010-11-30'],
-                [['id' => '<toString(@TestItem1->id)>'], ['id' => '<toString(@TestItem3->id)>']]
+                [
+                    ['id' => '<toString(@TestItem1->id)>'],
+                    ['id' => '<toString(@TestItem3->id)>'],
+                    ['id' => '<toString(@EmptyItem->id)>']
+                ]
             ],
             'by time field'            => [
                 ['fieldTime' => '10:11:13..10:13:13'],
@@ -559,7 +566,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $expectedRows = [
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
 
         $this->appendEntityConfig(
@@ -627,7 +635,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -647,7 +656,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -667,7 +677,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -687,7 +698,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
@@ -706,7 +718,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
-            ['id' => '<toString(@AnotherItem->id)>']
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
         ];
 
         return [
@@ -1013,6 +1026,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
             ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>'],
             ['id' => '<toString(@NullItem->id)>']
         ];
 
@@ -1182,6 +1196,36 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         );
     }
 
+    public function testEmptyValueFilterShouldBeDisabledByDefault()
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+        $response = $this->cget(['entity' => $entityType], ['filter[fieldString][empty]' => 'yes'], [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The operator "empty" is not supported.',
+                'source' => ['parameter' => 'filter[fieldString]']
+            ],
+            $response
+        );
+    }
+
+    public function testNotEmptyValueFilterShouldBeDisabledByDefault()
+    {
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+        $response = $this->cget(['entity' => $entityType], ['filter[fieldString][empty]' => 'no'], [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The operator "empty" is not supported.',
+                'source' => ['parameter' => 'filter[fieldString]']
+            ],
+            $response
+        );
+    }
+
     /**
      * @dataProvider containsFilterDataProvider
      */
@@ -1288,7 +1332,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
     public function notContainsFilterDataProvider(): array
     {
-        $expectedRows = [['id' => '<toString(@AnotherItem->id)>']];
+        $expectedRows = [
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
+        ];
 
         return [
             'by string field' => [
@@ -1408,7 +1455,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
     public function notStartsWithFilterDataProvider(): array
     {
-        $expectedRows = [['id' => '<toString(@AnotherItem->id)>']];
+        $expectedRows = [
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
+        ];
 
         return [
             'by string field' => [
@@ -1528,7 +1578,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
     public function notEndsWithFilterDataProvider(): array
     {
-        $expectedRows = [['id' => '<toString(@AnotherItem->id)>']];
+        $expectedRows = [
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
+        ];
 
         return [
             'by string field' => [
@@ -1539,6 +1592,92 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldText' => 'Value'],
                 $expectedRows
             ]
+        ];
+    }
+
+    /**
+     * @dataProvider emptyValueFilterDataProvider
+     */
+    public function testEmptyValueFilter(array $filter, array $expectedRows)
+    {
+        $filterFieldName = key($filter);
+        $filter = [sprintf('filter[%s][empty]', $filterFieldName) => $filter[$filterFieldName]];
+
+        $this->appendEntityConfig(
+            TestAllDataTypes::class,
+            ['filters' => ['fields' => [$filterFieldName => ['operators' => ['empty']]]]]
+        );
+
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+        $this->prepareExpectedRows($expectedRows, $entityType);
+
+        $response = $this->cget(['entity' => $entityType], $filter);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+    }
+
+    public function emptyValueFilterDataProvider(): array
+    {
+        $emptyValueExpectedRows = [
+            ['id' => '<toString(@EmptyItem->id)>'],
+            ['id' => '<toString(@NullItem->id)>']
+        ];
+        $notEmptyValueExpectedRows = [
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@TestItem2->id)>'],
+            ['id' => '<toString(@TestItem3->id)>'],
+            ['id' => '<toString(@AnotherItem->id)>']
+        ];
+
+        return [
+            'empty, by string field'     => [
+                ['fieldString' => 'yes'],
+                $emptyValueExpectedRows
+            ],
+            'not empty, by string field' => [
+                ['fieldString' => 'no'],
+                $notEmptyValueExpectedRows
+            ],
+            'empty, by text field'       => [
+                ['fieldText' => 'yes'],
+                $emptyValueExpectedRows
+            ],
+            'not empty, by text field'   => [
+                ['fieldText' => 'no'],
+                $notEmptyValueExpectedRows
+            ],
+            'empty, by array field'       => [
+                ['fieldArray' => 'yes'],
+                $emptyValueExpectedRows
+            ],
+            'not empty, by array field'   => [
+                ['fieldArray' => 'no'],
+                $notEmptyValueExpectedRows
+            ],
+            'empty, by simple array field'       => [
+                ['fieldSimpleArray' => 'yes'],
+                $emptyValueExpectedRows
+            ],
+            'not empty, by simple array field'   => [
+                ['fieldSimpleArray' => 'no'],
+                $notEmptyValueExpectedRows
+            ],
+            'empty, by json array field'       => [
+                ['fieldJsonArray' => 'yes'],
+                $emptyValueExpectedRows
+            ],
+            'not empty, by json array field'   => [
+                ['fieldJsonArray' => 'no'],
+                $notEmptyValueExpectedRows
+            ],
+            'empty, by json field'       => [
+                ['fieldJson' => 'yes'],
+                $emptyValueExpectedRows
+            ],
+            'not empty, by json field'   => [
+                ['fieldJson' => 'no'],
+                $notEmptyValueExpectedRows
+            ],
         ];
     }
 

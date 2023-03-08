@@ -1,15 +1,15 @@
 <?php
 
-namespace Oro\Component\TestUtils\ORM;
+namespace Oro\Component\Testing\Unit\ORM;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Driver\Connection;
 use Oro\Component\Testing\TempDirExtension;
-use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
-use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\Mocks\FetchIterator;
-use Oro\Component\TestUtils\ORM\Mocks\StatementMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\ConnectionMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\DriverMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\EntityManagerMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\FetchIterator;
+use Oro\Component\Testing\Unit\ORM\Mocks\StatementMock;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ConsecutiveCalls;
@@ -65,7 +65,7 @@ abstract class OrmTestCase extends TestCase
         // making our mock of 'CAST' available in Oro\ORM\Query\AST\Platform\Functions\Mock\ namespace:
         if (!class_exists('Oro\ORM\Query\AST\Platform\Functions\Mock\Cast', false)) {
             class_alias(
-                \Oro\Component\TestUtils\ORM\Mocks\Cast::class,
+                \Oro\Component\Testing\Unit\ORM\Mocks\Cast::class,
                 'Oro\ORM\Query\AST\Platform\Functions\Mock\Cast'
             );
         }

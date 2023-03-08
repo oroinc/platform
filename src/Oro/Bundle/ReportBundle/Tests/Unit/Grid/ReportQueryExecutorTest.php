@@ -15,7 +15,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutorInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\ReportQueryExecutor;
 use Oro\Component\Testing\TempDirExtension;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\EntityManagerMock;
 
 class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
 {

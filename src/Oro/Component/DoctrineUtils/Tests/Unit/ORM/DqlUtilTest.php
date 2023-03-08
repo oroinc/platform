@@ -3,16 +3,15 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class DqlUtilTest extends OrmTestCase
 {
-    /** @var EntityManager */
-    private $em;
+    private EntityManagerInterface $em;
 
     protected function setUp(): void
     {
@@ -54,7 +53,7 @@ class DqlUtilTest extends OrmTestCase
     {
         return [
             'query with fully qualified entity name' => [
-                function (EntityManager $em) {
+                function (EntityManagerInterface $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
                         ->from(Person::class, 'p')
@@ -64,7 +63,7 @@ class DqlUtilTest extends OrmTestCase
                 ['p', 'i'],
             ],
             'query aliased entity name' => [
-                function (EntityManager $em) {
+                function (EntityManagerInterface $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
                         ->from('Test:Person', 'p')
@@ -74,7 +73,7 @@ class DqlUtilTest extends OrmTestCase
                 ['p', 'i'],
             ],
             'query with subquery' => [
-                function (EntityManager $em) {
+                function (EntityManagerInterface $em) {
                     $qb = $em->createQueryBuilder();
 
                     return $qb

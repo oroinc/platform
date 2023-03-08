@@ -11,6 +11,7 @@ use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EmptyValueComparisonExpression;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\InComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
@@ -308,7 +309,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->walkComparison($comparison);
     }
 
-    public function testWalkComparisonWithUnknownCaseInsensitiveModifierOfOperator()
+    public function testWalkComparisonWithCaseInsensitiveModifierOfOperator()
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -328,6 +329,32 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             [new Parameter('e_test', 'test value')],
             $expressionVisitor->getParameters()
         );
+    }
+
+    public function testWalkComparisonForEmptyValueOperator()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            ['empty' => new EmptyValueComparisonExpression()],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        $expressionVisitor->setQueryAliases(['e']);
+        $comparison = new Comparison('e.test', 'empty/:string', true);
+        $result = $expressionVisitor->walkComparison($comparison);
+
+        self::assertEquals(
+            new QueryExpr\Orx([
+                'e.test IS NULL',
+                new QueryExpr\Comparison('e.test', '=', ':e_test')
+            ]),
+            $result
+        );
+        self::assertEquals(
+            [new Parameter('e_test', '')],
+            $expressionVisitor->getParameters()
+        );
+        self::assertNull($expressionVisitor->getFieldDataType());
     }
 
     public function testWalkComparisonWithUnsafeFieldName()

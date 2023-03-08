@@ -2,7 +2,7 @@
 /**
  * Declare custom SQL functions available in the Mock platform
  */
-namespace Oro\Component\TestUtils\ORM\Mocks;
+namespace Oro\Component\Testing\Unit\ORM\Mocks;
 
 use Oro\ORM\Query\AST\Platform\Functions\Mysql\Cast as BaseCast;
 
@@ -12,12 +12,12 @@ use Oro\ORM\Query\AST\Platform\Functions\Mysql\Cast as BaseCast;
  * <code>
  *  if (!\class_exists('Oro\ORM\Query\AST\Platform\Functions\Mock\Cast', false)) {
  *      \class_alias(
- *          \Oro\Component\TestUtils\ORM\Mocks\Cast::class,
+ *          \Oro\Component\Testing\Unit\ORM\Mocks\Cast::class,
  *          'Oro\ORM\Query\AST\Platform\Functions\Mock\Cast'
  *      );
  *  }
  * <code>
- * @see \Oro\Component\TestUtils\ORM\OrmTestCase::getTestEntityManager() - usage example
+ * @see \Oro\Component\Testing\Unit\ORM\OrmTestCase::getTestEntityManager() - usage example
  * @see \Oro\ORM\Query\AST\FunctionFactory::create()
  */
 class Cast extends BaseCast

@@ -315,12 +315,12 @@ field_operators:
         filters:
             fields:
                 field1:
-                    operators: ['=', '!=', 'exists']
+                    operators: ['=', '!=', 'exists', 'empty']
     expected:
         filters:
             fields:
                 field1:
-                    operators: ['eq', 'neq', 'exists']
+                    operators: ['eq', 'neq', 'exists', 'empty']
 
 unsupported_field_operators:
     config:

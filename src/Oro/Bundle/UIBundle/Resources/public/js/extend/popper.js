@@ -1,6 +1,6 @@
 import {isRTL} from 'underscore';
 import Popper from 'popper';
-import {getBoundaries} from 'popper-utils';
+import {getBoundaries, getOffsetRectRelativeToArbitraryNode} from 'popper-utils';
 
 Object.assign(Popper.Defaults, {
     onDestroy: () => {}
@@ -10,8 +10,12 @@ Object.assign(Popper.Defaults.modifiers, {
         order: 550,
         enabled: false,
         fn(data) {
+            const element = data.instance.popper;
+            const html = element.ownerDocument.documentElement;
+            const relativeOffset = getOffsetRectRelativeToArbitraryNode(element, html);
             const boundaries = _getBoundaries(data);
-            const availableHeight = Math.floor(boundaries.bottom - data.offsets.reference.bottom);
+            const availableHeight = Math.floor(boundaries.bottom + boundaries.top - relativeOffset.top);
+
             if (data.popper.height > availableHeight) {
                 data.styles.maxHeight = availableHeight + 'px';
                 data.attributes['x-adjusted-height'] = '';

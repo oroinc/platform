@@ -95,6 +95,9 @@ class NormalizeFilterValues implements ProcessorInterface
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function normalizeFilterValue(
         RequestType $requestType,
         StandaloneFilter $filter,
@@ -106,7 +109,7 @@ class NormalizeFilterValues implements ProcessorInterface
         $dataType = $filter->getDataType();
         $isArrayAllowed = $filter->isArrayAllowed($operator);
         $isRangeAllowed = $filter->isRangeAllowed($operator);
-        if (FilterOperator::EXISTS === $operator) {
+        if (FilterOperator::EXISTS === $operator || FilterOperator::EMPTY_VALUE === $operator) {
             $dataType = DataType::BOOLEAN;
             $isArrayAllowed = false;
             $isRangeAllowed = false;
