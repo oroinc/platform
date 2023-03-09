@@ -30,9 +30,9 @@ use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
  *
  * This class is mostly a copy of {@see \Symfony\Component\PropertyAccess\PropertyAccessor}
  * but it has the following advantages:
- * * allows to use the same syntax of the property path for objects and arrays
- * * fixes some issues of Symfony's PropertyAccessor, for example working with magic __get __set methods
- * * access to the properties of the object that inherit \ArrayAccess has been changed
+ * * allows using the same syntax of the property path for objects and arrays
+ * * magic __get __set methods are always enabled to support ORO extended entities
+ * * objects implementing \ArrayAccess are accessed as arrays, getter and setter methods are ignored
  * New features:
  * * 'remove' method is added to allow to remove items from arrays or objects
  *

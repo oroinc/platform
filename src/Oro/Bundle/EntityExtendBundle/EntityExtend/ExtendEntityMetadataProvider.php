@@ -41,14 +41,14 @@ class ExtendEntityMetadataProvider implements ExtendEntityMetadataProviderInterf
         $result = [];
         /** @var  $config */
         foreach ($configs as $config) {
-            $configItem = [
+            if (empty($configItem['is_extend'])) {
+                continue;
+            }
+            $result[] = [
                 'fieldName' => $config->getId()->getFieldName(),
                 'fieldType' => $config->getId()->getFieldType(),
                 ...$config->getValues()
             ];
-            if (!empty($configItem['is_extend'])) {
-                $result[] = $configItem;
-            }
         }
 
         return $this->entityFieldsCache[$class] = $result;

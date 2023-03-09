@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Functional\Fixture;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Functional\Stub;
 
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;

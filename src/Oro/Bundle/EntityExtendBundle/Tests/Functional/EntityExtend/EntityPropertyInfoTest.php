@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional\EntityExtend;
 
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
-use Oro\Bundle\EntityExtendBundle\Tests\Functional\Fixture\TestEnum;
+use Oro\Bundle\EntityExtendBundle\Tests\Functional\Stub\TestEnum;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EntityPropertyInfoTest extends WebTestCase
