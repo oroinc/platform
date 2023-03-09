@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Datasource;
 
 use Oro\Bundle\SearchBundle\Query\AbstractSearchQuery;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
+use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Symfony\Component\Config\Definition\Processor;
 
@@ -11,17 +12,18 @@ class YamlToSearchQueryConverter
 {
     /**
      * @param SearchQueryInterface $query
-     * @param array                $config
+     * @param array $config
      * @return mixed
      */
     public function process(SearchQueryInterface $query, array $config)
     {
-        if (!isset($config['query'])) {
+        if (empty($config['query'])) {
             return null;
         }
+        $hints = $config['hints'] ?? [];
 
         $processor = new Processor();
-        $config    = $processor->processConfiguration(new QueryConfiguration(), $this->preProcessConfig($config));
+        $config = $processor->processConfiguration(new QueryConfiguration(), $this->preProcessConfig($config));
 
         foreach ((array)$config['from'] as $from) {
             $query->setFrom($from);
@@ -32,6 +34,7 @@ class YamlToSearchQueryConverter
         }
 
         $this->processWhere($query, $config);
+        $this->processHints($query, $hints);
 
         return $query;
     }
@@ -43,13 +46,13 @@ class YamlToSearchQueryConverter
     protected function preProcessConfig(array $config)
     {
         return [
-            'query' => $config['query']
+            'query' => $config['query'],
         ];
     }
 
     /**
      * @param SearchQueryInterface $query
-     * @param array                $config
+     * @param array $config
      */
     protected function processWhere(SearchQueryInterface $query, $config)
     {
@@ -68,5 +71,32 @@ class YamlToSearchQueryConverter
                 }
             }
         }
+    }
+
+    private function processHints(SearchQueryInterface $query, array $hints): void
+    {
+        if (empty($hints)) {
+            return;
+        }
+
+        foreach ($hints as $hint) {
+            $hintName = $hint;
+            $hintValue = true;
+            if (\is_array($hint)) {
+                $hintName = $hint['name'];
+                $hintValue = $hint['value'];
+            }
+
+            $query->setHint($this->resolveHintName($hintName), $hintValue);
+        }
+    }
+
+    private function resolveHintName(string $name): string
+    {
+        if (\defined(Query::class.'::'.$name)) {
+            return \constant(Query::class.'::'.$name);
+        }
+
+        return $name;
     }
 }
