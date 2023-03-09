@@ -120,7 +120,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         const {eventBus: externalEventBus} = this.options;
         if (externalEventBus) {
             // proxy all own events to externalEventBus, if it is provided through options
-            this.listenTo(this, 'all', (eventName, ...args) => externalEventBus.trigger(eventName, args));
+            this.listenTo(this, 'all', (eventName, ...args) => externalEventBus.trigger(eventName, ...args));
             externalEventBus.trigger('init', this);
         }
         this.listenTo(this.main, {
