@@ -9,6 +9,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class PropertyAccessorWithDotArraySyntaxTest extends WebTestCase
 {
     protected PropertyAccessorInterface $propertyAccessor;
