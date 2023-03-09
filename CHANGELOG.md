@@ -229,7 +229,6 @@ use ExtendEntityTrait;
 #### AttachmentBundle
 * Added `Oro\Bundle\AttachmentBundle\Provider\OriginalFileNameProvider` filename provider that
   uses a sanitized original filename for files if `attachment_original_filenames` feature is enabled.
-  
 * Added `Oro\Bundle\AttachmentBundle\Entity\File::$externalUrl` property to store external file URL.
 * Added `Oro\Bundle\AttachmentBundle\Provider\ExternalUrlProvider` (`oro_attachment.provider.external_url_provider`) that
   returns `Oro\Bundle\AttachmentBundle\Entity\File::$externalUrl` for a file, a resized or a filtered image URL.
@@ -274,7 +273,6 @@ use ExtendEntityTrait;
 *  Added `\Oro\Bundle\LocaleBundle\Cache\Normalizer\LocalizedFallbackValueCollectionNormalizer` and `\Oro\Bundle\LocaleBundle\Cache\Normalizer\LocalizedFallbackValueNormalizer` for using when caching complex structures
 
 #### MigrationBundle
-
 * For better data consistency and more valid testing scenarios, data fixtures are now validated during ORM demo data load, and Behat fixtures load.
 
 #### SearchBundle
@@ -324,6 +322,11 @@ use ExtendEntityTrait;
 * Updated path of styles from `~slick-carousel/slick/slick.scss` to `~@oroinc/slick-carousel/slick/slick.scss`
   and path of js from `slick-carousel/slick/slick` to `@oroinc/slick-carousel/slick/slick`
 
+#### TestUtils component
+* Moved all ORM relates mocks and test cases to `Testing` component.
+  Old namespace for these classes was `Oro\Component\TestUtils\ORM`.
+  New namespace is `Oro\Component\Testing\Unit\ORM`.
+
 #### ApiBundle
 * The parameter `throwException` was removed from the method `convertToEntityType`
   of `Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil`. Use the `tryConvertToEntityType` method
@@ -336,16 +339,15 @@ use ExtendEntityTrait;
 * Changed configuration option `disable_babel` (`true` by default) to `with_babel` (`false` by default).
 
 #### AttachmentBundle
-
-  * Changed `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type to `?\SplFileInfo`
-    to allow `Oro\Bundle\AttachmentBundle\Model\ExternalFile`. Methods `setFile` and `getFile` are changed correspondingly.
-  * Changed `Oro\Bundle\AttachmentBundle\Manager\FileManager::getFileFromFileEntity` return type to `?\SplFileInfo`
-    to comply with `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type.
-  * Changed `Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper::getFieldLabel` visibility to public,
-    so it can be used for getting human-readable field names during import.
-  * Changed `Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener` constructor, so it expects
-    `Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator $fileManipulator`
-    instead of `$fileManager`, also the `$authorizationChecker` argument is removed.
+* Changed `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type to `?\SplFileInfo`
+  to allow `Oro\Bundle\AttachmentBundle\Model\ExternalFile`. Methods `setFile` and `getFile` are changed correspondingly.
+* Changed `Oro\Bundle\AttachmentBundle\Manager\FileManager::getFileFromFileEntity` return type to `?\SplFileInfo`
+  to comply with `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type.
+* Changed `Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper::getFieldLabel` visibility to public,
+  so it can be used for getting human-readable field names during import.
+* Changed `Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener` constructor, so it expects
+  `Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator $fileManipulator`
+  instead of `$fileManager`, also the `$authorizationChecker` argument is removed.
 
 #### DataGridBundle
 * The `iconHideText` option for `action-launcher` and `dropdown-select-choice-launcher` views was removed, use the `launcherMode` option instead.
@@ -388,7 +390,6 @@ use ExtendEntityTrait;
 * Added the bundle itself to `oro/platform` package. The bundle came from outer package `oro/redis-config` and it was rebuilt to utilize Symfony redis configuration components instead of once from 3rd party package `snc/redis-bundle`.
 
 #### UIBundle
-
 * `oroui/js/app/components/viewport-component` has been changed options from `viewport: {maxScreenType: 'tablet'}` or `viewport: {minScreenType: 'tablet'}` to `viewport: 'tablet'`
 - As a result, you need to update your `html`:
 
@@ -512,7 +513,6 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 * `title_fields` field from `search.yml` field has been removed
 
 #### UIBundle
-
 * CSSVariable parser `oroui/js/css-variables-manager` has been removed.
 * CSSVariable module `oroui/js/app/modules/css-variable-module` has been removed.
 * Removed `oroui/js/app/views/swipeable-view`, use `oroui/js/app/modules/swipeable-module` instead.

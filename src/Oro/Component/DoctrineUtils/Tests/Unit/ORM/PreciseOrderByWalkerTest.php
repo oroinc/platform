@@ -3,16 +3,15 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 use Oro\Component\DoctrineUtils\ORM\Walker\PreciseOrderByWalker;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class PreciseOrderByWalkerTest extends OrmTestCase
 {
-    /** @var EntityManagerMock */
-    private $em;
+    private EntityManagerInterface $em;
 
     protected function setUp(): void
     {

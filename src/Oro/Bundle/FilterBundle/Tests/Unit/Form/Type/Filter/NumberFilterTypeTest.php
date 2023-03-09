@@ -28,6 +28,8 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     /** @var NumberFilterType */
     private $type;
 
+    private string $defaultLocale;
+
     protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
@@ -41,6 +43,13 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
+
+        $this->defaultLocale = \Locale::getDefault();
+    }
+
+    protected function tearDown(): void
+    {
+        \Locale::setDefault($this->defaultLocale);
     }
 
     protected function getTypeExtensions(): array
