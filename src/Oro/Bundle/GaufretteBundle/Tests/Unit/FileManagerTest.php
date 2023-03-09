@@ -2397,4 +2397,62 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             @unlink($tmpFileName);
         }
     }
+
+    public function testGetTemporaryFileNameWithPathInSuggestedFileName()
+    {
+        $suggestedFileName = 'some/path/TestFile.txt';
+        $expectedFileName = 'TestFile.txt';
+
+        $fileManager = $this->getFileManager(true);
+
+        $tmpFileName = $fileManager->getTemporaryFileName($suggestedFileName);
+
+        self::assertNotEmpty($tmpFileName);
+        self::assertStringEndsWith(DIRECTORY_SEPARATOR . $expectedFileName, $tmpFileName);
+        self::assertStringNotContainsString('some/path/', $tmpFileName);
+
+        self::assertEquals(9, file_put_contents($tmpFileName, 'test_data'));
+        self::assertEquals('test_data', file_get_contents($tmpFileName));
+        self::assertTrue(unlink($tmpFileName));
+    }
+
+    public function testGetTemporaryFileNameWithExtraCharsInSuggestedFileName()
+    {
+        $suggestedFileName = 'T\e:s|t<F>i*l?e>:*:<.txt';
+        $expectedFileName = 'T_e_s_t_F_i_l_e_.txt';
+
+        $fileManager = $this->getFileManager(true);
+
+        $tmpFileName = $fileManager->getTemporaryFileName($suggestedFileName);
+
+        self::assertNotEmpty($tmpFileName);
+        self::assertStringEndsWith(DIRECTORY_SEPARATOR . $expectedFileName, $tmpFileName);
+
+        self::assertEquals(9, file_put_contents($tmpFileName, 'test_data'));
+        self::assertEquals('test_data', file_get_contents($tmpFileName));
+        self::assertTrue(unlink($tmpFileName));
+    }
+
+    public function testGetTemporaryFileFromExtraLongSuggestedFileName(): void
+    {
+        $suggestedFileName = 'Fuscebibendumleointemporhendreritmaurisestsemperodiovestibulumconguearcuera'
+            . 'tegeterateraesentacorcjustojrcivariusnatoquepenatibusetmagnisdisparturientmontesFuscebibend'
+            . 'umleointemporhendreritmaurisestsemperodiovestibulumconguearcuerategeterateraesentacorcjusto'
+            . 'jrcivariusnatoquepenatibusetmagnisdisparturientmontes.png';
+        $expectedFileName = 'toquepenatibusetmagnisdisparturientmontesFuscebibendumleointemporhendreritmaur'
+            . 'isestsemperodiovestibulumconguearcuerategeterateraesentacorcjustojrcivariusnatoquepenatibuset'
+            . 'magnisdisparturientmontes.png';
+
+        $fileManager = $this->getFileManager(true);
+
+        $tmpFileName = $fileManager->getTemporaryFileName($suggestedFileName);
+
+        self::assertNotEmpty($tmpFileName);
+        self::assertStringEndsWith(DIRECTORY_SEPARATOR . $expectedFileName, $tmpFileName);
+        self::assertStringNotContainsString('some/path/', $tmpFileName);
+
+        self::assertEquals(9, file_put_contents($tmpFileName, 'test_data'));
+        self::assertEquals('test_data', file_get_contents($tmpFileName));
+        self::assertTrue(unlink($tmpFileName));
+    }
 }

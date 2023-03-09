@@ -58,7 +58,12 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             'upload_image_mime_types' => [],
             'png_quality' => 100,
             'jpeg_quality' => 85,
-            'processors_allowed' => true
+            'processors_allowed' => true,
+            'cleanup' => [
+                'collect_attachment_files_batch_size' => 20000,
+                'load_existing_attachments_batch_size' => 500,
+                'load_attachments_batch_size' => 10000
+            ]
         ];
 
         $processor = new Processor();

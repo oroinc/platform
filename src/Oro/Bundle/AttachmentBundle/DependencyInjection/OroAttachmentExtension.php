@@ -16,7 +16,7 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
     private const IMAGINE_FILE_MANAGER = 'oro_attachment.manager.public_mediacache';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -40,6 +40,18 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         $container->setParameter('oro_attachment.processors_allowed', $config['processors_allowed']);
         $container->setParameter('oro_attachment.png_quality', $config['png_quality']);
         $container->setParameter('oro_attachment.jpeg_quality', $config['jpeg_quality']);
+        $container->setParameter(
+            'oro_attachment.collect_attachment_files_batch_size',
+            $config['cleanup']['collect_attachment_files_batch_size']
+        );
+        $container->setParameter(
+            'oro_attachment.load_existing_attachments_batch_size',
+            $config['cleanup']['load_existing_attachments_batch_size']
+        );
+        $container->setParameter(
+            'oro_attachment.load_attachments_batch_size',
+            $config['cleanup']['load_attachments_batch_size']
+        );
 
         $yaml = new Parser();
         $value = $yaml->parse(file_get_contents(__DIR__ . '/../Resources/config/files.yml'));
@@ -61,7 +73,6 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
     private function configureImagine(ExtendedContainerBuilder $container): void
     {
         $configs = $this->ensureImagineDefaultConfigSet($container->getExtensionConfig('liip_imagine'));
-
         /**
          * add empty config for "default" loader and resolver to each config item to avoid misconfiguration
          * @see \Liip\ImagineBundle\DependencyInjection\Configuration::getConfigTreeBuilder
@@ -92,7 +103,7 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
                 'loaders'   => ['default' => ['filesystem' => null]],
                 'resolvers' => ['default' => ['oro_gaufrette' => null]]
             ];
-            $i = count($configs) - 1;
+            $i = \count($configs) - 1;
         }
         if ($this->isImagineDefaultLoaderFilesystem($configs)) {
             if (!$this->hasImagineDefaultLoaderDataRoot($configs[$i])) {

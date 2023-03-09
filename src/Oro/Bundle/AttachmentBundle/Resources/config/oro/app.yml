@@ -8,6 +8,9 @@ knp_gaufrette:
         attachments:
             adapter: private
             alias: attachments_filesystem
+        attachments_cleanup_data:
+            adapter: private
+            alias: attachments_cleanup_data_filesystem
         public_mediacache:
             adapter: public
             alias: public_mediacache_filesystem

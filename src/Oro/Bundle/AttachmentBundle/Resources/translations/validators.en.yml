@@ -5,3 +5,6 @@ oro:
             images: 'Not more than {{max}} image is allowed in this field.|Not more than {{max}} images are allowed in this field.'
         mimetypes:
             not_allowed: 'MIME type {{ notAllowedMimeTypes }} is not allowed, please contact your system administrator.|MIME types {{ notAllowedMimeTypes }} are not allowed, please contact your system administrator.'
+
+        filename_with_path:
+            not_allowed: 'The file name should not have a path.'

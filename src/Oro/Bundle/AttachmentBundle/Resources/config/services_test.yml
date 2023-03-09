@@ -14,3 +14,10 @@ services:
     oro_attachment.tests.provider.image_file_names:
         alias: oro_attachment.provider.image_file_names
         public: true
+
+    oro_attachment.tests.skipped_file_systems:
+        class: Oro\Bundle\GaufretteBundle\Tests\Functional\Environment\SkippedGaufretteFileSystemProvider
+        decorates: oro_gaufrette.tests.skipped_file_systems
+        arguments:
+            - '@oro_attachment.tests.skipped_file_systems.inner'
+            - ['attachments_cleanup_data']

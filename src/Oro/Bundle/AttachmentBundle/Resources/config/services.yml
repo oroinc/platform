@@ -26,6 +26,11 @@ services:
         calls:
             - ['setClientMimeTypeMapper', ['@oro_attachment.mapper.client_mime_type_mapper']]
 
+    oro_attachment.file_manager.cleanup_data:
+        parent: oro_gaufrette.file_manager
+        arguments:
+            - 'attachments_cleanup_data'
+
     oro_attachment.mapper.client_mime_type_mapper:
         class: Oro\Bundle\AttachmentBundle\Mapper\ClientMimeTypeMapper
 

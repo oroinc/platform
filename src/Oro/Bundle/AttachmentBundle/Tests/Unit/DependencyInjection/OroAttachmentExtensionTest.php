@@ -26,6 +26,9 @@ class OroAttachmentExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_attachment.processors_allowed'                  => true,
                 'oro_attachment.png_quality'                         => 100,
                 'oro_attachment.jpeg_quality'                        => 85,
+                'oro_attachment.collect_attachment_files_batch_size' => 20000,
+                'oro_attachment.load_existing_attachments_batch_size' => 500,
+                'oro_attachment.load_attachments_batch_size'         => 10000,
                 'oro_attachment.files'                               => [
                     'default' => 'fa-file-o',
                     'doc'     => 'fa-file-text-o',
