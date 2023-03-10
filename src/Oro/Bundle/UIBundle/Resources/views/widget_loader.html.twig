@@ -4,8 +4,8 @@
     'options' : options
 } %}
 
-{%- set content = render(options.url) -%}
-{%- if content|length -%}
+{%- set content = options.elementFirst ? render(options.url) : '' -%}
+{%- if content|length or not options.elementFirst -%}
     {% set separateLayout = options.separateLayout is not defined or options.separateLayout %}
     {% set separateLayoutContent %}
         {% if separateLayout %} data-layout="separate"{% endif %}
