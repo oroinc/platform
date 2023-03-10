@@ -133,7 +133,8 @@ define([
          * @property {Object}
          */
         additionalParameters: {
-            view: 'gridView'
+            view: 'gridView',
+            _widgetId: 'widgetId'
         },
 
         /**
