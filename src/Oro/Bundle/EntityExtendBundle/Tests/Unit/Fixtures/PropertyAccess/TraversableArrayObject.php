@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Component\PropertyAccess\Tests\Unit\Fixtures;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess;
 
 /**
  * This class is a hand written simplified version of PHP native `ArrayObject`
  * class, to show that it behaves differently than the PHP native implementation.
  */
-class NonTraversableArrayObject implements \ArrayAccess, \Countable
+class TraversableArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     private $array;
 
@@ -37,6 +37,11 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable
     public function offsetUnset($offset): void
     {
         unset($this->array[$offset]);
+    }
+
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->array);
     }
 
     public function count(): int

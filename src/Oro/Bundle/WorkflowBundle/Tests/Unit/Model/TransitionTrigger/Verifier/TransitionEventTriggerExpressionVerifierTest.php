@@ -58,7 +58,15 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
 
     public function testVerificationBadTypesOperandsOk()
     {
-        $trigger = $this->buildEventTriggerWithExpression('wi.get("")[0]', EntityStub::class, EntityStub::class);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'There is no extended property with the name  in class: Oro\Bundle\WorkflowBundle\Entity\WorkflowItem'
+        );
+        $trigger = $this->buildEventTriggerWithExpression(
+            'wi.get("")[0]',
+            EntityStub::class,
+            EntityStub::class
+        );
 
         $this->verifier->verifyTrigger($trigger);
     }

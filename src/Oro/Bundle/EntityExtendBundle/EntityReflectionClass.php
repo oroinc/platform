@@ -15,7 +15,9 @@ class EntityReflectionClass extends \ReflectionClass
     public function getProperties(?int $filter = null): array
     {
         $properties = parent::getProperties($filter);
-
+        if ($this->isNotExtendEntity()) {
+            return $properties;
+        }
         foreach (EntityPropertyInfo::getExtendedProperties($this->name) as $extendPropertyName) {
             $properties[] = ReflectionVirtualProperty::create($extendPropertyName);
         }
@@ -95,7 +97,9 @@ class EntityReflectionClass extends \ReflectionClass
     public function getMethods($filter = null): array
     {
         $methods = parent::getMethods($filter);
-
+        if ($this->isNotExtendEntity()) {
+            return $methods;
+        }
         foreach (EntityPropertyInfo::getExtendedMethods($this->name) as $extendMethodName) {
             $methods[] = VirtualReflectionMethod::create($this->getName(), $extendMethodName);
         }

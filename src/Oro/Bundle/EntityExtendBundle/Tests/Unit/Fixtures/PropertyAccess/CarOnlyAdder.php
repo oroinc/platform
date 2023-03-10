@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\PropertyAccess\Tests\Unit\Fixtures;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess;
 
 class CarOnlyAdder
 {

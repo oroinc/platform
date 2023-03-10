@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Component\PropertyAccess\Tests\Unit;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EntityExtend;
 
-use Oro\Bundle\EntityExtendBundle\Decorator\PropertyAccessorWithDotArraySyntax;
+use Oro\Bundle\EntityExtendBundle\EntityExtend\PropertyAccessorWithDotArraySyntax;
 use Oro\Bundle\EntityExtendBundle\Extend\ReflectionExtractor;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
-use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClass;
-use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClassMagicCall;
-use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClassMagicGet;
-use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\Ticket5775Object;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClass;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClassMagicCall;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClassMagicGet;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -57,11 +56,11 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
 
         foreach ($calls as $call) {
             if (is_string($call)) {
-                $this->assertTrue(EntityPropertyInfo::methodExists($this->listener, $call));
+                $this->assertTrue(method_exists($this->listener, $call));
             } elseif (is_array($call)) {
                 foreach ($call as $method) {
                     [$method] = $method;
-                    $this->assertTrue(EntityPropertyInfo::methodExists($this->listener, $method));
+                    $this->assertTrue(method_exists($this->listener, $method));
                 }
             }
         }
