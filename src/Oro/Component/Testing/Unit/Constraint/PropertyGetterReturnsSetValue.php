@@ -2,8 +2,6 @@
 
 namespace Oro\Component\Testing\Unit\Constraint;
 
-use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
-
 /**
  * Constraint that asserts that a get*() or is*() getter returns the value
  * set by a corresponding set*() setter.
@@ -67,7 +65,7 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
     protected function matches($other): bool
     {
         $setter = 'set' . ucfirst($this->propertyName);
-        if (EntityPropertyInfo::methodExists($other, $setter)) {
+        if (method_exists($other, $setter)) {
             call_user_func_array([$other, $setter], array($this->testValue));
         } else {
             $class = new \ReflectionClass($other);

@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\PropertyAccess\Tests\Unit;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EntityExtend;
 
-use Oro\Bundle\EntityExtendBundle\Decorator\PropertyAccessorWithDotArraySyntax;
+use Oro\Bundle\EntityExtendBundle\EntityExtend\PropertyAccessorWithDotArraySyntax;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 

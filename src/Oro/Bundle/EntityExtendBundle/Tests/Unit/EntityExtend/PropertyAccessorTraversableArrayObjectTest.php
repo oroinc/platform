@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\PropertyAccess\Tests\Unit;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EntityExtend;
 
-use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TraversableArrayObject;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TraversableArrayObject;
 
 class PropertyAccessorTraversableArrayObjectTest extends PropertyAccessorCollectionTest
 {

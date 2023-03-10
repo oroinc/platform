@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\Form;
 
-use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -44,7 +43,7 @@ class MutableFormEventSubscriber implements EventSubscriberInterface
      */
     public function __call($method, $args)
     {
-        if (!EntityPropertyInfo::methodExists($this->wrapped, $method)) {
+        if (!method_exists($this->wrapped, $method)) {
             throw new \RuntimeException(sprintf('Unknown method %s', $method));
         }
 

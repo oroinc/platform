@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Component\PropertyAccess\Tests\Unit;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EntityExtend;
 
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
-use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\Car;
-use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarNoAdderAndRemover;
-use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarOnlyAdder;
-use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarOnlyRemover;
-use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarStructure;
-use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CompositeCar;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\Car;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\CarNoAdderAndRemover;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\CarOnlyAdder;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\CarOnlyRemover;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\CarStructure;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\CompositeCar;
 
 abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAccessTest
 {

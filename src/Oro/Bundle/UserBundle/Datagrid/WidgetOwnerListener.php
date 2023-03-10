@@ -3,12 +3,16 @@
 namespace Oro\Bundle\UserBundle\Datagrid;
 
 use Doctrine\ORM\Query;
+use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Add owner condition expression to query when a widget has configured an owner.
+ */
 class WidgetOwnerListener
 {
     /** @var OwnerHelper */
@@ -32,9 +36,13 @@ class WidgetOwnerListener
         $this->ownerField    = $ownerField;
     }
 
-    public function onResultBefore(OrmResultBefore $event)
+    /**
+     * @throws InvalidConfigurationException
+     */
+    public function onResultBefore(OrmResultBefore $event): void
     {
-        $widgetOptions = $this->widgetConfigs->getWidgetOptions();
+        $params        = $event->getDatagrid()->getParameters()->get('_parameters', null);
+        $widgetOptions = $this->widgetConfigs->getWidgetOptions($params['_widgetId'] ?? null);
         $ids           = $this->ownerHelper->getOwnerIds($widgetOptions);
         if ($ids) {
             /** @var OrmDatasource $dataSource */
