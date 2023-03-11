@@ -1,0 +1,5 @@
+oro_entity_hidden_fields:
+    Test\Entity1:
+        field1: true
+    Test\Entity2:
+        field1: true

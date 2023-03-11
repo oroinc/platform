@@ -12,15 +12,11 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * This is the class that loads and manages MessageQueueBundle service configuration
- */
 class OroMessageQueueExtension extends Extension
 {
     /** @var TransportFactoryInterface[] */
@@ -32,14 +28,13 @@ class OroMessageQueueExtension extends Extension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $environment = $container->getParameter('kernel.environment');
-        $config = $this->processConfiguration(new Configuration($this->factories, $environment), $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('log.yml');
         $loader->load('job.yml');
@@ -94,7 +89,7 @@ class OroMessageQueueExtension extends Extension
             ->registerForAutoconfiguration(TopicInterface::class)
             ->addTag('oro_message_queue.topic');
 
-        if ('test' === $environment) {
+        if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
             $loader->load('mq_topics_test.yml');
             $this->configureTestEnvironment($container);
@@ -102,14 +97,10 @@ class OroMessageQueueExtension extends Extension
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return Configuration
+     * {@inheritDoc}
      */
     public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
-        $container->addResource(new FileResource((new \ReflectionClass(Configuration::class))->getFileName()));
-
         return new Configuration($this->factories, $container->getParameter('kernel.environment'));
     }
 

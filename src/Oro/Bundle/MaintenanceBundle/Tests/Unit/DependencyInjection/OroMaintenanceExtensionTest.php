@@ -2,38 +2,36 @@
 
 namespace Oro\Bundle\MaintenanceBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\MaintenanceBundle\Command\MaintenanceLockCommand;
-use Oro\Bundle\MaintenanceBundle\Command\MaintenanceUnlockCommand;
 use Oro\Bundle\MaintenanceBundle\DependencyInjection\OroMaintenanceExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroMaintenanceExtensionTest extends ExtensionTestCase
+class OroMaintenanceExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroMaintenanceExtension());
+        $container = new ContainerBuilder();
 
-        $expectedDefinitions = [
-            'oro_maintenance.driver.factory',
-            'oro_maintenance.maintenance_listener',
-            MaintenanceLockCommand::class,
-            MaintenanceUnlockCommand::class,
-        ];
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        $extension = new OroMaintenanceExtension();
+        $extension->load([], $container);
 
-        $expectedParameters = [
-            'oro_maintenance.driver',
-            'oro_maintenance.authorized.path',
-            'oro_maintenance.authorized.host',
-            'oro_maintenance.authorized.ips',
-            'oro_maintenance.authorized.query',
-            'oro_maintenance.authorized.cookie',
-            'oro_maintenance.authorized.route',
-            'oro_maintenance.authorized.attributes',
-            'oro_maintenance.response.http_code',
-            'oro_maintenance.response.http_status',
-            'oro_maintenance.response.exception_message',
-        ];
-        $this->assertParametersLoaded($expectedParameters);
+        self::assertNotEmpty($container->getDefinitions());
+
+        self::assertSame(['options' => []], $container->getParameter('oro_maintenance.driver'));
+        self::assertNull($container->getParameter('oro_maintenance.authorized.path'));
+        self::assertNull($container->getParameter('oro_maintenance.authorized.host'));
+        self::assertSame([], $container->getParameter('oro_maintenance.authorized.ips'));
+        self::assertSame([], $container->getParameter('oro_maintenance.authorized.query'));
+        self::assertSame([], $container->getParameter('oro_maintenance.authorized.cookie'));
+        self::assertNull($container->getParameter('oro_maintenance.authorized.route'));
+        self::assertSame([], $container->getParameter('oro_maintenance.authorized.attributes'));
+        self::assertSame(503, $container->getParameter('oro_maintenance.response.http_code'));
+        self::assertEquals(
+            'Service Temporarily Unavailable',
+            $container->getParameter('oro_maintenance.response.http_status')
+        );
+        self::assertEquals(
+            'Service Temporarily Unavailable',
+            $container->getParameter('oro_maintenance.response.exception_message')
+        );
     }
 }

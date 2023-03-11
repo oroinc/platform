@@ -10,13 +10,28 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
  */
 class SettingsBuilder
 {
-    public const RESOLVED_KEY = 'resolved';
+    private const SETTINGS_KEY = 'settings';
+    private const RESOLVED_KEY = 'resolved';
+    private const TYPE_KEY = 'type';
+    private const VALUE_KEY = 'value';
+    private const SCOPE_KEY = 'scope';
+    private const SCALAR_TYPE = 'scalar';
+    private const BOOLEAN_TYPE = 'boolean';
+    private const ARRAY_TYPE = 'array';
+    private const ALLOWED_TYPES = [self::SCALAR_TYPE, self::BOOLEAN_TYPE, self::ARRAY_TYPE];
 
-    private const ALLOWED_TYPES = ['scalar', 'boolean', 'array'];
+    public static function getSettings(array $config): array
+    {
+        if (!\array_key_exists(self::SETTINGS_KEY, $config)) {
+            throw new \LogicException(sprintf('The config must contains "%s" section.', self::SETTINGS_KEY));
+        }
+
+        return [self::SETTINGS_KEY => $config[self::SETTINGS_KEY]];
+    }
 
     public static function append(ArrayNodeDefinition $root, array $settings): void
     {
-        $builder = new TreeBuilder('settings');
+        $builder = new TreeBuilder(self::SETTINGS_KEY);
         $node = $builder
             ->getRootNode()
             ->addDefaultsIfNotSet()
@@ -30,33 +45,33 @@ class SettingsBuilder
                 ->addDefaultsIfNotSet()
                 ->children();
 
-            if (!isset($setting['type'])) {
-                $type = 'scalar';
-                if (isset($setting['value']) && \is_array($setting['value'])) {
-                    $type = 'array';
+            if (!isset($setting[self::TYPE_KEY])) {
+                $type = self::SCALAR_TYPE;
+                if (isset($setting[self::VALUE_KEY]) && \is_array($setting[self::VALUE_KEY])) {
+                    $type = self::ARRAY_TYPE;
                 }
-            } elseif (\in_array($setting['type'], self::ALLOWED_TYPES, true)) {
-                $type = $setting['type'];
+            } elseif (\in_array($setting[self::TYPE_KEY], self::ALLOWED_TYPES, true)) {
+                $type = $setting[self::TYPE_KEY];
             } else {
-                $type = 'scalar';
+                $type = self::SCALAR_TYPE;
             }
 
             switch ($type) {
-                case 'scalar':
-                    $child->scalarNode('value')->defaultValue($setting['value']);
+                case self::SCALAR_TYPE:
+                    $child->scalarNode(self::VALUE_KEY)->defaultValue($setting[self::VALUE_KEY]);
                     break;
-                case 'boolean':
-                    $child->booleanNode('value')->defaultValue((bool)$setting['value']);
+                case self::BOOLEAN_TYPE:
+                    $child->booleanNode(self::VALUE_KEY)->defaultValue((bool)$setting[self::VALUE_KEY]);
                     break;
-                case 'array':
-                    $child->arrayNode('value')
+                case self::ARRAY_TYPE:
+                    $child->arrayNode(self::VALUE_KEY)
                         ->treatNullLike([])
                         ->prototype('variable')->end()
-                        ->defaultValue($setting['value'] ?? []);
+                        ->defaultValue($setting[self::VALUE_KEY] ?? []);
                     break;
             }
 
-            $child->scalarNode('scope')->defaultValue($setting['scope'] ?? 'app');
+            $child->scalarNode(self::SCOPE_KEY)->defaultValue($setting[self::SCOPE_KEY] ?? 'app');
         }
 
         $root->children()->append($node->end());

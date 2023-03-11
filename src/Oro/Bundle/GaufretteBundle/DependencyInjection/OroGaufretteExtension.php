@@ -25,9 +25,9 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
@@ -44,9 +44,9 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         if ($container instanceof ExtendedContainerBuilder) {
             $this->addGaufretteConfig($container, $this->configureAdapters($container));

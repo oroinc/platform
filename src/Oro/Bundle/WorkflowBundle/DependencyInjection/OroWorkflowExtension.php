@@ -12,9 +12,9 @@ class OroWorkflowExtension extends Extension
     /**
      * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('processors.yml');
         $loader->load('prototypes.yml');
@@ -38,7 +38,7 @@ class OroWorkflowExtension extends Extension
         $loader->load('mq_processors.yml');
         $loader->load('mq_topics.yml');
 
-        if ($container->getParameter('kernel.environment') === 'test') {
+        if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
         }
     }

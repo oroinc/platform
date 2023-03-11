@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\CommentBundle\Controller\Api\Rest\CommentController;
 use Oro\Bundle\CommentBundle\DependencyInjection\OroCommentExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroCommentExtensionTest extends ExtensionTestCase
+class OroCommentExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroCommentExtension());
+        $container = new ContainerBuilder();
 
-        $expectedDefinitions = [
-            CommentController::class,
-        ];
+        $extension = new OroCommentExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
     }
 }

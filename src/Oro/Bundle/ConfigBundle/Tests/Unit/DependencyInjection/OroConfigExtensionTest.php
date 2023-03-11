@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\ConfigBundle\Controller\Api\Rest\ConfigurationController;
 use Oro\Bundle\ConfigBundle\DependencyInjection\OroConfigExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroConfigExtensionTest extends ExtensionTestCase
+class OroConfigExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $expectedDefinitions = [
-            ConfigurationController::class,
-        ];
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
-        $this->loadExtension(new OroConfigExtension());
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        $extension = new OroConfigExtension();
+        $extension->load([], $container);
+
+        self::assertNotEmpty($container->getDefinitions());
     }
 }

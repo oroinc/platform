@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -14,9 +15,10 @@ class OroEmailExtension extends Extension implements PrependExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        $container->prependExtensionConfig($this->getAlias(), SettingsBuilder::getSettings($config));
 
         $container->setParameter(
             'oro_email.email_sync_exclusions',
@@ -32,7 +34,7 @@ class OroEmailExtension extends Extension implements PrependExtensionInterface
             $config['flash_notification']['max_emails_display']
         );
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('services_api.yml');
         $loader->load('mailer.yml');
@@ -46,14 +48,12 @@ class OroEmailExtension extends Extension implements PrependExtensionInterface
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
         }
-
-        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         // X-Frame-Options header should be removed from embedded forms
         $securityConfig = $container->getExtensionConfig('nelmio_security');
@@ -63,7 +63,8 @@ class OroEmailExtension extends Extension implements PrependExtensionInterface
         ];
 
         if (isset($securityConfig[0]['clickjacking']['paths'])
-            && is_array($securityConfig[0]['clickjacking']['paths'])) {
+            && \is_array($securityConfig[0]['clickjacking']['paths'])
+        ) {
             $securityConfig[0]['clickjacking']['paths']
                 = $emailTemplatePreviewPath + $securityConfig[0]['clickjacking']['paths'];
         }

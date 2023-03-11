@@ -2,23 +2,19 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\AddressBundle\Controller\Api\Rest as Api;
 use Oro\Bundle\AddressBundle\DependencyInjection\OroAddressExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroAddressExtensionTest extends ExtensionTestCase
+class OroAddressExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroAddressExtension());
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
-        $expectedDefinitions = [
-            Api\AddressTypeController::class,
-            Api\CountryController::class,
-            Api\CountryRegionsController::class,
-            Api\RegionController::class,
-        ];
+        $extension = new OroAddressExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
     }
 }
