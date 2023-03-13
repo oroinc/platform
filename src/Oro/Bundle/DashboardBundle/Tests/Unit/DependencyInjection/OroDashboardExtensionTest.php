@@ -2,22 +2,18 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\DashboardBundle\Controller\Api\Rest\DashboardController;
-use Oro\Bundle\DashboardBundle\Controller\Api\Rest\WidgetController;
 use Oro\Bundle\DashboardBundle\DependencyInjection\OroDashboardExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroDashboardExtensionTest extends ExtensionTestCase
+class OroDashboardExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroDashboardExtension());
+        $container = new ContainerBuilder();
 
-        $expectedDefinitions = [
-            DashboardController::class,
-            WidgetController::class,
-        ];
+        $extension = new OroDashboardExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
     }
 }

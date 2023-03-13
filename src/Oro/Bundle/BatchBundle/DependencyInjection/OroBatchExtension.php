@@ -11,17 +11,16 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroBatchExtension extends Extension
 {
-    protected const CONFIG_PATH = 'Resources/config/batch_jobs.yml';
-
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $configLoader = CumulativeConfigLoaderFactory::create('oro_batch_jobs', self::CONFIG_PATH);
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_batch_jobs', 'Resources/config/batch_jobs.yml');
         $configLoader->registerResources(new ContainerBuilderAdapter($container));
 
-        $config = $this->processConfiguration(new Configuration(), $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+
         $container->setParameter('oro_batch.cleanup_interval', $config['cleanup_interval']);
         $container->setParameter('oro_batch.log_batch', $config['log_batch']);
 

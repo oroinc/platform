@@ -4,7 +4,7 @@ namespace Oro\Component\Action\Model;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\Proxy;
-use Oro\Bundle\EntityExtendBundle\Decorator\PropertyAccessorWithDotArraySyntax;
+use Oro\Bundle\EntityExtendBundle\EntityExtend\PropertyAccessorWithDotArraySyntax;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;

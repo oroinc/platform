@@ -8,16 +8,21 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroReportExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoadEmptyConfig()
+    private ContainerBuilder $container;
+    private OroReportExtension $extension;
+
+    protected function setUp(): void
     {
-        $configs = [];
+        $this->container = new ContainerBuilder();
+        $this->extension = new OroReportExtension();
+    }
 
-        $container = new ContainerBuilder();
-        $extension = new OroReportExtension();
-        $extension->load($configs, $container);
+    public function testLoad(): void
+    {
+        $this->extension->load([], $this->container);
 
-        self::assertFalse($container->hasParameter(DbalConnectionCompilerPass::CONNECTION_PARAM_NAME));
-        self::assertFalse($container->hasParameter(DbalConnectionCompilerPass::DATAGRID_PREFIXES_PARAM_NAME));
+        self::assertFalse($this->container->hasParameter(DbalConnectionCompilerPass::CONNECTION_PARAM_NAME));
+        self::assertFalse($this->container->hasParameter(DbalConnectionCompilerPass::DATAGRID_PREFIXES_PARAM_NAME));
 
         self::assertEquals(
             [
@@ -28,11 +33,11 @@ class OroReportExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            $container->getExtensionConfig('oro_report')
+            $this->container->getExtensionConfig('oro_report')
         );
     }
 
-    public function testLoadConfigWithReportDbalConnection()
+    public function testLoadConfigWithReportDbalConnection(): void
     {
         $configs = [
             [
@@ -42,21 +47,19 @@ class OroReportExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $container = new ContainerBuilder();
-        $extension = new OroReportExtension();
-        $extension->load($configs, $container);
+        $this->extension->load($configs, $this->container);
 
         self::assertEquals(
             $configs[0]['dbal']['connection'],
-            $container->getParameter(DbalConnectionCompilerPass::CONNECTION_PARAM_NAME)
+            $this->container->getParameter(DbalConnectionCompilerPass::CONNECTION_PARAM_NAME)
         );
         self::assertEquals(
             [],
-            $container->getParameter(DbalConnectionCompilerPass::DATAGRID_PREFIXES_PARAM_NAME)
+            $this->container->getParameter(DbalConnectionCompilerPass::DATAGRID_PREFIXES_PARAM_NAME)
         );
     }
 
-    public function testLoadConfigWithReportDbalConnectionAndDatagridPrefixes()
+    public function testLoadConfigWithReportDbalConnectionAndDatagridPrefixes(): void
     {
         $configs = [
             [
@@ -67,21 +70,19 @@ class OroReportExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $container = new ContainerBuilder();
-        $extension = new OroReportExtension();
-        $extension->load($configs, $container);
+        $this->extension->load($configs, $this->container);
 
         self::assertEquals(
             $configs[0]['dbal']['connection'],
-            $container->getParameter(DbalConnectionCompilerPass::CONNECTION_PARAM_NAME)
+            $this->container->getParameter(DbalConnectionCompilerPass::CONNECTION_PARAM_NAME)
         );
         self::assertEquals(
             $configs[0]['dbal']['datagrid_prefixes'],
-            $container->getParameter(DbalConnectionCompilerPass::DATAGRID_PREFIXES_PARAM_NAME)
+            $this->container->getParameter(DbalConnectionCompilerPass::DATAGRID_PREFIXES_PARAM_NAME)
         );
     }
 
-    public function testLoadConfigWithReportDbalDatagridPrefixesButWithoutConnection()
+    public function testLoadConfigWithReportDbalDatagridPrefixesButWithoutConnection(): void
     {
         $configs = [
             [
@@ -91,11 +92,9 @@ class OroReportExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $container = new ContainerBuilder();
-        $extension = new OroReportExtension();
-        $extension->load($configs, $container);
+        $this->extension->load($configs, $this->container);
 
-        self::assertFalse($container->hasParameter(DbalConnectionCompilerPass::CONNECTION_PARAM_NAME));
-        self::assertFalse($container->hasParameter(DbalConnectionCompilerPass::DATAGRID_PREFIXES_PARAM_NAME));
+        self::assertFalse($this->container->hasParameter(DbalConnectionCompilerPass::CONNECTION_PARAM_NAME));
+        self::assertFalse($this->container->hasParameter(DbalConnectionCompilerPass::DATAGRID_PREFIXES_PARAM_NAME));
     }
 }

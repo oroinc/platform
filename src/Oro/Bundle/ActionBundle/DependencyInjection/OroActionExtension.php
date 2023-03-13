@@ -13,9 +13,9 @@ class OroActionExtension extends Extension implements PrependExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('assemblers.yml');
         $loader->load('block_types.yml');
         $loader->load('conditions.yml');
@@ -32,7 +32,10 @@ class OroActionExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    public function prepend(ContainerBuilder $container)
+    /**
+     * {@inheritDoc}
+     */
+    public function prepend(ContainerBuilder $container): void
     {
         if ('test' === $container->getParameter('kernel.environment')) {
             $path = dirname(__DIR__) . '/Tests/Functional/Stub/views';

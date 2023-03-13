@@ -16,15 +16,13 @@ class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $bundle1 = new Fixtures\FooBundle\FooBundle();
         $bundle2 = new Fixtures\BarBundle\BarBundle();
-
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)]);
 
-        $extension = new OroThemeExtension();
-
         $container = new ContainerBuilder();
 
+        $extension = new OroThemeExtension();
         $extension->load($configs, $container);
 
         $registryDefinition = $container->getDefinition('oro_theme.registry');

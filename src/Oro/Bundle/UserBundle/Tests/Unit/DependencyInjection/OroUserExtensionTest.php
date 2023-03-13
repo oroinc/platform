@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoadWithDefaults(): void
+    public function testLoad(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
@@ -16,7 +16,7 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroUserExtension();
         $extension->load([], $container);
 
-        $extensionConfig = $container->getExtensionConfig('oro_user');
+        self::assertNotEmpty($container->getDefinitions());
         self::assertSame(
             [
                 [
@@ -32,25 +32,25 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            $extensionConfig
+            $container->getExtensionConfig('oro_user')
         );
 
-        $this->assertEquals(86400, $container->getParameter('oro_user.reset.ttl'));
+        $this->assertSame(86400, $container->getParameter('oro_user.reset.ttl'));
+        $this->assertSame([], $container->getParameter('oro_user.privileges'));
+        $this->assertSame([], $container->getParameter('oro_user.login_sources'));
     }
 
-    public function testLoad(): void
+    public function testLoadWithCustomConfigs(): void
     {
-        $config = [
-            'reset' => [
-                'ttl' => 1800
-            ]
-        ];
-
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
 
+        $configs = [
+            ['reset' => ['ttl' => 1800]]
+        ];
+
         $extension = new OroUserExtension();
-        $extension->load([$config], $container);
+        $extension->load($configs, $container);
 
         $this->assertEquals(1800, $container->getParameter('oro_user.reset.ttl'));
     }

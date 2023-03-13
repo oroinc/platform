@@ -6,21 +6,11 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
 use Oro\Component\MessageQueue\Client\NoopMessageProcessor;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
-
-    public function testGetConfigTreeBuilder(): void
-    {
-        $factories = [];
-        $configuration = new Configuration($factories, 'prod');
-
-        $treeBuilder = $configuration->getConfigTreeBuilder();
-        self::assertInstanceOf(TreeBuilder::class, $treeBuilder);
-    }
 
     public function testProcessConfiguration(): void
     {
@@ -87,9 +77,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processConfigurationDataProvider
-     *
-     * @param string $environment
-     * @param string $expectedNoopStatus
      */
     public function testProcessConfigurationUsesDefaultNoopStatus(string $environment, string $expectedNoopStatus): void
     {
@@ -120,8 +107,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processConfigurationWithAllowedNoopStatusDataProvider
-     *
-     * @param string $noopStatus
      */
     public function testProcessConfigurationWithAllowedNoopStatus(string $noopStatus): void
     {

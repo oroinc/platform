@@ -7,17 +7,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * This is the class that loads and manages OroImportExportBundle service configuration.
- */
 class OroImportExportExtension extends Extension
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('serializer.yml');
         $loader->load('context.yml');
         $loader->load('converter.yml');
@@ -30,14 +27,13 @@ class OroImportExportExtension extends Extension
         $loader->load('handler.yml');
         $loader->load('field.yml');
         $loader->load('services.yml');
-
-        if ($container->getParameter('kernel.environment') === 'test') {
-            $loader->load('services_test.yml');
-        }
-
         $loader->load('mq_processor.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
         $loader->load('mq_topics.yml');
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
     }
 }

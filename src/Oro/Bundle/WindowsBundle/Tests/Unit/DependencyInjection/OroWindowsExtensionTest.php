@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\WindowsBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
-use Oro\Bundle\WindowsBundle\Controller\Api\WindowsStateController;
 use Oro\Bundle\WindowsBundle\DependencyInjection\OroWindowsExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroWindowsExtensionTest extends ExtensionTestCase
+class OroWindowsExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroWindowsExtension());
+        $container = new ContainerBuilder();
 
-        $expectedDefinitions = [
-            WindowsStateController::class,
-        ];
+        $extension = new OroWindowsExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
     }
 }

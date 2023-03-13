@@ -7,13 +7,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroActivityExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoadForDefaultConfig(): void
+    public function testLoad(): void
     {
         $container = new ContainerBuilder();
 
         $extension = new OroActivityExtension();
         $extension->load([], $container);
 
+        self::assertNotEmpty($container->getDefinitions());
         self::assertSame(
             [],
             $container->getDefinition('oro_activity.api.activity_association_provider')
@@ -21,7 +22,7 @@ class OroActivityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadWithActivityAssociationNamesConfig(): void
+    public function testLoadWithCustomConfigs(): void
     {
         $container = new ContainerBuilder();
         $configs = [
