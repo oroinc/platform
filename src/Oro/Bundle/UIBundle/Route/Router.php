@@ -61,8 +61,12 @@ class Router
         return new RedirectResponse($redirectUrl);
     }
 
-    public function getInputActionData(Request $request): ?array
+    public function getInputActionData(Request $request = null): ?array
     {
+        if ($request === null) {
+            $request = $this->requestStack->getCurrentRequest();
+        }
+
         return json_decode($this->getRawRouteData($request), true);
     }
 

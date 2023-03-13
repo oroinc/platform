@@ -2098,6 +2098,8 @@ JS;
 
         $webDriverSession->moveto($moveToOptions);
         $webDriverSession->buttonup();
+
+        $this->waitForAjax();
     }
 
     /**

@@ -283,4 +283,16 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals($inputAction, $this->router->getInputActionData($this->request));
     }
+
+    public function testGetInputActionDataWithoutRequest(): void
+    {
+        $inputAction = ['route' => 'test_route', 'parameters' => ['id' => 42]];
+        $this->request
+            ->expects(self::once())
+            ->method('get')
+            ->with(Router::ACTION_PARAMETER)
+            ->willReturn(json_encode($inputAction));
+
+        self::assertEquals($inputAction, $this->router->getInputActionData());
+    }
 }
