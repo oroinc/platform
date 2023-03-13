@@ -7,33 +7,21 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroHelpExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OroHelpExtension */
-    private $extension;
-
-    protected function setUp(): void
-    {
-        $this->extension = new OroHelpExtension();
-    }
-
     public function testLoad()
     {
         $container = new ContainerBuilder();
 
-        $this->extension->load(
-            [
-                'oro_help' => [
-                    'defaults' => [
-                        'server' => 'http://server.com'
-                    ]
-                ]
-            ],
-            $container
-        );
+        $configs = [
+            ['defaults' => ['server' => 'http://server.com']]
+        ];
 
-        $this->assertEquals(
-            [
-                'server' => 'http://server.com'
-            ],
+        $extension = new OroHelpExtension();
+        $extension->load($configs, $container);
+
+        self::assertNotEmpty($container->getDefinitions());
+
+        self::assertEquals(
+            ['server' => 'http://server.com'],
             $container->getDefinition('oro_help.help_link_provider')->getArgument(0)
         );
     }

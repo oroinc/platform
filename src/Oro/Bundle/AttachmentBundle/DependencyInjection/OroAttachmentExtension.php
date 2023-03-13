@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\DependencyInjection;
 
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -21,7 +22,8 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        $container->prependExtensionConfig($this->getAlias(), SettingsBuilder::getSettings($config));
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
@@ -63,8 +65,6 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         $yaml = new Parser();
         $value = $yaml->parse(file_get_contents(__DIR__ . '/../Resources/config/files.yml'));
         $container->setParameter('oro_attachment.files', $value['file-icons']);
-
-        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 
     /**

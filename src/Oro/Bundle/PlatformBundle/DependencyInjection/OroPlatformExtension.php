@@ -17,9 +17,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class OroPlatformExtension extends Extension implements PrependExtensionInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         $this->loadAppConfigsFromBundles($container);
         $this->preparePostgreSql($container);
@@ -135,7 +135,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         }
 
         $originalConfig = $container->getExtensionConfig($name);
-        if (!count($originalConfig)) {
+        if (!\count($originalConfig)) {
             $originalConfig[] = [];
         }
 
@@ -146,12 +146,11 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-
         $loader->load('services.yml');
         $loader->load('doctrine.yml');
         $loader->load('session.yml');

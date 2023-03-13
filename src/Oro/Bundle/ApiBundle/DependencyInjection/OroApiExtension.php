@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigBag;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Component\ChainProcessor\Debug\TraceableActionProcessor;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -36,11 +37,12 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     private const CACHE_MANAGER_SERVICE_ID = 'oro_api.cache_manager';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        $container->prependExtensionConfig($this->getAlias(), SettingsBuilder::getSettings($config));
         // remember the configuration to be able to use it in compiler passes
         DependencyInjectionUtil::setConfig($container, $config);
 
@@ -112,12 +114,10 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             $loader->load('services_test.yml');
             $this->configureTestEnvironment($container);
         }
-
-        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function prepend(ContainerBuilder $container): void

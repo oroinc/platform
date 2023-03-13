@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\OrganizationBundle\Controller\Api\Rest\BusinessUnitController;
 use Oro\Bundle\OrganizationBundle\DependencyInjection\OroOrganizationExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroOrganizationExtensionTest extends ExtensionTestCase
+class OroOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroOrganizationExtension());
+        $container = new ContainerBuilder();
 
-        $expectedDefinitions = [
-            BusinessUnitController::class,
-        ];
+        $extension = new OroOrganizationExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
     }
 }

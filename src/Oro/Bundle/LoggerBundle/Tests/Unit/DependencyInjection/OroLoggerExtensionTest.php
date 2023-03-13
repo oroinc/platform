@@ -3,27 +3,31 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\LoggerBundle\DependencyInjection\OroLoggerExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroLoggerExtensionTest extends ExtensionTestCase
+class OroLoggerExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OroLoggerExtension */
-    private $extension;
-
-    protected function setUp(): void
+    public function testLoad(): void
     {
-        $this->extension = new OroLoggerExtension();
-    }
+        $container = new ContainerBuilder();
 
-    public function testLoad()
-    {
-        $this->loadExtension($this->extension);
+        $extension = new OroLoggerExtension();
+        $extension->load([], $container);
 
-        $expectedServices = [
-            'oro_logger.event_subscriber.console_command',
-            'oro_logger.log_level_config_provider'
-        ];
-
-        $this->assertDefinitionsLoaded($expectedServices);
+        self::assertNotEmpty($container->getDefinitions());
+        self::assertSame(
+            [
+                [
+                    'settings' => [
+                        'resolved' => true,
+                        'detailed_logs_level' => ['value' => 'error', 'scope' => 'app'],
+                        'detailed_logs_end_timestamp' => ['value' => null, 'scope' => 'app'],
+                        'email_notification_recipients' => ['value' => '', 'scope' => 'app'],
+                        'email_notification_subject' => ['value' => 'An Error Occurred!', 'scope' => 'app'],
+                    ]
+                ]
+            ],
+            $container->getExtensionConfig('oro_logger')
+        );
     }
 }
