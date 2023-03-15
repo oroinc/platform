@@ -626,3 +626,9 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
         lazy: true
+
+    Oro\Bundle\EntityConfigBundle\Cache\ConfigManagerCacheWarmer:
+        arguments:
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro_entity_extend.warmer, priority: -1000 }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\EventListener\Extension;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\WorkflowBundle\Async\Topic\WorkflowTransitionEventTriggerTopic;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
@@ -14,7 +15,6 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * Extension for transition event triggers.
@@ -159,7 +159,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
      */
     private function createEntityFromChangeSet($entity, array $changeSet = null)
     {
-        $accessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS);
+        $accessor = PropertyAccess::createPropertyAccessor();
         $newEntity = clone $entity;
 
         if (null === $changeSet) {

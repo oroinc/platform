@@ -15,21 +15,15 @@ use Symfony\Component\Validator\Constraints;
 
 class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var ErrorCompleterRegistry */
-    private $errorCompleterRegistry;
-
-    /** @var CollectFormErrors */
-    private $processor;
+    private CollectFormErrors $processor;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->errorCompleterRegistry = $this->createMock(ErrorCompleterRegistry::class);
-
         $this->processor = new CollectFormErrors(
             new ConstraintTextExtractor(),
-            $this->errorCompleterRegistry,
+            $this->createMock(ErrorCompleterRegistry::class),
             PropertyAccess::createPropertyAccessor()
         );
     }

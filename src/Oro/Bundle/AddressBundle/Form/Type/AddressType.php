@@ -98,7 +98,7 @@ class AddressType extends AbstractType
                 'label' => 'oro.address.city.label',
                 StripTagsExtension::OPTION_NAME => true,
             ))
-            ->add('region', RegionType::class, array('required' => false, 'label' => 'oro.address.region.label'))
+            ->add('region', RegionType::class, array('required' => true, 'label' => 'oro.address.region.label'))
             ->add(
                 'region_text',
                 HiddenType::class,

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -10,14 +11,12 @@ use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\FormBundle\EventListener\CountQueryOptimizationListener;
 use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\Contact;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CountQueryOptimizationListenerTest extends OrmTestCase
 {
-    /** @var EntityManagerMock */
-    private $em;
+    private EntityManagerInterface $em;
 
     protected function setUp(): void
     {

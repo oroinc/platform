@@ -209,6 +209,7 @@ datagrids:
                     options:
                         field_options:
                             choices: "@oro_translation.provider.translation_domain->getAvailableDomainChoices"
+                            translatable_options: false
                             multiple: true
         properties:
             id: ~

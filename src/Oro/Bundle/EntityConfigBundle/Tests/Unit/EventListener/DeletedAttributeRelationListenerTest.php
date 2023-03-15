@@ -15,18 +15,18 @@ use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\ReflectionUtil;
-use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
+use Oro\Component\Testing\Unit\ORM\Mocks\UnitOfWorkMock;
 
 class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $messageProducer;
 
-    private MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject $messageProducer;
+    /** @var DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $deletedAttributeProvider;
 
-    private DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject $deletedAttributeProvider;
-
-    private DeletedAttributeRelationListener $listener;
+    /** @var DeletedAttributeRelationListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -46,7 +46,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $deletedAttributeId = 888;
         $attributeFamily = $this->getFilledAttributeFamily($attributeFamilyId, $movedAttributeId);
 
-        $uow = new UnitOfWork();
+        $uow = new UnitOfWorkMock();
         $uow->addDeletion($this->getFilledAttributeGroupRelation($attributeFamily, $movedAttributeId));
         $uow->addDeletion($this->getFilledAttributeGroupRelation($attributeFamily, $deletedAttributeId));
         $uow->addDeletion(new \stdClass());
@@ -109,8 +109,8 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $attributeGroup = new AttributeGroup();
         $attributeGroup->addAttributeRelation($attributeRelation);
 
-        /** @var AttributeFamily $attributeFamily */
-        $attributeFamily = $this->getEntity(AttributeFamily::class, ['id' => $attributeFamilyId]);
+        $attributeFamily = new AttributeFamily();
+        ReflectionUtil::setId($attributeFamily, $attributeFamilyId);
         $attributeFamily->addAttributeGroup($attributeGroup);
 
         return $attributeFamily;

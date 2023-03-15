@@ -6,9 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
-use Oro\Bundle\AddressBundle\Model\ExtendCountry;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 
 /**
  * Address country entity
@@ -30,8 +31,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      }
  * )
  */
-class Country extends ExtendCountry implements Translatable
+class Country implements Translatable, ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var string
      *
@@ -84,8 +87,6 @@ class Country extends ExtendCountry implements Translatable
      */
     public function __construct($iso2Code)
     {
-        parent::__construct();
-
         $this->iso2Code = $iso2Code;
         $this->regions  = new ArrayCollection();
     }

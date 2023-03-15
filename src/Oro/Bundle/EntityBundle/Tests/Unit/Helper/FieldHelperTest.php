@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
@@ -79,11 +80,13 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
         $entityExtendConfigurationProvider->expects(self::any())
             ->method('getUnderlyingTypes')
             ->willReturn([]);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         $this->helper = new FieldHelper(
             $this->fieldProvider,
             $configProvider,
-            new FieldTypeHelper($entityExtendConfigurationProvider)
+            new FieldTypeHelper($entityExtendConfigurationProvider),
+            $propertyAccessor
         );
     }
 

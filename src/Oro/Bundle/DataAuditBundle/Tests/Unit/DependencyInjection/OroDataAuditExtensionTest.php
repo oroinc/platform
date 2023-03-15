@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\DataAuditBundle\Controller\Api\Rest\AuditController;
 use Oro\Bundle\DataAuditBundle\DependencyInjection\OroDataAuditExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroDataAuditExtensionTest extends ExtensionTestCase
+class OroDataAuditExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroDataAuditExtension());
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
-        $expectedDefinitions = [
-            AuditController::class,
-        ];
+        $extension = new OroDataAuditExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
     }
 }

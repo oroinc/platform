@@ -4,9 +4,11 @@ namespace Oro\Component\Action\Model;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\Proxy;
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\EntityExtend\PropertyAccessorWithDotArraySyntax;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -27,16 +29,15 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     protected $modified;
 
-    /**
-     * @var PropertyAccessor
-     */
-    protected $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(array $data = [])
     {
         $this->data = $data;
         $this->modified = false;
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
+            throw: PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
+        );
     }
 
     /**

@@ -12,16 +12,15 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class OroEntityExtension extends Extension
 {
     public const DEFAULT_QUERY_CACHE_LIFETIME_PARAM_NAME = 'oro_entity.default_query_cache_lifetime';
-    private const CONFIG_FILE_PATH = 'Resources/config/oro/entity_hidden_fields.yml';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $this->loadHiddenFieldConfigs($container);
 
-        $config = $this->processConfiguration(new Configuration(), $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('orm.yml');
@@ -32,6 +31,7 @@ class OroEntityExtension extends Extension
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
         $loader->load('controllers_api.yml');
+        $loader->load('collectors.yml');
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
@@ -44,22 +44,20 @@ class OroEntityExtension extends Extension
             self::DEFAULT_QUERY_CACHE_LIFETIME_PARAM_NAME,
             $config['default_query_cache_lifetime']
         );
-
-        $loader->load('collectors.yml');
     }
 
     private function loadHiddenFieldConfigs(ContainerBuilder $container): void
     {
         $hiddenFieldConfigs = [];
-
-        $configLoader = CumulativeConfigLoaderFactory::create('oro_entity_hidden_fields', self::CONFIG_FILE_PATH);
+        $configLoader = CumulativeConfigLoaderFactory::create(
+            'oro_entity_hidden_fields',
+            'Resources/config/oro/entity_hidden_fields.yml'
+        );
         $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
-            $hiddenFieldConfigs = array_merge(
-                $hiddenFieldConfigs,
-                $resource->data['oro_entity_hidden_fields']
-            );
+            $hiddenFieldConfigs[] = $resource->data['oro_entity_hidden_fields'];
         }
+        $hiddenFieldConfigs = array_merge(...$hiddenFieldConfigs);
 
         $container->setParameter('oro_entity.hidden_fields', $hiddenFieldConfigs);
     }

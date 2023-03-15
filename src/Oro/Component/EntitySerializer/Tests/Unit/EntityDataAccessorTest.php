@@ -132,7 +132,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
     {
         $entity = ['someName' => 'test'];
         $value = 'prev';
-        self::assertFalse($this->entityDataAccessor->tryGetValue($entity, 'notExistingName', $value));
-        self::assertEquals('prev', $value);
+        $this->entityDataAccessor->tryGetValue($entity, 'notExistingName', $value);
+        self::assertEquals(null, $value);
     }
 }

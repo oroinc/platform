@@ -10,11 +10,11 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class OroSearchExtension extends Extension
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
         $container->setParameter('oro_search.engine_dsn', $config['engine_dsn']);
         $container->setParameter('oro_search.required_plugins', $config['required_plugins']);

@@ -7,7 +7,7 @@ use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 /**
@@ -149,7 +149,7 @@ class ParameterBinder
      */
     protected function getParameterValue($source, array $config)
     {
-        $propertyAccessor = new PropertyAccessor();
+        $propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
         try {
             $path = '';
             foreach (explode('.', $config['path']) as $part) {

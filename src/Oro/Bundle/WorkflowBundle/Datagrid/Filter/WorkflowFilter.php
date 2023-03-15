@@ -14,8 +14,7 @@ use Symfony\Component\Form\FormFactoryInterface;
  */
 class WorkflowFilter extends EntityFilter
 {
-    /** @var WorkflowTranslationHelper */
-    private $translationHelper;
+    private WorkflowTranslationHelper $translationHelper;
 
     public function __construct(
         FormFactoryInterface $factory,
@@ -28,29 +27,25 @@ class WorkflowFilter extends EntityFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function init($name, array $params)
     {
         foreach ($this->getFieldOptions() as $key => $value) {
-            $params[FilterUtility::FORM_OPTIONS_KEY]['field_options'][$key] = $value;
+            $params[FilterUtility::FORM_OPTIONS_KEY][self::FIELD_OPTIONS_KEY][$key] = $value;
         }
 
         parent::init($name, $params);
     }
 
-    /**
-     * @return array
-     */
-    protected function getFieldOptions()
+    protected function getFieldOptions(): array
     {
         return [
             'class'                => WorkflowDefinition::class,
             'multiple'             => true,
             'choice_label'         => function (WorkflowDefinition $definition) {
                 return $this->translationHelper->findTranslation($definition->getLabel());
-            },
-            'translatable_options' => false
+            }
         ];
     }
 }

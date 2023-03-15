@@ -44,7 +44,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 
     protected function createMockTranslator(): TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
     {
-        $translator = $this->getMockForAbstractClass(TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->with($this->anything(), [])

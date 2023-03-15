@@ -10,7 +10,7 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
 {
@@ -38,7 +38,7 @@ class SetDefaultEnumValueTest extends CustomizeFormDataProcessorTestCase
         $this->processor = new SetDefaultEnumValue(
             $this->enumValueProvider,
             $this->doctrineHelper,
-            new PropertyAccessor(),
+            PropertyAccess::createPropertyAccessor(),
             'singleEnumField',
             self::ENUM_CODE
         );

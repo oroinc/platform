@@ -25,6 +25,7 @@ datagrids:
                 data_name:     relatedEntity
                 frontend_type: select
                 choices:       "@oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice"
+                translatable_options: false
             executionOrder:
                 label:         oro.workflow.processdefinition.execution_order.label
                 frontend_type: integer
@@ -92,6 +93,7 @@ datagrids:
                         field_options:
                             multiple: true
                             choices:  "@oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice"
+                            translatable_options: false
                 createdAt:
                     type:      datetime
                     data_name: process.createdAt
@@ -136,6 +138,7 @@ datagrids:
                 data_name:     relatedEntity
                 frontend_type: select
                 choices:       "@oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice"
+                translatable_options: false
             active:
                 label:         oro.workflow.workflowdefinition.active.label
                 frontend_type: boolean
@@ -242,6 +245,7 @@ datagrids:
                         field_options:
                             multiple: true
                             choices: "@oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice"
+                            translatable_options: false
                 applications:
                     type: string
                     data_name: w.applications

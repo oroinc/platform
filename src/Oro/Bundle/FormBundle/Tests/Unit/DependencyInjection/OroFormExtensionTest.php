@@ -4,54 +4,57 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\FormBundle\DependencyInjection\OroFormExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class OroFormExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $definition = $this->createMock(Definition::class);
-        $definition->expects($this->once())
-            ->method('replaceArgument')
-            ->with(
-                0,
-                [
-                    'default' => [
-                        'allowed_html_elements' => [],
-                        'extends' => null,
-                        'allowed_iframe_domains' => [],
-                        'allowed_uri_schemes' => [],
-                        'allowed_rel' => []
-                    ]
-                ]
-            );
-
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
-        $container = $this->createMock(ContainerBuilder::class);
-        $container->expects($this->once())
-            ->method('getDefinition')
-            ->with('oro_form.provider.html_tag_provider')
-            ->willReturn($definition);
-        $container->expects(self::any())
-            ->method('getReflectionClass')
-            ->willReturnCallback(static fn ($class) =>  new \ReflectionClass($class));
-        $container->expects(self::any())
-            ->method('getParameterBag')
-            ->willReturn(new ParameterBag());
+        $container = new ContainerBuilder();
 
         $extension = new OroFormExtension();
+        $extension->load([], $container);
 
-        $config = [
-            'oro_form' => [
-                'html_purifier_modes' => [
-                    'default' => [
-                        'allowed_html_elements' => []
+        self::assertNotEmpty($container->getDefinitions());
+        self::assertSame(
+            [
+                [
+                    'settings' => [
+                        'resolved' => true,
+                        'wysiwyg_enabled' => ['value' => true, 'scope' => 'app']
                     ]
                 ]
-            ]
+            ],
+            $container->getExtensionConfig('oro_form')
+        );
+
+        self::assertSame(
+            [],
+            $container->getDefinition('oro_form.provider.html_tag_provider')->getArgument(0)
+        );
+    }
+
+    public function testLoadWithHtmlPurifierModes(): void
+    {
+        $container = new ContainerBuilder();
+
+        $configs = [
+            ['html_purifier_modes' => ['lax' => ['extends' => 'default']]]
         ];
 
-        $extension->load($config, $container);
+        $extension = new OroFormExtension();
+        $extension->load($configs, $container);
+
+        self::assertSame(
+            [
+                'lax' => [
+                    'extends' => 'default',
+                    'allowed_rel' => [],
+                    'allowed_iframe_domains' => [],
+                    'allowed_uri_schemes' => [],
+                    'allowed_html_elements' => [],
+                ]
+            ],
+            $container->getDefinition('oro_form.provider.html_tag_provider')->getArgument(0)
+        );
     }
 }

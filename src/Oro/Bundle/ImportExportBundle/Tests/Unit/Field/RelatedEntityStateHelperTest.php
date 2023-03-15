@@ -6,32 +6,24 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Component\Testing\ReflectionUtil;
 
 class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
-    /**
-     * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldHelper;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var RelatedEntityStateHelper
-     */
+    /** @var RelatedEntityStateHelper */
     private $helper;
 
     protected function setUp(): void
@@ -47,13 +39,13 @@ class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testForgetLoadedCollectionItems()
     {
-        $businessUnit = $this->getEntity(BusinessUnit::class, ['id' => 1]);
+        $businessUnit = new BusinessUnit();
+        ReflectionUtil::setId($businessUnit, 1);
 
         $em = $this->createMock(EntityManagerInterface::class);
         $classMetadata = $this->createMock(ClassMetadata::class);
         $collection = new PersistentCollection($em, $classMetadata, new ArrayCollection([$businessUnit]));
-        /** @var Organization $organization */
-        $organization = $this->getEntity(Organization::class);
+        $organization = new Organization();
         $collection->setOwner(
             $organization,
             [
@@ -123,10 +115,10 @@ class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveRememberedCollectionItems()
     {
-        /** @var Organization $organization */
-        $organization = $this->getEntity(Organization::class);
-        /** @var BusinessUnit $businessUnit */
-        $businessUnit = $this->getEntity(BusinessUnit::class, ['id' => 1]);
+        $businessUnit = new BusinessUnit();
+        ReflectionUtil::setId($businessUnit, 1);
+
+        $organization = new Organization();
         $organization->addBusinessUnit($businessUnit);
 
         $this->fieldHelper->expects($this->any())

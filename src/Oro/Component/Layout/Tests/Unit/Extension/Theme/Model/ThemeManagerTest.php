@@ -3,13 +3,13 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)

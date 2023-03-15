@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Bundle\ReportBundle\DependencyInjection\Compiler\DbalConnectionCompilerPass;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -13,10 +14,10 @@ class OroReportExtension extends Extension
     /**
      * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
-        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        $container->prependExtensionConfig($this->getAlias(), SettingsBuilder::getSettings($config));
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');

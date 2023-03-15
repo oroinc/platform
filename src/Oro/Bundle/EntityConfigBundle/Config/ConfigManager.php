@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -269,6 +270,7 @@ class ConfigManager
      */
     public function getEntityConfig($scope, $className)
     {
+        $className = ClassUtils::getRealClass($className);
         $config = $this->cache->getEntityConfig($scope, $className);
         if (!$config) {
             if (!$this->modelManager->checkDatabase()) {

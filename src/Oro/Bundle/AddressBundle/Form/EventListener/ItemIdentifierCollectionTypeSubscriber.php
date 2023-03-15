@@ -3,10 +3,10 @@
 namespace Oro\Bundle\AddressBundle\Form\EventListener;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -103,7 +103,7 @@ class ItemIdentifierCollectionTypeSubscriber implements EventSubscriberInterface
     private function getValue($item, $fieldName)
     {
         if (null === $this->propertyAccessor) {
-            $this->propertyAccessor = new PropertyAccessor();
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }
 
         return $this->propertyAccessor->getValue($item, $fieldName);

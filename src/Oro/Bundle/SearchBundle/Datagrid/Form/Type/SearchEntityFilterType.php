@@ -10,18 +10,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for filter by an entity for a datasource based on a search index.
+ */
 class SearchEntityFilterType extends AbstractType
 {
-    const NAME = 'oro_search_type_entity_filter';
-
-    /** @var EntityNameResolver */
-    protected $entityNameResolver;
-
-    /** @var LocalizationHelper */
-    protected $localizationHelper;
-
-    /** @var Localization */
-    protected $currentLocalization = false;
+    private EntityNameResolver $entityNameResolver;
+    private LocalizationHelper $localizationHelper;
+    private Localization|null|false $currentLocalization = false;
 
     public function __construct(EntityNameResolver $entityNameResolver, LocalizationHelper $localizationHelper)
     {
@@ -32,17 +28,17 @@ class SearchEntityFilterType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(
-            [
-                'field_options' => [
-                    'multiple' => true,
-                    'choice_label' => [$this, 'getLocalizedChoiceLabel'],
-                ],
-                'choices' => null,
-            ]
-        );
+        $resolver->setDefaults([
+            'field_options' => [
+                'multiple' => true,
+                'choice_label' => function (object $entity): string {
+                    return $this->entityNameResolver->getName($entity, null, $this->getCurrentLocalization());
+                }
+            ],
+            'choices' => null,
+        ]);
 
         // this normalizer allows to add/override field_options options outside
         $resolver->setNormalizer(
@@ -57,32 +53,9 @@ class SearchEntityFilterType extends AbstractType
     }
 
     /**
-     * @param object $entity
-     * @return string
-     */
-    public function getLocalizedChoiceLabel($entity)
-    {
-        $localization = $this->getCurrentLocalization();
-
-        return $this->entityNameResolver->getName($entity, null, $localization);
-    }
-
-    /**
-     * @return Localization
-     */
-    protected function getCurrentLocalization()
-    {
-        if (false === $this->currentLocalization) {
-            $this->currentLocalization = $this->localizationHelper->getCurrentLocalization();
-        }
-
-        return $this->currentLocalization;
-    }
-
-    /**
      * {@inheritDoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return EntityFilterType::class;
     }
@@ -90,16 +63,17 @@ class SearchEntityFilterType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getBlockPrefix(): string
     {
-        return $this->getBlockPrefix();
+        return 'oro_search_type_entity_filter';
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getBlockPrefix()
+    private function getCurrentLocalization(): ?Localization
     {
-        return self::NAME;
+        if (false === $this->currentLocalization) {
+            $this->currentLocalization = $this->localizationHelper->getCurrentLocalization();
+        }
+
+        return $this->currentLocalization;
     }
 }

@@ -835,6 +835,7 @@ datagrids:
                 label: oro.user.userloginattempt.source.label
                 frontend_type: select
                 choices: '@oro_user.logger.user_login_attempt->getSourceChoices()'
+                translatable_options: false
             username:
                 label: oro.user.userloginattempt.username.label
             user:
@@ -887,6 +888,7 @@ datagrids:
                     options:
                         field_options:
                             choices: '@oro_user.logger.user_login_attempt->getSourceChoices()'
+                            translatable_options: false
                             multiple: true
                 user:
                     type: choice-tree

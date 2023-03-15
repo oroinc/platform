@@ -12,11 +12,8 @@ use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
  */
 class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ExtendedContainerBuilder */
-    private $container;
-
-    /** @var OroGaufretteExtension */
-    private $extension;
+    private ExtendedContainerBuilder $container;
+    private OroGaufretteExtension $extension;
 
     private const CONFIG = [
         [

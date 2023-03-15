@@ -14,8 +14,8 @@ use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
-use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\Mocks\DriverMock;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -24,7 +24,7 @@ class QueryCountCalculatorTest extends OrmTestCase
 {
     private const TEST_COUNT = 42;
 
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface */
     private $em;
 
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */

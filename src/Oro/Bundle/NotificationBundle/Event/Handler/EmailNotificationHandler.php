@@ -5,11 +5,12 @@ namespace Oro\Bundle\NotificationBundle\Event\Handler;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
+use Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Email handler sends emails for notification events defined by notification rules.
@@ -22,7 +23,7 @@ class EmailNotificationHandler implements EventHandlerInterface
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var PropertyAccessor */
+    /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
 
     /** @var EventDispatcherInterface */
@@ -31,18 +32,22 @@ class EmailNotificationHandler implements EventHandlerInterface
     /** @var ChainAdditionalEmailAssociationProvider */
     private $additionalEmailAssociationProvider;
 
+    private WebsiteAwareEntityHelper $websiteAwareEntityHelper;
+
     public function __construct(
         EmailNotificationManager $manager,
         ManagerRegistry $doctrine,
-        PropertyAccessor $propertyAccessor,
+        PropertyAccessorInterface $propertyAccessor,
         EventDispatcherInterface $eventDispatcher,
-        ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider
+        ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider,
+        WebsiteAwareEntityHelper $websiteAwareEntityHelper,
     ) {
         $this->manager = $manager;
         $this->doctrine = $doctrine;
         $this->propertyAccessor = $propertyAccessor;
         $this->eventDispatcher = $eventDispatcher;
         $this->additionalEmailAssociationProvider = $additionalEmailAssociationProvider;
+        $this->websiteAwareEntityHelper = $websiteAwareEntityHelper;
     }
 
     /**
@@ -70,7 +75,8 @@ class EmailNotificationHandler implements EventHandlerInterface
             $this->doctrine->getManager(),
             $this->propertyAccessor,
             $this->eventDispatcher,
-            $this->additionalEmailAssociationProvider
+            $this->additionalEmailAssociationProvider,
+            $this->websiteAwareEntityHelper
         );
     }
 }

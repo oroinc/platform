@@ -23,6 +23,7 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestMailbox;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
@@ -39,7 +40,6 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -98,11 +98,6 @@ class EmailTypeTest extends TypeTestCase
      */
     protected function getExtensions(): array
     {
-        $translatableType = $this->createMock(TranslatableEntityType::class);
-        $translatableType->expects($this->any())
-            ->method('getName')
-            ->willReturn(TranslatableEntityType::NAME);
-
         $user = new User();
         $this->tokenAccessor->expects($this->any())
             ->method('getUser')
@@ -149,7 +144,7 @@ class EmailTypeTest extends TypeTestCase
             new PreloadedExtension(
                 [
                     $this->formType,
-                    TranslatableEntityType::class => $translatableType,
+                    TranslatableEntityType::class => $this->createMock(TranslatableEntityType::class),
                     new OroRichTextType(
                         $this->createMock(ConfigManager::class),
                         $htmlTagProvider,

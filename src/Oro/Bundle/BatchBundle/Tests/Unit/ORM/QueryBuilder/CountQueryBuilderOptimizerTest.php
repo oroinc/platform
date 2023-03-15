@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Expr\Join;
@@ -25,14 +26,13 @@ use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\UserApi;
 use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\UserEmail;
 use Oro\Bundle\EntityBundle\Helper\RelationHelper;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Oro\ORM\Query\AST\Functions;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CountQueryBuilderOptimizerTest extends OrmTestCase
 {
-    /** @var EntityManagerMock */
+    /** @var EntityManagerInterface */
     private $em;
 
     /** @var RelationHelper|\PHPUnit\Framework\MockObject\MockObject */

@@ -7,27 +7,21 @@ use Oro\Bundle\EntityBundle\DoctrineExtensions\DBAL\Types\DurationType;
 
 class DurationTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DurationType */
-    private $type;
-
-    /** @var AbstractPlatform */
-    private $platform;
+    private DurationType $type;
 
     protected function setUp(): void
     {
         $this->type = new DurationType();
-
-        $this->platform = $this->createMock(AbstractPlatform::class);
     }
 
     /**
      * @dataProvider convertToDatabaseValueDataProvider
      */
-    public function testConvertToDatabaseValue($value, $expected)
+    public function testConvertToDatabaseValue(mixed $value, mixed $expected)
     {
         $this->assertSame(
             $expected,
-            $this->type->convertToDatabaseValue($value, $this->platform)
+            $this->type->convertToDatabaseValue($value, $this->createMock(AbstractPlatform::class))
         );
     }
 
@@ -41,8 +35,23 @@ class DurationTypeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConvertToPHPValue()
+    /**
+     * @dataProvider convertToPHPValueDataProvider
+     */
+    public function testConvertToPHPValue(mixed $value, mixed $expected)
     {
-        $this->assertEquals(10, $this->type->convertToPHPValue('10', $this->platform));
+        $this->assertSame(
+            $expected,
+            $this->type->convertToPHPValue($value, $this->createMock(AbstractPlatform::class))
+        );
+    }
+
+    public function convertToPHPValueDataProvider(): array
+    {
+        return [
+            'null' => [null, null],
+            'string' => ['10', 10],
+            'integer' => [10, 10],
+        ];
     }
 }

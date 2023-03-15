@@ -13,11 +13,10 @@ use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
  */
 class DatagridFiltersProvider implements DatagridFiltersProviderInterface
 {
-    public const ORDER_FIELD_NAME  = 'order';
-    public const ORDER_FIELD_LABEL = 'label';
+    private const LABEL_KEY = 'label';
+    private const ORDER_KEY = 'order';
 
     private FilterFactory $filterFactory;
-
     private string $applicableDatasourceType;
 
     public function __construct(FilterFactory $filterFactory, string $applicableDatasourceType)
@@ -45,35 +44,15 @@ class DatagridFiltersProvider implements DatagridFiltersProviderInterface
         return $filters;
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     *
-     * @param DatagridConfiguration $gridConfig
-     * @return array
-     */
     private function getSortedFilters(DatagridConfiguration $gridConfig): array
     {
-        $filtersConfig = $gridConfig->offsetGetByPath(Configuration::COLUMNS_PATH, []);
-        foreach ($filtersConfig as $filterName => &$filterConfig) {
-            foreach ([self::ORDER_FIELD_LABEL, self::ORDER_FIELD_NAME, FilterUtility::DISABLED_KEY] as $field) {
-                if (!array_key_exists($field, $filterConfig)) {
-                    $filterConfig[$field] = $gridConfig->offsetGetByPath(
-                        sprintf('[%s][%s][%s]', FormatterConfiguration::COLUMNS_KEY, $filterName, $field)
-                    );
-                }
-            }
-
-            if (!empty($filterConfig[FilterUtility::DISABLED_KEY])) {
-                unset($filtersConfig[$filterName]);
-            }
-        }
-        unset($filterConfig);
+        $filtersConfig = $this->completeFilters($gridConfig);
 
         $weight  = 1;
-        $defined = array_column($filtersConfig, self::ORDER_FIELD_NAME);
+        $defined = array_column($filtersConfig, self::ORDER_KEY);
         foreach ($filtersConfig as &$filterConfig) {
             $order = filter_var(
-                $filterConfig[self::ORDER_FIELD_NAME] ?? null,
+                $filterConfig[self::ORDER_KEY] ?? null,
                 FILTER_VALIDATE_INT
             );
             if ($order === false) {
@@ -84,17 +63,52 @@ class DatagridFiltersProvider implements DatagridFiltersProviderInterface
                 $order = $weight;
             }
 
-            $filterConfig[self::ORDER_FIELD_NAME] = $order;
+            $filterConfig[self::ORDER_KEY] = $order;
         }
         unset($filterConfig);
 
         uasort($filtersConfig, static function (array $a, array $b) {
-            if ($a[self::ORDER_FIELD_NAME] === $b[self::ORDER_FIELD_NAME]) {
-                return 0;
-            }
-            return ($a[self::ORDER_FIELD_NAME] < $b[self::ORDER_FIELD_NAME]) ? -1 : 1;
+            return $a[self::ORDER_KEY] <=> $b[self::ORDER_KEY];
         });
 
         return $filtersConfig;
+    }
+
+    private function completeFilters(DatagridConfiguration $gridConfig): array
+    {
+        $filtersConfig = $gridConfig->offsetGetByPath(Configuration::COLUMNS_PATH, []);
+        foreach ($filtersConfig as $filterName => &$filterConfig) {
+            if (!\array_key_exists(self::LABEL_KEY, $filterConfig)) {
+                $filterConfig[self::LABEL_KEY] = $this->getColumnOption($gridConfig, $filterName, self::LABEL_KEY);
+                if (($filterConfig[FilterUtility::TRANSLATABLE_KEY] ?? true)
+                    && $this->getColumnOption($gridConfig, $filterName, FilterUtility::TRANSLATABLE_KEY) === false
+                ) {
+                    $filterConfig[FilterUtility::TRANSLATABLE_KEY] = false;
+                }
+            }
+            if (!\array_key_exists(self::ORDER_KEY, $filterConfig)) {
+                $filterConfig[self::ORDER_KEY] = $this->getColumnOption($gridConfig, $filterName, self::ORDER_KEY);
+            }
+            if (!\array_key_exists(FilterUtility::DISABLED_KEY, $filterConfig)) {
+                $filterConfig[FilterUtility::DISABLED_KEY] = $this->getColumnOption(
+                    $gridConfig,
+                    $filterName,
+                    FilterUtility::DISABLED_KEY
+                );
+            }
+            if (!empty($filterConfig[FilterUtility::DISABLED_KEY])) {
+                unset($filtersConfig[$filterName]);
+            }
+        }
+        unset($filterConfig);
+
+        return $filtersConfig;
+    }
+
+    private function getColumnOption(DatagridConfiguration $gridConfig, string $columnName, string $optionName): mixed
+    {
+        return $gridConfig->offsetGetByPath(
+            sprintf('[%s][%s][%s]', FormatterConfiguration::COLUMNS_KEY, $columnName, $optionName)
+        );
     }
 }

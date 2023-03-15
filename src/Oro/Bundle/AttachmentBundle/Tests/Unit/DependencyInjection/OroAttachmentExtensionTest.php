@@ -17,6 +17,7 @@ class OroAttachmentExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroAttachmentExtension();
         $extension->load([], $container);
 
+        self::assertNotEmpty($container->getDefinitions());
         self::assertSame(
             [
                 'kernel.environment' => 'prod',

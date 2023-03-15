@@ -30,7 +30,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validation;
@@ -104,7 +103,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         $this->formValidationHandler = new FormValidationHandler(
             $this->validator,
             new CustomizeFormDataEventDispatcher($this->customizationHandler),
-            new PropertyAccessor()
+            PropertyAccess::createPropertyAccessor()
         );
     }
 

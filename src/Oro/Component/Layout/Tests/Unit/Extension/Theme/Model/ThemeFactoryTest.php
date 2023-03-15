@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
@@ -17,7 +18,7 @@ class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->factory = new ThemeFactory(new PropertyAccessor());
+        $this->factory = new ThemeFactory(PropertyAccess::createPropertyAccessor());
     }
 
     /**

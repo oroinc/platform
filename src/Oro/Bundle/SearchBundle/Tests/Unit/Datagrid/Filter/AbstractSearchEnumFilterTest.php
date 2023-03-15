@@ -27,6 +27,10 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit\Framework\TestCase
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->dictionaryManager = $this->createMock(DictionaryApiEntityManager::class);
+
+        $this->dictionaryManager->expects(self::any())
+            ->method('resolveEntityClass')
+            ->willReturnArgument(0);
     }
 
     public function testApplyExceptionForWrongFilterDatasourceAdapter()

@@ -7,11 +7,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroRedisConfigExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OroRedisConfigExtension */
-    private $extension;
-
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
+    private OroRedisConfigExtension $extension;
 
     protected function setUp(): void
     {
@@ -25,7 +22,9 @@ class OroRedisConfigExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoad(string $paramId, mixed $paramValue): void
     {
         $this->container->setParameter($paramId, $paramValue);
+
         $this->extension->load([], $this->container);
+
         $this->assertNotEmpty($this->container->getResources());
     }
 
@@ -41,7 +40,9 @@ class OroRedisConfigExtensionTest extends \PHPUnit\Framework\TestCase
     public function testPrependConfigCacheEnadbled(): void
     {
         $this->container->setParameter('redis_dsn_cache', 'redis://127.0.0.1:6379/0');
+
         $this->extension->prepend($this->container);
+
         $config = $this->container->getExtensionConfig('framework');
         $this->assertEquals('oro.cache.redis_provider', $config[0]['cache']['default_redis_provider']);
     }
@@ -49,7 +50,9 @@ class OroRedisConfigExtensionTest extends \PHPUnit\Framework\TestCase
     public function testPrependConfigLayoutCacheEnabled(): void
     {
         $this->container->setParameter('redis_dsn_layout', 'redis://127.0.0.1:6379/2');
+
         $this->extension->prepend($this->container);
+
         $config = $this->container->getExtensionConfig('framework');
         $renderCache = $config[0]['cache']['pools']['cache.oro_layout.render'];
         $this->assertEquals('cache.adapter.redis_tag_aware', $renderCache['adapter']);

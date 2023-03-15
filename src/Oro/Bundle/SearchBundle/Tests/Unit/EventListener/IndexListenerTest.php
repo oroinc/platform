@@ -10,13 +10,13 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\EventListener\IndexListener;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class IndexListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -215,7 +215,7 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         $listener = new class(
             $this->doctrineHelper,
             $this->searchIndexer,
-            new PropertyAccessor()
+            PropertyAccess::createPropertyAccessor()
         ) extends IndexListener {
             public function xhasEntitiesToIndex()
             {

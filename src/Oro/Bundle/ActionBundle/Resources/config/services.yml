@@ -120,7 +120,7 @@ services:
             # custom types
             - [addDoctrineTypeMapping, ["percent", "float"]]
             - [addDoctrineTypeMapping, ["money", "float"]]
-            # set doctine typr mapping provider
+            # set doctrine type mapping provider
             - [setDoctrineTypeMappingProvider, ['@oro_action.provider.doctrine_type_mapping']]
 
     oro_action.attribute_guesser:

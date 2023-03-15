@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Config\Common;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
@@ -26,8 +26,8 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
 
     protected function __construct(array $params)
     {
-        $this->accessor = new PropertyAccessor();
-        $this->params   = $params;
+        $this->accessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
+        $this->params = $params;
     }
 
     /**

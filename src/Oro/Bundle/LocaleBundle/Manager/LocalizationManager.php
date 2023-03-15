@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\Manager;
 
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
 use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -167,7 +167,7 @@ class LocalizationManager implements WarmableConfigCacheInterface, ClearableConf
             : self::ENTITIES_CACHE_NAMESPACE;
     }
 
-    protected function getRepository(): LocalizationRepository
+    protected function getRepository(): EntityRepository
     {
         return $this->doctrineHelper->getEntityRepositoryForClass(Localization::class);
     }

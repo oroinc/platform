@@ -28,11 +28,9 @@ services:
         public: false
         parent: oro_currency.service.abstract_rounding
 
-    #currencyConfig
     oro_currency.config.currency:
         class: 'Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigProvider'
         public: true
-        lazy: true
         arguments:
             - '@oro_config.manager'
 

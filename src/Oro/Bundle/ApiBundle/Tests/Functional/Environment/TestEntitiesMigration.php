@@ -310,6 +310,11 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $table->addColumn('field_array', 'array', ['notnull' => false]);
         $table->addColumn('field_simple_array', 'simple_array', ['notnull' => false]);
         $table->addColumn('field_json_array', 'json_array', ['notnull' => false]);
+        $table->addColumn('field_json', 'json', [
+            'comment' => '(DC2Type:json)',
+            'notnull' => false,
+            'customSchemaOptions' => ['jsonb' => true]
+        ]);
         $table->addColumn('field_datetime', 'datetime', ['notnull' => false]);
         $table->addColumn('field_date', 'date', ['notnull' => false]);
         $table->addColumn('field_time', 'time', ['notnull' => false]);

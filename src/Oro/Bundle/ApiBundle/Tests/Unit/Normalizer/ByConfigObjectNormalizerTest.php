@@ -29,8 +29,8 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 

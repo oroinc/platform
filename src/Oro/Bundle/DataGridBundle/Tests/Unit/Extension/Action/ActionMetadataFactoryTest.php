@@ -35,9 +35,7 @@ class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
             ->method('trans');
 
         self::assertEquals(
-            [
-                ActionMetadataFactory::LABEL_KEY => null
-            ],
+            ['label' => null],
             $this->actionMetadataFactory->createActionMetadata($action)
         );
     }
@@ -55,9 +53,7 @@ class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
             ->method('trans');
 
         self::assertEquals(
-            [
-                ActionMetadataFactory::LABEL_KEY => null
-            ],
+            ['label' => null],
             $this->actionMetadataFactory->createActionMetadata($action)
         );
     }
@@ -77,9 +73,25 @@ class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn('translated_label1');
 
         self::assertEquals(
-            [
-                ActionMetadataFactory::LABEL_KEY => 'translated_label1'
-            ],
+            ['label' => 'translated_label1'],
+            $this->actionMetadataFactory->createActionMetadata($action)
+        );
+    }
+
+    public function testCreateActionMetadataWithAlreadyTranslatedLabel()
+    {
+        $action = $this->createMock(ActionInterface::class);
+        $actionOptions = ActionConfiguration::create(['label' => 'label1', 'translatable' => false]);
+
+        $action->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($actionOptions);
+
+        $this->translator->expects(self::never())
+            ->method('trans');
+
+        self::assertEquals(
+            ['label' => 'label1'],
             $this->actionMetadataFactory->createActionMetadata($action)
         );
     }

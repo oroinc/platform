@@ -7,25 +7,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OroFeatureToggleExtension */
-    private $extension;
-
-    protected function setUp(): void
-    {
-        $this->extension = new OroFeatureToggleExtension();
-    }
-
-    public function testGetAlias()
-    {
-        $this->assertEquals('oro_featuretoggle', $this->extension->getAlias());
-    }
-
-    public function testLoadWithoutConfig()
+    public function testLoad()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
 
-        $this->extension->load([], $container);
+        $extension = new OroFeatureToggleExtension();
+        $extension->load([], $container);
 
         $featureDecisionManagerDef = $container->getDefinition('oro_featuretoggle.feature_decision_manager');
         $this->assertEquals('unanimous', $featureDecisionManagerDef->getArgument('$strategy'));
@@ -33,18 +21,19 @@ class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($featureDecisionManagerDef->getArgument('$allowIfEqualGrantedDeniedDecisions'));
     }
 
-    public function testLoadWithConfig()
+    public function testLoadWithCustomConfigs()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
 
         $config = [
-            'strategy'                      => 'affirmative',
-            'allow_if_all_abstain'          => true,
+            'strategy' => 'affirmative',
+            'allow_if_all_abstain' => true,
             'allow_if_equal_granted_denied' => false
         ];
 
-        $this->extension->load([$config], $container);
+        $extension = new OroFeatureToggleExtension();
+        $extension->load([$config], $container);
 
         $featureDecisionManagerDef = $container->getDefinition('oro_featuretoggle.feature_decision_manager');
         $this->assertEquals(
@@ -59,5 +48,10 @@ class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
             $config['allow_if_equal_granted_denied'],
             $featureDecisionManagerDef->getArgument('$allowIfEqualGrantedDeniedDecisions')
         );
+    }
+
+    public function testGetAlias()
+    {
+        $this->assertEquals('oro_featuretoggle', (new OroFeatureToggleExtension())->getAlias());
     }
 }

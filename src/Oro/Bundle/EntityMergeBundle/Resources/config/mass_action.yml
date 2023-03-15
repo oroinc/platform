@@ -7,7 +7,6 @@ services:
         class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassAction
         arguments:
             - '@oro_entity_config.provider.merge'
-            - '@translator'
         shared: false
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: merge }

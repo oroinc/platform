@@ -4,8 +4,8 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Testing\ReflectionUtil;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ConfigValueTest extends \PHPUnit\Framework\TestCase
 {

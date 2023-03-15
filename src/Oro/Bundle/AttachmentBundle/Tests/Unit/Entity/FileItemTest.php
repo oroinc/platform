@@ -4,7 +4,6 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
-use Oro\Bundle\AttachmentBundle\Model\ExtendFileItem;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
@@ -40,10 +39,5 @@ class FileItemTest extends \PHPUnit\Framework\TestCase
         $this->entity->setFile(new File());
 
         $this->assertFalse($this->entity->isEmpty());
-    }
-
-    public function testExtendModel()
-    {
-        $this->assertInstanceof(ExtendFileItem::class, $this->entity);
     }
 }

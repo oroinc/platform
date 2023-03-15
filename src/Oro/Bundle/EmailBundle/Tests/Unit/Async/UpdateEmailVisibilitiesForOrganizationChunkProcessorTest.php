@@ -16,8 +16,8 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\Mocks\EntityManagerMock;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use PHPUnit\Framework\Constraint\StringEndsWith;
 
 class UpdateEmailVisibilitiesForOrganizationChunkProcessorTest extends OrmTestCase

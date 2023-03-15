@@ -63,7 +63,12 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $this->dispatcher = $this->createMock(EventDispatcher::class);
         $this->configBag = $this->createMock(ConfigBag::class);
 
-        $this->manager = $this->createManager($doctrine, $this->cache, $this->dispatcher, $this->configBag);
+        $this->manager = $this->createManager(
+            $doctrine,
+            $this->cache,
+            $this->dispatcher,
+            $this->configBag,
+        );
     }
 
     /**
@@ -475,7 +480,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         ManagerRegistry $doctrine,
         CacheInterface $cache,
         EventDispatcher $eventDispatcher,
-        ConfigBag $configBag
+        ConfigBag $configBag,
     ): AbstractScopeManager;
 
     abstract protected function getScopedEntityName(): string;

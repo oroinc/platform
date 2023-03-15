@@ -19,10 +19,10 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
     protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
-        $this->type = new SearchBooleanFilterType($translator);
+        $this->type = new SearchBooleanFilterType();
         $this->formExtensions[] = new CustomFormExtension(
             [
-                new BooleanFilterType($translator),
+                new BooleanFilterType(),
                 new ChoiceFilterType($translator),
                 new FilterType($translator),
                 $this->type
@@ -88,14 +88,9 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
         ];
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(SearchBooleanFilterType::NAME, $this->type->getName());
-    }
-
     public function testGetBlockPrefix()
     {
-        $this->assertEquals(SearchBooleanFilterType::NAME, $this->type->getBlockPrefix());
+        $this->assertEquals('oro_search_type_boolean_filter', $this->type->getBlockPrefix());
     }
 
     public function testGetParent()

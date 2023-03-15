@@ -188,10 +188,10 @@ services:
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
-    oro_attachment.entity_generator.extension:
-        class: Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension
+    oro_attachment.entity_field.attachment_extension:
+        class: Oro\Bundle\AttachmentBundle\EntityExtend\AttachmentEntityFieldExtension
         tags:
-            - { name: oro_entity_extend.entity_generator_extension }
+            - { name: 'oro_entity_extend.entity_field_extension', priority: 40 }
 
     oro_attachment.migration.extension.attachment:
         class: Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension

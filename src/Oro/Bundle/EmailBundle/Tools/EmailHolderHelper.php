@@ -6,7 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -17,7 +17,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class EmailHolderHelper implements ResetInterface
 {
-    private const GET_EMAIL_METHOD = 'getEmail';
+    private const EMAIL_PROPERTY = 'getEmail';
 
     /** @var ConfigProvider */
     private $extendConfigProvider;
@@ -70,8 +70,9 @@ class EmailHolderHelper implements ResetInterface
         if ($object instanceof EmailHolderInterface) {
             return $object->getEmail();
         }
-        if (method_exists($object, self::GET_EMAIL_METHOD)) {
-            $email = $object->getEmail();
+        $accessor = PropertyAccess::createPropertyAccessor();
+        if ($accessor->isReadable($object, self::EMAIL_PROPERTY)) {
+            $email = $accessor->getValue($object, self::EMAIL_PROPERTY);
             if (!is_object($email)) {
                 return $email;
             }

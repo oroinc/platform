@@ -209,7 +209,7 @@
             "@oroinc/bootstrap": "4.3.1-oro2",
             "popper.js": "1.16.1",
             "asap": "2.0.6",
-            "slick-carousel": "1.7.1",
+            "@oroinc/slick-carousel": "1.7.1-oro1",
             "xregexp": "^5.1.0",
             "scriptjs": "2.5.9",
             "focus-visible": "5.2.0",
@@ -330,7 +330,8 @@
     "config": {
         "allow-plugins": {
             "symfony/runtime": false,
-            "php-http/discovery": false
+            "php-http/discovery": false,
+            "symfony/flex": false
         }
     }
 }

@@ -5,25 +5,13 @@ namespace Oro\Bundle\UserBundle\Provider;
 use Oro\Bundle\UserBundle\Model\Gender;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides available genders.
+ */
 class GenderProvider
 {
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var array
-     */
-    protected $choices = [
-        'oro.user.gender.male' => Gender::MALE,
-        'oro.user.gender.female' => Gender::FEMALE,
-    ];
-
-    /**
-     * @var array
-     */
-    protected $translatedChoices;
+    private TranslatorInterface $translator;
+    private ?array $translatedChoices = null;
 
     public function __construct(TranslatorInterface $translator)
     {
@@ -31,30 +19,24 @@ class GenderProvider
     }
 
     /**
-     * @return array
+     * @return array [gender name => gender code, ...]
      */
-    public function getChoices()
+    public function getChoices(): array
     {
         if (null === $this->translatedChoices) {
-            $this->translatedChoices = array();
-            foreach ($this->choices as $label => $name) {
-                $this->translatedChoices[$this->translator->trans($label)] = $name;
-            }
+            $this->translatedChoices = [];
+            $this->translatedChoices[$this->translator->trans('oro.user.gender.male')] = Gender::MALE;
+            $this->translatedChoices[$this->translator->trans('oro.user.gender.female')] = Gender::FEMALE;
         }
 
         return $this->translatedChoices;
     }
 
-    /**
-     * @param string $name
-     * @return string
-     * @throws \LogicException
-     */
-    public function getLabelByName($name)
+    public function getLabelByName(string $name): string
     {
         $choices = $this->getChoices();
         $label = array_search($name, $choices, true);
-        if ($label === false) {
+        if (false === $label) {
             throw new \LogicException(sprintf('Unknown gender with name "%s"', $name));
         }
 

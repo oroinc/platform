@@ -142,6 +142,7 @@ oro_api:
         text[]: array of strings
         guid: string
         guid[]: array of strings
+        json: object
         json_array: object
         simple_array: array
         percent: float
@@ -211,6 +212,9 @@ oro_api:
         not_starts_with: '!^' # not starts with (NOT LIKE value%)
         ends_with:       '$'  # ends with (LIKE %value)
         not_ends_with:   '!$' # not ends with (NOT LIKE %value)
+        empty:           ~    # empty (EQUAL TO empty value OR IS NULL)
+                              # and not empty (NOT EQUAL TO empty value AND NOT IS NULL)
+                              # value is true = empty, value is false = not empty
 
     # the default value for "class" is "Oro\Bundle\ApiBundle\Filter\ComparisonFilter"
     # the default value for "supported_operators" is ['=', '!=', '*', '!*']
@@ -253,6 +257,26 @@ oro_api:
         currency: ~
         duration:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
+        array:
+            # by default, no any operators are enabled for array fields,
+            # to enable operators for a particular field the "operators" option should be
+            # specified for this field in api.yml configuration file, in "filters" section
+            supported_operators: []
+        simple_array:
+            # by default, no any operators are enabled for simple array fields,
+            # to enable operators for a particular field the "operators" option should be
+            # specified for this field in api.yml configuration file, in "filters" section
+            supported_operators: []
+        json_array:
+            # by default, no any operators are enabled for json array fields,
+            # to enable operators for a particular field the "operators" option should be
+            # specified for this field in api.yml configuration file, in "filters" section
+            supported_operators: []
+        json:
+            # by default, no any operators are enabled for json fields,
+            # to enable operators for a particular field the "operators" option should be
+            # specified for this field in api.yml configuration file, in "filters" section
+            supported_operators: []
         composite_identifier:
             factory: ['@oro_api.filter_factory.composite_identifier', 'createFilter']
             supported_operators: ['=', '!=']
@@ -348,6 +372,8 @@ oro_api:
         simple_array:
             form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
         json_array:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
+        json:
             form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
 
     actions:

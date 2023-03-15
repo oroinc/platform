@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
@@ -171,7 +172,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
             } elseif ($entityConfig->is('is_extend')) {
                 $fieldConfigs = $extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
                 $reflectionEntityClass = class_exists($entityClassName)
-                    ? new \ReflectionClass($entityClassName)
+                    ? new EntityReflectionClass($entityClassName)
                     : null;
                 foreach ($fieldConfigs as $fieldConfig) {
                     /** @var FieldConfigId $fieldConfigId */
@@ -186,9 +187,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                         continue;
                     }
 
-                    $mappingClassName  = $entityConfig->has('extend_class')
-                        ? $entityConfig->get('extend_class')
-                        : $entityConfig->getId()->getClassName();
+                    $mappingClassName  = $entityConfig->getId()->getClassName();
                     $fieldName         = $fieldConfigId->getFieldName();
                     $snapshotFieldName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);
 

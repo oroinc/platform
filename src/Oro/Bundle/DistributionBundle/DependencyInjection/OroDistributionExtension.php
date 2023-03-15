@@ -11,33 +11,30 @@ use Symfony\Component\Yaml\Yaml;
 class OroDistributionExtension extends Extension
 {
     /**
-     * @inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
-        $this->mergeTwigResources($container);
+        $this->loadTwigResources($container);
     }
 
-    protected function mergeTwigResources(ContainerBuilder $container): void
+    private function loadTwigResources(ContainerBuilder $container): void
     {
-        $data = [];
-
+        $resources = [];
         $bundles = $container->getParameter('kernel.bundles');
         foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
             $file = dirname($reflection->getFileName()) . '/Resources/config/oro/twig.yml';
             if (is_file($file)) {
-                /** @noinspection SlowArrayOperationsInLoopInspection */
-                $data = array_merge($data, Yaml::parse(file_get_contents(realpath($file)))['bundles']);
+                $resources[] = Yaml::parse(file_get_contents(realpath($file)))['bundles'];
             }
         }
+        $resources = array_merge(...$resources);
+        $resources = array_unique(array_merge((array)$container->getParameter('twig.form.resources'), $resources));
 
-        $container->setParameter(
-            'twig.form.resources',
-            array_unique(array_merge((array)$container->getParameter('twig.form.resources'), $data))
-        );
+        $container->setParameter('twig.form.resources', $resources);
     }
 }

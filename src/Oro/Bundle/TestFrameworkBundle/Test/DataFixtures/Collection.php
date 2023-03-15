@@ -9,6 +9,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 
 /**
  * All methods except #find and #random are copied from {@see \Doctrine\Common\Collections\ArrayCollection},
@@ -136,7 +137,7 @@ class Collection extends ArrayCollection
         }
 
         $getter = 'get'.ucfirst($property);
-        if (method_exists($object, $getter) && is_callable([$object, $getter])) {
+        if (EntityPropertyInfo::methodExists($object, $getter) && is_callable([$object, $getter])) {
             return $object->$getter();
         }
 

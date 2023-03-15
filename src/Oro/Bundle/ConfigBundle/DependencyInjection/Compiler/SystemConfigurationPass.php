@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ConfigBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
@@ -12,7 +11,6 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -25,16 +23,20 @@ class SystemConfigurationPass implements CompilerPassInterface
 
     private const CONFIG_FILE = 'Resources/config/oro/system_configuration.yml';
 
-    private const CONFIG_BAG_SERVICE            = 'oro_config.config_bag';
+    private const CONFIG_BAG_SERVICE = 'oro_config.config_bag';
     private const CONFIG_DEFINITION_BAG_SERVICE = 'oro_config.config_definition_bag';
-    private const MAIN_MANAGER_SERVICE          = 'oro_config.manager';
-    private const API_MANAGER_SERVICE           = 'oro_config.manager.api';
-    private const SCOPE_MANAGER_TAG_NAME        = 'oro_config.scope';
+    private const MAIN_MANAGER_SERVICE = 'oro_config.manager';
+    private const API_MANAGER_SERVICE = 'oro_config.manager.api';
+    private const SCOPE_MANAGER_TAG_NAME = 'oro_config.scope';
+
+    private const SETTINGS_KEY = 'settings';
+    private const RESOLVED_KEY = 'resolved';
+    private const VALUE_KEY = 'value';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $settings = $this->loadSettings($container);
         $container->getDefinition(self::CONFIG_DEFINITION_BAG_SERVICE)
@@ -96,7 +98,6 @@ class SystemConfigurationPass implements CompilerPassInterface
     {
         $settings = [];
 
-        /** @var ExtensionInterface[] $extensions */
         $extensions = $container->getExtensions();
         foreach ($extensions as $name => $extension) {
             $config = $container->getExtensionConfig($name);
@@ -106,12 +107,12 @@ class SystemConfigurationPass implements CompilerPassInterface
                 continue;
             }
 
-            if (isset($config['settings'])) {
-                if (empty($config['settings'][SettingsBuilder::RESOLVED_KEY])) {
+            if (isset($config[self::SETTINGS_KEY])) {
+                if (empty($config[self::SETTINGS_KEY][self::RESOLVED_KEY])) {
                     throw new InvalidArgumentException('Direct passed "settings" are not allowed');
                 }
 
-                $settings[$name] = $this->replaceServiceIdsWithDefinitions($container, $config['settings']);
+                $settings[$name] = $this->replaceServiceIdsWithDefinitions($container, $config[self::SETTINGS_KEY]);
             }
         }
 
@@ -121,13 +122,13 @@ class SystemConfigurationPass implements CompilerPassInterface
     private function replaceServiceIdsWithDefinitions(ContainerBuilder $containerBuilder, array $configSettings): array
     {
         foreach ($configSettings as &$configSetting) {
-            if (isset($configSetting['value'])
-                && \is_string($configSetting['value'])
-                && str_starts_with($configSetting['value'], '@')
+            if (isset($configSetting[self::VALUE_KEY])
+                && \is_string($configSetting[self::VALUE_KEY])
+                && str_starts_with($configSetting[self::VALUE_KEY], '@')
             ) {
-                $serviceId = substr($configSetting['value'], 1);
+                $serviceId = substr($configSetting[self::VALUE_KEY], 1);
                 if ($containerBuilder->hasDefinition($serviceId)) {
-                    $configSetting['value'] = $containerBuilder->getDefinition($serviceId);
+                    $configSetting[self::VALUE_KEY] = $containerBuilder->getDefinition($serviceId);
                 }
             }
         }
@@ -169,7 +170,7 @@ class SystemConfigurationPass implements CompilerPassInterface
         $variables = [];
         foreach ($settings as $alias => $items) {
             foreach ($items as $varName => $varData) {
-                if (SettingsBuilder::RESOLVED_KEY === $varName) {
+                if (self::RESOLVED_KEY === $varName) {
                     continue;
                 }
                 $variables[] = sprintf('%s.%s', $alias, $varName);

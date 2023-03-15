@@ -12,7 +12,7 @@ css:
         - 'bundles/oroui/css/scss/bootstrap/bootstrap.scss'
 
         # Libraries styles
-        - '~slick-carousel/slick/slick.scss'
+        - '~@oroinc/slick-carousel/slick/slick.scss'
         - 'bundles/oroui/css/scss/font-awesome/_core.scss'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'

@@ -25,14 +25,210 @@ The current file describes significant changes in the code that may affect the u
 
 ## 5.1.0 (UNRELEASED)
 
-[Show detailed list of changes](incompatibilities-5-1-rc-1.md)
+[Show detailed list of changes](incompatibilities-5-1-rc-2.md)
+
+### Migration of Extended Entities
+
+To remove the code generation in runtime, OroPlatform now uses extendable implementation of magic __get, __set and __call methods.
+
+To migrate your entities, follow the steps below:
+
+1. Add `ExtendEntityInterface` implementation for extendable entity.
+2. Add the usage of `ExtendEntityTrait` for extendable entity.
+3. Remove the extended entity as a layer, moving the base extend classes to the main extendable entity.
+
+Before:
+
+```php
+/**
+ * Extendable User entity.
+ */
+class User extends ExtendUser implements
+    EmailOwnerInterface,
+    EmailHolderInterface,
+    FullNameInterface,
+    AdvancedApiUserInterface
+{
+}
+```
+
+```php
+<?php
+
+namespace Oro\Bundle\UserBundle\Model;
+
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
+
+/**
+ * This class is required to make User entity extendable.
+ *
+ * @method setAuthStatus(AbstractEnumValue $enum)
+ * @method AbstractEnumValue getAuthStatus()
+ */
+abstract class ExtendUser extends AbstractUser
+{
+    /**
+     * Constructor
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * IMPORTANT: If the derived class has own constructor it must call parent constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+}
+```
+
+After:
+
+```php
+/**
+ * Extendable User entity.
+ * 
+ * @method setAuthStatus(AbstractEnumValue $enum)
+ * @method AbstractEnumValue getAuthStatus()
+ */
+class User extends AbstractUser implements
+    EmailOwnerInterface,
+    EmailHolderInterface,
+    FullNameInterface,
+    AdvancedApiUserInterface,
+    ExtendEntityInterface
+{
+    use ExtendEntityTrait;  // The implementation of the ExtendEntityInterface 
+}
+```
+
+#### Accessing Extended Properties and Methods
+
+* To access the properties and methods of all entities, you must use the PropertyAccess factory methods.
+* Method PropertyAccess::createPropertyAccessor() - used to create base symfony property accessor with custom reflection extractor. 
+* Method PropertyAccess::createPropertyAccessorWithDotSyntax() - should be used instead of Oro\Component\PropertyAccess\PropertyAccessor.
+
+Before:
+
+```php
+   protected function getPropertyAccessor(): PropertyAccessorInterface
+   {
+       if (!$this->propertyAccessor) {
+           $this->propertyAccessor = new PropertyAccessor();
+       }
+       return $this->propertyAccessor;
+   }
+```
+
+After:
+
+```php
+   protected function getPropertyAccessor(): PropertyAccessorInterface
+   {
+       if (!$this->propertyAccessor) {
+           $this->propertyAccessor = PropertyAccess::createPropertyAccessor(); 
+           // or PropertyAccess::createPropertyAccessorWithDotSyntax()
+       }
+       return $this->propertyAccessor;
+   }
+```
+
+OR:
+
+```yaml
+services:
+  acme_test.factory.test_factory:
+    class: Acme\Bundle\TestBundle\Factory\TestFactory
+    arguments:
+      - '@property_accessor' // or '@oro_entity_extend.accessor.property_accessor_with_dot_array_syntax' instead of Oro PropertyAccessor
+```
+
+#### Extended Entity Helper
+
+* For extended entities, we should use the helper method to check if extended property or method exists.
+* Oro\Bundle\EntityExtendBundle\EntityPropertyInfo helper methods must be used instead of property_exists() or method_exists() native methods for extended entities.
+
+**Important:** : property_exists() or method_exists() native methods are not working with extended entities.
+
+Before:
+
+```php
+    if(property_exists($extendedEntity, 'extendPropertyName')) {
+    }
+
+    if(method_exists($extendedEntity, 'getExtendMethodName')) {
+    }
+```
+
+After:
+
+```php
+    if(EntityPropertyInfo::propertyExists($extendedEntity, 'extendPropertyName')) {
+    }
+
+    if(EntityPropertyInfo::methodExists($extendedEntity, 'getExtendMethodName')) {
+    }
+```
+
+#### Reflection Usage With Extended Entities 
+
+* For extended entities, use Oro\Bundle\EntityExtendBundle\EntityReflectionClass instead of \ReflectionClass;
+* For extended properties, use Oro\Bundle\EntityExtendBundle\Doctrine\Persistence\Reflection\ReflectionVirtualProperty
+* For extended methods, use Oro\Bundle\EntityExtendBundle\Doctrine\Persistence\Reflection\VirtualReflectionMethod
+
+Before:
+
+```php
+   $reflectionClass = new ReflectionClass($className);
+   $reflectionProperty = new ReflectionProperty($className, 'extendProperty')
+   $reflectionProperty = new ReflectionMethod($className, 'getExtendPropertyMethod')
+```
+
+After:
+
+```php
+    $reflectionClass = new EntityReflectionClass($entity);
+    $reflectionProperty = ReflectionVirtualProperty::create($extendPropertyName);
+    $reflectionMethod = VirtualReflectionMethod::create($objectOrClass, $extendedMethodName);
+```
+
+#### Entity Generators
+
+Instead of entity generators, implement ``Oro\Bundle\EntityExtendBundle\EntityExtend\EntityFieldExtensionInterface``, that allows extending magic methods behavior in runtime.
+
+#### Clone Extend Entity
+
+To copy all the values of the extend entity (together with the virtual fields), call the
+``ExtendEntityTrait->cloneExtendEntityStorage()`` method
+
+#### Activity
+
+Entities need to be extended manually, before ActivityInterface and ExtendActivity (trait) are added at the code
+generation stage in the new implementation. 
+
+Before:
+
+```php
+class Call extends ExtendCall implements DatesAwareInterface
+{
+}
+```
+
+After:
+
+```php
+class Call implements DatesAwareInterface, ActivityInterface, ExtendEntityInterface
+{
+use ExtendActivity;
+use ExtendEntityTrait;
+}
+```
 
 ### Added
 
 #### AttachmentBundle
 * Added `Oro\Bundle\AttachmentBundle\Provider\OriginalFileNameProvider` filename provider that
   uses a sanitized original filename for files if `attachment_original_filenames` feature is enabled.
-  
 * Added `Oro\Bundle\AttachmentBundle\Entity\File::$externalUrl` property to store external file URL.
 * Added `Oro\Bundle\AttachmentBundle\Provider\ExternalUrlProvider` (`oro_attachment.provider.external_url_provider`) that
   returns `Oro\Bundle\AttachmentBundle\Entity\File::$externalUrl` for a file, a resized or a filtered image URL.
@@ -77,7 +273,6 @@ The current file describes significant changes in the code that may affect the u
 *  Added `\Oro\Bundle\LocaleBundle\Cache\Normalizer\LocalizedFallbackValueCollectionNormalizer` and `\Oro\Bundle\LocaleBundle\Cache\Normalizer\LocalizedFallbackValueNormalizer` for using when caching complex structures
 
 #### MigrationBundle
-
 * For better data consistency and more valid testing scenarios, data fixtures are now validated during ORM demo data load, and Behat fixtures load.
 
 #### SearchBundle
@@ -123,6 +318,15 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+* Updated from `slick-carousel: 1.7.1` to fork `@oroinc/slick-carousel: 1.7.1-oro1` with patched internal `postSlide` method
+* Updated path of styles from `~slick-carousel/slick/slick.scss` to `~@oroinc/slick-carousel/slick/slick.scss`
+  and path of js from `slick-carousel/slick/slick` to `@oroinc/slick-carousel/slick/slick`
+
+#### TestUtils component
+* Moved all ORM relates mocks and test cases to `Testing` component.
+  Old namespace for these classes was `Oro\Component\TestUtils\ORM`.
+  New namespace is `Oro\Component\Testing\Unit\ORM`.
+
 #### ApiBundle
 * The parameter `throwException` was removed from the method `convertToEntityType`
   of `Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil`. Use the `tryConvertToEntityType` method
@@ -135,16 +339,15 @@ The current file describes significant changes in the code that may affect the u
 * Changed configuration option `disable_babel` (`true` by default) to `with_babel` (`false` by default).
 
 #### AttachmentBundle
-
-  * Changed `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type to `?\SplFileInfo`
-    to allow `Oro\Bundle\AttachmentBundle\Model\ExternalFile`. Methods `setFile` and `getFile` are changed correspondingly.
-  * Changed `Oro\Bundle\AttachmentBundle\Manager\FileManager::getFileFromFileEntity` return type to `?\SplFileInfo`
-    to comply with `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type.
-  * Changed `Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper::getFieldLabel` visibility to public,
-    so it can be used for getting human-readable field names during import.
-  * Changed `Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener` constructor, so it expects
-    `Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator $fileManipulator`
-    instead of `$fileManager`, also the `$authorizationChecker` argument is removed.
+* Changed `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type to `?\SplFileInfo`
+  to allow `Oro\Bundle\AttachmentBundle\Model\ExternalFile`. Methods `setFile` and `getFile` are changed correspondingly.
+* Changed `Oro\Bundle\AttachmentBundle\Manager\FileManager::getFileFromFileEntity` return type to `?\SplFileInfo`
+  to comply with `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type.
+* Changed `Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper::getFieldLabel` visibility to public,
+  so it can be used for getting human-readable field names during import.
+* Changed `Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener` constructor, so it expects
+  `Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator $fileManipulator`
+  instead of `$fileManager`, also the `$authorizationChecker` argument is removed.
 
 #### DataGridBundle
 * The `iconHideText` option for `action-launcher` and `dropdown-select-choice-launcher` views was removed, use the `launcherMode` option instead.
@@ -187,7 +390,6 @@ The current file describes significant changes in the code that may affect the u
 * Added the bundle itself to `oro/platform` package. The bundle came from outer package `oro/redis-config` and it was rebuilt to utilize Symfony redis configuration components instead of once from 3rd party package `snc/redis-bundle`.
 
 #### UIBundle
-
 * `oroui/js/app/components/viewport-component` has been changed options from `viewport: {maxScreenType: 'tablet'}` or `viewport: {minScreenType: 'tablet'}` to `viewport: 'tablet'`
 - As a result, you need to update your `html`:
 
@@ -311,7 +513,6 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 * `title_fields` field from `search.yml` field has been removed
 
 #### UIBundle
-
 * CSSVariable parser `oroui/js/css-variables-manager` has been removed.
 * CSSVariable module `oroui/js/app/modules/css-variable-module` has been removed.
 * Removed `oroui/js/app/views/swipeable-view`, use `oroui/js/app/modules/swipeable-module` instead.

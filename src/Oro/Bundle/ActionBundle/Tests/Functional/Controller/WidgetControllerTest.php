@@ -7,13 +7,14 @@ use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\ActionBundle\Tests\Functional\Stub\ButtonProviderExtensionStub;
 use Oro\Bundle\ActionBundle\Tests\Functional\Stub\ButtonStub;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class WidgetControllerTest extends WebTestCase
 {
@@ -26,8 +27,7 @@ class WidgetControllerTest extends WebTestCase
     /** @var PhpArrayConfigCacheModifier */
     private $configModifier;
 
-    /** @var PropertyAccessor */
-    private $propertyAccessor;
+    protected ?PropertyAccessorInterface $propertyAccessor = null;
 
     protected function setUp(): void
     {
@@ -284,10 +284,10 @@ class WidgetControllerTest extends WebTestCase
             ->find($id);
     }
 
-    private function getPropertyAccessor(): PropertyAccessor
+    private function getPropertyAccessor(): PropertyAccessorInterface
     {
         if (!$this->propertyAccessor) {
-            $this->propertyAccessor = new PropertyAccessor();
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }
 
         return $this->propertyAccessor;

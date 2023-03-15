@@ -4,20 +4,23 @@ namespace Oro\Bundle\AddressBundle\Form\DataTransformer;
 
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * Address same transformer.
+ */
 class AddressSameTransformer implements DataTransformerInterface
 {
     /** @var array */
     private $fields = [];
 
-    /** @var PropertyAccessor */
+    /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
     /** @var array */
     private $ids = [];
 
-    public function __construct(PropertyAccessor $propertyAccessor, array $fields)
+    public function __construct(PropertyAccessorInterface $propertyAccessor, array $fields)
     {
         $this->propertyAccessor = $propertyAccessor;
         $this->fields = $fields;

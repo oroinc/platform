@@ -3,9 +3,12 @@
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\TestFrameworkBundle\Model\ExtendTestActivity;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -39,8 +42,14 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class TestActivity extends ExtendTestActivity implements TestFrameworkEntityInterface
+class TestActivity implements
+    TestFrameworkEntityInterface,
+    ActivityInterface,
+    ExtendEntityInterface
 {
+    use ExtendActivity;
+    use ExtendEntityTrait;
+
     /**
      * @var integer
      *

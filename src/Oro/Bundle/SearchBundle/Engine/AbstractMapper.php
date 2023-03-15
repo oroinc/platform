@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\SearchBundle\Exception\TypeCastingException;
 use Oro\Bundle\SearchBundle\Handler\TypeCast\TypeCastingHandlerRegistry;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
@@ -40,7 +41,8 @@ abstract class AbstractMapper
     {
         if (is_object($objectOrArray)) {
             $getter = sprintf('get%s', $fieldName);
-            if (method_exists($objectOrArray, $getter)) {
+            if (EntityPropertyInfo::methodExists($objectOrArray, $getter)) {
+                $getter = EntityPropertyInfo::getMatchedMethod($objectOrArray::class, $getter);
                 return $objectOrArray->$getter();
             }
         }

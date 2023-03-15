@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
+/**
+ * Helper for transition event trigger.
+ */
 class TransitionEventTriggerHelper
 {
     const TRIGGER_ENTITY = 'entity';
@@ -64,7 +67,7 @@ class TransitionEventTriggerHelper
     {
         $relation = $trigger->getRelation();
         if ($relation) {
-            $propertyAccessor = new PropertyAccessor();
+            $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
             $mainEntity = $propertyAccessor->getValue($entity, $trigger->getRelation());
         } else {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\IntegrationBundle\Entity\FieldsChanges;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class FieldsChangesTest extends \PHPUnit\Framework\TestCase
 {

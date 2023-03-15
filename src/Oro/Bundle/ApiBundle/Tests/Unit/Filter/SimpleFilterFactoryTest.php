@@ -7,13 +7,10 @@ use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SimpleFilterFactory */
-    private $filterFactory;
-
     private function getFilterFactory(
         array $filters = [],
         array $filterFactories = [],
@@ -30,10 +27,10 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
             $filters,
             $filterFactories,
             $factoryContainer,
-            new PropertyAccessor(),
+            PropertyAccess::createPropertyAccessor(),
             new FilterOperatorRegistry([
-                FilterOperator::EQ  => '=',
-                FilterOperator::NEQ => '!='
+                FilterOperator::EQ => '=',
+                FilterOperator::NEQ => '!=',
             ])
         );
     }

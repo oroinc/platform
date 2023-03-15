@@ -3,8 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\ExtendTestOverrideClassActivity;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
@@ -16,8 +19,14 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
  *     }
  * )
  */
-class TestOverrideClassActivity extends ExtendTestOverrideClassActivity implements TestFrameworkEntityInterface
+class TestOverrideClassActivity implements
+    TestFrameworkEntityInterface,
+    ActivityInterface,
+    ExtendEntityInterface
 {
+    use ExtendActivity;
+    use ExtendEntityTrait;
+
     /**
      * @var int
      *

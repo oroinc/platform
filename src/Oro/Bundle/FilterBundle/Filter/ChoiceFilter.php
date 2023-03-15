@@ -13,7 +13,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 class ChoiceFilter extends AbstractFilter
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getFormType()
     {
@@ -21,7 +21,7 @@ class ChoiceFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function init($name, array $params)
     {
@@ -32,7 +32,7 @@ class ChoiceFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
@@ -59,11 +59,11 @@ class ChoiceFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMetadata()
     {
-        $formView = $this->getForm()->createView();
+        $formView = $this->getFormView();
         $fieldView = $formView->children['value'];
 
         $choices = array_map(
@@ -113,7 +113,7 @@ class ChoiceFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function parseData($data)

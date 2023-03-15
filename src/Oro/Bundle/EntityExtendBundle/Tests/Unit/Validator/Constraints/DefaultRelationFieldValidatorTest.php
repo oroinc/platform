@@ -9,12 +9,12 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\DefaultRelationField;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\DefaultRelationFieldValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class DefaultRelationFieldValidatorTest extends ConstraintValidatorTestCase

@@ -12,6 +12,7 @@ use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Proxy\ProxyFactory;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Utility\IdentifierFlattener;
+use Doctrine\Persistence\Mapping\ReflectionService;
 use Oro\Bundle\EntityBundle\ORM\Event\PreClearEventArgs;
 use Oro\Bundle\EntityBundle\ORM\Event\PreCloseEventArgs;
 
@@ -80,6 +81,11 @@ class OroEntityManager extends EntityManager
             $this->getPrivateIdentifierFlattener(UnitOfWork::class, $this->getUnitOfWork()),
             $metadataFactory
         );
+    }
+
+    public function setMetadataReflectionService(ReflectionService $reflectionService): void
+    {
+        $this->getMetadataFactory()->setReflectionService($reflectionService);
     }
 
     /**

@@ -7,9 +7,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Model\ExtendGroup;
 
 /**
  * User group entity
@@ -43,8 +44,10 @@ use Oro\Bundle\UserBundle\Model\ExtendGroup;
  *      }
  * )
  */
-class Group extends ExtendGroup
+class Group implements ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer", name="id")
@@ -102,8 +105,6 @@ class Group extends ExtendGroup
      */
     public function __construct($name = '')
     {
-        parent::__construct();
-
         $this->name  = $name;
         $this->roles = new ArrayCollection();
     }

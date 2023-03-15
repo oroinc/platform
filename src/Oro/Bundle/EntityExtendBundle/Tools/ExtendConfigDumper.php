@@ -9,7 +9,9 @@ use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
@@ -153,6 +155,9 @@ class ExtendConfigDumper
         foreach ($extendConfigs as $extendConfig) {
             $schema    = $extendConfig->get('schema');
             $className = $extendConfig->getId()->getClassName();
+            if (!str_contains($className, ExtendClassLoadingUtils::getEntityNamespace())) {
+                continue;
+            }
 
             if ($schema) {
                 $schemas[$className]                 = $schema;
@@ -229,7 +234,7 @@ class ExtendConfigDumper
             if (isset($schema['type'], $schema['class'], $schema['entity']) && $schema['type'] === 'Extend') {
                 $entityClassName = $schema['entity'];
                 $parentClassName = get_parent_class($schema['class']);
-                if ($parentClassName !== $entityClassName) {
+                if (false !== $parentClassName && $parentClassName !== $entityClassName) {
                     $inheritClassName = get_parent_class($parentClassName);
 
                     $hasSchemaChanges = false;
@@ -394,10 +399,10 @@ class ExtendConfigDumper
                 ];
             }
         } else {
-            $type                  = 'Extend';
-            $entityName            = $extendConfig->get('extend_class');
+            $type = 'Extend';
+            $entityName = $className;
             $doctrine[$entityName] = [
-                'type'   => 'mappedSuperclass',
+                'type'   => 'entity',
                 'fields' => [],
             ];
         }
@@ -412,7 +417,7 @@ class ExtendConfigDumper
             ? $configProvider->getConfigs($className, true)
             : $configProvider->filter($filter, $className, true);
         $reflectionEntityClass = class_exists($entityName)
-            ? new \ReflectionClass($entityName)
+            ? new EntityReflectionClass($entityName)
             : null;
         foreach ($fieldConfigs as $fieldConfig) {
             $this->updateFieldState($fieldConfig);
@@ -482,7 +487,7 @@ class ExtendConfigDumper
                 $parentClassName = $aliases[$entityName];
             }
             $schema['parent']  = $parentClassName;
-            $schema['inherit'] = class_exists($className) ? get_parent_class($parentClassName): false;
+            $schema['inherit'] = class_exists($parentClassName) ? get_parent_class($parentClassName): false;
         } elseif ($extendConfig->has('inherit')) {
             $schema['inherit'] = $extendConfig->get('inherit');
         }
@@ -569,6 +574,20 @@ class ExtendConfigDumper
                     $config->set($code, ExtendHelper::updatedPendingValue($config->get($code), $value));
                 }
                 $this->configManager->persist($config);
+            }
+        }
+    }
+
+    public function validateExtendEntityConfig(): void
+    {
+        $extendConfigs = $this->configManager->getProvider('extend')->getConfigs(null, true);
+        foreach ($extendConfigs as $extendConfig) {
+            $schema = $extendConfig->get('schema');
+            $className = $extendConfig->getId()->getClassName();
+            if (isset($schema['type']) && 'Extend' === $schema['type'] && !ExtendHelper::isExtendEntity($className)) {
+                throw new \LogicException(
+                    'Extend class "' . $className . '"should implements ' . ExtendEntityInterface::class
+                );
             }
         }
     }

@@ -29,13 +29,6 @@ services:
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
-    oro_activity.entity_generator.extension:
-        class: Oro\Bundle\ActivityBundle\Tools\ActivityEntityGeneratorExtension
-        arguments:
-            - '@oro_entity_config.provider.grouping'
-        tags:
-            - { name: oro_entity_extend.entity_generator_extension }
-
     oro_activity.migration.extension.activity:
         class: Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
         tags:

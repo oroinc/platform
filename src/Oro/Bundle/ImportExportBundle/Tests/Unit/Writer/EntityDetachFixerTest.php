@@ -9,9 +9,9 @@ use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Writer\Stub\EntityStub;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
 {

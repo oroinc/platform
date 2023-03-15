@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener;
 use Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class DoctrineListenerTest extends OrmTestCase
 {
@@ -211,13 +211,6 @@ class DoctrineListenerTest extends OrmTestCase
                             'child' => $prefix . 'InheritedWithMSInTheMiddle\ChildEntity'
                         ]
                     ],
-                    $prefix . 'InheritedWithMSInTheMiddle\ExtendedChildEntity' => [
-                        null,
-                        [
-                            'base' => $prefix . 'InheritedWithMSInTheMiddle\BaseEntity',
-                            'child' => $prefix . 'InheritedWithMSInTheMiddle\ChildEntity'
-                        ]
-                    ]
                 ]
             ],
             'inherited entities, should raise duplicate exception' => [

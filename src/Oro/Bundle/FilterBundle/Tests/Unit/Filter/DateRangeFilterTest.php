@@ -16,8 +16,9 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -58,7 +59,7 @@ class DateRangeFilterTest extends OrmTestCase
 
     public function testGetForm()
     {
-        $form = $this->createMock(DateRangeFilterType::class);
+        $form = $this->createMock(FormInterface::class);
 
         $this->formFactory->expects(self::once())
             ->method('create')

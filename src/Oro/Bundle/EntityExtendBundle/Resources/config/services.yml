@@ -9,6 +9,35 @@ services:
     # and Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass
     oro_entity_extend.orm.metadata_factory:
         class: Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory
+        calls:
+            - [ 'setMappingDriver', [ '@doctrine.orm.entity_manager', '@oro_entity_extend.orm.mapping_driver' ] ]
+
+    oro_entity_extend.orm.mapping_driver:
+        class: Oro\Bundle\EntityExtendBundle\Tools\YamlDriver
+        lazy: true
+        arguments:
+            - "@oro_entity_config.config_manager"
+
+    oro_entity_extend.orm.metadata_reflection_service:
+        class: Oro\Bundle\EntityExtendBundle\Doctrine\Persistence\Mapping\VirtualPropertyRuntimeReflectionService
+
+    oro_entity_extend.entity_field_iterator:
+        public: true
+        class: Oro\Bundle\EntityExtendBundle\EntityExtend\EntityFieldIterator
+        arguments:
+            - !tagged_iterator { tag: 'oro_entity_extend.entity_field_extension' }
+
+    oro_entity_extend.entity_metadata_provider:
+        public: true
+        class: Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendEntityMetadataProvider
+        arguments:
+            - "@oro_entity_config.config_manager"
+            - '@oro_entity.doctrine_helper'
+
+    oro_entity_extend.entity_field.extension:
+        class: Oro\Bundle\EntityExtendBundle\EntityExtend\EntityFieldExtension
+        tags:
+            - { name: 'oro_entity_extend.entity_field_extension', priority: 110 }
 
     oro_entity_extend.entity.cache.warmer:
         public: true
@@ -715,6 +744,14 @@ services:
             - '@doctrine'
             - '@logger'
 
+    oro_entity_extend.duplicator_filter_type.storage:
+        class: 'Oro\Component\Duplicator\ObjectType'
+        arguments:
+            - extend_storage
+            - Oro\Bundle\EntityExtendBundle\Duplicator\Filter\StorageFilter
+        tags:
+            - { name: oro_action.duplicate.filter_type }
+
     Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendEntityConfiguration:
         tags:
             - oro_entity_config.validation.entity_config
@@ -738,3 +775,12 @@ services:
     Oro\Bundle\EntityExtendBundle\EntityConfig\SearchFieldConfiguration:
         tags:
             - oro_entity_config.validation.entity_config
+
+    oro_entity_extend.accessor.property_accessor_with_dot_array_syntax:
+        class: 'Oro\Bundle\EntityExtendBundle\EntityExtend\PropertyAccessorWithDotArraySyntax'
+        factory: [ 'Oro\Bundle\EntityExtendBundle\PropertyAccess', createPropertyAccessorWithDotSyntax ]
+
+    oro_entity_extend.twig.extension.get_attribute_node_extension:
+        class: Oro\Bundle\EntityExtendBundle\Twig\GetAttributeNodeExtension
+        tags:
+            - { name: twig.extension }

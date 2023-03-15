@@ -8,9 +8,9 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Provides attachments linked to an entity.

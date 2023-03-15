@@ -204,6 +204,11 @@ services:
         tags:
           - { name: oro.api.query.comparison_expression, operator: 'NOT_ENDS_WITH' }
 
+    oro_api.query.comparison_expression.empty_value:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EmptyValueComparisonExpression
+        tags:
+            - { name: oro.api.query.comparison_expression, operator: 'EMPTY_VALUE' }
+
     oro_api.query.comparison_expression.nested_tree:
         class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NestedTreeComparisonExpression
         arguments:

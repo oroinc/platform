@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\PlatformBundle\Validator\Constraints;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validate date earlier than.
+ */
 class DateEarlierThanValidator extends ConstraintValidator
 {
     /**

@@ -5,10 +5,12 @@ namespace Oro\Bundle\ReportBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
-use Oro\Bundle\ReportBundle\Model\ExtendReport;
 
 /**
  * Holds report configuration.
@@ -39,8 +41,10 @@ use Oro\Bundle\ReportBundle\Model\ExtendReport;
  *      }
  * )
  */
-class Report extends ExtendReport implements GridQueryDesignerInterface
+class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface, ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     const GRID_PREFIX = 'oro_report_table_';
 
     /**
@@ -143,6 +147,7 @@ class Report extends ExtendReport implements GridQueryDesignerInterface
         $this->id = null;
         $this->createdAt = null;
         $this->updatedAt = null;
+        $this->cloneExtendEntityStorage();
     }
 
     /**

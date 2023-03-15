@@ -6,8 +6,11 @@ define(function(require) {
         require('oroform/js/app/views/validation-message-handler/abstract-validation-message-handler-view');
 
     const InputValidationMessageHandlerView = AbstractValidationMessageHandlerView.extend({
+        useMessageLabelWidth: false,
+
         events: {
-            'validate-element': 'onValidateElement'
+            'validate-element': 'onUpdate',
+            'focus': 'onUpdate'
         },
 
         /**
@@ -18,22 +21,31 @@ define(function(require) {
         },
 
         isActive() {
-            return this.$el.hasClass('error');
+            return this.$el.hasClass('error') && this.$el.is(':focus');
+        },
+
+        onUpdate() {
+            this.active = this.isActive();
+
+            this.update();
         },
 
         getPopperReferenceElement() {
             return this.$el;
         },
 
-        onValidateElement() {
-            this.label.hide();
+        update() {
+            InputValidationMessageHandlerView.__super__.update.call(this);
+
+            this.label.addClass('hide');
         },
 
-
         render() {
-            this.label.show();
+            InputValidationMessageHandlerView.__super__.render.call(this);
 
-            return InputValidationMessageHandlerView.__super__.render.call(this);
+            this.update();
+
+            return this;
         },
 
         dispose() {
@@ -41,7 +53,7 @@ define(function(require) {
                 return;
             }
 
-            this.label.show();
+            this.label.removeClass('hide');
 
             InputValidationMessageHandlerView.__super__.dispose.call(this);
         }

@@ -29,4 +29,11 @@ use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
  */
 class TestEnumValue extends AbstractEnumValue implements ExtendEntityInterface
 {
+    public function get(string $name): mixed
+    {
+    }
+
+    public function set(string $name, mixed $value): static
+    {
+    }
 }

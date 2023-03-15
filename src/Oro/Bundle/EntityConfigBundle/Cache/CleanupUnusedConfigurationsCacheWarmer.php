@@ -64,7 +64,7 @@ class CleanupUnusedConfigurationsCacheWarmer implements CacheWarmerInterface
     private function getUnusedEntityConfigurations(): array
     {
         return [
-            'extend' => ['origin'],
+            'extend' => ['origin', 'extend_class'],
             'entity' => ['totals_mapping']
         ];
     }
