@@ -6,6 +6,7 @@ define(function(require) {
     const __ = require('orotranslation/js/translator');
     const BaseView = require('oroui/js/app/views/base/view');
     const routing = require('routing');
+    const urlHelper = require('orodatagrid/js/url-helper');
     require('bootstrap');
 
     const ShortcutsView = BaseView.extend({
@@ -165,7 +166,7 @@ define(function(require) {
                 process(this.cache[query]);
                 this.render();
             } else {
-                const url = routing.generate(this.sourceUrl, {query: query});
+                const url = routing.generate(this.sourceUrl, {query: urlHelper.encodeURI(query)});
                 $.get(url, data => {
                     this.data = data;
                     const result = [];
