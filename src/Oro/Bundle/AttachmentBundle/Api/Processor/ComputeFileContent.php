@@ -37,11 +37,12 @@ class ComputeFileContent implements ProcessorInterface
 
         $data = $context->getData();
 
-        if (!$context->isFieldRequested(self::CONTENT_FIELD_NAME, $data)) {
+        if (!$context->isFieldRequested(self::CONTENT_FIELD_NAME, $data) || $this->isExternalFile($context)) {
             return;
         }
 
         $fileNameFieldName = $context->getResultFieldName('filename');
+
         if (!$fileNameFieldName || empty($data[$fileNameFieldName])) {
             return;
         }
@@ -69,5 +70,13 @@ class ComputeFileContent implements ProcessorInterface
         }
 
         return $content;
+    }
+
+    private function isExternalFile(ContextInterface $context): bool
+    {
+        $externalUrlFieldName = $context->getResultFieldName('externalUrl');
+        $data = $context->getData();
+
+        return $externalUrlFieldName && !empty($data[$externalUrlFieldName]);
     }
 }

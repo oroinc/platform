@@ -54,7 +54,7 @@ class DocumentationTest extends RestJsonApiTestCase
 
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         $expectedData = $this->loadYamlData('simple_data_types.yml', 'documentation');
-        self::assertArrayContains($expectedData, $resourceData);
+        self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
     }
 
     /**
@@ -98,7 +98,7 @@ class DocumentationTest extends RestJsonApiTestCase
 
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         $expectedData = $this->loadYamlData('simple_data_types_filters.yml', 'documentation');
-        self::assertArrayContains($expectedData, $resourceData);
+        self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
     }
 
     /**
@@ -111,7 +111,7 @@ class DocumentationTest extends RestJsonApiTestCase
 
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         $expectedData = $this->loadYamlData('associations.yml', 'documentation');
-        self::assertArrayContains($expectedData, $resourceData);
+        self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
     }
 
     /**
@@ -124,7 +124,7 @@ class DocumentationTest extends RestJsonApiTestCase
 
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         $expectedData = $this->loadYamlData('filters.yml', 'documentation');
-        self::assertArrayContains($expectedData, $resourceData);
+        self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
     }
 
     /**
@@ -189,12 +189,13 @@ class DocumentationTest extends RestJsonApiTestCase
         $expectedData = $this->loadYamlData('filters.yml', 'documentation');
         unset(
             $expectedData['filters']['meta'],
-            $expectedData['filters']['include'],
-            $expectedData['filters']['fields[businessunits]']
+            $expectedData['filters']['include']
         );
-        self::assertArrayContains($expectedData, $resourceData);
-        self::assertArrayNotHasKey('meta', $resourceData['filters']);
-        self::assertArrayNotHasKey('include', $resourceData['filters']);
-        self::assertArrayNotHasKey('fields[businessunits]', $resourceData['filters']);
+        foreach ($expectedData['filters'] as $key => $val) {
+            if (str_starts_with($key, 'fields[')) {
+                unset($expectedData['filters'][$key]);
+            }
+        }
+        self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
     }
 }

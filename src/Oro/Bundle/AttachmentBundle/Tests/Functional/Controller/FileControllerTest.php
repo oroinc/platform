@@ -63,12 +63,16 @@ class FileControllerTest extends WebTestCase
     {
         $file = $this->getReference(LoadFileData::FILE_1);
         $url = self::getContainer()->get(FileUrlProviderInterface::class)
-            ->getFileUrl($file, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD);
+                   ->getFileUrl($file, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
         self::assertResponseContentTypeEquals($result, 'application/force-download');
-        self::assertResponseHeader($result, 'Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store, private');
+        self::assertResponseHeader(
+            $result,
+            'Cache-Control',
+            'max-age=-172800, must-revalidate, no-cache, no-store, private'
+        );
         self::assertResponseHeader($result, 'Content-Disposition', 'attachment');
         self::assertResponseHeader($result, 'Content-Length', $file->getFileSize());
         self::assertResponseStatusCodeEquals($result, 200);
@@ -78,12 +82,16 @@ class FileControllerTest extends WebTestCase
     {
         $file = $this->getReference(LoadFileData::FILE_2);
         $url = self::getContainer()->get(FileUrlProviderInterface::class)
-            ->getFileUrl($file, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD);
+                   ->getFileUrl($file, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
         self::assertResponseContentTypeEquals($result, 'application/force-download');
-        self::assertResponseHeader($result, 'Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store, private');
+        self::assertResponseHeader(
+            $result,
+            'Cache-Control',
+            'max-age=-172800, must-revalidate, no-cache, no-store, private'
+        );
         self::assertResponseHeader(
             $result,
             'Content-Disposition',
@@ -98,11 +106,15 @@ class FileControllerTest extends WebTestCase
         /** @var File $file */
         $file = $this->getReference(LoadFileData::FILE_1);
         $url = self::getContainer()->get(FileUrlProviderInterface::class)
-            ->getFileUrl($file, FileUrlProviderInterface::FILE_ACTION_GET);
+                   ->getFileUrl($file, FileUrlProviderInterface::FILE_ACTION_GET);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         self::assertResponseContentTypeEquals($result, 'text/plain; charset=UTF-8');
-        self::assertResponseHeader($result, 'Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store, private');
+        self::assertResponseHeader(
+            $result,
+            'Cache-Control',
+            'max-age=-172800, must-revalidate, no-cache, no-store, private'
+        );
         self::assertResponseHeader($result, 'Content-Length', $file->getFileSize());
         self::assertResponseStatusCodeEquals($result, 200);
     }
@@ -150,7 +162,7 @@ class FileControllerTest extends WebTestCase
         /** @var File $file */
         $file = $this->getReference(LoadImageData::IMAGE_JPG);
         $url = self::getContainer()->get(FileUrlProviderInterface::class)
-            ->getResizedImageUrl($file, 42, 142, '');
+                   ->getResizedImageUrl($file, 42, 142, '');
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
@@ -163,7 +175,7 @@ class FileControllerTest extends WebTestCase
         /** @var File $file */
         $file = $this->getReference(LoadImageData::IMAGE_JPG);
         $url = self::getContainer()->get(FileUrlProviderInterface::class)
-            ->getResizedImageUrl($file, 42, 142, 'webp');
+                   ->getResizedImageUrl($file, 42, 142, 'webp');
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
@@ -238,7 +250,7 @@ class FileControllerTest extends WebTestCase
         /** @var File $file */
         $file = $this->getReference(LoadImageData::IMAGE_JPG);
         $url = self::getContainer()->get(FileUrlProviderInterface::class)
-            ->getFilteredImageUrl($file, 'original', '');
+                   ->getFilteredImageUrl($file, 'original', '');
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
@@ -251,7 +263,7 @@ class FileControllerTest extends WebTestCase
         /** @var File $file */
         $file = $this->getReference(LoadImageData::IMAGE_JPG);
         $url = self::getContainer()->get(FileUrlProviderInterface::class)
-            ->getFilteredImageUrl($file, 'original', 'webp');
+                   ->getFilteredImageUrl($file, 'original', 'webp');
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
@@ -271,7 +283,7 @@ class FileControllerTest extends WebTestCase
         /** @var File $file */
         $file = $this->getReference(LoadImageData::IMAGE_JPG);
         $url = self::getContainer()->get(FileUrlProviderInterface::class)
-            ->getFilteredImageUrl($file, $filterName);
+                   ->getFilteredImageUrl($file, $filterName);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
@@ -291,7 +303,7 @@ class FileControllerTest extends WebTestCase
         /** @var File $file */
         $file = $this->getReference(LoadImageData::IMAGE_JPG);
         $url = self::getContainer()->get(FileUrlProviderInterface::class)
-            ->getFilteredImageUrl($file, $filterName, 'webp');
+                   ->getFilteredImageUrl($file, $filterName, 'webp');
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 

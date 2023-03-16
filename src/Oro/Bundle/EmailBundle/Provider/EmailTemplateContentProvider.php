@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Exception\EmailTemplateCompilationException;
@@ -14,6 +15,7 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Twig\Error\Error;
 
 /**
@@ -33,6 +35,10 @@ class EmailTemplateContentProvider
     /** @var LoggerInterface */
     private $logger;
 
+    private ?TranslatableListener $translatableListener;
+    private ?LocaleAwareInterface $translator;
+    private ?string $previousLocale;
+
     public function __construct(
         ManagerRegistry $doctrine,
         EmailRenderer $emailRenderer,
@@ -43,6 +49,16 @@ class EmailTemplateContentProvider
         $this->emailRenderer = $emailRenderer;
         $this->propertyAccessor = $propertyAccessor;
         $this->logger = $logger;
+    }
+
+    public function setTranslatableListener(TranslatableListener $translatableListener): void
+    {
+        $this->translatableListener = $translatableListener;
+    }
+
+    public function setTranslator(LocaleAwareInterface $translator): void
+    {
+        $this->translator = $translator;
     }
 
     /**
@@ -68,6 +84,7 @@ class EmailTemplateContentProvider
         }
 
         $emailTemplateModel = $this->getLocalizedModel($emailTemplateEntity, $localization);
+        $this->setLocalization($localization);
 
         try {
             [$subject, $content] = $this->emailRenderer->compileMessage($emailTemplateModel, $templateParams);
@@ -83,8 +100,9 @@ class EmailTemplateContentProvider
                 ),
                 ['exception' => $exception]
             );
-
             throw new EmailTemplateCompilationException($criteria);
+        } finally {
+            $this->restoreLocalization();
         }
 
         return $emailTemplateModel;
@@ -172,5 +190,19 @@ class EmailTemplateContentProvider
         }
 
         return null;
+    }
+
+    private function setLocalization(Localization $localization): void
+    {
+        $this->previousLocale = $localization->getLanguageCode();
+        $this->translatableListener->setTranslatableLocale($this->previousLocale);
+        $this->translator->setLocale($this->previousLocale);
+    }
+
+    private function restoreLocalization(): void
+    {
+        $this->translatableListener->setTranslatableLocale($this->previousLocale);
+        $this->translator->setLocale($this->previousLocale);
+        $this->previousLocale = null;
     }
 }

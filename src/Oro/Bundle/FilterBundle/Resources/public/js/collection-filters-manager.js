@@ -1,10 +1,10 @@
-define([
-    'underscore',
-    'oroui/js/tools',
-    'orofilter/js/filters-manager',
-    'oroui/js/mediator'
-], function(_, tools, FiltersManager, mediator) {
+define(function(require) {
     'use strict';
+
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const FiltersManager = require('orofilter/js/filters-manager');
+    const mediator = require('oroui/js/mediator');
 
     /**
      * View that represents all grid filters
@@ -87,16 +87,6 @@ define([
         },
 
         /**
-         * Triggers when filter select is changed
-         *
-         * @protected
-         */
-        _onChangeFilterSelect: function(filters) {
-            CollectionFiltersManager.__super__._onChangeFilterSelect.call(this, filters);
-            this._updateView();
-        },
-
-        /**
          * Triggers update filter state
          *
          * @protected
@@ -105,6 +95,11 @@ define([
             this.trigger('update-view:before-fetch');
             this.collection.state.currentPage = 1;
             this.collection.fetch({reset: true});
+        },
+
+        _onChangeFilterSelect(filters) {
+            CollectionFiltersManager.__super__._onChangeFilterSelect.call(this, filters);
+            this.collection.updateState({filters: this._createState()});
         },
 
         /**

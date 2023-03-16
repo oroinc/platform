@@ -27,7 +27,7 @@ class UpdtaeExpiredStatusQuery extends ParametrizedMigrationQuery
     public function getDescription()
     {
         $logger = new ArrayLogger();
-        $logger->info('Update expired user auth_status.');
+        $logger->info('Updates Expired user auth_status to Reset.');
         $this->doExecute($logger, true);
 
         return $logger->getMessages();
@@ -43,18 +43,23 @@ class UpdtaeExpiredStatusQuery extends ParametrizedMigrationQuery
 
     private function doExecute(LoggerInterface $logger, $dryRun = false): void
     {
-        $sql = 'UPDATE %s SET id = :id, name = :name WHERE id = :old_id';
-        $sql = sprintf($sql, $this->extendExtension->getNameGenerator()->generateEnumTableName('auth_status'));
+        $authStatusTableName = $this->extendExtension->getNameGenerator()->generateEnumTableName('auth_status');
 
+        $sql = sprintf(
+            'INSERT INTO %s (id, name, priority, is_default) VALUES (:id, :name, :priority, :is_default)',
+            $authStatusTableName
+        );
         $status = [
             ':id' => UserManager::STATUS_RESET,
             ':name' => 'Reset',
-            ':old_id' => 'expired'
+            ':priority' => 2,
+            ':is_default' => false
         ];
         $types = [
             'id' => Types::STRING,
             'name' => Types::STRING,
-            'old_id' => Types::STRING,
+            'priority' => Types::INTEGER,
+            'is_default' => Types::BOOLEAN
         ];
         $this->logQuery($logger, $sql, $status, $types);
         if (!$dryRun) {
@@ -62,14 +67,16 @@ class UpdtaeExpiredStatusQuery extends ParametrizedMigrationQuery
         }
 
         $sql = 'UPDATE oro_user SET auth_status_id = :id WHERE auth_status_id = :old_id';
-        $status = [
-            ':id' => UserManager::STATUS_RESET,
-            ':old_id' => 'expired'
-        ];
-        $types = [
-            'id' => Types::STRING,
-            'old_id' => Types::STRING,
-        ];
+        $status = [':id' => UserManager::STATUS_RESET, ':old_id' => 'expired'];
+        $types = ['id' => Types::STRING, 'old_id' => Types::STRING];
+        $this->logQuery($logger, $sql, $status, $types);
+        if (!$dryRun) {
+            $this->connection->executeStatement($sql, $status, $types);
+        }
+
+        $sql = sprintf('DELETE FROM %s WHERE id = :id', $authStatusTableName);
+        $status = [':id' => 'expired'];
+        $types = ['id' => Types::STRING];
         $this->logQuery($logger, $sql, $status, $types);
         if (!$dryRun) {
             $this->connection->executeStatement($sql, $status, $types);

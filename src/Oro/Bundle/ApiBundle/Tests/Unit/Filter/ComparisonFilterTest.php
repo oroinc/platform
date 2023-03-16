@@ -126,7 +126,8 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
             FilterOperator::STARTS_WITH,
             FilterOperator::NOT_STARTS_WITH,
             FilterOperator::ENDS_WITH,
-            FilterOperator::NOT_ENDS_WITH
+            FilterOperator::NOT_ENDS_WITH,
+            FilterOperator::EMPTY_VALUE
         ];
 
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
@@ -310,6 +311,20 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
                 false,
                 new FilterValue('path', 'value', FilterOperator::NOT_ENDS_WITH),
                 new Comparison('fieldName', 'NOT_ENDS_WITH', new Value('value'))
+            ],
+            'EMPTY_VALUE filter'           => [
+                'fieldName',
+                false,
+                false,
+                new FilterValue('path', true, FilterOperator::EMPTY_VALUE),
+                new Comparison('fieldName', 'EMPTY_VALUE/:integer', new Value(true))
+            ],
+            'NOT EMPTY_VALUE filter'       => [
+                'fieldName',
+                false,
+                false,
+                new FilterValue('path', false, FilterOperator::EMPTY_VALUE),
+                new Comparison('fieldName', 'EMPTY_VALUE/:integer', new Value(false))
             ]
         ];
     }

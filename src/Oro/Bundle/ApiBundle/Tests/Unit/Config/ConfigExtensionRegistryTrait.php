@@ -50,7 +50,8 @@ trait ConfigExtensionRegistryTrait
             FilterOperator::STARTS_WITH     => '^',
             FilterOperator::NOT_STARTS_WITH => '!^',
             FilterOperator::ENDS_WITH       => '$',
-            FilterOperator::NOT_ENDS_WITH   => '!$'
+            FilterOperator::NOT_ENDS_WITH   => '!$',
+            FilterOperator::EMPTY_VALUE     => null
         ]);
         $postProcessorRegistry = $this->createMock(PostProcessorRegistry::class);
         $postProcessorRegistry->expects(self::any())
