@@ -6,15 +6,8 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\Statist
 
 class FilesystemStatisticRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var string
-     */
-    public static $statFile;
-
-    /**
-     * @var string
-     */
-    public static $appDir;
+    public static string $statFile;
+    public static string $appDir;
 
     public static function setUpBeforeClass(): void
     {
@@ -26,22 +19,20 @@ class FilesystemStatisticRepositoryTest extends \PHPUnit\Framework\TestCase
             'path/to/features/3.feature' => 12,
         ];
 
-        file_put_contents(self::$statFile, json_encode($stat));
+        file_put_contents(self::$statFile, json_encode($stat, JSON_THROW_ON_ERROR));
         mkdir(self::$appDir);
     }
 
     /**
      * @dataProvider featureDurationProvider
-     * @param string $feature
-     * @param int $expectedDuration
      */
-    public function testGetFeatureDuration($feature, $expectedDuration)
+    public function testGetFeatureDuration(string $feature, int $expectedDuration)
     {
         $repository = new FilesystemStatisticRepository(self::$appDir);
         $this->assertSame($expectedDuration, $repository->getFeatureDuration($feature));
     }
 
-    public function featureDurationProvider()
+    public function featureDurationProvider(): array
     {
         return [
             ['1.feature', 7], // average time

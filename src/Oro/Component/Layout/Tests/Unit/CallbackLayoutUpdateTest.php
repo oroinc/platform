@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\CallbackLayoutUpdate;
+use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 
@@ -10,7 +11,7 @@ class CallbackLayoutUpdateTest extends \PHPUnit\Framework\TestCase
 {
     public function testInvalidCallbackType()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "callable", "integer" given.');
 
         new CallbackLayoutUpdate(123);
