@@ -17,8 +17,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     private const PERMISSION2 = 'PERMISSION2';
     private const PERMISSION3 = 'PERMISSION3';
 
-    /** @var array */
-    private $permissions = [
+    private array $permissions = [
         self::PERMISSION1 => [
             'label' => 'Label for Permission 1',
             'group_names' => ['frontend'],
@@ -57,11 +56,7 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var string */
-    private $cacheFile;
-
-    /** @var PermissionConfigurationProvider */
-    private $provider;
+    private PermissionConfigurationProvider $provider;
 
     protected function setUp(): void
     {
@@ -74,12 +69,9 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 $bundle2->getName() => get_class($bundle2)
             ]);
 
-        $this->cacheFile = $this->getTempFile('PermissionConfigurationProvider');
+        $cacheFile = $this->getTempFile('PermissionConfigurationProvider');
 
-        $this->provider = new PermissionConfigurationProvider(
-            $this->cacheFile,
-            false,
-        );
+        $this->provider = new PermissionConfigurationProvider($cacheFile, false);
     }
 
     public function testCorrectConfiguration()
