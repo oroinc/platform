@@ -6,36 +6,37 @@ use Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserChain;
 use Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
+use Oro\Component\Testing\ReflectionUtil;
 
 class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorWithInvalidGuesser()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage(
-            'Expected argument of type "Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface"'
-            . ', "stdClass" given'
-        );
+        $this->expectExceptionMessage(sprintf(
+            'Expected argument of type "%s", "stdClass" given',
+            ColumnOptionsGuesserInterface::class
+        ));
         new ColumnOptionsGuesserChain([new \stdClass()]);
     }
 
     public function testConstructorWithInvalidGuesserScalar()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage(
-            'Expected argument of type "Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface"'
-            . ', "string" given'
-        );
+        $this->expectExceptionMessage(sprintf(
+            'Expected argument of type "%s", "string" given',
+            ColumnOptionsGuesserInterface::class
+        ));
         new ColumnOptionsGuesserChain(['test']);
     }
 
     public function testConstructorWithInvalidGuesserNull()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage(
-            'Expected argument of type "Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface"'
-            . ', "NULL" given'
-        );
+        $this->expectExceptionMessage(sprintf(
+            'Expected argument of type "%s", "NULL" given',
+            ColumnOptionsGuesserInterface::class
+        ));
         new ColumnOptionsGuesserChain([null]);
     }
 
@@ -45,19 +46,15 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
         $guesser2 = $this->createMock(ColumnOptionsGuesserInterface::class);
         $guesser3 = $this->createMock(ColumnOptionsGuesserInterface::class);
 
-        $chainGuesser = new class(
-            [
-                $guesser1,
-                new ColumnOptionsGuesserChain([$guesser2, $guesser3])
-            ]
-        ) extends ColumnOptionsGuesserChain {
-            public function xgetGuessers(): array
-            {
-                return $this->guessers;
-            }
-        };
+        $chainGuesser = new ColumnOptionsGuesserChain([
+            $guesser1,
+            new ColumnOptionsGuesserChain([$guesser2, $guesser3])
+        ]);
 
-        self::assertSame([$guesser1, $guesser2, $guesser3], $chainGuesser->xgetGuessers());
+        self::assertSame(
+            [$guesser1, $guesser2, $guesser3],
+            ReflectionUtil::getPropertyValue($chainGuesser, 'guessers')
+        );
     }
 
     public function testGuessFormatter()
@@ -77,9 +74,9 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
 
     public function doTestGuess($guessMethodName)
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
-        $type     = 'integer';
+        $type = 'integer';
 
         $guess1 = new ColumnGuess([], ColumnGuess::LOW_CONFIDENCE);
         $guess2 = new ColumnGuess([], ColumnGuess::HIGH_CONFIDENCE);
