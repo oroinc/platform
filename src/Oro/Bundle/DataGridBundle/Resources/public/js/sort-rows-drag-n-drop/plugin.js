@@ -268,7 +268,9 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Event} e
      */
     onDocumentMouseMove(e) {
-        if (this.disposed) {
+        // There may be a case when the event will be captured by the system or browser extension like screenshot maker.
+        // As result, that event will fire later.
+        if (this.disposed || !this.main.$el.hasClass(this.startDragClass)) {
             return;
         }
 
@@ -735,8 +737,9 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
         if (options.ignoreAnimation) {
             return;
         }
-        this.main.collection .filter(attr)
-            .map(model => this.main.body.rows.find(row => row.model === model))
+        const rowByModeCid = Object.fromEntries(this.main.body.rows.map(row => [row.model.cid, row]));
+        this.main.collection.filter(attr)
+            .map(model => rowByModeCid[model.cid])
             .forEach(row => row.$el.addClassTemporarily('animate', this.ANIMATION_TIMEOUT));
         this.main.$el.addClassTemporarily(this.finishedClass, this.ANIMATION_TIMEOUT);
     },

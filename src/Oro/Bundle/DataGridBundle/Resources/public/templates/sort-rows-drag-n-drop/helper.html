@@ -5,7 +5,7 @@ if (hasSortOrder) {
 }
 let message = data.map(item => item.sku).join(', ');
 if (data.length === 1) {
-    message = [data[0]['sku'], data[0]['name']].join(' - ');
+    message = [data[0]['sku'], data[0]['name'] || data[0]['productName']].join(' - ');
 }
 %>
 <div class="sorting-helper <%- extraClass.join(' ') %>">
