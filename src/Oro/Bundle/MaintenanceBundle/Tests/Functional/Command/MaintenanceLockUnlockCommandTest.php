@@ -11,9 +11,6 @@ class MaintenanceLockUnlockCommandTest extends WebTestCase
 {
     use CommandTestingTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

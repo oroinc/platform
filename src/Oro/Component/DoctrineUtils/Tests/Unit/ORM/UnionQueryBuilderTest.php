@@ -3,6 +3,7 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\DBAL\Query\QueryException;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -142,7 +143,7 @@ class UnionQueryBuilderTest extends OrmTestCase
 
     public function testGetQueryBuilderWhenNoSubQueries()
     {
-        $this->expectException(\Doctrine\DBAL\Query\QueryException::class);
+        $this->expectException(QueryException::class);
         $this->expectExceptionMessage('At least one sub-query should be added.');
 
         $qb = new UnionQueryBuilder($this->em);
@@ -152,7 +153,7 @@ class UnionQueryBuilderTest extends OrmTestCase
 
     public function testGetQueryBuilderWhenNoSelectExpr()
     {
-        $this->expectException(\Doctrine\DBAL\Query\QueryException::class);
+        $this->expectException(QueryException::class);
         $this->expectExceptionMessage('At least one select expression should be added.');
 
         $qb = new UnionQueryBuilder($this->em);

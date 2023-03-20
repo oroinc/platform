@@ -12,18 +12,11 @@ class NameFormatConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var NameFormatConfigurationProvider */
-    private $configurationProvider;
+    private NameFormatConfigurationProvider $configurationProvider;
 
-    /** @var string */
-    private $cacheFile;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('NameFormatConfigurationProvider');
+        $cacheFile = $this->getTempFile('NameFormatConfigurationProvider');
 
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
@@ -34,7 +27,7 @@ class NameFormatConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 $bundle2->getName() => get_class($bundle2)
             ]);
 
-        $this->configurationProvider = new NameFormatConfigurationProvider($this->cacheFile, false);
+        $this->configurationProvider = new NameFormatConfigurationProvider($cacheFile, false);
     }
 
     public function testGetConfiguration()

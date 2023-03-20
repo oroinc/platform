@@ -26,9 +26,6 @@ class FormIntegrationTestCase extends BaseTestCase
     /** @var ConstraintValidatorInterface[] */
     private array $validators = [];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

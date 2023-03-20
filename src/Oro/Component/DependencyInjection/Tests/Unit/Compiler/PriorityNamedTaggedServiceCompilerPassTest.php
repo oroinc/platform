@@ -6,16 +6,17 @@ use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceCompile
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class PriorityNamedTaggedServiceCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     private const SERVICE_ID = 'test_service';
-    private const TAG_NAME   = 'test_tag';
+    private const TAG_NAME = 'test_tag';
 
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
     protected function setUp(): void
     {
@@ -24,7 +25,7 @@ class PriorityNamedTaggedServiceCompilerPassTest extends \PHPUnit\Framework\Test
 
     public function testProcessWhenNoServiceAndItIsRequired()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectException(ServiceNotFoundException::class);
         $this->container->setDefinition('tagged_service_1', new Definition())
             ->addTag(self::TAG_NAME, ['alias' => 'item1']);
 
@@ -72,7 +73,7 @@ class PriorityNamedTaggedServiceCompilerPassTest extends \PHPUnit\Framework\Test
 
     public function testProcessWithoutNameAttribute()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'The attribute "alias" is required for "test_tag" tag. Service: "tagged_service_1".'
         );

@@ -34,10 +34,7 @@ class PrivilegeCategoryConfigurationProviderTest extends \PHPUnit\Framework\Test
 
         $this->cacheFile = $this->getTempFile('PrivilegeCategoryConfigProvider');
 
-        $this->configurationProvider = new PrivilegeCategoryConfigurationProvider(
-            $this->cacheFile,
-            false
-        );
+        $this->configurationProvider = new PrivilegeCategoryConfigurationProvider($this->cacheFile, false);
     }
 
     public function testGetConfigurationWithCache()

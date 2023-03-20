@@ -13,17 +13,13 @@ class EntityConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var EntityConfigurationProvider */
-    private $configurationProvider;
-
-    /** @var string */
-    private $cacheFile;
+    private EntityConfigurationProvider $configurationProvider;
 
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('EntityConfigurationProvider');
+        $cacheFile = $this->getTempFile('EntityConfigurationProvider');
 
-        $this->configurationProvider = new EntityConfigurationProvider($this->cacheFile, false);
+        $this->configurationProvider = new EntityConfigurationProvider($cacheFile, false);
     }
 
     /**

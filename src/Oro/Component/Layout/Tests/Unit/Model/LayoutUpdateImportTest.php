@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Model;
 
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
 
@@ -39,7 +40,7 @@ class LayoutUpdateImportTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateFromArrayException()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Import id should be provided, array with "root, namespace" keys given');
 
         LayoutUpdateImport::createFromArray([

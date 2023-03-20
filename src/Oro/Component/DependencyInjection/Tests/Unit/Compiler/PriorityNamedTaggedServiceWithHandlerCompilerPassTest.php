@@ -6,16 +6,16 @@ use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHan
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class PriorityNamedTaggedServiceWithHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     private const SERVICE_ID = 'test_service';
-    private const TAG_NAME   = 'test_tag';
+    private const TAG_NAME = 'test_tag';
 
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
     protected function setUp(): void
     {
@@ -24,7 +24,7 @@ class PriorityNamedTaggedServiceWithHandlerCompilerPassTest extends \PHPUnit\Fra
 
     public function testProcessWhenNoServiceAndItIsRequired()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
+        $this->expectException(ServiceNotFoundException::class);
         $this->container->setDefinition('tagged_service_1', new Definition())
             ->addTag(self::TAG_NAME);
 

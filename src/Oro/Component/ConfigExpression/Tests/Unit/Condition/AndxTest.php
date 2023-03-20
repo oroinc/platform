@@ -4,11 +4,11 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 class AndxTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Condition\Andx */
-    protected $condition;
+    private Condition\Andx $condition;
 
     protected function setUp(): void
     {
@@ -60,7 +60,7 @@ class AndxTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeEmpty()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have at least one element.');
 
         $this->condition->initialize([]);
@@ -69,7 +69,7 @@ class AndxTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected)
+    public function testToArray(array $options, ?string $message, array $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -112,7 +112,7 @@ class AndxTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected)
+    public function testCompile(array $options, ?string $message, string $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {
