@@ -17,11 +17,6 @@ class JsonAggTest extends WebTestCase
         $this->entityManager = self::getContainer()->get('doctrine')->getManagerForClass(TestDecimalEntity::class);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->entityManager);
-    }
-
     /**
      * @dataProvider getDqlFunctionDataProvider
      */
