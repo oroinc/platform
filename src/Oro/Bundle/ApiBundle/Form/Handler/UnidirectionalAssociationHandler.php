@@ -89,6 +89,7 @@ class UnidirectionalAssociationHandler
                     $entity,
                     $previousTargetEntities,
                     $fieldForm,
+                    $targetEntityClass,
                     $targetAssociationName
                 );
             }
@@ -181,7 +182,7 @@ class UnidirectionalAssociationHandler
                 $this->deleteFromSingleValuedAssociation(
                     $previousTargetEntities,
                     $fieldForm,
-                    $targetAssociationName
+                    $targetEntityClass
                 );
             }
         }
@@ -229,6 +230,7 @@ class UnidirectionalAssociationHandler
         $entity,
         array $previousTargetEntities,
         FormInterface $fieldForm,
+        string $targetEntityClass,
         string $targetAssociationName
     ): void {
         $newTargetEntities = $fieldForm->getData();
@@ -238,9 +240,12 @@ class UnidirectionalAssociationHandler
                 $this->propertyAccessor->setValue($targetEntity, $targetAssociationName, $entity);
             }
         }
-        foreach ($previousTargetEntities as $targetEntity) {
-            if (!$this->hasEntity($targetEntity, $newTargetEntities)) {
-                $this->propertyAccessor->setValue($targetEntity, $targetAssociationName, null);
+        if ($previousTargetEntities) {
+            $em = $this->doctrineHelper->getEntityManagerForClass($targetEntityClass);
+            foreach ($previousTargetEntities as $targetEntity) {
+                if (!$this->hasEntity($targetEntity, $newTargetEntities)) {
+                    $em->remove($targetEntity);
+                }
             }
         }
     }
@@ -312,12 +317,15 @@ class UnidirectionalAssociationHandler
     private function deleteFromSingleValuedAssociation(
         array $previousTargetEntities,
         FormInterface $fieldForm,
-        string $targetAssociationName
+        string $targetEntityClass
     ): void {
         $targetEntities = $fieldForm->getData();
-        foreach ($targetEntities as $targetEntity) {
-            if ($this->hasEntity($targetEntity, $previousTargetEntities)) {
-                $this->propertyAccessor->setValue($targetEntity, $targetAssociationName, null);
+        if ($targetEntities) {
+            $em = $this->doctrineHelper->getEntityManagerForClass($targetEntityClass);
+            foreach ($targetEntities as $targetEntity) {
+                if ($this->hasEntity($targetEntity, $previousTargetEntities)) {
+                    $em->remove($targetEntity);
+                }
             }
         }
     }
