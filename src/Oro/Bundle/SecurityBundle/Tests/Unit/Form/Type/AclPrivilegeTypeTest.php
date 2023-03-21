@@ -33,7 +33,7 @@ class AclPrivilegeTypeTest extends \PHPUnit\Framework\TestCase
 
         $resolver->expects(self::once())
             ->method('setDefaults')
-            ->with(['privileges_config' => [], 'data_class' => AclPrivilege::class,]);
+            ->with(['privileges_config' => [], 'data_class' => AclPrivilege::class]);
 
         (new AclPrivilegeType())->configureOptions($resolver);
     }

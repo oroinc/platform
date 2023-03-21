@@ -18,18 +18,30 @@ class TestListener implements BaseListener
      */
     public function endTest(Test $test, float $time): void
     {
-        $reflection = new \ReflectionObject($test);
+        $reflection = new \ReflectionClass($test);
 
-        foreach ($reflection->getProperties() as $property) {
-            /** @noinspection NullPointerExceptionInspection */
-            if ($property->isStatic()
-                || str_starts_with($property->getDeclaringClass()->getName(), 'PHPUnit_')
-                || ($property->hasType() && !$property->getType()->allowsNull())
-            ) {
+        $propertyNames = [];
+        $properties = $reflection->getProperties();
+        foreach ($properties as $property) {
+            if ($property->isStatic()) {
                 continue;
             }
-            $property->setAccessible(true);
-            $property->setValue($test, null);
+            if (str_starts_with($property->getDeclaringClass()->getName(), 'PHPUnit\\')) {
+                continue;
+            }
+            $propertyNames[] = $property->getName();
+        }
+
+        if ($propertyNames) {
+            \Closure::bind(
+                function (array $propertyNames) {
+                    foreach ($propertyNames as $propertyName) {
+                        unset($this->{$propertyName});
+                    }
+                },
+                $test,
+                $reflection->getName()
+            )($propertyNames);
         }
     }
 }

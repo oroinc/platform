@@ -539,7 +539,7 @@ class UnidirectionalAssociationsTest extends RestJsonApiTestCase
         $this->assertRelationshipEquals($data, $associationName, $response);
 
         // test that the target entities were updated
-        self::assertTrue(null === $this->getTargetEntity($targetEntity11Id)->getUniM2O());
+        self::assertTrue(null === $this->getTargetEntity($targetEntity11Id));
         self::assertSame($entityId, $this->getTargetEntity($targetEntity12Id)->getUniM2O()->getId());
         self::assertSame($entityId, $this->getTargetEntity($targetEntity15Id)->getUniM2O()->getId());
 
@@ -877,7 +877,7 @@ class UnidirectionalAssociationsTest extends RestJsonApiTestCase
         );
 
         // test that the target entities were updated
-        self::assertTrue(null === $this->getTargetEntity($targetEntity11Id)->getUniM2O());
+        self::assertTrue(null === $this->getTargetEntity($targetEntity11Id));
         self::assertSame($entityId, $this->getTargetEntity($targetEntity12Id)->getUniM2O()->getId());
         self::assertSame($entityId, $this->getTargetEntity($targetEntity15Id)->getUniM2O()->getId());
 
@@ -1080,7 +1080,7 @@ class UnidirectionalAssociationsTest extends RestJsonApiTestCase
 
         // test that the target entities were updated
         self::assertSame($entityId, $this->getTargetEntity($targetEntity11Id)->getUniM2O()->getId());
-        self::assertTrue(null === $this->getTargetEntity($targetEntity12Id)->getUniM2O());
+        self::assertTrue(null === $this->getTargetEntity($targetEntity12Id));
         self::assertTrue(null === $this->getTargetEntity($targetEntity15Id)->getUniM2O());
 
         // test that changed data are returned by "get" action
