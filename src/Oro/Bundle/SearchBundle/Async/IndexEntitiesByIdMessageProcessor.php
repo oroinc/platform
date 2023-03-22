@@ -48,7 +48,7 @@ class IndexEntitiesByIdMessageProcessor implements
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        return $this->runUnique($message->getBody(), $message->getMessageId()) ? self::ACK : self::REJECT;
+        return $this->runUnique($message->getBody(), $message) ? self::ACK : self::REJECT;
     }
 
     /**
@@ -61,13 +61,11 @@ class IndexEntitiesByIdMessageProcessor implements
 
     /**
      * @param array $messageBody
-     * @param string $ownerId
      *
      * @return bool
      */
-    private function runUnique(array $messageBody, $ownerId)
+    private function runUnique(array $messageBody, $message)
     {
-        $jobName = $this->buildJobNameForMessage($messageBody);
         $closure = function () use ($messageBody) {
             /** @var array $ids */
             $ids = $messageBody[MessageTransformerInterface::MESSAGE_FIELD_ENTITY_IDS];
@@ -96,19 +94,6 @@ class IndexEntitiesByIdMessageProcessor implements
             return true;
         };
 
-        return $this->jobRunner->runUnique($ownerId, $jobName, $closure);
-    }
-
-    /**
-     * @param array $messageBody
-     *
-     * @return string
-     */
-    private function buildJobNameForMessage(array $messageBody)
-    {
-        $entityClass = $messageBody[MessageTransformerInterface::MESSAGE_FIELD_ENTITY_CLASS];
-        $ids = $messageBody[MessageTransformerInterface::MESSAGE_FIELD_ENTITY_IDS];
-        sort($ids);
-        return 'search_reindex|' . md5(serialize($entityClass) . serialize($ids));
+        return $this->jobRunner->runUniqueByMessage($message, $closure);
     }
 }

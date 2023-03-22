@@ -3,36 +3,24 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Error;
 
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
+use Symfony\Component\ErrorHandler\ErrorHandler as SymfonyErrorHandler;
 
 class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ErrorHandler
-     */
-    private $handler;
+    private SymfonyErrorHandler $handler;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->handler = ErrorHandler::register();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
-        unset($this->handler);
         restore_error_handler();
         restore_exception_handler();
     }
 
-    /**
-     * @throws \ErrorException
-     */
-    public function testSilenceGetaddresses(): void
+    public function testSilenceGetAddresses(): void
     {
         $this->assertTrue(
             $this->handler->handleError(
@@ -50,7 +38,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider silinceDataProvider
+     * @dataProvider silenceDataProvider
      */
     public function testSilenceReflectionToString(string $message): void
     {
@@ -60,7 +48,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         trigger_error($message, E_USER_DEPRECATED);
     }
 
-    public function silinceDataProvider(): array
+    public function silenceDataProvider(): array
     {
         return [
             ['Function ReflectionType::__toString() is deprecated'],

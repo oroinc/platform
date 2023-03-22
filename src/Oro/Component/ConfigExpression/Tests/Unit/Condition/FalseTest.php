@@ -3,11 +3,11 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 class FalseTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Condition\FalseCondition */
-    protected $condition;
+    private Condition\FalseCondition $condition;
 
     protected function setUp(): void
     {
@@ -26,7 +26,7 @@ class FalseTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFails()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options are prohibited');
 
         $this->condition->initialize(['anything']);
@@ -35,7 +35,7 @@ class FalseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($message, $expected)
+    public function testToArray(?string $message, array $expected)
     {
         if ($message !== null) {
             $this->condition->setMessage($message);
@@ -67,7 +67,7 @@ class FalseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($message, $expected)
+    public function testCompile(?string $message, string $expected)
     {
         if ($message !== null) {
             $this->condition->setMessage($message);

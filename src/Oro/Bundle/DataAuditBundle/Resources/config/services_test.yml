@@ -8,3 +8,11 @@ services:
         class: Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\StubEntityClassNameProvider
         tags:
             - { name: oro_entity.class_name_provider, priority: 255 }
+
+    Oro\Bundle\DataAuditBundle\EventListener\DataFixturesExecutingListener:
+        arguments:
+            - '@oro_platform.optional_listeners.manager'
+            - '@oro_distribution.handler.application_status'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }

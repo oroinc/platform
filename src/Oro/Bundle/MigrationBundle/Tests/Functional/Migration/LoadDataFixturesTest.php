@@ -13,9 +13,6 @@ class LoadDataFixturesTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();

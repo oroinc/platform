@@ -30,8 +30,7 @@ class ConsoleFatalErrorListenerTest extends \PHPUnit\Framework\TestCase
     /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $output;
 
-    /** @var array[] */
-    private static $defaultLoggers = [
+    private static array $defaultLoggers = [
         E_DEPRECATED => [null, LogLevel::INFO],
         E_USER_DEPRECATED => [null, LogLevel::INFO],
         E_NOTICE => [null, LogLevel::WARNING],
@@ -43,9 +42,6 @@ class ConsoleFatalErrorListenerTest extends \PHPUnit\Framework\TestCase
         E_CORE_WARNING => [null, LogLevel::WARNING],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -56,12 +52,8 @@ class ConsoleFatalErrorListenerTest extends \PHPUnit\Framework\TestCase
         $this->output = $this->createMock(OutputInterface::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
-        $this->handler = null;
         restore_error_handler();
         restore_exception_handler();
     }

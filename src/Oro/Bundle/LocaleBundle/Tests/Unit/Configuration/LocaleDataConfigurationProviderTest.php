@@ -12,18 +12,11 @@ class LocaleDataConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var LocaleDataConfigurationProvider */
-    private $configurationProvider;
+    private LocaleDataConfigurationProvider $configurationProvider;
 
-    /** @var string */
-    private $cacheFile;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('LocaleDataConfigurationProvider');
+        $cacheFile = $this->getTempFile('LocaleDataConfigurationProvider');
 
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
@@ -34,7 +27,7 @@ class LocaleDataConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 $bundle2->getName() => get_class($bundle2)
             ]);
 
-        $this->configurationProvider = new LocaleDataConfigurationProvider($this->cacheFile, false);
+        $this->configurationProvider = new LocaleDataConfigurationProvider($cacheFile, false);
     }
 
     public function testGetConfiguration()

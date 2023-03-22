@@ -17,7 +17,7 @@ class LanguageOperationsTest extends ActionTestCase
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
-        $this->loadFixtures([LoadLanguages::class,]);
+        $this->loadFixtures([LoadLanguages::class]);
         $this->client->disableReboot();
     }
 

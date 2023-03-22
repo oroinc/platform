@@ -14,17 +14,13 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var ConfigProvider */
-    private $configurationProvider;
-
-    /** @var string */
-    private $cacheFile;
+    private ConfigProvider $configurationProvider;
 
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('ChartConfigurationProvider');
+        $cacheFile = $this->getTempFile('ChartConfigurationProvider');
 
-        $this->configurationProvider = new ConfigProvider($this->cacheFile, false);
+        $this->configurationProvider = new ConfigProvider($cacheFile, false);
 
         $bundle1 = new FirstTestBundle();
         $bundle2 = new SecondTestBundle();

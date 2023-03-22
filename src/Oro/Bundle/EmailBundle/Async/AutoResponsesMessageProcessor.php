@@ -40,15 +40,9 @@ class AutoResponsesMessageProcessor implements MessageProcessorInterface, TopicS
         $data = $message->getBody();
 
         asort($data['ids']);
-        $jobName = sprintf(
-            '%s:%s',
-            'oro.email.send_auto_responses',
-            md5(implode(',', $data['ids']))
-        );
 
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            $jobName,
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
             function (JobRunner $jobRunner) use ($data) {
                 foreach ($data['ids'] as $id) {
                     $jobRunner->createDelayed(

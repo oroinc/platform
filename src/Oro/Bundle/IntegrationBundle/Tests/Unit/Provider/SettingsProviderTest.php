@@ -18,28 +18,18 @@ class SettingsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SettingsProvider */
     private $settingsProvider;
 
-    /** @var string */
-    private $cacheFile;
-
     /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('IntegrationSettingsProvider');
+        $cacheFile = $this->getTempFile('IntegrationSettingsProvider');
 
         $this->container = $this->createMock(ContainerInterface::class);
         $resolver = new SystemAwareResolver();
         $resolver->setContainer($this->container);
 
-        $this->settingsProvider = new SettingsProvider(
-            $this->cacheFile,
-            false,
-            $resolver
-        );
+        $this->settingsProvider = new SettingsProvider($cacheFile, false, $resolver);
 
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();

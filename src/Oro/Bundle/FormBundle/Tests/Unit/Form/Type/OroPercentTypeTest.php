@@ -8,8 +8,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroPercentTypeTest extends FormIntegrationTestCase
 {
-    /** @var string */
-    private $locale;
+    private string $locale;
 
     protected function setUp(): void
     {
@@ -22,9 +21,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-
         \Locale::setDefault($this->locale);
-        unset($this->locale);
     }
 
     public function testGetName()
@@ -40,13 +37,10 @@ class OroPercentTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param float $data
-     * @param array $viewData
-     * @param array $options
      * @dataProvider buildFormDataProvider
      */
     public function testBuildForm(
-        $data,
+        float $data,
         array $viewData,
         array $options = []
     ) {
@@ -81,14 +75,11 @@ class OroPercentTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param float $data
-     * @param array $expectedData
-     * @param array $options
      * @dataProvider submitFormDataProvider
      */
     public function testSubmitForm(
-        $data,
-        $expectedData,
+        mixed $data,
+        float $expectedData,
         array $options = []
     ) {
         $form = $this->factory->create(OroPercentType::class, null, $options);

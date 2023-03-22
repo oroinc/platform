@@ -11,8 +11,8 @@ class DsnBasedParametersTest extends \PHPUnit\Framework\TestCase
      */
     public function testInvalidDsnProcessing($dsn): void
     {
-        self::expectException(\InvalidArgumentException::class);
-        self::expectExceptionMessage(sprintf(
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf(
             'The "%s" message queue transport connection DSN is invalid.',
             $dsn
         ));
@@ -30,8 +30,8 @@ class DsnBasedParametersTest extends \PHPUnit\Framework\TestCase
 
     public function testMissingSchemeProcessing(): void
     {
-        self::expectException(\InvalidArgumentException::class);
-        self::expectExceptionMessage(
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'The "//localhost:5672" message queue transport connection DSN must contain a scheme.'
         );
         new DsnBasedParameters('//localhost:5672');

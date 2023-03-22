@@ -2,6 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Topic;
 
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Oro\Component\MessageQueue\Topic\NullTopic;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Oro\Component\MessageQueue\Topic\TopicRegistry;
@@ -11,12 +12,15 @@ class TopicRegistryTest extends \PHPUnit\Framework\TestCase
 {
     private ServiceProviderInterface|\PHPUnit\Framework\MockObject\MockObject $topicServiceProvider;
 
+    private ServiceProviderInterface|\PHPUnit\Framework\MockObject\MockObject $jobAwareTopicServiceProvider;
+
     private TopicRegistry $registry;
 
     protected function setUp(): void
     {
         $this->topicServiceProvider = $this->createMock(ServiceProviderInterface::class);
-        $this->registry = new TopicRegistry($this->topicServiceProvider);
+        $this->jobAwareTopicServiceProvider = $this->createMock(ServiceProviderInterface::class);
+        $this->registry = new TopicRegistry($this->topicServiceProvider, $this->jobAwareTopicServiceProvider);
     }
 
     public function testHas(): void
@@ -29,6 +33,43 @@ class TopicRegistryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         self::assertTrue($this->registry->has($topicName));
+    }
+
+    public function testGetJobAware(): void
+    {
+        $topicName = 'sample_topic';
+
+        $this->jobAwareTopicServiceProvider
+            ->expects(self::once())
+            ->method('has')
+            ->with($topicName)
+            ->willReturn(true);
+
+        $topic = $this->createMock(JobAwareTopicInterface::class);
+        $this->jobAwareTopicServiceProvider
+            ->expects(self::once())
+            ->method('get')
+            ->with($topicName)
+            ->willReturn($topic);
+
+        self::assertSame($topic, $this->registry->getJobAware($topicName));
+    }
+
+    public function testGetJobAwareWithUnknownTopic(): void
+    {
+        $topicName = 'sample_topic';
+
+        $this->jobAwareTopicServiceProvider
+            ->expects(self::once())
+            ->method('has')
+            ->with($topicName)
+            ->willReturn(false);
+
+        $this->jobAwareTopicServiceProvider
+            ->expects(self::never())
+            ->method('get');
+
+        self::assertNull($this->registry->getJobAware($topicName));
     }
 
     public function testGetReturnsNullTopicWhenEmptyTopicName(): void

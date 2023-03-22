@@ -23,11 +23,6 @@ class FixDecimalChangeSetListenerTest extends WebTestCase
         $this->getEntityManager()->getConnection()->getConfiguration()->setSQLLogger($this->logger);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->logger);
-    }
-
     public function testDecimal()
     {
         $owner = new TestDecimalEntity();

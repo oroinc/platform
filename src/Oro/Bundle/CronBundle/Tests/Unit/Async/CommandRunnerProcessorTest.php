@@ -55,8 +55,8 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical');
 
         $this->jobRunner->expects($this->once())
-            ->method('runUnique')
-            ->with(null, 'oro:cron:run_command:test:command-argKey=argVal')
+            ->method('runUniqueByMessage')
+            ->with($message)
             ->willReturn($jobResult);
         $this->jobRunner->expects($this->never())
             ->method('runDelayed');

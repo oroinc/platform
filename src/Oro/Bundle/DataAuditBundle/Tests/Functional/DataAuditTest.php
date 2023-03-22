@@ -17,11 +17,14 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\JobsAwareTestTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Config\Common\ConfigObject;
+use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
 /**
@@ -32,6 +35,7 @@ class DataAuditTest extends WebTestCase
 {
     use MessageQueueAssertTrait;
     use AuditChangedEntitiesExtensionTrait;
+    use JobsAwareTestTrait;
 
     protected function setUp(): void
     {
@@ -2251,6 +2255,16 @@ class DataAuditTest extends WebTestCase
                 $message = $this->getSentMessage($topic);
                 $messageModel = $session->createMessage($message);
                 $messageModel->setMessageId('oro_owner');
+                $messageModel->setProperties([
+                    Config::PARAMETER_TOPIC_NAME => $topic,
+                    JobAwareTopicInterface::UNIQUE_JOB_NAME => 'fakeJobID'
+                ]);
+
+                $this->getJobProcessor()->findOrCreateRootJob(
+                    $messageModel->getMessageId(),
+                    $this->getJobRunner()->getJobNameByMessage($messageModel),
+                    true
+                );
 
                 $processor->process($messageModel, $session);
             }

@@ -16,6 +16,7 @@ use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Authentication\Token\IntegrationTokenAwareTestTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Test\JobRunner;
@@ -25,6 +26,7 @@ use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -153,7 +155,6 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
 
         $uniqueJobs = $jobRunner->getRunUniqueJobs();
         self::assertCount(1, $uniqueJobs);
-        self::assertEquals('oro_integration:sync_integration:theIntegrationId', $uniqueJobs[0]['jobName']);
         self::assertEquals('theMessageId', $uniqueJobs[0]['ownerId']);
     }
 
@@ -194,7 +195,6 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
 
         $uniqueJobs = $jobRunner->getRunUniqueJobs();
         self::assertCount(1, $uniqueJobs);
-        self::assertEquals('oro_integration:sync_integration:theIntegrationId', $uniqueJobs[0]['jobName']);
         self::assertEquals('theMessageId', $uniqueJobs[0]['ownerId']);
     }
 
@@ -368,6 +368,61 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $status = $processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $status);
+    }
+
+    /**
+     * @dataProvider tokenProvider
+     */
+    public function testThatCorrectTokenIsPassedToTokenStorage(?OrganizationToken $token)
+    {
+        $integration = new Integration();
+        $integration->setEnabled(true);
+        $integration->setOrganization(new Organization());
+        $integration->setTransport($this->createTransport());
+        $integrationID = 'theIntegrationId';
+
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects(self::once())
+            ->method('find')
+            ->with(Integration::class, $integrationID)
+            ->willReturn($integration);
+
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token);
+
+        $message = $this->createMock(Message::class);
+        $message->method('getBody')->willReturn([
+            'integration_id' => $integrationID,
+            'transport_batch_size' => 100,
+        ]);
+
+        $processor = new SyncIntegrationProcessor(
+            $this->createDoctrine($entityManager),
+            $tokenStorage,
+            $this->createMock(SyncProcessorRegistry::class),
+            $this->createMock(JobRunner::class),
+            $this->createMock(LoggerInterface::class)
+        );
+
+        $processor->process($message, $this->createMock(SessionInterface::class));
+
+        $this->assertEquals(
+            $integration->getOrganization(),
+            $tokenStorage->getToken()->getOrganization(),
+        );
+
+        $this->assertEquals(
+            'Integration: ' . $integration->getName(),
+            $tokenStorage->getToken()->getAttribute('owner_description')
+        );
+    }
+
+    private function tokenProvider(): array
+    {
+        return [
+            [null],
+            [new OrganizationToken(new Organization())],
+        ];
     }
 
     private function createEntityManager(): EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject

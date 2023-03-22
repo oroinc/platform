@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\MessageQueueBundle\Command;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
+use Oro\Bundle\MessageQueueBundle\Job\JobManager;
 use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
@@ -24,17 +25,20 @@ class ClientConsumeMessagesCommand extends ConsumeMessagesCommand
 
     private ConsumerState $consumerState;
     private LoggerInterface $logger;
+    protected JobManager $jobManager;
 
     public function __construct(
-        QueueConsumer $queueConsumer,
+        QueueConsumer           $queueConsumer,
         DestinationMetaRegistry $destinationMetaRegistry,
-        ConsumerState $consumerState,
-        LoggerInterface $logger
+        ConsumerState           $consumerState,
+        LoggerInterface         $logger,
+        JobManager              $jobManager
     ) {
         parent::__construct($queueConsumer, $destinationMetaRegistry);
 
         $this->consumerState = $consumerState;
         $this->logger = $logger;
+        $this->jobManager = $jobManager;
     }
 
     protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void

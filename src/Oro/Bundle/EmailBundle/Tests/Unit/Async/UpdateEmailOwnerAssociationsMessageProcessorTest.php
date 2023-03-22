@@ -59,9 +59,9 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
 
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects($this->once())
-            ->method('runUnique')
-            ->with('message-id', 'oro.email.update_email_owner_associations' . ':class:'.md5('1,2'))
-            ->willReturnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $callback) use ($jobRunner) {
                 $callback($jobRunner);
 
                 return true;

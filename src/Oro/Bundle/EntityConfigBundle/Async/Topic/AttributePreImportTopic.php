@@ -10,9 +10,4 @@ use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
 class AttributePreImportTopic extends PreImportTopic
 {
     public const NAME = 'oro_entity_config.importexport.attribute.pre_import';
-
-    public static function getName(): string
-    {
-        return self::NAME;
-    }
 }
