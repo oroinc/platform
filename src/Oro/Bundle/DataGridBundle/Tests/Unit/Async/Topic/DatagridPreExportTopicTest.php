@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\MessageQueue\Test\AbstractTopicTestCase;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -15,7 +16,7 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
 {
     protected function getTopic(): TopicInterface
     {
-        return new DatagridPreExportTopic(4242);
+        return new DatagridPreExportTopic(4242, $this->createMock(TokenAccessorInterface::class));
     }
 
     public function validBodyDataProvider(): array

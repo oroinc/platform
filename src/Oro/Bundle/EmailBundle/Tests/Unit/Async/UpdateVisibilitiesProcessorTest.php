@@ -74,20 +74,21 @@ class UpdateVisibilitiesProcessorTest extends OrmTestCase
             ->willReturn($messageId);
 
         $jobId = 123;
-        $job = new Job();
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
             'SELECT o0_.id AS id_0 FROM oro_organization o0_ ORDER BY o0_.id ASC',
             [['id_0' => $organizationId]]
         );
-
+        $rootJob = new Job();
+        $rootJob->setName($jobName);
         $this->jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->with($messageId, $jobName)
-            ->willReturnCallback(function ($ownerId, $name, $runCallback) {
-                return $runCallback($this->jobRunner, new Job());
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $runCallback) use ($rootJob) {
+                return $runCallback($this->jobRunner, $rootJob);
             });
+        $job = new Job();
         $this->jobRunner->expects(self::once())
             ->method('createDelayed')
             ->with(sprintf('%s:%d', $jobName, $organizationId))

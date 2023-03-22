@@ -216,4 +216,12 @@ class UpdateListTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro:batch_api:42',
+            $this->getTopic()->createJobName(['operationId' => 42])
+        );
+    }
 }

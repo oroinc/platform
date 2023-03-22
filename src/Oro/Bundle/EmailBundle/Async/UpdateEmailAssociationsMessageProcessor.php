@@ -30,9 +30,8 @@ class UpdateEmailAssociationsMessageProcessor implements MessageProcessorInterfa
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            'oro.email.update_associations_to_emails',
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
             function () {
                 $this->associationManager->processUpdateAllEmailOwners();
 

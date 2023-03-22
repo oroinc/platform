@@ -22,6 +22,9 @@ class MessageProducer implements MessageProducerInterface, LoggerAwareInterface
 
     private bool $debug;
 
+    /** @var MessageProducerMiddlewareInterface[] */
+    private iterable $middlewares = [];
+
     public function __construct(
         DriverInterface $driver,
         MessageRouterInterface $messageRouter,
@@ -35,12 +38,25 @@ class MessageProducer implements MessageProducerInterface, LoggerAwareInterface
     }
 
     /**
+     * @param MessageProducerMiddlewareInterface[] $middlewares
+     * @return void
+     */
+    public function setMiddlewares(iterable $middlewares): void
+    {
+        $this->middlewares = $middlewares;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function send($topic, $message): void
     {
         try {
             $message = $this->createMessage($topic, $message);
+            foreach ($this->middlewares as $middleware) {
+                $middleware->handle($message);
+            }
+
             foreach ($this->messageRouter->handle($message) as $envelope) {
                 $this->driver->send($envelope->getQueue(), $envelope->getMessage());
             }

@@ -52,17 +52,14 @@ class RecalculateEmailVisibilityProcessor implements MessageProcessorInterface, 
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $data = $message->getBody();
-
         $emailAddress = $data['email'];
 
-        $jobName = sprintf('%s:%s', RecalculateEmailVisibilityTopic::getName(), md5($emailAddress));
-
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            $jobName,
-            function (JobRunner $jobRunner) use ($jobName, $emailAddress) {
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
+            function (JobRunner $jobRunner, Job $job) use ($emailAddress) {
                 $chunkNumber = 1;
                 $chunks = $this->getChunks($emailAddress);
+                $jobName = $job->getName();
                 foreach ($chunks as $ids) {
                     $this->scheduleRecalculateVisibilities(
                         $jobRunner,

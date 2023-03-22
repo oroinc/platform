@@ -195,7 +195,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         $this->processChunkFiles(
             $splitter,
             $chunkFiles,
-            $message->getMessageId(),
+            $message,
             $messageBody,
             $startTimestamp
         );
@@ -206,14 +206,14 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
     /**
      * @param FileSplitterInterface $splitter
      * @param ChunkFile[]           $chunkFiles
-     * @param string                $messageId
+     * @param MessageInterface      $message
      * @param array                 $body
      * @param float                 $startTimestamp
      */
     private function processChunkFiles(
         FileSplitterInterface $splitter,
         array $chunkFiles,
-        string $messageId,
+        MessageInterface $message,
         array $body,
         float $startTimestamp
     ): void {
@@ -245,7 +245,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
                 $chunkFiles = $this->processingHelper->loadChunkIndex($operationId);
                 $delayedCreationOfChunkJobs = true;
             }
-            $this->processChunks($messageId, $body, $chunkFiles, $delayedCreationOfChunkJobs);
+            $this->processChunks($message, $body, $chunkFiles, $delayedCreationOfChunkJobs);
             $this->operationManager->incrementAggregateTime(
                 $operationId,
                 $this->processingHelper->calculateAggregateTime($startTimestamp, $splitAggregateTime)
@@ -261,26 +261,25 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
     }
 
     /**
-     * @param string      $messageId
+     * @param MessageInterface $message
      * @param array       $body
      * @param ChunkFile[] $chunkFiles
      * @param bool        $delayed
      */
-    private function processChunks(string $messageId, array $body, array $chunkFiles, bool $delayed): void
+    private function processChunks(MessageInterface $message, array $body, array $chunkFiles, bool $delayed): void
     {
         $operationId = $body['operationId'];
         $dataFileName = $body['fileName'];
-        $jobName = sprintf('oro:batch_api:%d', $operationId);
-        $this->jobRunner->runUnique(
-            $messageId,
-            $jobName,
-            function (JobRunner $jobRunner, Job $job) use ($operationId, $jobName, $body, $chunkFiles, $delayed) {
+
+        $this->jobRunner->runUniqueByMessage(
+            $message,
+            function (JobRunner $jobRunner, Job $job) use ($operationId, $body, $chunkFiles, $delayed) {
                 $chunkFileCount = \count($chunkFiles);
                 $rootJob = $job->getRootJob();
                 $this->saveOperationIdToJob($operationId, $rootJob);
                 $this->createOperationInfoFile($operationId, $chunkFileCount);
                 $this->createFinishJob($body, $rootJob);
-                $chunkJobNameTemplate = $jobName . ':chunk:%s';
+                $chunkJobNameTemplate = $job->getName() . ':chunk:%s';
                 if ($delayed) {
                     $this->sendMessageToCreateChunkJobs(
                         $jobRunner,

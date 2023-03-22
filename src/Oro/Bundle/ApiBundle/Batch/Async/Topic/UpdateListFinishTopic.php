@@ -27,6 +27,18 @@ class UpdateListFinishTopic extends AbstractTopic
             ->setAllowedTypes('operationId', 'int');
 
         $resolver
+            ->setRequired('entityClass')
+            ->setAllowedTypes('entityClass', 'string');
+
+        $resolver
+            ->setRequired('requestType')
+            ->setAllowedTypes('requestType', 'string[]');
+
+        $resolver
+            ->setRequired('version')
+            ->setAllowedTypes('version', 'string');
+
+        $resolver
             ->setRequired('fileName')
             ->setAllowedTypes('fileName', 'string');
     }

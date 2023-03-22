@@ -3,12 +3,13 @@
 namespace Oro\Bundle\ImapBundle\Async\Topic;
 
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Clear inactive mailbox.
  */
-class ClearInactiveMailboxTopic extends AbstractTopic
+class ClearInactiveMailboxTopic extends AbstractTopic implements JobAwareTopicInterface
 {
     public const NAME = 'oro.imap.clear_inactive_mailbox';
 
@@ -27,5 +28,10 @@ class ClearInactiveMailboxTopic extends AbstractTopic
         $resolver
             ->setDefined(['id'])
             ->addAllowedTypes('id', ['string', 'int']);
+    }
+
+    public function createJobName($messageBody): string
+    {
+        return self::getName();
     }
 }

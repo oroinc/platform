@@ -185,8 +185,6 @@ services:
 
     oro_message_queue.topic.registry:
         class: Oro\Component\MessageQueue\Topic\TopicRegistry
-        arguments:
-            - ~ # Service locator for topics. It sets by Oro\Bundle\MessageQueueBundle\DependencyInjection\BuildTopicMetaRegistryPass
 
     oro_message_queue.interrupt_consumption.cache:
         parent: oro.data.cache

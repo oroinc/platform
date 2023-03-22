@@ -45,4 +45,12 @@ class UpdateEmailVisibilitiesForOrganizationTopicTest extends AbstractTopicTestC
             ]
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro:email:update-visibilities:emails:42',
+            $this->getTopic()->createJobName(['organizationId' => 42])
+        );
+    }
 }

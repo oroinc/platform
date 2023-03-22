@@ -86,4 +86,12 @@ class ReverseSyncIntegrationTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro_integration:revers_sync_integration:1',
+            $this->getTopic()->createJobName(['integration_id' => 1])
+        );
+    }
 }

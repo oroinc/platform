@@ -10,10 +10,14 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 class TopicRegistry
 {
     private ServiceProviderInterface $topicServiceProvider;
+    private ServiceProviderInterface $jobAwareTopicServiceProvider;
 
-    public function __construct(ServiceProviderInterface $topicServiceProvider)
-    {
+    public function __construct(
+        ServiceProviderInterface $topicServiceProvider,
+        ServiceProviderInterface $jobAwareTopicServiceProvider
+    ) {
         $this->topicServiceProvider = $topicServiceProvider;
+        $this->jobAwareTopicServiceProvider = $jobAwareTopicServiceProvider;
     }
 
     public function get(string $topicName): TopicInterface
@@ -23,6 +27,17 @@ class TopicRegistry
         }
 
         return $this->topicServiceProvider->get($topicName);
+    }
+
+    /**
+     * Returns topic if it implements JobAwareTopicInterface
+     */
+    public function getJobAware(string $topicName): ?JobAwareTopicInterface
+    {
+        if ($this->jobAwareTopicServiceProvider->has($topicName)) {
+            return $this->jobAwareTopicServiceProvider->get($topicName);
+        }
+        return null;
     }
 
     public function has(string $topicName): bool

@@ -12,3 +12,9 @@ services:
             - '@oro_integration.provider.connector_context_mediator'
         tags:
             - { name: oro_integration.connector, type: connector1, channel_type: foo }
+
+    oro_integration.sync_scheduler:
+        class: Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
+        public: true
+        arguments:
+            - '@oro_message_queue.message_producer'
