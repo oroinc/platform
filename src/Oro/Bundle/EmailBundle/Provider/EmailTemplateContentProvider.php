@@ -86,7 +86,7 @@ class EmailTemplateContentProvider
                 ),
                 ['exception' => $exception]
             );
-            throw new EmailTemplateCompilationException($criteria);
+            throw new EmailTemplateCompilationException($criteria, $exception);
         } finally {
             $this->restoreLocalization();
         }

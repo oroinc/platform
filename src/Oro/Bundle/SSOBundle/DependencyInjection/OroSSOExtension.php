@@ -14,7 +14,7 @@ class OroSSOExtension extends Extension implements PrependExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         if ($container instanceof ExtendedContainerBuilder) {
             $this->configureSecurityFirewalls($container);
@@ -24,7 +24,7 @@ class OroSSOExtension extends Extension implements PrependExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $serviceLoader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $serviceLoader->load('services.yml');

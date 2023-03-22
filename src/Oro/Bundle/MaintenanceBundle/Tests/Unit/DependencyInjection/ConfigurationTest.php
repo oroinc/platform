@@ -12,10 +12,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessConfiguration(array $configs, array $expected): void
     {
-        $configuration = new Configuration();
-        $processor = new Processor();
-
-        self::assertEquals($expected, $processor->processConfiguration($configuration, $configs));
+        self::assertEquals($expected, (new Processor())->processConfiguration(new Configuration(), $configs));
     }
 
     public function processConfigurationDataProvider(): array

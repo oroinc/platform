@@ -6,5 +6,6 @@ services:
     Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic:
         arguments:
             - '%oro_datagrid.export.size_of_batch%'
+            - '@oro_security.token_accessor'
 
     Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic: ~

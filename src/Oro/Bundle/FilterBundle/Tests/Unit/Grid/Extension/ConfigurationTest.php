@@ -12,11 +12,8 @@ use Symfony\Component\Config\Definition\Processor;
  */
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Configuration */
-    private $configuration;
-
-    /** @var Processor */
-    private $processor;
+    private Configuration $configuration;
+    private Processor $processor;
 
     protected function setUp(): void
     {

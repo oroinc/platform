@@ -12,20 +12,13 @@ class WidgetDefinitionProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var WidgetDefinitionProvider */
-    private $widgetDefinitionProvider;
+    private WidgetDefinitionProvider $widgetDefinitionProvider;
 
-    /** @var string */
-    private $cacheFile;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('WidgetDefinitionProvider');
+        $cacheFile = $this->getTempFile('WidgetDefinitionProvider');
 
-        $this->widgetDefinitionProvider = new WidgetDefinitionProvider($this->cacheFile, false);
+        $this->widgetDefinitionProvider = new WidgetDefinitionProvider($cacheFile, false);
 
         $bundle1 = new FooBundle();
         $bundle2 = new BarBundle();

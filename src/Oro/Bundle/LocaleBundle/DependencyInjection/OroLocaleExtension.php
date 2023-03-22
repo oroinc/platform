@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Bundle\LocaleBundle\Configuration\DefaultCurrencyValueProvider;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Config\FileLocator;
@@ -18,16 +19,15 @@ class OroLocaleExtension extends Extension
     /**
      * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
-
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
         $this->prepareSettings($config, $container);
 
         $container->setParameter(self::PARAMETER_FORMATTING_CODE, $config['formatting_code']);
         $container->setParameter(self::PARAMETER_LANGUAGE, $config['language']);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('duplicator.yml');
         $loader->load('form_types.yml');
@@ -38,10 +38,7 @@ class OroLocaleExtension extends Extension
         $loader->load('controllers.yml');
     }
 
-    /**
-     * Prepare locale system settings default values.
-     */
-    private function prepareSettings(array $config, ContainerBuilder $container)
+    private function prepareSettings(array $config, ContainerBuilder $container): void
     {
         if (empty($config['settings']['country']['value'])) {
             $config['settings']['country']['value'] = LocaleSettings::getCountryByLocale($config['formatting_code']);
@@ -58,6 +55,6 @@ class OroLocaleExtension extends Extension
             }
         }
 
-        $container->prependExtensionConfig('oro_locale', $config);
+        $container->prependExtensionConfig($this->getAlias(), SettingsBuilder::getSettings($config));
     }
 }

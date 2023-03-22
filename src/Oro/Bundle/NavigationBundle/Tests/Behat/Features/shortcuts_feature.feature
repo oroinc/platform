@@ -23,3 +23,9 @@ Feature: Shortcuts feature
     When I type "Compose" in "Enter shortcut action"
     And click "Compose Email" in shortcuts search results
     Then I should see an "Email Form" element
+
+  Scenario: Search actions in shortcut with special characters
+    Given I reload the page
+    And I click "Shortcuts"
+    When I type "//.." in "Enter shortcut action"
+    Then I should not see "There was an error performing the requested operation. Please try again or contact us for assistance." flash message

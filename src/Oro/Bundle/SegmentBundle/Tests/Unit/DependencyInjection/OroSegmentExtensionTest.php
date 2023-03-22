@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\SegmentBundle\Controller\Api\Rest\SegmentController;
 use Oro\Bundle\SegmentBundle\DependencyInjection\OroSegmentExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroSegmentExtensionTest extends ExtensionTestCase
+class OroSegmentExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroSegmentExtension());
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
-        $expectedDefinitions = [
-            SegmentController::class,
-        ];
+        $extension = new OroSegmentExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
     }
 }

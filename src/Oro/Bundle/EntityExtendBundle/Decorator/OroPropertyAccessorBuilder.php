@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Decorator;
 
-use Oro\Bundle\EntityExtendBundle\Decorator\PropertyAccessorWithDotArraySyntax as OroPropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\EntityExtend\PropertyAccessorWithDotArraySyntax as OroPropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 

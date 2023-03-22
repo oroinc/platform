@@ -5,18 +5,12 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Form\DataTransformer\AddressSameTransformer;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 
 class AddressSameTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
+    private AddressSameTransformer $transformer;
 
-    /** @var AddressSameTransformer */
-    private $transformer;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->transformer = new AddressSameTransformer(
@@ -25,12 +19,18 @@ class AddressSameTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    private function getAddress(int $id, string $label): Address
+    {
+        $address = new Address();
+        ReflectionUtil::setId($address, $id);
+        $address->setLabel($label);
+
+        return $address;
+    }
+
     public function testTransformWithSameId()
     {
-        $address = $this->getEntity(Address::class, [
-            'id' => 1,
-            'label' => 'Test Address'
-        ]);
+        $address = $this->getAddress(1, 'Test Address');
 
         $multiAddress = new MultiAddressMock();
         $multiAddress->setBillingAddress($address);
@@ -45,15 +45,8 @@ class AddressSameTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testTransformWithDifferentId()
     {
-        $address1 = $this->getEntity(Address::class, [
-            'id' => 1,
-            'label' => 'Test Address 1'
-        ]);
-
-        $address2 = $this->getEntity(Address::class, [
-            'id' => 2,
-            'label' => 'Test Address 2'
-        ]);
+        $address1 = $this->getAddress(1, 'Test Address 1');
+        $address2 = $this->getAddress(2, 'Test Address 2');
 
         $multiAddress = new MultiAddressMock();
         $multiAddress->setBillingAddress($address1);

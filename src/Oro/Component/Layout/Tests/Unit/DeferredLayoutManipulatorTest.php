@@ -4,6 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\CallbackLayoutUpdate;
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
@@ -416,7 +417,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
     public function testDuplicateAdd()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
             'Cannot add "logo" item to the layout. ParentId: root. BlockType: logo. SiblingId: .'
             . ' Reason: The "logo" item already exists. Remove existing item before add the new item with the same id.'

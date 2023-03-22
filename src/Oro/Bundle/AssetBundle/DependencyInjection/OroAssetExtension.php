@@ -12,11 +12,11 @@ class OroAssetExtension extends Extension
     /**
      * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
         $container->setParameter('oro_asset.with_babel', $config['with_babel']);

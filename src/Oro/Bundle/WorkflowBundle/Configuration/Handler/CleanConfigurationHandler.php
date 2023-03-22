@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration\Handler;
 
-use Oro\Bundle\EntityExtendBundle\Decorator\PropertyAccessorWithDotArraySyntax;
+use Oro\Bundle\EntityExtendBundle\EntityExtend\PropertyAccessorWithDotArraySyntax;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Symfony\Component\HttpFoundation\RequestStack;

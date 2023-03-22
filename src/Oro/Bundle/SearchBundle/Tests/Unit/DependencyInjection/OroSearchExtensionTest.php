@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\SearchBundle\Controller\Api\SearchAdvancedController;
-use Oro\Bundle\SearchBundle\Controller\Api\SearchController;
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoadDefaultConfig(): void
+    public function testLoad(): void
     {
         $container = new ContainerBuilder();
 
         $extension = new OroSearchExtension();
         $extension->load([], $container);
+
+        self::assertNotEmpty($container->getDefinitions());
 
         self::assertEquals(
             'orm:',
@@ -31,12 +31,9 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
             '@OroSearch/Datagrid/itemContainer.html.twig',
             $container->getParameter('oro_search.twig.item_container_template')
         );
-
-        self::assertTrue($container->hasDefinition(SearchAdvancedController::class));
-        self::assertTrue($container->hasDefinition(SearchController::class));
     }
 
-    public function testLoad(): void
+    public function testLoadWithCustomConfigs(): void
     {
         $container = new ContainerBuilder();
 

@@ -12,6 +12,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Topic\TopicRegistry;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
@@ -31,6 +32,9 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
+    /** @var TopicRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $topicRegistry;
+
     /** @var PostponedRowsHandler */
     private $handler;
 
@@ -43,6 +47,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
         $rootJob = $this->createMock(Job::class);
         $this->jobProcessor = $this->createMock(JobProcessor::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->topicRegistry = $this->createMock(TopicRegistry::class);
 
         $this->handler = new PostponedRowsHandler(
             $fileManagerMock,
@@ -61,7 +66,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(1);
         $jobExtension = $this->createMock(ExtensionInterface::class);
-        $this->jobRunner = new JobRunner($this->jobProcessor, $jobExtension, $this->currentJob);
+        $this->jobRunner = new JobRunner($this->jobProcessor, $jobExtension, $this->topicRegistry, $this->currentJob);
     }
 
     public function testItCreatesIncrementedJob()

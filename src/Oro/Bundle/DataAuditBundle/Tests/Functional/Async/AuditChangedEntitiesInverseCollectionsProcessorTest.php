@@ -15,6 +15,8 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\JobsAwareTestTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Client\Config as MessageQueueConfig;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -127,7 +129,12 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
             ],
             'entities_deleted' => [],
             'collections_updated' => [],
+        ], [
+            MessageQueueConfig::PARAMETER_TOPIC_NAME => AuditChangedEntitiesInverseCollectionsTopic::getName(),
+            JobAwareTopicInterface::UNIQUE_JOB_NAME => 'fakeJobID'
         ]);
+
+        $this->createRootJobMyMessage($message);
 
         $this->processor->setBatchSize($batchSize);
         $this->processor->process($message, $this->getConnection()->createSession());
@@ -179,11 +186,13 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         }
     }
 
-    private function createMessage(array $body): MessageInterface
+    private function createMessage(array $body, array $properties = []): MessageInterface
     {
         $message = new Message();
         $message->setBody($body);
         $message->setMessageId('some_message_id');
+
+        $message->setProperties($properties);
 
         return $message;
     }

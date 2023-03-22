@@ -9,10 +9,10 @@ class DsnBasedParametersTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidDsnProvider
      */
-    public function testInvalidDsnProcessing($dsn): void
+    public function testInvalidDsnProcessing(string $dsn): void
     {
-        self::expectException(\InvalidArgumentException::class);
-        self::expectExceptionMessage(sprintf('The "%s" websocket related config DSN string is invalid.', $dsn));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The "%s" websocket related config DSN string is invalid.', $dsn));
         new DsnBasedParameters($dsn);
     }
 
@@ -46,7 +46,7 @@ class DsnBasedParametersTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(current($parameter), $dsnParametersBag->getParamValue(key($parameter)));
     }
 
-    public function properDsnProvider()
+    public function properDsnProvider(): array
     {
         return [
             'full_info_dsn' => [

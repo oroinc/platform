@@ -8,16 +8,17 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
+    private function processConfiguration(array $config): array
+    {
+        return (new Processor())->processConfiguration(new Configuration(), $config);
+    }
+
     /**
      * @dataProvider processConfigurationDataProvider
      */
-    public function testProcessConfiguration($options, $expects): void
+    public function testProcessConfiguration(array $config, array $expected): void
     {
-        $processor = new Processor();
-        $configuration = new Configuration();
-        $result = $processor->processConfiguration($configuration, [$options]);
-
-        $this->assertEquals($expects, $result);
+        $this->assertEquals($expected, $this->processConfiguration([$config]));
     }
 
     public function processConfigurationDataProvider(): array
@@ -55,15 +56,15 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processConfigurationFailsDataProvider
      */
-    public function testProcessConfigurationFails($options, $expectedException, $expectedExceptionMessage): void
-    {
-        $processor = new Processor();
-        $configuration = new Configuration();
-
+    public function testProcessConfigurationFails(
+        array $config,
+        string $expectedException,
+        string $expectedExceptionMessage
+    ): void {
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
-        $processor->processConfiguration($configuration, [$options]);
+        $this->processConfiguration([$config]);
     }
 
     public function processConfigurationFailsDataProvider(): array

@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
  * Collects message processors metadata for {@see \Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry}
@@ -29,9 +31,22 @@ class BuildTopicMetaRegistryPass implements CompilerPassInterface
             new TaggedIteratorArgument('oro_message_queue.topic', 'topicName', 'getName', true),
             $container
         );
+        $jobAwareTopicServices = [];
+        /** @var TypedReference $topicService */
+        foreach ($topicServices as $topicName => $topicService) {
+            if (is_subclass_of($topicService->getType(), JobAwareTopicInterface::class)) {
+                $jobAwareTopicServices[$topicName] = $topicService;
+            }
+        }
+
 
         $topicRegistry = $container->getDefinition($topicRegistryId);
-        $topicRegistry->replaceArgument(0, new ServiceLocatorArgument($topicServices));
+
+        $topicRegistry->setArgument('$topicServiceProvider', new ServiceLocatorArgument($topicServices));
+        $topicRegistry->setArgument(
+            '$jobAwareTopicServiceProvider',
+            new ServiceLocatorArgument($jobAwareTopicServices)
+        );
 
         $messageProcessorsMetadata = $this->findMessageProcessorsMetadata(
             $container,

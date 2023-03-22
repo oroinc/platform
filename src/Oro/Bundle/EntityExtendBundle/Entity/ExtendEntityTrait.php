@@ -36,8 +36,13 @@ trait ExtendEntityTrait
         $transport->setName($name);
 
         ExtendedEntityFieldsProcessor::executeGet($transport);
+        if ($transport->isProcessed()) {
+            return $transport->getResult();
+        }
 
-        return $transport->getResult();
+        throw new \LogicException(
+            sprintf('There is no extended property with the name %s in class: %s', $name, static::class)
+        );
     }
 
     /**

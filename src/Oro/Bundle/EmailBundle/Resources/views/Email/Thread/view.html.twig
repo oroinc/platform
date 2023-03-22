@@ -50,23 +50,41 @@
 {% endblock %}
 
 {% block content_data %}
-    <div class="container-fluid">
-        <div class="responsive-section">
-            {{ oro_widget_render({
-                'widgetType': 'block',
-                'wid': 'thread-view',
-                'url': path('oro_email_thread_widget', {'id': entity.id, 'renderContexts': false,
-                    'showSingleEmail': not oro_config_value('oro_email.threads_grouping')}),
-                'alias': 'thread-view',
-                'contextsRendered': true
-            }) }}
-        </div>
-        <div class="widget-content email-activity-widget">
-            <h4 class="scrollspy-title">{{ 'oro.activity.sections.activities'|trans }}</h4>
-            <div class="scrollspy-nav-target"></div>
-            <div class="responsive-section">
-                {% placeholder view_content_data_activities with {entity: entity} %}
-            </div>
-        </div>
-    </div>
+    {% import '@OroUI/macros.html.twig' as UI %}
+
+    {% set emailInfoWidget %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'wid': 'thread-view',
+            'url': path('oro_email_thread_widget', {'id': entity.id, 'renderContexts': false,
+                'showSingleEmail': not oro_config_value('oro_email.threads_grouping')}),
+            'alias': 'thread-view',
+            'contextsRendered': true
+        }) }}
+    {% endset %}
+
+    {% set activitiesData %}
+        {% placeholder view_content_data_activities with {entity: entity} %}
+    {% endset %}
+
+    {% set dataBlocks = [
+        {
+            'title': 'General Information'|trans,
+            'class': 'active',
+            'subblocks': [{
+            'data' : [emailInfoWidget]
+        }]
+        },
+        {
+            'title': 'oro.activity.sections.activities'|trans,
+            'subblocks': [{
+            'spanClass': 'widget-content email-activity-widget',
+            'data' : [activitiesData]
+        }]
+        }
+    ] %}
+
+    {% set data = {'dataBlocks': dataBlocks} %}
+    {% set id = 'threadEmails' %}
+    {{ UI.scrollData(id, data, entity) }}
 {% endblock content_data %}

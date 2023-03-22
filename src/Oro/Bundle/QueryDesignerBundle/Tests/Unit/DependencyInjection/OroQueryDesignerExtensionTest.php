@@ -2,20 +2,29 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\QueryDesignerBundle\Controller\Api\Rest\QueryDesignerEntityController;
 use Oro\Bundle\QueryDesignerBundle\DependencyInjection\OroQueryDesignerExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroQueryDesignerExtensionTest extends ExtensionTestCase
+class OroQueryDesignerExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroQueryDesignerExtension());
+        $container = new ContainerBuilder();
 
-        $expectedDefinitions = [
-            QueryDesignerEntityController::class,
-        ];
+        $extension = new OroQueryDesignerExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
+        self::assertSame(
+            [
+                [
+                    'settings' => [
+                        'resolved' => true,
+                        'conditions_group_merge_same_entity_conditions' => ['value' => true, 'scope' => 'app']
+                    ]
+                ]
+            ],
+            $container->getExtensionConfig('oro_query_designer')
+        );
     }
 }

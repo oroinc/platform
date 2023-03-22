@@ -3,16 +3,18 @@
 namespace Oro\Bundle\AssetBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\AssetBundle\DependencyInjection\Configuration;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
+    private function processConfiguration(array $config): array
+    {
+        return (new Processor())->processConfiguration(new Configuration(), $config);
+    }
+
     public function testConfigTreeWithoutAnyOptions(): void
     {
-        $processor = new Processor();
-
-        $result = $processor->processConfiguration(new Configuration(), []);
+        $result = $this->processConfiguration([]);
 
         $this->assertArrayHasKey('with_babel', $result);
         $this->assertFalse($result['with_babel']);
@@ -33,13 +35,9 @@ class ConfigurationTest extends TestCase
     /**
      * @dataProvider dataProviderConfigTree
      */
-    public function testConfigTree(array $options, array $expects): void
+    public function testConfigTree(array $config, array $expected): void
     {
-        $processor = new Processor();
-        $configuration = new Configuration();
-        $result = $processor->processConfiguration($configuration, [$options]);
-
-        $this->assertEquals($expects, $result);
+        $this->assertEquals($expected, $this->processConfiguration([$config]));
     }
 
     public function dataProviderConfigTree(): array

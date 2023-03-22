@@ -47,17 +47,17 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildJobNameForMessage()
     {
+        $message = new Message();
+        $message->setMessageId('message id');
+        $message->setBody(['class' => 'class-name', 'entityIds' => ['id']]);
+
         $this->logger->expects($this->never())
             ->method('error');
 
         $this->jobRunner->expects($this->once())
-            ->method('runUnique')
+            ->method('runUniqueByMessage')
             ->willReturn(true)
-            ->with('message id', 'search_reindex|d0d06767b38da968e7118c69f821bc1e');
-
-        $message = new Message();
-        $message->setMessageId('message id');
-        $message->setBody(['class' => 'class-name', 'entityIds' => ['id']]);
+            ->with($message);
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 

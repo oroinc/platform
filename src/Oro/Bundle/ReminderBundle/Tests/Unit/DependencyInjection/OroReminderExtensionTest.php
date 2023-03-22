@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\ReminderBundle\Controller\Api\Rest\ReminderController;
 use Oro\Bundle\ReminderBundle\DependencyInjection\OroReminderExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroReminderExtensionTest extends ExtensionTestCase
+class OroReminderExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroReminderExtension());
+        $container = new ContainerBuilder();
 
-        $expectedDefinitions = [
-            ReminderController::class,
-        ];
+        $extension = new OroReminderExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
     }
 }

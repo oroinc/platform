@@ -44,6 +44,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
     use MessageQueueExtension;
 
     private const SPLIT_FILE_TIMEOUT = 30000;
+    private const JOB_NAME = 'oro:batch_api:';
 
     /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
     private $jobRunner;
@@ -205,13 +206,13 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willThrowException($exception);
     }
 
-    private function expectRunUniqueJob(string $messageId, int $operationId, Job $job): void
+    private function expectRunUniqueJob(MessageInterface $expectedMessage, Job $job): void
     {
+        $job->setName(self::JOB_NAME.'123');
         $this->jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->willReturnCallback(function ($ownerId, $name, $runCallback) use ($messageId, $operationId, $job) {
-                self::assertEquals($messageId, $ownerId);
-                self::assertEquals(sprintf('oro:batch_api:%d', $operationId), $name);
+            ->method('runUniqueByMessage')
+            ->willReturnCallback(function ($actualMessage, $runCallback) use ($expectedMessage, $job) {
+                self::assertEquals($actualMessage, $expectedMessage);
 
                 return $runCallback($this->jobRunner, $job);
             });
@@ -222,7 +223,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobRunner->expects(self::once())
             ->method('createDelayed')
             ->willReturnCallback(function ($name, $startCallback) use ($operationId, $job, $jobId) {
-                self::assertEquals(sprintf('oro:batch_api:%d:chunk:1', $operationId), $name);
+                self::assertEquals(sprintf(self::JOB_NAME.'%d:chunk:1', $operationId), $name);
                 $job->setId($jobId);
 
                 return $startCallback($this->jobRunner, $job);
@@ -530,7 +531,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $job = new Job();
         $job->setRootJob($rootJob);
 
-        $this->expectRunUniqueJob($messageId, $operationId, $job);
+        $this->expectRunUniqueJob($message, $job);
         $this->expectSaveJob($operationId, ['key' => 'value']);
         $this->fileManager->expects(self::once())
             ->method('writeToStorage')
@@ -647,7 +648,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $job = new Job();
         $job->setRootJob($rootJob);
 
-        $this->expectRunUniqueJob($messageId, $operationId, $job);
+        $this->expectRunUniqueJob($message, $job);
         $this->expectSaveJob($operationId, ['key' => 'value']);
         $this->fileManager->expects(self::once())
             ->method('writeToStorage')
@@ -667,7 +668,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $chunkJobNameTemplate = sprintf('oro:batch_api:%s:chunk:', $operationId) . '%s';
+        $chunkJobNameTemplate = sprintf(self::JOB_NAME.'%s:chunk:', $operationId) . '%s';
         $nextChunkFileIndex = 2;
         $this->processingHelper->expects(self::once())
             ->method('createChunkJobs')
@@ -773,7 +774,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($operationId, $aggregateTime);
 
         $this->jobRunner->expects(self::never())
-            ->method('runUnique');
+            ->method('runUniqueByMessage');
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
@@ -844,7 +845,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('markAsFailed');
 
         $this->jobRunner->expects(self::once())
-            ->method('runUnique')
+            ->method('runUniqueByMessage')
             ->willReturn(true);
         $this->sourceDataFileManager->expects(self::once())
             ->method('deleteFile')
@@ -916,7 +917,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $job = new Job();
         $job->setRootJob($rootJob);
 
-        $this->expectRunUniqueJob($messageId, $operationId, $job);
+        $this->expectRunUniqueJob($message, $job);
         $this->expectSaveJob($operationId, ['key' => 'value']);
         $this->fileManager->expects(self::once())
             ->method('writeToStorage')
@@ -1024,7 +1025,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('loadChunkIndex');
 
         $this->jobRunner->expects(self::never())
-            ->method('runUnique');
+            ->method('runUniqueByMessage');
         $this->jobManager->expects(self::never())
             ->method('saveJob');
         $this->fileManager->expects(self::never())

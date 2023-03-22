@@ -12,9 +12,9 @@ class OroEntityExtendExtension extends Extension
     /**
      * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $this->processConfiguration(new Configuration(), $configs);
+        $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
@@ -23,7 +23,7 @@ class OroEntityExtendExtension extends Extension
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
 
-        if ($container->getParameter('kernel.environment') === 'test') {
+        if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
         }
     }

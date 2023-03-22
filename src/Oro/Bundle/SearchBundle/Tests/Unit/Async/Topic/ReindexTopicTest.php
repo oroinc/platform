@@ -34,4 +34,12 @@ class ReindexTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro.search.reindex',
+            $this->getTopic()->createJobName([])
+        );
+    }
 }

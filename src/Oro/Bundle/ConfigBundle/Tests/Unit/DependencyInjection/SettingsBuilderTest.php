@@ -8,7 +8,27 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testAppendBoolean()
+    public function testGetSettings(): void
+    {
+        $config = [
+            'key1' => 'val1',
+            'settings' => [
+                'key1' => 'val1'
+            ]
+        ];
+
+        self::assertEquals(['settings' => $config['settings']], SettingsBuilder::getSettings($config));
+    }
+
+    public function testGetSettingsShouldThrowExceptionWhenNoSettingsInConfig(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The config must contains "settings" section.');
+
+        SettingsBuilder::getSettings(['key1' => 'val1']);
+    }
+
+    public function testAppendBoolean(): void
     {
         $root = $this->getRootNode();
 
@@ -29,7 +49,7 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('greeting', ReflectionUtil::getPropertyValue($children['settings'], 'children'));
     }
 
-    public function testAppendScalar()
+    public function testAppendScalar(): void
     {
         $root = $this->getRootNode();
 
@@ -50,7 +70,7 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('level', ReflectionUtil::getPropertyValue($children['settings'], 'children'));
     }
 
-    public function testAppendScalarWhenTypeIsNotSpecified()
+    public function testAppendScalarWhenTypeIsNotSpecified(): void
     {
         $root = $this->getRootNode();
 
@@ -70,7 +90,7 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('level', ReflectionUtil::getPropertyValue($children['settings'], 'children'));
     }
 
-    public function testAppendString()
+    public function testAppendString(): void
     {
         $root = $this->getRootNode();
 
@@ -91,7 +111,7 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('name', ReflectionUtil::getPropertyValue($children['settings'], 'children'));
     }
 
-    public function testAppendArray()
+    public function testAppendArray(): void
     {
         $root = $this->getRootNode();
 
@@ -114,7 +134,7 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(ArrayNodeDefinition::class, $list['value']);
     }
 
-    public function testAppendArrayWhenTypeIsNotSpecified()
+    public function testAppendArrayWhenTypeIsNotSpecified(): void
     {
         $root = $this->getRootNode();
 

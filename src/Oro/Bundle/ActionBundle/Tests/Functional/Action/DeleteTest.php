@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Action;
 
 use Oro\Bundle\ActionBundle\Tests\Functional\OperationAwareTestTrait;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
 
@@ -10,23 +11,17 @@ class DeleteTest extends WebTestCase
 {
     use OperationAwareTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $this->loadFixtures([
-            'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems',
-        ]);
+        $this->loadFixtures([LoadItems::class]);
     }
 
     public function testExecute()
     {
         $item = $this->getReference(LoadItems::ITEM1);
         $operationName = 'DELETE';
-        $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\Item';
+        $entityClass = Item::class;
         $entityId = $item->getId();
         $this->client->request(
             'POST',

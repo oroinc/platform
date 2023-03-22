@@ -12,20 +12,13 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var ConfigurationProvider */
-    private $configurationProvider;
+    private ConfigurationProvider $configurationProvider;
 
-    /** @var string */
-    private $cacheFile;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('HelpConfigurationProvider');
+        $cacheFile = $this->getTempFile('HelpConfigurationProvider');
 
-        $this->configurationProvider = new ConfigurationProvider($this->cacheFile, false);
+        $this->configurationProvider = new ConfigurationProvider($cacheFile, false);
     }
 
     public function testGetConfiguration()

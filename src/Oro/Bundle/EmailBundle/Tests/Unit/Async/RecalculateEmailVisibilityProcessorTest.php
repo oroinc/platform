@@ -23,6 +23,7 @@ use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
 {
     private const CHUNK_SIZE = 500;
+    private const JOB_NAME = 'oro.email.recalculate_email_visibility';
 
     use MessageQueueExtension;
 
@@ -67,17 +68,23 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
         $message->expects(self::any())
             ->method('getMessageId')
             ->willReturn($messageId);
+        $message->expects(self::any())
+            ->method('getProperties')
+            ->willReturn([]);
 
         return $message;
     }
 
-    private function expectsRunUnique(string $messageId, string $jobName): void
+    private function expectsRunUnique(MessageInterface $message): void
     {
+        $job = new Job();
+        $job->setName(self::JOB_NAME);
+
         $this->jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->with($messageId, $jobName)
-            ->willReturnCallback(function ($ownerId, $name, $runCallback) {
-                return $runCallback($this->jobRunner, new Job());
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $runCallback) use ($job) {
+                return $runCallback($this->jobRunner, $job);
             });
     }
 
@@ -130,12 +137,11 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
     public function testProcessWhenEmailsNotFound(): void
     {
         $email = 'test@test.com';
-        $jobName = sprintf('oro.email.recalculate_email_visibility:%s', md5($email));
 
         $messageId = 'test_message';
         $message = $this->getMessage(['email' => $email], $messageId);
 
-        $this->expectsRunUnique($messageId, $jobName);
+        $this->expectsRunUnique($message);
         $this->jobRunner->expects(self::never())
             ->method('createDelayed');
 
@@ -154,7 +160,7 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
     public function testProcessForOneChunk(): void
     {
         $email = 'test1@test.com';
-        $jobName = sprintf('oro.email.recalculate_email_visibility:%s', md5($email));
+        $jobName = self::JOB_NAME;
 
         $messageId = 'test_message';
         $message = $this->getMessage(['email' => $email], $messageId);
@@ -166,7 +172,7 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
         $this->addDataQueryExpectation($email, [['id_0' => 135]]);
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
-        $this->expectsRunUnique($messageId, $jobName);
+        $this->expectsRunUnique($message);
         $this->jobRunner->expects(self::once())
             ->method('createDelayed')
             ->with(sprintf('%s:1', $jobName))
@@ -194,7 +200,7 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
     public function testProcessForSeveralChunk(): void
     {
         $email = 'test2@test.com';
-        $jobName = sprintf('oro.email.recalculate_email_visibility:%s', md5($email));
+        $jobName = self::JOB_NAME;
 
         $messageId = 'test_message';
         $message = $this->getMessage(['email' => $email], $messageId);
@@ -223,7 +229,7 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
         $this->addDataQueryExpectation($email, $chunk2Data, self::CHUNK_SIZE);
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
-        $this->expectsRunUnique($messageId, $jobName);
+        $this->expectsRunUnique($message, $email);
         $this->jobRunner->expects(self::exactly(2))
             ->method('createDelayed')
             ->withConsecutive([sprintf('%s:1', $jobName)], [sprintf('%s:2', $jobName)])

@@ -2,7 +2,6 @@
 
 namespace Oro\Component\ExpressionLanguage\Node;
 
-use Oro\Bundle\EntityExtendBundle\Decorator\PropertyAccessorWithDotArraySyntax;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\ExpressionLanguage\Compiler;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
