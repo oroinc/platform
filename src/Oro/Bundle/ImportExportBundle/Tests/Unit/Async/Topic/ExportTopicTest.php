@@ -8,12 +8,13 @@ use Oro\Component\MessageQueue\Test\AbstractTopicTestCase;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ExportTopicTest extends AbstractTopicTestCase
 {
     protected function getTopic(): TopicInterface
     {
-        return new ExportTopic();
+        return new ExportTopic($this->createMock(TokenStorageInterface::class));
     }
 
     public function validBodyDataProvider(): array

@@ -12,6 +12,7 @@ use Oro\Component\MessageQueue\Provider\NullJobConfigurationProvider;
  * is quite difficult and would make it less readable.
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class JobProcessor
 {
@@ -72,22 +73,12 @@ class JobProcessor
             throw new \LogicException('Job name must not be empty');
         }
 
-        $job = $this->getJobRepository()->findRootJobByOwnerIdAndJobName($ownerId, $jobName);
+        $job = $this->findJobByName($ownerId, $jobName);
         if ($job) {
             return $job;
         }
 
-        $job = $this->getJobRepository()->createJob();
-        $job->setOwnerId($ownerId);
-        $job->setStatus(Job::STATUS_NEW);
-        $job->setName($jobName);
-        $job->setCreatedAt(new \DateTime());
-        $job->setLastActiveAt(new \DateTime());
-        $job->setStartedAt(new \DateTime());
-        $job->setJobProgress(0);
-        $job->setUnique((bool) $unique);
-
-        return $this->saveJobAndStaleDuplicateIfQualifies($job);
+        return $this->createRootJob($ownerId, $jobName, $unique);
     }
 
     /**
@@ -118,6 +109,11 @@ class JobProcessor
         $this->jobManager->saveJob($job);
 
         return $job;
+    }
+
+    public function findJobByName($ownerId, $jobName): ?Job
+    {
+        return $this->getJobRepository()->findRootJobByOwnerIdAndJobName($ownerId, $jobName);
     }
 
     public function startChildJob(Job $job): void
@@ -299,5 +295,26 @@ class JobProcessor
     private function getJobRepository(): JobRepositoryInterface
     {
         return $this->doctrine->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
+    }
+
+    /**
+     * @param string $ownerId
+     * @param string $jobName
+     * @param bool $unique
+     * @return Job|null
+     */
+    public function createRootJob(string $ownerId, string $jobName, bool $unique): ?Job
+    {
+        $job = $this->getJobRepository()->createJob();
+        $job->setOwnerId($ownerId);
+        $job->setStatus(Job::STATUS_NEW);
+        $job->setName($jobName);
+        $job->setCreatedAt(new \DateTime());
+        $job->setLastActiveAt(new \DateTime());
+        $job->setStartedAt(new \DateTime());
+        $job->setJobProgress(0);
+        $job->setUnique((bool)$unique);
+
+        return $this->saveJobAndStaleDuplicateIfQualifies($job);
     }
 }

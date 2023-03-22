@@ -154,7 +154,7 @@ trait AbstractMessageQueueAssertTrait
     /**
      * Gets all sent messages.
      *
-     * @return array [['topic' => topic name, 'message' => message (string|array|Message)], ...]
+     * @return array<array{topic: string, message: string|array|Message}>
      */
     protected static function getSentMessages(bool $extractBodies = true): array
     {

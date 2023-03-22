@@ -34,4 +34,12 @@ class UpdateEmailAssociationsTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro.email.update_associations_to_emails',
+            $this->getTopic()->createJobName([])
+        );
+    }
 }

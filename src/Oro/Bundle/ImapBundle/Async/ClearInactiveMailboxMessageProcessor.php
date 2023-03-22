@@ -43,9 +43,8 @@ class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface,
             $originId = $data['id'];
         }
 
-        $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            ClearInactiveMailboxTopic::getName(),
+        $this->jobRunner->runUniqueByMessage(
+            $message,
             function () use ($originId) {
                 $this->clearManager->clear($originId);
 

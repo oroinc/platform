@@ -8,6 +8,7 @@ use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumerMemoryExtensio
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitGarbageCollectionExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitObjectExtension;
+use Oro\Component\MessageQueue\Consumption\Extension\UniqueJobsProcessedExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,6 +29,13 @@ trait LimitsExtensionsCommandTrait
             ->addOption('memory-limit', null, InputOption::VALUE_REQUIRED, 'Exit if this memory limit (MB) is reached')
             ->addOption('object-limit', null, InputOption::VALUE_REQUIRED, 'Exit when objects amount reached')
             ->addOption('gc-limit', null, InputOption::VALUE_REQUIRED, 'Exit when GC calls amount reached')
+            ->addOption(
+                'stop-when-unique-jobs-processed',
+                false,
+                InputOption::VALUE_NONE,
+                'Stop consumer when all unique jobs are processed. Useful during development and in testing ' .
+                'scenarios. Not intended to be used in production'
+            )
             ->setHelp(
                 // @codingStandardsIgnoreStart
                 $this->getHelp().<<<'HELP'
@@ -103,6 +111,10 @@ HELP
         $garbageCollectionLimit = (int)$input->getOption('gc-limit');
         if ($garbageCollectionLimit) {
             $extensions[] = new LimitGarbageCollectionExtension($garbageCollectionLimit);
+        }
+
+        if ($input->getOption('stop-when-unique-jobs-processed')) {
+            $extensions[] = new UniqueJobsProcessedExtension($this->jobManager);
         }
 
         return $extensions;

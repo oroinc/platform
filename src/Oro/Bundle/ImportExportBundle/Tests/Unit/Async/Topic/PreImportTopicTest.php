@@ -192,4 +192,14 @@ class PreImportTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertStringStartsWith(
+            'oro:bar:baz:foo:1:',
+            $this->getTopic()->createJobName(
+                ['process' => 'bar', 'processorAlias' => 'baz', 'jobName' => 'foo', 'userId' => 1]
+            )
+        );
+    }
 }

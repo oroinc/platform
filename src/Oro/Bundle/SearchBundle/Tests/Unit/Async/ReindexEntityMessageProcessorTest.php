@@ -45,11 +45,15 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getClassesForReindex')
             ->willReturn(['class-name']);
 
+        $message = new Message();
+        $message->setMessageId('message-id');
+        $message->setBody('');
+
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects($this->once())
-            ->method('runUnique')
-            ->with('message-id', ReindexTopic::getName())
-            ->willReturnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $callback) use ($jobRunner) {
                 $callback($jobRunner);
 
                 return true;
@@ -63,10 +67,6 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
                 $callback($jobRunner, $job);
             });
-
-        $message = new Message();
-        $message->setMessageId('message-id');
-        $message->setBody('');
 
         $processor = new ReindexEntityMessageProcessor($indexer, $jobRunner, self::getMessageProducer());
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
@@ -89,11 +89,15 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('class-name')
             ->willReturn(['class-name']);
 
+        $message = new Message();
+        $message->setMessageId('message-id');
+        $message->setBody('class-name');
+
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects($this->once())
-            ->method('runUnique')
-            ->with('message-id', ReindexTopic::getName())
-            ->willReturnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $callback) use ($jobRunner) {
                 $callback($jobRunner);
 
                 return true;
@@ -107,10 +111,6 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
                 $callback($jobRunner, $job);
             });
-
-        $message = new Message();
-        $message->setMessageId('message-id');
-        $message->setBody('class-name');
 
         $processor = new ReindexEntityMessageProcessor($indexer, $jobRunner, self::getMessageProducer());
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
@@ -133,11 +133,15 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('class-name')
             ->willReturn(['class-name']);
 
+        $message = new Message();
+        $message->setMessageId('message-id');
+        $message->setBody(['class-name']);
+
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects($this->once())
-            ->method('runUnique')
-            ->with('message-id', ReindexTopic::getName())
-            ->willReturnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $callback) use ($jobRunner) {
                 $callback($jobRunner);
 
                 return true;
@@ -151,10 +155,6 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
                 $callback($jobRunner, $job);
             });
-
-        $message = new Message();
-        $message->setMessageId('message-id');
-        $message->setBody(['class-name']);
 
         $processor = new ReindexEntityMessageProcessor($indexer, $jobRunner, self::getMessageProducer());
         $result = $processor->process($message, $this->createMock(SessionInterface::class));

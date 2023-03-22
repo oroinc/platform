@@ -29,6 +29,8 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
+    private const JOB_NAME = 'oro_importexport.pre_export.test.user_1';
+
     public function testShouldReturnSubscribedTopics(): void
     {
         self::assertEquals([PreExportTopic::getName()], PreExportMessageProcessor::getSubscribedTopics());
@@ -40,7 +42,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldSetOrganizationAndACKMessage(): void
     {
         $exportHandler = $this->createMock(ExportHandler::class);
-        $jobUniqueName = 'oro_importexport.pre_export.test.user_1';
+        $jobUniqueName = self::JOB_NAME;
         $message = new TransportMessage();
         $message->setBody([
             'jobName' => 'test',
@@ -57,9 +59,9 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->with(123, $jobUniqueName)
-            ->willReturnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $callback) use ($jobRunner, $childJob) {
                 return $callback($jobRunner, $childJob);
             });
         $jobRunner->expects(self::once())
@@ -147,6 +149,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $job = new Job();
         $job->setId($id);
+        $job->setName(self::JOB_NAME);
         if (null !== $rootJob) {
             $job->setRootJob($rootJob);
         }

@@ -46,4 +46,12 @@ class SendAutoResponsesTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro.email.send_auto_responses:' . md5(implode(',', ['42', '142'])),
+            $this->getTopic()->createJobName(['ids' => ['42', '142']])
+        );
+    }
 }

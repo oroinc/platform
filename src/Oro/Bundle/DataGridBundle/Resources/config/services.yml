@@ -304,7 +304,6 @@ services:
             - '@oro_message_queue.job.runner'
             - '@oro_datagrid.async.executor.pre_export'
             - '@oro_datagrid.datagrid.manager'
-            - '@oro_security.token_accessor'
         tags:
             - { name: oro_message_queue.client.message_processor }
 

@@ -107,4 +107,12 @@ class AuditChangedEntitiesInverseCollectionsTopicTest extends AbstractTopicTestC
     {
         self::assertEquals(MessagePriority::VERY_LOW, $this->getTopic()->getDefaultPriority('queueName'));
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertStringStartsWith(
+            'oro.data_audit.entities_inversed_relations_changed.collections_',
+            $this->getTopic()->createJobName([])
+        );
+    }
 }

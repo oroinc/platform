@@ -58,9 +58,8 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
      */
     public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $messageId = $message->getMessageId();
         try {
-            return $this->processCollections($message->getBody(), $messageId) ? self::ACK : self::REJECT;
+            return $this->processCollections($message->getBody(), $message) ? self::ACK : self::REJECT;
         } catch (\Exception $e) {
             $this->logger->error(
                 'Unexpected exception occurred during queue message processing',
@@ -73,13 +72,12 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
 
     /**
      * @param array $body
-     * @param string $messageId
+     * @param MessageInterface $message
      *
      * @return mixed|null
      */
-    protected function processCollections(array $body, string $messageId)
+    protected function processCollections(array $body, MessageInterface $message)
     {
-        $jobName = uniqid(sprintf('%s_', AuditChangedEntitiesInverseCollectionsTopic::getName()));
         $collectionsData = array_merge(
             $this->processEntityFromCollection($body['entities_inserted'], 'inserted'),
             $this->processEntityFromCollection($body['entities_updated'], 'changed'),
@@ -93,9 +91,8 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
             $body['collections_updated']
         );
 
-        return $this->jobRunner->runUnique(
-            $messageId,
-            $jobName,
+        return $this->jobRunner->runUniqueByMessage(
+            $message,
             function (JobRunner $jobRunner, Job $job) use ($body, $collectionsData) {
                 $index = 0;
                 foreach ($collectionsData as $sourceEntityData) {

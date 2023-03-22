@@ -208,27 +208,26 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $expectedJobs = [
             [
                 'result'  => MessageProcessorInterface::REJECT,
-                'status'  => Job::STATUS_FAILED,
+                'status' => Job::STATUS_FAILED,
                 'summary' => [
-                    'readCount'   => 0,
-                    'writeCount'  => 0,
-                    'errorCount'  => 1,
+                    'readCount' => 0,
+                    'writeCount' => 0,
+                    'errorCount' => 1,
                     'createCount' => 0,
                     'updateCount' => 0
                 ]
             ]
         ];
-        $this->getBatchUpdateExceptionController()->setFailedGroups(['initialize']);
-        $operationId = $this->processUpdateListAndValidateJobs($entityClass, $data, $expectedJobs);
+        $operationId = $this->processUpdateListAndValidateJobs($entityClass, $data, $expectedJobs, 'initialize');
         $this->assertAsyncOperationRootJobStatus(
             $operationId,
             Job::STATUS_FAILED,
             1.0,
             true,
             [
-                'readCount'   => 0,
-                'writeCount'  => 0,
-                'errorCount'  => 1,
+                'readCount' => 0,
+                'writeCount' => 0,
+                'errorCount' => 1,
                 'createCount' => 0,
                 'updateCount' => 0
             ]
@@ -264,27 +263,26 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $expectedJobs = [
             [
                 'result'  => MessageProcessorInterface::REJECT,
-                'status'  => Job::STATUS_FAILED,
+                'status' => Job::STATUS_FAILED,
                 'summary' => [
-                    'readCount'   => 1,
-                    'writeCount'  => 1,
-                    'errorCount'  => 1,
+                    'readCount' => 1,
+                    'writeCount' => 1,
+                    'errorCount' => 1,
                     'createCount' => 1,
                     'updateCount' => 0
                 ]
             ]
         ];
-        $this->getBatchUpdateExceptionController()->setFailedGroups(['finalize']);
-        $operationId = $this->processUpdateListAndValidateJobs($entityClass, $data, $expectedJobs);
+        $operationId = $this->processUpdateListAndValidateJobs($entityClass, $data, $expectedJobs, 'finalize');
         $this->assertAsyncOperationRootJobStatus(
             $operationId,
             Job::STATUS_FAILED,
             1.0,
             true,
             [
-                'readCount'   => 1,
-                'writeCount'  => 1,
-                'errorCount'  => 1,
+                'readCount' => 1,
+                'writeCount' => 1,
+                'errorCount' => 1,
                 'createCount' => 1,
                 'updateCount' => 0
             ]
@@ -321,27 +319,31 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $expectedJobs = [
             [
                 'result'  => MessageProcessorInterface::REJECT,
-                'status'  => Job::STATUS_FAILED,
+                'status' => Job::STATUS_FAILED,
                 'summary' => [
-                    'readCount'   => 1,
-                    'writeCount'  => 0,
-                    'errorCount'  => 1,
+                    'readCount' => 1,
+                    'writeCount' => 0,
+                    'errorCount' => 1,
                     'createCount' => 0,
                     'updateCount' => 0
                 ]
             ]
         ];
-        $this->getBatchUpdateExceptionController()->setFailedGroups(['save_data:before_flush']);
-        $operationId = $this->processUpdateListAndValidateJobs($entityClass, $data, $expectedJobs);
+        $operationId = $this->processUpdateListAndValidateJobs(
+            $entityClass,
+            $data,
+            $expectedJobs,
+            'save_data:before_flush'
+        );
         $this->assertAsyncOperationRootJobStatus(
             $operationId,
             Job::STATUS_FAILED,
             1.0,
             true,
             [
-                'readCount'   => 1,
-                'writeCount'  => 0,
-                'errorCount'  => 1,
+                'readCount' => 1,
+                'writeCount' => 0,
+                'errorCount' => 1,
                 'createCount' => 0,
                 'updateCount' => 0
             ]
@@ -377,27 +379,26 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $expectedJobs = [
             [
                 'result'  => MessageProcessorInterface::REJECT,
-                'status'  => Job::STATUS_FAILED,
+                'status' => Job::STATUS_FAILED,
                 'summary' => [
-                    'readCount'   => 1,
-                    'writeCount'  => 1,
-                    'errorCount'  => 1,
+                    'readCount' => 1,
+                    'writeCount' => 1,
+                    'errorCount' => 1,
                     'createCount' => 1,
                     'updateCount' => 0
                 ]
             ]
         ];
-        $this->getBatchUpdateExceptionController()->setFailedGroups(['save_data']);
-        $operationId = $this->processUpdateListAndValidateJobs($entityClass, $data, $expectedJobs);
+        $operationId = $this->processUpdateListAndValidateJobs($entityClass, $data, $expectedJobs, 'save_data');
         $this->assertAsyncOperationRootJobStatus(
             $operationId,
             Job::STATUS_FAILED,
             1.0,
             true,
             [
-                'readCount'   => 1,
-                'writeCount'  => 1,
-                'errorCount'  => 1,
+                'readCount' => 1,
+                'writeCount' => 1,
+                'errorCount' => 1,
                 'createCount' => 1,
                 'updateCount' => 0
             ]
@@ -434,27 +435,26 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $expectedJobs = [
             [
                 'result'  => MessageProcessorInterface::REJECT,
-                'status'  => Job::STATUS_FAILED,
+                'status' => Job::STATUS_FAILED,
                 'summary' => [
-                    'readCount'   => 1,
-                    'writeCount'  => 1,
-                    'errorCount'  => 0,
+                    'readCount' => 1,
+                    'writeCount' => 1,
+                    'errorCount' => 0,
                     'createCount' => 1,
                     'updateCount' => 0
                 ]
             ]
         ];
-        $this->getBatchUpdateExceptionController()->setFailedGroups(['save_errors']);
-        $operationId = $this->processUpdateListAndValidateJobs($entityClass, $data, $expectedJobs);
+        $operationId = $this->processUpdateListAndValidateJobs($entityClass, $data, $expectedJobs, 'save_errors');
         $this->assertAsyncOperationRootJobStatus(
             $operationId,
             Job::STATUS_FAILED,
             1.0,
             true,
             [
-                'readCount'   => 1,
-                'writeCount'  => 1,
-                'errorCount'  => 0,
+                'readCount' => 1,
+                'writeCount' => 1,
+                'errorCount' => 0,
                 'createCount' => 1,
                 'updateCount' => 0
             ]
@@ -479,10 +479,11 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
                 ]
             ]
         ];
-        $this->getBatchUpdateExceptionController()->setFailedGroups(['normalize_result']);
         $operationId = $this->sendUpdateListRequest($entityClass, $data);
         try {
-            $this->processUpdateListChunkMessages();
+            $this->consumeMessages();
+            $this->getBatchUpdateExceptionController()->setFailedGroups(['normalize_result']);
+            $this->consumeAllMessages();
             self::fail(sprintf('Expected %s', JobRuntimeException::class));
         } catch (JobRuntimeException $e) {
             // it is expected exception
@@ -567,16 +568,13 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
                     ->getIncludedDataChunkSize(TestDepartment::class)
             ]
         );
-        $sentMessage = self::getSentMessage(UpdateListTopic::getName());
-        $messageBodyResolver = self::getContainer()->get('oro_message_queue.client.message_body_resolver');
-        $message = $this->createMessage($messageBodyResolver->resolveBody(UpdateListTopic::getName(), $sentMessage));
         self::clearMessageCollector();
 
         // check that the created asynchronous operation can be requested via REST API
         $this->assertAsyncOperationStatus($operationId, $newOperationAttributes);
 
         // check that sent "oro.api.update_list" message can be processed
-        $this->processUpdateListMessage($message);
+        $this->consumeMessages(1);
 
         // check that data file was removed
         self::assertFalse($this->getSourceDataFileManager()->hasFile($operation->getDataFileName()));
@@ -652,14 +650,14 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
                     ->getIncludedDataChunkSize(TestDepartment::class)
             ]
         );
-        $message = $this->createMessage(self::getSentMessage(UpdateListTopic::getName()));
+
         self::clearMessageCollector();
 
         // check that the created asynchronous operation can be requested via REST API
         $this->assertAsyncOperationStatus($operationId, $newOperationAttributes);
 
         // check that sent "oro.api.update_list" message can be processed
-        $this->processUpdateListMessage($message);
+        $this->consumeMessages(1);
 
         // check that data file was removed
         self::assertFalse($this->getSourceDataFileManager()->hasFile($operation->getDataFileName()));
@@ -731,27 +729,30 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $data = [
             'data' => [
                 [
-                    'type'       => $entityType,
+                    'type' => $entityType,
                     'attributes' => ['title' => 'New Department 1']
                 ]
             ]
         ];
-        $operation = $this->createAsyncOperation($entityClass, $data);
-        $message = $this->createUpdateListMessage($operation);
-        $this->processUpdateListMessage($message);
+
+        $operationID = $this->sendUpdateListRequest($entityClass, $data);
+
+        self::consumeMessages();
 
         self::assertMessagesCount(UpdateListProcessChunkTopic::getName(), 1);
-        $sentMessages = self::getSentMessagesByTopic(UpdateListProcessChunkTopic::getName());
+
+        $sentMessages = array_column(self::getSentMessages(), 'message');
+
         self::assertArrayContains(
             [
                 [
-                    'operationId'       => $operation->getId(),
-                    'entityClass'       => $operation->getEntityClass(),
-                    'requestType'       => $this->getRequestType()->toArray(),
-                    'version'           => Version::LATEST,
-                    'fileIndex'         => 0,
+                    'operationId' => $operationID,
+                    'entityClass' => $entityClass,
+                    'requestType' => $this->getRequestType()->toArray(),
+                    'version' => Version::LATEST,
+                    'fileIndex' => 0,
                     'firstRecordOffset' => 0,
-                    'sectionName'       => 'data'
+                    'sectionName' => 'data'
                 ]
             ],
             $sentMessages
@@ -776,35 +777,36 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $data = ['data' => []];
         for ($i = 1; $i <= $chunkSize + 1; $i++) {
             $data['data'][] = [
-                'type'       => $entityType,
+                'type' => $entityType,
                 'attributes' => ['title' => sprintf('New Department %d', $i)]
             ];
         }
-        $operation = $this->createAsyncOperation($entityClass, $data);
-        $message = $this->createUpdateListMessage($operation);
-        $this->processUpdateListMessage($message);
+        $operationID = $this->sendUpdateListRequest($entityClass, $data);
+        self::consumeMessages();
 
         self::assertMessagesCount(UpdateListProcessChunkTopic::getName(), 2);
+
         $sentMessages = self::getSentMessagesByTopic(UpdateListProcessChunkTopic::getName());
+
         self::assertArrayContains(
             [
                 [
-                    'operationId'       => $operation->getId(),
-                    'entityClass'       => $operation->getEntityClass(),
-                    'requestType'       => $this->getRequestType()->toArray(),
-                    'version'           => Version::LATEST,
-                    'fileIndex'         => 0,
+                    'operationId' => $operationID,
+                    'entityClass' => $entityClass,
+                    'requestType' => $this->getRequestType()->toArray(),
+                    'version' => Version::LATEST,
+                    'fileIndex' => 0,
                     'firstRecordOffset' => 0,
-                    'sectionName'       => 'data'
+                    'sectionName' => 'data'
                 ],
                 [
-                    'operationId'       => $operation->getId(),
-                    'entityClass'       => $operation->getEntityClass(),
-                    'requestType'       => $this->getRequestType()->toArray(),
-                    'version'           => Version::LATEST,
-                    'fileIndex'         => 1,
+                    'operationId' => $operationID,
+                    'entityClass' => $entityClass,
+                    'requestType' => $this->getRequestType()->toArray(),
+                    'version' => Version::LATEST,
+                    'fileIndex' => 1,
                     'firstRecordOffset' => $chunkSize,
-                    'sectionName'       => 'data'
+                    'sectionName' => 'data'
                 ]
             ],
             $sentMessages
@@ -1092,27 +1094,18 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessChunkWithValidationErrors(): void
     {
         $entityClass = TestDepartment::class;
-        $this->appendEntityConfig(
-            $entityClass,
-            [
-                'fields' => [
-                    'title' => [
-                        'form_options' => [
-                            'constraints' => [['NotBlank' => null]]
-                        ]
-                    ]
-                ]
-            ]
-        );
         $entityType = $this->getEntityType($entityClass);
         $departments = $this->createDepartments(['Department 2', 'Department 3']);
         $data = [
             'data' => [
                 [
-                    'type'       => $entityType,
+                    'type' => $entityType,
                     'attributes' => ['title' => '']
                 ],
                 [
@@ -1141,25 +1134,40 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             ],
             [
                 'extra_chunk' => true,
-                'summary'     => [
-                    'readCount'   => 1,
-                    'writeCount'  => 1,
-                    'errorCount'  => 0,
+                'summary' => [
+                    'readCount' => 1,
+                    'writeCount' => 1,
+                    'errorCount' => 0,
                     'createCount' => 0,
                     'updateCount' => 1
                 ]
             ]
         ];
-        $operationId = $this->processUpdateListAndValidateJobs($entityClass, $data, $expectedJobs);
+
+        $operationId = $this->processUpdateListAndValidateJobs(
+            $entityClass,
+            $data,
+            $expectedJobs,
+            entityConfig: [
+                'fields' => [
+                    'title' => [
+                        'form_options' => [
+                            'constraints' => [['NotBlank' => null]]
+                        ]
+                    ]
+                ]
+            ]
+        );
+
         $this->assertAsyncOperationRootJobStatus(
             $operationId,
             Job::STATUS_SUCCESS,
             1.0,
             true,
             [
-                'readCount'   => 3,
-                'writeCount'  => 1,
-                'errorCount'  => 2,
+                'readCount' => 3,
+                'writeCount' => 1,
+                'errorCount' => 2,
                 'createCount' => 0,
                 'updateCount' => 1
             ]

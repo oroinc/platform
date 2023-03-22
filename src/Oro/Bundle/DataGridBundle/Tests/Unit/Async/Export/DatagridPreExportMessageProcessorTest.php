@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Async\Export;
 
 use Oro\Bundle\DataGridBundle\Async\Export\DatagridPreExportMessageProcessor;
 use Oro\Bundle\DataGridBundle\Async\Export\Executor\DatagridPreExportExecutorInterface;
-use Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic;
 use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
@@ -89,20 +88,12 @@ class DatagridPreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getUserId')
             ->willReturn($userId);
 
-        $jobName = sprintf(
-            '%s.%s.user_%s.%s',
-            DatagridExportTopic::getName(),
-            $datagrid->getName(),
-            $userId,
-            $messageBody['outputFormat']
-        );
-
         $this->jobRunner
             ->expects(self::once())
-            ->method('runUnique')
-            ->with($message->getMessageId(), $jobName, self::isType('callable'))
+            ->method('runUniqueByMessage')
+            ->with($message, self::isType('callable'))
             ->willReturnCallback(
-                function (string $ownerId, string $jobName, callable $callback) use ($rootJobRunner, $job) {
+                function (Message $message, callable $callback) use ($rootJobRunner, $job) {
                     return $callback($rootJobRunner, $job);
                 }
             );

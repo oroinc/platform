@@ -182,7 +182,7 @@ HELP
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        if ($this->getContainer()->getParameter('kernel.environment') === 'test') {
+        if ($this->isTestEnvironment()) {
             $this->presetTestEnvironmentOptions($input, $output);
         }
     }
@@ -230,6 +230,8 @@ HELP
             // cache clear must be done after assets build process finished,
             // otherwise, it could lead to unpredictable errors
             $this->clearCache($commandExecutor, $input);
+
+            $this->eventDispatcher->dispatch($event, InstallerEvents::FINISH);
         } catch (\Exception $exception) {
             $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
             // Exceptions may originate in the command executor and in InstallCommand code itself
@@ -683,5 +685,10 @@ HELP
         }
 
         $input->setInteractive(false);
+    }
+
+    protected function isTestEnvironment(): bool
+    {
+        return $this->getContainer()->getParameter('kernel.environment') === 'test';
     }
 }
