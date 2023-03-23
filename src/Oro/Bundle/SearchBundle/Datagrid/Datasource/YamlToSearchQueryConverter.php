@@ -8,6 +8,9 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Symfony\Component\Config\Definition\Processor;
 
+/**
+ * Configure search query by YAML configuration.
+ */
 class YamlToSearchQueryConverter
 {
     /**
