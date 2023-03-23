@@ -100,3 +100,8 @@ services:
 
     Oro\Bundle\FormBundle\Provider\SaveAndReturnActionFormTemplateDataProvider:
         alias: oro_form.provider.form_template_data.return_action
+
+    oro_form.provider.form_fields_map:
+        class: Oro\Bundle\FormBundle\Provider\ScalarFieldsMapProvider
+        arguments:
+            - '@doctrine'
