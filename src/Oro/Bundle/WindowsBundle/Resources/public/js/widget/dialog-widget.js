@@ -388,6 +388,8 @@ define(function(require, exports, module) {
             if (doReposition) {
                 this.resetDialogPosition();
             }
+
+            this._setMaxMinWith();
         },
 
         _onAdoptedFormResetClick: function() {
@@ -471,20 +473,7 @@ define(function(require, exports, module) {
                 this._bindDialogEvents();
                 this.widget.html(this.$el).dialog(dialogOptions);
                 this.getLayoutElement().attr('data-layout', 'separate');
-
-                const minWidth = this.widget.dialog('option', 'minWidth');
-                let maxWidth = this.widget.dialog('option', 'maxWidth');
-
-                if (minWidth || maxWidth) {
-                    if (maxWidth > this.getLimitToContainer().clientWidth) {
-                        maxWidth = this.getLimitToContainer().clientWidth;
-                    }
-
-                    this.widget.dialog('instance').element.css({
-                        minWidth: minWidth,
-                        maxWidth: maxWidth || this.getLimitToContainer().clientWidth
-                    });
-                }
+                this._setMaxMinWith();
             } else {
                 if (this.widget.dialog('instance') !== void 0 && !this.widget.dialog('isOpen')) {
                     this.widget.dialog('open');
@@ -537,6 +526,32 @@ define(function(require, exports, module) {
             if (scrollableContent.length) {
                 scrollableContent.css('overflow', 'auto');
                 this.widget.on(resizeEvents, this._fixScrollableHeight.bind(this));
+            }
+        },
+
+        /**
+         * Adjusts dialog width to its limit container.
+         * There may be a case when content enlarges dialog size
+         * @private
+         */
+        _setMaxMinWith: function() {
+            if (!this.widget) {
+                // widget is not initialized -- where's nothing to position yet
+                return;
+            }
+
+            const minWidth = this.widget.dialog('option', 'minWidth');
+            let maxWidth = this.widget.dialog('option', 'maxWidth');
+
+            if (minWidth || maxWidth) {
+                if (maxWidth > this.getLimitToContainer().clientWidth) {
+                    maxWidth = this.getLimitToContainer().clientWidth;
+                }
+
+                this.widget.dialog('instance').element.css({
+                    minWidth: minWidth,
+                    maxWidth: maxWidth || this.getLimitToContainer().clientWidth
+                });
             }
         },
 
