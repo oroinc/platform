@@ -30,6 +30,7 @@ aliases:
     oro/datagrid/cell/number-cell$: orodatagrid/js/datagrid/cell/number-cell
     oro/datagrid/cell/phone-cell$: orodatagrid/js/datagrid/cell/phone-cell
     oro/datagrid/cell/relation-cell$: orodatagrid/js/datagrid/cell/relation-cell
+    oro/datagrid/cell/sort-icon-cell$: orodatagrid/js/sort-rows-drag-n-drop/sort-icon-cell
     oro/datagrid/cell/select-cell$: orodatagrid/js/datagrid/cell/select-cell
     oro/datagrid/cell/select-row-cell$: orodatagrid/js/datagrid/cell/select-row-cell
     oro/datagrid/cell/string-cell$: orodatagrid/js/datagrid/cell/string-cell
@@ -81,6 +82,7 @@ dynamic-imports:
         - oro/datagrid/cell/select-row-cell
         - oro/datagrid/cell/string-cell
         - oro/datagrid/cell/time-cell
+        - oro/datagrid/cell/sort-icon-cell
         - orodatagrid/js/app/components/cell-popup-editor-component
         - orodatagrid/js/app/components/column-renderer-component
         - orodatagrid/js/app/components/datagrid-allow-tracking-component
@@ -101,6 +103,7 @@ dynamic-imports:
         - orodatagrid/js/app/views/board/column-view
         - orodatagrid/js/appearance/builder
         - orodatagrid/js/cell-links/builder
+        - orodatagrid/js/sort-rows-drag-n-drop/builder
         - orodatagrid/js/datagrid/listener/action-form-listener
         - orodatagrid/js/datagrid/listener/callback-listener
         - orodatagrid/js/datagrid/listener/change-editable-cell-listener

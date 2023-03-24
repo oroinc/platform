@@ -1,0 +1,45 @@
+/* @theme: admin.oro; */
+
+.drop-zones-menu {
+    width: $drop-zones-menu-box-width;
+    z-index: $zindex-dropdown;
+    background-color: $primary-900;
+    border-radius: $drop-zones-menu-border-radius;
+    box-shadow: $drop-zones-menu-box-shadow;
+
+    &__item {
+        padding: 12px 6px;
+        font-size: 18px;
+        text-align: center;
+        color: $primary-200;
+
+        &:first-child {
+            border-radius: $drop-zones-menu-border-radius $drop-zones-menu-border-radius 0 0;
+        }
+
+        &:last-child {
+            border-radius: 0 0 $drop-zones-menu-border-radius $drop-zones-menu-border-radius;
+        }
+
+        &:only-child {
+            border-radius: $drop-zones-menu-border-radius;
+        }
+
+        &:not(:first-child) {
+            border-top: 1px dashed $primary-700;
+        }
+
+        &.hover {
+            background-color: $secondary;
+            color: $primary-inverse;
+        }
+    }
+
+    &:not(.show) {
+        display: none;
+    }
+
+    .drag-n-drop-cursor-out & {
+        visibility: hidden;
+    }
+}

@@ -302,8 +302,13 @@ define(function(require) {
             $parents.each(function() {
                 heightDiff += this.scrollTop;
             });
-            heightDiff -= documentHeight - $('#container')[0].getBoundingClientRect().bottom;
-            heightDiff -= this.PAGE_BOTTOM_PADDING;
+            const parentDialogWidgetElem = $mainEl.closest('.ui-dialog-content .widget-content')[0];
+            if (parentDialogWidgetElem) {
+                heightDiff -= documentHeight - parentDialogWidgetElem.getBoundingClientRect().bottom;
+            } else {
+                heightDiff -= documentHeight - $('#container')[0].getBoundingClientRect().bottom;
+                heightDiff -= this.PAGE_BOTTOM_PADDING;
+            }
             return heightDiff;
         },
 
@@ -355,7 +360,7 @@ define(function(require) {
          */
         enablePageScroll: function() {
             if (this._scrollDisabledElements && this._scrollDisabledElements.length) {
-                this._scrollDisabledElements.parents().removeClass('disable-scroll');
+                this._scrollDisabledElements.removeClass('disable-scroll');
                 delete this._scrollDisabledElements;
             }
         },

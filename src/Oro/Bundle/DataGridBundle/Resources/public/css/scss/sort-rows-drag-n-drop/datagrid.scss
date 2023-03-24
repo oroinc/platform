@@ -1,0 +1,108 @@
+/* @theme: admin.oro; */
+
+.oro-datagrid {
+    .sort-icon-cell {
+        width: $sort-datagrid-icon-cell-width;
+        text-align: $sort-datagrid-icon-cell-text-align;
+    }
+
+    .sort-icon {
+        @include fa-icon($sort-datagrid-sort-icon);
+    }
+}
+
+.drag-n-drop-highlight-sorted {
+    .row-has-sort-order {
+        background-color: $sort-datagrid-sorted-row-bg-color;
+
+        .sort-icon {
+            @include fa-icon($sort-datagrid-sorted-sort-icon);
+        }
+
+        &:hover {
+            background-color: $sort-datagrid-sorted-row-hovered-bg-color;
+        }
+    }
+}
+
+.drag-n-drop-start {
+    .grid-row.selected {
+        display: none;
+    }
+
+    .row-has-sort-order:hover {
+        // sorted rows under drag action should not be highlighted on hover
+        background-color: $sort-datagrid-sorted-row-bg-color;
+    }
+}
+
+.drag-n-drop-finished {
+    .grid-row {
+        &.animate {
+            background-color: $extra-200;
+            animation: sort-rows-drag-n-drop-animation 800ms linear;
+        }
+    }
+}
+
+.drag-n-drop-from-drop-zone {
+    .grid-row.selected {
+        @extend %hide;
+    }
+}
+
+.drag-n-drop-enabled {
+    .grid-container {
+        position: relative;
+    }
+
+    // Dynamically extend the height in case it is narrow
+    .grid-body::after {
+        content: '';
+        display: table-row;
+        height: var(--sort-rows-drag-n-drop-extend-height, 0);
+    }
+
+    .grid-row {
+        &.selected,
+        &.overturned {
+            background-color: $sort-datagrid-selected-row-bg-color;
+
+            &:hover {
+                background-color: $sort-datagrid-selected-row-bg-color;
+            }
+        }
+    }
+
+    .ui-sortable-handle {
+        cursor: default;
+    }
+}
+
+.drag-n-drop-start.with-thin-row-placeholder {
+    .grid-row.selected {
+        opacity: 20%;
+        display: table-row;
+    }
+}
+
+@keyframes sort-rows-drag-n-drop-animation {
+    0% {
+        background-color: rgba($extra-200, 1);
+    }
+    20% {
+        background-color: rgba($extra-200, .8);
+    }
+    40% {
+        background-color: rgba($extra-200, .6);
+    }
+    60% {
+        background-color: rgba($extra-200, .4);
+    }
+    80% {
+        background-color: rgba($extra-200, .2);
+    }
+    100% {
+        background-color: rgba($extra-200, 0);
+    }
+}

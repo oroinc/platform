@@ -24,6 +24,8 @@ define(['jquery'], function($) {
         ) {
             xhr.setRequestHeader('X-CSRF-Header', csrfCookie);
         }
+
+        xhr.setRequestHeader('Cache-Control', 'no-cache, no-store');
     });
 
     $.expr[':'].parents = function(a, i, m) {

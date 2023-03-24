@@ -148,6 +148,7 @@ define(function(require, exports, module) {
          * @property
          */
         typeDefinedValues: {
+            none: 0,
             today: 7,
             this_week: 8,
             this_month: 9,
@@ -187,11 +188,18 @@ define(function(require, exports, module) {
         },
 
         /**
-         * Flag to allow filter type change if start or end date is missing
+         * Flag to allow filter type swap start and end dates if end date is behind start date
          *
          * @property
          */
         autoUpdateRangeFilterType: true,
+
+        /**
+         * Flag to allow filter type change if start or end date is missing
+         *
+         * @property
+         */
+        autoUpdateBetweenWhenOneDate: true,
 
         /**
          * @inheritdoc
@@ -312,6 +320,7 @@ define(function(require, exports, module) {
                 this.$(startSeparatorEndSelector).css('display', '');
                 this.$el.addClass(this.customClass);
                 const typeDefinedValues = [
+                    this.typeDefinedValues.none,
                     this.typeDefinedValues.today,
                     this.typeDefinedValues.this_week,
                     this.typeDefinedValues.this_month,
@@ -630,7 +639,7 @@ define(function(require, exports, module) {
                             value.value.start = endValue;
                         }
                     }
-                } else {
+                } else if (this.autoUpdateBetweenWhenOneDate === true) {
                     if (value.value.start || value.value.end) {
                         // if only one date is filled replace filter type to less than or more than
                         if (type === this.typeValues.between) {
