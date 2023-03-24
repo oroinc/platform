@@ -9,6 +9,7 @@ use Oro\Bundle\ImportExportBundle\Async\Topic\SaveImportExportResultTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topic\SendImportNotificationTopic;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 /**
  * Responsible for splitting import process into a set of independent jobs each processing its own
@@ -21,27 +22,17 @@ class AttributePreImportMessageProcessor extends PreImportMessageProcessor
         return [AttributePreImportTopic::getName()];
     }
 
-    protected function processJob(string $parentMessageId, array $body, array $files)
+    protected function processJob(MessageInterface $message, array $body, array $files)
     {
-        $jobName = sprintf(
-            'oro:%s:%s:%s:%s:%d',
-            $body['process'],
-            $body['processorAlias'],
-            $body['jobName'],
-            $body['userId'],
-            random_int(1, PHP_INT_MAX)
-        );
-
-        $result = $this->jobRunner->runUnique(
-            $parentMessageId,
-            $jobName,
-            function (JobRunner $jobRunner, Job $job) use ($jobName, $body, $files) {
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
+            function (JobRunner $jobRunner, Job $job) use ($body, $files) {
                 $body['options']['importVersion'] = time();
                 $this->dispatchBeforeChunksEvent($body);
                 $this->createFinishJobs($job, $body);
 
                 $subJobs = [];
-
+                $jobName = $job->getName();
                 foreach ($files as $key => $file) {
                     $jobRunner->createDelayed(
                         sprintf('%s:chunk.%s', $jobName, ++$key),

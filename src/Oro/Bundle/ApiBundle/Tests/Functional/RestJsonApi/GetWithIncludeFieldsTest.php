@@ -117,20 +117,17 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
     {
         $response = $this->cget(
             ['entity' => 'users'],
-            ['fields' => ['unknown' => 'name'], 'page' => ['size' => 1]]
+            ['fields' => ['unknown' => 'name'], 'page' => ['size' => 1]],
+            [],
+            false
         );
 
-        $this->assertResponseContains(
+
+        $this->assertResponseValidationError(
             [
-                'data' => [
-                    [
-                        'type'       => 'users',
-                        'id'         => '1',
-                        'attributes' => [
-                            'username' => 'admin'
-                        ]
-                    ]
-                ]
+                'title'  => 'filter constraint',
+                'detail' => 'An entity type is not known.',
+                'source' => ['parameter' => 'fields[unknown]']
             ],
             $response
         );

@@ -12,15 +12,12 @@ use Symfony\Component\Yaml\Parser;
 
 class IncludeProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RuntimeCacheParser */
-    protected $parser;
-
     /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $kernel;
+    private $kernel;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var RuntimeCacheParser */
+    private $parser;
+
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(KernelInterface::class);
@@ -35,20 +32,9 @@ class IncludeProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset($this->parser);
-    }
-
-    /**
      * @dataProvider includeFilesDataProvider
-     *
-     * @param string $path
-     * @param null|string $expectsKernelCallWith
      */
-    public function testIncludeFiles($path, $expectsKernelCallWith = null)
+    public function testIncludeFiles(string $path, ?string $expectsKernelCallWith)
     {
         if ($expectsKernelCallWith) {
             $this->kernel->expects($this->once())
@@ -61,25 +47,24 @@ class IncludeProcessorTest extends \PHPUnit\Framework\TestCase
 
         $data = $this->parser->parse($path);
 
-        $this->assertSame(['test' => ['test' => null,],], $data);
+        $this->assertSame(['test' => ['test' => null]], $data);
     }
 
-    /**
-     * @return \Generator
-     */
-    public function includeFilesDataProvider()
+    public function includeFilesDataProvider(): array
     {
-        yield [
-            'path' => __DIR__ . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_1.yml',
-            'expectsKernelCallWith' => '@OroStubBundle/Tests/Behat/Features/Fixtures/test_include.yml',
-        ];
-        yield [
-            'path' => __DIR__ . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_2.yml',
-            'expectsKernelCallWith' => '@OroStubBundle/Tests/Behat/Features/Fixtures/test_include.yml',
-        ];
-        yield [
-            'path' => __DIR__ . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_3.yml',
-            'expectsKernelCallWith' => null,
+        return [
+            [
+                'path' => __DIR__ . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_1.yml',
+                'expectsKernelCallWith' => '@OroStubBundle/Tests/Behat/Features/Fixtures/test_include.yml'
+            ],
+            [
+                'path' => __DIR__ . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_2.yml',
+                'expectsKernelCallWith' => '@OroStubBundle/Tests/Behat/Features/Fixtures/test_include.yml'
+            ],
+            [
+                'path' => __DIR__ . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_fixture_3.yml',
+                'expectsKernelCallWith' => null
+            ]
         ];
     }
 }

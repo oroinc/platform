@@ -95,4 +95,12 @@ class SyncIntegrationTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro_integration:sync_integration:1',
+            $this->getTopic()->createJobName(['integration_id' => 1])
+        );
+    }
 }

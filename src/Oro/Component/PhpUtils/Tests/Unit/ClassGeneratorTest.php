@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Component\PhpUtils\Tests\Unit;
 
+use Nette\InvalidStateException;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
@@ -42,7 +43,7 @@ class ClassGeneratorTest extends TestCase
 
     public function testAddUseWithoutNamespaceProducesException(): void
     {
-        $this->expectException(\Nette\InvalidStateException::class);
+        $this->expectException(InvalidStateException::class);
         $this->expectExceptionMessage('Cannot add imports to a non-namespaced class.');
 
         $cg = new ClassGenerator('Test');

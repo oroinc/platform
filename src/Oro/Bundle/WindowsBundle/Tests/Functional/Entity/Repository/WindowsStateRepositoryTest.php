@@ -14,7 +14,7 @@ class WindowsStateRepositoryTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures([LoadWindowsStateData::class, LoadUserData::class,]);
+        $this->loadFixtures([LoadWindowsStateData::class, LoadUserData::class]);
     }
 
     public function testUpdate()

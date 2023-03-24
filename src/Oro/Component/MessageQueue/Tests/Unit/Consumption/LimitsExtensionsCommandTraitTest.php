@@ -17,12 +17,13 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit\Framework\TestCase
 
         $options = $trait->getDefinition()->getOptions();
 
-        $this->assertCount(5, $options);
+        $this->assertCount(6, $options);
         $this->assertArrayHasKey('memory-limit', $options);
         $this->assertArrayHasKey('message-limit', $options);
         $this->assertArrayHasKey('time-limit', $options);
         $this->assertArrayHasKey('object-limit', $options);
         $this->assertArrayHasKey('gc-limit', $options);
+        self::assertArrayHasKey('stop-when-unique-jobs-processed', $options);
     }
 
     public function testShouldAddMessageLimitExtension()

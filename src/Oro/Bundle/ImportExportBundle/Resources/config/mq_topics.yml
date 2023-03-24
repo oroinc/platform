@@ -10,8 +10,12 @@ services:
     Oro\Bundle\ImportExportBundle\Async\Topic\ImportTopic:
         arguments:
             - '%oro_importexport.import.size_of_batch%'
-    Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic: ~
-    Oro\Bundle\ImportExportBundle\Async\Topic\ExportTopic: ~
+    Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic:
+        arguments:
+            - '@security.token_storage'
+    Oro\Bundle\ImportExportBundle\Async\Topic\ExportTopic:
+        arguments:
+            - '@security.token_storage'
     Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic: ~
     Oro\Bundle\ImportExportBundle\Async\Topic\SendImportNotificationTopic: ~
     Oro\Bundle\ImportExportBundle\Async\Topic\SaveImportExportResultTopic:

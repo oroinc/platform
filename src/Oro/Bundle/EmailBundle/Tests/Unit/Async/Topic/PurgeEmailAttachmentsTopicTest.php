@@ -57,4 +57,12 @@ class PurgeEmailAttachmentsTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro.email.purge_email_attachments',
+            $this->getTopic()->createJobName([])
+        );
+    }
 }

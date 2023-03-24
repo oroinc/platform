@@ -2,27 +2,18 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Topic;
 
-use Oro\Bundle\ImportExportBundle\Context\Context;
-use Oro\Component\MessageQueue\Topic\AbstractTopic;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 
 /**
  * Topic for splitting import process into a set of independent jobs.
  */
-class PreImportTopic extends AbstractTopic
+class PreImportTopic extends AbstractImportTopic implements JobAwareTopicInterface
 {
-    private int $batchSize;
-
-    public function __construct(int $batchSize)
-    {
-        $this->batchSize = $batchSize;
-    }
+    public const NAME = 'oro.importexport.pre_import';
 
     public static function getName(): string
     {
-        return 'oro.importexport.pre_import';
+        return static::NAME;
     }
 
     public static function getDescription(): string
@@ -30,53 +21,15 @@ class PreImportTopic extends AbstractTopic
         return 'Splits import process into a set of independent jobs';
     }
 
-    public function configureMessageBody(OptionsResolver $resolver): void
+    public function createJobName($messageBody): string
     {
-        $batchSize = $this->batchSize;
-
-        $resolver
-            ->setDefined([
-                'userId',
-                'jobName',
-                'process',
-                'processorAlias',
-                'fileName',
-                'originFileName',
-                'options',
-            ])
-            ->setRequired([
-                'userId',
-                'jobName',
-                'process',
-                'processorAlias',
-                'fileName',
-                'originFileName'
-            ])
-            ->setDefaults([
-                'options' => [],
-            ])
-            ->setNormalizer('options', static function (Options $options, $value) use ($batchSize) {
-                if (!array_key_exists(Context::OPTION_BATCH_SIZE, $value)) {
-                    $value[Context::OPTION_BATCH_SIZE] = $batchSize;
-                }
-
-                if (!is_int($value[Context::OPTION_BATCH_SIZE])) {
-                    throw new InvalidOptionsException(
-                        sprintf(
-                            'The option "options[%s]" is expected to be of type "int".',
-                            Context::OPTION_BATCH_SIZE
-                        )
-                    );
-                }
-
-                return $value;
-            })
-            ->addAllowedTypes('userId', 'int')
-            ->addAllowedTypes('jobName', 'string')
-            ->addAllowedTypes('process', 'string')
-            ->addAllowedTypes('processorAlias', 'string')
-            ->addAllowedTypes('fileName', 'string')
-            ->addAllowedTypes('originFileName', 'string')
-            ->addAllowedTypes('options', 'array');
+        return sprintf(
+            'oro:%s:%s:%s:%s:%d',
+            $messageBody['process'],
+            $messageBody['processorAlias'],
+            $messageBody['jobName'],
+            $messageBody['userId'],
+            random_int(1, PHP_INT_MAX)
+        );
     }
 }

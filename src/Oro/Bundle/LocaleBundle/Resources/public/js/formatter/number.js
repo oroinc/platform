@@ -241,6 +241,24 @@ define(function(require) {
                 ];
                 return doFormat(value, options, formattersChain);
             },
+            formatCurrencyRounded: function(value, currency, opts) {
+                const customOptions = prepareCustomOptions(opts);
+                const currencyOptions = localeSettings.getNumberFormats('currency');
+                if (!currency) {
+                    currency = localeSettings.getCurrency();
+                }
+                const options = _.extend({}, currencyOptions, customOptions);
+                options.style = 'currency';
+                options.min_fraction_digits = 0;
+                options.max_fraction_digits = 0;
+                options.currency_code = currency;
+                const formattersChain = [
+                    formatters.numeralFormat,
+                    formatters.addPrefixSuffix,
+                    formatters.replaceCurrency
+                ];
+                return doFormat(Math.round(value), options, formattersChain);
+            },
             /**
              * Takes number of seconds and converts it into time duration formatted string
              * (formats 21811 => "06:03:31")

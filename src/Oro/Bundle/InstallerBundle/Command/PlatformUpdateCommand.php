@@ -122,6 +122,8 @@ HELP
                 $eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION);
 
                 $this->finalStep($commandExecutor, $output, $input);
+
+                $eventDispatcher->dispatch($event, InstallerEvents::FINISH);
             } catch (\Exception $exception) {
                 $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
                 // Exceptions may originate in the command executor and in PlatformUpdateCommand code itself

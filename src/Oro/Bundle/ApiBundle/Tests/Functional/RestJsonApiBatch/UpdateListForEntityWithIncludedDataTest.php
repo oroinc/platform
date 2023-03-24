@@ -482,6 +482,59 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
      */
     public function testCreateEntitiesWithValidationErrorsInIncludedData()
     {
+        $departmentEntityType = $this->getEntityType(TestDepartment::class);
+        $employeeEntityType = $this->getEntityType(TestEmployee::class);
+
+        $operationId = $this->sendUpdateListRequest(TestDepartment::class, [
+            'data' => [
+                [
+                    'type' => $departmentEntityType,
+                    'attributes' => ['title' => 'New Department 1'],
+                    'relationships' => [
+                        'staff' => [
+                            'data' => [
+                                ['type' => $employeeEntityType, 'id' => 'new_employee1']
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'type' => $departmentEntityType,
+                    'attributes' => ['title' => 'New Department 2'],
+                    'relationships' => [
+                        'staff' => [
+                            'data' => [
+                                ['type' => $employeeEntityType, 'id' => 'new_employee2'],
+                                ['type' => $employeeEntityType, 'id' => 'new_employee3']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee1',
+                    'attributes' => ['name' => 'New Employee 1']
+                ],
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee2',
+                    'attributes' => ['name' => 'New Employee 2']
+                ],
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee3',
+                    'attributes' => ['name' => null]
+                ]
+            ]
+        ]);
+
+        $tokenStorage = $this->getTokenStorage();
+        $token = $this->getTokenStorage()->getToken();
+
+        $this->consumeMessages();
+
         $this->appendEntityConfig(
             TestEmployee::class,
             [
@@ -494,62 +547,16 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                 ]
             ]
         );
-        $departmentEntityType = $this->getEntityType(TestDepartment::class);
-        $employeeEntityType = $this->getEntityType(TestEmployee::class);
-        $operationId = $this->processUpdateList(
-            TestDepartment::class,
-            [
-                'data'     => [
-                    [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 1'],
-                        'relationships' => [
-                            'staff' => [
-                                'data' => [
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee1']
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 2'],
-                        'relationships' => [
-                            'staff' => [
-                                'data' => [
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee2'],
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee3']
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'included' => [
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee1',
-                        'attributes' => ['name' => 'New Employee 1']
-                    ],
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee2',
-                        'attributes' => ['name' => 'New Employee 2']
-                    ],
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee3',
-                        'attributes' => ['name' => null]
-                    ]
-                ]
-            ],
-            false
-        );
+
+        //refresh token after resetting in consumer
+        $tokenStorage->setToken($token);
+        $this->consumeAllMessages();
 
         $this->assertAsyncOperationError(
             [
-                'id'     => $operationId . '-1-1',
+                'id' => $operationId . '-1-1',
                 'status' => 400,
-                'title'  => 'not blank constraint',
+                'title' => 'not blank constraint',
                 'detail' => 'This value should not be blank.',
                 'source' => ['pointer' => '/included/2/attributes/name']
             ],

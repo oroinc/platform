@@ -1,4 +1,8 @@
 oro_behat_extension:
+  elements:
+    Widget Config Data:
+      selector: '.widget-config-data'
+
   pages:
     Admin Dashboard:
       class: Oro\Bundle\DashboardBundle\Tests\Behat\Page\AdminDashboard

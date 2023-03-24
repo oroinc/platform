@@ -32,6 +32,15 @@ services:
             - '@.inner'
             - '@oro_platform.optional_listeners.manager'
 
+    oro_message_queue.job.job_middleware:
+        class: 'Oro\Component\MessageQueue\Job\JobMiddleware'
+        arguments:
+            - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.topic.registry'
+            - '@oro_message_queue.job.processor'
+        tags:
+            - { name: oro_message_queue.middleware }
+
     oro_message_queue.client.driver:
         class: 'Oro\Component\MessageQueue\Client\DriverInterface'
         public: true
@@ -49,6 +58,7 @@ services:
             - '%kernel.debug%'
         calls:
             - [setLogger, ['@logger']]
+            - [setMiddlewares, [!tagged_iterator oro_message_queue.middleware]]
 
     Oro\Component\MessageQueue\Client\MessageProducerInterface:
         alias: 'oro_message_queue.client.message_producer'
@@ -200,3 +210,10 @@ services:
             - '@oro_message_queue.job.processor'
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
+
+    oro_message_queue.job.job_extension:
+        class: 'Oro\Component\MessageQueue\Job\JobExtension'
+        arguments:
+            - '@oro_message_queue.job.runner'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension'}

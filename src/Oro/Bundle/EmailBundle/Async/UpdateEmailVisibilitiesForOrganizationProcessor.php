@@ -55,13 +55,13 @@ class UpdateEmailVisibilitiesForOrganizationProcessor implements
         $data = $message->getBody();
 
         $organizationId = $data['organizationId'];
-        $jobName = sprintf('oro:email:update-visibilities:emails:%d', $organizationId);
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            $jobName,
-            function (JobRunner $jobRunner) use ($jobName, $organizationId) {
+
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
+            function (JobRunner $jobRunner, Job $job) use ($organizationId) {
                 $chunkNumber = 1;
                 $chunks = $this->getChunks($organizationId);
+                $jobName = $job->getName();
                 foreach ($chunks as [$firstEmailId, $lastEmailId]) {
                     $this->scheduleSettingVisibilities(
                         $jobRunner,

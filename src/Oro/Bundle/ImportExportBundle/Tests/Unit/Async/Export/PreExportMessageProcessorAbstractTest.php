@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 {
     private const USER_ID = 54;
+    private const JOB_UNIQUE_NAME = 'job_unique_name';
 
     /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
     private $jobRunner;
@@ -86,14 +87,14 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
      */
     public function testShouldReturnMessageStatusDependsOfJobResult(bool $jobResult, string $expectedResult): void
     {
-        $jobUniqueName = 'job_unique_name';
+        $jobUniqueName = self::JOB_UNIQUE_NAME;
 
         $message = new Message();
         $message->setMessageId(123);
 
         $this->jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->with($message->getMessageId(), $jobUniqueName)
+            ->method('runUniqueByMessage')
+            ->with($message)
             ->willReturn($jobResult);
 
         $this->processor->setMessageBody(['message_body']);
@@ -109,7 +110,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Security token is null');
 
         $messageBody = ['message_body'];
-        $jobUniqueName = 'job_unique_name';
+        $jobUniqueName = self::JOB_UNIQUE_NAME;
         $message = new Message();
         $message->setMessageId(123);
 
@@ -117,9 +118,9 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $childJob = $this->createJob(10, $job);
 
         $this->jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->with($message->getMessageId(), $jobUniqueName)
-            ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
 
@@ -168,7 +169,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Not supported user type');
 
         $messageBody = ['message_body'];
-        $jobUniqueName = 'job_unique_name';
+        $jobUniqueName = self::JOB_UNIQUE_NAME;
         $message = new Message();
         $message->setMessageId(123);
 
@@ -176,9 +177,9 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $childJob = $this->createJob(10, $job);
 
         $this->jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->with($message->getMessageId(), $jobUniqueName)
-            ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
 
@@ -218,7 +219,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             'outputFormat' => 'output_format',
             'entity' => 'Acme'
         ];
-        $jobUniqueName = 'job_unique_name';
+        $jobUniqueName = self::JOB_UNIQUE_NAME;
         $message = new Message();
         $message->setMessageId(123);
 
@@ -226,9 +227,9 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $childJob = $this->createJob(10, $job);
 
         $this->jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->with($message->getMessageId(), $jobUniqueName)
-            ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
 
@@ -286,7 +287,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             'outputFormat' => 'output_format',
             'entity' => 'Acme'
         ];
-        $jobUniqueName = 'job_unique_name';
+        $jobUniqueName = self::JOB_UNIQUE_NAME;
         $message = new Message();
         $message->setMessageId(123);
 
@@ -294,9 +295,9 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $childJob = $this->createJob(10, $job);
 
         $this->jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->with($message->getMessageId(), $jobUniqueName)
-            ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
         $this->jobRunner->expects(self::exactly(2))
@@ -353,6 +354,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     {
         $job = new Job();
         $job->setId($id);
+        $job->setName(self::JOB_UNIQUE_NAME);
         if (null !== $rootJob) {
             $job->setRootJob($rootJob);
         }

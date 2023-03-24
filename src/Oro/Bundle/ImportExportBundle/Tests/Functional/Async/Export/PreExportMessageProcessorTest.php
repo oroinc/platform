@@ -11,6 +11,7 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Oro\Component\MessageQueue\Client\Config as MessageQueueConfig;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
@@ -43,6 +44,11 @@ class PreExportMessageProcessorTest extends WebTestCase
         $message = new Message();
         $message->setMessageId('abc');
         $message->setBody($messageBody);
+        $message->setProperties([
+            MessageQueueConfig::PARAMETER_TOPIC_NAME => ExportTopic::getName()
+        ]);
+
+        $this->createRootJobMyMessage($message);
 
         $exportingEntityIds = [1, 2, 3];
 

@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -33,7 +34,7 @@ class HandleFieldsFilter implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -59,16 +60,47 @@ class HandleFieldsFilter implements ProcessorInterface
             return;
         }
 
+        $fields = $this->processFilterValues($filterValues, $filterGroupName, $requestType, $context);
+        if ($context->hasErrors()) {
+            // detected errors in the filter value
+            return;
+        }
+
+        $context->addConfigExtra(new FilterFieldsConfigExtra($fields));
+    }
+
+    /**
+     * @param FilterValue[] $filterValues
+     * @param string        $filterGroupName
+     * @param RequestType   $requestType
+     * @param Context       $context
+     *
+     * @return array [entity type => [field name, ...], ...]
+     */
+    private function processFilterValues(
+        array $filterValues,
+        string $filterGroupName,
+        RequestType $requestType,
+        Context $context
+    ): array {
         $fields = [];
         foreach ($filterValues as $filterValue) {
             $path = $filterValue->getPath();
-            if (!$path || $path === $filterGroupName) {
+            if (!$path || ($path === $filterGroupName && $filterValue->getSourceKey() === $path)) {
                 $context->addError(
                     Error::createValidationError(Constraint::FILTER)
                         ->setDetail('An entity type is not specified.')
                         ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()))
                 );
-                break;
+                continue;
+            }
+            if (!$this->isKnownEntityType($path, $requestType)) {
+                $context->addError(
+                    Error::createValidationError(Constraint::FILTER)
+                        ->setDetail('An entity type is not known.')
+                        ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()))
+                );
+                continue;
             }
 
             try {
@@ -81,12 +113,13 @@ class HandleFieldsFilter implements ProcessorInterface
                 );
             }
         }
-        if ($context->hasErrors()) {
-            // detected errors in the filter value
-            return;
-        }
 
-        $context->addConfigExtra(new FilterFieldsConfigExtra($fields));
+        return $fields;
+    }
+
+    private function isKnownEntityType(string $entityType, RequestType $requestType): bool
+    {
+        return null !== ValueNormalizerUtil::tryConvertToEntityClass($this->valueNormalizer, $entityType, $requestType);
     }
 
     private function normalizeFilterValue(FilterValue $filterValue, RequestType $requestType): mixed

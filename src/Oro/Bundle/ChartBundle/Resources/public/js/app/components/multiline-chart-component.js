@@ -32,7 +32,6 @@ define(function(require) {
             const options = this.options;
             const $chart = this.$chart;
             const xFormat = options.data_schema.label.type;
-            const yFormat = options.data_schema.value.type;
             const rawData = this.data;
 
             if (!$chart.get(0).clientWidth) {
@@ -63,70 +62,12 @@ define(function(require) {
             let count = 0;
             const charts = [];
 
-            const getXLabel = function(data) {
-                let label = dataFormatter.formatValue(data, xFormat);
-                if (label === null) {
-                    const number = parseInt(data);
-                    if (rawData.length > number) {
-                        label = rawData[number].label === null
-                            ? 'N/A'
-                            : rawData[number].label;
-                    } else {
-                        label = '';
-                    }
-                }
-                return label;
-            };
-            const getYLabel = function(data) {
-                let label = dataFormatter.formatValue(data, yFormat);
-                if (label === null) {
-                    const number = parseInt(data);
-                    if (rawData.length > number) {
-                        label = rawData[data].value === null
-                            ? 'N/A'
-                            : rawData[data].value;
-                    } else {
-                        label = '';
-                    }
-                }
-                return label;
-            };
-
-            const makeChart = function(rawData, count, key) {
-                const chartData = [];
-
-                for (const i in rawData) {
-                    if (!rawData.hasOwnProperty(i)) {
-                        continue;
-                    }
-                    let yValue = dataFormatter.parseValue(rawData[i].value, yFormat);
-                    yValue = yValue === null ? parseInt(i) : yValue;
-                    let xValue = dataFormatter.parseValue(rawData[i].label, xFormat);
-                    xValue = xValue === null ? parseInt(i) : xValue;
-
-                    const item = [xValue, yValue];
-                    chartData.push(item);
-                }
-
-                return {
-                    label: key,
-                    data: chartData,
-                    color: colors[count % colors.length],
-                    markers: {
-                        show: false
-                    },
-                    points: {
-                        show: !connectDots
-                    }
-                };
-            };
-
             _.each(rawData, function(rawData, key) {
-                const result = makeChart(rawData, count, key);
+                const result = this.makeChart(rawData, count, key);
                 count++;
 
                 charts.push(result);
-            });
+            }, this);
 
             Flotr.draw(
                 $chart.get(0),
@@ -142,26 +83,18 @@ define(function(require) {
                     mouse: {
                         track: true,
                         relative: true,
-                        trackFormatter: function(pointData) {
-                            return pointData.series.label +
-                                ', ' + getXLabel(pointData.x) +
-                                ': ' + getYLabel(pointData.y);
-                        }
+                        trackFormatter: this.trackFormatter.bind(this)
                     },
                     yaxis: {
                         autoscale: true,
                         autoscaleMargin: 1,
-                        tickFormatter: function(y) {
-                            return getYLabel(y);
-                        },
+                        tickFormatter: this.YTickFormatter.bind(this),
                         title: options.data_schema.value.label + '  '
                     },
                     xaxis: {
                         autoscale: true,
                         autoscaleMargin: 0,
-                        tickFormatter: function(x) {
-                            return getXLabel(x);
-                        },
+                        tickFormatter: this.XTickFormatter.bind(this),
                         title: this.narrowScreen ? ' ' : options.data_schema.label.label,
                         mode: options.xaxis.mode,
                         noTicks: options.xaxis.noTicks,
@@ -189,6 +122,94 @@ define(function(require) {
                 this.aspectRatio = MultilineChartComponent.__super__.aspectRatio;
             }
             MultilineChartComponent.__super__.update.call(this);
+        },
+
+        /**
+         * Formats the values in the point tooltip
+         *
+         * @param {Object} pointData
+         * @returns {string}
+         */
+        trackFormatter: function(pointData) {
+            return pointData.series.label +
+                ', ' + this.XTickFormatter(pointData.x) +
+                ': ' + this.YTickFormatter(pointData.y);
+        },
+
+        XTickFormatter: function(value) {
+            const xFormat = this.options.data_schema.label.type;
+            const rawData = this.data;
+
+            let label = dataFormatter.formatValue(value, xFormat);
+            if (label === null) {
+                const number = parseInt(value);
+                if (rawData.length > number) {
+                    label = rawData[number].label === null
+                        ? 'N/A'
+                        : rawData[number].label;
+                } else {
+                    label = '';
+                }
+            }
+
+            return label;
+        },
+
+        YTickFormatter: function(value) {
+            const yFormat = this.options.data_schema.value.type;
+            const rawData = this.data;
+
+            let label = dataFormatter.formatValue(value, yFormat);
+            if (label === null) {
+                const number = parseInt(value);
+                if (rawData.length > number) {
+                    label = rawData[value].value === null
+                        ? 'N/A'
+                        : rawData[value].value;
+                } else {
+                    label = '';
+                }
+            }
+
+            return label;
+        },
+
+        makeChart: function(rawData, count, key) {
+            const colors = this.config.default_settings.chartColors;
+            const connectDots = this.options.settings.connect_dots_with_line;
+
+            return {
+                label: key,
+                data: this.getChartData(rawData),
+                color: colors[count % colors.length],
+                markers: {
+                    show: false
+                },
+                points: {
+                    show: !connectDots
+                }
+            };
+        },
+
+        getChartData: function(rawData) {
+            const yFormat = this.options.data_schema.value.type;
+            const xFormat = this.options.data_schema.label.type;
+            const chartData = [];
+
+            for (const i in rawData) {
+                if (!rawData.hasOwnProperty(i)) {
+                    continue;
+                }
+                let yValue = dataFormatter.parseValue(rawData[i].value, yFormat);
+                yValue = yValue === null ? parseInt(i) : yValue;
+                let xValue = dataFormatter.parseValue(rawData[i].label, xFormat);
+                xValue = xValue === null ? parseInt(i) : xValue;
+
+                const item = [xValue, yValue];
+                chartData.push(item);
+            }
+
+            return chartData;
         }
     });
 

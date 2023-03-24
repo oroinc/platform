@@ -14,6 +14,19 @@ define(function(require) {
         $elParent.toggleClass('uniform-empty-value', $el[0].value.trim() === '');
     }
 
+    /**
+     * Add or remove extra class in Uniform container if an element is in "readonly" state
+     * @param {jQuery.Element} $el
+     * @param {jQuery.Element} $elParent
+     */
+    function markAsReadonly($el, $elParent) {
+        if (!$el.length || !$elParent.length) {
+            return;
+        }
+
+        $elParent.toggleClass('readonly', $el.is('[readonly]'));
+    }
+
     const $ = require('jquery');
     const _ = require('underscore');
 
@@ -38,6 +51,7 @@ define(function(require) {
                 const uniformContainer = $el.parent(uniformParentSelectors);
 
                 markIfEmpty($el, uniformContainer);
+                markAsReadonly($el, uniformContainer);
 
                 $el.on('change' + config.eventNamespace, _.partial(markIfEmpty, $el, uniformContainer));
             });

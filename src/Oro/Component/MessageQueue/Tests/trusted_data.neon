@@ -13,6 +13,8 @@ trusted_data:
                 uniqueTableName: true
             delete:
                 uniqueTableName: true
+            list:
+                uniqueTableName: true
         Oro\Component\MessageQueue\Job\JobStorage:
             createJobQueryBuilder:
                 entityClass: true

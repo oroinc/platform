@@ -5,12 +5,12 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition\NoElements;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class NoElementsTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var NoElements */
-    protected $condition;
+    private NoElements $condition;
 
     protected function setUp(): void
     {
@@ -20,11 +20,8 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider evaluateDataProvider
-     * @param array $options
-     * @param array $context
-     * @param bool $expectedResult
      */
-    public function testEvaluate(array $options, array $context, $expectedResult)
+    public function testEvaluate(array $options, array $context, bool $expectedResult)
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -78,7 +75,7 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWithEmptyOptions()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
 
         $this->condition->initialize([]);
@@ -86,11 +83,8 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider toArrayDataProvider
-     * @param array $options
-     * @param string|null $message
-     * @param array $expected
      */
-    public function testToArray(array $options, $message, array $expected)
+    public function testToArray(array $options, ?string $message, array $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -131,11 +125,8 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider compileDataProvider
-     * @param array $options
-     * @param string|null $message
-     * @param string $expected
      */
-    public function testCompile(array $options, $message, $expected)
+    public function testCompile(array $options, ?string $message, string $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {

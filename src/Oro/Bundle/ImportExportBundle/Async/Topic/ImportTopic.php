@@ -7,7 +7,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Topic for importing a file.
  */
-class ImportTopic extends PreImportTopic
+class ImportTopic extends AbstractImportTopic
 {
     public const NAME = 'oro.importexport.import';
 

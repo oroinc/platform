@@ -49,16 +49,8 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
 
         asort($data['ownerIds']);
 
-        $jobName = sprintf(
-            '%s:%s:%s',
-            'oro.email.update_email_owner_associations',
-            $data['ownerClass'],
-            md5(implode(',', $data['ownerIds']))
-        );
-
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            $jobName,
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
             function (JobRunner $jobRunner) use ($data) {
                 foreach ($data['ownerIds'] as $id) {
                     $jobRunner->createDelayed(

@@ -3,12 +3,13 @@
 namespace Oro\Bundle\EmailBundle\Async\Topic;
 
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Update multiple emails for email owner.
  */
-class UpdateEmailOwnerAssociationsTopic extends AbstractTopic
+class UpdateEmailOwnerAssociationsTopic extends AbstractTopic implements JobAwareTopicInterface
 {
     public static function getName(): string
     {
@@ -29,5 +30,17 @@ class UpdateEmailOwnerAssociationsTopic extends AbstractTopic
             ])
             ->addAllowedTypes('ownerIds', ['string[]', 'int[]'])
             ->addAllowedTypes('ownerClass', 'string');
+    }
+
+    public function createJobName($messageBody): string
+    {
+        asort($messageBody['ownerIds']);
+
+        return sprintf(
+            '%s:%s:%s',
+            'oro.email.update_email_owner_associations',
+            $messageBody['ownerClass'],
+            md5(implode(',', $messageBody['ownerIds']))
+        );
     }
 }

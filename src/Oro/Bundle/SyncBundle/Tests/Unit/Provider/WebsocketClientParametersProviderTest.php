@@ -10,10 +10,10 @@ class WebsocketClientParametersProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidTransportsProvider
      */
-    public function testInvalidTransportGiven($transport): void
+    public function testInvalidTransportGiven(string $transport): void
     {
-        self::expectException(InvalidConfigurationException::class);
-        self::expectExceptionMessage(sprintf(
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(sprintf(
             'Transport "%s" is not available, please run stream_get_transports() to verify'
             . ' the list of registered transports.',
             $transport
@@ -29,10 +29,10 @@ class WebsocketClientParametersProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider nonExistentContextOptionProvider
      */
-    public function testNonExistentContextOptionGiven($optionName): void
+    public function testNonExistentContextOptionGiven(string $optionName): void
     {
-        self::expectException(InvalidConfigurationException::class);
-        self::expectExceptionMessage(sprintf(
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(sprintf(
             'Unknown socket context option "%s". Only SSL context options '
             . '(http://php.net/manual/en/context.ssl.php) are allowed.',
             $optionName
@@ -47,8 +47,8 @@ class WebsocketClientParametersProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testNotAnArrayContextOptionsGiven(): void
     {
-        self::expectException(InvalidConfigurationException::class);
-        self::expectExceptionMessage('Socket context options must be an array');
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Socket context options must be an array');
         new WebsocketClientParametersProvider('//*:8080?context_options=val');
     }
 
@@ -60,8 +60,8 @@ class WebsocketClientParametersProviderTest extends \PHPUnit\Framework\TestCase
         string $optionName,
         mixed $optionValue
     ): void {
-        self::expectException(InvalidConfigurationException::class);
-        self::expectExceptionMessage(sprintf(
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(sprintf(
             'Invalid type of socket context option "%s", expected "%s" type.',
             $optionName,
             $optionType
@@ -101,11 +101,6 @@ class WebsocketClientParametersProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($wsClientParamsProvider->getContextOptions(), $expectedContextOptions);
     }
 
-    /**
-     * All available options will be listed
-     *
-     * @return array
-     */
     public function properContextOptionsProvider(): array
     {
         return [
