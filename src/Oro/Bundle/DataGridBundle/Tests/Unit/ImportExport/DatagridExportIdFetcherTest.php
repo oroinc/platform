@@ -69,7 +69,8 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     public function testGetGridRootEntity(): void
     {
         $qb = new QueryBuilder($this->em);
-        $qb->from(Entity::class, 't')
+        $qb
+            ->from(Entity::class, 't')
             ->select('t.id');
 
         $this->assertGridCall($qb);
@@ -182,13 +183,14 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $grid->expects(self::any())
             ->method('getAcceptedDatasource')
             ->willReturn($dataSource);
-        $grid->expects(self::any())
-            ->method('getAcceptedDatasource')
-            ->willReturn($dataSource);
         $results = ResultsObject::create(['options' => ['totalRecords' => 4242]]);
         $grid->expects(self::any())
             ->method('getData')
             ->willReturn($results);
+        $grid
+            ->expects(self::any())
+            ->method('getDatasource')
+            ->willReturn($dataSource);
 
         $this->context->expects(self::any())
             ->method('hasOption')
