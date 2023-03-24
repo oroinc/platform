@@ -1,0 +1,94 @@
+/* @theme: admin.oro; */
+
+.sorting-helper {
+    $root: &;
+
+    opacity: .7;
+
+    &__content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+        border: solid 1px $primary-200;
+        border-radius: 2px;
+        background-color: $extra-200;
+        color: $popover-body-color;
+        height: 100%;
+        z-index: 3;
+        position: relative;
+    }
+
+    &__icon {
+        width: $sort-datagrid-icon-cell-width;
+        min-width: $sort-datagrid-icon-cell-width;
+        text-align: $sort-datagrid-icon-cell-text-align;
+    }
+
+    .sort-icon {
+        @include fa-icon($sort-datagrid-sort-icon);
+    }
+
+    .drag-n-drop-highlight-sorted + &.has-sort-order {
+        .sort-icon {
+            @include fa-icon($sort-datagrid-sorted-sort-icon);
+        }
+    }
+
+    &__message {
+        flex-grow: 1;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        @include text-line-truncate(null);
+    }
+
+    &__count {
+        min-width: 120px;
+        text-align: center;
+        padding: 0 8px;
+
+        @include text-line-truncate(null);
+    }
+
+    &.single {
+        #{$root}__content {
+            box-shadow: 1px 1px 3px 1px $primary-800;
+        }
+    }
+
+    &.stack {
+        &::before,
+        &::after {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            height: 100%;
+            width: 100%;
+            border: solid 1px $primary-200;
+            background-color: $primary-500;
+            border-radius: 2px;
+        }
+
+        &::before {
+            top: 2px;
+            left: 2px;
+            z-index: 2;
+        }
+
+        &::after {
+            top: 4px;
+            left: 4px;
+
+            z-index: 1;
+        }
+    }
+
+    &.separator {
+        opacity: 1;
+        background-color: $primary-830;
+
+        @extend %draggable-separator;
+    }
+}

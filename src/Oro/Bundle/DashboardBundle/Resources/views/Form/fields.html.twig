@@ -15,6 +15,22 @@
     {{ UI.renderDateWidgeView(form, valueType, 'date', 'orodashboard/js/app/views/widget-date-range-view') }}
 {% endblock oro_type_widget_date_range_widget %}
 
+{% block oro_type_current_date_widget_date_range_widget %}
+    {% set valueType = form.vars.value.type|default(constant('Oro\\Bundle\\FilterBundle\\Form\\Type\\Filter\\AbstractDateFilterType::TYPE_THIS_MONTH')) %}
+
+    {% import '@OroDashboard/macros.html.twig' as UI %}
+
+    {{ UI.renderDateWidgeView(form, valueType, 'date', 'orodashboard/js/app/views/current-date-widget-date-range-view') }}
+{% endblock oro_type_current_date_widget_date_range_widget %}
+
+{% block oro_type_dependent_date_widget_date_range_widget %}
+    {% set valueType = form.vars.value.type|default(constant('Oro\\Bundle\\FilterBundle\\Form\\Type\\Filter\\AbstractDateFilterType::TYPE_NONE')) %}
+
+    {% import '@OroDashboard/macros.html.twig' as UI %}
+
+    {{ UI.renderDateWidgeView(form, valueType, 'date', 'orodashboard/js/app/views/widget-date-range-view') }}
+{% endblock oro_type_dependent_date_widget_date_range_widget %}
+
 {% block oro_type_widget_title_widget %}
     {% import '@OroUI/macros.html.twig' as UI %}
 

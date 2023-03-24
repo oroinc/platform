@@ -1,4 +1,12 @@
-<div class="alert <% if (type) {  %><%= 'alert-' + type %><% } %> alert-dismissible alert-icon fade show top-messages" role="alert">
-    <button type="button" class="fa-close close" data-dismiss="alert" aria-label="<%- _.__('Close') %>"></button>
+<%
+    const classes = ['alert'];
+    if (type) classes.push(`alert-${type}`);
+    if (dismissible) classes.push('alert-dismissible');
+    if (showIcon) classes.push('alert-icon');
+    if (animation) classes.push('fade');
+    classes.push('show', 'top-messages');
+%>
+<div class="<%= classes.join(' ') %>" role="alert">
+    <% if (dismissible) { %><button type="button" class="fa-close close" data-dismiss="alert" aria-label="<%- _.__('Close') %>"></button><% } %>
     <div class="message"><%= message %></div>
 </div>

@@ -793,29 +793,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Example: Given I click "Configure" in "Leads List" widget
-     *
-     * @Given /^(?:|I )click "(?P<needle>[\w\s]+)" in "(?P<widget>[\w\s]+)" widget$/
-     */
-    public function iClickLinkInDashboardWidget($needle, $widget)
-    {
-        $userMenu = $this->createElement($widget);
-        self::assertTrue($userMenu->isValid());
-        $userMenu->clickLink($needle);
-    }
-
-    /**
-     * Example: I should see "Leads list" widget on dashboard
-     *
-     * @Given /^(?:|I )should see "(?P<widget>[\w\s]+)" widget on dashboard$/
-     */
-    public function iShouldSeeDashboardWidget($widget)
-    {
-        $widget = $this->createElement($widget);
-        self::assertTrue($widget->isValid());
-    }
-
-    /**
      * Example: Given I click Websites in sidebar menu
      *
      * @Given /^(?:|I )click (?P<needle>[\w\s]+) in sidebar menu$/
@@ -2072,6 +2049,12 @@ JS;
         ]);
         $webDriverSession->buttondown();
 
+        // initiate drag action
+        $webDriverSession->moveto([
+            'xoffset' => -1,
+            'yoffset' => -1
+        ]);
+
         $moveToOptions = ['element' => null];
 
         if ($dropZone) {
@@ -2092,6 +2075,8 @@ JS;
 
         $webDriverSession->moveto($moveToOptions);
         $webDriverSession->buttonup();
+
+        $this->waitForAjax();
     }
 
     /**
@@ -2203,7 +2188,7 @@ JS;
 
         $jsTreeItem = $this->createElement('JS Tree item', $treeElement);
         self::assertTrue($jsTreeItem->isIsset(), 'Tree is empty');
-        
+
         if ($nodeTitle !== '') {
             $nodeElement = $jsTreeItem->find('named', ['content', $nodeTitle]);
 

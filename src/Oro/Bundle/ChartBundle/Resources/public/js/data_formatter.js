@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    const moment = require('moment');
     const numberFormatter = require('orolocale/js/formatter/number');
     const dateTimeFormatter = require('orolocale/js/formatter/datetime');
 
@@ -45,6 +44,8 @@ define(function(require) {
                     return dateTimeFormatter.formatDateTime(date);
                 case 'money': case 'currency':
                     return numberFormatter.formatCurrency(data);
+                case 'currency_rounded':
+                    return numberFormatter.formatCurrencyRounded(data);
                 case 'percent':
                     return numberFormatter.formatPercent(data);
                 case 'day':
@@ -52,7 +53,9 @@ define(function(require) {
                     date.setTime(data);
                     return dateTimeFormatter.getMomentForBackendDate(date).format('MMM DD');
                 case 'time':
-                    return moment(data).format(dateTimeFormatter.getTimeFormat());
+                    date = new Date();
+                    date.setTime(data);
+                    return dateTimeFormatter.getMomentForBackendDate(date).format(dateTimeFormatter.getTimeFormat());
                 default:
                     return null;
             }
@@ -81,6 +84,11 @@ define(function(require) {
                         data = 0;
                     }
                     return parseFloat(data);
+                case 'currency_rounded':
+                    if (data === null) {
+                        data = 0;
+                    }
+                    return Math.round(data);
                 case 'date':
                 case 'year':
                 case 'month':
@@ -88,8 +96,7 @@ define(function(require) {
                     return dateTimeFormatter.unformatBackendDateTime(data).valueOf(); // add convert to date
                 case 'datetime':
                 case 'time':
-                    const date = dateTimeFormatter.unformatBackendDateTime(data);
-                    return date;
+                    return dateTimeFormatter.unformatBackendDateTime(data);
                 default:
                     return null;
             }
@@ -108,6 +115,7 @@ define(function(require) {
                 case 'float':
                 case 'money':
                 case 'currency':
+                case 'currency_rounded':
                 case 'percent':
                 case 'date':
                 case 'month':

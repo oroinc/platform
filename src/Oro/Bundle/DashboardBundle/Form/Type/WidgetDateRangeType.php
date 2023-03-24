@@ -14,6 +14,9 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type date range widget
+ */
 class WidgetDateRangeType extends AbstractType
 {
     const NAME = 'oro_type_widget_date_range';
@@ -94,6 +97,7 @@ class WidgetDateRangeType extends AbstractType
                 'field_type'       => WidgetDateRangeValueType::class,
                 'operator_choices' => [],
                 'value_types'      => false,
+                'none_value'       => false,
                 'all_time_value'   => true,
                 'widget_options'   => [
                     'showTime'       => false,
@@ -136,8 +140,14 @@ class WidgetDateRangeType extends AbstractType
     protected function getOperatorChoices(Options $options)
     {
         $choices = [];
+        if ($options['none_value']) {
+            $choices += [
+                $this->translator->trans('oro.dashboard.widget.filter.date_range.none')
+                    => AbstractDateFilterType::TYPE_NONE,
+            ];
+        }
         if ($options['value_types']) {
-            $choices = [
+            $choices += [
                 $this->translator->trans('oro.dashboard.widget.filter.date_range.today')
                     => AbstractDateFilterType::TYPE_TODAY,
                 $this->translator->trans('oro.dashboard.widget.filter.date_range.this_week')

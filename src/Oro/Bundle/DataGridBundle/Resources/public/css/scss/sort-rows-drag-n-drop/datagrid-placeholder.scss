@@ -1,0 +1,35 @@
+/* @theme: admin.oro; */
+
+.sorting-placeholder {
+    td {
+        border-top: 1px solid $sorting-placeholder-border-color;
+        border-bottom: 2px solid $sorting-placeholder-border-color;
+    }
+
+    .with-thin-row-placeholder &.row-placeholder {
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 0 0 $sorting-placeholder-thin-box-shadow-size $secondary-dark;
+
+        &:first-child {
+            box-shadow: 0 $sorting-placeholder-thin-box-shadow-size 0
+                        $sorting-placeholder-thin-box-shadow-size $secondary-dark;
+        }
+
+        &:last-child {
+            box-shadow: 0 (- $sorting-placeholder-thin-box-shadow-size)
+                        0 $sorting-placeholder-thin-box-shadow-size $secondary-dark;
+        }
+
+        td {
+            line-height: 0;
+            font-size: 0;
+            border-width: 0;
+            padding: 0;
+        }
+    }
+
+    &.separator {
+        line-height: 0;
+    }
+}

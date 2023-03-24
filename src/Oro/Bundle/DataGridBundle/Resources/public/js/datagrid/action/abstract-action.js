@@ -3,7 +3,7 @@ define(function(require) {
 
     const $ = require('jquery');
     const _ = require('underscore');
-    const Backbone = require('backbone');
+    const BaseView = require('oroui/js/app/views/base/view');
     const routing = require('routing');
     const __ = require('orotranslation/js/translator');
     const mediator = require('oroui/js/mediator');
@@ -22,9 +22,9 @@ define(function(require) {
      *
      * @export  oro/datagrid/action/abstract-action
      * @class   oro.datagrid.action.AbstractAction
-     * @extends Backbone.View
+     * @extends BaseView
      */
-    const AbstractAction = Backbone.View.extend({
+    const AbstractAction = BaseView.extend({
         /** @property {Function} */
         launcher: ActionLauncher,
 
@@ -104,7 +104,7 @@ define(function(require) {
          * @param {Object} options
          * @param {Object} [options.launcherOptions] Options for new instance of launcher object
          */
-        initialize: function(options) {
+        initialize(options) {
             if (!options.datagrid) {
                 throw new TypeError('"datagrid" is required');
             }
@@ -132,7 +132,7 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        dispose: function() {
+        dispose() {
             if (this.disposed) {
                 return;
             }
@@ -154,7 +154,7 @@ define(function(require) {
          * @param {Object=} options Launcher options
          * @return {orodatagrid.datagrid.ActionLauncher}
          */
-        createLauncher: function(options) {
+        createLauncher(options) {
             options = options || {};
             if (_.isUndefined(options.icon) && !_.isUndefined(this.icon)) {
                 options.icon = this.icon;
@@ -172,7 +172,7 @@ define(function(require) {
          *
          * @param {Object} options
          */
-        run: function(options) {
+        run(options) {
             options = _.defaults(options, {
                 doExecute: true
             });
@@ -186,11 +186,11 @@ define(function(require) {
         /**
          * Execute action
          */
-        execute: function() {
+        execute() {
             this._confirmationExecutor(this.executeConfiguredAction.bind(this));
         },
 
-        executeConfiguredAction: function() {
+        executeConfiguredAction() {
             switch (this.frontend_handle) {
                 case 'ajax':
                     this._handleAjax();
@@ -209,14 +209,14 @@ define(function(require) {
          * @returns {Object}
          * @protected
          */
-        _getDefaultMessages: function() {
+        _getDefaultMessages() {
             let defaultMessages = Chaplin.utils.getAllPropertyVersions(this, 'defaultMessages');
             defaultMessages.unshift({});
             defaultMessages = _.extend(...defaultMessages);
             return defaultMessages;
         },
 
-        _confirmationExecutor: function(callback) {
+        _confirmationExecutor(callback) {
             if (this.confirmation) {
                 this.getConfirmDialog(callback).open();
             } else {
@@ -224,20 +224,22 @@ define(function(require) {
             }
         },
 
-        _handleWidget: function() {
+        async _handleWidget() {
             if (this.dispatched) {
                 return;
             }
             this.frontend_options = this.frontend_options || {};
             this.frontend_options.url = this.getLinkWithParameters();
             this.frontend_options.title = this.frontend_options.title || this.label;
-            loadModules('oro/' + this.frontend_handle + '-widget', function(WidgetType) {
-                const widget = new WidgetType(this.frontend_options);
-                widget.render();
-            }.bind(this));
+            return loadModules('oro/' + this.frontend_handle + '-widget')
+                .then(WidgetType => {
+                    const widget = new WidgetType(this.frontend_options);
+                    widget.render();
+                    return widget;
+                });
         },
 
-        _handleRedirect: function() {
+        _handleRedirect() {
             if (this.dispatched) {
                 return;
             }
@@ -245,18 +247,18 @@ define(function(require) {
             mediator.execute('redirectTo', {url: url}, {redirect: true});
         },
 
-        _handleAjax: function() {
+        async _handleAjax() {
             if (this.dispatched) {
                 return;
             }
             if (this.reloadData) {
                 this.datagrid.showLoading();
             }
-            this._doAjaxRequest();
+            return this._doAjaxRequest();
         },
 
-        _doAjaxRequest: function() {
-            $.ajax({
+        async _doAjaxRequest() {
+            return $.ajax({
                 url: this.getLink(),
                 data: this.getActionParameters(),
                 context: this,
@@ -267,13 +269,13 @@ define(function(require) {
             });
         },
 
-        _onAjaxError: function(jqXHR) {
+        _onAjaxError(jqXHR) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
             }
         },
 
-        _onAjaxSuccess: function(data) {
+        _onAjaxSuccess(data) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
                 this.datagrid.collection.fetch({reset: true});
@@ -281,7 +283,7 @@ define(function(require) {
             this._showAjaxSuccessMessage(data);
         },
 
-        _showAjaxSuccessMessage: function(data) {
+        _showAjaxSuccessMessage(data) {
             const defaultMessage = data.successful ? this.messages.success : this.messages.error;
             const type = data.successful ? 'success' : 'error';
             const messageOptions = data[`${type}MessageOptions`] || this[`${type}MessageOptions`] || {};
@@ -294,14 +296,10 @@ define(function(require) {
         /**
          * Get action url
          *
-         * @return {String}
+         * @return {string=}
          * @private
          */
-        getLink: function(parameters) {
-            if (_.isUndefined(parameters)) {
-                parameters = {};
-            }
-
+        getLink(parameters = {}) {
             // Add original query parameters as them may be valuable for backend logic
             const originalUrl = this.datagrid.collection.url;
             const originalRequestParameters = tools.unpackFromQueryString(
@@ -322,7 +320,7 @@ define(function(require) {
          *
          * @returns {String}
          */
-        getLinkWithParameters: function() {
+        getLinkWithParameters() {
             return this.getLink(this.getActionParameters());
         },
 
@@ -331,7 +329,7 @@ define(function(require) {
          *
          * @returns {Object}
          */
-        getActionParameters: function() {
+        getActionParameters() {
             return {};
         },
 
@@ -340,7 +338,7 @@ define(function(require) {
          *
          * @return {oroui.Modal}
          */
-        getConfirmDialog: function(callback) {
+        getConfirmDialog(callback) {
             if (this.confirmModal) {
                 this.confirmModal.dispose();
                 delete this.confirmModal;
@@ -357,7 +355,7 @@ define(function(require) {
             return this.confirmModal;
         },
 
-        getConfirmDialogOptions: function() {
+        getConfirmDialogOptions() {
             const options = {
                 title: __(this.messages.confirm_title),
                 content: this.getConfirmContentMessage(),
@@ -373,7 +371,7 @@ define(function(require) {
          *
          * @return {String}
          */
-        getConfirmContentMessage: function() {
+        getConfirmContentMessage() {
             return __(this.messages.confirm_content, this.messages.confirm_content_params);
         },
 
@@ -382,7 +380,7 @@ define(function(require) {
          *
          * @return {String}
          */
-        getRequestType: function() {
+        getRequestType() {
             return this.requestType;
         }
 
