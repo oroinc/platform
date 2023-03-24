@@ -33,4 +33,9 @@ interface ResultRecordInterface
      * @param mixed $value
      */
     public function setValue($name, $value);
+
+    /**
+     * @return array Associative array data contained in a result record.
+     */
+    public function getDataArray(): array;
 }

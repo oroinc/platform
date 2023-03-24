@@ -126,4 +126,9 @@ class ResultRecord implements ResultRecordInterface
 
         return $this->propertyAccessor;
     }
+
+    public function getDataArray(): array
+    {
+        return array_merge(...array_reverse(array_filter($this->valueContainers, 'is_array')));
+    }
 }
