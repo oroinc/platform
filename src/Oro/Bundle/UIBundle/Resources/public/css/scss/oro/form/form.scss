@@ -220,6 +220,7 @@ select[multiple] {
         border-color: $input-focus-border-color;
     }
 
+    &.readonly,
     &.disabled {
         span {
             cursor: $input-disabled-cursor;

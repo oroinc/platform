@@ -36,3 +36,10 @@ oro:
               is_nozzle: Is step nozzle
       stackedbar_chart:
           hint: Drag the chart to see more data.
+      overlaid_multiline_chart:
+          label: Overlaid Line Chart
+          params:
+              label: Category (X axis)
+              value: Value (Y axis)
+          settings:
+              connect_dots_with_line: Connect dots with line

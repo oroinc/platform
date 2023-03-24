@@ -144,6 +144,20 @@ services:
         tags:
             - { name: form.type, alias: "oro_type_widget_date_range" }
 
+    oro_dashboard.form.type.current_date_widget_date_range:
+        class: Oro\Bundle\DashboardBundle\Form\Type\CurrentDateWidgetDateRangeType
+        arguments:
+            - '@translator'
+        tags:
+            - { name: form.type }
+
+    oro_dashboard.form.type.dependent_date_widget_date_range:
+        class: Oro\Bundle\DashboardBundle\Form\Type\DependentDateWidgetDateRangeType
+        arguments:
+            - '@translator'
+        tags:
+            - { name: form.type }
+
     oro_dashboard.form.type.widget_datetime_range:
         class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateTimeRangeType
         tags:
@@ -205,6 +219,8 @@ services:
             - '@translator'
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeType }
+            - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\CurrentDateWidgetDateRangeType }
+            - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\DependentDateWidgetDateRangeType }
 
     oro_dashboard.widget_config_value.datetime_range.converter:
         class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter
