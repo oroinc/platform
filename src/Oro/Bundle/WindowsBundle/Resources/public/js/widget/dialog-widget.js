@@ -224,6 +224,17 @@ define(function(require, exports, module) {
                     container: this.widget.dialog('instance').uiDialogTitlebar,
                     ajaxLoading: true
                 }));
+
+                this.widget.on({
+                    [`ajaxStart${this.eventNamespace()}`]: e => {
+                        e.stopPropagation();
+                        this.subview('LoadingBarView').showLoader();
+                    },
+                    [`ajaxComplete${this.eventNamespace()}`]: e => {
+                        e.stopPropagation();
+                        this.subview('LoadingBarView').hideLoader();
+                    }
+                });
             }
         },
 
@@ -329,7 +340,7 @@ define(function(require, exports, module) {
         },
 
         handleStateChange: function(e, data) {
-            if (!this.options.stateEnabled) {
+            if (!this.options.stateEnabled || this.disposed) {
                 return;
             }
             if (this.restoreMode) {
@@ -510,6 +521,7 @@ define(function(require, exports, module) {
             _.delay(() => {
                 if (!this.disposed) {
                     this.widget.dialog('widget').removeClass('invisible');
+                    this.focusContent();
                 }
             }, 50);
         },

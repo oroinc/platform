@@ -2049,6 +2049,12 @@ JS;
         ]);
         $webDriverSession->buttondown();
 
+        // initiate drag action
+        $webDriverSession->moveto([
+            'xoffset' => -1,
+            'yoffset' => -1
+        ]);
+
         $moveToOptions = ['element' => null];
 
         if ($dropZone) {
@@ -2069,6 +2075,8 @@ JS;
 
         $webDriverSession->moveto($moveToOptions);
         $webDriverSession->buttonup();
+
+        $this->waitForAjax();
     }
 
     /**
@@ -2180,7 +2188,7 @@ JS;
 
         $jsTreeItem = $this->createElement('JS Tree item', $treeElement);
         self::assertTrue($jsTreeItem->isIsset(), 'Tree is empty');
-        
+
         if ($nodeTitle !== '') {
             $nodeElement = $jsTreeItem->find('named', ['content', $nodeTitle]);
 

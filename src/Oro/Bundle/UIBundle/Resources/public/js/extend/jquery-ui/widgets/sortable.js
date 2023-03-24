@@ -45,7 +45,7 @@ $.widget('ui.sortable', $.ui.sortable, {
      * Handle the jQuery UI widget's touchstart events
      * @param {Object} event The widget element's touchstart event
      */
-    _touchStart: function(event) {
+    _touchStart(event) {
         // Prevents interactions from starting on specified elements.
         // options.cancel is selector like: 'a, input, .btn, select'
         const elIsCancel = typeof this.options.cancel === 'string' && event.target.nodeName
@@ -69,7 +69,7 @@ $.widget('ui.sortable', $.ui.sortable, {
         simulateMouseEvent(event, 'mousedown');
     },
 
-    _getCreateOptions: function() {
+    _getCreateOptions() {
         const options = this._super() || {};
 
         // Allows trigger 'touchstart' and 'touchend' events on elements matching the selector while sorting
@@ -82,7 +82,7 @@ $.widget('ui.sortable', $.ui.sortable, {
      * Handle the jQuery UI widget's touchmove events
      * @param {Object} event The document's touchmove event
      */
-    _touchMove: function(event) {
+    _touchMove(event) {
         // Ignore event if not handled
         if (!touchHandled) {
             return;
@@ -98,7 +98,7 @@ $.widget('ui.sortable', $.ui.sortable, {
      * Handle the jQuery UI widget's touchend events
      * @param {Object} event The document's touchend event
      */
-    _touchEnd: function(event) {
+    _touchEnd(event) {
         // Ignore event if not handled
         if (!touchHandled) {
             return;
@@ -118,12 +118,22 @@ $.widget('ui.sortable', $.ui.sortable, {
         return true;
     },
 
+    _mouseStart(...args) {
+        this._trigger('beforePick', args[0], this._uiHash());
+        return this._superApply(args);
+    },
+
+    _clear(...args) {
+        this._trigger('beforeDrop', args[0], this._uiHash());
+        return this._superApply(args);
+    },
+
     /**
      * Method _mouseInit extends $.ui.mouse widget with bound touch event handlers that
      * translate touch events to mouse events and pass them to the widget's
      * original mouse event handling methods.
      */
-    _mouseInit: function(...args) {
+    _mouseInit(...args) {
         // Delegate the touch handlers to the widget's element
         const handlers = {
             touchstart: this._touchStart.bind(this),
@@ -146,7 +156,7 @@ $.widget('ui.sortable', $.ui.sortable, {
     /**
      * Faster and rough handle class setting method
      */
-    _setHandleClassName: function() {
+    _setHandleClassName() {
         this._removeClass(this.element.find('.ui-sortable-handle'), 'ui-sortable-handle');
 
         this._addClass(

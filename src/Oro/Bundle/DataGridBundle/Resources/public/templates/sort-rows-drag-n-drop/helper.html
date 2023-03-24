@@ -1,0 +1,19 @@
+<%
+const extraClass = [isSeparator ? 'separator' : data.length === 1 ? 'single' : 'stack'];
+if (hasSortOrder) {
+    extraClass.push('has-sort-order');
+}
+let message = data.map(item => item.sku).join(', ');
+if (data.length === 1) {
+    message = [data[0]['sku'], data[0]['name'] || data[0]['productName']].join(' - ');
+}
+%>
+<div class="sorting-helper <%- extraClass.join(' ') %>">
+    <% if (!isSeparator) { %>
+    <div class="sorting-helper__content">
+        <div class="sorting-helper__icon" aria-hidden="true"><span class="sort-icon"></span></div>
+        <div class="sorting-helper__message"><%- message %></div>
+        <div class="sorting-helper__count"><%- _.__('oro.datagrid.drag_n_drop.helper', {count: data.length}, data.length) %></div>
+    </div>
+    <% } %>
+</div>

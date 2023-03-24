@@ -1,0 +1,25 @@
+/* @theme: admin.oro; */
+
+.cancel-drag-n-drop-hint {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: $zindex-popover;
+    display: none;
+
+    &__wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        border: 1px solid $oro-datagrid-cell-border-color;
+        background-color: rgba($primary-inverse, .7);
+    }
+
+    &__text {
+        margin: 0;
+        padding: $content-padding-small;
+        font-size: $base-font-size--m;
+        background-color: $primary-inverse;
+    }
+}
