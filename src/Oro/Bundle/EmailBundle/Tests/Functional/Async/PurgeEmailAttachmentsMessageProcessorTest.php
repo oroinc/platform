@@ -4,14 +4,12 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
-use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsByIdsTopic;
+use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsTopic;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
 {
@@ -19,7 +17,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->initClient();
+        $this->initClient([], $this->generateBasicAuthHeader());
     }
 
     public function testCouldBeConstructedByContainer()
@@ -38,27 +36,19 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
         $allAttachments = $this->getEntityManager()->getRepository(EmailAttachment::class)->findAll();
         $this->assertCount(3, $allAttachments);
 
-        $message = new Message();
-        $message->setBody(['size' => null, 'all' => true]);
-        $message->setMessageId('SomeId');
+        $this->ajaxRequest('POST', $this->getUrl('oro_email_purge_emails_attachments'));
 
-        $processor = $this->getContainer()->get('oro_email.async.purge_email_attachments');
+        self::assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
+        self::consume();
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
-        $this->assertMessageSent(
-            PurgeEmailAttachmentsByIdsTopic::getName(),
-            [
-                'ids' => [
-                    $allAttachments[0]->getId(),
-                    $allAttachments[1]->getId(),
-                    $allAttachments[2]->getId(),
-                ]
-            ],
-            true,
-            true
-        );
+        $processedMessages = self::getProcessedMessagesByTopic(PurgeEmailAttachmentsTopic::getName());
+
+        self::assertNotEmpty($processedMessages);
+
+        foreach ($processedMessages as $processedMessage) {
+            $this->assertEquals(MessageProcessorInterface::ACK, $processedMessage['context']->getStatus());
+        }
     }
 
     private function createEmailAttachmentWithContent(string $content): EmailAttachment

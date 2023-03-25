@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Processor;
 use Doctrine\DBAL\Connection;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Job\Job;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -62,10 +63,26 @@ class DbalMessageQueueProcessor implements MessageQueueProcessorInterface
             }
         }
 
-        throw new \RuntimeException(sprintf(
-            'The message queue has not been able to finish processing messages within the last %d seconds.',
-            $timeLimit
-        ));
+        $exception = new \RuntimeException(
+            sprintf(
+                'The message queue has not been able to finish processing messages within the last %d seconds.',
+                $timeLimit
+            )
+        );
+
+        $this->getLogger()->error(
+            'Not processed messages list: {messages}, jobs: {jobs}, unique jobs: {uniqueJobs}',
+            [
+                'messages' => $this->getQueueMessages($this->getMessageQueueConnection()),
+                'exception' => $exception,
+                'jobs' => $this->getMessageQueueConnection()->executeQuery(
+                    $this->getRunningJobsSql()
+                )->fetchAllAssociative(),
+                'uniqueJobs' => $this->getUniqueJobs($this->getMessageQueueConnection()),
+            ]
+        );
+
+        throw $exception;
     }
 
     /**
@@ -83,9 +100,7 @@ class DbalMessageQueueProcessor implements MessageQueueProcessorInterface
     {
         $this->baseMessageQueueProcessor->cleanUp();
 
-        /** @var ManagerRegistry $doctrine */
-        $doctrine = $this->kernel->getContainer()->get('doctrine');
-        $connection = $doctrine->getConnection('message_queue');
+        $connection = $this->getMessageQueueConnection();
 
         /** @var Filesystem $filesystem */
         $filesystem = $this->kernel->getContainer()->get('filesystem');
@@ -103,21 +118,11 @@ class DbalMessageQueueProcessor implements MessageQueueProcessorInterface
      */
     private function isEmptyTables()
     {
-        /** @var ManagerRegistry $doctrine */
-        $doctrine = $this->kernel->getContainer()->get('doctrine');
-        /** @var Connection $connection */
-        $connection = $doctrine->getConnection('message_queue');
+        $connection = $this->getMessageQueueConnection();
 
         return
             !$this->hasRows($connection, 'SELECT * FROM oro_message_queue')
-            && !$this->hasRows(
-                $connection,
-                sprintf(
-                    "SELECT * FROM oro_message_queue_job WHERE status NOT IN ('%s', '%s')",
-                    Job::STATUS_SUCCESS,
-                    Job::STATUS_FAILED
-                )
-            )
+            && !$this->hasRows($connection, $this->getRunningJobsSql())
             && !$this->hasRows($connection, 'SELECT * FROM oro_message_queue_job_unique');
     }
 
@@ -130,5 +135,40 @@ class DbalMessageQueueProcessor implements MessageQueueProcessorInterface
     private function hasRows(Connection $connection, $sqlQuery)
     {
         return 0 !== $connection->executeQuery($sqlQuery)->rowCount();
+    }
+
+    private function getRunningJobsSql(): string
+    {
+        return sprintf(
+            "SELECT * FROM oro_message_queue_job WHERE status NOT IN ('%s', '%s', '%s')",
+            Job::STATUS_SUCCESS,
+            Job::STATUS_FAILED,
+            Job::STATUS_CANCELLED
+        );
+    }
+
+
+    private function getQueueMessages(Connection $connection): array
+    {
+        return $connection->executeQuery('SELECT * FROM oro_message_queue')->fetchAllAssociative();
+    }
+
+    private function getMessageQueueConnection(): Connection
+    {
+        /** @var ManagerRegistry $doctrine */
+        $doctrine = $this->kernel->getContainer()->get('doctrine');
+
+
+        return $doctrine->getConnection('message_queue');
+    }
+
+    private function getLogger(): LoggerInterface
+    {
+        return $this->kernel->getContainer()->get('monolog.logger.consumer');
+    }
+
+    private function getUniqueJobs(Connection $connection)
+    {
+        return $connection->executeQuery('SELECT * FROM oro_message_queue_job_unique')->fetchAllAssociative();
     }
 }

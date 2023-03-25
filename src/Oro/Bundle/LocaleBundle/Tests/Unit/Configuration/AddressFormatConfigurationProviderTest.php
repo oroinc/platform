@@ -12,18 +12,11 @@ class AddressFormatConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var AddressFormatConfigurationProvider */
-    private $configurationProvider;
+    private AddressFormatConfigurationProvider $configurationProvider;
 
-    /** @var string */
-    private $cacheFile;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('AddressFormatConfigurationProvider');
+        $cacheFile = $this->getTempFile('AddressFormatConfigurationProvider');
 
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
@@ -34,7 +27,7 @@ class AddressFormatConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 $bundle2->getName() => get_class($bundle2)
             ]);
 
-        $this->configurationProvider = new AddressFormatConfigurationProvider($this->cacheFile, false);
+        $this->configurationProvider = new AddressFormatConfigurationProvider($cacheFile, false);
     }
 
     public function testGetConfiguration()

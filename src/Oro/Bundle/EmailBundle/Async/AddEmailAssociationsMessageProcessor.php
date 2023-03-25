@@ -48,17 +48,8 @@ class AddEmailAssociationsMessageProcessor implements MessageProcessorInterface,
 
         asort($data['emailIds']);
 
-        $jobName = sprintf(
-            '%s:%s:%s:%s',
-            'oro.email.add_association_to_emails',
-            $data['targetClass'],
-            $data['targetId'],
-            md5(implode(',', $data['emailIds']))
-        );
-
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            $jobName,
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
             function (JobRunner $jobRunner) use ($data) {
                 foreach ($data['emailIds'] as $id) {
                     $jobRunner->createDelayed(

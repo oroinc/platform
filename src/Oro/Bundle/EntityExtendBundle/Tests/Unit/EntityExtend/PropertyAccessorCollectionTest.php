@@ -9,6 +9,7 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\CarOnlyAdde
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\CarOnlyRemover;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\CarStructure;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\CompositeCar;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAccessTest
 {
@@ -76,7 +77,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
 
         $car = $this->createMock(CarNoAdderAndRemover::class);
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth']);
@@ -93,32 +94,28 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
     public function testIsWritableReturnsTrueIfAdderAndRemoverExists()
     {
         $car = $this->createMock(Car::class);
-        $axes = $this->getContainer([1 => 'first', 2 => 'second', 3 => 'third']);
 
-        $this->assertTrue($this->propertyAccessor->isWritable($car, 'axes', $axes));
+        $this->assertTrue($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
     public function testIsWritableReturnsFalseIfOnlyAdderExists()
     {
         $car = $this->createMock(CarOnlyAdder::class);
-        $axes = $this->getContainer([1 => 'first', 2 => 'second', 3 => 'third']);
 
-        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
     public function testIsWritableReturnsFalseIfOnlyRemoverExists()
     {
         $car = $this->createMock(CarOnlyRemover::class);
-        $axes = $this->getContainer([1 => 'first', 2 => 'second', 3 => 'third']);
 
-        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
     public function testIsWritableReturnsFalseIfNoAdderNorRemoverExists()
     {
         $car = $this->createMock(CarNoAdderAndRemover::class);
-        $axes = $this->getContainer([1 => 'first', 2 => 'second', 3 => 'third']);
 
-        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 }

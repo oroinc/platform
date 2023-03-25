@@ -10,6 +10,7 @@ dynamic-imports:
         - orochart/js/app/components/horizontal_bar-chart-component
         - orochart/js/app/components/line-chart-component
         - orochart/js/app/components/multiline-chart-component
+        - orochart/js/app/components/overlaid_multiline-chart-component
         - orochart/js/app/components/pie-chart-component
         - orochart/js/data_formatter
         - orochart/js/flotr2/funnel

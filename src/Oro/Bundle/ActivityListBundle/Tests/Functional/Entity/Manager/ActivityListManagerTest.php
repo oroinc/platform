@@ -11,14 +11,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class ActivityListManagerTest extends WebTestCase
 {
-    /**
-     * @var ActivityListManager
-     */
-    private $manager;
+    private ActivityListManager $manager;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([]);

@@ -50,4 +50,16 @@ class IndexEntitiesByIdTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        $messageBody = [
+            'class' => 'class-name',
+            'entityIds' => ['42', '142'],
+        ];
+        self::assertSame(
+            'search_reindex|'. md5(serialize($messageBody['class']) . serialize($messageBody['entityIds'])),
+            $this->getTopic()->createJobName($messageBody)
+        );
+    }
 }

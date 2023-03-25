@@ -41,7 +41,7 @@ class Router
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        $rawRouteData = json_decode($this->getRawRouteData($request), true);
+        $rawRouteData = $this->getInputActionData($request);
 
         /**
          * Default route should be used in case if no input_action in request
@@ -59,6 +59,15 @@ class Router
             $redirectUrl = $this->urlGenerator->generate($routeName, $routeParams);
         }
         return new RedirectResponse($redirectUrl);
+    }
+
+    public function getInputActionData(Request $request = null): ?array
+    {
+        if ($request === null) {
+            $request = $this->requestStack->getCurrentRequest();
+        }
+
+        return json_decode($this->getRawRouteData($request), true);
     }
 
     /**

@@ -12,6 +12,8 @@ use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\Exception\InvalidArgumentException;
+use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\Extension\ExtensionInterface;
 use Oro\Component\Layout\LayoutItemInterface;
@@ -24,17 +26,18 @@ use Oro\Component\Layout\LayoutUpdateInterface;
  */
 class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $extension;
+
     /** @var LayoutRegistry */
     private $registry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $extension;
-
     protected function setUp(): void
     {
+        $this->extension = $this->createMock(ExtensionInterface::class);
+
         $this->registry = new LayoutRegistry();
         $this->registry->addExtension(new CoreExtension());
-        $this->extension = $this->createMock(ExtensionInterface::class);
         $this->registry->addExtension($this->extension);
     }
 
@@ -84,7 +87,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeWithNullName()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "string", "NULL" given.');
 
         $this->registry->getType(null);
@@ -92,7 +95,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeWithEmptyName()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not load a block type "".');
 
         $this->registry->getType('');
@@ -100,7 +103,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeWithNotStringName()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "string", "integer" given.');
 
         $this->registry->getType(1);
@@ -108,7 +111,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUndefinedType()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not load a block type "widget".');
 
         $this->extension->expects($this->once())
@@ -177,7 +180,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testFindDataProviderWithNullName()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "string", "NULL" given.');
 
         $this->registry->findDataProvider(null);
@@ -190,7 +193,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testFindDataProviderWithNotStringName()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "string", "integer" given.');
 
         $this->registry->findDataProvider(1);

@@ -3,12 +3,13 @@
 namespace Oro\Bundle\IntegrationBundle\Async\Topic;
 
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Topic for integration syncing.
  */
-class SyncIntegrationTopic extends AbstractTopic
+class SyncIntegrationTopic extends AbstractTopic implements JobAwareTopicInterface
 {
     private int $transportBatchSize;
 
@@ -48,5 +49,10 @@ class SyncIntegrationTopic extends AbstractTopic
             ->addAllowedTypes('connector', ['null', 'string'])
             ->addAllowedTypes('connector_parameters', 'array')
             ->addAllowedTypes('transport_batch_size', 'int');
+    }
+
+    public function createJobName($messageBody): string
+    {
+        return 'oro_integration:sync_integration:' . $messageBody['integration_id'];
     }
 }

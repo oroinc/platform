@@ -245,31 +245,37 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
 
     public function testTryToCreateEntityWhenCreateActionDisabled()
     {
+        $entityType = $this->getEntityType(TestDepartment::class);
+
+        $operationId = $this->sendUpdateListRequest(TestDepartment::class, [
+            'data' => [
+                [
+                    'type' => $entityType,
+                    'attributes' => ['name' => 'Updated Department']
+                ]
+            ]
+        ]);
+
+        $tokenStorage = $this->getTokenStorage();
+        $token = $this->getTokenStorage()->getToken();
+
+        $this->consumeMessages();
+
         $this->appendEntityConfig(
             TestDepartment::class,
             ['actions' => ['create' => false]],
             true
         );
 
-        $entityType = $this->getEntityType(TestDepartment::class);
-        $operationId = $this->processUpdateList(
-            TestDepartment::class,
-            [
-                'data' => [
-                    [
-                        'type'       => $entityType,
-                        'attributes' => ['name' => 'Updated Department']
-                    ]
-                ]
-            ],
-            false
-        );
+        //refresh token after resetting in consumer
+        $tokenStorage->setToken($token);
+        $this->consumeAllMessages();
 
         $this->assertAsyncOperationError(
             [
-                'id'     => $operationId . '-1-1',
+                'id' => $operationId . '-1-1',
                 'status' => 405,
-                'title'  => 'action not allowed exception',
+                'title' => 'action not allowed exception',
                 'detail' => 'The action is not allowed.',
                 'source' => ['pointer' => '/data/0']
             ],
@@ -285,29 +291,38 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             [
                 'data' => [
                     [
-                        'type'       => $entityType,
+                        'type' => $entityType,
                         'attributes' => ['name' => 'Updated Department']
                     ]
                 ]
             ]
         );
 
+        $this->consumeMessages();
+
         $this->appendEntityConfig(
             TestDepartment::class,
             ['actions' => ['create' => false]],
             true
         );
-        $this->processUpdateListChunkMessages();
+
+        $this->consumeMessages();
 
         $this->assertAsyncOperationError(
             [
-                'id'     => $operationId . '-1-1',
+                'id' => $operationId . '-1-1',
                 'status' => 405,
-                'title'  => 'action not allowed exception',
+                'title' => 'action not allowed exception',
                 'detail' => 'The action is not allowed.',
                 'source' => ['pointer' => '/data/0']
             ],
             $operationId
+        );
+
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['create' => true]],
+            true
         );
     }
 
@@ -319,29 +334,38 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             [
                 'data' => [
                     [
-                        'type'       => $entityType,
+                        'type' => $entityType,
                         'attributes' => ['name' => 'Updated Department']
                     ]
                 ]
             ]
         );
 
+        $this->consumeMessages();
+
         $this->appendEntityConfig(
             TestDepartment::class,
             ['actions' => ['get' => false]],
             true
         );
-        $this->processUpdateListChunkMessages();
+
+        $this->consumeMessages();
 
         $this->assertAsyncOperationError(
             [
-                'id'     => $operationId . '-1-1',
+                'id' => $operationId . '-1-1',
                 'status' => 405,
-                'title'  => 'action not allowed exception',
+                'title' => 'action not allowed exception',
                 'detail' => 'The action is not allowed.',
                 'source' => ['pointer' => '/data/0']
             ],
             $operationId
+        );
+
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['get' => true]],
+            true
         );
     }
 
@@ -542,33 +566,39 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
 
     public function testTryToUpdateEntityWhenUpdateActionDisabled()
     {
+        $entityType = $this->getEntityType(TestDepartment::class);
+
+        $operationId = $this->sendUpdateListRequest(TestDepartment::class, [
+            'data' => [
+                [
+                    'meta' => ['update' => true],
+                    'type' => $entityType,
+                    'id' => '1',
+                    'attributes' => ['name' => 'Updated Department']
+                ]
+            ]
+        ]);
+
+        $tokenStorage = $this->getTokenStorage();
+        $token = $this->getTokenStorage()->getToken();
+
+        $this->consumeMessages();
+
         $this->appendEntityConfig(
             TestDepartment::class,
             ['actions' => ['update' => false]],
             true
         );
 
-        $entityType = $this->getEntityType(TestDepartment::class);
-        $operationId = $this->processUpdateList(
-            TestDepartment::class,
-            [
-                'data' => [
-                    [
-                        'meta'       => ['update' => true],
-                        'type'       => $entityType,
-                        'id'         => '1',
-                        'attributes' => ['name' => 'Updated Department']
-                    ]
-                ]
-            ],
-            false
-        );
+        //refresh token after resetting in consumer
+        $tokenStorage->setToken($token);
+        $this->consumeAllMessages();
 
         $this->assertAsyncOperationError(
             [
-                'id'     => $operationId . '-1-1',
+                'id' => $operationId . '-1-1',
                 'status' => 405,
-                'title'  => 'action not allowed exception',
+                'title' => 'action not allowed exception',
                 'detail' => 'The action is not allowed.',
                 'source' => ['pointer' => '/data/0']
             ],
@@ -579,36 +609,48 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
     public function testTryToUpdateEntityWhenUpdateActionDisabledAfterUpdateListRequestWasAlreadySent()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
-        $operationId = $this->sendUpdateListRequest(
-            TestDepartment::class,
-            [
-                'data' => [
-                    [
-                        'meta'       => ['update' => true],
-                        'type'       => $entityType,
-                        'id'         => '1',
-                        'attributes' => ['name' => 'Updated Department']
-                    ]
+
+        $operationId = $this->sendUpdateListRequest(TestDepartment::class, [
+            'data' => [
+                [
+                    'meta' => ['update' => true],
+                    'type' => $entityType,
+                    'id' => '1',
+                    'attributes' => ['name' => 'Updated Department']
                 ]
             ]
-        );
+        ]);
+
+        $tokenStorage = $this->getTokenStorage();
+        $token = $this->getTokenStorage()->getToken();
+
+        $this->consumeMessages();
 
         $this->appendEntityConfig(
             TestDepartment::class,
             ['actions' => ['update' => false]],
             true
         );
-        $this->processUpdateListChunkMessages();
+
+        //refresh token after resetting in consumer
+        $tokenStorage->setToken($token);
+        $this->consumeAllMessages();
 
         $this->assertAsyncOperationError(
             [
-                'id'     => $operationId . '-1-1',
+                'id' => $operationId . '-1-1',
                 'status' => 405,
-                'title'  => 'action not allowed exception',
+                'title' => 'action not allowed exception',
                 'detail' => 'The action is not allowed.',
                 'source' => ['pointer' => '/data/0']
             ],
             $operationId
+        );
+
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['update' => true]],
+            true
         );
     }
 
@@ -620,31 +662,39 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             [
                 'data' => [
                     [
-                        'meta'       => ['update' => true],
-                        'type'       => $entityType,
-                        'id'         => '1',
+                        'meta' => ['update' => true],
+                        'type' => $entityType,
+                        'id' => '1',
                         'attributes' => ['name' => 'Updated Department']
                     ]
                 ]
             ]
         );
 
+        $this->consumeMessages();
+
         $this->appendEntityConfig(
             TestDepartment::class,
             ['actions' => ['get' => false]],
             true
         );
-        $this->processUpdateListChunkMessages();
+        $this->consumeMessages();
 
         $this->assertAsyncOperationError(
             [
-                'id'     => $operationId . '-1-1',
+                'id' => $operationId . '-1-1',
                 'status' => 405,
-                'title'  => 'action not allowed exception',
+                'title' => 'action not allowed exception',
                 'detail' => 'The action is not allowed.',
                 'source' => ['pointer' => '/data/0']
             ],
             $operationId
+        );
+
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['actions' => ['get' => true]],
+            true
         );
     }
 

@@ -13,6 +13,10 @@ define(function(require) {
     const BaseView = require('oroui/js/app/views/base/view');
 
     const PageStateView = BaseView.extend({
+        IGNORE: ':input[type=button], :input[type=submit], :input[type=reset], ' +
+            ':input[type=password], :input[type=file], :input[name$="[_token]"], ' +
+            '[data-ignore-form-state-change] :input, :input[name^=temp-validation-name]',
+
         listen: {
             'change:data model': '_saveModel',
             'change model': '_updateCache',
@@ -23,6 +27,10 @@ define(function(require) {
             'page:afterPagePartChange mediator': 'afterPageChange',
             'page:beforeRefresh mediator': 'beforePageRefresh',
             'openLink:before mediator': 'beforePageChange'
+        },
+
+        events: {
+            'patchInitialState form[data-collect=true]': 'onPatchInitialState'
         },
 
         /**
@@ -202,6 +210,61 @@ define(function(require) {
         },
 
         /**
+         * Handles `patchInitialState` DOM event and execute correspondent handler for an input/a container and its form
+         * @param {jQuery.Event} event
+         */
+        onPatchInitialState(event) {
+            this.patchInitialState($(event.target), $(event.currentTarget));
+        },
+
+        /**
+         * Collects patch data and updates initial state
+         * @param {jQuery.Element} $elem an input or a container
+         * @param {jQuery.Element} $form
+         */
+        patchInitialState($elem, $form) {
+            const formIndex = this.$('form[data-collect=true]').index($form);
+            if (formIndex === -1 || !this._initialState || !this._initialState[formIndex]) {
+                // form with traced state is not found
+                return;
+            }
+            const initialState = this._initialState[formIndex];
+            const patchData = this._extractInputsData($elem);
+            const findIndexInState = (state, patch) => {
+                return state.findIndex((itemA, indexA) => {
+                    return patch.every((itemB, indexB) => state[indexA + indexB].name === itemB.name);
+                });
+            };
+
+            const replaceIndex = findIndexInState(initialState, patchData);
+            if (replaceIndex !== -1) {
+                // found exact sequence of patchData in initialState -- replace that data
+                initialState.splice(replaceIndex, patchData.length, ...patchData);
+            } else {
+                // insert patchData into initial state
+                const newState = this._extractInputsData($form);
+                const newIndex = findIndexInState(newState, patchData);
+                const preNewItem = newState[newIndex - 1];
+                const nextNewItem = newState[newIndex + patchData.length];
+
+                if (preNewItem) {
+                    // there's previous item, try to find its index in initial state
+                    const index = initialState.findLastIndex(item => item.name === preNewItem.name);
+                    // index is found and no next item (end of list) or next item is the same as in initial state
+                    if (index !== -1 && (!nextNewItem || initialState[index + 1].name === nextNewItem.name)) {
+                        initialState.splice(index + 1, 0, ...patchData);
+                    }
+                } else if (nextNewItem) {
+                    // no previous item, but next item is found, insert before it
+                    const index = initialState.findIndex(item => item.name === nextNewItem.name);
+                    if (index !== -1) {
+                        initialState.splice(index - 1, 0, ...patchData);
+                    }
+                }
+            }
+        },
+
+        /**
          * Switch on form state trace
          * @param {Object=} options
          * @protected
@@ -335,35 +398,44 @@ define(function(require) {
         },
 
         /**
-         * Goes through the form and collects data
+         * Goes through collectable forms and collects data
          * @returns {Array}
          * @protected
          */
-        _collectFormsData: function() {
-            const data = [];
-            $('form[data-collect=true]').each(function(index, el) {
-                let items = $(el)
-                    .find('input, textarea, select')
-                    .not(':input[type=button],   :input[type=submit], :input[type=reset], ' +
-                         ':input[type=password], :input[type=file],   :input[name$="[_token]"], ' +
-                         '.select2[type=hidden], [data-ignore-form-state-change] :input');
+        _collectFormsData() {
+            return this.$('form[data-collect=true]')
+                .toArray()
+                .map(form => this._extractInputsData($(form)));
+        },
 
-                data[index] = items.serializeArray();
+        /**
+         * Extracts data from input elements collection
+         * @param {jQuery.Element} $elem input element or container with inputs
+         * @returns {Array<{name: string, value: string}>}
+         * @protected
+         */
+        _extractInputsData($elem) {
+            const inputSelector = `:input:not(${this.IGNORE})`;
+            const $inputs = $elem.is(inputSelector) ? $elem : $elem.find(inputSelector);
 
-                // collect select2 selected data
-                items = $(el).find('.select2[type=hidden], .select2[type=select]');
-                _.each(items, function(item) {
-                    const $item = $(item);
-                    const selectedData = $item.inputWidget('data');
-                    const itemData = {name: item.name, value: $item.val()};
+            const data = $inputs
+                .toArray()
+                .map(input => {
+                    const $input = $(input);
+                    if (!$input.is('.select2[type=hidden]')) {
+                        return $input.serializeArray()[0];
+                    } else {
+                        // collect select2 selected data
+                        const selectedData = $input.inputWidget('data');
+                        const itemData = {name: input.name, value: $input.val()};
 
-                    if (!_.isEmpty(selectedData)) {
-                        itemData.selectedData = selectedData;
+                        if (!_.isEmpty(selectedData)) {
+                            itemData.selectedData = selectedData;
+                        }
+                        return itemData;
                     }
-
-                    data[index].push(itemData);
-                });
-            });
+                })
+                .filter(item => item);
             return data;
         },
 

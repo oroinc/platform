@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Model\Action\AddActivityTarget;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -98,12 +99,9 @@ class AddActivityTargetTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeWithMissingRequiredOption()
     {
-        $this->expectException(\Oro\Component\Action\Exception\InvalidParameterException::class);
-        $options = [
-            'email' => '$.email',
-        ];
+        $this->expectException(InvalidParameterException::class);
 
-        $this->action->initialize($options);
+        $this->action->initialize(['email' => '$.email']);
     }
 
     public function testExecuteActionWithAttribute()

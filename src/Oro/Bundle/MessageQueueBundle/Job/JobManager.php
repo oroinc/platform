@@ -11,6 +11,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
 use Oro\Component\MessageQueue\Event\AfterSaveJobEvent;
 use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
+use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\UniqueJobHandler;
@@ -73,10 +74,16 @@ class JobManager implements JobManagerInterface
 
     /**
      * {@inheritdoc}
+     * @throws DuplicateJobException
      */
     public function saveJob(Job $job): void
     {
         $em = $this->getEntityManager();
+
+        if (!$job->getId() && $job->isRoot()) {
+            $this->uniqueJobHandler->checkRootJobOnDuplicate($em->getConnection(), $job);
+        }
+
         $em->getConnection()->transactional(function (Connection $connection) use ($job, $em) {
             $this->eventDispatcher->dispatch(new BeforeSaveJobEvent($job), BeforeSaveJobEvent::EVENT_ALIAS);
 
@@ -131,6 +138,13 @@ class JobManager implements JobManagerInterface
             ->andWhere($qb->expr()->in('status', ':statuses'))
             ->setParameter('statuses', $statuses, Type::SIMPLE_ARRAY)
             ->execute();
+    }
+
+    public function getUniqueJobs(): array
+    {
+        return $this->uniqueJobHandler->list(
+            $this->getEntityManager()->getConnection()
+        );
     }
 
     private function insertJob(Job $job, EntityManager $em): void

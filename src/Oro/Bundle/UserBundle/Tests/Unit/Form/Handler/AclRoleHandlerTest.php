@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
@@ -31,19 +32,14 @@ class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
         $this->privilegeRepository = $this->createMock(AclPrivilegeRepository::class);
         $this->aclManager = $this->createMock(AclManager::class);
 
-        $this->handler = new class($factory, $aclCache, []) extends AclRoleHandler {
-            public function xgetExtensionFilters(): array
-            {
-                return $this->extensionFilters;
-            }
-        };
+        $this->handler = new AclRoleHandler($factory, $aclCache, []);
         $this->handler->setAclPrivilegeRepository($this->privilegeRepository);
         $this->handler->setAclManager($this->aclManager);
     }
 
     public function testAddExtensionFilter()
     {
-        self::assertEmpty($this->handler->xgetExtensionFilters());
+        self::assertEmpty(ReflectionUtil::getPropertyValue($this->handler, 'extensionFilters'));
 
         $actionKey = 'action';
         $entityKey = 'entity';
@@ -57,13 +53,13 @@ class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
             $actionKey => [$defaultGroup],
             $entityKey => [$defaultGroup],
         ];
-        self::assertEquals($expectedFilters, $this->handler->xgetExtensionFilters());
+        self::assertEquals($expectedFilters, ReflectionUtil::getPropertyValue($this->handler, 'extensionFilters'));
 
         // each group added only once
         $this->handler->addExtensionFilter($actionKey, $defaultGroup);
         $this->handler->addExtensionFilter($entityKey, $defaultGroup);
 
-        self::assertEquals($expectedFilters, $this->handler->xgetExtensionFilters());
+        self::assertEquals($expectedFilters, ReflectionUtil::getPropertyValue($this->handler, 'extensionFilters'));
     }
 
     public function testGetAllPrivilegesUseAclGroup()

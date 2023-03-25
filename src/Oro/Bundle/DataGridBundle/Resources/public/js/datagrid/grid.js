@@ -117,50 +117,56 @@ define(function(require) {
         selectState: null,
 
         /**
-         * @property {Object} Default properties values
+         * Generates default properties
+         *
+         * @returns {Object}
+         * @protected
          */
-        defaults: {
-            rowClickActionClass: 'row-click-action',
-            rowClassName: '',
-            toolbarOptions: {
-                addResetAction: true,
-                addRefreshAction: true,
-                addDatagridSettingsManager: true,
-                addSorting: false,
-                datagridSettings: {
-                    addSorting: true
-                },
-                placement: {
-                    top: true,
-                    bottom: false
-                }
-            },
-            actionOptions: {
-                refreshAction: {
-                    launcherOptions: {
-                        label: __('oro_datagrid.action.refresh'),
-                        ariaLabel: __('oro_datagrid.action.refresh.aria_label'),
-                        className: 'btn refresh-action',
-                        iconClassName: 'fa-repeat',
-                        launcherMode: 'icon-only'
+        _defaults() {
+            return {
+                rowClickActionClass: 'row-click-action',
+                rowClassName: '',
+                toolbarOptions: {
+                    addResetAction: true,
+                    addRefreshAction: true,
+                    addDatagridSettingsManager: true,
+                    addSorting: false,
+                    datagridSettings: {
+                        addSorting: true
+                    },
+                    placement: {
+                        top: true,
+                        bottom: false
                     }
                 },
-                resetAction: {
-                    launcherOptions: {
-                        label: __('oro_datagrid.action.reset'),
-                        ariaLabel: __('oro_datagrid.action.reset.aria_label'),
-                        className: 'btn reset-action',
-                        iconClassName: 'fa-refresh',
-                        launcherMode: 'icon-only'
+                actionOptions: {
+                    refreshAction: {
+                        launcherOptions: {
+                            label: __('oro_datagrid.action.refresh'),
+                            ariaLabel: __('oro_datagrid.action.refresh.aria_label'),
+                            className: 'btn refresh-action',
+                            iconClassName: 'fa-repeat',
+                            launcherMode: 'icon-only'
+                        }
+                    },
+                    resetAction: {
+                        launcherOptions: {
+                            label: __('oro_datagrid.action.reset'),
+                            ariaLabel: __('oro_datagrid.action.reset.aria_label'),
+                            className: 'btn reset-action',
+                            iconClassName: 'fa-refresh',
+                            launcherMode: 'icon-only'
+                        }
                     }
-                }
-            },
-            rowClickAction: undefined,
-            multipleSorting: true,
-            rowActions: [],
-            massActions: new Backbone.Collection(),
-            enableFullScreenLayout: false,
-            scopeDelimiter: ':'
+                },
+                rowClickAction: undefined,
+                multipleSorting: true,
+                rowActions: [],
+                massActions: new Backbone.Collection(),
+                extraActions: new Backbone.Collection(),
+                enableFullScreenLayout: false,
+                scopeDelimiter: ':'
+            };
         },
 
         /**
@@ -180,6 +186,7 @@ define(function(require) {
          * @inheritdoc
          */
         constructor: function Grid(options) {
+            this.defaults = this._defaults();
             Grid.__super__.constructor.call(this, options);
         },
 
@@ -193,6 +200,7 @@ define(function(require) {
          * @param {String} [options.rowClassName] CSS class for row
          * @param {Object} [options.toolbarOptions] Options for toolbar
          * @param {Object} [options.exportOptions] Options for export
+         * @param {Object} [options.extraActions] Options for extra actions
          * @param {Array<oro.datagrid.action.AbstractAction>} [options.rowActions] Array of row actions prototypes
          * @param {Backbone.Collection<oro.datagrid.action.AbstractAction>} [options.massActions] Collection of mass actions prototypes
          * @param {Boolean} [options.multiSelectRowEnabled] Option for enabling multi select row
@@ -797,7 +805,13 @@ define(function(require) {
          * @private
          */
         _getToolbarExtraActions: function() {
-            const actions = [];
+            const actions = this.extraActions.map(actionModel => {
+                const Action = actionModel.get('module');
+                return new Action({
+                    datagrid: this
+                });
+            });
+
             if (!_.isEmpty(this.exportOptions)) {
                 actions.push(this.getExportAction());
             }
