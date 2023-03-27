@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\BackupManager\EntityConfigBackupManagerInterface;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Event\UpdateSchemaEvent;
@@ -15,27 +16,15 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  */
 class EntityExtendUpdateProcessor
 {
-    private MaintenanceMode $maintenance;
-    private CommandExecutor $commandExecutor;
-    private LoggerInterface $logger;
-    private EventDispatcherInterface $dispatcher;
-    protected EntityConfigBackupManagerInterface $entityConfigBackupManager;
-    private ?Profiler $profiler;
-
     public function __construct(
-        MaintenanceMode $maintenance,
-        CommandExecutor $commandExecutor,
-        LoggerInterface $logger,
-        EventDispatcherInterface $dispatcher,
-        EntityConfigBackupManagerInterface $entityConfigBackupManager,
-        Profiler $profiler = null
+        private MaintenanceMode $maintenance,
+        private CommandExecutor $commandExecutor,
+        private LoggerInterface $logger,
+        private EventDispatcherInterface $dispatcher,
+        protected EntityConfigBackupManagerInterface $entityConfigBackupManager,
+        protected ConfigManager $configManager,
+        private ?Profiler $profiler = null
     ) {
-        $this->maintenance = $maintenance;
-        $this->commandExecutor = $commandExecutor;
-        $this->logger = $logger;
-        $this->dispatcher = $dispatcher;
-        $this->entityConfigBackupManager = $entityConfigBackupManager;
-        $this->profiler = $profiler;
     }
 
     /**
@@ -110,6 +99,8 @@ class EntityExtendUpdateProcessor
 
     protected function applyChangesToDatabase(): void
     {
+        // Before running oro:entity-extend:update-config, the model cache must be cleared.
+        $this->configManager->clearModelCache();
         $this->executeCommand('oro:entity-extend:update-config', ['--update-custom' => true, '--force' => true]);
         $this->executeCommand('oro:entity-extend:cache:warmup');
         $this->executeCommand('oro:entity-extend:update-schema', [

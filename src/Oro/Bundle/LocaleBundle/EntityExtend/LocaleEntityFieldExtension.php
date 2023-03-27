@@ -9,6 +9,7 @@ use Oro\Bundle\EntityExtendBundle\EntityExtend\AbstractEntityFieldExtension;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\EntityFieldExtensionInterface;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\EntityFieldProcessTransport;
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityStaticCache;
 use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
@@ -23,23 +24,23 @@ use Oro\Bundle\LocaleBundle\Storage\EntityFallbackFieldsStorage;
  */
 class LocaleEntityFieldExtension extends AbstractEntityFieldExtension implements EntityFieldExtensionInterface
 {
-    private const CLONE_METHOD        = 'cloneLocalizedFallbackValueAssociations';
+    private const CLONE_METHOD = 'cloneLocalizedFallbackValueAssociations';
     private const SET_FALLBACK_METHOD = 'setDefaultFallbackValue';
 
-    private const PROPERTY_FIELD  = 'field';
+    private const PROPERTY_FIELD = 'field';
     private const PROPERTY_GETTER = 'getter';
     private const PROPERTY_SETTER = 'setter';
     private const METHOD_ARGUMENT = 'argument';
     private const METHOD_CALLBACK = 'callback';
 
-    private EntityFallbackFieldsStorage         $storage;
+    private EntityFallbackFieldsStorage $storage;
     private DefaultFallbackMethodsNamesProvider $namesProvider;
 
     public function __construct(
         EntityFallbackFieldsStorage $storage,
         DefaultFallbackMethodsNamesProvider $namesProvider
     ) {
-        $this->storage       = $storage;
+        $this->storage = $storage;
         $this->namesProvider = $namesProvider;
     }
 
@@ -266,7 +267,7 @@ EOF;
 
     private function getFallbackValue(EntityFieldProcessTransport $transport, string $fieldName): void
     {
-        $values       = $this->getStorageValue($transport, $fieldName);
+        $values = $this->getStorageValue($transport, $fieldName);
         $localization = null;
         if ($transport->getArgument(0)) {
             $localization = $transport->getArgument(0);
@@ -317,11 +318,8 @@ EOF;
     {
         $properties = $this->getProperties($transport);
         if (array_key_exists($transport->getName(), $properties)) {
-            call_user_func(
-                [$this, $properties[$transport->getName()][self::PROPERTY_GETTER]],
-                $transport,
-                $properties[$transport->getName()][self::PROPERTY_FIELD]
-            );
+            $methodName = $properties[$transport->getName()][self::PROPERTY_GETTER];
+            $this->$methodName($transport, $properties[$transport->getName()][self::PROPERTY_FIELD]);
         }
     }
 
@@ -335,11 +333,8 @@ EOF;
             && isset($properties[$transport->getName()][self::PROPERTY_SETTER])
         ) {
             $transport->setArguments([$transport->getValue()]);
-            call_user_func(
-                [$this, $properties[$transport->getName()][self::PROPERTY_SETTER]],
-                $transport,
-                $properties[$transport->getName()][self::PROPERTY_FIELD]
-            );
+            $methodName = $properties[$transport->getName()][self::PROPERTY_SETTER];
+            $this->$methodName($transport, $properties[$transport->getName()][self::PROPERTY_FIELD]);
         }
     }
 
@@ -351,33 +346,24 @@ EOF;
         if (str_starts_with($transport->getName(), 'get')) {
             $methods = $this->getGetMethods($transport);
             if (isset($methods[$transport->getName()])) {
-                call_user_func(
-                    [$this, $methods[$transport->getName()][self::METHOD_CALLBACK]],
-                    $transport,
-                    $methods[$transport->getName()][self::METHOD_ARGUMENT]
-                );
+                $methodName = $methods[$transport->getName()][self::METHOD_CALLBACK];
+                $this->$methodName($transport, $methods[$transport->getName()][self::METHOD_ARGUMENT]);
             }
         }
 
         if (str_starts_with($transport->getName(), 'set')) {
             $methods = $this->getSetMethods($transport);
             if (isset($methods[$transport->getName()])) {
-                call_user_func(
-                    [$this, $methods[$transport->getName()][self::METHOD_CALLBACK]],
-                    $transport,
-                    $methods[$transport->getName()][self::METHOD_ARGUMENT]
-                );
+                $methodName = $methods[$transport->getName()][self::METHOD_CALLBACK];
+                $this->$methodName($transport, $methods[$transport->getName()][self::METHOD_ARGUMENT]);
             }
         }
 
         if (str_starts_with($transport->getName(), 'default')) {
             $methods = $this->getDefaultMethods($transport);
             if (isset($methods[$transport->getName()])) {
-                call_user_func(
-                    [$this, $methods[$transport->getName()][self::METHOD_CALLBACK]],
-                    $transport,
-                    $methods[$transport->getName()][self::METHOD_ARGUMENT]
-                );
+                $methodName = $methods[$transport->getName()][self::METHOD_CALLBACK];
+                $this->$methodName($transport, $methods[$transport->getName()][self::METHOD_ARGUMENT]);
             }
         }
 
@@ -442,6 +428,7 @@ EOF;
         if ($exists) {
             $transport->setResult(true);
             $transport->setProcessed(true);
+            ExtendEntityStaticCache::setMethodExistsCache($transport, true);
         }
     }
 

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
-use Oro\Bundle\MaintenanceBundle\Maintenance\Mode;
+use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 
@@ -11,7 +11,7 @@ use Oro\Component\MessageQueue\Consumption\Context;
  */
 class MaintenanceExtension extends AbstractExtension
 {
-    /** @var Mode */
+    /** @var MaintenanceModeState */
     private $maintenance;
 
     /** @var string */
@@ -21,11 +21,11 @@ class MaintenanceExtension extends AbstractExtension
     private $idleTime;
 
     /**
-     * @param Mode $maintenance The maintenance mode state
+     * @param MaintenanceModeState $maintenance The maintenance mode state
      * @param int  $idleTime    The sleep time in seconds between checks
      *                          whether the system is still in the maintenance mode
      */
-    public function __construct(Mode $maintenance, $idleTime)
+    public function __construct(MaintenanceModeState $maintenance, $idleTime)
     {
         $this->maintenance = $maintenance;
         $this->idleTime = $idleTime;

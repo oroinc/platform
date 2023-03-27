@@ -21,31 +21,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EntityVariablesProvider implements EntityVariablesProviderInterface
 {
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var FormatterManager */
-    protected $formatterManager;
-
-    /** @var ManagerRegistry */
-    protected $doctrine;
-    private Inflector $inflector;
+    private array $reflectionClasses = [];
+    private array $classMetadata = [];
+    private array $extendGetterMethods = [];
 
     public function __construct(
-        TranslatorInterface $translator,
-        ConfigManager $configManager,
-        ManagerRegistry $doctrine,
-        FormatterManager $formatterManager,
-        Inflector $inflector
+        protected TranslatorInterface $translator,
+        protected ConfigManager       $configManager,
+        protected ManagerRegistry     $doctrine,
+        protected FormatterManager    $formatterManager,
+        protected Inflector           $inflector
     ) {
-        $this->translator = $translator;
-        $this->configManager = $configManager;
-        $this->doctrine = $doctrine;
-        $this->formatterManager = $formatterManager;
-        $this->inflector = $inflector;
     }
 
     /**
@@ -162,10 +148,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
             return [];
         }
 
-        $em = $this->doctrine->getManagerForClass($entityClass);
-        $metadata = $em->getClassMetadata($entityClass);
         $result = [];
-        $reflClass = new EntityReflectionClass($entityClass);
         $fieldConfigs = $this->configManager->getProvider('email')->getConfigs($entityClass);
         foreach ($fieldConfigs as $fieldConfig) {
             if (!$fieldConfig->is('available_in_template')) {
@@ -174,14 +157,16 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
 
             /** @var FieldConfigId $fieldId */
             $fieldId = $fieldConfig->getId();
-
-            [$varName, $getter] = $this->getFieldAccessInfo($reflClass, $fieldId->getFieldName());
+            [$varName, $getter] = $this->getFieldAccessInfo(
+                $this->getEntityReflectionClass($entityClass),
+                $fieldId->getFieldName()
+            );
             if (!$varName) {
                 continue;
             }
 
             $data = [];
-            $this->addTargetClassData($fieldId, $metadata, $data);
+            $this->addTargetClassData($fieldId, $this->getMetadataForClass($entityClass), $data);
             $this->addFormatterData($fieldId, $data);
             if ($data) {
                 $getter = array_merge($data, ['property_path' => $getter]);
@@ -189,10 +174,41 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
 
             $result[$varName] = $getter;
         }
-        $extendEntityMethods = EntityPropertyInfo::getExtendedMethods($entityClass);
-        $result = array_merge($result, array_keys($extendEntityMethods));
+        $result = array_merge($result, $this->getExtendGetterMethods($entityClass));
 
         return $result;
+    }
+
+    protected function getExtendGetterMethods(string $entityClass): array
+    {
+        if (!isset($this->extendGetterMethods[$entityClass])) {
+            $extendEntityMethods = array_keys(EntityPropertyInfo::getExtendedMethods($entityClass));
+            $extendEntityMethods = array_filter($extendEntityMethods, function (string $methodName) {
+                return str_starts_with($methodName, 'get') || str_starts_with($methodName, 'is');
+            });
+            $this->extendGetterMethods[$entityClass] = $extendEntityMethods;
+        }
+
+        return $this->extendGetterMethods[$entityClass];
+    }
+
+    protected function getEntityReflectionClass(string $entityClass): EntityReflectionClass
+    {
+        if (!isset($this->reflectionClasses[$entityClass])) {
+            $this->reflectionClasses[$entityClass] = new EntityReflectionClass($entityClass);
+        }
+
+        return $this->reflectionClasses[$entityClass];
+    }
+
+    protected function getMetadataForClass(string $entityClass): ClassMetadata
+    {
+        if (!isset($this->classMetadata[$entityClass])) {
+            $this->classMetadata[$entityClass] = $this->doctrine->getManagerForClass($entityClass)
+                ->getClassMetadata($entityClass);
+        }
+
+        return $this->classMetadata[$entityClass];
     }
 
     /**
