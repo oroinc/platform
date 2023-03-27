@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EntityExtend;
 
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Bundle\EntityExtendBundle\Extend\ReflectionExtractor;
 use Psr\Cache\CacheItemPoolInterface;
@@ -1008,9 +1007,9 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
 
     private function getReflectionClass(string $className): \ReflectionClass
     {
-        $realClassName = ClassUtils::getRealClass($className);
+        $realClassName = CachedClassUtils::getRealClass($className);
         if (!isset($this->reflectionClassesCache[$realClassName])) {
-            $realClassUtils = ClassUtils::getRealClass($realClassName);
+            $realClassUtils = CachedClassUtils::getRealClass($realClassName);
             $this->reflectionClassesCache[$realClassName] = new EntityReflectionClass($realClassUtils);
         }
 

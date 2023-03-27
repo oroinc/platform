@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntityConfigListenerTestCase extends \PHPUnit\Framework\TestCase
@@ -44,14 +45,27 @@ class EntityConfigListenerTestCase extends \PHPUnit\Framework\TestCase
                     ? $this->configProvider
                     : null;
             });
+        $serviceProvider = new ServiceLocator([
+            'annotation_metadata_factory' => function () {
+                return $this->createMock(MetadataFactory::class);
+            },
+            'configuration_handler' => function () {
+                return ConfigurationHandlerMock::getInstance();
+            },
+            'event_dispatcher' => function () {
+                return $this->eventDispatcher;
+            },
+            'audit_manager' => function () {
+                return $this->createMock(AuditManager::class);
+            },
+            'config_model_manager' => function () {
+                return $this->createMock(ConfigModelManager::class);
+            }
+        ]);
 
         $this->configManager = new ConfigManager(
-            $this->eventDispatcher,
-            $this->createMock(MetadataFactory::class),
-            $this->createMock(ConfigModelManager::class),
-            $this->createMock(AuditManager::class),
             $this->configCache,
-            ConfigurationHandlerMock::getInstance()
+            $serviceProvider
         );
         $this->configManager->setProviderBag($configProviderBag);
     }

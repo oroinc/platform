@@ -273,6 +273,7 @@ services:
             - '@logger'
             - '@event_dispatcher'
             - '@oro_entity_config.tools.backup_manager.entity_config_backup_manager'
+            - '@oro_entity_config.config_manager'
             - '@?profiler'
 
     oro_entity_extend.extend.entity_proxy_generator:
@@ -779,6 +780,16 @@ services:
     oro_entity_extend.accessor.property_accessor_with_dot_array_syntax:
         class: 'Oro\Bundle\EntityExtendBundle\EntityExtend\PropertyAccessorWithDotArraySyntax'
         factory: [ 'Oro\Bundle\EntityExtendBundle\PropertyAccess', createPropertyAccessorWithDotSyntax ]
+
+    oro_entity_extend.accessor.property_access_factory:
+        class: Oro\Bundle\EntityExtendBundle\PropertyAccess
+        calls:
+            - [ 'setCacheItemPool', [ '@oro_entity_extend.accessor.cache_item_pool' ] ]
+
+    oro_entity_extend.accessor.cache_item_pool:
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_entity_extend_property_accessor' }
 
     oro_entity_extend.twig.extension.get_attribute_node_extension:
         class: Oro\Bundle\EntityExtendBundle\Twig\GetAttributeNodeExtension

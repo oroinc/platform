@@ -11,7 +11,7 @@ services:
     oro_message_queue.consumption.maintenance_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension'
         arguments:
-            - '@oro_maintenance.maintenance'
+            - '@oro_maintenance.maintenance_state'
             - '%oro_message_queue.maintenance.idle_time%'
         calls:
             - ['setFilePathServerLockFromConfig', ['%kernel.project_dir%/config/oro_env.conf']]

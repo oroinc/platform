@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\EntityExtend\CachedClassUtils;
 use Oro\Bundle\EntityExtendBundle\EntityExtendEvents;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
@@ -16,7 +17,6 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -106,7 +106,7 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
     public function getFields($entity, $entityClass = null)
     {
         if (null === $entityClass) {
-            $entityClass = ClassUtils::getRealClass($entity);
+            $entityClass = CachedClassUtils::getClass($entity);
         }
 
         $dynamicRows = [];

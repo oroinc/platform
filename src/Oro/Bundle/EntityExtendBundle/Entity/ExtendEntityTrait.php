@@ -6,6 +6,8 @@ namespace Oro\Bundle\EntityExtendBundle\Entity;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\EntityFieldProcessTransport;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendedEntityFieldsProcessor;
 use Oro\Bundle\EntityExtendBundle\Model\ExtendEntityStorage;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityStaticCache;
+use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 /**
@@ -32,6 +34,9 @@ trait ExtendEntityTrait
      */
     public function get(string $name): mixed
     {
+        if (ExtendEntityStaticCache::isAllowedIgnoreGet($this, $name) && $this->getStorage()->offsetExists($name)) {
+            return $this->getStorage()[$name];
+        }
         $transport = $this->createTransport();
         $transport->setName($name);
 
@@ -50,6 +55,12 @@ trait ExtendEntityTrait
      */
     public function set(string $name, mixed $value): static
     {
+        if (!$this instanceof AbstractLocalizedFallbackValue
+            && ExtendEntityStaticCache::isAllowedIgnoreSet($this, $name)) {
+            $this->getStorage()->offsetSet($name, $value);
+
+            return $this;
+        }
         $transport = $this->createTransport();
         $transport->setName($name);
         $transport->setValue($value);
@@ -71,6 +82,9 @@ trait ExtendEntityTrait
 
     public function __get(string $name)
     {
+        if (ExtendEntityStaticCache::isAllowedIgnoreGet($this, $name) && $this->getStorage()->offsetExists($name)) {
+            return $this->getStorage()[$name];
+        }
         $transport = $this->createTransport();
         $transport->setName($name);
 
@@ -85,6 +99,12 @@ trait ExtendEntityTrait
 
     public function __set(string $name, $value)
     {
+        if (!$this instanceof AbstractLocalizedFallbackValue
+            && ExtendEntityStaticCache::isAllowedIgnoreSet($this, $name)) {
+            $this->getStorage()->offsetSet($name, $value);
+
+            return $this;
+        }
         $transport = $this->createTransport();
         $transport->setName($name);
         $transport->setValue($value);
