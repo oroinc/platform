@@ -5,12 +5,14 @@ namespace Oro\Bundle\MaintenanceBundle\Tests\Unit\Maintenance;
 use Oro\Bundle\MaintenanceBundle\Drivers\AbstractDriver;
 use Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory;
 use Oro\Bundle\MaintenanceBundle\Event\MaintenanceEvent;
+use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState;
 use Oro\Bundle\MaintenanceBundle\Maintenance\Mode;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class ModeTest extends \PHPUnit\Framework\TestCase
 {
-    private Mode $mode;
+    private Mode $maintenanceMode;
+    private MaintenanceModeState $maintenanceModeState;
 
     private AbstractDriver|\PHPUnit\Framework\MockObject\MockObject $driver;
 
@@ -33,7 +35,8 @@ class ModeTest extends \PHPUnit\Framework\TestCase
             ->method('unlock')
             ->willReturn(true);
 
-        $this->mode = new Mode($factory, $this->dispatcher);
+        $this->maintenanceMode = new Mode($factory, $this->dispatcher);
+        $this->maintenanceModeState = new MaintenanceModeState($factory);
     }
 
     public function testModeIsOn(): void
@@ -42,7 +45,7 @@ class ModeTest extends \PHPUnit\Framework\TestCase
             ->method('decide')
             ->willReturn(true);
 
-        self::assertTrue($this->mode->isOn());
+        self::assertTrue($this->maintenanceModeState->isOn());
     }
 
     public function testModeOn(): void
@@ -51,7 +54,7 @@ class ModeTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_ON);
 
-        self::assertTrue($this->mode->on());
+        self::assertTrue($this->maintenanceMode->on());
     }
 
     public function testModeOff(): void
@@ -60,7 +63,7 @@ class ModeTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_OFF);
 
-        self::assertTrue($this->mode->off());
+        self::assertTrue($this->maintenanceMode->off());
     }
 
     public function testActivate(): void

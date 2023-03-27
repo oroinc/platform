@@ -47,6 +47,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
 
     /** @var EventDispatcherInterface */
     protected $dispatcher;
+    protected array $availableForExportField = [];
 
     public function __construct(
         FieldHelper $fieldHelper,
@@ -331,7 +332,15 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
 
     protected function isFieldAvailableForExport(string $entityName, string $fieldName): bool
     {
-        return !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded');
+        if (!isset($this->availableForExportField[$entityName][$fieldName])) {
+            $this->availableForExportField[$entityName][$fieldName] = !$this->fieldHelper->getConfigValue(
+                $entityName,
+                $fieldName,
+                'excluded'
+            );
+        }
+
+        return $this->availableForExportField[$entityName][$fieldName];
     }
 
     /**

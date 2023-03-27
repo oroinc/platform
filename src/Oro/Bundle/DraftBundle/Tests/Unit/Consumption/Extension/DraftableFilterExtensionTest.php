@@ -7,6 +7,7 @@ use Doctrine\ORM\Query\FilterCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DraftBundle\Consumption\Extension\DraftableFilterExtension;
 use Oro\Bundle\DraftBundle\Doctrine\DraftableFilter;
+use Oro\Bundle\DraftBundle\Manager\DraftableFilterState;
 use Oro\Component\MessageQueue\Consumption\Context;
 
 class DraftableFilterExtensionTest extends \PHPUnit\Framework\TestCase
@@ -22,7 +23,8 @@ class DraftableFilterExtensionTest extends \PHPUnit\Framework\TestCase
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
 
         $this->extension = new DraftableFilterExtension(
-            $this->managerRegistry
+            $this->managerRegistry,
+            $this->createMock(DraftableFilterState::class)
         );
     }
 
