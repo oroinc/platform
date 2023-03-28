@@ -365,7 +365,7 @@ datagrids:
                             modal:         true
                             dblclick:      maximize
                             maximizedHeightDecreaseBy: minimize-bar
-                            width: 700
+                            width: 812
             view_thread:
                 type: dialog
                 label: oro.email.datagrid.emails.action.view
