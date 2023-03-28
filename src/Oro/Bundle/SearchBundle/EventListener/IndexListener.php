@@ -331,7 +331,6 @@ class IndexListener implements OptionalListenerInterface
         if (isset($this->entitiesIndexedFieldsCache[$className])) {
             return $this->entitiesIndexedFieldsCache[$className];
         }
-        $this->mappingProvider->warmUpCache();
         if (!$this->mappingProvider->hasFieldsMapping($className)) {
             $this->entitiesIndexedFieldsCache[$className] = [];
 

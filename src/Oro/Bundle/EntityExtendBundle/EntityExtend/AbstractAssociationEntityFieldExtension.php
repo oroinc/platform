@@ -7,6 +7,7 @@ namespace Oro\Bundle\EntityExtendBundle\EntityExtend;
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationNameGenerator as NameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityStaticCache;
 
 /**
  * Abstract Extended Entity Field Processor Associations Extension
@@ -205,6 +206,7 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
         if (EntityPropertyInfo::isMethodMatchExists($methods, $transport->getName())) {
             $transport->setResult(true);
             $transport->setProcessed(true);
+            ExtendEntityStaticCache::setMethodExistsCache($transport, true);
         }
     }
 }

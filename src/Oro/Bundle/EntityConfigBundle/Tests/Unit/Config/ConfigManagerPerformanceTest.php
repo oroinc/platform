@@ -23,6 +23,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -434,14 +435,27 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
         $modelCache->expects($this->any())
             ->method('getItem')
             ->willReturn($cacheItem);
+        $serviceProvider = new ServiceLocator([
+            'annotation_metadata_factory' => function () {
+                return $this->createMock(MetadataFactory::class);
+            },
+            'configuration_handler' => function () {
+                return ConfigurationHandlerMock::getInstance();
+            },
+            'event_dispatcher' => function () {
+                return $this->createMock(EventDispatcher::class);
+            },
+            'audit_manager' => function () use ($securityTokenStorage, $doctrine) {
+                return new AuditManager($securityTokenStorage, $doctrine);
+            },
+            'config_model_manager' => function () use ($doctrine, $lockObject, $databaseChecker) {
+                return new ConfigModelManager($doctrine, $lockObject, $databaseChecker);
+            }
+        ]);
 
         return new ConfigManager(
-            $this->createMock(EventDispatcher::class),
-            $this->createMock(MetadataFactory::class),
-            new ConfigModelManager($doctrine, $lockObject, $databaseChecker),
-            new AuditManager($securityTokenStorage, $doctrine),
             new ConfigCache($cache, $modelCache, ['test' => 'test']),
-            ConfigurationHandlerMock::getInstance()
+            $serviceProvider
         );
     }
 

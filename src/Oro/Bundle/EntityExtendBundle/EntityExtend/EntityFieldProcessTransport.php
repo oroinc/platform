@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\EntityExtend;
 
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
 /**
@@ -45,7 +44,7 @@ class EntityFieldProcessTransport
 
     public function setClass(string $class): void
     {
-        $this->class = ClassUtils::getRealClass($class);
+        $this->class = CachedClassUtils::getRealClass($class);
     }
 
     public function getStorage(): \ArrayAccess

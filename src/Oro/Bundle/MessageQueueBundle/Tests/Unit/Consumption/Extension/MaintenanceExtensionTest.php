@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
-use Oro\Bundle\MaintenanceBundle\Maintenance\Mode;
+use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Psr\Log\LoggerInterface;
 
 class MaintenanceExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    private Mode|\PHPUnit\Framework\MockObject\MockObject $maintenance;
+    private MaintenanceModeState|\PHPUnit\Framework\MockObject\MockObject $maintenance;
 
     private MaintenanceExtension $extension;
 
     protected function setUp(): void
     {
-        $this->maintenance = $this->createMock(Mode::class);
+        $this->maintenance = $this->createMock(MaintenanceModeState::class);
 
         $this->extension = new MaintenanceExtension($this->maintenance, 1);
     }

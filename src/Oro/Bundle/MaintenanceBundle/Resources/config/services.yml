@@ -30,5 +30,13 @@ services:
             - "@oro_maintenance.driver.factory"
             - "@event_dispatcher"
 
+    oro_maintenance.maintenance_state:
+        class: Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState
+        arguments:
+            - "@oro_maintenance.driver.factory"
+
+    Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState:
+        alias: oro_maintenance.maintenance_state
+
     Oro\Bundle\MaintenanceBundle\Maintenance\Mode:
         alias: oro_maintenance.maintenance

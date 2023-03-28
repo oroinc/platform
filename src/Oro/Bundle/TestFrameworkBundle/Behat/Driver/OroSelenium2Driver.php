@@ -117,12 +117,12 @@ class OroSelenium2Driver extends Selenium2Driver
      * @param string $xpath
      * @param string $value
      */
-    public function typeIntoInput($xpath, $value)
+    public function typeIntoInput($xpath, $value, $clearField = true)
     {
         $element = $this->findElement($xpath);
         $elementName = strtolower($element->name());
 
-        if (in_array($elementName, array('input', 'textarea'))) {
+        if ($clearField && in_array($elementName, array('input', 'textarea'))) {
             $existingValueLength = strlen($this->getValue($xpath));
             $value = str_repeat(Key::BACKSPACE . Key::DELETE, $existingValueLength) . $value;
         }

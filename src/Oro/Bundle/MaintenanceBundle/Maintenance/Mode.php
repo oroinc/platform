@@ -50,14 +50,6 @@ class Mode
     }
 
     /**
-     * Whether maintenance mode is on or not
-     */
-    public function isOn(): bool
-    {
-        return $this->factory->getDriver()->decide();
-    }
-
-    /**
      * Turn on maintenance mode and register shutdown function to turn it off
      */
     public function activate(): void

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\EntityExtend;
 
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityStaticCache;
 
 /**
  * Processes Entity Field Extensions for Extended Entity
@@ -79,6 +79,16 @@ class ExtendedEntityFieldsProcessor
 
     public static function executeMethodExists(EntityFieldProcessTransport $transport): void
     {
+        $cacheIsMethodExists = ExtendEntityStaticCache::getMethodExistsCache($transport);
+        if (null !== $cacheIsMethodExists) {
+            if (false === $cacheIsMethodExists) {
+                return;
+            }
+            $transport->setResult(true);
+            $transport->setProcessed(true);
+
+            return;
+        }
         self::extendTransportWithMetadataProvider($transport);
         foreach (self::$iterator->getExtensions() as $extension) {
             $extension->methodExists($transport);
@@ -86,6 +96,7 @@ class ExtendedEntityFieldsProcessor
                 return;
             }
         }
+        ExtendEntityStaticCache::setMethodExistsCache($transport, false);
     }
 
     private static function extendTransportWithMetadataProvider(EntityFieldProcessTransport $transport): void
@@ -111,7 +122,7 @@ class ExtendedEntityFieldsProcessor
     public static function getEntityMetadata(object|string $objectOrClass): ?ConfigInterface
     {
         if (is_object($objectOrClass)) {
-            $objectOrClass = ClassUtils::getClass($objectOrClass);
+            $objectOrClass = CachedClassUtils::getClass($objectOrClass);
         }
 
         return self::$metadataProvider->getExtendEntityMetadata($objectOrClass);

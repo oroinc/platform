@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Provider;
 
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
+use Oro\Bundle\EntityExtendBundle\EntityExtend\CachedClassUtils;
 
 /**
  * Returns default form options.
@@ -19,7 +19,7 @@ class ExtendFieldFormOptionsDefaultProvider implements ExtendFieldFormOptionsPro
 
     public function getOptions(string $className, string $fieldName): array
     {
-        $className = ClassUtils::getRealClass($className);
+        $className = CachedClassUtils::getRealClass($className);
         $entityFieldConfig = $this->entityConfigManager->getFieldConfig('entity', $className, $fieldName);
 
         return [
