@@ -198,7 +198,7 @@ define([
 
             if (options.url) {
                 this.url = options.url;
-                this.urlParams = options.urlParams;
+                this.urlParams = _.isEmpty(options.urlParams) ? {} : options.urlParams;
             }
             if (options.model) {
                 this.model = options.model;
@@ -842,6 +842,10 @@ define([
             }
 
             return BBColProto.fetch.call(this, options);
+        },
+
+        assignUrlParams(params) {
+            Object.assign(this.urlParams, params);
         },
 
         hasExtraRecordsToLoad: function() {
