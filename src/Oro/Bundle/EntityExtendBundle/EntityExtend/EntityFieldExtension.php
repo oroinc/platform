@@ -101,6 +101,9 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         }
 
         foreach ($transport->getFieldsMetadata() as $fieldConfig) {
+            if (!$fieldConfig['is_extend'] || $fieldConfig['is_serialized']) {
+                continue;
+            }
             $method = EntityFieldAccessorsHelper::getterName($fieldConfig['fieldName']);
             $result[$method] = $fieldConfig['fieldName'];
         }

@@ -258,6 +258,28 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         return $this->query->getAggregations();
     }
 
+    public function setHint(string $name, $value): self
+    {
+        $this->query->setHint($name, $value);
+
+        return $this;
+    }
+
+    public function getHint(string $name)
+    {
+        return $this->query->getHint($name);
+    }
+
+    public function hasHint(string $name): bool
+    {
+        return $this->query->hasHint($name);
+    }
+
+    public function getHints(): array
+    {
+        return $this->query->getHints();
+    }
+
     public function __clone()
     {
         $this->query = clone $this->query;

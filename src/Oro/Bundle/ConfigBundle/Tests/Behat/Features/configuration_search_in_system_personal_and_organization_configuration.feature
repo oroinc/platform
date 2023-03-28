@@ -8,6 +8,7 @@ Feature: Configuration Search in System, Personal and Organization configuration
     Given I login as administrator
     And I go to System/ Configuration
     When I type "application" in "Configuration Quick Search"
+    And I expand all on configuration sidebar
     Then I should see "Application Settings" in the "Configuration Sidebar Content" element
     And I should not see "Localization" in the "Configuration Sidebar Content" element
     When I click "Clear Sidebar Search"
@@ -16,14 +17,17 @@ Feature: Configuration Search in System, Personal and Organization configuration
 
   Scenario: Search should work in fuzzy mode if no result was found
     When I type "Routin" in "Configuration Quick Search"
+    And I expand all on configuration sidebar
     Then I should see "Routing" in the "Configuration Sidebar Content" element
     And I should not see "Marketing" in the "Configuration Sidebar Content" element
     When I type "RoutinW" in "Configuration Quick Search"
+    And I expand all on configuration sidebar
     Then I should see "Routing" in the "Configuration Sidebar Content" element
     And I should see "Marketing" in the "Configuration Sidebar Content" element
 
   Scenario: Search should show sections which contain found settings
     When I type "url" in "Configuration Quick Search"
+    And I expand all on configuration sidebar
     Then I should see "Routing" in the "Configuration Sidebar Content" element
     And I should not see "Localization" in the "Configuration Sidebar Content" element
     When I click "Clear Sidebar Search"
@@ -32,6 +36,7 @@ Feature: Configuration Search in System, Personal and Organization configuration
 
   Scenario: Settings tooltips should be searchable
     When I type "permitted for upload" in "Configuration Quick Search"
+    And I expand all on configuration sidebar
     Then I should see "Upload Settings" in the "Configuration Sidebar Content" element
     And I should not see "Localization" in the "Configuration Sidebar Content" element
     When I click "Clear Sidebar Search"
@@ -40,6 +45,7 @@ Feature: Configuration Search in System, Personal and Organization configuration
 
   Scenario: Settings with search type choice should be searchable
     When I type "Never" in "Configuration Quick Search"
+    And I expand all on configuration sidebar
     Then I should see "Routing" in the "Configuration Sidebar Content" element
     And I should not see "Localization" in the "Configuration Sidebar Content" element
     When I click "Clear Sidebar Search"
@@ -48,6 +54,7 @@ Feature: Configuration Search in System, Personal and Organization configuration
 
   Scenario: If the user types section name, all child settings should be displayed
     When I type "websites" in "Configuration Quick Search"
+    And I expand all on configuration sidebar
     Then I should see "Routing" in the "Configuration Sidebar Content" element
     And I should see "Sitemap" in the "Configuration Sidebar Content" element
     And I should not see "Localization" in the "Configuration Sidebar Content" element
@@ -64,11 +71,13 @@ Feature: Configuration Search in System, Personal and Organization configuration
 
   Scenario: Check that search text is highlighted in the configuration section label
     When I type "url" in "Configuration Quick Search"
+    And I expand all on configuration sidebar
     Then I should see "Highlight Container" element inside "Configuration Section Label" element
     And I should see "Highlighted Text" element with text "URL" inside "Configuration Section Label" element
 
   Scenario: Check that search text is highlighted in the option label
     When I type "applic" in "Configuration Quick Search"
+    And I expand all on configuration sidebar
     Then I should see "Highlight Container" element inside "Configuration Option Label" element
     And I should see "Highlighted Text" element with text "Applic" inside "Configuration Option Label" element
 
@@ -82,6 +91,7 @@ Feature: Configuration Search in System, Personal and Organization configuration
 
   Scenario: Check highlighted tooltip content after searching in System Configuration
     When I type "notifications" in "Configuration Quick Search"
+    And I expand all on configuration sidebar
     Then I should see "Highlighted Tooltip Icon" element inside "Configuration Page" element
     And I click on "Highlighted Tooltip Icon"
     Then I should see "Highlighted Text" element with text "notifications" inside "Tooltip Container" element
@@ -114,6 +124,7 @@ Feature: Configuration Search in System, Personal and Organization configuration
     Given I go to System/ Configuration
     And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
     When I type "Calendar" in "Configuration Quick Search"
+    And I expand all on configuration sidebar
     And I should see "Show hidden items"
     And I should not see "User bar"
     And I should not see "Navigation bar"
