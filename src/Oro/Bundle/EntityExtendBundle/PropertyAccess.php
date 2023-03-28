@@ -13,6 +13,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 final class PropertyAccess
 {
+    protected static $cacheItemPool = null;
+
     /**
      * Creates a property accessor with the default configuration.
      */
@@ -33,14 +35,15 @@ final class PropertyAccess
         $builder = new OroPropertyAccessorBuilder();
         $builder->setReadInfoExtractor(new ReflectionExtractor(enableConstructorExtraction: false));
         $builder->setWriteInfoExtractor(new ReflectionExtractor(mutatorPrefixes: ['set']));
+        if (null !== self::$cacheItemPool) {
+            $builder->setCacheItemPool(self::$cacheItemPool);
+        }
 
         return $builder;
     }
 
-    /**
-     * This class cannot be instantiated.
-     */
-    private function __construct()
+    public function setCacheItemPool($cacheItemPool): void
     {
+        self::$cacheItemPool = $cacheItemPool;
     }
 }

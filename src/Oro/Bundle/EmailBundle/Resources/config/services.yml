@@ -1473,3 +1473,9 @@ services:
         class: Oro\Bundle\EmailBundle\Provider\EmailTemplateEntityProvider
         parent: oro_entity.entity_provider.abstract
         lazy: true
+
+    oro_email.twig.email_security_policy_decorator:
+        decorates: oro_email.twig.email_security_policy
+        class: Oro\Bundle\EmailBundle\Twig\EmailSecurityPolicyDecorator
+        arguments:
+            - '@.inner'

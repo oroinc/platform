@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Oro\Bundle\EntityExtendBundle\EntityExtend;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -55,7 +54,7 @@ class AssociationExtendEntity
     public static function support(object $object, string $targetClass): bool
     {
         $associations = static::getAssociations($object);
-        $targetClass  = ClassUtils::getRealClass($targetClass);
+        $targetClass  = CachedClassUtils::getRealClass($targetClass);
 
         return isset($associations[$targetClass]);
     }
@@ -85,7 +84,7 @@ class AssociationExtendEntity
             return $targets;
         }
 
-        $targetClass = ClassUtils::getRealClass($targetClass);
+        $targetClass = CachedClassUtils::getRealClass($targetClass);
         if (isset($associations[$targetClass])) {
             return $object->get($associations[$targetClass]);
         }
@@ -121,7 +120,7 @@ class AssociationExtendEntity
             return;
         }
 
-        $targetClass = ClassUtils::getClass($target);
+        $targetClass = CachedClassUtils::getClass($target);
         $associations = static::getAssociations($object);
         foreach ($associations as $className => $fieldName) {
             if ($className === $targetClass) {
@@ -137,7 +136,7 @@ class AssociationExtendEntity
     public static function hasTarget(object $object, object $target): bool
     {
         $associations = static::getAssociations($object);
-        $targetClass  = ClassUtils::getClass($target);
+        $targetClass  = CachedClassUtils::getClass($target);
 
         if (isset($associations[$targetClass])) {
             switch (static::getRelationType($object)) {
@@ -155,7 +154,7 @@ class AssociationExtendEntity
     public static function addTarget(object $object, object $target): void
     {
         $associations = static::getAssociations($object);
-        $targetClass  = ClassUtils::getClass($target);
+        $targetClass  = CachedClassUtils::getClass($target);
 
         if (isset($associations[$targetClass])) {
             switch (static::getRelationType($object)) {
@@ -177,7 +176,7 @@ class AssociationExtendEntity
     public static function removeTarget(object $object, object $target): void
     {
         $associations = static::getAssociations($object);
-        $targetClass  = ClassUtils::getClass($target);
+        $targetClass  = CachedClassUtils::getClass($target);
 
         if (isset($associations[$targetClass])) {
             switch (static::getRelationType($object)) {

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -17,6 +16,9 @@ class ChangePropertyAccessorReflectionExtractorPass implements CompilerPassInter
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('property_accessor')
-            ->setFactory([PropertyAccess::class, 'createPropertyAccessor']);
+            ->setFactory([
+                $container->getDefinition('oro_entity_extend.accessor.property_access_factory'),
+                'createPropertyAccessor'
+            ]);
     }
 }

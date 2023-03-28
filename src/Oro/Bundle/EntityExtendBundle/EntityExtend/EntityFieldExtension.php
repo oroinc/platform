@@ -29,14 +29,13 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
             $this->setBoolCacheItem($transport, $this, true);
             return true;
         }
-        foreach ($transport->getFieldsMetadata() as $fieldConfig) {
-            if (!$fieldConfig['is_extend'] || $fieldConfig['is_serialized']) {
-                continue;
-            }
-            if ($fieldConfig['fieldName'] === $transport->getName()) {
-                $this->setBoolCacheItem($transport, $this, true);
-                return true;
-            }
+        $fieldsMetadata = $transport->getFieldsMetadata();
+        if (isset($fieldsMetadata[$transport->getName()])
+            && $fieldsMetadata[$transport->getName()]['is_extend']
+            && !$fieldsMetadata[$transport->getName()]['is_serialized']) {
+            $this->setBoolCacheItem($transport, $this, true);
+
+            return true;
         }
         $entityMetadata = $transport->getEntityMetadata();
         $isCustom = !$entityMetadata->get('inherit') && $entityMetadata->get('schema')['type'] === 'Custom';
@@ -102,6 +101,9 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         }
 
         foreach ($transport->getFieldsMetadata() as $fieldConfig) {
+            if (!$fieldConfig['is_extend'] || $fieldConfig['is_serialized']) {
+                continue;
+            }
             $method = EntityFieldAccessorsHelper::getterName($fieldConfig['fieldName']);
             $result[$method] = $fieldConfig['fieldName'];
         }
@@ -192,14 +194,11 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         if (!$this->isPropertyExists($transport)) {
             return;
         }
-
         $this->initializeDefaultValue($transport);
+        ExtendEntityStaticCache::allowIgnoreGetCache($transport);
         $result = $transport->getStorage()[$transport->getName()];
-        if (!$transport->isProcessed()) {
-            ExtendEntityStaticCache::allowIgnoreGetCache($transport);
-            $transport->setProcessed(true);
-            $transport->setResult($result);
-        }
+        $transport->setProcessed(true);
+        $transport->setResult($result);
     }
 
     /**
@@ -375,6 +374,7 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
                 if ($exists) {
                     $transport->setResult(true);
                     $transport->setProcessed(true);
+                    ExtendEntityStaticCache::setMethodExistsCache($transport, true);
 
                     return;
                 }

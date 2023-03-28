@@ -5,6 +5,7 @@ namespace Oro\Bundle\DraftBundle\Consumption\Extension;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DraftBundle\Doctrine\DraftableFilter;
+use Oro\Bundle\DraftBundle\Manager\DraftableFilterState;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 
@@ -13,14 +14,10 @@ use Oro\Component\MessageQueue\Consumption\Context;
  */
 class DraftableFilterExtension extends AbstractExtension
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry)
-    {
-        $this->managerRegistry = $managerRegistry;
+    public function __construct(
+        private ManagerRegistry $managerRegistry,
+        protected DraftableFilterState $filterState
+    ) {
     }
 
     /**
@@ -28,6 +25,9 @@ class DraftableFilterExtension extends AbstractExtension
      */
     public function onPreReceived(Context $context)
     {
+        if ($this->filterState->isDisabled()) {
+            return;
+        }
         $this->disableDraftableFilter();
     }
 
@@ -38,6 +38,7 @@ class DraftableFilterExtension extends AbstractExtension
         $filters = $em->getFilters();
         if ($filters->isEnabled(DraftableFilter::FILTER_ID)) {
             $filters->disable(DraftableFilter::FILTER_ID);
+            $this->filterState->setDisabled();
         }
     }
 }
