@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\EntityExtendBundle\Test\EntityExtendTestInitializer;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
@@ -107,6 +108,14 @@ abstract class WebTestCase extends BaseWebTestCase
 
     protected function setUp(): void
     {
+    }
+
+    /**
+     * @beforeClass
+     */
+    public static function setUpExtendEntityProcessor()
+    {
+        EntityExtendTestInitializer::initialize();
     }
 
     /**
