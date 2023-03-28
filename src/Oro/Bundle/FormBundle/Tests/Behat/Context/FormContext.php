@@ -450,6 +450,29 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $form->typeInField($locator, $value);
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Type value in field chapter by chapter. Imitate real user input from keyboard
+     * Example: And continue typing "Common" in "search"
+     * Example: When I continue typing "Create" in "Enter shortcut action"
+     *
+     * @When /^(?:|I )continue typing "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )continue typing "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)" from "(?P<formName>(?:[^"]|\\")*)"$/
+     * @throws ElementNotFoundException
+     */
+    //@codingStandardsIgnoreEnd
+    public function iContinueTypingInFieldWith($locator, $value, $formName = 'OroForm')
+    {
+        $locator = $this->fixStepArgument($locator);
+        $value = $this->fixStepArgument($value);
+        $formName = $this->fixStepArgument($formName);
+
+        /** @var OroForm $form */
+        $form = $this->createElement($formName);
+
+        $form->typeInField($locator, $value, false);
+    }
+
     /**
      * Example: And press select entity button on Owner field
      *

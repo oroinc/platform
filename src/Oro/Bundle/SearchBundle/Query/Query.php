@@ -11,53 +11,68 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
  */
 class Query
 {
-    const ORDER_ASC  = 'asc';
+    const ORDER_ASC = 'asc';
     const ORDER_DESC = 'desc';
 
-    const KEYWORD_SELECT      = 'select';
-    const KEYWORD_FROM        = 'from';
-    const KEYWORD_WHERE       = 'where';
-    const KEYWORD_AND         = 'and';
-    const KEYWORD_OR          = 'or';
-    const KEYWORD_OFFSET      = 'offset';
+    const KEYWORD_SELECT = 'select';
+    const KEYWORD_FROM = 'from';
+    const KEYWORD_WHERE = 'where';
+    const KEYWORD_AND = 'and';
+    const KEYWORD_OR = 'or';
+    const KEYWORD_OFFSET = 'offset';
     const KEYWORD_MAX_RESULTS = 'max_results';
-    const KEYWORD_AGGREGATE   = 'aggregate';
-    const KEYWORD_ORDER_BY    = 'order_by';
-    const KEYWORD_AS          = 'as';
+    const KEYWORD_AGGREGATE = 'aggregate';
+    const KEYWORD_ORDER_BY = 'order_by';
+    const KEYWORD_AS = 'as';
 
-    const OPERATOR_EQUALS              = '=';
-    const OPERATOR_NOT_EQUALS          = '!=';
-    const OPERATOR_GREATER_THAN        = '>';
+    const OPERATOR_EQUALS = '=';
+    const OPERATOR_NOT_EQUALS = '!=';
+    const OPERATOR_GREATER_THAN = '>';
     const OPERATOR_GREATER_THAN_EQUALS = '>=';
-    const OPERATOR_LESS_THAN           = '<';
-    const OPERATOR_LESS_THAN_EQUALS    = '<=';
-    const OPERATOR_CONTAINS            = '~';
-    const OPERATOR_NOT_CONTAINS        = '!~';
-    const OPERATOR_IN                  = 'in';
-    const OPERATOR_NOT_IN              = '!in';
-    const OPERATOR_STARTS_WITH         = 'starts_with';
-    const OPERATOR_EXISTS              = 'exists';
-    const OPERATOR_NOT_EXISTS          = 'notexists';
-    const OPERATOR_LIKE                = 'like';
-    const OPERATOR_NOT_LIKE            = 'notlike';
+    const OPERATOR_LESS_THAN = '<';
+    const OPERATOR_LESS_THAN_EQUALS = '<=';
+    const OPERATOR_CONTAINS = '~';
+    const OPERATOR_NOT_CONTAINS = '!~';
+    const OPERATOR_IN = 'in';
+    const OPERATOR_NOT_IN = '!in';
+    const OPERATOR_STARTS_WITH = 'starts_with';
+    const OPERATOR_EXISTS = 'exists';
+    const OPERATOR_NOT_EXISTS = 'notexists';
+    const OPERATOR_LIKE = 'like';
+    const OPERATOR_NOT_LIKE = 'notlike';
 
-    const TYPE_TEXT     = 'text';
-    const TYPE_INTEGER  = 'integer';
+    const TYPE_TEXT = 'text';
+    const TYPE_INTEGER = 'integer';
     const TYPE_DATETIME = 'datetime';
-    const TYPE_DECIMAL  = 'decimal';
+    const TYPE_DECIMAL = 'decimal';
 
     const INFINITY = 10000000;
-    const FINITY   = 0.000001;
+    const FINITY = 0.000001;
 
     const AGGREGATE_FUNCTION_COUNT = 'count';
-    const AGGREGATE_FUNCTION_SUM   = 'sum';
-    const AGGREGATE_FUNCTION_MAX   = 'max';
-    const AGGREGATE_FUNCTION_MIN   = 'min';
-    const AGGREGATE_FUNCTION_AVG   = 'avg';
+    const AGGREGATE_FUNCTION_SUM = 'sum';
+    const AGGREGATE_FUNCTION_MAX = 'max';
+    const AGGREGATE_FUNCTION_MIN = 'min';
+    const AGGREGATE_FUNCTION_AVG = 'avg';
 
     const AGGREGATE_PARAMETER_MAX = 'max';
 
     const DELIMITER = ' ';
+
+    /**
+     * Indicates type of search query
+     */
+    public const HINT_SEARCH_TYPE = 'search_type';
+
+    /**
+     * Stores search term
+     */
+    public const HINT_SEARCH_TERM = 'search_term';
+
+    /**
+     * Stores search term
+     */
+    public const HINT_SEARCH_SESSION = 'search_session';
 
     /** @var array */
     protected $select = [];
@@ -80,13 +95,18 @@ class Query
     /** @var array */
     protected $aggregations = [];
 
+    /**
+     * The map of query hints.
+     *
+     * @var array
+     */
+    protected $hints = [];
+
     public function __construct()
     {
-        $this->maxResults = 0;
-        $this->from       = false;
+        $this->from = false;
 
         $this->criteria = Criteria::create();
-
         $this->criteria->setMaxResults(0);
     }
 
@@ -140,14 +160,14 @@ class Query
             }
         }
 
-        $this->fields        = $fields;
+        $this->fields = $fields;
         $this->mappingConfig = $mappingConfig;
     }
 
     /**
      * Insert list of required fields to query select
      *
-     * @param mixed  $field
+     * @param mixed $field
      *
      * @param string $enforcedFieldType
      *
@@ -246,7 +266,7 @@ class Query
     /**
      * Clear string
      *
-     * @param  string $inputString
+     * @param string $inputString
      *
      * @return string
      */
@@ -281,7 +301,7 @@ class Query
         $fromString = '';
         $from = $this->getFrom();
         if ($from) {
-            $fromString .= 'from ' . implode(', ', $from);
+            $fromString .= 'from '.implode(', ', $from);
         }
 
         $whereString = $this->getWhereString();
@@ -291,34 +311,34 @@ class Query
         if ($orderings) {
             $orderByString = ' order by';
             foreach ($orderings as $field => $direction) {
-                $orderByString .= ' ' . Criteria::explodeFieldTypeName($field)[1] . ' ' . $direction;
+                $orderByString .= ' '.Criteria::explodeFieldTypeName($field)[1].' '.$direction;
             }
         }
 
         $limitString = '';
         $maxResults = $this->criteria->getMaxResults();
         if ($maxResults && $maxResults != Query::INFINITY) {
-            $limitString = ' limit ' . $maxResults;
+            $limitString = ' limit '.$maxResults;
         }
 
         $offsetString = '';
         $firstResult = $this->criteria->getFirstResult();
         if ($firstResult) {
-            $offsetString .= ' offset ' . $firstResult;
+            $offsetString .= ' offset '.$firstResult;
         }
 
         $selectString = '';
         $selectColumnsString = $this->getStringColumns();
         if (!empty($selectColumnsString)) {
-            $selectString = trim('select ' . $selectColumnsString) . ' ';
+            $selectString = trim('select '.$selectColumnsString).' ';
         }
 
         return $selectString
-            . $fromString
-            . $whereString
-            . $orderByString
-            . $limitString
-            . $offsetString;
+            .$fromString
+            .$whereString
+            .$orderByString
+            .$limitString
+            .$offsetString;
     }
 
     /**
@@ -343,7 +363,7 @@ class Query
         }
 
         $aliases = $this->selectAliases;
-        $result  = [];
+        $result = [];
 
         foreach ($this->select as $select) {
             list($fieldType, $fieldName) = Criteria::explodeFieldTypeName($select);
@@ -439,8 +459,8 @@ class Query
     {
         $whereString = '';
         if (null !== $whereExpr = $this->criteria->getWhereExpression()) {
-            $visitor     = new QueryStringExpressionVisitor();
-            $whereString = ' where ' . $whereExpr->visit($visitor);
+            $visitor = new QueryStringExpressionVisitor();
+            $whereString = ' where '.$whereExpr->visit($visitor);
         }
 
         return $whereString;
@@ -460,15 +480,15 @@ class Query
         $result = implode(', ', $selects);
 
         if (count($selects) > 1) {
-            $result = '(' . $result . ')';
+            $result = '('.$result.')';
         }
 
         return $result;
     }
 
     /**
-     * @param array  $fields
-     * @param array  $field
+     * @param array $fields
+     * @param array $field
      * @param string $entity
      *
      * @return array
@@ -485,8 +505,8 @@ class Query
     }
 
     /**
-     * @param array  $fields
-     * @param array  $field
+     * @param array $fields
+     * @param array $field
      * @param string $entity
      *
      * @return array
@@ -520,8 +540,8 @@ class Query
 
         if (count($part) > 1) {
             // splitting with ' ' and taking first word as a field name - does not allow spaces in field name
-            $rev   = strrev($part[1]);
-            $rev   = explode(' ', $rev);
+            $rev = strrev($part[1]);
+            $rev = explode(' ', $rev);
             $field = array_shift($rev);
 
             list($explodedType, $explodedName) = Criteria::explodeFieldTypeName($field);
@@ -542,8 +562,58 @@ class Query
         return $field;
     }
 
+    /**
+     * Sets a query hint. If the hint name is not recognized, it is silently ignored.
+     *
+     * @param string $name The name of the hint.
+     * @param mixed $value The value of the hint.
+     *
+     * @return $this
+     */
+    public function setHint(string $name, $value): self
+    {
+        $this->hints[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of a query hint. If the hint name is not recognized, FALSE is returned.
+     *
+     * @param string $name The name of the hint.
+     *
+     * @return mixed The value of the hint or FALSE, if the hint name is not recognized.
+     */
+    public function getHint(string $name)
+    {
+        return $this->hints[$name] ?? false;
+    }
+
+    /**
+     * Check if the query has a hint
+     *
+     * @param string $name The name of the hint
+     *
+     * @return bool False if the query does not have any hint
+     */
+    public function hasHint(string $name): bool
+    {
+        return isset($this->hints[$name]);
+    }
+
+    /**
+     * Return the key value map of query hints that are currently set.
+     *
+     * @return array<string,mixed>
+     */
+    public function getHints(): array
+    {
+        return $this->hints;
+    }
+
     public function __clone()
     {
+        $this->hints = [];
         $this->criteria = clone $this->criteria;
     }
 }

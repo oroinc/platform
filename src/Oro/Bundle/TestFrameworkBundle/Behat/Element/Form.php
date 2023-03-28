@@ -58,7 +58,7 @@ class Form extends Element
      * @param string $value
      * @throws ElementNotFoundException
      */
-    public function typeInField($label, $value)
+    public function typeInField($label, $value, $clearField = true)
     {
         $field = null;
         if (isset($this->options['mapping'][$label])) {
@@ -89,7 +89,7 @@ class Form extends Element
 
         self::assertTrue($field->isVisible(), "Field with '$label' was found, but it not visible");
 
-        $this->getDriver()->typeIntoInput($field->getXpath(), $value);
+        $this->getDriver()->typeIntoInput($field->getXpath(), $value, $clearField);
     }
 
     public function assertFields(TableNode $table)
