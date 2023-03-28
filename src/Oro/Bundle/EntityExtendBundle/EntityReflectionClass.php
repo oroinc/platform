@@ -50,7 +50,7 @@ class EntityReflectionClass extends \ReflectionClass
 
         throw new \ReflectionException(
             sprintf(
-                'roperty %s::%s does not exist in extended entity.',
+                'Property %s::%s does not exist in extended entity.',
                 $this->getName(),
                 $name
             )
