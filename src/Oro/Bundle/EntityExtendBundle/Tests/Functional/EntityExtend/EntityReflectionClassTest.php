@@ -133,7 +133,7 @@ class EntityReflectionClassTest extends WebTestCase
         $this->expectException(\ReflectionException::class);
         $this->expectExceptionMessage(
             sprintf(
-                'property %s::%s does not exist in extended entity.',
+                'Property %s::%s does not exist in extended entity.',
                 User::class,
                 'undefinedPropertyName'
             )
