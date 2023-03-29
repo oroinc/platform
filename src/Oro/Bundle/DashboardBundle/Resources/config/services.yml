@@ -46,6 +46,14 @@ services:
             - '@oro_dashboard.config_provider'
             - '@oro_dashboard.manager.state'
             - '@oro_dashboard.widget_configs'
+            - !tagged_iterator oro_dashboard.dashboard_type.config.provider
+
+    oro_dashboard.dashboard_type.config.provider.widgets:
+        class: Oro\Bundle\DashboardBundle\DashboardType\WidgetsDashboardTypeConfigProvider
+        arguments:
+            - '@oro_dashboard.config_provider'
+        tags:
+            - { name: oro_dashboard.dashboard_type.config.provider }
 
     oro_dashboard.manager.state:
         class: Oro\Bundle\DashboardBundle\Model\StateManager
@@ -77,6 +85,8 @@ services:
 
     oro_dashboard.form.type.edit:
         class: Oro\Bundle\DashboardBundle\Form\Type\DashboardType
+        arguments:
+            - '@doctrine'
         tags:
             - { name: form.type, alias: "oro_dashboard" }
 
@@ -353,3 +363,11 @@ services:
             - '@oro_user.dashboard.owner_helper'
         tags:
             - { name: oro_dashboard.widget_provider.filter }
+
+    oro_dashboard.listener.datagrid.dashboards-grid:
+        class: Oro\Bundle\DashboardBundle\EventListener\DashboardTypeDatagridListener
+        arguments:
+            - "@doctrine"
+            - "@translator"
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.dashboards-grid, method: onBuildBefore }

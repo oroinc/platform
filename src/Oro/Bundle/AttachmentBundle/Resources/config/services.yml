@@ -315,6 +315,7 @@ services:
 
     oro_attachment.media_cache_manager_registry:
         class: 'Oro\Bundle\AttachmentBundle\Manager\MediaCacheManagerRegistry'
+        public: true
         arguments:
             - '@oro_attachment.acl.file_access_control_checker'
             - '@oro_attachment.manager.public_mediacache'
@@ -564,6 +565,7 @@ services:
 
     oro_attachment.provider.image_file_names:
         class: Oro\Bundle\AttachmentBundle\Provider\ImageFileNamesProvider
+        public: true
         arguments:
             - '@liip_imagine.filter.configuration'
             - '@oro_attachment.provider.resized_image_path'
@@ -698,6 +700,7 @@ services:
 
     oro_attachment.tools.webp_configuration:
         class: Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration
+        public: true
         arguments:
             - '@oro_config.manager'
             - '%oro_attachment.webp_strategy%'

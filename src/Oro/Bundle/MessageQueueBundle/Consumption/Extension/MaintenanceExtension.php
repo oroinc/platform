@@ -75,7 +75,20 @@ class MaintenanceExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
+    public function onStart(Context $context)
+    {
+        $this->reactToMaintenanceMode($context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function onBeforeReceive(Context $context)
+    {
+        $this->reactToMaintenanceMode($context);
+    }
+
+    private function reactToMaintenanceMode(Context $context): void
     {
         $interrupt = false;
         if ($this->isMaintenance()) {

@@ -12,32 +12,6 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
  */
 class DoctrineHelper extends BaseHelper
 {
-    private array $manageableEntityClasses = [];
-
-    /**
-     * {@inheritDoc}
-     */
-    public function reset(): void
-    {
-        parent::reset();
-        $this->manageableEntityClasses = [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isManageableEntityClass($entityClass)
-    {
-        if (isset($this->manageableEntityClasses[$entityClass])) {
-            return $this->manageableEntityClasses[$entityClass];
-        }
-
-        $isManageable = null !== $this->registry->getManagerForClass($entityClass);
-        $this->manageableEntityClasses[$entityClass] = $isManageable;
-
-        return $isManageable;
-    }
-
     /**
      * Returns the given API resource class if it is a manageable entity;
      * otherwise, checks if the API resource is based on a manageable entity, and if so,

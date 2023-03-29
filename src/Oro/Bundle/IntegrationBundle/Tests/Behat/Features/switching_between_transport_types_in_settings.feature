@@ -1,6 +1,6 @@
 @regression
 @ticket-BAP-17677
-
+@behat-test-env
 Feature: Switching between transport types in settings
   In order to manage integrations having more than one transport type
   As an Administrator

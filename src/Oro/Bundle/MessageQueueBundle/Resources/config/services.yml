@@ -16,7 +16,7 @@ services:
         calls:
             - ['setFilePathServerLockFromConfig', ['%kernel.project_dir%/config/oro_env.conf']]
         tags:
-            - { name: 'oro_message_queue.consumption.extension' }
+            - { name: 'oro_message_queue.consumption.extension', priority: 512 }
 
     oro_message_queue.consumption.doctrine_clear_identity_map_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension'

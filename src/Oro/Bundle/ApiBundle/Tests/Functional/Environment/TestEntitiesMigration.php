@@ -10,6 +10,8 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
+use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtension;
+use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -17,31 +19,44 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface, ActivityExtensionAwareInterface
+class TestEntitiesMigration implements
+    Migration,
+    ExtendExtensionAwareInterface,
+    SerializedFieldsExtensionAwareInterface,
+    ActivityExtensionAwareInterface
 {
     private ExtendExtension $extendExtension;
+    private SerializedFieldsExtension $serializedFieldsExtension;
     private ActivityExtension $activityExtension;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setExtendExtension(ExtendExtension $extendExtension)
+    public function setExtendExtension(ExtendExtension $extendExtension): void
     {
         $this->extendExtension = $extendExtension;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setActivityExtension(ActivityExtension $activityExtension)
+    public function setSerializedFieldsExtension(SerializedFieldsExtension $serializedFieldsExtension): void
+    {
+        $this->serializedFieldsExtension = $serializedFieldsExtension;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setActivityExtension(ActivityExtension $activityExtension): void
     {
         $this->activityExtension = $activityExtension;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $this->createTestDepartmentTable($schema);
         $this->createTestPersonTable($schema);
@@ -65,7 +80,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_department table
      */
-    private function createTestDepartmentTable(Schema $schema)
+    private function createTestDepartmentTable(Schema $schema): void
     {
         if ($schema->hasTable('test_api_department')) {
             return;
@@ -97,7 +112,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_person table
      */
-    private function createTestPersonTable(Schema $schema)
+    private function createTestPersonTable(Schema $schema): void
     {
         if ($schema->hasTable('test_api_person')) {
             return;
@@ -137,7 +152,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_default_and_null table
      */
-    private function createTestDefaultAndNullTable(Schema $schema)
+    private function createTestDefaultAndNullTable(Schema $schema): void
     {
         if ($schema->hasTable('test_api_default_and_null')) {
             return;
@@ -161,7 +176,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_nested_objects table
      */
-    public function createTestNestedObjectsTable(Schema $schema)
+    public function createTestNestedObjectsTable(Schema $schema): void
     {
         if ($schema->hasTable('test_api_nested_objects')) {
             return;
@@ -195,7 +210,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_without_id_generator table
      */
-    private function createTestWithoutIdGeneratorTable(Schema $schema)
+    private function createTestWithoutIdGeneratorTable(Schema $schema): void
     {
         if ($schema->hasTable('test_api_without_id_generator')) {
             return;
@@ -210,7 +225,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_composite_id table
      */
-    private function createTestCompositeIdentifierTable(Schema $schema)
+    private function createTestCompositeIdentifierTable(Schema $schema): void
     {
         if ($schema->hasTable('test_api_composite_id')) {
             return;
@@ -241,7 +256,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_custom_id and test_api_custom_composite_id tables
      */
-    private function createTestCustomIdentifierTables(Schema $schema)
+    private function createTestCustomIdentifierTables(Schema $schema): void
     {
         if ($schema->hasTable('test_api_custom_id')
             || $schema->hasTable('test_api_custom_composite_id')
@@ -290,7 +305,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_composite_id table
      */
-    private function createTestAllDataTypesTable(Schema $schema)
+    private function createTestAllDataTypesTable(Schema $schema): void
     {
         if ($schema->hasTable('test_api_all_data_types')) {
             return;
@@ -333,7 +348,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create custom entity tables
      */
-    private function createTestCustomEntityTables(Schema $schema)
+    private function createTestCustomEntityTables(Schema $schema): void
     {
         if ($schema->hasTable('oro_ext_testapie1') || $schema->hasTable('oro_ext_testapie2')) {
             return;
@@ -344,6 +359,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
 
         $t1 = $this->extendExtension->createCustomEntityTable($schema, 'TestApiE1');
         $t1->addColumn('name', 'string', ['length' => 255, OroOptions::KEY => $customOwner]);
+        $this->serializedFieldsExtension->addSerializedField($t1, 'serializedField', 'string', $customOwner);
         $this->addEnumField($schema, $t1, 'enumField', 'api_enum1');
         $this->addEnumField($schema, $t1, 'multiEnumField', 'api_enum2', true);
         $t2 = $this->extendExtension->createCustomEntityTable($schema, 'TestApiE2');
@@ -381,7 +397,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create custom entity table contains deleted fields and associations
      */
-    private function createTestCustomEntityTableWithDeletedFields(Schema $schema)
+    private function createTestCustomEntityTableWithDeletedFields(Schema $schema): void
     {
         if ($schema->hasTable('oro_ext_testapie3')) {
             return;
@@ -414,7 +430,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->addOneToManyRelation($schema, $t, 'uniO2MnD', $tt, $deletedWithoutDefault);
     }
 
-    private function addEnumField(Schema $s, Table $t, string $name, string $code, bool $isMultiple = false)
+    private function addEnumField(Schema $s, Table $t, string $name, string $code, bool $isMultiple = false): void
     {
         $this->extendExtension->addEnumField(
             $s,
@@ -427,7 +443,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         );
     }
 
-    private function addManyToOneRelation(Schema $s, Table $t, string $name, Table $tt, array $options = [])
+    private function addManyToOneRelation(Schema $s, Table $t, string $name, Table $tt, array $options = []): void
     {
         $options = array_merge_recursive(
             [
@@ -441,8 +457,13 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->extendExtension->addManyToOneRelation($s, $t, $name, $tt, 'name', $options);
     }
 
-    private function addManyToOneInverseRelation(Schema $s, Table $t, string $name, Table $tt, string $targetName)
-    {
+    private function addManyToOneInverseRelation(
+        Schema $s,
+        Table $t,
+        string $name,
+        Table $tt,
+        string $targetName
+    ): void {
         $this->extendExtension->addManyToOneInverseRelation(
             $s,
             $t,
@@ -456,7 +477,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         );
     }
 
-    private function addManyToManyRelation(Schema $s, Table $t, string $name, Table $tt, array $options = [])
+    private function addManyToManyRelation(Schema $s, Table $t, string $name, Table $tt, array $options = []): void
     {
         $options = array_merge_recursive(
             [
@@ -472,8 +493,13 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->extendExtension->addManyToManyRelation($s, $t, $name, $tt, ['name'], ['name'], ['name'], $options);
     }
 
-    private function addManyToManyInverseRelation(Schema $s, Table $t, string $name, Table $tt, string $targetName)
-    {
+    private function addManyToManyInverseRelation(
+        Schema $s,
+        Table $t,
+        string $name,
+        Table $tt,
+        string $targetName
+    ): void {
         $this->extendExtension->addManyToManyInverseRelation(
             $s,
             $t,
@@ -487,7 +513,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         );
     }
 
-    private function addOneToManyRelation(Schema $s, Table $t, string $name, Table $tt, array $options = [])
+    private function addOneToManyRelation(Schema $s, Table $t, string $name, Table $tt, array $options = []): void
     {
         $options = array_merge_recursive(
             [
@@ -503,8 +529,13 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->extendExtension->addOneToManyRelation($s, $t, $name, $tt, ['name'], ['name'], ['name'], $options);
     }
 
-    private function addOneToManyInverseRelation(Schema $s, Table $t, string $name, Table $tt, string $targetName)
-    {
+    private function addOneToManyInverseRelation(
+        Schema $s,
+        Table $t,
+        string $name,
+        Table $tt,
+        string $targetName
+    ): void {
         $this->extendExtension->addOneToManyInverseRelation(
             $s,
             $t,
@@ -522,7 +553,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
      * * test_api_target
      * * test_api_activity
      */
-    private function createTestEntityTables(Schema $schema)
+    private function createTestEntityTables(Schema $schema): void
     {
         if ($schema->hasTable('test_api_owner')
             || $schema->hasTable('test_api_target')
@@ -589,7 +620,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_product table
      */
-    private function createTestProductTable(Schema $schema)
+    private function createTestProductTable(Schema $schema): void
     {
         if ($schema->hasTable('test_api_product')) {
             return;
@@ -604,7 +635,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_order and test_api_order_line_item tables
      */
-    private function createTestOrderTables(Schema $schema)
+    private function createTestOrderTables(Schema $schema): void
     {
         if ($schema->hasTable('test_api_order') || $schema->hasTable('test_api_order_line_item')) {
             return;
@@ -652,7 +683,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
      * * test_api_override_a_target
      * * test_api_override_activity
      */
-    private function createTestOverrideClassEntityTables(Schema $schema)
+    private function createTestOverrideClassEntityTables(Schema $schema): void
     {
         if ($schema->hasTable('test_api_override_owner')
             || $schema->hasTable('test_api_override_target')
@@ -740,7 +771,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_magazine and test_api_article tables
      */
-    private function createTestMagazineTables(Schema $schema)
+    private function createTestMagazineTables(Schema $schema): void
     {
         if ($schema->hasTable('test_api_article') || $schema->hasTable('test_api_magazine')) {
             return;
@@ -773,7 +804,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     /**
      * Create test_api_custom_magazine and test_api_custom_article tables
      */
-    private function createTestCustomMagazineTables(Schema $schema)
+    private function createTestCustomMagazineTables(Schema $schema): void
     {
         if ($schema->hasTable('test_api_custom_article') || $schema->hasTable('test_api_custom_magazine')) {
             return;
@@ -808,7 +839,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    private function createTestCollectionTables(Schema $schema)
+    private function createTestCollectionTables(Schema $schema): void
     {
         if ($schema->hasTable('test_api_coll') || $schema->hasTable('test_api_coll_item')) {
             return;
@@ -951,7 +982,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->addCollectionTableForeignKeyConstraint($table, $collectionTable, 'parent_id');
     }
 
-    private function addCollectionTableForeignKeyConstraint(Table $table, Table $targetTable, string $columnName)
+    private function addCollectionTableForeignKeyConstraint(Table $table, Table $targetTable, string $columnName): void
     {
         $table->addForeignKeyConstraint(
             $targetTable,

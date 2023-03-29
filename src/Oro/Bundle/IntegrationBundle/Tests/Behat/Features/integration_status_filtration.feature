@@ -1,7 +1,7 @@
 @regression
 @ticket-BAP-15769
 @fixture-OroIntegrationBundle:IntegrationWithStatuses.yml
-
+@behat-test-env
 Feature: Integration status filtration
 
   Scenario: Check integration status filter

@@ -727,6 +727,7 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
 
         $flashMessage = 'Import started successfully. You will receive an email notification upon completion.';
         $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
+        usleep(150000);
     }
 
     /**

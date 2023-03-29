@@ -4,17 +4,25 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Oro\Component\EntitySerializer\EntityDataAccessor;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\TestEntity;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\TestEntityWithArrayAccess;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\TestEntityWithMagicMethods;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    private EntityDataAccessor $entityDataAccessor;
+    protected EntityDataAccessor $entityDataAccessor;
 
     protected function setUp(): void
     {
-        $this->entityDataAccessor = new EntityDataAccessor();
+        $this->entityDataAccessor = $this->createEntityDataAccessor();
+    }
+
+    protected function createEntityDataAccessor(): EntityDataAccessor
+    {
+        return new EntityDataAccessor();
     }
 
     public function accessibleFieldsProvider(): array
@@ -29,8 +37,33 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
             ['public_is_accessor'],
             ['publicHasAccessor'],
             ['public_has_accessor'],
+            ['publicCanAccessor'],
+            ['public_can_accessor'],
             ['publicGetSetter'],
             ['public_get_setter'],
+            ['valueGetter'],
+            ['value_getter'],
+            ['valueGetGetter'],
+            ['value_get_getter'],
+            ['valueIsGetter'],
+            ['value_is_getter'],
+            ['valueHasGetter'],
+            ['value_has_getter'],
+            ['valueCanGetter'],
+            ['value_can_getter'],
+            ['publicBaseProperty'],
+            ['protectedBaseProperty'],
+            ['privateBaseProperty'],
+            ['baseValueGetter'],
+            ['base_value_getter'],
+            ['baseValueGetGetter'],
+            ['base_value_get_getter'],
+            ['baseValueIsGetter'],
+            ['base_value_is_getter'],
+            ['baseValueHasGetter'],
+            ['base_value_has_getter'],
+            ['baseValueCanGetter'],
+            ['base_value_can_getter'],
         ];
     }
 
@@ -41,12 +74,15 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
             ['protectedAccessor'],
             ['protectedIsAccessor'],
             ['protectedHasAccessor'],
+            ['protectedCanAccessor'],
             ['privateAccessor'],
             ['privateIsAccessor'],
             ['privateHasAccessor'],
+            ['privateCanAccessor'],
             ['publicAccessorWithParameter'],
             ['publicIsAccessorWithParameter'],
             ['publicHasAccessorWithParameter'],
+            ['publicCanAccessorWithParameter'],
         ];
     }
 
@@ -132,7 +168,115 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
     {
         $entity = ['someName' => 'test'];
         $value = 'prev';
-        $this->entityDataAccessor->tryGetValue($entity, 'notExistingName', $value);
-        self::assertEquals(null, $value);
+        self::assertFalse($this->entityDataAccessor->tryGetValue($entity, 'notExistingName', $value));
+    }
+
+    public function testHasGetterForAttributeWhenClassDoesNotImplementArrayAccess(): void
+    {
+        $className = \stdClass::class;
+        $propertyName = 'testAttribute';
+        self::assertFalse($this->entityDataAccessor->hasGetter($className, $propertyName));
+    }
+
+    public function testTryGetValueForAttributeWhenClassDoesNotImplementArrayAccess(): void
+    {
+        $object = new TestEntity();
+        $propertyName = 'testAttribute';
+        $value = 'prev';
+        self::assertFalse($this->entityDataAccessor->tryGetValue($object, $propertyName, $value));
+        self::assertEquals('prev', $value);
+    }
+
+    public function testHasGetterForAttributeThatHasGetterWhenClassImplementsArrayAccess(): void
+    {
+        $className = TestEntityWithArrayAccess::class;
+        $propertyName = 'typedAttribute';
+        self::assertTrue($this->entityDataAccessor->hasGetter($className, $propertyName));
+    }
+
+    public function testHasGetterForAttributeWhenClassImplementsArrayAccess(): void
+    {
+        $className = TestEntityWithArrayAccess::class;
+        $propertyName = 'testAttribute';
+        self::assertFalse($this->entityDataAccessor->hasGetter($className, $propertyName));
+    }
+
+    public function testTryGetValueForAttributeThatHasGetterWhenClassImplementsArrayAccess(): void
+    {
+        $object = new TestEntityWithArrayAccess();
+        $object->setTypedAttribute('test');
+        $propertyName = 'typedAttribute';
+        $value = null;
+        self::assertTrue($this->entityDataAccessor->tryGetValue($object, $propertyName, $value));
+        self::assertSame('test', $value);
+    }
+
+    public function testTryGetValueForAttributeWhenClassImplementsArrayAccess(): void
+    {
+        $object = new TestEntityWithArrayAccess();
+        $propertyName = 'testAttribute';
+        $object[$propertyName] = 'test';
+        $value = null;
+        self::assertTrue($this->entityDataAccessor->tryGetValue($object, $propertyName, $value));
+        self::assertSame('test', $value);
+    }
+
+    public function testTryGetValueForUnknownAttributeWhenClassImplementsArrayAccess(): void
+    {
+        $object = new TestEntityWithArrayAccess();
+        $propertyName = 'anotherAttribute';
+        $value = null;
+        self::assertFalse($this->entityDataAccessor->tryGetValue($object, $propertyName, $value));
+        self::assertNull($value);
+    }
+
+    public function testHasGetterForAttributeThatHasGetterWhenClassHasMagicMethods(): void
+    {
+        $className = TestEntityWithMagicMethods::class;
+        $propertyName = 'typedAttribute';
+        self::assertTrue($this->entityDataAccessor->hasGetter($className, $propertyName));
+    }
+
+    public function testHasGetterForAttributeWhenClassHasMagicMethods(): void
+    {
+        $className = TestEntityWithMagicMethods::class;
+        $propertyName = 'magicAttribute';
+        self::assertTrue($this->entityDataAccessor->hasGetter($className, $propertyName));
+    }
+
+    public function testHasGetterForUnknownAttributeWhenClassHasMagicMethods(): void
+    {
+        $className = TestEntityWithMagicMethods::class;
+        $propertyName = 'anotherAttribute';
+        self::assertFalse($this->entityDataAccessor->hasGetter($className, $propertyName));
+    }
+
+    public function testTryGetValueForAttributeThatHasGetterWhenClassHasMagicMethods(): void
+    {
+        $object = new TestEntityWithMagicMethods();
+        $object->setTypedAttribute('test');
+        $propertyName = 'typedAttribute';
+        $value = null;
+        self::assertTrue($this->entityDataAccessor->tryGetValue($object, $propertyName, $value));
+        self::assertSame('test', $value);
+    }
+
+    public function testTryGetValueForAttributeWhenClassHasMagicMethods(): void
+    {
+        $object = new TestEntityWithMagicMethods();
+        $propertyName = 'magicAttribute';
+        $object->{$propertyName} = 'test';
+        $value = null;
+        self::assertTrue($this->entityDataAccessor->tryGetValue($object, $propertyName, $value));
+        self::assertSame('test', $value);
+    }
+
+    public function testTryGetValueForUnknownAttributeWhenClassHasMagicMethods(): void
+    {
+        $object = new TestEntityWithMagicMethods();
+        $propertyName = 'anotherAttribute';
+        $value = null;
+        self::assertFalse($this->entityDataAccessor->tryGetValue($object, $propertyName, $value));
+        self::assertNull($value);
     }
 }

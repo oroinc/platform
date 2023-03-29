@@ -9,24 +9,19 @@ class ReflectionUtil
 {
     /**
      * Finds a property in a given class or any of its superclasses.
-     *
-     * @param \ReflectionClass $reflClass
-     * @param string           $propertyName
-     *
-     * @return \ReflectionProperty|null
      */
-    public static function getProperty(\ReflectionClass $reflClass, $propertyName)
+    public static function getProperty(\ReflectionClass $reflClass, string $propertyName): ?\ReflectionProperty
     {
         if ($reflClass->hasProperty($propertyName)) {
             return $reflClass->getProperty($propertyName);
         }
 
-        $reflClass = $reflClass->getParentClass();
-        while ($reflClass) {
-            if ($reflClass->hasProperty($propertyName)) {
-                return $reflClass->getProperty($propertyName);
+        $parentReflClass = $reflClass->getParentClass();
+        while ($parentReflClass) {
+            if ($parentReflClass->hasProperty($propertyName)) {
+                return $parentReflClass->getProperty($propertyName);
             }
-            $reflClass = $reflClass->getParentClass();
+            $parentReflClass = $parentReflClass->getParentClass();
         }
 
         return null;

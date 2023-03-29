@@ -10,7 +10,7 @@ navigation:
             oro_dashboard_index:
                 label:    'oro.dashboard.menu.dashboards_list.label'
                 route:    'oro_dashboard_index'
-                position: 10
+                position: 1
                 extras:
                     routes: ['oro_dashboard_update', 'oro_dashboard_create', 'oro_dashboard_view']
 

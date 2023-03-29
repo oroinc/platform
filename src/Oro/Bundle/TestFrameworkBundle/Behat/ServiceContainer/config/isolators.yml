@@ -3,17 +3,23 @@ services:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\TestIsolationSubscriber'
     arguments:
       - ~
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'event_dispatcher.subscriber', priority: 100 }
 
-  oro_behat_extension.isolation.message_queue_isolation_subscriber:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\MessageQueueIsolationSubscriber'
+  oro_behat_extension.isolation.enable_maintenance_mode_isolator:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EnableMaintenanceModeIsolator
     arguments:
       - '@fob_symfony.kernel'
-    calls:
-      - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
     tags:
-      - { name: 'event_dispatcher.subscriber', priority: 150 }
+      - { name: 'oro_behat.isolator', priority: 50 }
+
+  oro_behat_extension.isolation.disable_maintenance_mode_isolator:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DisableMaintenanceModeIsolator
+    arguments:
+      - '@fob_symfony.kernel'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 500 }
 
   oro_behat_extension.isolation.mail_catcher_isolator:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MailCatcherIsolator
@@ -76,15 +82,6 @@ services:
     tags:
       - { name: 'oro_behat.isolator', priority: 120 }
 
-  oro_behat_extension.isolation.inital_massage_queue_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\InitalMessageQueueIsolator'
-    arguments:
-      - '@fob_symfony.kernel'
-    calls:
-      - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
-    tags:
-      - { name: 'oro_behat.isolator', priority: 50 }
-
   oro_behat_extension.isolation.doctrine_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator'
     arguments:
@@ -93,13 +90,6 @@ services:
       - '@oro_test.alice_loader'
     tags:
       - { name: 'oro_behat.isolator', priority: 300 }
-
-  oro_behat_extension.isolation.doctrine_message_queue_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineMessageQueueIsolator'
-    calls:
-      - [ 'setMessageQueueProcessor', [ '@oro_test.processor.message_queue' ] ]
-    tags:
-      - { name: 'oro_behat.isolator', priority: 310 }
 
   oro_behat_extension.isolation.import_export:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ImportExportIsolator'
