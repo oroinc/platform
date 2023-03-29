@@ -11,6 +11,7 @@ use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Factory;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetModel;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -43,6 +44,10 @@ abstract class AbstractDashboardFixture extends AbstractFixture implements Conta
     protected function createAdminDashboardModel(ObjectManager $manager, $dashboardName)
     {
         $adminUser = $this->getAdminUser($manager);
+        $enumRepo = $manager->getRepository(
+            ExtendHelper::buildEnumValueClassName('dashboard_type')
+        );
+        $type = $enumRepo->findOneBy(['id' => 'widgets']);
 
         $dashboard = $this->getDashboardManager()
             ->createDashboardModel()
@@ -50,6 +55,7 @@ abstract class AbstractDashboardFixture extends AbstractFixture implements Conta
             ->setLabel($dashboardName)
             ->setOwner($adminUser)
             ->setOrganization($adminUser->getOrganization());
+        $dashboard->getEntity()->setDashboardType($type);
 
         $this->getDashboardManager()->save($dashboard);
 

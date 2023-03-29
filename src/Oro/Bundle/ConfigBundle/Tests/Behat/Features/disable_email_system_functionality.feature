@@ -7,7 +7,6 @@ Feature: Disable Email system functionality
 
   Scenario: Emails functionality enabled
     Given I login as administrator
-    When I go to Dashboards/Dashboard
     Then should see "Recent Emails"
     And I should see an "Recent Emails" element
     And I go to System/Scheduled Tasks
@@ -31,7 +30,7 @@ Feature: Disable Email system functionality
     Then I should not see My emails in user menu
 
   Scenario: Administrator see widgets disabled
-    When I go to Dashboards/Dashboard
+    When I login as administrator
     Then I should not see "Recent Emails"
 
   Scenario: Administrator see Email Synchronization inactive
