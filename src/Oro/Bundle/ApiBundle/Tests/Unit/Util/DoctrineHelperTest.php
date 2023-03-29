@@ -3,10 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -16,36 +14,6 @@ class DoctrineHelperTest extends OrmRelatedTestCase
     private function getClassMetadata(string $entityClass): ClassMetadata
     {
         return $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-    }
-
-    public function testIsManageableEntityClassShouldBeCached()
-    {
-        $entityClass = 'Test\Entity';
-        $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with($entityClass)
-            ->willReturn($this->em);
-
-        $doctrineHelper = new DoctrineHelper($doctrine);
-        self::assertTrue($doctrineHelper->isManageableEntityClass($entityClass));
-        // test local cache
-        self::assertTrue($doctrineHelper->isManageableEntityClass($entityClass));
-    }
-
-    public function testIsManageableEntityClassShouldBeCachedEvenForNotManageableEntity()
-    {
-        $entityClass = 'Test\Entity';
-        $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with($entityClass)
-            ->willReturn(null);
-
-        $doctrineHelper = new DoctrineHelper($doctrine);
-        self::assertFalse($doctrineHelper->isManageableEntityClass($entityClass));
-        // test local cache
-        self::assertFalse($doctrineHelper->isManageableEntityClass($entityClass));
     }
 
     public function testFindEntityMetadataByPathForAssociation()

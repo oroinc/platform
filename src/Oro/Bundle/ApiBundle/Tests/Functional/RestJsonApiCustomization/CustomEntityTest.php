@@ -26,23 +26,24 @@ class CustomEntityTest extends RestJsonApiTestCase
             TestEntity1::class,
             [
                 'fields' => [
-                    'renamedName'           => ['property_path' => 'name'],
-                    'renamedEnumField'      => ['property_path' => 'enumField'],
-                    'renamedMultiEnumField' => ['property_path' => 'multiEnumField'],
-                    'renamedUniM2O'         => ['property_path' => 'uniM2O'],
-                    'renamedBiM2O'          => ['property_path' => 'biM2O'],
-                    'renamedUniM2M'         => ['property_path' => 'uniM2M'],
-                    'renamedDefaultUniM2M'  => ['property_path' => 'default_uniM2M'],
-                    'renamedUniM2MnD'       => ['property_path' => 'uniM2MnD'],
-                    'renamedBiM2M'          => ['property_path' => 'biM2M'],
-                    'renamedDefaultBiM2M'   => ['property_path' => 'default_biM2M'],
-                    'renamedBiM2MnD'        => ['property_path' => 'biM2MnD'],
-                    'renamedUniO2M'         => ['property_path' => 'uniO2M'],
-                    'renamedDefaultUniO2M'  => ['property_path' => 'default_uniO2M'],
-                    'renamedUniO2MnD'       => ['property_path' => 'uniO2MnD'],
-                    'renamedBiO2M'          => ['property_path' => 'biO2M'],
-                    'renamedDefaultBiO2M'   => ['property_path' => 'default_biO2M'],
-                    'renamedBiO2MnD'        => ['property_path' => 'biO2MnD'],
+                    'renamedName'            => ['property_path' => 'name'],
+                    'renamedSerializedField' => ['property_path' => 'serializedField'],
+                    'renamedEnumField'       => ['property_path' => 'enumField'],
+                    'renamedMultiEnumField'  => ['property_path' => 'multiEnumField'],
+                    'renamedUniM2O'          => ['property_path' => 'uniM2O'],
+                    'renamedBiM2O'           => ['property_path' => 'biM2O'],
+                    'renamedUniM2M'          => ['property_path' => 'uniM2M'],
+                    'renamedDefaultUniM2M'   => ['property_path' => 'default_uniM2M'],
+                    'renamedUniM2MnD'        => ['property_path' => 'uniM2MnD'],
+                    'renamedBiM2M'           => ['property_path' => 'biM2M'],
+                    'renamedDefaultBiM2M'    => ['property_path' => 'default_biM2M'],
+                    'renamedBiM2MnD'         => ['property_path' => 'biM2MnD'],
+                    'renamedUniO2M'          => ['property_path' => 'uniO2M'],
+                    'renamedDefaultUniO2M'   => ['property_path' => 'default_uniO2M'],
+                    'renamedUniO2MnD'        => ['property_path' => 'uniO2MnD'],
+                    'renamedBiO2M'           => ['property_path' => 'biO2M'],
+                    'renamedDefaultBiO2M'    => ['property_path' => 'default_biO2M'],
+                    'renamedBiO2MnD'         => ['property_path' => 'biO2MnD'],
                 ]
             ],
             true
@@ -61,7 +62,8 @@ class CustomEntityTest extends RestJsonApiTestCase
                     'type'          => 'testapientity1',
                     'id'            => '<toString(@entity1_1->id)>',
                     'attributes'    => [
-                        'name' => 'Entity 1 (1)'
+                        'name'            => 'Entity 1 (1)',
+                        'serializedField' => 'serialized 1'
                     ],
                     'relationships' => [
                         'enumField'      => [
@@ -159,7 +161,8 @@ class CustomEntityTest extends RestJsonApiTestCase
                     'type'          => 'testapientity1',
                     'id'            => '<toString(@entity1_1->id)>',
                     'attributes'    => [
-                        'renamedName' => 'Entity 1 (1)'
+                        'renamedName'            => 'Entity 1 (1)',
+                        'renamedSerializedField' => 'serialized 1'
                     ],
                     'relationships' => [
                         'renamedEnumField'      => [

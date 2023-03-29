@@ -70,7 +70,7 @@ services:
             - '@oro_soap.entity_serializer.data_transformer'
 
     oro_soap.entity_serializer.entity_accessor:
-        class: Oro\Component\EntitySerializer\EntityDataAccessor
+        class: Oro\Bundle\ApiBundle\Util\EntityDataAccessor
         public: true
 
     oro_soap.entity_serializer.field_accessor:
