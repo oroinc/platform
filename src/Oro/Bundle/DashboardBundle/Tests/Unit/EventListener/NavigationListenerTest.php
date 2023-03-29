@@ -91,7 +91,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
             'route'           => 'oro_dashboard_view',
             'extras'          => [
                 'translate_disabled' => true,
-                'position' => 1
+                'position' => 2
             ],
             'routeParameters' => [
                 'id'               => $id,
@@ -103,7 +103,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
             'route'           => 'oro_dashboard_view',
             'extras'          => [
                 'translate_disabled' => true,
-                'position' => 1
+                'position' => 2
             ],
             'routeParameters' => [
                 'id'               => $secondId,
@@ -131,7 +131,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
         $divider->expects($this->exactly(2))
             ->method('setExtra')
             ->willReturnMap([
-                ['position', 2, $divider],
+                ['position', 3, $divider],
                 ['divider', true, $divider]
             ]);
 

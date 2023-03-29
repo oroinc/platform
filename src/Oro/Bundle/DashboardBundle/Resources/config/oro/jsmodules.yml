@@ -12,3 +12,4 @@ dynamic-imports:
         - orodashboard/js/app/views/widget-datetime-range-view
         - orodashboard/js/app/views/widget-tabs-view
         - orodashboard/js/items/view
+        - orodashboard/js/views/dashboard-type-view

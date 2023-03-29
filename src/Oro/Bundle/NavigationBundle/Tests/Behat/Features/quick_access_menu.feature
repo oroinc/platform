@@ -13,12 +13,12 @@ Feature: Quick access menu
     And go to next pages:
       | Reports & Segments/ Manage Custom Reports |
       | System/ User Management/ Users            |
-      | Dashboards/ Manage Dashboards             |
+      | Reports & Segments/ Manage Custom Reports |
       | System/ User Management/ Users            |
-      | Dashboards/ Manage Dashboards             |
       | Dashboards/ Dashboard                     |
     Then History must looks like:
-      | Manage Dashboards - Dashboards             |
+      | Users - User Management - System           |
+      | Manage Custom Reports - Reports & Segments |
       | Users - User Management - System           |
       | Manage Custom Reports - Reports & Segments |
 
@@ -26,7 +26,6 @@ Feature: Quick access menu
     Given I choose Most Viewed tab
     Then Most Viewed must looks like:
       | Users - User Management - System           |
-      | Manage Dashboards - Dashboards             |
       | Manage Custom Reports - Reports & Segments |
 
   Scenario: Add page to favorite

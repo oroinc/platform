@@ -52,7 +52,7 @@ class NavigationListener
                         'route' => 'oro_dashboard_view',
                         'extras' => [
                             'translate_disabled' => true,
-                            'position' => 1
+                            'position' => 2
                         ],
                         'routeParameters' => [
                             'id' => $dashboardId,
@@ -66,7 +66,7 @@ class NavigationListener
                 ->addChild('divider-dashboard')
                 ->setLabel('')
                 ->setAttribute('class', 'menu-divider')
-                ->setExtra('position', 2)
+                ->setExtra('position', 3)
                 ->setExtra('divider', true);
         }
     }

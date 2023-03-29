@@ -3,9 +3,7 @@
 namespace Oro\Component\EntitySerializer;
 
 use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
  * Reads property values from entity objects or arrays.
@@ -13,13 +11,14 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 class EntityDataAccessor implements DataAccessorInterface
 {
     private const NO_GETTER = '';
+    private const NO_PROPERTY = false;
 
     /** @var \ReflectionClass[] */
     private array $reflCache = [];
     /** @var array [class name => [property name => getter name, ...], ...] */
     private array $getterCache = [];
-
-    private ?PropertyAccessorInterface $propertyAccessor = null;
+    /** @var array [class name => [property name => property, ...], ...] */
+    private array $propertyCache = [];
 
     /**
      * {@inheritDoc}
@@ -28,7 +27,9 @@ class EntityDataAccessor implements DataAccessorInterface
     {
         $reflClass = $this->getReflectionClass($className);
 
-        return $this->findGetterName($reflClass, $property) || $reflClass->hasProperty($property);
+        return
+            null !== $this->findGetterName($reflClass, $property)
+            || null !== $this->findProperty($reflClass, $property);
     }
 
     /**
@@ -36,38 +37,39 @@ class EntityDataAccessor implements DataAccessorInterface
      */
     public function tryGetValue(object|array $object, string $property, mixed &$value): bool
     {
-        if (\is_array($object) && \array_key_exists($property, $object)) {
+        if (\is_array($object)) {
+            if (!\array_key_exists($property, $object)) {
+                return false;
+            }
+
             $value = $object[$property];
 
             return true;
         }
 
-        try {
-            $tryGetValue = $this->getPropertyAccessor()->getValue($object, $property);
-            if ($value !== $tryGetValue) {
-                $value = $tryGetValue;
+        $reflClass = $this->getReflectionClass(\get_class($object));
+        $getter = $this->findGetterName($reflClass, $property);
+        if (null !== $getter) {
+            $value = $object->{$getter}();
 
-                return true;
+            return true;
+        }
+
+        $propertyObject = $this->findProperty($reflClass, $property);
+        if (null !== $propertyObject) {
+            $value = $propertyObject->getValue($object);
+
+            return true;
+        }
+
+        if ($object instanceof \ArrayAccess) {
+            if (!$object->offsetExists($property)) {
+                return false;
             }
-            if (is_object($object)) {
-                $reflClass = $this->getReflectionClass(get_class($object));
-                $getter = $this->findGetterName($reflClass, $property);
-                if (null !== $getter) {
-                    $value = $object->{$getter}();
 
-                    return true;
-                }
-                if ($reflClass->hasProperty($property)) {
-                    $prop = $reflClass->getProperty($property);
-                    $prop->setAccessible(true);
-                    $value = $prop->getValue($object);
+            $value = $object->offsetGet($property);
 
-                    return true;
-                }
-            }
-        } catch (\Throwable $exception) {
-            // We should return false when property does not exist.
-            return false;
+            return true;
         }
 
         return false;
@@ -99,10 +101,32 @@ class EntityDataAccessor implements DataAccessorInterface
             return $this->reflCache[$className];
         }
 
-        $reflClass = new EntityReflectionClass(ClassUtils::getRealClass($className));
+        $reflClass = $this->createReflectionClass(ClassUtils::getRealClass($className));
         $this->reflCache[$className] = $reflClass;
 
         return $reflClass;
+    }
+
+    protected function createReflectionClass(string $className): \ReflectionClass
+    {
+        return new \ReflectionClass($className);
+    }
+
+    protected function findProperty(\ReflectionClass $reflClass, string $property): ?\ReflectionProperty
+    {
+        if (isset($this->propertyCache[$reflClass->name][$property])) {
+            $propertyObject = $this->propertyCache[$reflClass->name][$property];
+        } else {
+            $propertyObject = ReflectionUtil::getProperty($reflClass, $property);
+            if (null === $propertyObject) {
+                $propertyObject = self::NO_PROPERTY;
+            } elseif (!$propertyObject->isPublic()) {
+                $propertyObject->setAccessible(true);
+            }
+            $this->propertyCache[$reflClass->name][$property] = $propertyObject;
+        }
+
+        return self::NO_PROPERTY === $propertyObject ? null : $propertyObject;
     }
 
     protected function findGetterName(\ReflectionClass $reflClass, string $property): ?string
@@ -132,6 +156,10 @@ class EntityDataAccessor implements DataAccessorInterface
         if ($this->isGetter($reflClass, $getter)) {
             return $getter;
         }
+        $getter = 'can' . $camelized;
+        if ($this->isGetter($reflClass, $getter)) {
+            return $getter;
+        }
         $getter = lcfirst($camelized);
         if ($this->isGetter($reflClass, $getter)) {
             return $getter;
@@ -153,16 +181,6 @@ class EntityDataAccessor implements DataAccessorInterface
 
         $method = $reflClass->getMethod($methodName);
 
-        return $method->isPublic()
-            && 0 === $method->getNumberOfRequiredParameters();
-    }
-
-    private function getPropertyAccessor(): PropertyAccessorInterface
-    {
-        if (null === $this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
-        }
-
-        return $this->propertyAccessor;
+        return $method->isPublic() && 0 === $method->getNumberOfRequiredParameters();
     }
 }

@@ -19,6 +19,7 @@ oro:
         widgets.label:       Widgets
         organization.label:  Organization
         options.label:       Options
+        dashboard_type.label: Dashboard type
 
         feature:
             label: Dashboards

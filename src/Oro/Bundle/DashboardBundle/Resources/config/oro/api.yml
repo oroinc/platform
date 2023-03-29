@@ -1,0 +1,4 @@
+api:
+    entities:
+        Extend\Entity\EV_Dashboard_Type:
+            exclude: true
