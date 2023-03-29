@@ -18,25 +18,15 @@ use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\EventListener\JUnitDurati
  */
 final class JUnitScenarioPrinter
 {
-    /**
-     * @var ResultToStringConverter
-     */
-    private $resultConverter;
+    private ResultToStringConverter $resultConverter;
 
-    /**
-     * @var JUnitOutlineStoreListener
-     */
-    private $outlineStoreListener;
+    private JUnitOutlineStoreListener $outlineStoreListener;
 
-    /**
-     * @var OutlineNode
-     */
-    private $lastOutline;
+    private ?OutlineNode $lastOutline = null;
 
-    /**
-     * @var int
-     */
-    private $outlineStepCount;
+    private int $outlineStepCount = 0;
+
+    private JUnitDurationListener $durationListener;
 
     public function __construct(
         ResultToStringConverter $resultConverter,

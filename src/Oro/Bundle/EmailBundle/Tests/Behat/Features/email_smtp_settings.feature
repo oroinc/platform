@@ -1,4 +1,4 @@
-@container-incompatible
+@behat-test-env
 @ticket-BAP-15487
 @ticket-BAP-17649
 

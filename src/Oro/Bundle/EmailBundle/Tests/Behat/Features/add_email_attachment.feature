@@ -15,7 +15,7 @@ Feature: Add email attachment
     When I attach "page.html" file to email
     Then I should see "page.html"
     When I click "Send"
-    Then I should see "The MIME type of the file is invalid (\"text/html\"). Allowed MIME types are \"image/svg+xml\", \"image/svg\", \"text/csv\", \"text/plain\", \"application/msword\", \"application/vnd.openxmlformats-officedocument.wordprocessingml.document\", \"application/vnd.ms-excel\", \"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\", \"application/vnd.ms-powerpoint\", \"application/vnd.openxmlformats-officedocument.presentationml.presentation\", \"application/pdf\", \"application/zip\", \"image/gif\", \"image/jpeg\", \"image/png\", \"image/webp\"."
+    Then I should see "The MIME type of the file is invalid (\"text/html\"). Allowed MIME types are \"text/csv\", \"text/plain\", \"application/msword\", \"application/vnd.openxmlformats-officedocument.wordprocessingml.document\", \"application/vnd.ms-excel\", \"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\", \"application/vnd.ms-powerpoint\", \"application/vnd.openxmlformats-officedocument.presentationml.presentation\", \"application/pdf\", \"application/zip\", \"image/gif\", \"image/jpeg\", \"image/png\", \"image/webp\"."
     And I close ui dialog
 
   Scenario: Email attachment max file size validation

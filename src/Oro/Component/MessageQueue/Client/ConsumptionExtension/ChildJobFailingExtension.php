@@ -44,6 +44,9 @@ class ChildJobFailingExtension extends AbstractExtension
 
             return;
         }
+        if ($message->isRedelivered()) {
+            return;
+        }
 
         $jobId = $message->getBody()[$this->jobIdOption] ?? null;
 

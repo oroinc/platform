@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -46,14 +47,17 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
     private array $skipIsolatorsTags = [];
 
+    private KernelInterface $kernel;
+
     /**
      * @param IsolatorInterface[] $isolators
      */
-    public function __construct(array $isolators)
+    public function __construct(array $isolators, KernelInterface $kernel)
     {
         $this->reverseIsolators = $isolators;
         $this->isolators = array_reverse($isolators);
         $this->stopwatch = new Stopwatch();
+        $this->kernel = $kernel;
     }
 
     /**
@@ -144,6 +148,12 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
     public function beforeFeature(BeforeFeatureTested $event)
     {
+        if (array_search('behat-test-env', $event->getFeature()->getTags()) &&
+            $this->kernel->getEnvironment() !== 'behat_test') {
+            $this->output->writeln(
+                '<error>Tests tagged by @behat-test-env work only in the behat_test application environment</error>'
+            );
+        }
         if ($this->skip) {
             return;
         }

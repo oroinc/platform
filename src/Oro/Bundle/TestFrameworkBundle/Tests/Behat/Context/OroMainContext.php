@@ -52,11 +52,12 @@ class OroMainContext extends MinkContext implements
     SessionAliasProviderAwareInterface,
     AppKernelAwareInterface
 {
-    const SKIP_WAIT_PATTERN = '/' .
-    '^(?:|I )should see ".+" flash message$|' .
-    '^(?:|I )should see ".+" flash message and I close it$|' .
-    '^(?:|I )should see ".+" error message$|' .
-    '^(?:|I )should see Schema updated flash message$' .
+    const SKIP_WAIT_PATTERN = '/'.
+        '^(?:|I )should see .+ flash message$|'.
+        '^(?:|I )should see .+ flash message and I close it$|'.
+        '^(?:|I )should see .+ error message$|'.
+        '^(?:|I )should see success message with number of records were deleted$|'.
+        '^(?:|I )should see Schema updated flash message$'.
     '/';
 
     use AssertTrait, PageObjectDictionary, SessionAliasProviderAwareTrait, SpinTrait, AppKernelAwareTrait;
@@ -292,6 +293,10 @@ class OroMainContext extends MinkContext implements
     {
         $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
 
+        if ($title === 'Configuration saved') {
+            // consumer doesn't catch up changes of configuration changes immediately, so we need to wait
+            sleep(3);
+        }
         self::assertNotNull(
             $flashMessage,
             sprintf(
@@ -1127,6 +1132,10 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButton($button)
     {
+        if ($button === 'Change History') {
+            // consumer doesn't catch up changes of data audit changes immediately, so we need to wait
+            sleep(3);
+        }
         for ($i = 0; $i < 2; $i++) {
             try {
                 parent::pressButton($button);

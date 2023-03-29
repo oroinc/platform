@@ -279,6 +279,14 @@ use ExtendEntityTrait;
 * Search query aggregations now can have parameters added via fourth parameter of the `addAggregate` method
 * Added possibility to set maximum number of results for the count search aggregation
 
+#### TestFrameworkBundle
+* Added ``behat_test`` environment to run tests that depend on mocks in a separate environment.
+* Marked all the tests that depend on behat_test environment with the ``@behat-test-env`` tag.
+* Replaced message queue Behat isolators with the JobStatusSubscriber that checks the jobs table and does not depend on application changes
+* Added the `--do-not-run-consumer` argument to the bin/behat command to run application tests in the production-like environment where the supervisord or systemd runs the consumer.
+* Added maintenance mode isolators to toggle the maintenance mode when the database is backed up and restored so the message consumer does not produce errors during these operations.
+* Updated some behat tests and contexts to work with the new isolators.
+
 #### UIBundle
 * Added `renderCollapsibleWysiwygContentPreview` and `renderWysiwygContentPreview` TWIG macros to UIBundle for
   rendering WYSIWYG content in backoffice.

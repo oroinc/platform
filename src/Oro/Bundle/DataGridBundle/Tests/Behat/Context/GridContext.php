@@ -1951,12 +1951,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iShouldSeeSuccessMessageWithNumberOfRecordsWereDeleted()
     {
-        $flashMessage = $this->getSession()->getPage()->find('css', '.flash-messages-holder');
+        $found = $this->spin(function (GridContext $context) {
+            $flashMessage = $context->getSession()->getPage()->find('css', '.flash-messages-holder');
+            $regex = '/\d+ entities have been deleted successfully/';
 
-        self::assertNotNull($flashMessage, 'Can\'t find flash message');
+            return preg_match($regex, $flashMessage->getText()) > 0;
+        });
 
-        $regex = '/\d+ entities have been deleted successfully/';
-        self::assertMatchesRegularExpression($regex, $flashMessage->getText());
+        self::assertTrue($found, 'Can\'t find flash message');
     }
 
     /**

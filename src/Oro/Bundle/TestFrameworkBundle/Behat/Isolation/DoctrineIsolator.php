@@ -209,5 +209,6 @@ class DoctrineIsolator implements IsolatorInterface
                 );
             }
         }
+        usleep(300000);
     }
 }

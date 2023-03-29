@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -66,6 +67,17 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     public function initialize(ExtensionManager $extensionManager)
     {
+        $envPath = '.env-app';
+        if (is_file($envPath)) {
+            (new Dotenv('ORO_ENV', 'ORO_DEBUG'))
+                ->setProdEnvs(['prod', 'behat_test'])
+                ->bootEnv($envPath, 'prod');
+        }
+
+        $environment = $_SERVER['ORO_ENV'] ?? $_ENV['ORO_ENV'] ?? 'prod';
+        putenv('APP_ENV='.$environment);
+        $_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $environment;
+
         /** @var MinkExtension $minkExtension */
         $minkExtension = $extensionManager->getExtension('mink');
         $minkExtension->registerDriverFactory(new OroSelenium2Factory());

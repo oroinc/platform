@@ -335,7 +335,7 @@ JS;
      */
     public function iShouldSeePictureElement(NodeElement|string $picture): void
     {
-        $webpConfiguration = $this->getAppContainer()->get('oro_attachment.behat.tools.webp_configuration');
+        $webpConfiguration = $this->getAppContainer()->get('oro_attachment.tools.webp_configuration');
 
         if (!$webpConfiguration->isDisabled()) {
             $this->iShouldSeeWebpImageInElement($picture);
@@ -480,12 +480,12 @@ JS;
             $files = $this->getImageFiles($imageName);
             foreach ($files as $file) {
                 $paths = $this->getAppContainer()
-                    ->get('oro_attachment.behat.provider.image_file_names')
+                    ->get('oro_attachment.provider.image_file_names')
                     ->getFileNames($file);
                 self::assertNotEmpty($paths, sprintf('File paths for image %s not found', $imageName));
 
                 $mediaCacheManager = $mediaCacheManager ?? $this->getAppContainer()
-                        ->get('oro_attachment.behat.media_cache_manager_registry')
+                        ->get('oro_attachment.media_cache_manager_registry')
                         ->getManagerForFile($file);
 
                 foreach ($paths as $path) {

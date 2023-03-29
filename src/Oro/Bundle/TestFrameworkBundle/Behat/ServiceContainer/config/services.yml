@@ -18,6 +18,13 @@ services:
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
+    oro_test.listener.job_status_subcriber:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\JobStatusSubscriber
+        arguments:
+            - '@fob_symfony.kernel'
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
+
     oro_test.listener.suite_aware_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SuiteAwareSubscriber
         arguments:
@@ -154,37 +161,6 @@ services:
             - '@context.factory'
         tags:
             - { name: 'environment.handler', priority: 256 }
-
-    oro_test.processor.message_queue.base:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessor
-        arguments:
-            - '@fob_symfony.kernel'
-
-    oro_test.processor.message_queue.dbal:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\DbalMessageQueueProcessor
-        arguments:
-            - '@fob_symfony.kernel'
-            - '@oro_test.processor.message_queue.base'
-
-    oro_test.processor.message_queue.amqp:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\AmqpMessageQueueProcessor
-        arguments:
-            - '@fob_symfony.kernel'
-            - '@oro_test.processor.message_queue.base'
-
-    oro_test.processor.message_queue:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorFacade
-        arguments:
-            - '@fob_symfony.kernel'
-            - '@oro_test.processor.message_queue.dbal'
-            - '@oro_test.processor.message_queue.amqp'
-
-    oro_test.processor.message_queue_initializer:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorInitializer'
-        calls:
-            - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
-        tags:
-            - { name: 'context.initializer' }
 
     Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\AppKernelInitializer:
         arguments:

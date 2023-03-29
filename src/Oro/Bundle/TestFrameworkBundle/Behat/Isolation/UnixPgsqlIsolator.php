@@ -6,6 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
  * Restore and backup PostgreSQL database between features
@@ -135,9 +136,20 @@ class UnixPgsqlIsolator extends AbstractDbOsRelatedIsolator
 
     protected function dropDb(string $dbName): void
     {
-        $this->killConnections();
-
-        parent::dropDb($dbName);
+        $attempts = 1;
+        while (true) {
+            try {
+                $this->killConnections();
+                parent::dropDb($dbName);
+            } catch (ProcessFailedException $e) {
+                if ($attempts < 5) {
+                    $attempts++;
+                    continue;
+                }
+                throw $e;
+            }
+            break;
+        }
     }
 
     private function killConnections()
