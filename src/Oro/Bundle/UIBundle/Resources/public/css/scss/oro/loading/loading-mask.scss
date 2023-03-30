@@ -24,7 +24,7 @@ $loading-mask: 'loader-mask';
 
     overflow: hidden;
 
-    background-color: rgba($loading-mask-background-color, .5);
+    background-color: var(--loading-mask-background-color, rgba($loading-mask-background-color, .5));
 
     .loader-frame {
         @include loader();

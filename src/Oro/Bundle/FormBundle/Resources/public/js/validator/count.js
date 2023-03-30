@@ -77,6 +77,14 @@ define(function(require) {
     function getCount(validator, element) {
         // Example: collectionName = 'form[additional]'
         const collectionName = $(element).data('collectionName');
+        const type = $(element).data('type');
+
+        if (type === 'json-collection') {
+            try {
+                return JSON.parse(element.value).length;
+            } catch (e) {}
+        }
+
         if (!collectionName) {
             const $fields = validator.findByName(element.name);
             if (element.type === 'select-multiple' || element.type === 'select-one') {

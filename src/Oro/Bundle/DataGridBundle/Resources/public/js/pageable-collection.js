@@ -198,7 +198,7 @@ define([
 
             if (options.url) {
                 this.url = options.url;
-                this.urlParams = options.urlParams;
+                this.urlParams = _.isEmpty(options.urlParams) ? {} : options.urlParams;
             }
             if (options.model) {
                 this.model = options.model;
@@ -401,7 +401,7 @@ define([
          */
         _parseResponseModels: function(resp) {
             if (this.options.parseResponseModels) {
-                return this.options.parseResponseModels(resp);
+                return this.options.parseResponseModels.call(this, resp);
             }
 
             if (_.has(resp, 'data')) {
@@ -417,7 +417,7 @@ define([
          */
         _parseResponseOptions: function(resp) {
             if (this.options.parseResponseOptions) {
-                return this.options.parseResponseOptions(resp);
+                return this.options.parseResponseOptions.call(this, resp);
             }
 
             if (_.has(resp, 'options')) {
@@ -750,7 +750,7 @@ define([
             }
 
             options.url = url;
-            options.data = data;
+            options.data = Object.assign(data, {[this.inputName]: this.urlParams});
 
             const type = this.options.type || '';
 
@@ -842,6 +842,10 @@ define([
             }
 
             return BBColProto.fetch.call(this, options);
+        },
+
+        assignUrlParams(params) {
+            Object.assign(this.urlParams, params);
         },
 
         hasExtraRecordsToLoad: function() {
