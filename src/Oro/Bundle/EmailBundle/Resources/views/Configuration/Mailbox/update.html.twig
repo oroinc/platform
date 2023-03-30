@@ -91,11 +91,19 @@
     }) }}
         {% set autoResponseRules %}
             {% set mailboxId = form.vars.value.id %}
+            {% set mailboxParams = {} %}
+
+            {% if mailboxId %}
+                {% set mailboxParams = mailboxParams|merge({
+                    'mailbox': mailboxId
+                }) %}
+            {% endif %}
+
             <fieldset class="form-horizontal form-horizontal-large auto-response-rules">
                 <div class="auto-response-rule-header">
                     <h5 class="user-fieldset">{{ 'oro.email.autoresponserule.entity_plural_label'|trans }}</h5>
                     {{ UI.clientLink({
-                        'dataUrl': path('oro_email_autoresponserule_create', {mailbox: mailboxId}),
+                        'dataUrl': path('oro_email_autoresponserule_create', mailboxParams),
                         'aCss': 'pull-right no-hash btn btn-primary',
                         'label' : 'oro.email.autoresponserule.action.add.label'|trans,
                         'widget' : {
@@ -118,7 +126,14 @@
                     }) }}
                 </div>
                 {% import '@OroDataGrid/macros.html.twig' as dataGrid %}
-                {{ dataGrid.renderGrid('email-auto-response-rules', {mailbox: mailboxId}) }}
+
+                {% if form.unboundRules.vars.value is defined %}
+                    {% set mailboxParams = mailboxParams|merge({
+                        ids: form.unboundRules.vars.value|split(',')
+                    }) %}
+                {% endif %}
+
+                {{ dataGrid.renderGrid('email-auto-response-rules', mailboxParams) }}
             </fieldset>
         {% endset %}
         {{ emailUI.renderMailboxConfigTitleAndButtons(pageTitle, buttons) }}
