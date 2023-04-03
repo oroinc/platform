@@ -385,13 +385,6 @@ class CustomizeFormDataExtendabilityTest extends RestJsonApiUpdateListTestCase
         //refresh token after resetting in consumer
         $tokenStorage->setToken($token);
 
-        /** @var ContainerResetExtension $resetExtension */
-        $resetExtension = $this->getContainer()->get('oro_message_queue.consumption.container_reset_extension');
-
-        //we have to not clear a logger after the processor execution to check logs
-        $resetExtension->setPersistentProcessors([
-            'oro_api.batch.async.update_list.process_chunk'
-        ]);
         $this->consumeMessages();
 
         $this->assertAsyncOperationErrors([], $operationId);
