@@ -9,6 +9,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
@@ -43,7 +44,11 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      */
     public function convert(string $gridName, AbstractQueryDesigner $source): DatagridConfiguration
     {
-        $config = DatagridConfiguration::createNamed($gridName, []);
+        $config = DatagridConfiguration::createNamed(
+            $gridName,
+            [],
+            PropertyAccess::createPropertyAccessorWithDotSyntax()
+        );
         $config->setDatasourceType(OrmDatasource::TYPE);
 
         $this->context()->setConfig($config);
