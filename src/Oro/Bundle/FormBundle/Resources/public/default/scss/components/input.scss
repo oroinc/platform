@@ -93,6 +93,10 @@
     @include element-state('error') {
         border-color: $input-border-color-error-state;
         box-shadow: $input-box-shadow-error-state;
+
+        @include element-state('focus') {
+            border-color: $input-border-color-error-state;
+        }
     }
 
     @include element-state('disabled') {

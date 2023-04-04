@@ -427,6 +427,7 @@
 
     {% if isDesktopVersion() or parameters.mobileEnabled|default(false) %}
         {% set options = parameters.options|default({}) %}
+        {% set rootClassName = parameters.rootClassName|default('pull-right pinned-dropdown') %}
         {% set options = options|merge({
             widgetModule: options.widgetModule|default('oroui/js/content-processor/pinned-dropdown-button'),
             widgetName: options.widgetName|default('pinnedDropdownButtonProcessor'),
@@ -434,7 +435,7 @@
             useMainButtonsClone: true
         }) %}
         {% apply spaceless %}
-            <div class="pull-right pinned-dropdown"
+            <div class="{{ rootClassName }}"
                  {{ UIMacro.renderAttributes(parameters.dataAttributes|default({})|merge({
                      'page-component-module': 'oroui/js/app/components/jquery-widget-component',
                      'page-component-options': options
