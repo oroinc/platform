@@ -31,12 +31,7 @@ class SearchEntityFilterType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'field_options' => [
-                'multiple' => true,
-                'choice_label' => function (object $entity): string {
-                    return $this->entityNameResolver->getName($entity, null, $this->getCurrentLocalization());
-                }
-            ],
+            'field_options' => [],
             'choices' => null,
         ]);
 
@@ -46,6 +41,10 @@ class SearchEntityFilterType extends AbstractType
             function (Options $options, $value) {
                 $value['class'] = $options['class'] ?? null;
                 $value['choices'] = $options['choices'] ?? null;
+                $value['multiple'] = $options['multiple'] ?? true;
+                $value['choice_label'] = $options['choice_label'] ?? function (object $entity): string {
+                    return $this->entityNameResolver->getName($entity, null, $this->getCurrentLocalization());
+                };
 
                 return $value;
             }
