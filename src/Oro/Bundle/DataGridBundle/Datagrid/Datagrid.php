@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 
 /**
  * Represents datagrid.
@@ -97,7 +98,10 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
             ['datagrid_results' => $this->getParameters()],
             function () {
                 $rows = $this->getAcceptedDatasource()->getResults();
-                $results = ResultsObject::create(['data' => $rows]);
+                $results = ResultsObject::create(
+                    ['data' => $rows],
+                    PropertyAccess::createPropertyAccessorWithDotSyntax()
+                );
                 $this->acceptor->acceptResult($results);
 
                 return $results;

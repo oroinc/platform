@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Config\Tests\Unit\Common;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Config\Common\ConfigObject;
 
 class ObjectTest extends \PHPUnit\Framework\TestCase
@@ -18,7 +19,8 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
                     'false' => false,
                     'null'  => null,
                 ],
-            ]
+            ],
+            PropertyAccess::createPropertyAccessorWithDotSyntax()
         );
     }
 
