@@ -10,6 +10,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for filter by an entity for a datasource based on a search index.
+ */
 class SearchEntityFilterType extends AbstractType
 {
     const NAME = 'oro_search_type_entity_filter';
@@ -34,15 +37,10 @@ class SearchEntityFilterType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'field_options' => [
-                    'multiple' => true,
-                    'choice_label' => [$this, 'getLocalizedChoiceLabel'],
-                ],
-                'choices' => null,
-            ]
-        );
+        $resolver->setDefaults([
+            'field_options' => [],
+            'choices' => null,
+        ]);
 
         // this normalizer allows to add/override field_options options outside
         $resolver->setNormalizer(
@@ -50,6 +48,8 @@ class SearchEntityFilterType extends AbstractType
             function (Options $options, $value) {
                 $value['class'] = $options['class'] ?? null;
                 $value['choices'] = $options['choices'] ?? null;
+                $value['multiple'] = $options['multiple'] ?? true;
+                $value['choice_label'] = $options['choice_label'] ?? [$this, 'getLocalizedChoiceLabel'];
 
                 return $value;
             }
