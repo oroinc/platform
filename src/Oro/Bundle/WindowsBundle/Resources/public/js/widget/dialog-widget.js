@@ -770,7 +770,7 @@ define(function(require, exports, module) {
                     dialog.css('min-height', containerEl.clientHeight - top);
                 }
             }
-            const posY = dialog.offset().top - $(window).scrollTop();
+            const posY = dialog.get(0).offsetTop - $(window).scrollTop();
             if (posY + height > windowHeight) {
                 if (windowHeight - top < this.options.dialogOptions.minHeight &&
                     this.options.dialogOptions.minHeight <= windowHeight) {
