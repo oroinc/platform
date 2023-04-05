@@ -40,7 +40,7 @@ class MetadataObject extends ConfigObject
         $config = self::create($params);
         $config->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
 
-        return self::create($params);
+        return $config;
     }
 
     /**
