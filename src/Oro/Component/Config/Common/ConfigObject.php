@@ -39,7 +39,7 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
      */
     public static function create(array $params, PropertyAccessorInterface $propertyAccessor = null)
     {
-        return new static($params);
+        return new static($params, $propertyAccessor);
     }
 
     /**
@@ -50,11 +50,11 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
      *
      * @return $this
      */
-    public static function createNamed($name, array $params)
+    public static function createNamed($name, array $params, PropertyAccessorInterface $propertyAccessor = null)
     {
         $params[self::NAME_KEY] = $name;
 
-        return new static($params);
+        return new static($params, $propertyAccessor);
     }
 
     /**
