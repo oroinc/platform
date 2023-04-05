@@ -44,11 +44,8 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      */
     public function convert(string $gridName, AbstractQueryDesigner $source): DatagridConfiguration
     {
-        $config = DatagridConfiguration::createNamed(
-            $gridName,
-            [],
-            PropertyAccess::createPropertyAccessorWithDotSyntax()
-        );
+        $config = DatagridConfiguration::createNamed($gridName, []);
+        $config->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
         $config->setDatasourceType(OrmDatasource::TYPE);
 
         $this->context()->setConfig($config);

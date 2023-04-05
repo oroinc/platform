@@ -62,8 +62,8 @@ class NoDataMessagesExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            PropertyAccess::createPropertyAccessorWithDotSyntax()
         );
+        $config->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
 
         $expected = [
             'entityHint' => 'Entities',
@@ -99,9 +99,9 @@ class NoDataMessagesExtensionTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ],
-            ],
-            PropertyAccess::createPropertyAccessorWithDotSyntax()
+            ]
         );
+        $config->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
 
         $expected = [
             'entityHint' => 'Entities',
@@ -133,9 +133,9 @@ class NoDataMessagesExtensionTest extends \PHPUnit\Framework\TestCase
                         'from' => ['alias']
                     ]
                 ]
-            ],
-            PropertyAccess::createPropertyAccessorWithDotSyntax()
+            ]
         );
+        $config->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
 
         $expected = [
             'entityHint' => 'Entities',

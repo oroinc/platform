@@ -98,10 +98,8 @@ class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
             ['datagrid_results' => $this->getParameters()],
             function () {
                 $rows = $this->getAcceptedDatasource()->getResults();
-                $results = ResultsObject::create(
-                    ['data' => $rows],
-                    PropertyAccess::createPropertyAccessorWithDotSyntax()
-                );
+                $results = ResultsObject::create(['data' => $rows]);
+                $results->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
                 $this->acceptor->acceptResult($results);
 
                 return $results;

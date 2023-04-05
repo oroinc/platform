@@ -50,11 +50,12 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             }
             $this->processedConfiguration[$gridName] = $this->resolver->resolve($gridName, $rawConfig);
         }
-
-        return DatagridConfiguration::createNamed(
+        $gridConfiguration = DatagridConfiguration::createNamed(
             $gridName,
-            $this->processedConfiguration[$gridName],
-            PropertyAccess::createPropertyAccessorWithDotSyntax()
+            $this->processedConfiguration[$gridName]
         );
+        $gridConfiguration->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
+
+        return $gridConfiguration;
     }
 }

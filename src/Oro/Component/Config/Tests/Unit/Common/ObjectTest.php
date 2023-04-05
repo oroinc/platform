@@ -9,19 +9,21 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
 {
     private function getConfigObject(): ConfigObject
     {
-        return ConfigObject::create(
+        $config = ConfigObject::create(
             [
-                'true'  => true,
+                'true' => true,
                 'false' => false,
-                'null'  => null,
+                'null' => null,
                 'array' => [
-                    'true'  => true,
+                    'true' => true,
                     'false' => false,
-                    'null'  => null,
+                    'null' => null,
                 ],
             ],
-            PropertyAccess::createPropertyAccessorWithDotSyntax()
         );
+        $config->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
+
+        return $config;
     }
 
     /**

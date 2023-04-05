@@ -24,9 +24,9 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
     /** @var array */
     protected $params;
 
-    protected function __construct(array $params, PropertyAccessorInterface $propertyAccessor = null)
+    protected function __construct(array $params)
     {
-        $this->accessor = $propertyAccessor ?? new PropertyAccessor();
+        $this->accessor = new PropertyAccessor();
         $this->params = $params;
     }
 
@@ -37,9 +37,9 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
      *
      * @return $this
      */
-    public static function create(array $params, PropertyAccessorInterface $propertyAccessor = null)
+    public static function create(array $params)
     {
-        return new static($params, $propertyAccessor);
+        return new static($params);
     }
 
     /**
@@ -50,11 +50,11 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
      *
      * @return $this
      */
-    public static function createNamed($name, array $params, PropertyAccessorInterface $propertyAccessor = null)
+    public static function createNamed($name, array $params)
     {
         $params[self::NAME_KEY] = $name;
 
-        return new static($params, $propertyAccessor);
+        return new static($params);
     }
 
     /**
@@ -83,6 +83,13 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
     public function setName($name)
     {
         $this[self::NAME_KEY] = $name;
+
+        return $this;
+    }
+
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor): static
+    {
+        $this->accessor = $propertyAccessor;
 
         return $this;
     }

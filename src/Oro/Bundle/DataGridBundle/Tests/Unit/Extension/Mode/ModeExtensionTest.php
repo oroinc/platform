@@ -53,7 +53,8 @@ class ModeExtensionTest extends \PHPUnit\Framework\TestCase
     public function testVisitMetadata()
     {
         $config = DatagridConfiguration::create(['options' => ['mode' => ModeExtension::MODE_CLIENT]]);
-        $metadata = MetadataObject::create([], PropertyAccess::createPropertyAccessorWithDotSyntax());
+        $metadata = MetadataObject::create([]);
+        $metadata->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
 
         $this->extension->visitMetadata($config, $metadata);
         $this->assertEquals(ModeExtension::MODE_CLIENT, $metadata->offsetGetByPath('mode'));
