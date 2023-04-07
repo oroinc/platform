@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 
 class ModeExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -53,6 +54,7 @@ class ModeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $config = DatagridConfiguration::create(['options' => ['mode' => ModeExtension::MODE_CLIENT]]);
         $metadata = MetadataObject::create([]);
+        $metadata->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
 
         $this->extension->visitMetadata($config, $metadata);
         $this->assertEquals(ModeExtension::MODE_CLIENT, $metadata->offsetGetByPath('mode'));

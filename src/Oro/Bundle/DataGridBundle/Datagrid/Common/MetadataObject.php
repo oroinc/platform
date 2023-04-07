@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Config\Common\ConfigObject;
 
 /**
@@ -34,10 +35,12 @@ class MetadataObject extends ConfigObject
      */
     public static function createNamed($name, array $params)
     {
-        $params                                         = array_merge(self::getDefaultMetadata(), $params);
+        $params = array_merge(self::getDefaultMetadata(), $params);
         $params[self::OPTIONS_KEY][self::GRID_NAME_KEY] = $name;
+        $config = self::create($params);
+        $config->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
 
-        return self::create($params);
+        return $config;
     }
 
     /**

@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\NoDataMessages\NoDataMessagesExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -51,15 +52,18 @@ class NoDataMessagesExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessConfigs(): void
     {
-        $config = DatagridConfiguration::create([
-            'options' => [
-                'entityHint' => 'entity_hint_key',
-                'noDataMessages' => [
-                    'emptyGrid' => 'empty_grid_key',
-                    'emptyFilteredGrid' => 'empty_filtered_grid_key'
+        $config = DatagridConfiguration::create(
+            [
+                'options' => [
+                    'entityHint' => 'entity_hint_key',
+                    'noDataMessages' => [
+                        'emptyGrid' => 'empty_grid_key',
+                        'emptyFilteredGrid' => 'empty_filtered_grid_key'
+                    ]
                 ]
-            ]
-        ]);
+            ],
+        );
+        $config->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
 
         $expected = [
             'entityHint' => 'Entities',
@@ -84,17 +88,20 @@ class NoDataMessagesExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessConfigsOrmDatasourceWithoutOptions(): void
     {
-        $config = DatagridConfiguration::create([
-            'source' => [
-                'type' => OrmDatasource::TYPE,
-                'query' => [
-                    'select' => ['entity.id'],
-                    'from' => [
-                        ['table' => 'entity_table', 'alias' => 'entity']
+        $config = DatagridConfiguration::create(
+            [
+                'source' => [
+                    'type' => OrmDatasource::TYPE,
+                    'query' => [
+                        'select' => ['entity.id'],
+                        'from' => [
+                            ['table' => 'entity_table', 'alias' => 'entity']
+                        ]
                     ]
-                ]
+                ],
             ]
-        ]);
+        );
+        $config->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
 
         $expected = [
             'entityHint' => 'Entities',
@@ -117,15 +124,18 @@ class NoDataMessagesExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessConfigsSearchDatasourceWithoutOptions(): void
     {
-        $config = DatagridConfiguration::create([
-            'source' => [
-                'type' => SearchDatasource::TYPE,
-                'query' => [
-                    'select' => ['entity.id'],
-                    'from' => ['alias']
+        $config = DatagridConfiguration::create(
+            [
+                'source' => [
+                    'type' => SearchDatasource::TYPE,
+                    'query' => [
+                        'select' => ['entity.id'],
+                        'from' => ['alias']
+                    ]
                 ]
             ]
-        ]);
+        );
+        $config->setPropertyAccessor(PropertyAccess::createPropertyAccessorWithDotSyntax());
 
         $expected = [
             'entityHint' => 'Entities',
@@ -148,11 +158,14 @@ class NoDataMessagesExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessConfigsArrayDatasourceWithoutOptions(): void
     {
-        $config = DatagridConfiguration::create([
-            'source' => [
-                'type' => ArrayDatasource::TYPE,
-            ]
-        ]);
+        $config = DatagridConfiguration::create(
+            [
+                'source' => [
+                    'type' => ArrayDatasource::TYPE,
+                ]
+            ],
+            PropertyAccess::createPropertyAccessorWithDotSyntax()
+        );
 
         $this->extension->processConfigs($config);
 
