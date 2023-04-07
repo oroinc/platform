@@ -8,6 +8,8 @@
 
     .sort-icon {
         @include fa-icon($sort-datagrid-sort-icon);
+
+        cursor: move;
     }
 }
 
