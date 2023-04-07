@@ -102,6 +102,21 @@ class ChildJobFailingExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testOnPostReceivedIsSkippedWhenRedelivered(): void
+    {
+        $message = new Message();
+        $message->setMessageId('sample-id');
+        $message->setRedelivered(true);
+        $this->context->setMessage($message);
+        $this->context->setStatus(MessageProcessorInterface::REJECT);
+
+        $this->jobProcessor
+            ->expects(self::never())
+            ->method(self::anything());
+
+        $this->extension->onPostReceived($this->context);
+    }
+
     public function testOnPostReceivedIsSkippedWhenJobIsRoot(): void
     {
         $message = new Message();
