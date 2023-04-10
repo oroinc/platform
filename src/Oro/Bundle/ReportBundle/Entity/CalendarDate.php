@@ -6,8 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
+ * Entity class that represents calendar_date table
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository")
- * @ORM\Table("oro_calendar_date")
+ * @ORM\Table("oro_calendar_date", uniqueConstraints={
+ *     @ORM\UniqueConstraint(name="oro_calendar_date_date_unique_idx", columns={"date"})
+ * })
  * @Config(mode="hidden")
  */
 class CalendarDate
@@ -24,7 +28,7 @@ class CalendarDate
     /**
      * @var \DateTime
      *
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="date")
      */
     protected $date;
 
