@@ -324,7 +324,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
                                 'alias' => 't1',
                                 'conditionType' => 'WITH',
                                 'condition' =>
-                                    'CAST(calendarDate.date as DATE) = '
+                                    'calendarDate.date = '
                                     . "CAST(CONVERT_TZ(t1.createdAt, '+00:00', '+10:00') as DATE)",
                             ],
                         ],
