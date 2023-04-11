@@ -60,19 +60,25 @@
         {% if form.owner is defined %}
             {{ form_row(form.owner) }}
         {% endif %}
+        {% set startDashboardGroupId = 'start-dashboard-'|uniqid %}
         {% if form.dashboardType is defined %}
-            {{ form_row(form.dashboardType, {'group_attr': {'class': 'dashboard-type'}}) }}
+            {% set dashboardTypeViewOptions = {
+                startDashboardrField: '#' ~ startDashboardGroupId,
+            } %}
+            {{ form_row(form.dashboardType, {
+                'attr': {
+                    'data-page-component-view': 'orodashboard/js/views/dashboard-type-view',
+                    'data-page-component-options': dashboardTypeViewOptions|json_encode
+                }
+            }) }}
         {% endif %}
         {% if form.startDashboard is defined %}
-            <div {{ UI.renderPageComponentAttributes({
-                view: 'orodashboard/js/views/dashboard-type-view',
-                options: {
-                    startDashboardrField: '#start-dashboard',
-                    _sourceElement: '.dashboard-type select',
+            {{ form_row(form.startDashboard, {
+                'group_attr': {
+                    'id': startDashboardGroupId,
+                    'class': form.dashboardType is defined ? 'hide' : ''
                 }
-            }) }}>
-                {{ form_row(form.startDashboard, {'group_attr': {'id': 'start-dashboard', 'class': 'hide'}}) }}
-            </div>
+            }) }}
         {% endif %}
         {% for child in form.children %}
             {% if child.vars.extra_field is defined and child.vars.extra_field %}

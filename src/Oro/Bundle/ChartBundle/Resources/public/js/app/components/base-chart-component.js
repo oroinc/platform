@@ -14,6 +14,10 @@ define(function(require) {
     const BaseChartComponent = BaseComponent.extend({
         template: _.template(chartTemplate),
 
+        NARROW_SCREEN_WIDTH: 520,
+
+        narrowScreen: false,
+
         aspectRatio: 0.4,
 
         updateDelay: 40,
@@ -74,6 +78,12 @@ define(function(require) {
             this.$container = this.$el.find('.chart-container');
         },
 
+        calcChartWidth() {
+            const $chart = this.$chart;
+            const $widgetContent = $chart.parents('.chart-container').parent();
+            return Math.round($widgetContent.width() * 0.9);
+        },
+
         /**
          * Update chart size and redraw
          */
@@ -93,12 +103,12 @@ define(function(require) {
          */
         setChartSize: function() {
             const $chart = this.$chart;
-            const $widgetContent = $chart.parents('.chart-container').parent();
-            const chartWidth = Math.round($widgetContent.width() * 0.9);
+            const chartWidth = this.calcChartWidth();
+            const chartHeight = Math.min(Math.round(chartWidth * this.aspectRatio), 350);
 
-            if (chartWidth > 0 && chartWidth !== $chart.width()) {
+            if (chartWidth > 0 && chartWidth !== $chart.width() || chartHeight !== parseInt($chart.css('height'))) {
                 $chart.width(chartWidth);
-                $chart.height(Math.min(Math.round(chartWidth * this.aspectRatio), 350));
+                $chart.height(chartHeight);
                 return true;
             }
             return false;
