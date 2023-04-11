@@ -9,8 +9,8 @@ country:
     AI: Anguilla
     AL: Albania
     AM: Armenia
-    AN: 'Netherlands Antilles'
     AO: Angola
+    AQ: Antarctica
     AR: Argentina
     AS: 'American Samoa'
     AT: Austria
@@ -31,10 +31,12 @@ country:
     BM: Bermuda
     BN: 'Brunei Darussalam'
     BO: Bolivia
+    BQ: 'Bonaire, Sint Eustatius and Saba'
     BR: Brazil
     BS: Bahamas
     BT: Bhutan
     BW: Botswana
+    BV: 'Bouvet Island'
     BY: Belarus
     BZ: Belize
     CA: Canada
@@ -53,6 +55,7 @@ country:
     CU: Cuba
     CV: 'Cape Verde'
     CW: Curacao
+    CX: 'Christmas Island'
     CY: Cyprus
     CZ: 'Czech Republic'
     DE: Germany
@@ -64,6 +67,7 @@ country:
     EC: Ecuador
     EE: Estonia
     EG: Egypt
+    EH: 'Western Sahara'
     ER: Eritrea
     ES: Spain
     ET: Ethiopia
@@ -80,17 +84,20 @@ country:
     GF: 'French Guiana'
     GG: Guernsey
     GH: Ghana
+    GI: Gibraltar
     GL: Greenland
     GM: Gambia
     GN: Guinea
     GP: Guadeloupe
     GQ: 'Equatorial Guinea'
     GR: Greece
+    GS: 'South Georgia and the South Sandwich Islands'
     GT: Guatemala
     GU: Guam
     GW: Guinea-Bissau
     GY: Guyana
     HK: 'Hong Kong'
+    HM: 'Heard Island and McDonald Islands'
     HN: Honduras
     HR: Croatia
     HT: Haiti
@@ -100,6 +107,7 @@ country:
     IL: Israel
     IM: 'Isle of Man'
     IN: India
+    IO: 'British Indian Ocean Territory (the)'
     IQ: Iraq
     IR: 'Iran (Islamic Republic of)'
     IS: Iceland
@@ -143,6 +151,7 @@ country:
     MN: Mongolia
     MO: Macao
     MR: Mauritania
+    MS: Montserrat
     MT: Malta
     MU: Mauritius
     MP: 'Northern Mariana Islands'
@@ -155,12 +164,14 @@ country:
     NA: Namibia
     NC: 'New Caledonia'
     NE: Niger
+    NF: 'Norfolk Island'
     NG: Nigeria
     NI: Nicaragua
     NL: Netherlands
     NO: Norway
     NP: Nepal
     NR: Nauru
+    NU: Niue
     NZ: 'New Zealand'
     OM: Oman
     PA: Panama
@@ -170,6 +181,8 @@ country:
     PH: Philippines
     PK: Pakistan
     PL: Poland
+    PM: 'Saint Pierre and Miquelon'
+    PN: Pitcairn
     PR: 'Puerto Rico'
     PS: 'Palestinian Territory'
     PT: Portugal
@@ -189,21 +202,26 @@ country:
     SG: Singapore
     SH: 'Saint Helena'
     SI: Slovenia
+    SJ: 'Svalbard and Jan Mayen'
     SK: Slovakia
     SL: 'Sierra Leone'
     SM: 'San Marino'
     SN: Senegal
     SO: Somalia
     SR: Suriname
+    SS: 'South Sudan'
     ST: 'Sao Tome and Principe'
     SV: 'El Salvador'
+    SX: 'Sint Maarten (Dutch part)'
     SY: 'Syrian Arab Republic'
     SZ: Swaziland
     TC: 'Turks & Caicos Islands'
     TD: Chad
+    TF: 'French Southern Territories (the)'
     TG: Togo
     TH: Thailand
     TJ: Tajikistan
+    TK: Tokelau
     TL: 'Timor Leste'
     TM: Turkmenistan
     TN: Tunisia
@@ -219,6 +237,7 @@ country:
     US: 'United States'
     UY: Uruguay
     UZ: Uzbekistan
+    VA: 'Holy See (the)'
     VC: 'Saint Vincent and the Grenadines'
     VE: Venezuela
     VG: 'British Virgin Islands'
@@ -721,6 +740,9 @@ region:
     BO-P: Potosí
     BO-S: 'Santa Cruz'
     BO-T: Tarija
+    BQ-BO: Bonaire
+    BQ-SA: Saba
+    BQ-SE: 'Sint Eustatius'
     BR-AC: Acre
     BR-AL: Alagoas
     BR-AM: Amazonas
@@ -4138,6 +4160,16 @@ region:
     SR-SA: Saramacca
     SR-SI: Sipaliwini
     SR-WA: Wanica
+    SS-EC: 'Central Equatoria'
+    SS-EE: 'Eastern Equatoria'
+    SS-JG: Jonglei
+    SS-LK: Lakes
+    SS-BN: 'Northern Bahr el Ghazal'
+    SS-UY: Unity
+    SS-NU: 'Upper Nile'
+    SS-WR: Warrap
+    SS-BW: 'Western Bahr el Ghazal'
+    SS-EW: 'Western Equatoria'
     ST-01: 'Água Grande'
     ST-02: Cantagalo
     ST-03: Caué
@@ -4438,27 +4470,26 @@ region:
     TV-NMG: Nanumanga
     TV-VAI: Vaitupu
     TW-CHA: Changhua
-    TW-CYI: 'Chiay City'
+    TW-CYI: 'Chiayi City'
     TW-CYQ: Chiayi
     TW-HSQ: Hsinchu
-    TW-HSZ: 'Hsinchui City'
+    TW-HSZ: 'Hsinchu City'
     TW-HUA: Hualien
-    TW-ILA: Ilan
+    TW-ILA: Yilan
     TW-KEE: 'Keelung City'
-    TW-KHH: 'Kaohsiung City'
-    TW-KHQ: Kaohsiung
+    TW-KIN: Kinmen
+    TW-LIE: Lienchiang
+    TW-KHH: Kaohsiung
     TW-MIA: Miaoli
     TW-NAN: Nantou
+    TW-NWT: 'New Taipei'
     TW-PEN: Penghu
     TW-PIF: Pingtung
     TW-TAO: Taoyuan
-    TW-TNN: 'Tainan City'
-    TW-TNQ: Tainan
-    TW-TPE: 'Taipei City'
-    TW-TPQ: Taipei
+    TW-TNN: Tainan
+    TW-TPE: Taipei
     TW-TTT: Taitung
-    TW-TXG: 'Taichung City'
-    TW-TXQ: Taichung
+    TW-TXG: Taichung
     TW-YUN: Yunlin
     TZ-01: Arusha
     TZ-02: Dar-es-Salaam
