@@ -54,7 +54,7 @@ class TagsExtension extends AbstractTagsExtension
     /**
      * {@inheritdoc}
      */
-    public function getPriority()
+    public function getPriority(): int
     {
         return 10;
     }
@@ -100,7 +100,7 @@ class TagsExtension extends AbstractTagsExtension
     /**
      * {@inheritdoc}
      */
-    public function processConfigs(DatagridConfiguration $config)
+    public function processConfigs(DatagridConfiguration $config): void
     {
         $columns = $config->offsetGetByPath('[columns]', []);
         $column = [self::COLUMN_NAME => $this->getColumnDefinition($config)];
@@ -116,7 +116,7 @@ class TagsExtension extends AbstractTagsExtension
         $this->enableInlineEditing($config);
     }
 
-    public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
+    public function visitMetadata(DatagridConfiguration $config, MetadataObject $data): void
     {
         if ($this->inlineEditingConfigurator->isInlineEditingSupported($config)) {
             $data->offsetSet(
@@ -133,7 +133,7 @@ class TagsExtension extends AbstractTagsExtension
      *
      * @return array
      */
-    protected function getColumnDefinition(DatagridConfiguration $config)
+    protected function getColumnDefinition(DatagridConfiguration $config): array
     {
         $className = $this->getEntity($config);
 
@@ -147,7 +147,10 @@ class TagsExtension extends AbstractTagsExtension
             'editable' => false,
             'translatable' => true,
             'notMarkAsBlank' => true,
-            'renderable' => $this->taggableHelper->isEnableGridColumn($className)
+            'renderable' => $this->taggableHelper->isEnableGridColumn($className),
+            'inline_editing' => [
+                'enable' => $config->offsetGetByPath($this->getInlineEditingEnabledPathForColumn(), true)
+            ]
         ];
     }
 
@@ -158,7 +161,7 @@ class TagsExtension extends AbstractTagsExtension
      *
      * @return array
      */
-    protected function getColumnFilterDefinition(DatagridConfiguration $config)
+    protected function getColumnFilterDefinition(DatagridConfiguration $config): array
     {
         $className = $this->getEntity($config);
         $dataName = sprintf('%s.%s', $config->getOrmQuery()->getRootAlias(), 'id');
@@ -180,7 +183,7 @@ class TagsExtension extends AbstractTagsExtension
     /**
      * {@inheritdoc}
      */
-    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
+    public function visitResult(DatagridConfiguration $config, ResultsObject $result): void
     {
         $rows = $result->getData();
         $idField = 'id';
@@ -195,11 +198,21 @@ class TagsExtension extends AbstractTagsExtension
     private function enableInlineEditing(DatagridConfiguration $config): void
     {
         if ($this->inlineEditingConfigurator->isInlineEditingSupported($config)
-            && !$config->offsetGetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH)
+            && $config->offsetGetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH) !== false
+            && $config->offsetGetByPath($this->getInlineEditingEnabledPathForColumn()) !== false
         ) {
             $config->offsetSetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH, true);
             $this->inlineEditingConfigurator->configureInlineEditingForGrid($config);
             $this->inlineEditingConfigurator->configureInlineEditingForColumn($config, self::COLUMN_NAME);
         }
+    }
+
+    private function getInlineEditingEnabledPathForColumn(): string
+    {
+        return sprintf(
+            '[columns][%s]%s',
+            self::COLUMN_NAME,
+            InlineEditingConfiguration::ENABLED_CONFIG_PATH
+        );
     }
 }

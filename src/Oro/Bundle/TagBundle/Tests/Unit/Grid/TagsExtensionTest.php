@@ -194,13 +194,13 @@ class TagsExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testProcessConfigs(): void
+    public function testProcessConfigsWhenInlineEditingEnabled(): void
     {
         $config = DatagridConfiguration::create([
             'extended_entity_name' => 'Test',
             'columns' => [
                 'column1' => [
-                    'label' => 'Column 1'
+                    'label' => 'Column 1',
                 ]
             ],
             'filters' => [
@@ -225,7 +225,84 @@ class TagsExtensionTest extends \PHPUnit\Framework\TestCase
 
         $actualParameters = $config->toArray();
         self::assertArrayHasKey('tags', $actualParameters['columns']);
+        self::assertTrue($actualParameters['columns']['tags']['inline_editing']['enable']);
         self::assertArrayHasKey('tagname', $actualParameters['filters']['columns']);
         self::assertTrue($actualParameters['inline_editing']['enable']);
+    }
+
+    public function testProcessConfigsWhenInlineEditingDisabledForDatagrid(): void
+    {
+        $config = DatagridConfiguration::create([
+            'extended_entity_name' => 'Test',
+            'columns' => [
+                'column1' => [
+                    'label' => 'Column 1'
+                ]
+            ],
+            'filters' => [
+                'columns' => [
+                    'id' => []
+                ]
+            ],
+            'inline_editing' => [
+                'enable' => false
+            ]
+        ]);
+
+        $this->inlineEditingConfigurator->expects(self::once())
+            ->method('isInlineEditingSupported')
+            ->with($config)
+            ->willReturn(true);
+
+        $this->inlineEditingConfigurator->expects(self::never())
+            ->method('configureInlineEditingForGrid');
+        $this->inlineEditingConfigurator->expects(self::never())
+            ->method('configureInlineEditingForColumn');
+
+        $this->extension->processConfigs($config);
+
+        $actualParameters = $config->toArray();
+        self::assertArrayHasKey('tags', $actualParameters['columns']);
+        self::assertArrayHasKey('tagname', $actualParameters['filters']['columns']);
+        self::assertFalse($actualParameters['inline_editing']['enable']);
+    }
+
+    public function testProcessConfigsWhenInlineEditingDisabledForColumnInDatagrid(): void
+    {
+        $config = DatagridConfiguration::create([
+            'extended_entity_name' => 'Test',
+            'columns' => [
+                'column1' => [
+                    'label' => 'Column 1'
+                ],
+                'tags' => [
+                    'inline_editing' => [
+                        'enable' => false
+                    ]
+                ]
+            ],
+            'filters' => [
+                'columns' => [
+                    'id' => []
+                ]
+            ]
+        ]);
+
+        $this->inlineEditingConfigurator->expects(self::once())
+            ->method('isInlineEditingSupported')
+            ->with($config)
+            ->willReturn(true);
+
+        $this->inlineEditingConfigurator->expects(self::never())
+            ->method('configureInlineEditingForGrid');
+        $this->inlineEditingConfigurator->expects(self::never())
+            ->method('configureInlineEditingForColumn');
+
+        $this->extension->processConfigs($config);
+
+        $actualParameters = $config->toArray();
+        self::assertArrayHasKey('tags', $actualParameters['columns']);
+        self::assertArrayHasKey('tagname', $actualParameters['filters']['columns']);
+        self::assertFalse($actualParameters['columns']['tags']['inline_editing']['enable']);
     }
 }
