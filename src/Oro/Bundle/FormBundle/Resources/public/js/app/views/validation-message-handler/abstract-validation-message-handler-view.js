@@ -93,6 +93,8 @@ define(function(require) {
                 const popperReference = this.getPopperReferenceElement();
 
                 this.scrollParent = getScrollParent(popperReference[0]);
+                const boundariesElement =
+                    document.querySelector(this.$el.attr('data-boundaries-element')) || 'window';
 
                 this.popper = new Popper(popperReference, messageEl, {
                     placement: _.isRTL() ? 'top-end' : 'top-start',
@@ -106,7 +108,7 @@ define(function(require) {
                         },
 
                         preventOverflow: {
-                            boundariesElement: 'window'
+                            boundariesElement: boundariesElement
                         },
 
                         hide: {

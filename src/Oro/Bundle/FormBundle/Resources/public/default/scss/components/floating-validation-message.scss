@@ -72,4 +72,14 @@
             border-width: $arrow-height ($arrow-height - 1) 0;
         }
     }
+
+    &[x-out-of-boundaries] {
+        // Avoid 'display: none' to ability getting real size of popper element before showing
+
+        position: fixed;
+
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+    }
 }

@@ -42,5 +42,9 @@ $input-box-shadow-error-state: 0 1px 7px 0 color.scale(get-color('ui', 'error-da
 $input-border-color-disabled-background: get-color('additional', 'base') !default;
 $input-border-color-disabled-hover-border-color: get-color('additional', 'light') !default;
 
+// Read only
+$input-border-color-readonly-background: $input-border-color-disabled-background !default;
+$input-border-color-readonly-hover-border-color: $input-border-color-disabled-hover-border-color !default;
+
 // Error
 $input-border-color-error-state: get-color('ui', 'error-dark');

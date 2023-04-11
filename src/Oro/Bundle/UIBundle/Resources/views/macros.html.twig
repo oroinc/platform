@@ -428,6 +428,8 @@
     {% if isDesktopVersion() or parameters.mobileEnabled|default(false) %}
         {% set options = parameters.options|default({}) %}
         {% set rootClassName = parameters.rootClassName|default('pull-right pinned-dropdown') %}
+        {# formId - 'id 'attribute of form that dropdown associate with #}
+        {% set formId = parameters.formId is defined ? parameters.formId : null %}
         {% set options = options|merge({
             widgetModule: options.widgetModule|default('oroui/js/content-processor/pinned-dropdown-button'),
             widgetName: options.widgetName|default('pinnedDropdownButtonProcessor'),
@@ -436,6 +438,7 @@
         }) %}
         {% apply spaceless %}
             <div class="{{ rootClassName }}"
+                 {% if formId is not null %}data-form="{{ formId }}"{% endif %}
                  {{ UIMacro.renderAttributes(parameters.dataAttributes|default({})|merge({
                      'page-component-module': 'oroui/js/app/components/jquery-widget-component',
                      'page-component-options': options
@@ -814,6 +817,9 @@
             type="{{ type }}"
         {% if (parameters.title is defined) %}
             title="{{ parameters.title }}"
+        {% endif %}
+        {% if (parameters.form is defined) %}
+            form="{{ parameters.form }}"
         {% endif %}
         {%- if (parameters.dataUrlRaw is defined) -%}
             data-url="{{ parameters.dataUrlRaw|raw }}"
