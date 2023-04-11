@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     const _ = require('underscore');
-    const $ = require('jquery');
     const Flotr = require('flotr2');
     const dataFormatter = require('orochart/js/data_formatter');
     const BaseChartComponent = require('orochart/js/app/components/base-chart-component');
@@ -13,8 +12,6 @@ define(function(require) {
      * @exports orochart/app/components/multiline-chart-component
      */
     const MultilineChartComponent = BaseChartComponent.extend({
-
-        narrowScreen: false,
 
         /**
          * @inheritdoc
@@ -89,10 +86,10 @@ define(function(require) {
                         autoscale: true,
                         autoscaleMargin: 1,
                         tickFormatter: this.YTickFormatter.bind(this),
+                        tickDecimals: false,
                         title: options.data_schema.value.label + '  '
                     },
                     xaxis: {
-                        autoscale: true,
                         autoscaleMargin: 0,
                         tickFormatter: this.XTickFormatter.bind(this),
                         title: this.narrowScreen ? ' ' : options.data_schema.label.label,
@@ -115,9 +112,9 @@ define(function(require) {
         },
 
         update: function() {
-            this.narrowScreen = $('html').width() < 520;
+            this.narrowScreen = this.calcChartWidth() < this.NARROW_SCREEN_WIDTH;
             if (this.narrowScreen) {
-                this.aspectRatio = 0.55;
+                this.aspectRatio = 0.75;
             } else {
                 this.aspectRatio = MultilineChartComponent.__super__.aspectRatio;
             }
