@@ -38,12 +38,13 @@ class CrowdinCatalogueLoader implements CatalogueLoaderInterface
     {
         $tmpDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $filesPath = $tmpDir . 'unpacked';
+        $this->ensureDirectoryExist($filesPath);
         $archivePath = $tmpDir . 'temp.zip';
 
         $this->translationServiceAdapter->downloadLanguageTranslationsArchive($locale, $archivePath);
 
         // We treat "en_US" and "en" as the same language, and we use "en" to designate its translations internally.
-        // It may be removed once the default locale is changed to 'en_US" (BB-19560).
+        // It may be removed once the default locale is changed to "en_US" (BB-19560).
         if ('en' === $locale) {
             $this->translationServiceAdapter->extractTranslationsFromArchive($archivePath, $filesPath, 'en_US');
             // renames all *.en_US.csv translation files to *.en.csv
@@ -59,6 +60,13 @@ class CrowdinCatalogueLoader implements CatalogueLoaderInterface
         $this->removeDirectory($filesPath);
 
         return $catalogue;
+    }
+
+    private function ensureDirectoryExist(string $targetDir): void
+    {
+        if (!\is_dir($targetDir) && !\mkdir($targetDir) && !\is_dir($targetDir)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $targetDir));
+        }
     }
 
     private function removeDirectory(string $targetDir): void
