@@ -371,10 +371,6 @@ AM:
         AM-VD:
             combinedCode: AM-VD
             code: VD
-AN:
-    iso2Code: AN
-    iso3Code: ANT
-    regions: {  }
 AO:
     iso2Code: AO
     iso3Code: AGO
@@ -433,6 +429,10 @@ AO:
         AO-ZAI:
             combinedCode: AO-ZAI
             code: ZAI
+AQ:
+    iso2Code: AQ
+    iso3Code: ATA
+    regions: {  }
 AR:
     iso2Code: AR
     iso3Code: ARG
@@ -1578,6 +1578,19 @@ BO:
         BO-T:
             combinedCode: BO-T
             code: T
+BQ:
+    iso2Code: BQ
+    iso3Code: BES
+    regions:
+        BQ-BO:
+            combinedCode: BQ-BO
+            code: BO
+        BQ-SA:
+            combinedCode: BQ-SA
+            code: SA
+        BR-AM:
+            combinedCode: BQ-SE
+            code: SE
 BR:
     iso2Code: BR
     iso3Code: BRA
@@ -1833,6 +1846,10 @@ BT:
         BT-TY:
             combinedCode: BT-TY
             code: TY
+BV:
+    iso2Code: BV
+    iso3Code: BVT
+    regions: {  }
 BW:
     iso2Code: BW
     iso3Code: BWA
@@ -2710,6 +2727,10 @@ CW:
     iso2Code: CW
     iso3Code: CUW
     regions: {  }
+CX:
+    iso2Code: CX
+    iso3Code: CXR
+    regions: {  }
 CY:
     iso2Code: CY
     iso3Code: CYP
@@ -3360,6 +3381,10 @@ EG:
         EG-WAD:
             combinedCode: EG-WAD
             code: WAD
+EH:
+    iso2Code: EH
+    iso3Code: ESH
+    regions: {  }
 ER:
     iso2Code: ER
     iso3Code: ERI
@@ -4942,6 +4967,10 @@ GH:
         GH-WP:
             combinedCode: GH-WP
             code: WP
+GI:
+    iso2Code: GI
+    iso3Code: GIB
+    regions: {  }
 GL:
     iso2Code: GL
     iso3Code: GRL
@@ -5341,6 +5370,10 @@ GR:
         GR-M:
             combinedCode: GR-M
             code: M
+GS:
+    iso2Code: GS
+    iso3Code: SGS
+    regions: {  }
 GT:
     iso2Code: GT
     iso3Code: GTM
@@ -5492,6 +5525,10 @@ GY:
 HK:
     iso2Code: HK
     iso3Code: HKG
+    regions: {  }
+HM:
+    iso2Code: HM
+    iso3Code: HMD
     regions: {  }
 HN:
     iso2Code: HN
@@ -6129,6 +6166,10 @@ IN:
         IN-WB:
             combinedCode: IN-WB
             code: WB
+IO:
+    iso2Code: IO
+    iso3Code: IOT
+    regions: {  }
 IQ:
     iso2Code: IQ
     iso3Code: IRQ
@@ -8868,6 +8909,10 @@ MR:
         MR-NKC:
             combinedCode: MR-NKC
             code: NKC
+MS:
+    iso2Code: MS
+    iso3Code: MSR
+    regions: {  }
 MT:
     iso2Code: MT
     iso3Code: MLT
@@ -9556,6 +9601,10 @@ NE:
         NE-8:
             combinedCode: NE-8
             code: '8'
+NF:
+    iso2Code: NF
+    iso3Code: NFK
+    regions:
 NG:
     iso2Code: NG
     iso3Code: NGA
@@ -9940,6 +9989,10 @@ NR:
         NR-14:
             combinedCode: NR-14
             code: '14'
+NU:
+    iso2Code: NU
+    iso3Code: NIU
+    regions: {  }
 NZ:
     iso2Code: NZ
     iso3Code: NZL
@@ -10594,6 +10647,14 @@ PL:
         PL-ZP:
             combinedCode: PL-ZP
             code: ZP
+PM:
+    iso2Code: PM
+    iso3Code: SPM
+    regions: {  }
+PN:
+    iso2Code: PN
+    iso3Code: PCN
+    regions: {  }
 PR:
     iso2Code: PR
     iso3Code: PRI
@@ -12272,6 +12333,10 @@ SI:
         SI-211:
             combinedCode: SI-211
             code: '211'
+SJ:
+    iso2Code: SJ
+    iso3Code: SJM
+    regions: {  }
 SK:
     iso2Code: SK
     iso3Code: SVK
@@ -12485,6 +12550,40 @@ SR:
         SR-WA:
             combinedCode: SR-WA
             code: WA
+SS:
+    iso2Code: SS
+    iso3Code: SSD
+    regions:
+        SS-EC:
+            combinedCode: SS-EC
+            code: 'EC'
+        SS-EE:
+            combinedCode: SS-EE
+            code: 'EE'
+        SS-JG:
+            combinedCode: SS-JG
+            code: 'JG'
+        SS-LK:
+            combinedCode: SS-LK
+            code: 'LK'
+        SS-BN:
+            combinedCode: SS-BN
+            code: 'BN'
+        SS-UY:
+            combinedCode: SS-UY
+            code: 'UY'
+        SS-NU:
+            combinedCode: SS-NU
+            code: 'NU'
+        SS-WR:
+            combinedCode: SS-WR
+            code: 'WR'
+        SS-BW:
+            combinedCode: SS-BW
+            code: 'BW'
+        SS-EW:
+            combinedCode: SS-EW
+            code: 'EW'
 ST:
     iso2Code: ST
     iso3Code: STP
@@ -12556,6 +12655,10 @@ SV:
         SV-US:
             combinedCode: SV-US
             code: US
+SX:
+    iso2Code: SX
+    iso3Code: SXM
+    regions: {  }
 SY:
     iso2Code: SY
     iso3Code: SYR
@@ -12692,6 +12795,10 @@ TD:
         TD-WF:
             combinedCode: TD-WF
             code: WF
+TF:
+    iso2Code: TF
+    iso3Code: ATF
+    regions: {  }
 TG:
     iso2Code: TG
     iso3Code: TGO
@@ -12959,6 +13066,10 @@ TJ:
         TJ-SU:
             combinedCode: TJ-SU
             code: SU
+TK:
+    iso2Code: TK
+    iso3Code: TKL
+    regions: {  }
 TL:
     iso2Code: TL
     iso3Code: TLS
@@ -13474,18 +13585,24 @@ TW:
         TW-KEE:
             combinedCode: TW-KEE
             code: KEE
+        TW-KIN:
+            combinedCode: TW-KIN
+            code: KIN
+        TW-LIE:
+            combinedCode: TW-LIE
+            code: LIE
         TW-KHH:
             combinedCode: TW-KHH
             code: KHH
-        TW-KHQ:
-            combinedCode: TW-KHQ
-            code: KHQ
         TW-MIA:
             combinedCode: TW-MIA
             code: MIA
         TW-NAN:
             combinedCode: TW-NAN
             code: NAN
+        TW-NWT:
+            combinedCode: TW-NWT
+            code: NWT
         TW-PEN:
             combinedCode: TW-PEN
             code: PEN
@@ -13498,24 +13615,15 @@ TW:
         TW-TNN:
             combinedCode: TW-TNN
             code: TNN
-        TW-TNQ:
-            combinedCode: TW-TNQ
-            code: TNQ
         TW-TPE:
             combinedCode: TW-TPE
             code: TPE
-        TW-TPQ:
-            combinedCode: TW-TPQ
-            code: TPQ
         TW-TTT:
             combinedCode: TW-TTT
             code: TTT
         TW-TXG:
             combinedCode: TW-TXG
             code: TXG
-        TW-TXQ:
-            combinedCode: TW-TXQ
-            code: TXQ
         TW-YUN:
             combinedCode: TW-YUN
             code: YUN
@@ -14255,6 +14363,10 @@ UZ:
         UZ-XO:
             combinedCode: UZ-XO
             code: XO
+VA:
+    iso2Code: VA
+    iso3Code: VAT
+    regions: {  }
 VC:
     iso2Code: VC
     iso3Code: VCT
