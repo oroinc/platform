@@ -42,6 +42,16 @@ class TranslationServiceAdapterStub implements TranslationServiceAdapterInterfac
         string $directoryPathToExtractTo,
         string $languageCode
     ): void {
+        /**
+         * Double check if the target directory already exist.
+         * This should be done because real adapter do not check if directory exist
+         * at the extractTranslationsFromArchive method
+         * of {@see \Oro\Bundle\TranslationBundle\Download\OroTranslationServiceAdapter} class.
+         */
+        if (!\is_dir($directoryPathToExtractTo)) {
+            throw new \RuntimeException(sprintf('Directory "%s" do not exists.', $directoryPathToExtractTo));
+        }
+
         $zip = new \ZipArchive();
         $zip->open($pathToArchive);
         $zip->extractTo($directoryPathToExtractTo);
