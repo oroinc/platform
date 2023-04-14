@@ -3,4 +3,8 @@
 .checkbox-label {
     display: $checkbox-label-display;
     gap: $checkbox-label-gap;
+
+    &.no-gap {
+        gap: initial;
+    }
 }
