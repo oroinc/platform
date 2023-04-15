@@ -251,6 +251,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
+                ['setSystemConfigExclusionProvider', [new Reference('oro_entity.exclusion_provider.config')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.default')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
@@ -553,6 +554,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
+                ['setSystemConfigExclusionProvider', [new Reference('oro_entity.exclusion_provider.config')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.default')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
@@ -560,6 +562,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
+                ['setSystemConfigExclusionProvider', [new Reference('oro_entity.exclusion_provider.config')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.first')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
@@ -567,6 +570,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
+                ['setSystemConfigExclusionProvider', [new Reference('oro_entity.exclusion_provider.config')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.second')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
@@ -1217,6 +1221,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
+                ['setSystemConfigExclusionProvider', [new Reference('oro_entity.exclusion_provider.config')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.default')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
@@ -1224,6 +1229,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
+                ['setSystemConfigExclusionProvider', [new Reference('oro_entity.exclusion_provider.config')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.first')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
@@ -1231,6 +1237,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
+                ['setSystemConfigExclusionProvider', [new Reference('oro_entity.exclusion_provider.config')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.second')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],

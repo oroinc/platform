@@ -3,10 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassOwner;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassTarget;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Tests for API resource for a model inherited from ORM entity ("override_class" option).
@@ -193,6 +197,14 @@ class EntityOverrideTest extends RestJsonApiTestCase
             ],
             $response
         );
+        $activityAssociationNames = [
+            ExtendHelper::buildAssociationName(TestOwner::class, ActivityScope::ASSOCIATION_KIND),
+            ExtendHelper::buildAssociationName(TestTarget::class, ActivityScope::ASSOCIATION_KIND)
+        ];
+        $responseContent = self::jsonToArray($response->getContent());
+        foreach ($activityAssociationNames as $associationName) {
+            self::assertArrayNotHasKey($associationName, $responseContent['data']['relationships']);
+        }
     }
 
     public function testFilterByExtendedAssociationToOverriddenEntity()

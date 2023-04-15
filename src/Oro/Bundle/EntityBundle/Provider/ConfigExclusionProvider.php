@@ -11,14 +11,9 @@ use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
  */
 class ConfigExclusionProvider implements ExclusionProviderInterface
 {
-    /** @var EntityRuleMatcher */
-    private $entityHierarchyProvider;
-
-    /** @var EntityRuleMatcher */
-    private $configProvider;
-
-    /** @var EntityRuleMatcher|null */
-    private $matcher;
+    private EntityHierarchyProviderInterface $entityHierarchyProvider;
+    private EntityConfigurationProvider $configProvider;
+    private ?EntityRuleMatcher $matcher = null;
 
     public function __construct(
         EntityHierarchyProviderInterface $entityHierarchyProvider,
@@ -29,7 +24,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isIgnoredEntity($className)
     {
@@ -37,7 +32,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
@@ -49,17 +44,14 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         return $this->getMatcher()->isFieldMatched($metadata->name, $associationName);
     }
 
-    /**
-     * @return EntityRuleMatcher
-     */
-    private function getMatcher()
+    private function getMatcher(): EntityRuleMatcher
     {
         if (null === $this->matcher) {
             $this->matcher = new EntityRuleMatcher(

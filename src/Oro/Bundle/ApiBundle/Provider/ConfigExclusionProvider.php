@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityRuleMatcher;
+use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
  * The exclusion provider for entities and fields excluded from API
@@ -15,17 +16,24 @@ class ConfigExclusionProvider extends ChainExclusionProvider
 {
     private EntityHierarchyProviderInterface $entityHierarchyProvider;
     private ConfigCache $configCache;
-
+    private ExclusionProviderInterface $systemConfigExclusionProvider;
     private ?EntityRuleMatcher $excludeMatcher = null;
-    private ?EntityRuleMatcher $includeMatcher = null;
-    private array $cache = [];
+    private ?IncludeEntityRuleMatcher $includeMatcher = null;
+    private array $entityCache = [];
+    private array $fieldCache = [];
 
     public function __construct(
         EntityHierarchyProviderInterface $entityHierarchyProvider,
         ConfigCache $configCache
     ) {
+        parent::__construct();
         $this->entityHierarchyProvider = $entityHierarchyProvider;
         $this->configCache = $configCache;
+    }
+
+    public function setSystemConfigExclusionProvider(ExclusionProviderInterface $systemConfigExclusionProvider): void
+    {
+        $this->systemConfigExclusionProvider = $systemConfigExclusionProvider;
     }
 
     /**
@@ -33,14 +41,22 @@ class ConfigExclusionProvider extends ChainExclusionProvider
      */
     public function isIgnoredEntity($className)
     {
-        if ($this->getIncludeMatcher()->isEntityMatched($className)) {
-            return false;
-        }
-        if ($this->getExcludeMatcher()->isEntityMatched($className)) {
-            return true;
+        if (isset($this->entityCache[$className])) {
+            return $this->entityCache[$className];
         }
 
-        return parent::isIgnoredEntity($className);
+        $result = false;
+        if (!$this->getIncludeMatcher()->isEntityMatched($className)) {
+            if ($this->getExcludeMatcher()->isEntityMatched($className)) {
+                $result = true;
+            } else {
+                $result = parent::isIgnoredEntity($className);
+            }
+        }
+
+        $this->entityCache[$className] = $result;
+
+        return $result;
     }
 
     /**
@@ -48,17 +64,23 @@ class ConfigExclusionProvider extends ChainExclusionProvider
      */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
-        if (isset($this->cache[$metadata->name][$fieldName])) {
-            return $this->cache[$metadata->name][$fieldName];
+        if (isset($this->fieldCache[$metadata->name][$fieldName])) {
+            return $this->fieldCache[$metadata->name][$fieldName];
         }
 
         $result = false;
         if (!$this->getIncludeMatcher()->isFieldMatched($metadata->name, $fieldName)) {
-            $result = $this->getExcludeMatcher()->isFieldMatched($metadata->name, $fieldName)
-                || parent::isIgnoredField($metadata, $fieldName);
+            if ($this->getExcludeMatcher()->isFieldMatched($metadata->name, $fieldName)) {
+                $result = true;
+            } elseif ($this->getIncludeMatcher()->isEntityMatched($metadata->name)) {
+                $result = parent::isIgnoredField($metadata, $fieldName);
+            } else {
+                $result = $this->systemConfigExclusionProvider->isIgnoredField($metadata, $fieldName)
+                    || parent::isIgnoredField($metadata, $fieldName);
+            }
         }
 
-        $this->cache[$metadata->name][$fieldName] = $result;
+        $this->fieldCache[$metadata->name][$fieldName] = $result;
 
         return $result;
     }
@@ -68,17 +90,23 @@ class ConfigExclusionProvider extends ChainExclusionProvider
      */
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
-        if (isset($this->cache[$metadata->name][$associationName])) {
-            return $this->cache[$metadata->name][$associationName];
+        if (isset($this->fieldCache[$metadata->name][$associationName])) {
+            return $this->fieldCache[$metadata->name][$associationName];
         }
 
         $result = false;
         if (!$this->getIncludeMatcher()->isFieldMatched($metadata->name, $associationName)) {
-            $result = $this->getExcludeMatcher()->isFieldMatched($metadata->name, $associationName)
-                || parent::isIgnoredRelation($metadata, $associationName);
+            if ($this->getExcludeMatcher()->isFieldMatched($metadata->name, $associationName)) {
+                $result = true;
+            } elseif ($this->getIncludeMatcher()->isEntityMatched($metadata->name)) {
+                $result = parent::isIgnoredRelation($metadata, $associationName);
+            } else {
+                $result = $this->systemConfigExclusionProvider->isIgnoredField($metadata, $associationName)
+                    || parent::isIgnoredRelation($metadata, $associationName);
+            }
         }
 
-        $this->cache[$metadata->name][$associationName] = $result;
+        $this->fieldCache[$metadata->name][$associationName] = $result;
 
         return $result;
     }
@@ -95,10 +123,10 @@ class ConfigExclusionProvider extends ChainExclusionProvider
         return $this->excludeMatcher;
     }
 
-    private function getIncludeMatcher(): EntityRuleMatcher
+    private function getIncludeMatcher(): IncludeEntityRuleMatcher
     {
         if (null === $this->includeMatcher) {
-            $this->includeMatcher = new EntityRuleMatcher(
+            $this->includeMatcher = new IncludeEntityRuleMatcher(
                 $this->entityHierarchyProvider,
                 $this->configCache->getInclusions()
             );

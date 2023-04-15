@@ -405,6 +405,7 @@ class ConfigurationLoader
                 new Reference($configCacheServiceId)
             ])
             ->setPublic(false)
+            ->addMethodCall('setSystemConfigExclusionProvider', [new Reference('oro_entity.exclusion_provider.config')])
             ->addMethodCall('addProvider', [new Reference($aliasedExclusionProviderServiceId)])
             ->addMethodCall('addProvider', [new Reference(self::SHARED_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID)]);
 
