@@ -402,7 +402,8 @@ class ConfigurationLoader
             ->register($exclusionProviderServiceId, ConfigExclusionProvider::class)
             ->setArguments([
                 new Reference('oro_entity.entity_hierarchy_provider.all'),
-                new Reference($configCacheServiceId)
+                new Reference($configCacheServiceId),
+                new Reference('oro_entity.exclusion_provider.config')
             ])
             ->setPublic(false)
             ->addMethodCall('addProvider', [new Reference($aliasedExclusionProviderServiceId)])

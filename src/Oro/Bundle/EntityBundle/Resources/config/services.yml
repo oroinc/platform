@@ -178,7 +178,6 @@ services:
             - '@oro_entity.entity_configuration.provider'
         tags:
             - { name: oro_entity.exclusion_provider.default }
-            - { name: oro_entity.exclusion_provider.api, priority: 50 }
 
     oro_entity.virtual_field_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider

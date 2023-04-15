@@ -6,6 +6,7 @@ api:
 
         Oro\Bundle\EmailBundle\Entity\Email:
             documentation_resource: '@OroEmailBundle/Resources/doc/api/email.md'
+            exclude: false # override exclude rule from entity.yml
             actions:
                 get: false
                 get_list: false
