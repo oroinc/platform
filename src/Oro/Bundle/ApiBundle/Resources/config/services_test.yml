@@ -17,6 +17,12 @@ services:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\NullSkippedEntityProvider
         public: true
 
+    oro_api.tests.config_entity_exclusion_provider:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigExclusionProvider
+        decorates: oro_entity.exclusion_provider.config
+        arguments:
+            - '@.inner'
+
     oro_api.tests.config_registry:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry
         public: true
