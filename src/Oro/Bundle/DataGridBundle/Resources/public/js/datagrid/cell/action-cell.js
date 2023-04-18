@@ -149,6 +149,16 @@ define(function(require, exports, module) {
             this.subviews.push(...this.actions);
         },
 
+        _attributes() {
+            if (Object.values(this.model.get('action_configuration')).every(action => !action)) {
+                return {
+                    'aria-label': null,
+                    'data-blank-content': null,
+                    'aria-colindex': null
+                };
+            }
+        },
+
         /**
          * @inheritdoc
          */
