@@ -150,7 +150,9 @@ define(function(require, exports, module) {
         },
 
         _attributes() {
-            if (Object.values(this.model.get('action_configuration')).every(action => !action)) {
+            const actionConf = this.model.get('action_configuration');
+
+            if (!actionConf || Object.values(actionConf).every(action => !action)) {
                 return {
                     'aria-label': null,
                     'data-blank-content': null,
