@@ -2015,16 +2015,31 @@ JS;
     }
 
     /**
-     * Drag and Drop one element before another
+     * Drag and Drop one element up before another
      * Example: When I drag and drop "Products" before "Clearance"
+     *          When I drag and drop "Products" up before "Clearance"
      *
      * @When /^(?:|I )drag and drop "(?P<elementName>[\w\s]+)" before "(?P<dropZoneName>[\w\s]+)"$/
+     * @When /^(?:|I )drag and drop "(?P<elementName>[\w\s]+)" up before "(?P<dropZoneName>[\w\s]+)"$/
      * @param string $elementName
      * @param string $dropZoneName
      */
     public function iDragAndDropElementBeforeAnotherOne($elementName, $dropZoneName)
     {
         $this->dragAndDropElementToAnotherOne($elementName, $dropZoneName, 1, 1);
+    }
+
+    /**
+     * Drag and Drop one element down before another
+     * Example: When I drag and drop "Products" down before "Clearance"
+     *
+     * @When /^(?:|I )drag and drop "(?P<elementName>[\w\s]+)" down before "(?P<dropZoneName>[\w\s]+)"$/
+     * @param string $elementName
+     * @param string $dropZoneName
+     */
+    public function iDragAndDropElementDownBeforeAnotherOne($elementName, $dropZoneName)
+    {
+        $this->dragAndDropElementToAnotherOne($elementName, $dropZoneName, -1, -1);
     }
 
     /**
