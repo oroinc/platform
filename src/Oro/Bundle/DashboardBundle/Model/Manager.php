@@ -37,7 +37,7 @@ class Manager
     }
 
     /**
-     * Find dashboard model by id
+     * Find dashboard model by id.
      *
      * @param integer $id
      *
@@ -45,7 +45,7 @@ class Manager
      */
     public function findDashboardModel($id)
     {
-        $entity = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->find($id);
+        $entity = $this->entityManager->getRepository(Dashboard::class)->find($id);
 
         if ($entity) {
             return $this->getDashboardModel($entity);
@@ -55,7 +55,7 @@ class Manager
     }
 
     /**
-     * Find dashboard model by criteria
+     * Find dashboard model by criteria.
      *
      * @param array      $criteria
      * @param array|null $orderBy
@@ -64,7 +64,7 @@ class Manager
      */
     public function findOneDashboardModelBy(array $criteria, array $orderBy = null)
     {
-        $entity = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
+        $entity = $this->entityManager->getRepository(Dashboard::class)
             ->findOneBy($criteria, $orderBy);
 
         if ($entity) {
@@ -75,7 +75,7 @@ class Manager
     }
 
     /**
-     * Find dashboard widget model by id
+     * Find dashboard widget model by id.
      *
      * @param integer $id
      *
@@ -83,7 +83,7 @@ class Manager
      */
     public function findWidgetModel($id)
     {
-        $entity = $this->entityManager->getRepository('OroDashboardBundle:Widget')->find($id);
+        $entity = $this->entityManager->getRepository(Widget::class)->find($id);
 
         if ($entity) {
             return $this->getWidgetModel($entity);
@@ -93,7 +93,7 @@ class Manager
     }
 
     /**
-     * Get dashboard
+     * Get dashboard.
      *
      * @param Dashboard $entity
      *
@@ -105,7 +105,7 @@ class Manager
     }
 
     /**
-     * Get dashboard widget
+     * Get dashboard widget.
      *
      * @param Widget $entity
      *
@@ -117,7 +117,7 @@ class Manager
     }
 
     /**
-     * Get all dashboards
+     * Get all dashboards.
      *
      * @param array $entities
      *
@@ -134,23 +134,17 @@ class Manager
     }
 
     /**
-     * Create dashboard
+     * Create dashboard.
      *
      * @return DashboardModel
      */
     public function createDashboardModel()
     {
-        $dashboard = new Dashboard();
-        $token = $this->tokenStorage->getToken();
-        if ($token instanceof OrganizationAwareTokenInterface) {
-            $dashboard->setOrganization($token->getOrganization());
-        }
-
-        return $this->getDashboardModel($dashboard);
+        return $this->getDashboardModel(new Dashboard());
     }
 
     /**
-     * Create dashboard widget
+     * Create dashboard widget.
      *
      * @param string $widgetName
      *
@@ -189,7 +183,7 @@ class Manager
     }
 
     /**
-     * Find active dashboard or default dashboard
+     * Find active dashboard or default dashboard.
      *
      * @param User $user
      *
@@ -198,11 +192,11 @@ class Manager
     public function findUserActiveOrDefaultDashboard(User $user)
     {
         $activeDashboard = $this->findUserActiveDashboard($user);
-        return $activeDashboard ? $activeDashboard : $this->findDefaultDashboard();
+        return $activeDashboard ?: $this->findDefaultDashboard();
     }
 
     /**
-     * Find active dashboard
+     * Find active dashboard.
      *
      * @param User $user
      *
@@ -213,7 +207,7 @@ class Manager
         /** @var OrganizationAwareTokenInterface $token */
         $token = $this->tokenStorage->getToken();
         $organization = $token->getOrganization();
-        $dashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
+        $dashboard = $this->entityManager->getRepository(ActiveDashboard::class)
             ->findOneBy(array('user' => $user, 'organization' => $organization));
 
         if ($dashboard) {
@@ -224,7 +218,7 @@ class Manager
     }
 
     /**
-     * Find default dashboard
+     * Find default dashboard.
      *
      * @return DashboardModel|null
      */
@@ -233,14 +227,14 @@ class Manager
         /** @var OrganizationAwareTokenInterface $token */
         $token = $this->tokenStorage->getToken();
         $organization = $token->getOrganization();
-        $dashboard = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
+        $dashboard = $this->entityManager->getRepository(Dashboard::class)
             ->findDefaultDashboard($organization);
 
         if ($dashboard) {
             return $this->getDashboardModel($dashboard);
         }
 
-        return null;
+        return $this->findOneDashboardModelBy(['organization' => $organization]);
     }
 
     /**
@@ -251,11 +245,12 @@ class Manager
      */
     public function findAllowedDashboards($permission = 'VIEW', $organizationId = null)
     {
-        $qb = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->createQueryBuilder('dashboard');
+        $qb = $this->entityManager->getRepository(Dashboard::class)->createQueryBuilder('dashboard');
         if ($organizationId) {
             $qb->andWhere($qb->expr()->eq('dashboard.organization', ':organizationId'))
                 ->setParameter('organizationId', $organizationId);
         }
+
         return $this->getDashboardModels($this->aclHelper->apply($qb, $permission)->execute());
     }
 
@@ -267,18 +262,19 @@ class Manager
      */
     public function findAllowedDashboardsShortenedInfo($permission = 'VIEW', $organizationId = null)
     {
-        $qb = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
+        $qb = $this->entityManager->getRepository(Dashboard::class)
             ->createQueryBuilder('dashboard')
             ->select('dashboard.id, dashboard.label');
         if ($organizationId) {
             $qb->andWhere($qb->expr()->eq('dashboard.organization', ':organizationId'))
                 ->setParameter('organizationId', $organizationId);
         }
+
         return $this->aclHelper->apply($qb, $permission)->execute();
     }
 
     /**
-     * Set current dashboard as active for passed user
+     * Set current dashboard as active for passed user.
      *
      * @param DashboardModel $dashboard
      * @param User           $user
@@ -292,7 +288,7 @@ class Manager
         $token = $this->tokenStorage->getToken();
         $organization = $token->getOrganization();
         $activeDashboard = $this->entityManager
-            ->getRepository('OroDashboardBundle:ActiveDashboard')
+            ->getRepository(ActiveDashboard::class)
             ->findOneBy(array('user' => $user, 'organization' => $organization));
 
         if (!$activeDashboard) {
@@ -312,19 +308,19 @@ class Manager
     }
 
     /**
-     * Copy widgets from source entity to dashboard model
+     * Copy widgets from source entity to dashboard model.
      */
     protected function copyWidgets(DashboardModel $target, Dashboard $source)
     {
         foreach ($source->getWidgets() as $sourceWidget) {
             $widgetModel = $this->copyWidgetModel($sourceWidget);
-            $this->save($widgetModel, false);
+            $this->save($widgetModel);
             $target->addWidget($widgetModel);
         }
     }
 
     /**
-     * Copy widget model by entity
+     * Copy widget model by entity.
      *
      * @param Widget $sourceWidget
      *
