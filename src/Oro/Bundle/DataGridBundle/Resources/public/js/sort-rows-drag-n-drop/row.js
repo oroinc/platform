@@ -33,7 +33,7 @@ const SortRowsDragNDropRow = Row.extend({
      * @inheritdoc
      */
     render() {
-        this.$el.data('modelId', this.model.id);
+        this.$el.attr('data-model-id', this.model.id);
         this.toggleOrderClass();
         this.toggleSelectedClass();
         if (this.model.isSeparator()) {

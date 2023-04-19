@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Functional\Entity\Repository;
 
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadFileData;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Entity\Repository\DigitalAssetRepository;
@@ -48,12 +49,17 @@ class DigitalAssetRepositoryTest extends WebTestCase
 
     public function testFindForEntityField(): void
     {
+        $result = $this->getRepository()->findForEntityField(\stdClass::class, 1, 'attachmentFieldA');
+        usort($result, function (File $a, File $b): int {
+            return $a->getId() <=> $b->getId();
+        });
+
         self::assertEquals(
             [
                 $this->getReference(LoadDigitalAssetData::DIGITAL_ASSET_1_CHILD_1),
                 $this->getReference(LoadDigitalAssetData::DIGITAL_ASSET_2_CHILD_1),
             ],
-            $this->getRepository()->findForEntityField(\stdClass::class, 1, 'attachmentFieldA')
+            $result
         );
     }
 

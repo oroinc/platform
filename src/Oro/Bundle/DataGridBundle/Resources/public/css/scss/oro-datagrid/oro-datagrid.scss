@@ -9,10 +9,6 @@
     @import 'board-view/board';
     @import 'board-view/card';
 
-    .dropdown-menu {
-        z-index: $zindex-dropdown - 112;
-    }
-
     .loader-mask {
         // to show under grid's filter
         z-index: $zindex-dropdown - 101;

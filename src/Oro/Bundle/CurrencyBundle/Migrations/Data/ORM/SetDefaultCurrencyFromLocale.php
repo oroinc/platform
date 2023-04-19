@@ -35,10 +35,7 @@ class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerA
         }
     }
 
-    /**
-     * @return string
-     */
-    protected function getDefaultCurrency()
+    protected function getDefaultCurrency(): string
     {
         if ($this->container->hasParameter('currency')) {
             return $this->container->getParameter('currency');

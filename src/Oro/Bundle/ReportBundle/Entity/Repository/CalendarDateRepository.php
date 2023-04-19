@@ -20,8 +20,8 @@ class CalendarDateRepository extends EntityRepository
         $qb = $this->createQueryBuilder('d')->orderBy('d.date', 'DESC')->setMaxResults(1);
         if ($date) {
             $qb
-                ->where($qb->expr()->eq('CAST(d.date as date)', 'CAST(:date as date)'))
-                ->setParameter('date', $date, Types::DATETIME_MUTABLE);
+                ->where($qb->expr()->eq('d.date', ':date'))
+                ->setParameter('date', $date, Types::DATE_MUTABLE);
         }
 
         return $qb->getQuery()->getOneOrNullResult();

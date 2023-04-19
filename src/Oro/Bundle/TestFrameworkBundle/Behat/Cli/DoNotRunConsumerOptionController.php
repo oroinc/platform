@@ -44,7 +44,6 @@ class DoNotRunConsumerOptionController implements Controller
             !$input->getOption('check') &&
             !$input->getOption('dry-run') &&
             !$input->getOption('skip-isolators-but-load-fixtures') &&
-            !$input->getOption('skip-isolators') &&
             $input->getOption('skip-isolators') !== null &&
             !($input->hasOption('available-suite-sets') && $input->getOption('available-suite-sets'))
         ) {
