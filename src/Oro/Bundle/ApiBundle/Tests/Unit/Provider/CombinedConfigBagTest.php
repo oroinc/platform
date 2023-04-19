@@ -81,11 +81,12 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Class1';
         $version = '1.2';
+        $config = ['fields' => ['field1' => []]];
 
         $this->configBag1->expects(self::once())
             ->method('getConfig')
             ->with($className, $version)
-            ->willReturn(['fields' => ['field1' => []]]);
+            ->willReturn($config);
         $this->configBag2->expects(self::once())
             ->method('getConfig')
             ->with($className, $version)
@@ -94,12 +95,12 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
             ->method('merge');
 
         self::assertEquals(
-            ['fields' => ['field1' => []]],
+            $config,
             $this->combinedConfigBag->getConfig($className, $version)
         );
         // test that data is cached in memory
         self::assertEquals(
-            ['fields' => ['field1' => []]],
+            $config,
             $this->combinedConfigBag->getConfig($className, $version)
         );
     }
@@ -108,6 +109,7 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Class1';
         $version = '1.2';
+        $config = ['fields' => ['field1' => []]];
 
         $this->configBag1->expects(self::once())
             ->method('getConfig')
@@ -116,17 +118,17 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->configBag2->expects(self::once())
             ->method('getConfig')
             ->with($className, $version)
-            ->willReturn(['fields' => ['field1' => []]]);
+            ->willReturn($config);
         $this->entityConfigMerger->expects(self::never())
             ->method('merge');
 
         self::assertEquals(
-            ['fields' => ['field1' => []]],
+            $config,
             $this->combinedConfigBag->getConfig($className, $version)
         );
         // test that data is cached in memory
         self::assertEquals(
-            ['fields' => ['field1' => []]],
+            $config,
             $this->combinedConfigBag->getConfig($className, $version)
         );
     }
@@ -135,6 +137,7 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Class1';
         $version = '1.2';
+        $mergedConfig = ['fields' => ['field1' => [], 'field2' => []]];
 
         $this->configBag1->expects(self::once())
             ->method('getConfig')
@@ -147,15 +150,15 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->entityConfigMerger->expects(self::once())
             ->method('merge')
             ->with(['fields' => ['field1' => []]], ['fields' => ['field2' => []]])
-            ->willReturn(['fields' => ['field1' => [], 'field2' => []]]);
+            ->willReturn($mergedConfig);
 
         self::assertEquals(
-            ['fields' => ['field1' => [], 'field2' => []]],
+            $mergedConfig,
             $this->combinedConfigBag->getConfig($className, $version)
         );
         // test that data is cached in memory
         self::assertEquals(
-            ['fields' => ['field1' => [], 'field2' => []]],
+            $mergedConfig,
             $this->combinedConfigBag->getConfig($className, $version)
         );
     }
@@ -164,6 +167,7 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Class1';
         $version = '1.2';
+        $config = ['fields' => ['field1' => []]];
 
         $this->configBag1->expects(self::exactly(2))
             ->method('getConfig')
@@ -172,25 +176,25 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->configBag2->expects(self::exactly(2))
             ->method('getConfig')
             ->with($className, $version)
-            ->willReturn(['fields' => ['field1' => []]]);
+            ->willReturn($config);
         $this->entityConfigMerger->expects(self::never())
             ->method('merge');
         $this->configBag1->expects(self::once())
             ->method('reset');
 
         self::assertEquals(
-            ['fields' => ['field1' => []]],
+            $config,
             $this->combinedConfigBag->getConfig($className, $version)
         );
         // test that data is cached in memory
         self::assertEquals(
-            ['fields' => ['field1' => []]],
+            $config,
             $this->combinedConfigBag->getConfig($className, $version)
         );
 
         $this->combinedConfigBag->reset();
         self::assertEquals(
-            ['fields' => ['field1' => []]],
+            $config,
             $this->combinedConfigBag->getConfig($className, $version)
         );
     }
