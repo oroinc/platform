@@ -107,6 +107,7 @@ class FormHelper
      * Adds a field to the given form.
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function addFormField(
         FormBuilderInterface $formBuilder,
@@ -118,20 +119,27 @@ class FormHelper
     ): FormBuilderInterface {
         $formType = $fieldConfig->getFormType();
         /**
-         * Ignore configured form options for associations that are represented as fields
-         * to avoid collisions between configured and guessed form options.
+         * Ignore configured form options (except "property_path" and "mapped" options) for associations
+         * that are represented as fields to avoid collisions between configured and guessed form options.
          * For these associations the options merging is performed by form type guessers.
          * @see \Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser::getTypeGuessForArrayAssociation
          * @see \Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser::getTypeGuessForCollapsedArrayAssociation
          */
         $configuredOptions = $this->getFormFieldOptions($fieldMetadata, $fieldConfig);
-        if ($configuredOptions
-            && (
-                null !== $formType
-                || !DataType::isAssociationAsField($fieldConfig->getDataType())
-                || false === ($configuredOptions['mapped'] ?? true)
-            )) {
-            $options = array_replace($options, $configuredOptions);
+        if ($configuredOptions) {
+            if (null !== $formType || !DataType::isAssociationAsField($fieldConfig->getDataType())) {
+                $options = array_replace($options, $configuredOptions);
+            }
+            if (!\array_key_exists('property_path', $options)
+                && \array_key_exists('property_path', $configuredOptions)
+            ) {
+                $options['property_path'] = $configuredOptions['property_path'];
+            }
+            if (!\array_key_exists('mapped', $options)
+                && \array_key_exists('mapped', $configuredOptions)
+            ) {
+                $options['mapped'] = $configuredOptions['mapped'];
+            }
         }
         if (null === $formType && $allowGuessType) {
             $dataType = $fieldMetadata->getDataType();
