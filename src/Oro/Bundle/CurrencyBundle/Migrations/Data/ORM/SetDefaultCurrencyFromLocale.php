@@ -21,9 +21,6 @@ class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerA
      */
     public function load(ObjectManager $manager)
     {
-        if (!$this->container->hasParameter('currency')) {
-            return;
-        }
         /** @var ConfigManager $configManager */
         $configManager = $this->container->get('oro_config.global');
         $currencyConfigKey = CurrencyConfig::getConfigKeyByName(CurrencyConfig::KEY_DEFAULT_CURRENCY);
@@ -40,6 +37,10 @@ class SetDefaultCurrencyFromLocale extends AbstractFixture implements ContainerA
 
     protected function getDefaultCurrency(): string
     {
-        return $this->container->getParameter('currency');
+        if ($this->container->hasParameter('currency')) {
+            return $this->container->getParameter('currency');
+        }
+
+        return CurrencyConfig::DEFAULT_CURRENCY;
     }
 }
