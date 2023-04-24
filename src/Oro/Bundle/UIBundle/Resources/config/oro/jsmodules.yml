@@ -51,7 +51,7 @@ aliases:
     scriptjs$: scriptjs/dist/script
     slick$: '@oroinc/slick-carousel/slick/slick'
     styled-scroll-bar$: oroui/js/app/plugins/styled-scroll-bar
-    underscore$: underscore/underscore
+    underscore$: underscore/underscore.js
 app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/color-util
