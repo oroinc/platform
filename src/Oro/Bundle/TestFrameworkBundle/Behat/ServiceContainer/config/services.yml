@@ -174,3 +174,6 @@ services:
 
     oro_test.storage.failed_features:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Storage\FailedFeatures
+
+    nelmio_alice.generator.resolver.value.chainable.fixture_reference_resolver:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceFixtureReferenceResolver

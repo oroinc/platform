@@ -88,6 +88,7 @@ services:
       - '@fob_symfony.kernel'
       - '@oro_test.context.fixture_loader'
       - '@oro_test.alice_loader'
+      - '@nelmio_alice.generator.resolver.value.chainable.fixture_reference_resolver'
     tags:
       - { name: 'oro_behat.isolator', priority: 300 }
 
