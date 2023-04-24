@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\RestrictFlushInitializerListener;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceFixtureReferenceResolver;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -26,29 +27,15 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class DoctrineIsolator implements IsolatorInterface
 {
-    /** @var KernelInterface */
-    protected $kernel;
-
-    /** @var FixtureLoader */
-    protected $fixtureLoader;
-
     /** @var ReferenceRepositoryInitializerInterface[] */
     protected $initializers = [];
 
-    /** @var AliceFixtureLoader */
-    protected $aliceLoader;
-
-    /** @var array */
-    protected $requiredListeners = [];
-
     public function __construct(
-        KernelInterface $kernel,
-        FixtureLoader $fixtureLoader,
-        AliceFixtureLoader $aliceLoader
+        protected KernelInterface $kernel,
+        protected FixtureLoader $fixtureLoader,
+        protected AliceFixtureLoader $aliceLoader,
+        protected AliceFixtureReferenceResolver $fixtureReferenceResolver
     ) {
-        $this->kernel = $kernel;
-        $this->fixtureLoader = $fixtureLoader;
-        $this->aliceLoader = $aliceLoader;
     }
 
     public function addInitializer(ReferenceRepositoryInitializerInterface $initializer)
@@ -126,6 +113,7 @@ class DoctrineIsolator implements IsolatorInterface
     {
         $this->kernel->getContainer()->get('doctrine')->getManager()->clear();
         $this->kernel->getContainer()->get('doctrine')->resetManager();
+        $this->clearAliceIncompleteObjectsState();
     }
 
     /**
@@ -210,5 +198,13 @@ class DoctrineIsolator implements IsolatorInterface
             }
         }
         usleep(300000);
+    }
+
+    private function clearAliceIncompleteObjectsState()
+    {
+        $this->fixtureReferenceResolver->clear();
+        foreach ($this->fixtureReferenceResolver->getInstances() as $resolver) {
+            $resolver->clear();
+        }
     }
 }
