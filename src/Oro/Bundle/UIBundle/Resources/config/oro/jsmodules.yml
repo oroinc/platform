@@ -50,7 +50,7 @@ aliases:
     popper-utils$: popper.js/dist/popper-utils
     scriptjs$: scriptjs/dist/script
     styled-scroll-bar$: oroui/js/app/plugins/styled-scroll-bar
-    underscore$: underscore/underscore
+    underscore$: underscore/underscore.js
     slick$: slick-carousel/slick/slick
 app-modules:
     - oroui/js/app/modules/ajax-error-module
