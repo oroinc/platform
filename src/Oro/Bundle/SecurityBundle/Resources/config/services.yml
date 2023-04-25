@@ -866,3 +866,11 @@ services:
     # The fallback for the backward compatibility
     snc_redis.session.handler:
         alias: oro.session_handler
+
+    oro_security.authentication.failure_handler:
+        parent: security.authentication.failure_handler
+        class: Oro\Bundle\SecurityBundle\Authentication\Handler\DefaultAuthenticationFailureHandler
+
+    oro_security.authentication.success_handler:
+        parent: security.authentication.success_handler
+        class: Oro\Bundle\SecurityBundle\Authentication\Handler\DefaultAuthenticationSuccessHandler
