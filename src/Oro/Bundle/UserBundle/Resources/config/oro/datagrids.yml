@@ -808,10 +808,11 @@ datagrids:
         acl_resource: oro_view_user_login_attempt
         source:
             type: orm
+#            id in user loing attempt is in type of uuid.
             query:
                 select:
                     - partial ul.{ id }
-                    - ul.id
+                    - CAST(ul.id as string) as ulId
                     - ul.attemptAt
                     - ul.success
                     - ul.source
@@ -875,7 +876,7 @@ datagrids:
             columns:
                 id:
                     type: string
-                    data_name: ul.id
+                    data_name: ulId
                 success:
                     data_name: ul.success
                     type: boolean
