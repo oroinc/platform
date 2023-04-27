@@ -69,20 +69,11 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string|null $from
-     * @param float|string $to
-     * @param int|null $scale
-     * @param bool|null $grouping
-     * @param int|null $roundingMode
-     * @param string|null $locale
-     * @param string $decimalSeparator
-     * @param string $groupingSeparator
-     *
      * @dataProvider reverseTransformDataProvider
      */
     public function testReverseTransform(
         ?string $from,
-        $to,
+        string|float|null $to,
         int $scale = null,
         ?bool $grouping = false,
         ?int $roundingMode = NumberToLocalizedStringTransformer::ROUND_HALF_UP,
@@ -98,8 +89,6 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnOnConsecutiveCalls($decimalSeparator, $groupingSeparator);
 
-        \Locale::setDefault($locale);
-
         $transformer = new NumberToLocalizedStringTransformer(
             $this->numberFormatter,
             $scale,
@@ -107,7 +96,16 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
             $roundingMode,
             $locale
         );
-        self::assertSame($to, $transformer->reverseTransform($from));
+
+        $defaultLocale = \Locale::getDefault();
+        \Locale::setDefault($locale);
+        try {
+            $result = $transformer->reverseTransform($from);
+        } finally {
+            \Locale::setDefault($defaultLocale);
+        }
+
+        self::assertSame($to, $result);
     }
 
     public function reverseTransformDataProvider(): array
