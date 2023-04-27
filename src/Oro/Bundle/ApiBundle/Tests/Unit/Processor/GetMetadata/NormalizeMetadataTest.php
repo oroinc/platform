@@ -506,7 +506,78 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessRenamedLinkedProperty()
+    public function testProcessRenamedLinkedPropertyWhenItIsField()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'linkedField1' => [
+                    'property_path' => 'realAssociation1.realField11'
+                ],
+                'association1'       => [
+                    'exclude'       => true,
+                    'property_path' => 'realAssociation1',
+                    'target_class'  => 'Test\AssociationTarget',
+                    'fields'        => [
+                        'field11' => [
+                            'property_path' => 'realField11'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $configObject = $this->createConfigObject($config);
+
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
+        $metadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                'Test\Association1Target',
+                'manyToOne',
+                false,
+                'integer',
+                ['Test\Association1Target']
+            )
+        );
+
+        $association1TargetMetadata = new EntityMetadata('Test\Association11Target');
+        $field11Metadata = $this->createFieldMetadata('field11', 'integer');
+        $field11Metadata->setPropertyPath('realField11');
+        $association1TargetMetadata->addField($field11Metadata);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                'Test\AssociationTarget',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $configObject->getField('association1')->getTargetEntity(),
+                $this->context->getExtras(),
+                false
+            )
+            ->willReturn($association1TargetMetadata);
+
+        $this->context->setConfig($configObject);
+        $this->context->setResult($metadata);
+        $this->processor->process($this->context);
+
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
+        $expectedLinkedField1 = $this->createFieldMetadata('linkedField1', 'integer');
+        $expectedLinkedField1->setIsNullable(false);
+        $expectedMetadata->addField($expectedLinkedField1);
+
+        self::assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessRenamedLinkedPropertyWhenItIsAssociation()
     {
         $config = [
             'exclusion_policy' => 'all',
