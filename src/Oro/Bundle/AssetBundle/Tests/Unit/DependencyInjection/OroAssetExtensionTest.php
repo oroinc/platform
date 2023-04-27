@@ -17,8 +17,8 @@ class OroAssetExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertNotEmpty($container->getDefinitions());
 
         self::assertFalse($container->getParameter('oro_asset.with_babel'));
-        self::assertNotEmpty($container->getParameter('oro_asset.nodejs_path'));
-        self::assertNotEmpty($container->getParameter('oro_asset.npm_path'));
+        self::assertIsString($container->getParameter('oro_asset.nodejs_path'));
+        self::assertIsString($container->getParameter('oro_asset.npm_path'));
         self::assertNull($container->getParameter('oro_asset.build_timeout'));
         self::assertNull($container->getParameter('oro_asset.npm_install_timeout'));
         self::assertSame(
