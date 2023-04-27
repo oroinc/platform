@@ -12,9 +12,6 @@
     <rule ref="Generic.Commenting.Todo">
         <type>error</type>
     </rule>
-    <rule ref="Oro.Commenting.Deprecated">
-        <type>error</type>
-    </rule>
     <exclude-pattern>*/Acme/*</exclude-pattern>
     <exclude-pattern>*/doctrine-em-loader.php</exclude-pattern>
 </ruleset>
