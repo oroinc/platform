@@ -110,6 +110,7 @@ define([
             $.ajax({
                 url: options.layoutSubtreeUrl || this.url,
                 type: this.method,
+                global: options.global ?? true,
                 data: {
                     layout_block_ids: eventBlockIds
                 }

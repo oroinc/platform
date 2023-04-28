@@ -93,8 +93,12 @@ define(function(require) {
                 const popperReference = this.getPopperReferenceElement();
 
                 this.scrollParent = getScrollParent(popperReference[0]);
-                const boundariesElement =
-                    document.querySelector(this.$el.attr('data-boundaries-element')) || 'window';
+                const boundariesElementSelector = this.$el.attr('data-boundaries-element');
+                let boundariesElement = 'window';
+
+                if (typeof boundariesElementSelector === 'string' && boundariesElementSelector.length) {
+                    boundariesElement = this.$el.parents(boundariesElementSelector).last()[0];
+                }
 
                 this.popper = new Popper(popperReference, messageEl, {
                     placement: _.isRTL() ? 'top-end' : 'top-start',

@@ -469,6 +469,11 @@ define(function(require, exports, module) {
 
         _renderExtraHeaderContent() {
             if (this.$extraHeaderContainer && this.$extraHeaderContainer.length) {
+                const $content = this.$el.find('[data-dialog-extra-header-content]');
+
+                if ($content.length) {
+                    this.$extraHeaderContainer.html('');
+                }
                 this.$el.find('[data-dialog-extra-header-content]').appendTo(this.$extraHeaderContainer);
             }
         },

@@ -418,7 +418,13 @@ define(function(require) {
          * @private
          */
         _appendActionElement: function(sectionContainer, actionElement) {
-            sectionContainer.append($(this.options.actionWrapperTemplate()).append(actionElement));
+            let content = actionElement;
+
+            if (typeof this.options.actionWrapperTemplate === 'function') {
+                content = $(this.options.actionWrapperTemplate()).append(content);
+            }
+
+            sectionContainer.append(content);
         },
 
         /**
