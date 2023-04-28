@@ -1,8 +1,10 @@
 /* global gapi */
+/* global google */
 define(function(require) {
     'use strict';
 
     const scriptjs = require('scriptjs');
+    const routing = require('routing');
     const BaseComponent = require('oroui/js/app/components/base/component');
     const GoogleSyncCheckboxView = require('oroimap/js/app/views/google-sync-checkbox-view');
 
@@ -36,18 +38,32 @@ define(function(require) {
                 googleWarningMessage: options.googleWarningMessage
             });
 
-            scriptjs('//apis.google.com/js/client.js?onload=checkAuth', function() {
+            scriptjs('//accounts.google.com/gsi/client', function() {
                 this.listenTo(this.view, 'requestToken', this.requestToken);
             }.bind(this));
+
+            scriptjs('//apis.google.com/js/api.js', function() {
+                gapi.load('client', function() {
+                    gapi.client.init({});
+                });
+            });
         },
 
         requestToken: function() {
-            gapi.auth.authorize(
-                {
-                    client_id: this.$clientIdElement.val(),
-                    scope: this.scopes.join(' '),
-                    immediate: false
-                }, this.checkAuthorization.bind(this));
+            const client = google.accounts.oauth2.initTokenClient({
+                client_id: this.$clientIdElement.val(),
+                scope: this.scopes.join(' '),
+                redirect_uri: routing.generate('oro_google_integration_sso_login_google', {}, true),
+                callback: ''
+            });
+            client.callback = async resp => {
+                if (resp.error !== undefined) {
+                    throw (resp);
+                }
+                this.checkAuthorization(resp.access_token);
+            };
+
+            client.requestAccessToken();
         },
 
         checkAuthorization: function(result) {

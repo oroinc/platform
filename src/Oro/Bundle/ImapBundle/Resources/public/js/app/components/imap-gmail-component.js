@@ -1,8 +1,9 @@
-/* global gapi */
+/* global google */
 define(function(require) {
     'use strict';
 
     const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
     const ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
     const BaseImapComponent = require('oroimap/js/app/components/imap-component');
 
@@ -16,7 +17,7 @@ define(function(require) {
         type: 'gmail',
 
         /** @property {String|Null} */
-        scriptPath: '//apis.google.com/js/client.js?onload=checkAuth',
+        scriptPath: '//accounts.google.com/gsi/client',
 
         /** @property {Object} */
         errorsMessages: {
@@ -56,34 +57,35 @@ define(function(require) {
             const args = {};
 
             this._wrapFirstWindowOpen(args);
-            args.deferred = gapi.auth.authorize(
-                {
-                    client_id: data.clientId,
-                    scope: this.scopes.join(' '),
-                    immediate: false,
-                    login_hint: emailAddress,
-                    access_type: 'offline',
-                    response_type: 'code',
-                    approval_prompt: 'force'
-                },
-                this.handleResponseAuthCode.bind(this)
-            ).then(
-                null,
-                function(reason) {
-                    if (null === reason) {
-                        // do not show the flash message if there is not rejection reason
-                        // usually this happens when all goes ok and the callback function is called,
-                        // so, any problems are handled by this callback (see handleResponseAuthCode)
-                        // e.g. we do not need the flash message if an user clicks "Deny" button
-                        return;
-                    }
+
+            const client = google.accounts.oauth2.initCodeClient({
+                client_id: data.clientId,
+                scope: this.scopes.join(' '),
+                redirect_uri: routing.generate('oro_google_integration_sso_login_google', {}, true),
+                ux_mode: 'popup',
+                immediate: false,
+                login_hint: emailAddress,
+                access_type: 'offline',
+                approval_prompt: 'force',
+                callback: ''
+            });
+
+            client.callback = async resp => {
+                if (resp.error !== undefined && null !== resp.reason) {
+                    // do not show the flash message if there is no rejection reason
+                    // usually this happens when all goes ok and the callback function is called,
+                    // so, any problems are handled by this callback (see handleResponseAuthCode)
+                    // e.g. we do not need the flash message if a user clicks "Deny" button
                     mediator.execute(
                         'showFlashMessage',
                         'error',
                         this.getErrorMessage('closed_auth')
                     );
-                }.bind(this)
-            );
+                }
+                this.handleResponseAuthCode(resp);
+            };
+
+            args.deferred = client.requestCode();
         },
 
         /**
