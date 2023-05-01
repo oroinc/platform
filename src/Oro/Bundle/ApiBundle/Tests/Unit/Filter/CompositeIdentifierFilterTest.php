@@ -16,7 +16,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerRegistry */
+    /** @var EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $entityIdTransformerRegistry;
 
     /** @var CompositeIdentifierFilter */
@@ -48,7 +48,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
     public function testApplyFilterForNullIdentifier()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The composite identifier value must not be NULL.');
+        $this->expectExceptionMessage('The value must not be NULL.');
 
         $filterValue = new FilterValue('id', null);
         $requestType = new RequestType([RequestType::REST]);
@@ -64,7 +64,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
     public function testApplyFilterForUnsupportedOperator()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The operator ">" is not supported for composite identifier.');
+        $this->expectExceptionMessage('The operator ">" is not supported.');
 
         $filterValue = new FilterValue('id', 'id1=1;renamedId2=2', '>');
         $requestType = new RequestType([RequestType::REST]);
