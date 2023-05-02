@@ -118,7 +118,7 @@ class LoadFromConfigBag implements ProcessorInterface
             } else {
                 $config = array_pop($configs);
                 while (!empty($configs)) {
-                    $config = $this->mergeConfigs(array_pop($configs), $config);
+                    $config = $this->entityConfigMerger->merge(array_pop($configs), $config);
                 }
             }
         }
@@ -217,11 +217,6 @@ class LoadFromConfigBag implements ProcessorInterface
                 $this->loadConfigObject(ConfigUtil::DEFINITION, $config)
             );
         }
-    }
-
-    private function mergeConfigs(array $config, array $parentConfig): array
-    {
-        return $this->entityConfigMerger->merge($config, $parentConfig);
     }
 
     private function loadConfigObject(string $configType, array $config): object

@@ -69,6 +69,6 @@ class VirtualReflectionMethod extends \ReflectionMethod
             return parent::invokeArgs($object, $args);
         }
 
-        return $object->{$this->getName()}($args);
+        return $object->{$this->getName()}(...$args);
     }
 }

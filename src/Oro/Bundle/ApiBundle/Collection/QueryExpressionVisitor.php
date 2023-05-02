@@ -282,7 +282,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
                 $this,
                 $field,
                 $expression,
-                $this->getParameterName($comparison->getField()),
+                $this->getParameterName($field),
                 $this->walkValue($comparison->getValue())
             );
         $this->fieldDataType = null;
@@ -300,14 +300,22 @@ class QueryExpressionVisitor extends ExpressionVisitor
 
     private function getField(string $field): string
     {
-        foreach ($this->queryAliases as $alias) {
-            if ($field !== $alias && str_starts_with($field . '.', $alias . '.')) {
-                return $field;
-            }
-        }
-
         if ($field) {
-            $field = $this->getRootAlias() . '.' . $field;
+            if (str_contains($field, '.')) {
+                foreach ($this->queryAliases as $alias) {
+                    if ($field !== $alias && str_starts_with($field . '.', $alias . '.')) {
+                        return $field;
+                    }
+                }
+            }
+            if (str_starts_with($field, Criteria::PLACEHOLDER_START)
+                && str_ends_with($field, Criteria::PLACEHOLDER_END)
+            ) {
+                // it is a computed field that does not related to any join or a root entity
+                $field = substr($field, 1, -1);
+            } else {
+                $field = $this->getRootAlias() . '.' . $field;
+            }
         }
 
         return $field;

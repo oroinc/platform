@@ -63,12 +63,12 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         $this->aclHelper = $this->createMock(AclHelper::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager->expects(self::any())
             ->method('getRepository')
             ->willReturnMap([
-                ['OroDashboardBundle:Dashboard', $this->dashboardRepository],
-                ['OroDashboardBundle:Widget', $this->widgetRepository],
-                ['OroDashboardBundle:ActiveDashboard', $this->activeDashboardRepository],
+                [Dashboard::class, $this->dashboardRepository],
+                [Widget::class, $this->widgetRepository],
+                [ActiveDashboard::class, $this->activeDashboardRepository],
             ]);
 
         $this->manager = new Manager(
@@ -79,39 +79,39 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFindDashboardModel()
+    public function testFindDashboardModel(): void
     {
         $id = 100;
 
         $dashboard = $this->createMock(Dashboard::class);
         $dashboardModel = $this->createMock(DashboardModel::class);
 
-        $this->dashboardRepository->expects($this->once())
+        $this->dashboardRepository->expects(self::once())
             ->method('find')
             ->with($id)
             ->willReturn($dashboard);
 
-        $this->factory->expects($this->once())
+        $this->factory->expects(self::once())
             ->method('createDashboardModel')
             ->with($dashboard)
             ->willReturn($dashboardModel);
 
-        $this->assertEquals($dashboardModel, $this->manager->findDashboardModel($id));
+        self::assertEquals($dashboardModel, $this->manager->findDashboardModel($id));
     }
 
-    public function testFindDashboardModelEmpty()
+    public function testFindDashboardModelEmpty(): void
     {
         $id = 100;
 
-        $this->dashboardRepository->expects($this->once())
+        $this->dashboardRepository->expects(self::once())
             ->method('find')
             ->with($id)
             ->willReturn(null);
 
-        $this->assertNull($this->manager->findDashboardModel($id));
+        self::assertNull($this->manager->findDashboardModel($id));
     }
 
-    public function testFindOneDashboardModelBy()
+    public function testFindOneDashboardModelBy(): void
     {
         $criteria = ['label' => 'Foo'];
         $orderBy = ['label' => 'ASC'];
@@ -119,91 +119,91 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         $dashboard = $this->createMock(Dashboard::class);
         $dashboardModel = $this->createMock(DashboardModel::class);
 
-        $this->dashboardRepository->expects($this->once())
+        $this->dashboardRepository->expects(self::once())
             ->method('findOneBy')
             ->with($criteria, $orderBy)
             ->willReturn($dashboard);
 
-        $this->factory->expects($this->once())
+        $this->factory->expects(self::once())
             ->method('createDashboardModel')
             ->with($dashboard)
             ->willReturn($dashboardModel);
 
-        $this->assertEquals($dashboardModel, $this->manager->findOneDashboardModelBy($criteria, $orderBy));
+        self::assertEquals($dashboardModel, $this->manager->findOneDashboardModelBy($criteria, $orderBy));
     }
 
-    public function testFindOneDashboardModelByEmpty()
+    public function testFindOneDashboardModelByEmpty(): void
     {
         $criteria = ['label' => 'Foo'];
         $orderBy = ['label' => 'ASC'];
 
-        $this->dashboardRepository->expects($this->once())
+        $this->dashboardRepository->expects(self::once())
             ->method('findOneBy')
             ->with($criteria, $orderBy)
             ->willReturn(null);
 
-        $this->assertNull($this->manager->findOneDashboardModelBy($criteria, $orderBy));
+        self::assertNull($this->manager->findOneDashboardModelBy($criteria, $orderBy));
     }
 
-    public function testFindWidgetModel()
+    public function testFindWidgetModel(): void
     {
         $id = 100;
 
         $widget = $this->createMock(Widget::class);
         $widgetModel = $this->createMock(WidgetModel::class);
 
-        $this->widgetRepository->expects($this->once())
+        $this->widgetRepository->expects(self::once())
             ->method('find')
             ->with($id)
             ->willReturn($widget);
 
-        $this->factory->expects($this->once())
+        $this->factory->expects(self::once())
             ->method('createWidgetModel')
             ->with($widget)
             ->willReturn($widgetModel);
 
-        $this->assertEquals($widgetModel, $this->manager->findWidgetModel($id));
+        self::assertEquals($widgetModel, $this->manager->findWidgetModel($id));
     }
 
-    public function testFindWidgetModelEmpty()
+    public function testFindWidgetModelEmpty(): void
     {
         $id = 100;
 
-        $this->widgetRepository->expects($this->once())
+        $this->widgetRepository->expects(self::once())
             ->method('find')
             ->with($id)
             ->willReturn(null);
 
-        $this->assertNull($this->manager->findWidgetModel($id));
+        self::assertNull($this->manager->findWidgetModel($id));
     }
 
-    public function testGetDashboardModel()
+    public function testGetDashboardModel(): void
     {
         $dashboard = $this->createMock(Dashboard::class);
         $dashboardModel = $this->createMock(DashboardModel::class);
 
-        $this->factory->expects($this->once())
+        $this->factory->expects(self::once())
             ->method('createDashboardModel')
             ->with($dashboard)
             ->willReturn($dashboardModel);
 
-        $this->assertEquals($dashboardModel, $this->manager->getDashboardModel($dashboard));
+        self::assertEquals($dashboardModel, $this->manager->getDashboardModel($dashboard));
     }
 
-    public function testGetWidgetModel()
+    public function testGetWidgetModel(): void
     {
         $widget = $this->createMock(Widget::class);
         $widgetModel = $this->createMock(WidgetModel::class);
 
-        $this->factory->expects($this->once())
+        $this->factory->expects(self::once())
             ->method('createWidgetModel')
             ->with($widget)
             ->willReturn($widgetModel);
 
-        $this->assertEquals($widgetModel, $this->manager->getWidgetModel($widget));
+        self::assertEquals($widgetModel, $this->manager->getWidgetModel($widget));
     }
 
-    public function testGetDashboardModels()
+    public function testGetDashboardModels(): void
     {
         /** @var Dashboard[]|\PHPUnit\Framework\MockObject\MockObject[] $entities */
         $entities = [
@@ -216,52 +216,41 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             $this->createMock(DashboardModel::class)
         ];
 
-        $this->factory->expects($this->exactly(2))
+        $this->factory->expects(self::exactly(2))
             ->method('createDashboardModel')
             ->willReturnMap([
                 [$entities[0], $dashboardModels[0]],
                 [$entities[1], $dashboardModels[1]]
             ]);
 
-        $this->assertEquals($dashboardModels, $this->manager->getDashboardModels($entities));
+        self::assertEquals($dashboardModels, $this->manager->getDashboardModels($entities));
     }
 
-    public function testCreateDashboardModel()
+    public function testCreateDashboardModel(): void
     {
-        $organization = new Organization();
         $dashboardModel = $this->createMock(DashboardModel::class);
 
-        $token = $this->createMock(UsernamePasswordOrganizationToken::class);
-
-        $this->factory->expects($this->once())
+        $this->factory->expects(self::once())
             ->method('createDashboardModel')
             ->with($this->isInstanceOf(Dashboard::class))
             ->willReturn($dashboardModel);
 
-        $this->tokenStorage->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
-
-        $token->expects($this->once())
-            ->method('getOrganization')
-            ->willReturn($organization);
-
-        $this->assertEquals($dashboardModel, $this->manager->createDashboardModel());
+        self::assertEquals($dashboardModel, $this->manager->createDashboardModel());
     }
 
-    public function testCreateWidgetModel()
+    public function testCreateWidgetModel(): void
     {
         $widgetName = 'test';
 
         $widgetModel = $this->createMock(WidgetModel::class);
 
-        $this->factory->expects($this->once())
+        $this->factory->expects(self::once())
             ->method('createWidgetModel')
             ->with(
                 $this->callback(
                     function ($entity) use ($widgetName) {
                         $this->assertInstanceOf(Widget::class, $entity);
-                        $this->assertEquals($widgetName, $entity->getName());
+                        self::assertEquals($widgetName, $entity->getName());
 
                         return true;
                     }
@@ -269,94 +258,93 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($widgetModel);
 
-        $this->assertEquals($widgetModel, $this->manager->createWidgetModel($widgetName));
+        self::assertEquals($widgetModel, $this->manager->createWidgetModel($widgetName));
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $widgetEntity = $this->createMock(Widget::class);
         $widgetModel = $this->createMock(EntityModelInterface::class);
-        $widgetModel->expects($this->once())
+        $widgetModel->expects(self::once())
             ->method('getEntity')
             ->willReturn($widgetEntity);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('persist')
             ->with($widgetEntity);
 
-        $this->entityManager->expects($this->never())
+        $this->entityManager->expects(self::never())
             ->method('flush');
 
         $this->manager->save($widgetModel);
     }
 
-    public function testSaveWithFlush()
+    public function testSaveWithFlush(): void
     {
         $widgetEntity = $this->createMock(Widget::class);
         $widgetModel = $this->createMock(EntityModelInterface::class);
-        $widgetModel->expects($this->exactly(2))
+        $widgetModel->expects(self::exactly(2))
             ->method('getEntity')
             ->willReturn($widgetEntity);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('persist')
             ->with($widgetEntity);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('flush')
             ->with($widgetEntity);
 
         $this->manager->save($widgetModel, true);
     }
 
-    public function testSaveDashboardWithoutCopyEmptyStartDashboard()
+    public function testSaveDashboardWithoutCopyEmptyStartDashboard(): void
     {
         $dashboardModel = $this->createMock(DashboardModel::class);
-
         $dashboardEntity = $this->createMock(Dashboard::class);
 
-        $dashboardModel->expects($this->once())
+        $dashboardModel->expects(self::once())
             ->method('getStartDashboard')
             ->willReturn(null);
 
-        $dashboardModel->expects($this->once())
+        $dashboardModel->expects(self::once())
             ->method('getEntity')
             ->willReturn($dashboardEntity);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('persist')
             ->with($dashboardEntity);
 
-        $this->manager->save($dashboardModel, false);
+        $this->manager->save($dashboardModel);
     }
 
-    public function testSaveDashboardWithoutCopyNotNew()
+    public function testSaveDashboardWithoutCopyNotNew(): void
     {
         $dashboardModel = $this->createMock(DashboardModel::class);
 
         $startDashboardEntity = $this->createMock(Dashboard::class);
         $dashboardEntity = $this->createMock(Dashboard::class);
 
-        $dashboardModel->expects($this->once())
+        $dashboardModel->expects(self::once())
             ->method('getStartDashboard')
             ->willReturn($startDashboardEntity);
 
-        $dashboardModel->expects($this->once())
+        $dashboardModel->expects(self::once())
             ->method('getId')
             ->willReturn(1);
 
-        $dashboardModel->expects($this->once())
+        $dashboardModel->expects(self::once())
             ->method('getEntity')
             ->willReturn($dashboardEntity);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('persist')
             ->with($dashboardEntity);
 
-        $this->manager->save($dashboardModel, false);
+        $this->manager->save($dashboardModel);
     }
 
-    public function testSaveDashboardWithCopy()
+    public function testSaveDashboardWithCopy(): void
     {
         $dashboardModel = $this->createMock(DashboardModel::class);
 
@@ -383,15 +371,15 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ['layoutPosition' => [1, 0], 'name' => 'bar'],
         ];
 
-        $dashboardModel->expects($this->exactly(2))
+        $dashboardModel->expects(self::exactly(2))
             ->method('getStartDashboard')
             ->willReturn($startDashboardEntity);
 
-        $dashboardModel->expects($this->once())
+        $dashboardModel->expects(self::once())
             ->method('getId')
             ->willReturn(null);
 
-        $startDashboardEntity->expects($this->once())
+        $startDashboardEntity->expects(self::once())
             ->method('getWidgets')
             ->willReturn($startDashboardWidgets);
 
@@ -400,63 +388,63 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         foreach ($startDashboardWidgets as $index => $widget) {
             $expectedData = $expectedCopyWidgetsData[$index];
 
-            $widget->expects($this->once())
+            $widget->expects(self::once())
                 ->method('getLayoutPosition')
                 ->willReturn($expectedData['layoutPosition']);
-            $widget->expects($this->once())
+            $widget->expects(self::once())
                 ->method('getName')
                 ->willReturn($expectedData['name']);
-            $widget->expects($this->once())
+            $widget->expects(self::once())
                 ->method('getOptions')
                 ->willReturn([]);
 
             $widgetModel = $copyWidgetModels[$index];
-            $widgetModel->expects($this->once())
+            $widgetModel->expects(self::once())
                 ->method('getEntity')
                 ->willReturn($copyWidgets[$index]);
 
             $widgetModelReturnCallbacks[] = new ReturnCallback(function ($entity) use ($expectedData, $widgetModel) {
                 $this->assertInstanceOf(Widget::class, $entity);
-                $this->assertEquals($expectedData['layoutPosition'], $entity->getLayoutPosition());
-                $this->assertEquals($expectedData['name'], $entity->getName());
+                self::assertEquals($expectedData['layoutPosition'], $entity->getLayoutPosition());
+                self::assertEquals($expectedData['name'], $entity->getName());
 
                 return $widgetModel;
             });
 
             $persists[] = [$copyWidgets[$index]];
         }
-        $this->factory->expects($this->exactly(count($widgetModelReturnCallbacks)))
+        $this->factory->expects(self::exactly(count($widgetModelReturnCallbacks)))
             ->method('createWidgetModel')
             ->willReturnOnConsecutiveCalls(...$widgetModelReturnCallbacks);
 
         $persists[] = [$dashboardEntity];
-        $this->entityManager->expects($this->exactly(count($persists)))
+        $this->entityManager->expects(self::exactly(count($persists)))
             ->method('persist')
             ->withConsecutive(...$persists);
 
-        $dashboardModel->expects($this->once())
+        $dashboardModel->expects(self::once())
             ->method('getEntity')
             ->willReturn($dashboardEntity);
 
         $this->manager->save($dashboardModel);
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $widgetEntity = $this->createMock(Widget::class);
         $widgetModel = $this->createMock(EntityModelInterface::class);
-        $widgetModel->expects($this->once())
+        $widgetModel->expects(self::once())
             ->method('getEntity')
             ->willReturn($widgetEntity);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('remove')
             ->with($widgetEntity);
 
         $this->manager->remove($widgetModel);
     }
 
-    public function testFindUserActiveDashboard()
+    public function testFindUserActiveDashboard(): void
     {
         $organization = $this->createMock(Organization::class);
         $user = $this->createMock(User::class);
@@ -466,61 +454,61 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
 
         $token = $this->createMock(UsernamePasswordOrganizationToken::class);
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 
-        $token->expects($this->once())
+        $token->expects(self::once())
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->activeDashboardRepository->expects($this->once())
+        $this->activeDashboardRepository->expects(self::once())
             ->method('findOneBy')
             ->with(['user' => $user, 'organization' => $organization])
             ->willReturn($activeDashboardEntity);
 
-        $activeDashboardEntity->expects($this->once())
+        $activeDashboardEntity->expects(self::once())
             ->method('getDashboard')
             ->willReturn($dashboardEntity);
 
-        $this->factory->expects($this->once())
+        $this->factory->expects(self::once())
             ->method('createDashboardModel')
             ->with($dashboardEntity)
             ->willReturn($dashboardModel);
 
-        $this->assertEquals(
+        self::assertEquals(
             $dashboardModel,
             $this->manager->findUserActiveDashboard($user)
         );
     }
 
-    public function testFindUserActiveDashboardEmpty()
+    public function testFindUserActiveDashboardEmpty(): void
     {
         $organization = $this->createMock(Organization::class);
         $user = $this->createMock(User::class);
 
         $token = $this->createMock(UsernamePasswordOrganizationToken::class);
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 
-        $token->expects($this->once())
+        $token->expects(self::once())
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->activeDashboardRepository->expects($this->once())
+        $this->activeDashboardRepository->expects(self::once())
             ->method('findOneBy')
             ->with(['user' => $user, 'organization' => $organization])
             ->willReturn(null);
 
-        $this->factory->expects($this->never())
-            ->method($this->anything());
+        $this->factory->expects(self::never())
+            ->method(self::anything());
 
-        $this->assertNull($this->manager->findUserActiveDashboard($user));
+        self::assertNull($this->manager->findUserActiveDashboard($user));
     }
 
-    public function testFindDefaultDashboard()
+    public function testFindDefaultDashboard(): void
     {
         $organization = new Organization();
         $dashboardEntity = $this->createMock(Dashboard::class);
@@ -528,54 +516,54 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
 
         $token = $this->createMock(UsernamePasswordOrganizationToken::class);
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 
-        $token->expects($this->once())
+        $token->expects(self::once())
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->dashboardRepository->expects($this->once())
+        $this->dashboardRepository->expects(self::once())
             ->method('findDefaultDashboard')
             ->with($organization)
             ->willReturn($dashboardEntity);
 
-        $this->factory->expects($this->once())
+        $this->factory->expects(self::once())
             ->method('createDashboardModel')
             ->with($dashboardEntity)
             ->willReturn($dashboardModel);
 
-        $this->assertEquals(
+        self::assertEquals(
             $dashboardModel,
             $this->manager->findDefaultDashboard()
         );
     }
 
-    public function testFindDefaultDashboardEmpty()
+    public function testFindDefaultDashboardEmpty(): void
     {
         $organization = new Organization();
         $token = $this->createMock(UsernamePasswordOrganizationToken::class);
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 
-        $token->expects($this->once())
+        $token->expects(self::once())
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->dashboardRepository->expects($this->once())
+        $this->dashboardRepository->expects(self::once())
             ->method('findDefaultDashboard')
             ->willReturn(null);
 
-        $this->factory->expects($this->never())
-            ->method($this->anything());
+        $this->factory->expects(self::never())
+            ->method(self::anything());
 
-        $this->assertNull($this->manager->findDefaultDashboard());
+        self::assertNull($this->manager->findDefaultDashboard());
     }
 
-    public function testFindAllowedDashboards()
+    public function testFindAllowedDashboards(): void
     {
         $permission = 'EDIT';
         $expectedEntities = [$this->createMock(Dashboard::class)];
@@ -587,32 +575,32 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('execute')
             ->willReturn($expectedEntities);
 
-        $this->dashboardRepository->expects($this->once())
+        $this->dashboardRepository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('dashboard')
             ->willReturn($queryBuilder);
 
-        $this->aclHelper->expects($this->once())
+        $this->aclHelper->expects(self::once())
             ->method('apply')
             ->with($queryBuilder, $permission)
             ->willReturn($query);
 
-        $this->factory->expects($this->once())
+        $this->factory->expects(self::once())
             ->method('createDashboardModel')
             ->with($expectedEntities[0])
             ->willReturn($expectedModels[0]);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedModels,
             $this->manager->findAllowedDashboards($permission)
         );
     }
 
-    public function testFindAllowedDashboardsShortenedInfo()
+    public function testFindAllowedDashboardsShortenedInfo(): void
     {
         $permission = 'EDIT';
         $expectedInfo = [['id' => 1, 'label' => 'test label 1'], ['id' => 2, 'label' => 'test label 2']];
@@ -620,32 +608,32 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('execute')
             ->willReturn($expectedInfo);
 
-        $this->dashboardRepository->expects($this->once())
+        $this->dashboardRepository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('dashboard')
             ->willReturn($queryBuilder);
 
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('select')
             ->with('dashboard.id, dashboard.label')
             ->willReturnSelf();
 
-        $this->aclHelper->expects($this->once())
+        $this->aclHelper->expects(self::once())
             ->method('apply')
             ->with($queryBuilder, $permission)
             ->willReturn($query);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedInfo,
             $this->manager->findAllowedDashboardsShortenedInfo($permission)
         );
     }
 
-    public function testFindAllowedDashboardsShortenedInfoFilteredByOrganization()
+    public function testFindAllowedDashboardsShortenedInfoFilteredByOrganization(): void
     {
         $permission = 'EDIT';
         $organizationId = 42;
@@ -654,57 +642,57 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('execute')
             ->willReturn($expectedInfo);
 
-        $this->dashboardRepository->expects($this->once())
+        $this->dashboardRepository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('dashboard')
             ->willReturn($queryBuilder);
 
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('select')
             ->with('dashboard.id, dashboard.label')
             ->willReturnSelf();
 
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('andWhere')
             ->willReturnSelf();
 
         $expr = $this->createMock(Expr::class);
-        $expr->expects($this->once())
+        $expr->expects(self::once())
             ->method('eq')
             ->with('dashboard.organization', ':organizationId');
 
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('expr')
             ->willReturn($expr);
 
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('setParameter')
             ->with('organizationId', $organizationId)
             ->willReturnSelf();
 
-        $this->aclHelper->expects($this->once())
+        $this->aclHelper->expects(self::once())
             ->method('apply')
             ->with($queryBuilder, $permission)
             ->willReturn($query);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedInfo,
             $this->manager->findAllowedDashboardsShortenedInfo($permission, $organizationId)
         );
     }
 
-    public function testSetUserActiveDashboardOverrideExistOne()
+    public function testSetUserActiveDashboardOverrideExistOne(): void
     {
         $organization = $this->createMock(Organization::class);
         $activeDashboard = $this->createMock(ActiveDashboard::class);
         $dashboard = $this->createMock(Dashboard::class);
 
         $dashboardModel = $this->createMock(DashboardModel::class);
-        $dashboardModel->expects($this->once())
+        $dashboardModel->expects(self::once())
             ->method('getEntity')
             ->willReturn($dashboard);
 
@@ -712,37 +700,37 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
 
         $token = $this->createMock(UsernamePasswordOrganizationToken::class);
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 
-        $token->expects($this->once())
+        $token->expects(self::once())
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->activeDashboardRepository->expects($this->once())
+        $this->activeDashboardRepository->expects(self::once())
             ->method('findOneBy')
             ->with(['user' => $user, 'organization' => $organization])
             ->willReturn($activeDashboard);
 
-        $activeDashboard->expects($this->once())
+        $activeDashboard->expects(self::once())
             ->method('setDashboard')
             ->with($dashboard);
-        $this->entityManager->expects($this->never())
+        $this->entityManager->expects(self::never())
             ->method('persist');
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('flush')
             ->with($activeDashboard);
 
         $this->manager->setUserActiveDashboard($dashboardModel, $user, true);
     }
 
-    public function testSetUserActiveDashboardCreateNew()
+    public function testSetUserActiveDashboardCreateNew(): void
     {
         $dashboard = $this->createMock(Dashboard::class);
 
         $dashboardModel = $this->createMock(DashboardModel::class);
-        $dashboardModel->expects($this->once())
+        $dashboardModel->expects(self::once())
             ->method('getEntity')
             ->willReturn($dashboard);
 
@@ -751,22 +739,22 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
 
         $token = $this->createMock(UsernamePasswordOrganizationToken::class);
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 
-        $token->expects($this->once())
+        $token->expects(self::once())
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->activeDashboardRepository->expects($this->once())
+        $this->activeDashboardRepository->expects(self::once())
             ->method('findOneBy')
             ->with(['user' => $user, 'organization' => $organization])
             ->willReturn(null);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('persist');
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('flush')
             ->with($this->isInstanceOf(ActiveDashboard::class));
 

@@ -222,6 +222,75 @@ class EntityWithAssociationsAsAttributesTest extends RestJsonApiTestCase
         );
     }
 
+    public function testUpdateForRenamedToOneAssociation()
+    {
+        $this->appendEntityConfig(
+            TestMagazine::class,
+            [
+                'fields' => [
+                    'renamedBestArticle' => [
+                        'property_path' => 'bestArticle'
+                    ]
+                ]
+            ]
+        );
+
+        $magazineId = $this->getReference('magazine1')->getId();
+        $data = [
+            'data' => [
+                'type'       => 'testapimagazines',
+                'id'         => (string)$magazineId,
+                'attributes' => [
+                    'renamedBestArticle' => [
+                        'headline' => 'Updated Article 1'
+                    ]
+                ]
+            ]
+        ];
+        $this->patch(
+            ['entity' => 'testapimagazines', 'id' => (string)$magazineId],
+            $data
+        );
+
+        $response = $this->get(
+            ['entity' => 'testapimagazines', 'id' => (string)$magazineId]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'       => 'testapimagazines',
+                    'id'         => (string)$magazineId,
+                    'attributes' => [
+                        'name'               => 'Magazine 1',
+                        'articles'           => [
+                            [
+                                'id'       => '@article1->id',
+                                'headline' => 'Updated Article 1',
+                                'body'     => 'Article 1 Body'
+                            ],
+                            [
+                                'id'       => '@article2->id',
+                                'headline' => 'Article 2',
+                                'body'     => 'Article 2 Body'
+                            ],
+                            [
+                                'id'       => '@article3->id',
+                                'headline' => 'Article 3',
+                                'body'     => 'Article 3 Body'
+                            ]
+                        ],
+                        'renamedBestArticle' => [
+                            'id'       => '@article1->id',
+                            'headline' => 'Updated Article 1',
+                            'body'     => 'Article 1 Body'
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
     public function testUpdateForToOneAssociationWhenPreviousValueIsNull()
     {
         $magazineId = $this->getReference('magazine2')->getId();

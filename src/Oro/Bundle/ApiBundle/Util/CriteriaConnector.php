@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\Common\Collections\Criteria as CommonCriteria;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
@@ -38,10 +39,11 @@ class CriteriaConnector
     {
         $rootAlias = QueryBuilderUtil::getSingleRootAlias($qb);
         if ($criteria instanceof Criteria) {
-            $rootEntityClass = $this->entityClassResolver->getEntityClass($qb->getRootEntities()[0]);
+            $rootEntityClass = $this->entityClassResolver->getEntityClass(QueryBuilderUtil::getSingleRootEntity($qb));
+            $this->addJoinsToCriteria($criteria, $qb, $rootAlias);
             $this->criteriaNormalizer->normalizeCriteria($criteria, $rootEntityClass);
             $this->placeholdersResolver->resolvePlaceholders($criteria, $rootAlias);
-            $this->addJoins($qb, $criteria);
+            $this->processJoins($qb, $criteria, $rootAlias);
         } else {
             $this->placeholdersResolver->resolvePlaceholders($criteria, $rootAlias);
         }
@@ -70,19 +72,67 @@ class CriteriaConnector
         }
     }
 
-    private function addJoins(QueryBuilder $qb, Criteria $criteria): void
+    private function processJoins(QueryBuilder $qb, Criteria $criteria, string $rootAlias): void
     {
         $joins = $criteria->getJoins();
-        if (!empty($joins)) {
+        if ($joins) {
+            $this->resetJoins($qb, $rootAlias);
+            $this->addJoins($qb, $joins);
+        }
+    }
+
+    private function resetJoins(QueryBuilder $qb, string $rootAlias): void
+    {
+        $joinPart = $qb->getDQLPart('join');
+        if (!$joinPart) {
+            return;
+        }
+
+        $qb->resetDQLPart('join');
+        foreach ($joinPart as $joinGroupAlias => $joins) {
+            if ($joinGroupAlias !== $rootAlias) {
+                $this->addJoins($qb, $joins);
+            }
+        }
+    }
+
+    private function addJoins(QueryBuilder $qb, array $joins): void
+    {
+        /** @var Expr\Join $join */
+        foreach ($joins as $join) {
+            $method = strtolower($join->getJoinType()) . 'Join';
+            $qb->{$method}(
+                $join->getJoin(),
+                $join->getAlias(),
+                $join->getConditionType(),
+                $join->getCondition(),
+                $join->getIndexBy()
+            );
+        }
+    }
+
+    private function addJoinsToCriteria(Criteria $criteria, QueryBuilder $qb, string $rootAlias): void
+    {
+        $joinPart = $qb->getDQLPart('join');
+        /** @var Expr\Join[] $joins */
+        foreach ($joinPart as $joinGroupAlias => $joins) {
+            if ($joinGroupAlias !== $rootAlias) {
+                continue;
+            }
             foreach ($joins as $join) {
-                $method = strtolower($join->getJoinType()) . 'Join';
-                $qb->{$method}(
-                    $join->getJoin(),
-                    $join->getAlias(),
-                    $join->getConditionType(),
-                    $join->getCondition(),
-                    $join->getIndexBy()
-                );
+                $joinAlias = $join->getAlias();
+                if (!$criteria->hasJoin($joinAlias)) {
+                    $method = 'add' . ucfirst(strtolower($join->getJoinType())) . 'Join';
+                    $criteria
+                        ->{$method}(
+                            $joinAlias,
+                            $join->getJoin(),
+                            $join->getConditionType(),
+                            $join->getCondition(),
+                            $join->getIndexBy()
+                        )
+                        ->setAlias($joinAlias);
+                }
             }
         }
     }
@@ -108,15 +158,23 @@ class CriteriaConnector
         $orderings = $criteria->getOrderings();
         foreach ($orderings as $sort => $order) {
             $hasValidAlias = false;
-            foreach ($aliases as $alias) {
-                if ($sort !== $alias && str_starts_with($sort . '.', $alias . '.')) {
-                    $hasValidAlias = true;
-                    break;
+            if (str_contains($sort, '.')) {
+                foreach ($aliases as $alias) {
+                    if ($sort !== $alias && str_starts_with($sort . '.', $alias . '.')) {
+                        $hasValidAlias = true;
+                        break;
+                    }
                 }
             }
-
             if (!$hasValidAlias) {
-                $sort = $aliases[0] . '.' . $sort;
+                if (str_starts_with($sort, Criteria::PLACEHOLDER_START)
+                    && str_ends_with($sort, Criteria::PLACEHOLDER_END)
+                ) {
+                    // it is a computed field that does not related to any join or a root entity
+                    $sort = substr($sort, 1, -1);
+                } else {
+                    $sort = $aliases[0] . '.' . $sort;
+                }
             }
 
             QueryBuilderUtil::checkField($sort);

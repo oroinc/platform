@@ -193,9 +193,12 @@ class TestEntitiesMigration implements
         $table->addColumn('related_class', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('related_id', 'integer', ['notnull' => false]);
         $table->addColumn('parent_id', 'integer', ['notnull' => false]);
+        $table->addColumn('linked_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['parent_id']);
+        $table->addIndex(['linked_id']);
         $table->addForeignKeyConstraint($table, ['parent_id'], ['id']);
+        $table->addForeignKeyConstraint($schema->getTable('test_api_custom_id'), ['linked_id'], ['id']);
 
         $tableLinks = $schema->createTable('test_api_nested_objects_links');
         $tableLinks->addColumn('owner_id', 'integer');

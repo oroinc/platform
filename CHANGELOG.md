@@ -483,6 +483,9 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 #### NavigationBundle
 * Changed the sorting mechanism in `\Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider`: menu items are sorted as a single list instead of separate - sorted and unsorted parts. 
 
+#### MessageQueueBundle
+* Every custom MQ topic needs a `topic` class now; see more in the [Message Queue Topics](https://doc.oroinc.com/backend/mq/message-queue-topics/) topic.
+
 ### Removed
 
 #### CronBundle
