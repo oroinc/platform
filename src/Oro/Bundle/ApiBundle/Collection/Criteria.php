@@ -11,9 +11,11 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
  */
 class Criteria extends BaseCriteria
 {
-    public const ROOT_ALIAS_PLACEHOLDER   = '{root}';
+    public const ROOT_ALIAS_PLACEHOLDER = '{root}';
     public const ENTITY_ALIAS_PLACEHOLDER = '{entity}';
-    public const PLACEHOLDER_TEMPLATE     = '{%s}';
+    public const PLACEHOLDER_TEMPLATE = '{%s}';
+    public const PLACEHOLDER_START = '{';
+    public const PLACEHOLDER_END = '}';
 
     private EntityClassResolver $entityClassResolver;
     /** @var Join[] */

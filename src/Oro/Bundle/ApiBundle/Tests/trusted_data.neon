@@ -47,6 +47,8 @@ trusted_data:
         Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig:
             findFieldNameByPropertyPath: true
             getIdentifierFieldNames: true
+        Oro\Bundle\ApiBundle\Util\WhereExpressionModifier:
+            dispatch: true
 
     check_methods:
         Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface:

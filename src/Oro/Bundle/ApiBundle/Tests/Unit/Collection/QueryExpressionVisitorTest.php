@@ -373,6 +373,30 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->walkComparison($comparison);
     }
 
+    public function testWalkComparisonWithComputedField()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            ['IN' => new InComparisonExpression()],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        $expressionVisitor->setQueryAliases(['e']);
+        $comparison = new Comparison('{test}', 'IN', [1, 2, 3]);
+        $result = $expressionVisitor->walkComparison($comparison);
+
+        self::assertEquals(
+            new QueryExpr\Func('test IN', [':test']),
+            $result
+        );
+        self::assertEquals(
+            [
+                new Parameter('test', [1, 2, 3])
+            ],
+            $expressionVisitor->getParameters()
+        );
+    }
+
     public function testCreateSubqueryWithoutQuery()
     {
         $this->expectException(QueryException::class);
