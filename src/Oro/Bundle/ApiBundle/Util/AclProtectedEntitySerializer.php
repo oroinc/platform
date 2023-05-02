@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Component\EntitySerializer\EntityConfig;
@@ -49,6 +50,26 @@ class AclProtectedEntitySerializer extends EntitySerializer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function buildQuery(
+        QueryBuilder $qb,
+        EntityConfig|array $config,
+        array $context = [],
+        ?callable $queryModifier = null
+    ): Query {
+        if (null !== $queryModifier) {
+            $queryModifier = $this->getQueryModifier($queryModifier);
+        }
+        $this->setContext($context);
+        try {
+            return parent::buildQuery($qb, $config, $context, $queryModifier);
+        } finally {
+            $this->resetContext();
+        }
+    }
+
     private function setContext(array $context): void
     {
         // push the context to the stack
@@ -83,5 +104,13 @@ class AclProtectedEntitySerializer extends EntitySerializer
             $this->queryFactory->setRequestType($requestType);
             $this->fieldAccessor->setRequestType($requestType);
         }
+    }
+
+    private function getQueryModifier(callable $queryModifier): callable
+    {
+        return function (QueryBuilder $qb, EntityConfig $entityConfig, array $context) use ($queryModifier) {
+            $queryModifier($qb, $entityConfig, $context);
+            (new ComputedFieldsWhereExpressionModifier())->updateQuery($qb);
+        };
     }
 }

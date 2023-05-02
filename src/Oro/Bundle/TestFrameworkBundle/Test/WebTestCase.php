@@ -16,6 +16,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResol
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\ResolverInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\Event\DisableListenersForDataFixturesEvent;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\TestEventsLoggerTrait;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
@@ -433,8 +434,7 @@ abstract class WebTestCase extends BaseWebTestCase
             }
         }
 
-        $resolver = self::getContainer()->get('oro_test.value_resolver');
-        $resolver->setReferences(new Collection(self::$referenceRepository->getReferences()));
+        $resolver = self::getReferenceResolver();
 
         if (is_array($data)) {
             array_walk_recursive($data, function (&$item) use ($resolver) {
@@ -449,6 +449,14 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return $data;
+    }
+
+    protected static function getReferenceResolver(): ResolverInterface
+    {
+        $resolver = self::getContainer()->get('oro_test.value_resolver');
+        $resolver->setReferences(new Collection(self::$referenceRepository->getReferences()));
+
+        return $resolver;
     }
 
     /**
