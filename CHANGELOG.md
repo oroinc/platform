@@ -357,6 +357,30 @@ use ExtendEntityTrait;
   `Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator $fileManipulator`
   instead of `$fileManager`, also the `$authorizationChecker` argument is removed.
 
+### CacheBundle
+
+* The `oro.cache.abstract` abstract service is removed, use `oro.data.cache` instead, with the `cache.pool` tag 
+and the namespace in a tag attribute.
+
+  Before: 
+  ```yaml
+  services:
+      oro_catalog.layout.data_provider.category.cache:
+          parent: oro.cache.abstract
+          public: false
+          calls:
+              - [ setNamespace, [ 'oro_catalog_category' ] ]
+  ```
+  After:
+  ```yaml
+  services:
+      oro_catalog.layout.data_provider.category.cache:
+          parent: oro.data.cache
+          public: false
+          tags:
+              - { name: 'cache.pool', namespace: 'oro_catalog_category' }
+  ```
+
 #### DataGridBundle
 * The `iconHideText` option for `action-launcher` and `dropdown-select-choice-launcher` views was removed, use the `launcherMode` option instead.
   The `launcherMode` option can have three different values:
