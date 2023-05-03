@@ -11,9 +11,9 @@ use Oro\Component\ChainProcessor\ActionProcessor;
 class CollectSubresourcesProcessor extends ActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): CollectSubresourcesContext
     {
         return new CollectSubresourcesContext();
     }

@@ -65,7 +65,6 @@ class LoadLanguages extends AbstractFixture implements DependentFixtureInterface
         $language
             ->setCode($code)
             ->setEnabled($options['enabled'])
-            ->setOwner($user)
             ->setOrganization($user->getOrganization());
 
         $manager->persist($language);

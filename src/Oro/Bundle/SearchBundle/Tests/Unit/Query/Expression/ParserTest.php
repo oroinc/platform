@@ -55,7 +55,9 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $query = $parser->parse(new TokenStream($tokens));
 
         $this->assertEquals(
-            ['test_name' => ['field' => 'text.test_field', 'function' => Query::AGGREGATE_FUNCTION_COUNT]],
+            ['test_name' =>
+                ['field' => 'text.test_field', 'function' => Query::AGGREGATE_FUNCTION_COUNT, 'parameters' => []]
+            ],
             $query->getAggregations()
         );
     }

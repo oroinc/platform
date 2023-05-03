@@ -12,23 +12,17 @@ class MaxRelatedEntitiesConfigExtra implements ConfigExtraInterface
 {
     public const NAME = 'max_related_entities';
 
-    /** @var int */
-    private $maxRelatedEntities;
+    private int $maxRelatedEntities;
 
-    /**
-     * @param int $maxRelatedEntities
-     */
-    public function __construct($maxRelatedEntities)
+    public function __construct(int $maxRelatedEntities)
     {
         $this->maxRelatedEntities = $maxRelatedEntities;
     }
 
     /**
      * Gets the maximum number of related entities that can be retrieved
-     *
-     * @return int
      */
-    public function getMaxRelatedEntities()
+    public function getMaxRelatedEntities(): int
     {
         return $this->maxRelatedEntities;
     }
@@ -36,7 +30,7 @@ class MaxRelatedEntitiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -44,7 +38,7 @@ class MaxRelatedEntitiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(ConfigContext $context)
+    public function configureContext(ConfigContext $context): void
     {
         $context->setMaxRelatedEntities($this->maxRelatedEntities);
     }
@@ -52,7 +46,7 @@ class MaxRelatedEntitiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function isPropagable()
+    public function isPropagable(): bool
     {
         return false;
     }
@@ -60,7 +54,7 @@ class MaxRelatedEntitiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         return self::NAME . ':' . (string)$this->maxRelatedEntities;
     }

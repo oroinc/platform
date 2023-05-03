@@ -8,14 +8,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GenderProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var GenderProvider */
-    private $genderProvider;
-
-    /** @var array */
-    private $expectedChoices = [
-        'oro.user.gender.male.translated' => Gender::MALE,
-        'oro.user.gender.female.translated' => Gender::FEMALE,
-    ];
+    private GenderProvider $genderProvider;
 
     protected function setUp(): void
     {
@@ -31,15 +24,25 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetChoices()
     {
+        $expectedChoices = [
+            'oro.user.gender.male.translated' => Gender::MALE,
+            'oro.user.gender.female.translated' => Gender::FEMALE
+        ];
         // run two times to test internal cache
-        $this->assertEquals($this->expectedChoices, $this->genderProvider->getChoices());
-        $this->assertEquals($this->expectedChoices, $this->genderProvider->getChoices());
+        $this->assertEquals($expectedChoices, $this->genderProvider->getChoices());
+        $this->assertEquals($expectedChoices, $this->genderProvider->getChoices());
     }
 
     public function testGetLabelByName()
     {
-        $expectedLabel = array_search(Gender::MALE, $this->expectedChoices, true);
-        $this->assertEquals($expectedLabel, $this->genderProvider->getLabelByName(Gender::MALE));
+        $this->assertEquals(
+            'oro.user.gender.male.translated',
+            $this->genderProvider->getLabelByName(Gender::MALE)
+        );
+        $this->assertEquals(
+            'oro.user.gender.female.translated',
+            $this->genderProvider->getLabelByName(Gender::FEMALE)
+        );
     }
 
     public function testGetLabelByNameUnknownGender()

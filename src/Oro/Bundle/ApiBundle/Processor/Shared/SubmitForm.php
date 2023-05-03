@@ -14,7 +14,7 @@ class SubmitForm implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */
 
@@ -37,19 +37,14 @@ class SubmitForm implements ProcessorInterface
         $form->submit($this->prepareRequestData($context->getRequestData()), false);
     }
 
-    /**
-     * @param array $requestData
-     *
-     * @return array
-     */
-    protected function prepareRequestData(array $requestData)
+    private function prepareRequestData(array $requestData): array
     {
         /**
          * as Symfony Form treats false as NULL due to checkboxes
          * @see \Symfony\Component\Form\Form::submit
          * we have to convert false to its string representation here
          */
-        \array_walk_recursive(
+        array_walk_recursive(
             $requestData,
             function (&$value) {
                 if (false === $value) {

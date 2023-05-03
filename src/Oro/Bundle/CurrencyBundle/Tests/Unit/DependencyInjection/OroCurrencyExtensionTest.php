@@ -4,27 +4,30 @@ declare(strict_types=1);
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\CurrencyBundle\DependencyInjection\OroCurrencyExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroCurrencyExtensionTest extends ExtensionTestCase
+class OroCurrencyExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroCurrencyExtension());
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
-        $expectedParameters = [
-            'oro_currency.price.model',
-        ];
-        $this->assertParametersLoaded($expectedParameters);
+        $extension = new OroCurrencyExtension();
+        $extension->load([], $container);
 
-        $expectedDefinitions = [
-            'oro_currency.twig.currency',
-        ];
-        $this->assertDefinitionsLoaded($expectedDefinitions);
-
-        $expectedExtensionConfigs = [
-            'oro_currency',
-        ];
-        $this->assertExtensionConfigsLoaded($expectedExtensionConfigs);
+        self::assertNotEmpty($container->getDefinitions());
+        self::assertSame(
+            [
+                [
+                    'settings' => [
+                        'resolved' => true,
+                        'default_currency' => ['value' => 'USD', 'scope' => 'app'],
+                        'currency_display' => ['value' => 'symbol', 'scope' => 'app'],
+                    ]
+                ]
+            ],
+            $container->getExtensionConfig('oro_currency')
+        );
     }
 }

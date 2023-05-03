@@ -3,13 +3,13 @@
 {% block widget_content %}
     {% set renderParams = renderParams|merge({
         routerEnabled: false,
-        jsmodules: ['orodatagrid/js/row-select-for-widget/builder'],
-        gridBuildersOptions: {
+        jsmodules: renderParams.jsmodules|default(['orodatagrid/js/row-select-for-widget/builder']),
+        gridBuildersOptions: renderParams.gridBuildersOptions|default({
             rowSelectForWidget: {
                 wid: app.request.get('_wid'),
                 multiSelect: multiselect
             }
-        }
+        })
     }) %}
 
     {{ parent() }}

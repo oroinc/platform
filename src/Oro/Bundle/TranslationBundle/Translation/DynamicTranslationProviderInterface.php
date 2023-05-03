@@ -37,5 +37,5 @@ interface DynamicTranslationProviderInterface
     /**
      * Warms up the cache for all translations for the given locale.
      */
-    public function warmUp(string $locale): void;
+    public function warmUp(array $locales): void;
 }

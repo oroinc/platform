@@ -285,7 +285,7 @@ class OrmQueryConfiguration
             $joinPath,
             $selectExpr,
             $selectPath
-            ] = $this->findJoinAndSelectByAliases($joinAlias, $columnAlias);
+        ] = $this->findJoinAndSelectByAliases($joinAlias, $columnAlias);
         if (!$join || !$selectExpr) {
             return;
         }
@@ -347,7 +347,7 @@ class OrmQueryConfiguration
             $joinPath,
             $selectExpr,
             $selectPath
-            ] = $this->findJoinAndSelectByAliases($joinAlias, $columnAlias);
+        ] = $this->findJoinAndSelectByAliases($joinAlias, $columnAlias);
         if (!$join || !$selectExpr || empty($join[self::CONDITION_KEY])) {
             return;
         }

@@ -3,17 +3,13 @@
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetConfigTreeBuilder()
+    private function processConfiguration(array $config): array
     {
-        $configuration = new Configuration();
-        $builder = $configuration->getConfigTreeBuilder();
-
-        $this->assertInstanceOf(TreeBuilder::class, $builder);
+        return (new Processor())->processConfiguration(new Configuration(), $config);
     }
 
     /**
@@ -21,9 +17,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessConfiguration(array $configs, array $expected)
     {
-        $configuration = new Configuration();
-        $processor = new Processor();
-        $this->assertEquals($expected, $processor->processConfiguration($configuration, $configs));
+        $this->assertEquals($expected, $this->processConfiguration($configs));
     }
 
     public function testInvalidConfiguration()
@@ -42,9 +36,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-        $configuration = new Configuration();
-        $processor = new Processor();
-        $processor->processConfiguration($configuration, $configs);
+        $this->processConfiguration($configs);
     }
 
     /**

@@ -75,7 +75,7 @@ class FileManager
         $this->clearTempFiles();
     }
 
-    public function clearTempFiles()
+    public function clearTempFiles(): void
     {
         foreach (array_keys($this->tmpFiles) as $tmpFile) {
             @unlink($tmpFile);
@@ -84,7 +84,7 @@ class FileManager
         $this->tmpFiles = [];
     }
 
-    private function rememberTempFile(string $file)
+    private function rememberTempFile(string $file): void
     {
         if (!$this->clearTempFilesCallbackRegistered) {
             // In case of unexpected exit(); call or maximum execution time reaching temp files should be removed
@@ -418,7 +418,7 @@ class FileManager
      */
     public function deleteAllFiles(string $prefix = ''): void
     {
-        $hasTailingDirectorySeparator = self::endsWithDirectorySeparator($prefix);
+        $hasTailingDirectorySeparator = str_ends_with($prefix, self::DIRECTORY_SEPARATOR);
         if ($hasTailingDirectorySeparator) {
             $prefix = rtrim($prefix, self::DIRECTORY_SEPARATOR) . self::DIRECTORY_SEPARATOR;
         }
@@ -614,17 +614,14 @@ class FileManager
      */
     public function getTemporaryFileName(string $suggestedFileName = null): string
     {
-        $tmpDir = ini_get('upload_tmp_dir');
-        if (!$tmpDir || !is_dir($tmpDir) || !is_writable($tmpDir)) {
-            $tmpDir = sys_get_temp_dir();
-        }
-        $tmpDir = realpath($tmpDir);
-        if (DIRECTORY_SEPARATOR !== substr($tmpDir, -\strlen(DIRECTORY_SEPARATOR))) {
-            $tmpDir .= DIRECTORY_SEPARATOR;
-        }
+        $tmpDir = $this->getTempDirPath();
         $extension = null;
         if ($suggestedFileName) {
             $extension = pathinfo($suggestedFileName, PATHINFO_EXTENSION);
+            $suggestedFileName = substr(
+                preg_replace('/[<>:\"\/|?*\\\[:cntrl:]]+/', '_', basename($suggestedFileName)),
+                -200
+            );
         }
         $tmpFile = $tmpDir . ($suggestedFileName ?: $this->generateFileName($extension));
         while (file_exists($tmpFile)) {
@@ -749,8 +746,18 @@ class FileManager
         return $fileName;
     }
 
-    private static function endsWithDirectorySeparator(string $path): bool
+    private function getTempDirPath(): string
     {
-        return substr($path, -\strlen(self::DIRECTORY_SEPARATOR)) === self::DIRECTORY_SEPARATOR;
+        $tmpDir = ini_get('upload_tmp_dir');
+        if (!$tmpDir || !is_dir($tmpDir) || !is_writable($tmpDir)) {
+            $tmpDir = sys_get_temp_dir();
+        }
+
+        $tmpDir = realpath($tmpDir);
+        if (!str_ends_with($tmpDir, DIRECTORY_SEPARATOR)) {
+            $tmpDir .= DIRECTORY_SEPARATOR;
+        }
+
+        return $tmpDir;
     }
 }

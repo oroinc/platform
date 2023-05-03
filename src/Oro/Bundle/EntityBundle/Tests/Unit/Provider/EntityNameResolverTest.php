@@ -36,14 +36,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param array  $providers
-     * @param string $defaultFormat
-     * @param array  $config
-     *
-     * @return EntityNameResolver
-     */
-    private function getEntityNameResolver($providers, $defaultFormat, $config)
+    private function getEntityNameResolver(array $providers, string $defaultFormat, array $config): EntityNameResolver
     {
         $configProvider = $this->createMock(EntityConfigurationProvider::class);
         $configProvider->expects(self::any())

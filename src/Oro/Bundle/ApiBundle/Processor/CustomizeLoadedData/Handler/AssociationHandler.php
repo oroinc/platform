@@ -13,11 +13,8 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
  */
 class AssociationHandler extends EntityHandler
 {
-    /** @var string */
-    private $rootEntityClass;
-
-    /** @var string */
-    private $propertyPath;
+    private string $rootEntityClass;
+    private string $propertyPath;
 
     /**
      * @param ActionProcessorInterface $customizationProcessor
@@ -84,7 +81,7 @@ class AssociationHandler extends EntityHandler
         return
             $handler instanceof self
             && $this->propertyPath === $handler->propertyPath
-            && \is_a($this->rootEntityClass, $handler->rootEntityClass, true)
+            && is_a($this->rootEntityClass, $handler->rootEntityClass, true)
             && parent::isRedundantHandler($handler);
     }
 

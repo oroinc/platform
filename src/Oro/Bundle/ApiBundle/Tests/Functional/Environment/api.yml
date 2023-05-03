@@ -148,6 +148,8 @@ api:
                             property_path: relatedClass
                         id:
                             property_path: relatedId
+                linkedField:
+                    property_path: linked.key
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             filters:
                 fields:
@@ -377,6 +379,7 @@ api:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivity:
+            exclude: false # override system wide exclude rule, see Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigExclusionProvider
             fields:
                 activityTargets:
                     data_type: association:manyToMany:activity

@@ -16,8 +16,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class NumberFilterTest extends WebTestCase
 {
-    /** @var NumberFilter */
-    private $filter;
+    private NumberFilter $filter;
 
     protected function setUp(): void
     {
@@ -82,7 +81,7 @@ class NumberFilterTest extends WebTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function filterProvider()
+    public function filterProvider(): array
     {
         return [
             'Filter "not empty"'         => [

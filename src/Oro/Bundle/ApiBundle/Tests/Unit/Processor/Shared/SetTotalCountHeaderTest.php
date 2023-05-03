@@ -76,16 +76,6 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessWithWrongTotalCallback()
-    {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Expected callable for "totalCount", "stdClass" given.');
-
-        $this->context->setTotalCountCallback(new \stdClass());
-        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
-        $this->processor->process($this->context);
-    }
-
     public function testProcessWithWrongTotalCallbackResult()
     {
         $this->expectException(\RuntimeException::class);
@@ -135,6 +125,59 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
             $totalCount,
             $this->context->getResponseHeaders()->get('X-Include-Total-Count')
         );
+    }
+
+    /**
+     * @dataProvider computedFieldDataProvider
+     */
+    public function testProcessOrmQueryBuilderWithComputedFields(string $computedFieldExpr)
+    {
+        $entityClass = Group::class;
+        $config = new EntityDefinitionConfig();
+        $totalCount = 123;
+
+        $query = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
+        $query->addSelect($computedFieldExpr);
+        $query->setFirstResult(20);
+        $query->setMaxResults(10);
+
+        $this->countQueryBuilderOptimizer->expects(self::once())
+            ->method('getCountQueryBuilder')
+            ->willReturnCallback(function (QueryBuilder $qb) {
+                $qb->select('e.id');
+
+                return $qb;
+            });
+        $this->queryResolver->expects(self::once())
+            ->method('resolveQuery')
+            ->with(self::isInstanceOf(Query::class), self::identicalTo($config));
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT count(g0_.id) AS sclr_0 FROM group_table g0_',
+            [['sclr_0' => $totalCount]]
+        );
+
+        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->setQuery($query);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            $totalCount,
+            $this->context->getResponseHeaders()->get('X-Include-Total-Count')
+        );
+    }
+
+    public function computedFieldDataProvider(): array
+    {
+        return [
+            ['(CASE WHEN e.name IS NULL THEN false ELSE true END) AS hasName'],
+            ['(case when e.name is null then false else true end) as hasName'],
+            ['e.name AS name_1'],
+            ['e.name as name_1'],
+            ['e.name AS name-1'],
+            ['e.name as name-1'],
+        ];
     }
 
     public function testProcessOrmQuery()
@@ -189,8 +232,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
             ->method('query')
             ->willReturnCallback(function ($sql) use ($totalCount) {
                 self::assertEquals(
-                    'SELECT COUNT(*)'
-                    . ' FROM (SELECT e.id AS id, e.name AS name FROM group_table e) count_query',
+                    'SELECT COUNT(*) FROM (SELECT e.id AS id, e.name AS name FROM group_table e) count_query',
                     $sql
                 );
 
@@ -230,8 +272,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
             ->method('query')
             ->willReturnCallback(function ($sql) use ($totalCount) {
                 self::assertEquals(
-                    'SELECT COUNT(*)'
-                    . ' FROM (SELECT e.id AS id, e.name AS name FROM group_table e) count_query',
+                    'SELECT COUNT(*) FROM (SELECT e.id AS id, e.name AS name FROM group_table e) count_query',
                     $sql
                 );
 

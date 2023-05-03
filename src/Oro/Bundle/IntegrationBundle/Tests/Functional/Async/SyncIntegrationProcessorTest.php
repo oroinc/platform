@@ -3,24 +3,22 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\IntegrationBundle\Async\SyncIntegrationProcessor;
+use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Test\Provider\TestConnector;
 use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadChannelData;
-use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 /**
  * @dbIsolationPerTest
  */
 class SyncIntegrationProcessorTest extends WebTestCase
 {
-    private EntityManagerInterface $channelManager;
+    use MessageQueueExtension;
 
-    private SyncIntegrationProcessor $processor;
+    private EntityManagerInterface $channelManager;
 
     protected function setUp(): void
     {
@@ -31,7 +29,6 @@ class SyncIntegrationProcessorTest extends WebTestCase
         ]);
 
         $this->channelManager = self::getContainer()->get('doctrine')->getManagerForClass(Channel::class);
-        $this->processor = self::getContainer()->get('oro_integration.async.sync_integration_processor');
     }
 
     public function testProcess(): void
@@ -40,16 +37,17 @@ class SyncIntegrationProcessorTest extends WebTestCase
         $integration = $this->getReference('oro_integration:foo_integration');
         self::assertEmpty($integration->getStatuses()->toArray());
 
-        $message = new Message();
-        $message->setMessageId(UUIDGenerator::v4());
-        $message->setBody([
-            'integration_id' => $integration->getId(),
-            'connector' => null,
-            'connector_parameters' => [],
-            'transport_batch_size' => 100,
-        ]);
+        $params = [
+            '--connector' => TestConnector::TYPE,
+            '--integration' => (string)$integration->getId()
+        ];
 
-        $this->processor->process($message, $this->createMock(SessionInterface::class));
+        self::runCommand(SyncCommand::getDefaultName(), $params);
+
+        self::consume();
+
+        // get managed entity again after reset in consumer
+        $integration = $this->getIntegration();
 
         $this->channelManager->refresh($integration);
 
@@ -61,5 +59,10 @@ class SyncIntegrationProcessorTest extends WebTestCase
 
         self::assertEquals(TestConnector::TYPE, $status->getConnector());
         self::assertStringContainsString('Can\'t find job "integration_test_import"', $status->getMessage());
+    }
+
+    private function getIntegration(): Channel
+    {
+        return $this->getReference('oro_integration:foo_integration');
     }
 }

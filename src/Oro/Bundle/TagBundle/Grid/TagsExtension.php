@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration as InlineEditingConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingConfigurator;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
@@ -21,22 +22,16 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class TagsExtension extends AbstractTagsExtension
 {
-    const TAGS_ROOT_PARAM = '_tags';
-    const DISABLED_PARAM = '_disabled';
+    public const TAGS_ROOT_PARAM = '_tags';
+    public const DISABLED_PARAM = '_disabled';
 
-    const COLUMN_NAME = 'tags';
+    private const COLUMN_NAME = 'tags';
 
-    /** @var TaggableHelper */
-    protected $taggableHelper;
-
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
-
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
-
-    /** @var InlineEditingConfigurator */
-    private $inlineEditingConfigurator;
+    private TaggableHelper $taggableHelper;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private TokenStorageInterface $tokenStorage;
+    private InlineEditingConfigurator $inlineEditingConfigurator;
+    private FeatureChecker $featureChecker;
 
     public function __construct(
         TagManager $tagManager,
@@ -44,7 +39,8 @@ class TagsExtension extends AbstractTagsExtension
         TaggableHelper $helper,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenStorageInterface $tokenStorage,
-        InlineEditingConfigurator $inlineEditingConfigurator
+        InlineEditingConfigurator $inlineEditingConfigurator,
+        FeatureChecker $featureChecker
     ) {
         parent::__construct($tagManager, $entityClassResolver);
 
@@ -52,12 +48,13 @@ class TagsExtension extends AbstractTagsExtension
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenStorage = $tokenStorage;
         $this->inlineEditingConfigurator = $inlineEditingConfigurator;
+        $this->featureChecker = $featureChecker;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPriority()
+    public function getPriority(): int
     {
         return 10;
     }
@@ -68,13 +65,14 @@ class TagsExtension extends AbstractTagsExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            parent::isApplicable($config) &&
-            !$this->isDisabled() &&
-            !$this->isUnsupportedGridPrefix($config) &&
-            $this->isGridRootEntityTaggable($config) &&
-            null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
-            null !== $this->tokenStorage->getToken() &&
-            $this->authorizationChecker->isGranted('oro_tag_view');
+            parent::isApplicable($config)
+            && $this->featureChecker->isFeatureEnabled('manage_tags')
+            && !$this->isDisabled()
+            && !$this->isUnsupportedGridPrefix($config)
+            && $this->isGridRootEntityTaggable($config)
+            && null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH)
+            && null !== $this->tokenStorage->getToken()
+            && $this->authorizationChecker->isGranted('oro_tag_view');
     }
 
     /**
@@ -102,7 +100,7 @@ class TagsExtension extends AbstractTagsExtension
     /**
      * {@inheritdoc}
      */
-    public function processConfigs(DatagridConfiguration $config)
+    public function processConfigs(DatagridConfiguration $config): void
     {
         $columns = $config->offsetGetByPath('[columns]', []);
         $column = [self::COLUMN_NAME => $this->getColumnDefinition($config)];
@@ -118,7 +116,7 @@ class TagsExtension extends AbstractTagsExtension
         $this->enableInlineEditing($config);
     }
 
-    public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
+    public function visitMetadata(DatagridConfiguration $config, MetadataObject $data): void
     {
         if ($this->inlineEditingConfigurator->isInlineEditingSupported($config)) {
             $data->offsetSet(
@@ -135,7 +133,7 @@ class TagsExtension extends AbstractTagsExtension
      *
      * @return array
      */
-    protected function getColumnDefinition(DatagridConfiguration $config)
+    protected function getColumnDefinition(DatagridConfiguration $config): array
     {
         $className = $this->getEntity($config);
 
@@ -149,7 +147,10 @@ class TagsExtension extends AbstractTagsExtension
             'editable' => false,
             'translatable' => true,
             'notMarkAsBlank' => true,
-            'renderable' => $this->taggableHelper->isEnableGridColumn($className)
+            'renderable' => $this->taggableHelper->isEnableGridColumn($className),
+            'inline_editing' => [
+                'enable' => $config->offsetGetByPath($this->getInlineEditingEnabledPathForColumn(), true)
+            ]
         ];
     }
 
@@ -160,7 +161,7 @@ class TagsExtension extends AbstractTagsExtension
      *
      * @return array
      */
-    protected function getColumnFilterDefinition(DatagridConfiguration $config)
+    protected function getColumnFilterDefinition(DatagridConfiguration $config): array
     {
         $className = $this->getEntity($config);
         $dataName = sprintf('%s.%s', $config->getOrmQuery()->getRootAlias(), 'id');
@@ -182,7 +183,7 @@ class TagsExtension extends AbstractTagsExtension
     /**
      * {@inheritdoc}
      */
-    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
+    public function visitResult(DatagridConfiguration $config, ResultsObject $result): void
     {
         $rows = $result->getData();
         $idField = 'id';
@@ -197,11 +198,21 @@ class TagsExtension extends AbstractTagsExtension
     private function enableInlineEditing(DatagridConfiguration $config): void
     {
         if ($this->inlineEditingConfigurator->isInlineEditingSupported($config)
-            && !$config->offsetGetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH)
+            && $config->offsetGetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH) !== false
+            && $config->offsetGetByPath($this->getInlineEditingEnabledPathForColumn()) !== false
         ) {
             $config->offsetSetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH, true);
             $this->inlineEditingConfigurator->configureInlineEditingForGrid($config);
             $this->inlineEditingConfigurator->configureInlineEditingForColumn($config, self::COLUMN_NAME);
         }
+    }
+
+    private function getInlineEditingEnabledPathForColumn(): string
+    {
+        return sprintf(
+            '[columns][%s]%s',
+            self::COLUMN_NAME,
+            InlineEditingConfiguration::ENABLED_CONFIG_PATH
+        );
     }
 }

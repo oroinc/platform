@@ -13,17 +13,17 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroThemeExtension extends Extension
 {
-    const THEMES_SETTINGS_PARAMETER = 'oro_theme.settings';
-    const THEME_REGISTRY_SERVICE_ID = 'oro_theme.registry';
+    private const THEMES_SETTINGS_PARAMETER = 'oro_theme.settings';
+    private const THEME_REGISTRY_SERVICE_ID = 'oro_theme.registry';
 
     /**
      * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         array_unshift($configs, ['themes' => $this->getBundlesThemesSettings($container)]);
 
-        $config = $this->processConfiguration(new Configuration(), $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
         $container->setParameter(self::THEMES_SETTINGS_PARAMETER, $config['themes']);
 
@@ -37,13 +37,7 @@ class OroThemeExtension extends Extension
         }
     }
 
-    /**
-     * Gets bundles themes configuration
-     *
-     * @param ContainerBuilder $container
-     * @return array
-     */
-    protected function getBundlesThemesSettings(ContainerBuilder $container)
+    private function getBundlesThemesSettings(ContainerBuilder $container): array
     {
         $result = [];
 
@@ -63,18 +57,11 @@ class OroThemeExtension extends Extension
         return $result;
     }
 
-    /**
-     * @param string $path
-     * @param string $folderPlaceholder
-     * @param string $folderPattern
-     *
-     * @return FolderingCumulativeFileLoader
-     */
     private function getFolderingCumulativeFileLoaderForPath(
-        $path,
-        $folderPlaceholder = '{folder}',
-        $folderPattern = '\w+'
-    ) {
+        string $path,
+        string $folderPlaceholder = '{folder}',
+        string $folderPattern = '\w+'
+    ): FolderingCumulativeFileLoader {
         return new FolderingCumulativeFileLoader(
             $folderPlaceholder,
             $folderPattern,

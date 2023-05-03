@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
@@ -185,6 +186,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         $expectedContext = new FormContextStub($this->configProvider, $this->metadataProvider);
+        $expectedContext->setAction(ApiAction::UPDATE);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
         $expectedContext->setMasterRequest(true);

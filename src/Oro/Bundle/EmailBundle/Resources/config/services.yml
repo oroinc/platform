@@ -250,8 +250,18 @@ services:
         class: Oro\Bundle\EmailBundle\Async\RecalculateEmailVisibilityProcessor
         arguments:
             - '@doctrine'
+            - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.client.message_producer'
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_email.async.recalculate_email_visibility_chunk:
+        class: Oro\Bundle\EmailBundle\Async\RecalculateEmailVisibilityChunkProcessor
+        arguments:
+            - '@doctrine'
             - '@oro_email.email_address_visibility.manager'
             - '@oro_activity_list.provider.chain'
+            - '@oro_message_queue.job.runner'
         tags:
             - { name: oro_message_queue.client.message_processor }
 
@@ -422,7 +432,7 @@ services:
         class: Twig\Sandbox\SecurityPolicy
         arguments:
             # tags
-            - [ 'app', 'for', 'if', 'apply' ]
+            - [ 'app', 'for', 'if', 'apply', 'set' ]
             # filters
             - [ 'default', 'date', 'escape', 'format', 'length', 'lower', 'nl2br', 'number_format', 'title', 'trim', 'upper', 'oro_html_sanitize', 'slice', 'spaceless' ]
             # methods
@@ -1364,6 +1374,8 @@ services:
             - '@oro_email.email_renderer'
             - '@property_accessor'
             - '@logger'
+            - '@stof_doctrine_extensions.listener.translatable'
+            - '@translator'
 
     oro_email.provider.url_provider:
         class: 'Oro\Bundle\EmailBundle\Provider\UrlProvider'
@@ -1461,3 +1473,9 @@ services:
         class: Oro\Bundle\EmailBundle\Provider\EmailTemplateEntityProvider
         parent: oro_entity.entity_provider.abstract
         lazy: true
+
+    oro_email.twig.email_security_policy_decorator:
+        decorates: oro_email.twig.email_security_policy
+        class: Oro\Bundle\EmailBundle\Twig\EmailSecurityPolicyDecorator
+        arguments:
+            - '@.inner'

@@ -22,10 +22,9 @@ use Oro\Component\EntitySerializer\EntityConfigInterface;
 class CompleteFilters extends CompleteSection
 {
     /** @var array [data type => true, ...] */
-    protected $disallowArrayDataTypes;
-
+    private array $disallowArrayDataTypes;
     /** @var array [data type => true, ...] */
-    protected $disallowRangeDataTypes;
+    private array $disallowRangeDataTypes;
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -38,14 +37,14 @@ class CompleteFilters extends CompleteSection
         array $disallowRangeDataTypes
     ) {
         parent::__construct($doctrineHelper);
-        $this->disallowArrayDataTypes = \array_fill_keys($disallowArrayDataTypes, true);
-        $this->disallowRangeDataTypes = \array_fill_keys($disallowRangeDataTypes, true);
+        $this->disallowArrayDataTypes = array_fill_keys($disallowArrayDataTypes, true);
+        $this->disallowRangeDataTypes = array_fill_keys($disallowRangeDataTypes, true);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -59,7 +58,7 @@ class CompleteFilters extends CompleteSection
         EntityConfigInterface $section,
         string $entityClass,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
         /** @var FiltersConfig $section */
@@ -70,11 +69,11 @@ class CompleteFilters extends CompleteSection
         $this->completeFiltersForExtendedAssociations($section, $metadata, $definition);
     }
 
-    protected function completePreConfiguredFilters(
+    private function completePreConfiguredFilters(
         FiltersConfig $filters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         $filtersFields = $filters->getFields();
         foreach ($filtersFields as $fieldName => $filter) {
             if ($filter->hasType()) {
@@ -90,12 +89,12 @@ class CompleteFilters extends CompleteSection
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function completePreConfiguredFilter(
+    private function completePreConfiguredFilter(
         string $fieldName,
         FilterFieldConfig $filter,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         if (!$filter->hasPropertyPath()) {
             $field = $definition->getField($fieldName);
             if (null !== $field) {
@@ -128,12 +127,12 @@ class CompleteFilters extends CompleteSection
         $this->setFilterRangeAllowed($filter);
     }
 
-    protected function completeFiltersForIdentifierFields(
+    private function completeFiltersForIdentifierFields(
         FiltersConfig $filters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
-    ) {
-        if (\is_subclass_of($metadata->name, AbstractEnumValue::class)) {
+    ): void {
+        if (is_subclass_of($metadata->name, AbstractEnumValue::class)) {
             $enumIdFieldName = $this->getEnumIdentifierFieldName($definition);
             if (null !== $enumIdFieldName) {
                 $enumIdFilter = $filters->getOrAddField($enumIdFieldName);
@@ -167,11 +166,11 @@ class CompleteFilters extends CompleteSection
         }
     }
 
-    protected function completeFiltersForFields(
+    private function completeFiltersForFields(
         FiltersConfig $filters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         $indexedFields = $this->doctrineHelper->getIndexedFields($metadata);
         foreach ($indexedFields as $propertyPath => $dataType) {
             $filter = $filters->findField($propertyPath, true);
@@ -192,7 +191,7 @@ class CompleteFilters extends CompleteSection
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function completeFiltersForAssociations(
+    private function completeFiltersForAssociations(
         FiltersConfig $filters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
@@ -211,7 +210,7 @@ class CompleteFilters extends CompleteSection
                 if (null !== $targetDefinition) {
                     $targetClass = $field->getTargetClass();
                     $dataType = $this->getExactType($targetDefinition, $targetClass, $dataType);
-                    if ($targetClass && \is_subclass_of($targetClass, AbstractEnumValue::class)) {
+                    if ($targetClass && is_subclass_of($targetClass, AbstractEnumValue::class)) {
                         $enumIdFieldName = $this->getEnumIdentifierFieldName($targetDefinition);
                         if (null !== $enumIdFieldName && !$filter->hasArrayAllowed()) {
                             $filter->setArrayAllowed();
@@ -234,11 +233,11 @@ class CompleteFilters extends CompleteSection
         }
     }
 
-    protected function completeFiltersForExtendedAssociations(
+    private function completeFiltersForExtendedAssociations(
         FiltersConfig $filters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($field->isExcluded()) {
@@ -269,15 +268,10 @@ class CompleteFilters extends CompleteSection
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     *
-     * @return string|null
-     */
-    protected function getEnumIdentifierFieldName(EntityDefinitionConfig $definition)
+    private function getEnumIdentifierFieldName(EntityDefinitionConfig $definition): ?string
     {
         $idFieldNames = $definition->getIdentifierFieldNames();
-        if (count($idFieldNames) !== 1) {
+        if (\count($idFieldNames) !== 1) {
             return null;
         }
 
@@ -290,7 +284,7 @@ class CompleteFilters extends CompleteSection
         return $idFieldName;
     }
 
-    protected function setFilterArrayAllowed(FilterFieldConfig $filter)
+    private function setFilterArrayAllowed(FilterFieldConfig $filter): void
     {
         if (!$filter->hasArrayAllowed()) {
             $dataType = $filter->getDataType();
@@ -300,7 +294,7 @@ class CompleteFilters extends CompleteSection
         }
     }
 
-    protected function setFilterRangeAllowed(FilterFieldConfig $filter)
+    private function setFilterRangeAllowed(FilterFieldConfig $filter): void
     {
         if (!$filter->hasRangeAllowed()) {
             $dataType = $filter->getDataType();
@@ -310,10 +304,10 @@ class CompleteFilters extends CompleteSection
         }
     }
 
-    protected function getFieldDataType(ClassMetadata $metadata, string $propertyPath): ?string
+    private function getFieldDataType(ClassMetadata $metadata, string $propertyPath): ?string
     {
         $path = ConfigUtil::explodePropertyPath($propertyPath);
-        $lastFieldName = \array_pop($path);
+        $lastFieldName = array_pop($path);
         if (!empty($path)) {
             $parentMetadata = $this->doctrineHelper->findEntityMetadataByPath($metadata->name, $path);
             if (null === $parentMetadata) {
@@ -325,10 +319,10 @@ class CompleteFilters extends CompleteSection
         return $this->doctrineHelper->getFieldDataType($metadata, $lastFieldName);
     }
 
-    protected function isCollectionValuedAssociation(ClassMetadata $metadata, string $propertyPath): bool
+    private function isCollectionValuedAssociation(ClassMetadata $metadata, string $propertyPath): bool
     {
         $path = ConfigUtil::explodePropertyPath($propertyPath);
-        $lastFieldName = \array_pop($path);
+        $lastFieldName = array_pop($path);
         if (!empty($path)) {
             $parentMetadata = $this->doctrineHelper->findEntityMetadataByPath($metadata->name, $path);
             if (null === $parentMetadata) {

@@ -15,11 +15,11 @@ use Symfony\Component\Intl\Currencies;
 
 class CurrencySelectionTypeTest extends FormIntegrationTestCase
 {
-    /** @var CurrencySelectionType */
-    private $formType;
-
     /** @var CurrencyProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $currencyProvider;
+
+    /** @var CurrencySelectionType */
+    private $formType;
 
     protected function setUp(): void
     {
@@ -40,18 +40,12 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    $this->formType,
-                    CurrencySelectionType::class => $this->formType
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->formType], [])
         ];
     }
 

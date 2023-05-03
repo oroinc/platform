@@ -131,7 +131,7 @@ class TestOrder implements TestFrameworkEntityInterface
     public function validate(ExecutionContextInterface $context)
     {
         if (null !== $this->target && null !== $this->target->name) {
-            $targetNameLength = strlen($this->target->name);
+            $targetNameLength = \strlen($this->target->name);
             if ($targetNameLength > 0 && $targetNameLength < 2) {
                 $context->buildViolation('The name must have at least 2 symbols.')
                     ->atPath('target.name')

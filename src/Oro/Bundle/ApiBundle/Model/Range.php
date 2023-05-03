@@ -7,50 +7,31 @@ namespace Oro\Bundle\ApiBundle\Model;
  */
 class Range
 {
-    /** @var mixed */
-    private $fromValue;
+    private mixed $fromValue;
+    private mixed $toValue;
 
-    /** @var mixed */
-    private $toValue;
-
-    /**
-     * @param mixed $fromValue
-     * @param mixed $toValue
-     */
-    public function __construct($fromValue = null, $toValue = null)
+    public function __construct(mixed $fromValue = null, mixed $toValue = null)
     {
         $this->fromValue = $fromValue;
         $this->toValue = $toValue;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFromValue()
+    public function getFromValue(): mixed
     {
         return $this->fromValue;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function setFromValue($value)
+    public function setFromValue(mixed $value): void
     {
         $this->fromValue = $value;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getToValue()
+    public function getToValue(): mixed
     {
         return $this->toValue;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function setToValue($value)
+    public function setToValue(mixed $value): void
     {
         $this->toValue = $value;
     }

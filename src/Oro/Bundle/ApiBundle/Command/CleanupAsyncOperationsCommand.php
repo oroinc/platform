@@ -55,7 +55,7 @@ class CleanupAsyncOperationsCommand extends Command implements CronCommandSchedu
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
@@ -83,7 +83,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $minDate = date_sub(
             new \DateTime('now', new \DateTimeZone('UTC')),

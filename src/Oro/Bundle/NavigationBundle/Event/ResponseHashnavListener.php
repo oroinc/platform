@@ -1,45 +1,33 @@
 <?php
+
 namespace Oro\Bundle\NavigationBundle\Event;
 
+use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
 
 /**
  * Updates response headers and check if full redirect is required when using hash navigation.
  */
-class ResponseHashnavListener
+class ResponseHashnavListener implements ServiceSubscriberInterface
 {
-    const HASH_NAVIGATION_HEADER = 'x-oro-hash-navigation';
+    public const HASH_NAVIGATION_HEADER = 'x-oro-hash-navigation';
 
-    /**
-     * @var TokenStorageInterface
-     */
-    protected $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
+    private bool $debug;
+    private ContainerInterface $container;
 
-    /**
-     * @var Environment
-     */
-    protected $twig;
-
-    /**
-     * @var bool
-     */
-    protected $isDebug;
-
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param Environment           $twig
-     * @param bool                  $isDebug
-     */
     public function __construct(
         TokenStorageInterface $tokenStorage,
-        Environment $twig,
-        $isDebug = false
+        bool $debug,
+        ContainerInterface $container
     ) {
         $this->tokenStorage = $tokenStorage;
-        $this->twig = $twig;
-        $this->isDebug = $isDebug;
+        $this->debug = $debug;
+        $this->container = $container;
     }
 
     /**
@@ -49,26 +37,28 @@ class ResponseHashnavListener
      */
     public function onResponse(ResponseEvent $event): void
     {
-        $request  = $event->getRequest();
-        $response = $event->getResponse();
+        $request = $event->getRequest();
         if ($request->get(self::HASH_NAVIGATION_HEADER) || $request->headers->get(self::HASH_NAVIGATION_HEADER)) {
-            $location       = '';
+            $location = '';
             $isFullRedirect = false;
+            $response = $event->getResponse();
             if ($response->isRedirect()) {
                 $location = $response->headers->get('location');
-                if ($request->attributes->get('_fullRedirect') || !is_object($this->tokenStorage->getToken())) {
+                if ($request->attributes->get('_fullRedirect') || !\is_object($this->tokenStorage->getToken())) {
                     $isFullRedirect = true;
                 }
             }
-            if ($response->isNotFound() || ($response->getStatusCode() == 503 && !$this->isDebug)) {
+            if ($response->isNotFound()
+                || ($response->getStatusCode() === Response::HTTP_SERVICE_UNAVAILABLE && !$this->debug)
+            ) {
                 $location = $request->getUri();
                 $isFullRedirect = true;
             }
             if ($location) {
                 $response->headers->remove('location');
-                $response->setStatusCode(200);
+                $response->setStatusCode(Response::HTTP_OK);
 
-                $template = $this->twig->render(
+                $template = $this->getTwig()->render(
                     '@OroNavigation/HashNav/redirect.html.twig',
                     [
                         'full_redirect' => $isFullRedirect,
@@ -87,5 +77,24 @@ class ResponseHashnavListener
             $response->headers->addCacheControlDirective('no-store', true);
             $event->setResponse($response);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        /**
+         * Inject TWIG service via the service locator because it is optional and not all requests use it,
+         * e.g. REST API and AJAX requests do not need TWIG. This solution improves performance of such requests.
+         */
+        return [
+            Environment::class
+        ];
+    }
+
+    private function getTwig(): Environment
+    {
+        return $this->container->get(Environment::class);
     }
 }

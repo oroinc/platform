@@ -40,12 +40,12 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
                 ->method('isStart')
                 ->willReturn($isStart);
 
-            $mockButton = $this->createMock($className);
-            $mockButton->expects($this->once())
+            $button = $this->createMock($className);
+            $button->expects($this->once())
                 ->method('getTransition')
                 ->willReturn($cloneTransition);
 
-            return $mockButton;
+            return $button;
         };
 
         return [

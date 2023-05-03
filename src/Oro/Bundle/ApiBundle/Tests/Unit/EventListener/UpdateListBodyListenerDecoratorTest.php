@@ -33,7 +33,7 @@ class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->event = new RequestEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
-            HttpKernelInterface::MASTER_REQUEST
+            HttpKernelInterface::MAIN_REQUEST
         );
 
         $this->bodyListener = $this->createMock(BodyListenerInterface::class);

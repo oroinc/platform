@@ -164,14 +164,10 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
         $this->assertTrue(ReflectionUtil::getPropertyValue($childFiles, 'initialized'));
     }
 
-    /**
-     * @param Collection $childFiles
-     * @param ComponentFile|\PHPUnit\Framework\MockObject\MockObject $uploadedFile
-     *
-     * @return DigitalAsset
-     */
-    private function getDigitalAsset(Collection $childFiles, ComponentFile $uploadedFile): DigitalAsset
-    {
+    private function getDigitalAsset(
+        Collection $childFiles,
+        ComponentFile|\PHPUnit\Framework\MockObject\MockObject $uploadedFile
+    ): DigitalAsset {
         $fileMimeType = 'file/type';
 
         $sourceFile = $this->createMock(File::class);

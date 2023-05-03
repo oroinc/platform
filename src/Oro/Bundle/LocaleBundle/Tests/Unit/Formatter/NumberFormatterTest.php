@@ -318,9 +318,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($formattedValue, $currency);
     }
 
-    /**
-     * @return array[]
-     */
     public function dataProviderFormatCurrency(): array
     {
         return [

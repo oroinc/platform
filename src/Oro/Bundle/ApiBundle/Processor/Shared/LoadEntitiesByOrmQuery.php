@@ -16,8 +16,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
  */
 class LoadEntitiesByOrmQuery implements ProcessorInterface
 {
-    /** @var QueryHintResolverInterface */
-    private $queryHintResolver;
+    private QueryHintResolverInterface $queryHintResolver;
 
     public function __construct(QueryHintResolverInterface $queryHintResolver)
     {
@@ -27,7 +26,7 @@ class LoadEntitiesByOrmQuery implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */
 

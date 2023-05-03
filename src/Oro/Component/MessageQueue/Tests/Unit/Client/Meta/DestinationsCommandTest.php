@@ -9,9 +9,11 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
 {
-    private DestinationsCommand $command;
+    /** @var DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    private DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
+    /** @var DestinationsCommand */
+    private $command;
 
     protected function setUp(): void
     {
@@ -33,7 +35,7 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
 
         $output = $this->executeCommand();
 
-        static::assertStringContainsString('Found 0 destinations', $output);
+        self::assertStringContainsString('Found 0 destinations', $output);
     }
 
     public function testShouldShowMessageFoundTwoDestinations(): void
@@ -41,41 +43,34 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
             ->willReturn([
-                             new DestinationMeta('aClientName', 'aDestinationName'),
-                             new DestinationMeta('anotherClientName', 'anotherDestinationName'),
-                         ]);
+                new DestinationMeta('aClientName', 'aDestinationName'),
+                new DestinationMeta('anotherClientName', 'anotherDestinationName'),
+            ]);
 
         $output = $this->executeCommand();
 
-        static::assertStringContainsString('Found 2 destinations', $output);
+        self::assertStringContainsString('Found 2 destinations', $output);
     }
 
     public function testShouldShowInfoAboutDestinations(): void
     {
         $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
-            ->willReturn(
-                [
-                    new DestinationMeta('aFooClientName', 'aFooDestinationName', ['fooSubscriber']),
-                    new DestinationMeta('aBarClientName', 'aBarDestinationName', ['barSubscriber']),
-                ]
-            );
+            ->willReturn([
+                new DestinationMeta('aFooClientName', 'aFooDestinationName', ['fooSubscriber']),
+                new DestinationMeta('aBarClientName', 'aBarDestinationName', ['barSubscriber']),
+            ]);
 
         $output = $this->executeCommand();
 
-        static::assertStringContainsString('aFooClientName', $output);
-        static::assertStringContainsString('aFooDestinationName', $output);
-        static::assertStringContainsString('fooSubscriber', $output);
-        static::assertStringContainsString('aBarClientName', $output);
-        static::assertStringContainsString('aBarDestinationName', $output);
-        static::assertStringContainsString('barSubscriber', $output);
+        self::assertStringContainsString('aFooClientName', $output);
+        self::assertStringContainsString('aFooDestinationName', $output);
+        self::assertStringContainsString('fooSubscriber', $output);
+        self::assertStringContainsString('aBarClientName', $output);
+        self::assertStringContainsString('aBarDestinationName', $output);
+        self::assertStringContainsString('barSubscriber', $output);
     }
 
-    /**
-     * @param string[] $arguments
-     *
-     * @return string
-     */
     private function executeCommand(array $arguments = []): string
     {
         $tester = new CommandTester($this->command);

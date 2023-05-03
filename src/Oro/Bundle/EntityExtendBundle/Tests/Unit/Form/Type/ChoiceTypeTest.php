@@ -6,14 +6,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType as SymfonyChoiceType;
 
 class ChoiceTypeTest extends AbstractConfigTypeTestCase
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getFormType()
+    protected function getFormType(): AbstractType
     {
         return new ChoiceType(
             new ConfigTypeHelper($this->configManager),
@@ -24,7 +25,7 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
     /**
      * @dataProvider submitProvider
      */
-    public function testSubmit($newVal, $oldVal, $state, $isSetStateExpected)
+    public function testSubmit(bool $newVal, bool $oldVal, string $state, bool $isSetStateExpected)
     {
         $this->doTestSubmit(
             'testAttr',
@@ -41,7 +42,7 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
         );
     }
 
-    public function submitProvider()
+    public function submitProvider(): array
     {
         return [
             [false, false, ExtendScope::STATE_ACTIVE, false],
@@ -52,11 +53,11 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
         ];
     }
 
-    public function testGetName()
+    public function testGetBlockPrefix()
     {
         $this->assertEquals(
             'oro_entity_extend_choice',
-            $this->getFormType()->getName()
+            $this->getFormType()->getBlockPrefix()
         );
     }
 

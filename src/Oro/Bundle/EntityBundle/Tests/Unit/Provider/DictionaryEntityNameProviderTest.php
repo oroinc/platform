@@ -10,20 +10,20 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Provider\Fixtures\DictionaryEntity;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var DictionaryEntityNameProvider */
     private $entityNameProvider;
 
     protected function setUp(): void
@@ -34,18 +34,11 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $this->entityNameProvider = new DictionaryEntityNameProvider(
             $this->configManager,
             $this->doctrine,
-            new PropertyAccessor()
+            PropertyAccess::createPropertyAccessor()
         );
     }
 
-    /**
-     * @param string $scope
-     * @param string $entityClass
-     * @param array  $values
-     *
-     * @return Config
-     */
-    private function getEntityConfig($scope, $entityClass, $values = [])
+    private function getEntityConfig(string $scope, string $entityClass, array $values = []): Config
     {
         return new Config(
             new EntityConfigId($scope, $entityClass),
@@ -53,12 +46,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     * @param string $hasField
-     */
-    private function setHasFieldExpectations($entityClass, $fieldName, $hasField)
+    private function setHasFieldExpectations(string $entityClass, string $fieldName, bool $hasField): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $metadata = $this->createMock(ClassMetadata::class);

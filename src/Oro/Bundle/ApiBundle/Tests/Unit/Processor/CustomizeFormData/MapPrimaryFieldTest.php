@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\MapPrimaryField;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
@@ -29,7 +30,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validation;
@@ -74,6 +74,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         $configProvider = $this->createMock(ConfigProvider::class);
         $metadataProvider = $this->createMock(MetadataProvider::class);
         $this->formContext = new FormContextStub($configProvider, $metadataProvider);
+        $this->formContext->setAction(ApiAction::UPDATE);
         $this->formContext->setVersion('1.1');
         $this->formContext->getRequestType()->add(RequestType::REST);
 
@@ -102,7 +103,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         $this->formValidationHandler = new FormValidationHandler(
             $this->validator,
             new CustomizeFormDataEventDispatcher($this->customizationHandler),
-            new PropertyAccessor()
+            PropertyAccess::createPropertyAccessor()
         );
     }
 

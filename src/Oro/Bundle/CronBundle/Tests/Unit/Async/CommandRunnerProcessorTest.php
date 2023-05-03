@@ -39,11 +39,8 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider jobDataProvider
-     *
-     * @param bool $jobResult
-     * @param string $expectedResult
      */
-    public function testProcessUniqueJob($jobResult, $expectedResult)
+    public function testProcessUniqueJob(bool $jobResult, string $expectedResult)
     {
         $commandName = 'test:command';
         $commandArguments = ['argKey' => 'argVal'];
@@ -58,13 +55,8 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical');
 
         $this->jobRunner->expects($this->once())
-            ->method('runUnique')
-            ->with(
-                null,
-                'oro:cron:run_command:test:command-argKey=argVal',
-                function () use ($commandName, $commandArguments) {
-                }
-            )
+            ->method('runUniqueByMessage')
+            ->with($message)
             ->willReturn($jobResult);
         $this->jobRunner->expects($this->never())
             ->method('runDelayed');
@@ -76,11 +68,8 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider jobDataProvider
-     *
-     * @param bool $jobResult
-     * @param string $expectedResult
      */
-    public function testProcessDelayedJob($jobResult, $expectedResult)
+    public function testProcessDelayedJob(bool $jobResult, string $expectedResult)
     {
         $jobId = 'job_id';
         $commandName = 'test:command';
@@ -100,11 +89,7 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('runUnique');
         $this->jobRunner->expects($this->once())
             ->method('runDelayed')
-            ->with(
-                $jobId,
-                function () use ($commandName, $commandArguments) {
-                }
-            )
+            ->with($jobId)
             ->willReturn($jobResult);
 
         $session = $this->createMock(SessionInterface::class);

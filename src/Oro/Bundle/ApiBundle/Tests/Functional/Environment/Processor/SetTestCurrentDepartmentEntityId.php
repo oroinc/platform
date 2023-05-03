@@ -10,8 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class SetTestCurrentDepartmentEntityId implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -21,7 +20,7 @@ class SetTestCurrentDepartmentEntityId implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */
 
@@ -32,7 +31,7 @@ class SetTestCurrentDepartmentEntityId implements ProcessorInterface
             ->setParameter('name', 'Current Department')
             ->getQuery()
             ->getArrayResult();
-        if (!empty($rows)) {
+        if ($rows) {
             $context->setId((string)$rows[0]['id']);
         }
     }

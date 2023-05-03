@@ -37,12 +37,12 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
         parent::setUp();
     }
 
-    /**
-     * @return AbstractType
-     */
-    abstract protected function getFormType();
+    abstract protected function getFormType(): AbstractType;
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
         $validator = new RecursiveValidator(
             new ExecutionContextFactory(new IdentityTranslator()),
@@ -65,28 +65,16 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
         ];
     }
 
-    /**
-     * @param string                                     $formName
-     * @param string                                     $formTypeClass
-     * @param array                                      $options
-     * @param \PHPUnit\Framework\MockObject\MockObject[] $configProviders
-     * @param mixed                                      $newVal
-     * @param mixed                                      $oldVal
-     * @param string                                     $state
-     * @param bool                                       $isSetStateExpected
-     *
-     * @return mixed The form data
-     */
     protected function doTestSubmit(
-        $formName,
-        $formTypeClass,
+        string $formName,
+        string $formTypeClass,
         array $options,
         array $configProviders,
-        $newVal,
-        $oldVal,
-        $state,
-        $isSetStateExpected
-    ) {
+        mixed $newVal,
+        mixed $oldVal,
+        string $state,
+        bool $isSetStateExpected
+    ): mixed {
         $config = new Config(new EntityConfigId('test', 'Test\Entity'));
         $config->set($formName, $oldVal);
 
@@ -169,7 +157,7 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
         return $form->getData();
     }
 
-    protected function setConfigProvidersForSubmitTest(array &$configProviders)
+    protected function setConfigProvidersForSubmitTest(array &$configProviders): void
     {
         $configProviders['test'] = $this->testConfigProvider;
     }

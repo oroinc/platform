@@ -68,11 +68,6 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
 
     /**
      * @dataProvider configureOptionsProvider
-     *
-     * @param bool $multiple
-     * @param bool $expanded
-     * @param mixed $expectedEmptyValue
-     * @param mixed $expectedEmptyData
      */
     public function testConfigureOptions(
         bool $multiple,
@@ -106,9 +101,6 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function configureOptionsProvider(): array
     {
         return [
@@ -168,7 +160,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
             $choiceView = new ChoiceView($data, $item, (string)$key);
             $view->vars['choices'][] = $choiceView;
 
-            if ((is_array($disabledValues) && in_array((string)$key, $disabledValues))
+            if ((is_array($disabledValues) && in_array((string)$key, $disabledValues, true))
                 || (is_callable($disabledValues) && $disabledValues((string)$key))
             ) {
                 $choiceView->attr = ['disabled' => 'disabled'];
@@ -187,9 +179,6 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
         $this->assertSame($result, $returnedChoices);
     }
 
-    /**
-     * @return array
-     */
     public function disabledValuesProvider(): array
     {
         return [
@@ -212,8 +201,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
                     '0.5' => '05',
                     '5' => '5'
                 ],
-                'disabledValues' => static function ($value) {
-                    unset($value);
+                'disabledValues' => static function () {
                     return false;
                 },
             ]

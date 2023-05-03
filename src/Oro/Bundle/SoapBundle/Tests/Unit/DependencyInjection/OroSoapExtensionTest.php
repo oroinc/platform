@@ -3,20 +3,18 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\SoapBundle\DependencyInjection\OroSoapExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroSoapExtensionTest extends ExtensionTestCase
+class OroSoapExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroSoapExtension());
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
-        $expectedDefinitions = [
-            'oro_soap.client.factory',
-            'oro_soap.client',
-            'oro_soap.client.factory.settings',
-        ];
+        $extension = new OroSoapExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
     }
 }

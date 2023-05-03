@@ -6,8 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\ByStepNormalizeResultContext;
 
 class ByStepNormalizeResultContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ByStepNormalizeResultContext */
-    private $context;
+    private ByStepNormalizeResultContext $context;
 
     protected function setUp(): void
     {

@@ -11,13 +11,7 @@ use Oro\Bundle\EntityBundle\Model\EntityStructure;
  */
 class EntityStructureNormalizer
 {
-    /**
-     * @param EntityStructure        $entity
-     * @param EntityDefinitionConfig $config
-     *
-     * @return mixed
-     */
-    public function normalize(EntityStructure $entity, EntityDefinitionConfig $config)
+    public function normalize(EntityStructure $entity, EntityDefinitionConfig $config): array
     {
         return [
             'id'          => $entity->getId(),
@@ -39,8 +33,10 @@ class EntityStructureNormalizer
     /**
      * @param EntityFieldStructure[] $fields
      * @param EntityDefinitionConfig $config
+     *
+     * @return array
      */
-    private function normalizeFields(array $fields, EntityDefinitionConfig $config)
+    private function normalizeFields(array $fields, EntityDefinitionConfig $config): array
     {
         $result = [];
         foreach ($fields as $field) {

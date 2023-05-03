@@ -8,6 +8,7 @@ use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\StepNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Driver\Selenium2Driver;
+use Behat\Mink\Element\ElementInterface;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Session;
@@ -52,9 +53,10 @@ class OroMainContext extends MinkContext implements
     AppKernelAwareInterface
 {
     const SKIP_WAIT_PATTERN = '/'.
-        '^(?:|I )should see ".+" flash message$|'.
-        '^(?:|I )should see ".+" flash message and I close it$|'.
-        '^(?:|I )should see ".+" error message$|'.
+        '^(?:|I )should see .+ flash message$|'.
+        '^(?:|I )should see .+ flash message and I close it$|'.
+        '^(?:|I )should see .+ error message$|'.
+        '^(?:|I )should see success message with number of records were deleted$|'.
         '^(?:|I )should see Schema updated flash message$'.
     '/';
 
@@ -199,21 +201,23 @@ class OroMainContext extends MinkContext implements
     {
         $errorNotifyElements = [
             'Alert Error Message',
-            'Alert Error Flash Message'
+            'Alert Error Flash Message',
         ];
         $errors = [
             'There was an error performing the requested operation. Please try again or contact us for assistance.',
-            'Error occurred during layout update. Please contact system administrator.'
+            'Error occurred during layout update. Please contact system administrator.',
         ];
 
         foreach ($errorNotifyElements as $element) {
             foreach ($errors as $error) {
                 $error = $this->elementFactory->findElementContains($element, $error);
                 if ($error->isIsset()) {
-                    self::fail(sprintf(
-                        'There is an error message "%s" found on the page, something went wrong',
-                        $error->getText()
-                    ));
+                    self::fail(
+                        sprintf(
+                            'There is an error message "%s" found on the page, something went wrong',
+                            $error->getText()
+                        )
+                    );
                 }
             }
         }
@@ -253,10 +257,13 @@ class OroMainContext extends MinkContext implements
     {
         $flashMessage = $this->getFlashMessage($message);
 
-        self::assertNotNull($flashMessage, sprintf(
-            'Expected "%s" message didn\'t appear',
-            $title
-        ));
+        self::assertNotNull(
+            $flashMessage,
+            sprintf(
+                'Expected "%s" message didn\'t appear',
+                $title
+            )
+        );
 
         if ($flashMessage) {
             $link = $flashMessage->findElementContains('Link', $title);
@@ -286,10 +293,17 @@ class OroMainContext extends MinkContext implements
     {
         $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
 
-        self::assertNotNull($flashMessage, sprintf(
-            'Expected "%s" message didn\'t appear',
-            $title
-        ));
+        if ($title === 'Configuration saved') {
+            // consumer doesn't catch up changes of configuration changes immediately, so we need to wait
+            sleep(3);
+        }
+        self::assertNotNull(
+            $flashMessage,
+            sprintf(
+                'Expected "%s" message didn\'t appear',
+                $title
+            )
+        );
     }
 
     /**
@@ -307,10 +321,13 @@ class OroMainContext extends MinkContext implements
     {
         $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
 
-        self::assertNull($flashMessage, sprintf(
-            'Expected that message "%s" won\'t appear',
-            $title
-        ));
+        self::assertNull(
+            $flashMessage,
+            sprintf(
+                'Expected that message "%s" won\'t appear',
+                $title
+            )
+        );
     }
 
     /**
@@ -328,10 +345,13 @@ class OroMainContext extends MinkContext implements
     {
         $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
 
-        self::assertNotNull($flashMessage, sprintf(
-            'Expected "%s" message didn\'t appear',
-            $title
-        ));
+        self::assertNotNull(
+            $flashMessage,
+            sprintf(
+                'Expected "%s" message didn\'t appear',
+                $title
+            )
+        );
 
         /** @var NodeElement $closeButton */
         $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
@@ -542,11 +562,15 @@ class OroMainContext extends MinkContext implements
         $message = $errorElement->getText();
         $errorElement->find('css', 'button.close')->press();
 
-        static::assertStringContainsString($title, $message, \sprintf(
-            'Expect that "%s" error message contains "%s" string, but it isn\'t',
+        static::assertStringContainsString(
+            $title,
             $message,
-            $title
-        ));
+            \sprintf(
+                'Expect that "%s" error message contains "%s" string, but it isn\'t',
+                $message,
+                $title
+            )
+        );
     }
 
     /**
@@ -565,11 +589,15 @@ class OroMainContext extends MinkContext implements
         $message = $errorElement->find('css', 'ul')->getText();
         $errorElement->find('css', 'button.close')->press();
 
-        self::assertEquals($title, $message, sprintf(
-            'Expect that "%s" error message contains "%s" string, but it isn\'t',
+        self::assertEquals(
+            $title,
             $message,
-            $title
-        ));
+            sprintf(
+                'Expect that "%s" error message contains "%s" string, but it isn\'t',
+                $message,
+                $title
+            )
+        );
     }
 
     /**
@@ -617,7 +645,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        self::fail('Expect to see no alert but alert with "'.$alertMessage.'" message is present');
+        self::fail('Expect to see no alert but alert with "' . $alertMessage . '" message is present');
     }
 
     /**
@@ -738,14 +766,14 @@ class OroMainContext extends MinkContext implements
     /**
      * Login with credentials under specified session name and session alias
      * Registers an alias switches to specified session and performs the login procedure
+     * @param string $session
+     * @param string $alias
+     * @param string $credential
      * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::switchToActorWindowSession
      *
      * @Given /^(?:|I )login as "(?P<credential>(?:[^"]|\\")*)" and use in (?P<session>\w+) as (?P<alias>\w+)$/
      * @Given /^(?:|I )login as administrator and use in "(?P<session>[^"]*)" as "(?P<alias>[^"]*)"$/
      *
-     * @param string $session
-     * @param string $alias
-     * @param string $credential
      */
     public function loginAsUserWithPasswordInSession($session, $alias, $credential = 'admin')
     {
@@ -767,29 +795,6 @@ class OroMainContext extends MinkContext implements
         self::assertTrue($userMenu->isValid());
         $userMenu->open();
         $userMenu->clickLink($needle);
-    }
-
-    /**
-     * Example: Given I click "Configure" in "Leads List" widget
-     *
-     * @Given /^(?:|I )click "(?P<needle>[\w\s]+)" in "(?P<widget>[\w\s]+)" widget$/
-     */
-    public function iClickLinkInDashboardWidget($needle, $widget)
-    {
-        $userMenu = $this->createElement($widget);
-        self::assertTrue($userMenu->isValid());
-        $userMenu->clickLink($needle);
-    }
-
-    /**
-     * Example: I should see "Leads list" widget on dashboard
-     *
-     * @Given /^(?:|I )should see "(?P<widget>[\w\s]+)" widget on dashboard$/
-     */
-    public function iShouldSeeDashboardWidget($widget)
-    {
-        $widget = $this->createElement($widget);
-        self::assertTrue($widget->isValid());
     }
 
     /**
@@ -832,13 +837,22 @@ class OroMainContext extends MinkContext implements
      * Example: When I click on "Help Icon" with title "Help"
      *
      * @When /^(?:|I )click on "(?P<selector>[^"]+)" with title "(?P<title>[^"]+)"$/
-     *
-     * @param string $selector
-     * @param string $title
+     * @When /^(?:|I )click on "(?P<selector>[^"]+)" with title "(?P<title>[^"]+)" in element "(?P<container>[^"]+)"$/
      */
-    public function iClickOnElementWithTitle($selector, $title)
+    public function iClickOnElementWithTitle(string $selector, string $title, string $container = ''): void
     {
-        $element = $this->findElementContains($selector, $title);
+        if ($container) {
+            $containerElement = $this->createElement($container);
+            self::assertTrue(
+                $containerElement->isValid(),
+                sprintf('Element "%s" is not found on page', $container)
+            );
+
+            $element = $this->findElementContains($selector, $title, $containerElement);
+        } else {
+            $element = $this->findElementContains($selector, $title);
+        }
+
 
         self::assertTrue(
             $element->isValid(),
@@ -1118,6 +1132,10 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButton($button)
     {
+        if ($button === 'Change History') {
+            // consumer doesn't catch up changes of data audit changes immediately, so we need to wait
+            sleep(3);
+        }
         for ($i = 0; $i < 2; $i++) {
             try {
                 parent::pressButton($button);
@@ -1197,11 +1215,11 @@ class OroMainContext extends MinkContext implements
         $actual = $elementObject->getText();
         $text = $this->fixStepArgument($text);
 
-        $regex = '/'.preg_quote($text, '/').'/ui';
+        $regex = '/' . preg_quote($text, '/') . '/ui';
 
         $message = sprintf('Failed asserting that "%s" contains "%s"', $text, $actual);
 
-        self::assertTrue((bool) preg_match($regex, $actual), $message, $element);
+        self::assertTrue((bool)preg_match($regex, $actual), $message, $element);
     }
 
     /**
@@ -1215,7 +1233,7 @@ class OroMainContext extends MinkContext implements
         $actual = $elementObject->getText();
         $text = $this->fixStepArgument($text);
 
-        $regex = '/'.preg_quote($text, '/').'/ui';
+        $regex = '/' . preg_quote($text, '/') . '/ui';
 
         $message = sprintf('Failed asserting that "%s" does not contain "%s"', $text, $actual);
 
@@ -1288,6 +1306,7 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButtonInModalWindow($button)
     {
+        /** @var NodeElement $modalWindow */
         $modalWindow = $this->spin(function () {
             return $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
         }, 5);
@@ -1556,7 +1575,7 @@ JS;
                     $controlLabel
                 );
 
-                if (true === $controlLabel->compareValues(Form::normalizeValue($value, $label))) {
+                if (true === $controlLabel->compareValues(Form::normalizeValue($value))) {
                     continue 2;
                 }
             }
@@ -1791,11 +1810,14 @@ JS;
      */
     public function iShouldSeeStringInElementUnderElements($string, $elementName, $parentElementName)
     {
-        static::assertTrue($this->stringFoundInElements($string, $elementName, $parentElementName), sprintf(
-            '`%s` has not been found in any of `%s` elements',
-            $string,
-            $elementName
-        ));
+        static::assertTrue(
+            $this->stringFoundInElements($string, $elementName, $parentElementName),
+            sprintf(
+                '`%s` has not been found in any of `%s` elements',
+                $string,
+                $elementName
+            )
+        );
     }
 
     /**
@@ -1803,11 +1825,14 @@ JS;
      */
     public function iShouldNotSeeStringInElementUnderElements($string, $elementName, $parentElementName)
     {
-        static::assertFalse($this->stringFoundInElements($string, $elementName, $parentElementName), sprintf(
-            '`%s` has been found in one of `%s` elements',
-            $string,
-            $elementName
-        ));
+        static::assertFalse(
+            $this->stringFoundInElements($string, $elementName, $parentElementName),
+            sprintf(
+                '`%s` has been found in one of `%s` elements',
+                $string,
+                $elementName
+            )
+        );
     }
 
     /**
@@ -1883,7 +1908,7 @@ JS;
 
     /**
      * Switch to named session window (aliases must be initialized earlier)
-     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::iOperateAsActorUnderSession
+     * @param string $sessionAlias
      * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::sessionsInit
      * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::loginAsUserWithPasswordInSession
      * To define session aliases
@@ -1900,7 +1925,7 @@ JS;
      * @Then /^I proceed as the ([^"]*)$/
      * @Then /^I switch to the "([^"]*)" session$/
      *
-     * @param string $sessionAlias
+     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::iOperateAsActorUnderSession
      */
     public function switchToActorWindowSession($sessionAlias)
     {
@@ -1990,16 +2015,31 @@ JS;
     }
 
     /**
-     * Drag and Drop one element before another
+     * Drag and Drop one element up before another
      * Example: When I drag and drop "Products" before "Clearance"
+     *          When I drag and drop "Products" up before "Clearance"
      *
      * @When /^(?:|I )drag and drop "(?P<elementName>[\w\s]+)" before "(?P<dropZoneName>[\w\s]+)"$/
+     * @When /^(?:|I )drag and drop "(?P<elementName>[\w\s]+)" up before "(?P<dropZoneName>[\w\s]+)"$/
      * @param string $elementName
      * @param string $dropZoneName
      */
     public function iDragAndDropElementBeforeAnotherOne($elementName, $dropZoneName)
     {
         $this->dragAndDropElementToAnotherOne($elementName, $dropZoneName, 1, 1);
+    }
+
+    /**
+     * Drag and Drop one element down before another
+     * Example: When I drag and drop "Products" down before "Clearance"
+     *
+     * @When /^(?:|I )drag and drop "(?P<elementName>[\w\s]+)" down before "(?P<dropZoneName>[\w\s]+)"$/
+     * @param string $elementName
+     * @param string $dropZoneName
+     */
+    public function iDragAndDropElementDownBeforeAnotherOne($elementName, $dropZoneName)
+    {
+        $this->dragAndDropElementToAnotherOne($elementName, $dropZoneName, -1, -1);
     }
 
     /**
@@ -2015,31 +2055,35 @@ JS;
         $this->dragAndDropElementToAnotherOne($elementName, $dropZoneName);
     }
 
-    /**
-     * @param string $elementName
-     * @param string $dropZoneName
-     * @param int $xOffset
-     * @param int $yOffset
-     */
-    public function dragAndDropElementToAnotherOne($elementName, $dropZoneName, $xOffset = null, $yOffset = null)
-    {
+    public function dragAndDropElementToAnotherOne(
+        ElementInterface|string $element,
+        ElementInterface|string|null $dropZone,
+        ?int $xOffset = null,
+        ?int $yOffset = null
+    ): void {
         /** @var Selenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
         $webDriverSession = $driver->getWebDriverSession();
 
-        $element = $this->createElement($elementName);
-        $source = $webDriverSession->element('xpath', $element->getXpath());
+        $sourceXpath = is_string($element) ? $this->createElement($element)->getXpath() : $element->getXpath();
+        $source = $webDriverSession->element('xpath', $sourceXpath);
 
         $webDriverSession->moveto([
-            'element' => $source->getID()
+            'element' => $source->getID(),
         ]);
         $webDriverSession->buttondown();
 
+        // initiate drag action
+        $webDriverSession->moveto([
+            'xoffset' => -1,
+            'yoffset' => -1
+        ]);
+
         $moveToOptions = ['element' => null];
 
-        if ($dropZoneName) {
-            $dropZone = $this->createElement($dropZoneName);
-            $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+        if ($dropZone) {
+            $destXpath = is_string($dropZone) ? $this->createElement($dropZone)->getXpath() : $dropZone->getXpath();
+            $destination = $webDriverSession->element('xpath', $destXpath);
 
             $moveToOptions['element'] = $destination->getID();
         }
@@ -2050,9 +2094,13 @@ JS;
         if (!is_null($yOffset)) {
             $moveToOptions['yoffset'] = $yOffset;
         }
+
         $this->waitForAjax();
+
         $webDriverSession->moveto($moveToOptions);
         $webDriverSession->buttonup();
+
+        $this->waitForAjax();
     }
 
     /**
@@ -2071,53 +2119,152 @@ JS;
         self::assertEquals($width, $driver->evaluateScript($javascipt));
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: When I move "Retail Supplies" before "Clearance" in tree
+     *
+     * @When /^(?:|I )move "(?P<nodeTitle>(?:[^"]|\\")+)" (?P<operation>before|into) "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
+     * @When /^(?:|I )move "(?P<nodeTitle>(?:[^"]|\\")+)" (?P<operation>before|into) "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iMoveNodeInTree(
+        string $nodeTitle,
+        string $operation,
+        string $anotherNodeTitle,
+        string $treeElementName = ''
+    ): void {
+        $nodeTitle = $this->fixStepArgument($nodeTitle);
+        $anotherNodeTitle = $this->fixStepArgument($anotherNodeTitle);
+
+        $treeElement = null;
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $jsTreeItem = $this->createElement('JS Tree item', $treeElement);
+
+        $nodeElement = $jsTreeItem->find('named', ['content', $nodeTitle]);
+        self::assertTrue(
+            $nodeElement?->isValid(),
+            sprintf('Tree item with title "%s" is not found', $nodeTitle)
+        );
+
+        $anotherNodeElement = $jsTreeItem->find('named', ['content', $anotherNodeTitle]);
+        self::assertTrue(
+            $anotherNodeElement?->isValid(),
+            sprintf('Tree item with title "%s" is not found', $anotherNodeTitle)
+        );
+
+        if ($operation === 'before') {
+            $xOffset = 1;
+            $yOffset = 1;
+        } else {
+            $xOffset = $yOffset = null;
+        }
+
+        $this->dragAndDropElementToAnotherOne($nodeElement, $anotherNodeElement, $xOffset, $yOffset);
+    }
+
     /**
      * Expand node of JS Tree detected by given title
      * Example: When I expand "Retail Supplies" in tree
      *
      * @When /^(?:|I )expand "(?P<nodeTitle>(?:[^"]|\\")+)" in tree$/
-     * @param string $nodeTitle
+     * @When /^(?:|I )expand "(?P<nodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
-    public function iExpandNodeInTree($nodeTitle)
+    public function iExpandNodeInTree(string $nodeTitle, string $treeElementName = ''): void
     {
         $nodeTitle = $this->fixStepArgument($nodeTitle);
 
         $page = $this->getSession()->getPage();
-        $nodeStateControl = $page->find(
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $nodeStateControl = ($treeElement ?? $page)->find(
             'xpath',
             '//a[contains(., "' . $nodeTitle . '")]/parent::li[contains(@class, "jstree-closed")]'
             . '/i[contains(@class, "jstree-ocl")]'
         );
-        if (null !== $nodeStateControl) {
-            $nodeStateControl->click();
+
+        $nodeStateControl?->click();
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: When I click on "Retail Supplies" in tree
+     *
+     * @When /^(?:|I )click on (?:"(?P<nodeTitle>(?:[^"]|\\")+)"|first node) in tree$/
+     * @When /^(?:|I )click on (?:"(?P<nodeTitle>(?:[^"]|\\")+)"|first node) in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iClickOnNodeInTree(string $nodeTitle = '', string $treeElementName = ''): void
+    {
+        $nodeTitle = $this->fixStepArgument($nodeTitle);
+
+        $treeElement = null;
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $jsTreeItem = $this->createElement('JS Tree item', $treeElement);
+        self::assertTrue($jsTreeItem->isIsset(), 'Tree is empty');
+
+        if ($nodeTitle !== '') {
+            $nodeElement = $jsTreeItem->find('named', ['content', $nodeTitle]);
+
+            self::assertTrue(
+                $nodeElement?->isValid(),
+                sprintf('Tree item with title "%s" is not found', $nodeTitle)
+            );
+
+            $nodeElement->click();
+        } else {
+            $jsTreeItem->click();
         }
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * Check that some JS Tree node located right after another one node
      * Example: Then I see "By Brand" after "New Arrivals" in tree
      *
      * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" after "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
-     * @param string $nodeTitle
-     * @param string $anotherNodeTitle
+     * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" after "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
-    public function iSeeNodeAfterAnotherOneInTree($nodeTitle, $anotherNodeTitle)
-    {
+    //@codingStandardsIgnoreEnd
+    public function iSeeNodeAfterAnotherOneInTree(
+        string $nodeTitle,
+        string $anotherNodeTitle,
+        string $treeElementName = ''
+    ): void {
         $nodeTitle = $this->fixStepArgument($nodeTitle);
         $anotherNodeTitle = $this->fixStepArgument($anotherNodeTitle);
 
         $page = $this->getSession()->getPage();
-        $resultElement = $page->find(
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $resultElement = ($treeElement ?? $page)->find(
             'xpath',
-            '//a[contains(., "' . $anotherNodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
-            . '/following-sibling::li[contains(@class, "jstree-node")]/a[contains(., "' . $nodeTitle . '")]'
+            '//a[normalize-space(string(.)) = "' . $anotherNodeTitle . '"]/parent::li[contains(@class, "jstree-node")]'
+            . '/following-sibling::li[contains(@class, "jstree-node")]/a[normalize-space(string(.)) = "'
+            . $nodeTitle . '"]'
         );
 
-        self::assertNotNull($resultElement, sprintf(
-            'Node "%s" not found after "%s" in tree.',
-            $nodeTitle,
-            $anotherNodeTitle
-        ));
+        self::assertNotNull(
+            $resultElement,
+            sprintf(
+                'Node "%s" not found after "%s" in tree.',
+                $nodeTitle,
+                $anotherNodeTitle
+            )
+        );
     }
 
     //@codingStandardsIgnoreStart
@@ -2126,25 +2273,38 @@ JS;
      * Example: Then I should see "By Brand" belongs to "New Arrivals" in tree
      *
      * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
-     * @param string $nodeTitle
-     * @param string $anotherNodeTitle
+     * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
     //@codingStandardsIgnoreEnd
-    public function iSeeNodeBelongsAnotherOneInTree($nodeTitle, $anotherNodeTitle)
-    {
-        $page = $this->getSession()->getPage();
-        $resultElement = $page->find(
-            'xpath',
-            '//a[contains(., "' . $nodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
-            . '/parent::ul[contains(@class, "jstree-children")]/parent::li[contains(@class, "jstree-node")]'
-            . '/a[contains(., "' . $anotherNodeTitle . '")]'
-        );
+    public function iSeeNodeBelongsAnotherOneInTree(
+        string $nodeTitle,
+        string $anotherNodeTitle,
+        string $treeElementName = ''
+    ): void {
+        $nodeTitle = $this->fixStepArgument($nodeTitle);
+        $anotherNodeTitle = $this->fixStepArgument($anotherNodeTitle);
 
-        self::assertNotNull($resultElement, sprintf(
-            'Node "%s" does not belong to "%s" in tree.',
-            $nodeTitle,
-            $anotherNodeTitle
-        ));
+        $page = $this->getSession()->getPage();
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $xpath = '//a[normalize-space(string(.)) = ' . $this->escapeXpath($nodeTitle) . ']'
+            . '/parent::li[contains(@class, "jstree-node")]'
+            . '/parent::ul[contains(@class, "jstree-children")]'
+            . '/parent::li[contains(@class, "jstree-node")]'
+            . '/a[normalize-space(string(.)) = ' . $this->escapeXpath($anotherNodeTitle) . ']';
+        $resultElement = ($treeElement ?? $page)->find('xpath', $xpath);
+
+        self::assertNotNull(
+            $resultElement,
+            sprintf(
+                'Node "%s" does not belong to "%s" in tree.',
+                $nodeTitle,
+                $anotherNodeTitle
+            )
+        );
     }
 
     //@codingStandardsIgnoreStart
@@ -2153,25 +2313,38 @@ JS;
      * Example: Then I should not see "By Brand" belongs to "New Arrivals" in tree
      *
      * @Then /^(?:|I )should not see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
-     * @param string $nodeTitle
-     * @param string $anotherNodeTitle
+     * @Then /^(?:|I )should not see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
     //@codingStandardsIgnoreEnd
-    public function iNotSeeNodeBelongsAnotherOneInTree($nodeTitle, $anotherNodeTitle)
-    {
+    public function iNotSeeNodeBelongsAnotherOneInTree(
+        string $nodeTitle,
+        string $anotherNodeTitle,
+        string $treeElementName = ''
+    ): void {
+        $nodeTitle = $this->fixStepArgument($nodeTitle);
+        $anotherNodeTitle = $this->fixStepArgument($anotherNodeTitle);
+
         $page = $this->getSession()->getPage();
-        $resultElement = $page->find(
+        if ($treeElementName) {
+            $treeElement = $this->createElement($treeElementName);
+            self::assertTrue($treeElement->isIsset(), sprintf('Tree element "%s" is not found', $treeElementName));
+        }
+
+        $resultElement = ($treeElement ?? $page)->find(
             'xpath',
-            '//a[contains(., "' . $nodeTitle . '")]/parent::li[contains(@class, "jstree-node")]'
+            '//a[normalize-space(string(.)) = "' . $nodeTitle . '"]/parent::li[contains(@class, "jstree-node")]'
             . '/parent::ul[contains(@class, "jstree-children")]/parent::li[contains(@class, "jstree-node")]'
-            . '/a[contains(., "' . $anotherNodeTitle . '")]'
+            . '/a[normalize-space(string(.)) = "' . $anotherNodeTitle . '"]'
         );
 
-        self::assertTrue(is_null($resultElement), sprintf(
-            'Node "%s" belong to "%s" in tree.',
-            $nodeTitle,
-            $anotherNodeTitle
-        ));
+        self::assertNull(
+            $resultElement,
+            sprintf(
+                'Node "%s" belong to "%s" in tree.',
+                $nodeTitle,
+                $anotherNodeTitle
+            )
+        );
     }
 
     /**
@@ -2247,11 +2420,13 @@ JS;
         }
 
         if (!array_key_exists($keyName, $keyMap)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Key "%s" is not supported, see supported keys: "%s"',
-                $keyName,
-                implode('", "', array_keys($keyMap))
-            ));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Key "%s" is not supported, see supported keys: "%s"',
+                    $keyName,
+                    implode('", "', array_keys($keyMap))
+                )
+            );
         }
 
         $xpath = $this->elementFactory->createElement($elementName)->getXpath();
@@ -2395,22 +2570,31 @@ JS;
     public function iShouldSeeElementInsideElement($childElementName, $parentElementName)
     {
         $parentElement = $this->createElement($parentElementName);
-        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
-            'Parent element "%s" not found on page',
-            $parentElementName
-        ));
+        self::assertTrue(
+            $parentElement->isIsset() && $parentElement->isVisible(),
+            sprintf(
+                'Parent element "%s" not found on page',
+                $parentElementName
+            )
+        );
 
         $childElement = $parentElement->getElement($childElementName);
-        self::assertTrue($childElement->isIsset(), sprintf(
-            'Element "%s" not found inside element "%s"',
-            $childElementName,
-            $parentElementName
-        ));
-        self::assertTrue($childElement->isVisible(), sprintf(
-            'Element "%s" found inside element "%s", but it\'s not visible',
-            $childElementName,
-            $parentElementName
-        ));
+        self::assertTrue(
+            $childElement->isIsset(),
+            sprintf(
+                'Element "%s" not found inside element "%s"',
+                $childElementName,
+                $parentElementName
+            )
+        );
+        self::assertTrue(
+            $childElement->isVisible(),
+            sprintf(
+                'Element "%s" found inside element "%s", but it\'s not visible',
+                $childElementName,
+                $parentElementName
+            )
+        );
     }
 
     /**
@@ -2423,17 +2607,23 @@ JS;
     public function iShouldNotSeeElementInsideElement($childElementName, $parentElementName)
     {
         $parentElement = $this->createElement($parentElementName);
-        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
-            'Parent element "%s" not found on page',
-            $parentElementName
-        ));
+        self::assertTrue(
+            $parentElement->isIsset() && $parentElement->isVisible(),
+            sprintf(
+                'Parent element "%s" not found on page',
+                $parentElementName
+            )
+        );
 
         $childElement = $parentElement->getElement($childElementName);
-        self::assertTrue(!$childElement->isIsset() || !$childElement->isVisible(), sprintf(
-            'Element "%s" exists inside element "%s" when it should not',
-            $childElementName,
-            $parentElementName
-        ));
+        self::assertTrue(
+            !$childElement->isIsset() || !$childElement->isVisible(),
+            sprintf(
+                'Element "%s" exists inside element "%s" when it should not',
+                $childElementName,
+                $parentElementName
+            )
+        );
     }
 
     /**
@@ -2446,10 +2636,13 @@ JS;
     public function iShouldSeeElementInsideIframe($childElementName, $iframeName)
     {
         $iframeElement = $this->createElement($iframeName);
-        self::assertTrue($iframeElement->isIsset() && $iframeElement->isVisible(), sprintf(
-            'Iframe element "%s" not found on page',
-            $iframeName
-        ));
+        self::assertTrue(
+            $iframeElement->isIsset() && $iframeElement->isVisible(),
+            sprintf(
+                'Iframe element "%s" not found on page',
+                $iframeName
+            )
+        );
 
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
@@ -2457,16 +2650,22 @@ JS;
 
         $iframeBody = $this->getSession()->getPage()->find('css', 'body');
         $childElement = $this->elementFactory->createElement($childElementName, $iframeBody);
-        self::assertTrue($childElement->isIsset(), sprintf(
-            'Element "%s" not found inside iframe',
-            $childElementName,
-            $iframeName
-        ));
-        self::assertTrue($childElement->isVisible(), sprintf(
-            'Element "%s" found inside iframe, but it\'s not visible',
-            $childElementName,
-            $iframeName
-        ));
+        self::assertTrue(
+            $childElement->isIsset(),
+            sprintf(
+                'Element "%s" not found inside iframe',
+                $childElementName,
+                $iframeName
+            )
+        );
+        self::assertTrue(
+            $childElement->isVisible(),
+            sprintf(
+                'Element "%s" found inside iframe, but it\'s not visible',
+                $childElementName,
+                $iframeName
+            )
+        );
 
         $driver->switchToWindow();
     }
@@ -2479,10 +2678,13 @@ JS;
     public function iShouldSeeTextInsideIframe(string $text, string $iframeName)
     {
         $iframeElement = $this->createElement($iframeName);
-        self::assertTrue($iframeElement->isIsset() && $iframeElement->isVisible(), sprintf(
-            'Iframe element "%s" not found on page',
-            $iframeName
-        ));
+        self::assertTrue(
+            $iframeElement->isIsset() && $iframeElement->isVisible(),
+            sprintf(
+                'Iframe element "%s" not found on page',
+                $iframeName
+            )
+        );
 
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
@@ -2491,11 +2693,14 @@ JS;
         $iframeBody = $this->getSession()->getPage()->find('css', 'body');
         $element = $iframeBody->find('named', ['content', $text]);
         self::assertNotNull($element, sprintf('Text "%s" not found inside iframe "%s"', $text, $iframeName));
-        self::assertTrue($element->isVisible(), sprintf(
-            'Text "%s" found inside iframe "%s", but it\'s not visible',
-            $text,
-            $iframeName
-        ));
+        self::assertTrue(
+            $element->isVisible(),
+            sprintf(
+                'Text "%s" found inside iframe "%s", but it\'s not visible',
+                $text,
+                $iframeName
+            )
+        );
 
         $driver->switchToWindow();
     }
@@ -2511,24 +2716,33 @@ JS;
     public function iShouldSeeElementWithTextInsideElement($childElementName, $parentElementName, $text)
     {
         $parentElement = $this->createElement($parentElementName);
-        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
-            'Parent element "%s" not found on page',
-            $parentElementName
-        ));
+        self::assertTrue(
+            $parentElement->isIsset() && $parentElement->isVisible(),
+            sprintf(
+                'Parent element "%s" not found on page',
+                $parentElementName
+            )
+        );
 
         $childElement = $parentElement->findElementContains($childElementName, $text);
-        self::assertTrue($childElement->isIsset(), sprintf(
-            'Element "%s" with text "%s" not found inside element "%s"',
-            $childElementName,
-            $text,
-            $parentElementName
-        ));
-        self::assertTrue($childElement->isVisible(), sprintf(
-            'Element "%s" with text "%s" found inside element "%s", but it\'s not visible',
-            $childElementName,
-            $text,
-            $parentElementName
-        ));
+        self::assertTrue(
+            $childElement->isIsset(),
+            sprintf(
+                'Element "%s" with text "%s" not found inside element "%s"',
+                $childElementName,
+                $text,
+                $parentElementName
+            )
+        );
+        self::assertTrue(
+            $childElement->isVisible(),
+            sprintf(
+                'Element "%s" with text "%s" found inside element "%s", but it\'s not visible',
+                $childElementName,
+                $text,
+                $parentElementName
+            )
+        );
     }
 
     /**
@@ -2542,18 +2756,24 @@ JS;
     public function iShouldNotSeeElementWithTextInsideElement($childElementName, $parentElementName, $text)
     {
         $parentElement = $this->createElement($parentElementName);
-        self::assertTrue($parentElement->isIsset() && $parentElement->isVisible(), sprintf(
-            'Parent element "%s" not found on page',
-            $parentElementName
-        ));
+        self::assertTrue(
+            $parentElement->isIsset() && $parentElement->isVisible(),
+            sprintf(
+                'Parent element "%s" not found on page',
+                $parentElementName
+            )
+        );
 
         $childElement = $parentElement->findElementContains($childElementName, $text);
-        self::assertTrue(!$childElement->isIsset() || !$childElement->isVisible(), sprintf(
-            'Element "%s" with text "%s" exists inside element "%s" when it should not',
-            $childElementName,
-            $text,
-            $parentElementName
-        ));
+        self::assertTrue(
+            !$childElement->isIsset() || !$childElement->isVisible(),
+            sprintf(
+                'Element "%s" with text "%s" exists inside element "%s" when it should not',
+                $childElementName,
+                $text,
+                $parentElementName
+            )
+        );
     }
 
     /**
@@ -2691,17 +2911,20 @@ JS;
         $value = $this->fixStepArgument($value);
 
         $field = $this->createElement($fieldName);
-        self::assertTrue($field->isIsset(), sprintf(
-            'Element "%s" not found on page',
-            $fieldName
-        ));
+        self::assertTrue(
+            $field->isIsset(),
+            sprintf(
+                'Element "%s" not found on page',
+                $fieldName
+            )
+        );
 
         $actual = $field->getValue();
-        $regex = '/^'.preg_quote($value, '/').'$/ui';
+        $regex = '/^' . preg_quote($value, '/') . '$/ui';
 
         $message = sprintf('The field "%s" value is "%s", but "%s" expected.', $fieldName, $actual, $value);
 
-        self::assertTrue((bool) preg_match($regex, $actual), $message);
+        self::assertTrue((bool)preg_match($regex, $actual), $message);
     }
 
     /**
@@ -2756,6 +2979,31 @@ JS;
     }
 
     /**
+     * Properly escapes XPath selector.
+     * If the string contains both types of quotes, then splits it into multiple parts and passes to concat().
+     */
+    protected function escapeXpath(string $string): string
+    {
+        $parts = explode("'", $string);
+        if (count($parts) < 2) {
+            return "'" . $string . "'";
+        }
+
+        $concat = [];
+        foreach ($parts as $part) {
+            if (str_contains($part, '"')) {
+                $concat[] = "'" . $part . "'";
+            } else {
+                $concat[] = '"' . $part . '"';
+            }
+            $concat[] = '"' . "'" . '"';
+        }
+        array_pop($concat);
+
+        return sprintf('concat(%s)', implode(', ', $concat));
+    }
+
+    /**
      * Checks downloading file for a certain link
      * Example: And I download file "some_link_name.jpg"
      * @Given /^I download file "([^"]*)"$/
@@ -2766,10 +3014,12 @@ JS;
 
         self::assertNotNull($link);
         if (!$link->hasAttribute('href')) {
-            throw new \InvalidArgumentException(sprintf(
-                'Link "%s" is not downloadable (no href attribute)',
-                $linkTitle
-            ));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Link "%s" is not downloadable (no href attribute)',
+                    $linkTitle
+                )
+            );
         }
 
         $url = $this->locatePath($link->getAttribute('href'));
@@ -2889,6 +3139,19 @@ JS;
     public function assertFieldContains($field, $value)
     {
         parent::assertFieldContains($field, $value);
+    }
+
+    /**
+     * One minute(maximum) awaiting given element to appear
+     *
+     * @Then /^(?:|I )wait for "(?P<element>[\w\s]+)" element to appear$/
+     */
+    public function waitForElementToAppear($element)
+    {
+        $awaitedElement = $this->createElement($element);
+        $this->spin(function () use ($awaitedElement) {
+            return $awaitedElement->isIsset();
+        }, 60);
     }
 
     /**

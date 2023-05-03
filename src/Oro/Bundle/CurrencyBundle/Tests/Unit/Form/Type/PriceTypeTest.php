@@ -18,15 +18,12 @@ class PriceTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $currencyProvider = $this->createMock(CurrencyProviderInterface::class);
         $currencyProvider->expects($this->any())
             ->method('getCurrencyList')
             ->willReturn(['USD', 'EUR']);
-
-        $localeSettings = $this->createMock(LocaleSettings::class);
-        $currencyNameHelper = $this->createMock(CurrencyNameHelper::class);
 
         $priceType = new PriceType();
         $priceType->setDataClass(Price::class);
@@ -34,11 +31,11 @@ class PriceTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    PriceType::class => $priceType,
-                    CurrencySelectionType::class => new CurrencySelectionType(
+                    $priceType,
+                    new CurrencySelectionType(
                         $currencyProvider,
-                        $localeSettings,
-                        $currencyNameHelper
+                        $this->createMock(LocaleSettings::class),
+                        $this->createMock(CurrencyNameHelper::class)
                     )
                 ],
                 []

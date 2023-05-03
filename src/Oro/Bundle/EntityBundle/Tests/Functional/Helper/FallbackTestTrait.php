@@ -6,23 +6,15 @@ use Symfony\Component\DomCrawler\Form;
 
 trait FallbackTestTrait
 {
-    /**
-     * @param Form $form
-     * @param mixed $scalarValue
-     * @param mixed $fallbackValue
-     * @param string $formName
-     * @param string $fieldName
-     * @return Form
-     */
-    protected function updateFallbackField(
+    private function updateFallbackField(
         Form $form,
-        $scalarValue,
-        $fallbackValue,
-        $formName,
-        $fieldName
-    ) {
+        mixed $scalarValue,
+        mixed $fallbackValue,
+        string $formName,
+        string $fieldName
+    ): Form {
         $scalarFieldName = sprintf('%s[%s][scalarValue]', $formName, $fieldName);
-        if (is_null($scalarValue)) {
+        if (null === $scalarValue) {
             unset($form[$scalarFieldName]);
         } else {
             $form[$scalarFieldName] = $scalarValue;

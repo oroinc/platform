@@ -4,18 +4,13 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional;
 
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Form;
 
 class AbstractWidgetTestCase extends WebTestCase
 {
-    /**
-     * @param Form $form
-     * @param string $fieldName
-     * @param mixed $value
-     * @param string $fieldType
-     */
-    protected function setOrAdd(Form $form, $fieldName, $value, $fieldType = 'text')
+    protected function setOrAdd(Form $form, string $fieldName, mixed $value, string $fieldType = 'text'): void
     {
         if (!$form->has($fieldName)) {
             $doc = new \DOMDocument('1.0');
@@ -37,7 +32,7 @@ class AbstractWidgetTestCase extends WebTestCase
             )
         );
         $response = $this->client->getResponse();
-        $this->assertEquals($response->getStatusCode(), 200, 'Failed in getting configure widget dialog window !');
+        $this->assertEquals(200, $response->getStatusCode(), 'Failed in getting configure widget dialog window !');
 
         $crawler = $this->client->getCrawler();
         $form = $crawler->selectButton('Save')->form();
@@ -49,27 +44,26 @@ class AbstractWidgetTestCase extends WebTestCase
         $this->client->submit($form);
 
         $response = $this->client->getResponse();
-        $this->assertEquals($response->getStatusCode(), 200, 'Failed in submit widget configuration options !');
+        $this->assertEquals(200, $response->getStatusCode(), 'Failed in submit widget configuration options !');
     }
 
     /**
      * Returns data for which will be used to show widget's chart
-     *
-     * @param $crawler
-     * @return array
      */
-    protected function getChartData($crawler)
+    protected function getChartData(Crawler $crawler): array
     {
         $dataComponent = $crawler->filter('.column-chart');
         if ($dataComponent->extract(['data-page-component-options'])) {
             $data = $dataComponent->extract(['data-page-component-options']);
             $data = json_decode($data[0], false, 512, JSON_THROW_ON_ERROR);
+
             return $data->chartOptions->dataSource->data;
-        } else {
-            $dataComponent = $crawler->filter('.dashboard-widget-content > [data-page-component-options]');
-            $data = $dataComponent->extract(['data-page-component-options']);
-            $data = json_decode($data[0], false, 512, JSON_THROW_ON_ERROR);
-            return $data->data;
         }
+
+        $dataComponent = $crawler->filter('.dashboard-widget-content > [data-page-component-options]');
+        $data = $dataComponent->extract(['data-page-component-options']);
+        $data = json_decode($data[0], false, 512, JSON_THROW_ON_ERROR);
+
+        return $data->data;
     }
 }

@@ -24,9 +24,9 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testIsApplicableOnUserPage(?object $user, bool $expected)
+    public function testIsApplicableOnUserPage(?object $user, bool $expected): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             $this->placeholderFilter->isPasswordManageEnabled($user)
         );
@@ -50,13 +50,13 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isUserApplicableDataProvider
      */
-    public function testIsUserApplicable(object $user, bool $expected)
+    public function testIsUserApplicable(object $user, bool $expected): void
     {
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->assertEquals($expected, $this->placeholderFilter->isUserApplicable());
+        self::assertEquals($expected, $this->placeholderFilter->isUserApplicable());
     }
 
     public function isUserApplicableDataProvider(): array
@@ -64,6 +64,35 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         return [
             [new \stdClass(), false],
             [new User(), true]
+        ];
+    }
+
+    /**
+     * @dataProvider isPasswordResetEnabledDataProvider
+     */
+    public function testisPasswordResetEnabled(int $tokenUserId, object $methodUser, bool $expected): void
+    {
+        $this->tokenAccessor->expects(self::any())
+            ->method('getUserId')
+            ->willReturn($tokenUserId);
+
+        self::assertEquals($expected, $this->placeholderFilter->isPasswordResetEnabled($methodUser));
+    }
+
+    public function isPasswordResetEnabledDataProvider(): array
+    {
+        $user1 = new User(1);
+        $user1->setEnabled(true);
+        $user2 = new User(2);
+        $user2->setEnabled(true);
+        $user2Disabled = new User(2);
+        $user2Disabled->setEnabled(false);
+
+        return [
+            [1, new \stdClass(), false],
+            [1, $user1, false],
+            [1, $user2Disabled, false],
+            [1, $user2, true]
         ];
     }
 }

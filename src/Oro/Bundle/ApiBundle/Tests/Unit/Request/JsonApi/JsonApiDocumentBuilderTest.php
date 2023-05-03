@@ -14,8 +14,10 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
 {
@@ -47,7 +49,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             'name' => 'Name'
         ];
 
-        $this->documentBuilder->setDataObject($object, $this->requestType);
+        $this->documentBuilder->setDataObject($object, $this->requestType, null);
 
         self::assertEquals(
             [
@@ -67,7 +69,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             'name' => 'Name'
         ];
 
-        $this->documentBuilder->setDataCollection([$object], $this->requestType);
+        $this->documentBuilder->setDataCollection([$object], $this->requestType, null);
 
         self::assertEquals(
             [
@@ -2280,6 +2282,184 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                             'name' => 'test'
                         ]
                     ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testSetDataObjectWithIncludedEntityDuplicatesPrimaryEntity()
+    {
+        $object = [
+            'id'        => 1,
+            'name'      => 'Account1',
+            'customers' => [
+                ['id' => 11, 'name' => 'Customer1', 'account' => ['id' => 1, 'name' => 'Account1']],
+                ['id' => 12, 'name' => 'Customer2', 'account' => ['id' => 2, 'name' => 'Account2']]
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Account', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addAssociation($this->createAssociationMetadata('customers', 'Test\Customer', true));
+        $customerMetadata = $metadata->getAssociation('customers')->getTargetMetadata();
+        $customerMetadata->addField($this->createFieldMetadata('id'));
+        $customerMetadata->addField($this->createFieldMetadata('name'));
+        $customerMetadata->addAssociation($this->createAssociationMetadata('account', 'Test\Account'));
+        $accountMetadata = $customerMetadata->getAssociation('account')->getTargetMetadata();
+        $accountMetadata->addField($this->createFieldMetadata('id'));
+        $accountMetadata->addField($this->createFieldMetadata('name'));
+        $accountMetadata->addAssociation($this->createAssociationMetadata('customers', 'Test\Customer', true));
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'data'     => [
+                    'type'          => 'test_account',
+                    'id'            => 'Test\Account::1',
+                    'attributes'    => ['name' => 'Account1'],
+                    'relationships' => [
+                        'customers' => [
+                            'data' => [
+                                ['type' => 'test_customer', 'id' => 'Test\Customer::11'],
+                                ['type' => 'test_customer', 'id' => 'Test\Customer::12']
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type'          => 'test_customer',
+                        'id'            => 'Test\Customer::11',
+                        'attributes'    => ['name' => 'Customer1'],
+                        'relationships' => [
+                            'account' => ['data' => ['type' => 'test_account', 'id' => 'Test\Account::1']]
+                        ]
+                    ],
+                    [
+                        'type'          => 'test_account',
+                        'id'            => 'Test\Account::2',
+                        'attributes'    => ['name' => 'Account2'],
+                        'relationships' => [
+                            'customers' => ['data' => []]
+                        ]
+                    ],
+                    [
+                        'type'          => 'test_customer',
+                        'id'            => 'Test\Customer::12',
+                        'attributes'    => ['name' => 'Customer2'],
+                        'relationships' => [
+                            'account' => ['data' => ['type' => 'test_account', 'id' => 'Test\Account::2']]
+                        ]
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testSetDataCollectionWithIncludedEntityDuplicatesPrimaryEntity()
+    {
+        $objects = [
+            [
+                'id'        => 1,
+                'name'      => 'Account1',
+                'customers' => [
+                    ['id' => 11, 'name' => 'Customer1', 'account' => ['id' => 1, 'name' => 'Account1']],
+                    ['id' => 12, 'name' => 'Customer2', 'account' => ['id' => 2, 'name' => 'Account2']]
+                ]
+            ],
+            [
+                'id'        => 2,
+                'name'      => 'Account2',
+                'customers' => [
+                    ['id' => 12, 'name' => 'Customer2', 'account' => ['id' => 2, 'name' => 'Account2']],
+                    ['id' => 13, 'name' => 'Customer3', 'account' => ['id' => 3, 'name' => 'Account3']]
+                ]
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Account', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addField($this->createFieldMetadata('name'));
+        $metadata->addAssociation($this->createAssociationMetadata('customers', 'Test\Customer', true));
+        $customerMetadata = $metadata->getAssociation('customers')->getTargetMetadata();
+        $customerMetadata->addField($this->createFieldMetadata('id'));
+        $customerMetadata->addField($this->createFieldMetadata('name'));
+        $customerMetadata->addAssociation($this->createAssociationMetadata('account', 'Test\Account'));
+        $accountMetadata = $customerMetadata->getAssociation('account')->getTargetMetadata();
+        $accountMetadata->addField($this->createFieldMetadata('id'));
+        $accountMetadata->addField($this->createFieldMetadata('name'));
+        $accountMetadata->addAssociation($this->createAssociationMetadata('customers', 'Test\Customer', true));
+
+        $this->documentBuilder->setDataCollection($objects, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'data'     => [
+                    [
+                        'type'          => 'test_account',
+                        'id'            => 'Test\Account::1',
+                        'attributes'    => ['name' => 'Account1'],
+                        'relationships' => [
+                            'customers' => [
+                                'data' => [
+                                    ['type' => 'test_customer', 'id' => 'Test\Customer::11'],
+                                    ['type' => 'test_customer', 'id' => 'Test\Customer::12']
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type'          => 'test_account',
+                        'id'            => 'Test\Account::2',
+                        'attributes'    => ['name' => 'Account2'],
+                        'relationships' => [
+                            'customers' => [
+                                'data' => [
+                                    ['type' => 'test_customer', 'id' => 'Test\Customer::12'],
+                                    ['type' => 'test_customer', 'id' => 'Test\Customer::13']
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type'          => 'test_customer',
+                        'id'            => 'Test\Customer::11',
+                        'attributes'    => ['name' => 'Customer1'],
+                        'relationships' => [
+                            'account' => ['data' => ['type' => 'test_account', 'id' => 'Test\Account::1']]
+                        ]
+                    ],
+                    [
+                        'type'          => 'test_customer',
+                        'id'            => 'Test\Customer::12',
+                        'attributes'    => ['name' => 'Customer2'],
+                        'relationships' => [
+                            'account' => ['data' => ['type' => 'test_account', 'id' => 'Test\Account::2']]
+                        ]
+                    ],
+                    [
+                        'type'          => 'test_account',
+                        'id'            => 'Test\Account::3',
+                        'attributes'    => ['name' => 'Account3'],
+                        'relationships' => [
+                            'customers' => ['data' => []]
+                        ]
+                    ],
+                    [
+                        'type'          => 'test_customer',
+                        'id'            => 'Test\Customer::13',
+                        'attributes'    => ['name' => 'Customer3'],
+                        'relationships' => [
+                            'account' => ['data' => ['type' => 'test_account', 'id' => 'Test\Account::3']]
+                        ]
+                    ],
                 ]
             ],
             $this->documentBuilder->getDocument()

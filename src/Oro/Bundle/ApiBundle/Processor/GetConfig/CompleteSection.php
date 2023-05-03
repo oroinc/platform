@@ -13,8 +13,7 @@ use Oro\Component\EntitySerializer\EntityConfigInterface;
  */
 abstract class CompleteSection implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    protected DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -25,7 +24,7 @@ abstract class CompleteSection implements ProcessorInterface
         EntityConfigInterface $section,
         string $entityClass,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         if (!$section->isExcludeAll()) {
             if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
                 $this->completeFields($section, $entityClass, $definition);
@@ -40,9 +39,9 @@ abstract class CompleteSection implements ProcessorInterface
         EntityConfigInterface $section,
         string $entityClass,
         EntityDefinitionConfig $definition
-    );
+    ): void;
 
-    protected function applyFieldExclusions(EntityConfigInterface $section, EntityDefinitionConfig $definition)
+    protected function applyFieldExclusions(EntityConfigInterface $section, EntityDefinitionConfig $definition): void
     {
         $fields = $section->getFields();
         foreach ($fields as $fieldName => $sectionField) {

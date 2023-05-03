@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class NormalizeValueContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var NormalizeValueContext */
-    private $context;
+    private NormalizeValueContext $context;
 
     protected function setUp(): void
     {

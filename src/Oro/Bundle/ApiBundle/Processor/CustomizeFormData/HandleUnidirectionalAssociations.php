@@ -13,8 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class HandleUnidirectionalAssociations implements ProcessorInterface
 {
-    /** @var UnidirectionalAssociationHandler */
-    private $handler;
+    private UnidirectionalAssociationHandler $handler;
 
     public function __construct(UnidirectionalAssociationHandler $handler)
     {
@@ -24,7 +23,7 @@ class HandleUnidirectionalAssociations implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
 

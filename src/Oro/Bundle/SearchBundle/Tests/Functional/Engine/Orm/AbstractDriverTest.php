@@ -12,10 +12,6 @@ abstract class AbstractDriverTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-
-        if ($this->getContainer()->getParameter('database_driver') !== $this->getDriverName()) {
-            $this->markTestSkipped(sprintf('Test doesn\'t run for currently configured DBMS'));
-        }
     }
 
     public function testOnlyItemIsAccepted()
@@ -71,9 +67,4 @@ abstract class AbstractDriverTest extends WebTestCase
      * @return BaseDriver
      */
     abstract protected function getDriver();
-
-    /**
-     * @return string
-     */
-    abstract public function getDriverName();
 }

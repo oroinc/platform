@@ -10,12 +10,8 @@ class OperationFindCriteriaTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider criteriaData
-     *
-     * @param null|string $entityClass
-     * @param null|string $route
-     * @param null|string $datagrid
      */
-    public function testCriteriaSimpleGetters($entityClass, $route, $datagrid)
+    public function testCriteriaSimpleGetters(?string $entityClass, ?string $route, ?string $datagrid)
     {
         $criteria = new OperationFindCriteria($entityClass, $route, $datagrid);
 
@@ -24,60 +20,51 @@ class OperationFindCriteriaTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($datagrid, $criteria->getDatagrid());
     }
 
-    /**
-     * @return \Generator
-     */
-    public function criteriaData()
+    public function criteriaData(): array
     {
-        yield 'simple defaults' => [
-            'entityClass' => null,
-            'route' => null,
-            'datagrid' => null
-        ];
-
-        yield 'simple values' => [
-            'entityClass' => \stdClass::class,
-            'route' => 'route1',
-            'datagrid' => 'datagrid1'
+        return [
+            'simple defaults' => [
+                'entityClass' => null,
+                'route' => null,
+                'datagrid' => null
+            ],
+            'simple values' => [
+                'entityClass' => \stdClass::class,
+                'route' => 'route1',
+                'datagrid' => 'datagrid1'
+            ]
         ];
     }
 
     /**
      * @dataProvider criteriaGroupGetterNormalizationData
-     *
-     * @param null|string|array $setGroup
-     * @param array $expected
      */
-    public function testCriteriaGroupGetterNormalization($setGroup, array $expected)
+    public function testCriteriaGroupGetterNormalization(mixed $set, array $expected)
     {
-        $criteria = new OperationFindCriteria(null, null, null, $setGroup);
+        $criteria = new OperationFindCriteria(null, null, null, $set);
 
         $this->assertEquals($expected, $criteria->getGroups());
     }
 
-    /**
-     * @return \Generator
-     */
-    public function criteriaGroupGetterNormalizationData()
+    public function criteriaGroupGetterNormalizationData(): array
     {
-        yield 'default' => [
-            'set' => null,
-            'expected' => [ButtonInterface::DEFAULT_GROUP]
-        ];
-
-        yield 'convert to array' => [
-            'set' => 'group',
-            'expected' => ['group']
-        ];
-
-        yield 'custom group normalizations' => [
-            'set' => [0, 'string'],
-            'expected' => ['0', 'string']
-        ];
-
-        yield 'correct group object normalization' => [
-            'set' => new ClassWithToString,
-            'expected' => ['string representation']
+        return [
+            'default' => [
+                'set' => null,
+                'expected' => [ButtonInterface::DEFAULT_GROUP]
+            ],
+            'convert to array' => [
+                'set' => 'group',
+                'expected' => ['group']
+            ],
+            'custom group normalizations' => [
+                'set' => [0, 'string'],
+                'expected' => ['0', 'string']
+            ],
+            'correct group object normalization' => [
+                'set' => new ClassWithToString(),
+                'expected' => ['string representation']
+            ]
         ];
     }
 }

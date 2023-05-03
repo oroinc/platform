@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
 /**
@@ -66,6 +67,6 @@ class FieldAccessor
      */
     public static function hasGetter($entity, $fieldName)
     {
-        return method_exists($entity, 'get' . InflectorFactory::create()->classify($fieldName));
+        return EntityPropertyInfo::methodExists($entity, 'get' . InflectorFactory::create()->classify($fieldName));
     }
 }

@@ -14,7 +14,7 @@ class SetHttpAllowHeaderForSingleItem extends SetHttpAllowHeader
     /**
      * {@inheritdoc}
      */
-    protected function getHttpMethodToActionsMap()
+    protected function getHttpMethodToActionsMap(): array
     {
         return [
             Request::METHOD_OPTIONS => ApiAction::OPTIONS,

@@ -58,7 +58,10 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
         $classMetadata = $this->createMock(ClassMetadata::class);
         $classMetadata->expects($this->any())
@@ -88,7 +91,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             new PreloadedExtension(
                 [
                     $this->type,
-                    EntityType::class => new EntityType($doctrine)
+                    new EntityType($doctrine)
                 ],
                 []
             )

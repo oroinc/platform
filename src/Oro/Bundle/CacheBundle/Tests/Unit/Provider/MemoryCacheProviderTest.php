@@ -28,25 +28,21 @@ class MemoryCacheProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWithCallback(): void
     {
-        $this->universalCacheKeyGenerator
-            ->expects($this->once())
+        $this->universalCacheKeyGenerator->expects($this->once())
             ->method('generate')
             ->with($cacheKeyArguments = 'sample_argument')
             ->willReturn($cacheKey = 'sample_key');
 
         $cachedData = 'sample_data';
 
-        $this->arrayAdapter
-            ->expects($this->once())
+        $this->arrayAdapter->expects($this->once())
             ->method('get')
-            ->willReturnCallback(
-                function ($key, $callable) use ($cacheKey, $cachedData) {
-                    $this->assertEquals($cacheKey, $key);
-                    $this->assertIsCallable($callable);
+            ->willReturnCallback(function ($key, $callable) use ($cacheKey, $cachedData) {
+                $this->assertEquals($cacheKey, $key);
+                $this->assertIsCallable($callable);
 
-                    return $cachedData;
-                }
-            );
+                return $cachedData;
+            });
 
         $this->assertEquals(
             $cachedData,
@@ -60,25 +56,21 @@ class MemoryCacheProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWithoutCallback(): void
     {
-        $this->universalCacheKeyGenerator
-            ->expects($this->once())
+        $this->universalCacheKeyGenerator->expects($this->once())
             ->method('generate')
             ->with($cacheKeyArguments = ['sample_argument'])
             ->willReturn($cacheKey = 'sample_key');
 
-        $this->arrayAdapter
-            ->expects($this->once())
+        $this->arrayAdapter->expects($this->once())
             ->method('getItem')
             ->with($cacheKey)
             ->willReturn($cacheItem = $this->createMock(ItemInterface::class));
 
-        $cacheItem
-            ->expects($this->once())
+        $cacheItem->expects($this->once())
             ->method('isHit')
             ->willReturn(true);
 
-        $cacheItem
-            ->expects($this->once())
+        $cacheItem->expects($this->once())
             ->method('get')
             ->willReturn($cachedData = 'sample_data');
 
@@ -87,25 +79,21 @@ class MemoryCacheProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWithoutCallbackWhenNoData(): void
     {
-        $this->universalCacheKeyGenerator
-            ->expects($this->once())
+        $this->universalCacheKeyGenerator->expects($this->once())
             ->method('generate')
             ->with($cacheKeyArguments = ['sample_argument'])
             ->willReturn($cacheKey = 'sample_key');
 
-        $this->arrayAdapter
-            ->expects($this->once())
+        $this->arrayAdapter->expects($this->once())
             ->method('getItem')
             ->with($cacheKey)
             ->willReturn($cacheItem = $this->createMock(ItemInterface::class));
 
-        $cacheItem
-            ->expects($this->once())
+        $cacheItem->expects($this->once())
             ->method('isHit')
             ->willReturn(false);
 
-        $cacheItem
-            ->expects($this->never())
+        $cacheItem->expects($this->never())
             ->method('get');
 
         $this->assertNull($this->provider->get($cacheKeyArguments));
@@ -113,8 +101,7 @@ class MemoryCacheProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testReset(): void
     {
-        $this->arrayAdapter
-            ->expects($this->once())
+        $this->arrayAdapter->expects($this->once())
             ->method('reset');
 
         $this->provider->reset();

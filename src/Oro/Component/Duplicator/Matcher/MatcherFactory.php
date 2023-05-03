@@ -7,7 +7,9 @@ use Oro\Component\Duplicator\AbstractFactory;
 use Oro\Component\Duplicator\ObjectType;
 
 /**
- * @method BaseMatcher create(ObjectType $objectType)
+ * Duplicator Matcher factory with interface restrict
+ *
+ * @method BaseMatcher create(ObjectType $objectType, array $constructorArgs = [])
  */
 class MatcherFactory extends AbstractFactory
 {

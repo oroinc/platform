@@ -445,6 +445,10 @@ class DoctrineHelper implements ResetInterface
      * @param mixed  $entityId    The identifier of an entity
      *
      * @return object
+     *
+     * @template T
+     * @psalm-param class-string<T> $entityClass
+     * @psalm-return T
      */
     public function getEntityReference($entityClass, $entityId)
     {
@@ -460,6 +464,10 @@ class DoctrineHelper implements ResetInterface
      * @param mixed  $entityId    The identifier of an entity
      *
      * @return object|null
+     *
+     * @template T
+     * @psalm-param class-string<T> $entityClass
+     * @psalm-return T
      */
     public function getEntity($entityClass, $entityId)
     {

@@ -41,56 +41,28 @@ class CommandRunnerProcessor implements
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = $message->getBody();
+        $messageBody = $message->getBody();
 
-        if (array_key_exists('jobId', $body)) {
-            $result = $this->runDelayedJob($body['jobId'], $body['command'], $body['arguments']);
+        $commandArguments = $messageBody['arguments'];
+        $commandName = $messageBody['command'];
+
+        if (array_key_exists('jobId', $messageBody)) {
+            $result = $this->jobRunner->runDelayed(
+                $messageBody['jobId'],
+                function () use ($commandName, $commandArguments) {
+                    return $this->runCommand($commandName, $commandArguments);
+                }
+            );
         } else {
-            $result = $this->runUniqueJob($message->getMessageId(), $body['command'], $body['arguments']);
+            $result = $this->jobRunner->runUniqueByMessage(
+                $message,
+                function () use ($commandName, $commandArguments) {
+                    return $this->runCommand($commandName, $commandArguments);
+                }
+            );
         }
 
         return $result ? self::ACK : self::REJECT;
-    }
-
-    /**
-     * @param string $ownerId
-     * @param string $commandName
-     * @param array $commandArguments
-     *
-     * @return bool
-     */
-    private function runUniqueJob($ownerId, $commandName, array $commandArguments)
-    {
-        $jobName = sprintf('oro:cron:run_command:%s', $commandName);
-        if ($commandArguments) {
-            array_walk($commandArguments, static function ($item, $key) use (&$jobName) {
-                if (is_array($item)) {
-                    $item = implode(',', $item);
-                }
-
-                $jobName .= sprintf('-%s=%s', $key, $item);
-            });
-        }
-
-        return $this->jobRunner->runUnique($ownerId, $jobName, function () use ($commandName, $commandArguments) {
-            return $this->runCommand($commandName, $commandArguments);
-        });
-    }
-
-    /**
-     * @param string $jobId
-     * @param string $commandName
-     * @param array $commandArguments
-     *
-     * @return bool
-     */
-    private function runDelayedJob($jobId, $commandName, array $commandArguments)
-    {
-        $result = $this->jobRunner->runDelayed($jobId, function () use ($commandName, $commandArguments) {
-            return $this->runCommand($commandName, $commandArguments);
-        });
-
-        return $result;
     }
 
     /**

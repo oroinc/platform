@@ -5,16 +5,14 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class TypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Condition\Type */
-    protected $condition;
+    private $condition;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->condition = new Condition\Type();
@@ -23,29 +21,22 @@ class TypeTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeWithException()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "left" must be property path');
 
         $this->condition->initialize([1, 2]);
     }
 
     /**
-     * @param array $options
-     * @param array $context
-     * @param bool $expectedResult
-     *
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, array $context, $expectedResult)
+    public function testEvaluate(array $options, array $context, bool $expectedResult)
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    /**
-     * @return array
-     */
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
             'integer' => [
@@ -142,10 +133,7 @@ class TypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $errors->get(0));
     }
 
-    /**
-     * @return array
-     */
-    public function errorMessagesProvider()
+    public function errorMessagesProvider(): array
     {
         return [
             'integer value (scalar)' => [

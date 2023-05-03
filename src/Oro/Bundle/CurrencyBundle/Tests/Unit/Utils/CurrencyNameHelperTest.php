@@ -103,9 +103,9 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
     }
 
     /**
-     * @return string
+     * {@inheritDoc}
      */
-    public function getViewType()
+    public function getViewType(): string
     {
         return $this->viewType;
     }
@@ -140,12 +140,9 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
     }
 
     /**
-     * @param Price $price
-     * @param array $options
-     * @param string $expected
      * @dataProvider formatCurrencyDataProvider
      */
-    public function testFormatCurrency(Price $price, array $options, $expected)
+    public function testFormatCurrency(Price $price, array $options, string $expected)
     {
         $currencyNameHelper = new CurrencyNameHelper(
             $this->getLocaleSettings('en'),

@@ -12,14 +12,12 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class GenderTypeTest extends FormIntegrationTestCase
 {
-    /** @var array */
-    private $genderChoices = [
+    private array $genderChoices = [
         'Male' => Gender::MALE,
         'Female' => Gender::FEMALE,
     ];
 
-    /** @var GenderType */
-    private $type;
+    private GenderType $type;
 
     protected function setUp(): void
     {
@@ -35,15 +33,10 @@ class GenderTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    $this->type
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->type], [])
         ];
     }
 

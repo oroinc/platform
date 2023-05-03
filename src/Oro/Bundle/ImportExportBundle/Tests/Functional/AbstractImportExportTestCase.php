@@ -4,12 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Functional;
 
 use Oro\Bundle\ImportExportBundle\Async\Topic\ExportTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topic\ImportTopic;
-use Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
-use Oro\Bundle\ImportExportBundle\Async\Topic\SaveImportExportResultTopic;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
-use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -19,10 +16,9 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationT
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
-use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -80,60 +76,23 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         string $expectedCsvFilePath,
         array $skippedColumns = []
     ): void {
-        $messageBodyResolver = self::getContainer()->get('oro_message_queue.client.message_body_resolver');
         $this->assertPreExportActionExecuted($configuration);
+        $this->assertMessageProcessorExecuted();
 
-        $preExportMessageData = $this->getOneSentMessageWithTopic(PreExportTopic::getName());
-        self::clearMessageCollector();
-
-        $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.pre_export',
-            $messageBodyResolver->resolveBody(PreExportTopic::getName(), $preExportMessageData)
-        );
 
         self::assertMessageSent(ExportTopic::getName());
-
         $exportMessageData = $this->getOneSentMessageWithTopic(ExportTopic::getName());
         $jobId = $exportMessageData['jobId'];
-        self::clearMessageCollector();
 
-        $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.export',
-            $messageBodyResolver->resolveBody(ExportTopic::getName(), $exportMessageData)
-        );
+        $this->assertMessageProcessorExecuted();
 
-        $rootJobStoppedData = $this->getOneSentMessageWithTopic(RootJobStoppedTopic::getName());
-        $this->assertMessageProcessorExecuted(
-            'oro_message_queue.job.dependent_job_processor',
-            $rootJobStoppedData
-        );
-
-        $postExportMessageData = $this->getOneSentMessageWithTopic(PostExportTopic::getName());
-        $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.post_export',
-            $messageBodyResolver->resolveBody(PostExportTopic::getName(), array_merge($postExportMessageData))
-        );
+        $this->assertMessageProcessorExecuted();
+        $this->assertMessageProcessorExecuted();
 
         $job = $this->findJob($jobId);
         $job = $job->isRoot() ? $job : $job->getRootJob();
 
-        $saveResultMessageData = $this->getOneSentMessageWithTopic(SaveImportExportResultTopic::getName());
-        self::clearMessageCollector();
-
-        $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.save_import_export_result_processor',
-            $messageBodyResolver->resolveBody(
-                SaveImportExportResultTopic::getName(),
-                array_merge(
-                    $saveResultMessageData,
-                    [
-                        'jobId' => $job->getId(),
-                        'type' => ProcessorRegistry::TYPE_EXPORT,
-                        'entity' => ImportExportResult::class
-                    ]
-                )
-            )
-        );
+        $this->assertMessageProcessorExecuted();
 
         $exportedFilename = $job->getData()['file'];
         $this->assertExportFileData($job->getId(), $expectedCsvFilePath, $exportedFilename, $skippedColumns);
@@ -141,27 +100,15 @@ abstract class AbstractImportExportTestCase extends WebTestCase
 
     protected function assertImportWorks(
         ImportExportConfigurationInterface $configuration,
-        string $importFilePath
+        string                             $importFilePath,
     ): void {
         $this->assertPreImportActionExecuted($configuration, $importFilePath);
-
         $preImportMessageData = $this->getOneSentMessageWithTopic(PreImportTopic::getName());
-        self::clearMessageCollector();
-
-        $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.pre_import',
-            $preImportMessageData
-        );
+        $this->assertMessageProcessorExecuted();
 
         self::assertMessageSent(ImportTopic::getName());
-
         $importMessageData = $this->getOneSentMessageWithTopic(ImportTopic::getName());
-        self::clearMessageCollector();
-
-        $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.import',
-            $importMessageData
-        );
+        $this->assertMessageProcessorExecuted();
 
         $this->assertTmpFileRemoved($preImportMessageData['fileName']);
         $this->assertTmpFileRemoved($importMessageData['fileName']);
@@ -179,16 +126,13 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         $preImportValidateMessageData = $this->getOneSentMessageWithTopic(PreImportTopic::getName());
         self::clearMessageCollector();
 
-        $this->assertMessageProcessorExecuted(
-            'oro_importexport.async.pre_import',
-            $preImportValidateMessageData
-        );
+        $this->assertMessageProcessorExecuted();
 
         $importValidateMessageData = $this->getOneSentMessageWithTopic(ImportTopic::getName());
         $jobId = $importValidateMessageData['jobId'];
         self::clearMessageCollector();
 
-        $this->assertMessageProcessorExecuted('oro_importexport.async.import', $importValidateMessageData);
+        $this->assertMessageProcessorExecuted();
 
         $job = $this->findJob($jobId);
         $jobData = $job->getData();
@@ -212,16 +156,6 @@ abstract class AbstractImportExportTestCase extends WebTestCase
     protected function getFileContent(string $filePath): string
     {
         return file_get_contents($filePath);
-    }
-
-    protected function createTransportMessage(array $messageData): TransportMessage
-    {
-        $message = new TransportMessage();
-
-        $message->setMessageId('abc');
-        $message->setBody($messageData);
-
-        return $message;
     }
 
     protected function getOneSentMessageWithTopic(string $topic): array
@@ -339,25 +273,36 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         ]);
     }
 
-    protected function assertMessageProcessorExecuted(string $processorServiceName, array $messageData): void
+    protected function assertMessageProcessorExecuted(): void
     {
-        $processorResult = self::getContainer()
-            ->get($processorServiceName)
-            ->process(
-                $this->createTransportMessage($messageData),
-                $this->createMock(SessionInterface::class)
-            );
+        $messagesCount = count(self::getSentMessages());
+        self::clearMessageCollector();
 
-        self::assertEquals(MessageProcessorInterface::ACK, $processorResult);
+        self::consume($messagesCount);
 
+        self::assertCount($messagesCount, self::getProcessedMessages());
+        /** @var array{topic: string, message: MessageInterface, context: Context} $processedMessage */
+        foreach (self::getProcessedMessages() as $processedMessage) {
+            self::assertEquals(MessageProcessorInterface::ACK, $processedMessage['context']->getStatus());
+        }
+
+        self::clearProcessedMessages();
         self::flushMessagesBuffer();
     }
 
+    /**
+     * @param int $jobId
+     * @param string $expectedCsvFilePath
+     * @param string $exportedFilename
+     * @param array $skippedColumns
+     * @return void
+     */
+
     protected function assertExportFileData(
-        int $jobId,
+        int    $jobId,
         string $expectedCsvFilePath,
         string $exportedFilename,
-        array $skippedColumns
+        array  $skippedColumns
     ): void {
         $exportFileContent = $this->getImportExportFileContent($jobId);
         $this->deleteImportExportFile($exportedFilename);

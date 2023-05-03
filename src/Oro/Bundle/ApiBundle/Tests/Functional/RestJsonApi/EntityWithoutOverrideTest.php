@@ -3,10 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Tests similar to EntityOverrideTest, but without "override_class" option.
@@ -35,20 +37,20 @@ class EntityWithoutOverrideTest extends RestJsonApiTestCase
      */
     private function assertToManyAssociation(array $expectedEntities, Collection $association)
     {
-        $associationIds = \array_map(
+        $associationIds = array_map(
             function ($entity) {
                 return $entity->id;
             },
             $association->toArray()
         );
-        \sort($associationIds);
-        $expectedIds = \array_map(
+        sort($associationIds);
+        $expectedIds = array_map(
             function ($referenceName) {
                 return $this->getReference($referenceName)->id;
             },
             $expectedEntities
         );
-        \sort($expectedIds);
+        sort($expectedIds);
         self::assertEquals($expectedIds, $associationIds);
     }
 
@@ -195,6 +197,14 @@ class EntityWithoutOverrideTest extends RestJsonApiTestCase
             ],
             $response
         );
+        $activityAssociationNames = [
+            ExtendHelper::buildAssociationName(TestOwner::class, ActivityScope::ASSOCIATION_KIND),
+            ExtendHelper::buildAssociationName(TestTarget::class, ActivityScope::ASSOCIATION_KIND)
+        ];
+        $responseContent = self::jsonToArray($response->getContent());
+        foreach ($activityAssociationNames as $associationName) {
+            self::assertArrayNotHasKey($associationName, $responseContent['data']['relationships']);
+        }
     }
 
     public function testGetWithIncludeFilterForEntityWithExtendedAssociation()
@@ -255,7 +265,7 @@ class EntityWithoutOverrideTest extends RestJsonApiTestCase
         $responseContent = self::jsonToArray($response->getContent());
         self::assertCount(2, $responseContent['included'], 'included');
         foreach ($responseContent['included'] as $key => $item) {
-            self::assertArrayNotHasKey('meta', $responseContent['included'][$key], sprintf('included[$s]', $key));
+            self::assertArrayNotHasKey('meta', $responseContent['included'][$key], sprintf('included[%s]', $key));
         }
     }
 

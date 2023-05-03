@@ -16,6 +16,7 @@ Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
         imapEncryption: ssl
         user: test@test.com
         password: test
+        folders: ['@inbox_folder', '@send_folder', '@another1_folder', '@another2_folder', '@another3_folder']
 
 Oro\Bundle\EmailBundle\Entity\EmailFolder:
     inbox_folder:

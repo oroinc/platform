@@ -15,8 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ValidateMetaPropertyFilterSupported implements ProcessorInterface
 {
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
+    private FilterNamesRegistry $filterNamesRegistry;
 
     public function __construct(FilterNamesRegistry $filterNamesRegistry)
     {
@@ -26,7 +25,7 @@ class ValidateMetaPropertyFilterSupported implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

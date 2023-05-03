@@ -3,13 +3,13 @@
 namespace Oro\Bundle\NavigationBundle\Menu\Helper;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Oro\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -23,8 +23,7 @@ class MenuUpdateHelper
     /** @var LocalizationHelper */
     protected $localizationHelper;
 
-    /** @var PropertyAccessor */
-    private $propertyAccessor;
+    protected ?PropertyAccessorInterface $propertyAccessor = null;
 
     public function __construct(TranslatorInterface $translator, LocalizationHelper $localizationHelper)
     {
@@ -34,23 +33,35 @@ class MenuUpdateHelper
 
     /**
      * @param MenuUpdateInterface $entity
-     * @param string              $value
-     * @param string              $name
-     * @param string              $type
+     * @param string|null $value
+     * @param string $name
+     * @param string $type
      *
      * @return MenuUpdateHelper
      */
-    public function applyLocalizedFallbackValue(MenuUpdateInterface $entity, $value, $name, $type)
-    {
+    public function applyLocalizedFallbackValue(
+        MenuUpdateInterface $entity,
+        ?string $value,
+        string $name,
+        string $type
+    ) {
         $values = $this->getPropertyAccessor()->getValue($entity, $name . 's');
         if ($values instanceof Collection && $values->count() <= 0) {
-            // Default translation for menu must always has value for English locale, because out of the box app has
+            $value = (string) $value;
+            $doTranslation = $value !== '';
+
+            // Default translation for menu must always have value for English locale, because out of the box app has
             // translations only for English language.
-            $defaultValue = $this->translator->trans((string) $value, [], null, Configuration::DEFAULT_LOCALE);
-            $this->getPropertyAccessor()->setValue($entity, 'default_' . $name, $defaultValue);
+            $defaultValue = $doTranslation
+                ? $this->translator->trans($value, [], null, Configuration::DEFAULT_LOCALE)
+                : $value;
+            $defaultFallbackValue = new LocalizedFallbackValue();
+            $this->getPropertyAccessor()->setValue($defaultFallbackValue, $type, $defaultValue);
+
+            $fallbackValues = [$defaultFallbackValue];
             foreach ($this->localizationHelper->getLocalizations() as $localization) {
                 $locale = $localization->getLanguageCode();
-                $translatedValue = $this->translator->trans((string) $value, [], null, $locale);
+                $translatedValue = $doTranslation ? $this->translator->trans($value, [], null, $locale) : $value;
                 $fallbackValue = new LocalizedFallbackValue();
                 $fallbackValue->setLocalization($localization);
 
@@ -61,15 +72,17 @@ class MenuUpdateHelper
                     $this->getPropertyAccessor()->setValue($fallbackValue, $type, $translatedValue);
                 }
 
-                $this->getPropertyAccessor()->setValue($entity, $name, [$fallbackValue]);
+                $fallbackValues[] = $fallbackValue;
             }
+
+            $this->getPropertyAccessor()->setValue($entity, $name, $fallbackValues);
         }
 
         return $this;
     }
 
     /**
-     * @return PropertyAccessor
+     * @return PropertyAccessorInterface
      */
     private function getPropertyAccessor()
     {

@@ -34,4 +34,12 @@ class UpdateVisibilitiesTopicTest extends AbstractTopicTestCase
             ]
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro:email:update-visibilities:email-addresses',
+            $this->getTopic()->createJobName([])
+        );
+    }
 }

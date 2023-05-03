@@ -24,35 +24,23 @@ class QueryExpressionVisitor extends ExpressionVisitor
 {
     private const SUBQUERY_ALIAS_TEMPLATE = '%s_subquery%d';
 
-    /** @var string[] */
-    private $queryAliases;
-
-    /** @var array [path => join alias, ...] */
-    private $queryJoinMap;
-
-    /** @var array [join alias => path, ...] */
-    private $queryAliasMap;
-
-    /** @var QueryBuilder */
-    private $query;
-
-    /** @var int */
-    private $subqueryCount = 0;
-
-    /** @var Parameter[] */
-    private $parameters = [];
-
-    /** @var Expr */
-    private $expressionBuilder;
-
     /** @var CompositeExpressionInterface[] */
-    private $compositeExpressions;
-
+    private array $compositeExpressions;
     /** @var ComparisonExpressionInterface[] */
-    private $comparisonExpressions;
-
-    /** @var EntityClassResolver */
-    private $entityClassResolver;
+    private array $comparisonExpressions;
+    private EntityClassResolver $entityClassResolver;
+    /** @var string[] */
+    private array $queryAliases;
+    /** @var array|null [path => join alias, ...] */
+    private ?array $queryJoinMap = null;
+    /** @var array|null [join alias => path, ...] */
+    private ?array $queryAliasMap = null;
+    private ?QueryBuilder $query = null;
+    private int $subqueryCount = 0;
+    /** @var Parameter[] */
+    private array $parameters = [];
+    private ?Expr $expressionBuilder = null;
+    private ?string $fieldDataType = null;
 
     /**
      * @param CompositeExpressionInterface[]  $compositeExpressions  [type => expression, ...]
@@ -108,7 +96,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
      * @param mixed            $value     The value of a parameter
      * @param mixed            $type      The data type of a parameter
      */
-    public function addParameter($parameter, $value = null, $type = null): void
+    public function addParameter(Parameter|string $parameter, mixed $value = null, mixed $type = null): void
     {
         if (!$parameter instanceof Parameter) {
             $parameter = $this->createParameter($parameter, $value, $type);
@@ -118,14 +106,8 @@ class QueryExpressionVisitor extends ExpressionVisitor
 
     /**
      * Creates a new instance of Parameter.
-     *
-     * @param string $name
-     * @param mixed  $value
-     * @param mixed  $type
-     *
-     * @return Parameter
      */
-    public function createParameter(string $name, $value, $type = null): Parameter
+    public function createParameter(string $name, mixed $value, mixed $type = null): Parameter
     {
         return new Parameter($name, $value, $type);
     }
@@ -148,6 +130,14 @@ class QueryExpressionVisitor extends ExpressionVisitor
         }
 
         return $this->expressionBuilder;
+    }
+
+    /**
+     * Gets the data type of a field for which the current comparison expression is being building.
+     */
+    public function getFieldDataType(): ?string
+    {
+        return $this->fieldDataType;
     }
 
     /**
@@ -238,9 +228,9 @@ class QueryExpressionVisitor extends ExpressionVisitor
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function walkCompositeExpression(CompositeExpression $expr)
+    public function walkCompositeExpression(CompositeExpression $expr): mixed
     {
         $expressionType = $expr->getType();
         if (!isset($this->compositeExpressions[$expressionType])) {
@@ -258,9 +248,9 @@ class QueryExpressionVisitor extends ExpressionVisitor
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function walkComparison(Comparison $comparison)
+    public function walkComparison(Comparison $comparison): mixed
     {
         if (!isset($this->queryAliases[0])) {
             throw new QueryException('No aliases are set before invoking walkComparison().');
@@ -277,6 +267,8 @@ class QueryExpressionVisitor extends ExpressionVisitor
         $expression = $field;
         if ('i' === $modifier) {
             $expression = sprintf('LOWER(%s)', $expression);
+        } elseif (str_starts_with($modifier, ':')) {
+            $this->fieldDataType = substr($modifier, 1);
         } elseif ($modifier) {
             throw new QueryException(sprintf(
                 'Unknown modifier "%s" for comparison operator "%s".',
@@ -285,34 +277,45 @@ class QueryExpressionVisitor extends ExpressionVisitor
             ));
         }
 
-        return $this->comparisonExpressions[$operator]
+        $expr = $this->comparisonExpressions[$operator]
             ->walkComparisonExpression(
                 $this,
                 $field,
                 $expression,
-                $this->getParameterName($comparison->getField()),
+                $this->getParameterName($field),
                 $this->walkValue($comparison->getValue())
             );
+        $this->fieldDataType = null;
+
+        return $expr;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function walkValue(Value $value)
+    public function walkValue(Value $value): mixed
     {
         return $value->getValue();
     }
 
     private function getField(string $field): string
     {
-        foreach ($this->queryAliases as $alias) {
-            if ($field !== $alias && str_starts_with($field . '.', $alias . '.')) {
-                return $field;
-            }
-        }
-
         if ($field) {
-            $field = $this->getRootAlias() . '.' . $field;
+            if (str_contains($field, '.')) {
+                foreach ($this->queryAliases as $alias) {
+                    if ($field !== $alias && str_starts_with($field . '.', $alias . '.')) {
+                        return $field;
+                    }
+                }
+            }
+            if (str_starts_with($field, Criteria::PLACEHOLDER_START)
+                && str_ends_with($field, Criteria::PLACEHOLDER_END)
+            ) {
+                // it is a computed field that does not related to any join or a root entity
+                $field = substr($field, 1, -1);
+            } else {
+                $field = $this->getRootAlias() . '.' . $field;
+            }
         }
 
         return $field;
@@ -325,7 +328,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
             : $this->getRootAlias();
         foreach ($this->parameters as $parameter) {
             if ($parameter->getName() === $result) {
-                $result .= '_' . count($this->parameters);
+                $result .= '_' . \count($this->parameters);
                 break;
             }
         }
@@ -333,11 +336,6 @@ class QueryExpressionVisitor extends ExpressionVisitor
         return $result;
     }
 
-    /**
-     * @param string $field
-     *
-     * @return string
-     */
     private function getSubqueryPath(string $field): ?string
     {
         $path = $field;
@@ -429,7 +427,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
             if ($entityMetadata->hasAssociation($currentName)) {
                 $entityClass = $entityMetadata->getAssociationTargetClass($currentName);
                 $associationName = $currentName;
-            } elseif (!$allowEndsWithField || count($associationNames) !== $i) {
+            } elseif (!$allowEndsWithField || \count($associationNames) !== $i) {
                 throw new QueryException(sprintf(
                     'The "%s" must be an association in "%s" entity.',
                     $currentName,

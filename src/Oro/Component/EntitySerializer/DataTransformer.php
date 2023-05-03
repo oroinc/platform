@@ -11,8 +11,7 @@ use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterf
  */
 class DataTransformer implements DataTransformerInterface
 {
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -20,9 +19,9 @@ class DataTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function transform($value, array $config, array $context)
+    public function transform(mixed $value, array $config, array $context): mixed
     {
         if (isset($config[ConfigUtil::DATA_TRANSFORMER])) {
             foreach ($config[ConfigUtil::DATA_TRANSFORMER] as $transformer) {
@@ -39,21 +38,14 @@ class DataTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param mixed  $transformer
-     * @param mixed  $value
-     * @param array  $config
-     * @param array  $context
-     *
-     * @return mixed
-     *
      * @throws \InvalidArgumentException if the given data transformer has unknown type
      */
     protected function transformByCustomTransformer(
-        $transformer,
-        $value,
+        mixed $transformer,
+        mixed $value,
         array $config,
         array $context
-    ) {
+    ): mixed {
         if (\is_string($transformer)) {
             $transformerService = $this->container->get($transformer, ContainerInterface::NULL_ON_INVALID_REFERENCE);
             if (null === $transformerService) {
@@ -77,7 +69,7 @@ class DataTransformer implements DataTransformerInterface
 
         throw new \InvalidArgumentException(sprintf(
             'Unexpected type of data transformer "%s". Expected "%s", "%s" or "%s".',
-            \is_object($transformer) ? \get_class($transformer) : \gettype($transformer),
+            get_debug_type($transformer),
             DataTransformerInterface::class,
             FormDataTransformerInterface::class,
             'callable'

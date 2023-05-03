@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -13,6 +13,9 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailUserAdded;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Butch processor for Email entity.
+ */
 class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 {
     /**
@@ -140,7 +143,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Tell the given EntityManager to manage this batch
      */
-    public function persist(EntityManager $em)
+    public function persist(EntityManagerInterface $em): void
     {
         $this->persistFolders($em);
         $this->persistAddresses($em);
@@ -181,7 +184,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Persist EmailUser objects
      */
-    protected function persistEmailUsers(EntityManager $em)
+    protected function persistEmailUsers(EntityManagerInterface $em): void
     {
         $this->processDuplicateEmails($em);
 
@@ -195,7 +198,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Replaces emails with already existing in DB emails to avoid duplicates
      */
-    protected function processDuplicateEmails(EntityManager $em)
+    protected function processDuplicateEmails(EntityManagerInterface $em): void
     {
         $existingEmails = $this->getExistingEmails($em);
         if (!empty($existingEmails)) {
@@ -216,10 +219,10 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Loads emails already exist in the database for the current batch
      *
-     * @param EntityManager $em
+     * @param EntityManagerInterface $em
      * @return Email[]
      */
-    protected function getExistingEmails(EntityManager $em)
+    protected function getExistingEmails(EntityManagerInterface $em)
     {
         // get distinct list of Message-ID
         $messageIds = [];
@@ -272,7 +275,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Tell the given EntityManager to manage EmailAddress objects in this batch
      */
-    protected function persistAddresses(EntityManager $em)
+    protected function persistAddresses(EntityManagerInterface $em)
     {
         $repository = $this->emailAddressManager->getEmailAddressRepository($em);
         foreach ($this->addresses as $key => $obj) {
@@ -291,7 +294,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Tell the given EntityManager to manage EmailFolder objects in this batch
      */
-    protected function persistFolders(EntityManager $em)
+    protected function persistFolders(EntityManagerInterface $em)
     {
         $repository = $em->getRepository('OroEmailBundle:EmailFolder');
         foreach ($this->folders as $key => $obj) {

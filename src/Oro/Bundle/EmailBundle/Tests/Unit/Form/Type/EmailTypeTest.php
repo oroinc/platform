@@ -22,6 +22,8 @@ use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestMailbox;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
@@ -36,10 +38,8 @@ use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -48,9 +48,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EmailTypeTest extends TypeTestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
@@ -72,44 +69,35 @@ class EmailTypeTest extends TypeTestCase
     /** @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $emailOriginHelper;
 
-    /** @var ConfigManager */
-    private $configManager;
+    /** @var EmailType */
+    private $formType;
 
     protected function setUp(): void
     {
-        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->emailRenderer = $this->createMock(EmailRenderer::class);
         $this->emailModelBuilderHelper = $this->createMock(EmailModelBuilderHelper::class);
-        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->mailboxManager = $this->createMock(MailboxManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->em = $this->createMock(EntityManager::class);
+        $this->emailOriginHelper = $this->createMock(EmailOriginHelper::class);
+
+        $this->formType = new EmailType(
+            $this->createMock(AuthorizationCheckerInterface::class),
+            $this->tokenAccessor,
+            $this->emailRenderer,
+            $this->emailModelBuilderHelper,
+            $this->createMock(ConfigManager::class)
+        );
 
         parent::setUp();
     }
 
-    private function createEmailType(): EmailType
-    {
-        return new EmailType(
-            $this->authorizationChecker,
-            $this->tokenAccessor,
-            $this->emailRenderer,
-            $this->emailModelBuilderHelper,
-            $this->configManager
-        );
-    }
-
     /**
      * {@inheritDoc}
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $translatableType = $this->createMock(TranslatableEntityType::class);
-        $translatableType->expects($this->any())
-            ->method('getName')
-            ->willReturn(TranslatableEntityType::NAME);
-
-        $this->mailboxManager = $this->createMock(MailboxManager::class);
-
         $user = new User();
         $this->tokenAccessor->expects($this->any())
             ->method('getUser')
@@ -121,44 +109,15 @@ class EmailTypeTest extends TypeTestCase
             ->with($user)
             ->willReturn(['john@example.com' => 'John Smith <john@example.com>']);
 
-        $this->mailboxManager->expects($this->any())
-            ->method('findAvailableMailboxEmails')
-            ->willReturn([]);
-
-        $configManager = $this->createMock(ConfigManager::class);
-
-        $this->doctrine = $this->createMock(ManagerRegistry::class);
-
-        $helper = $this->createMock(EmailModelBuilderHelper::class);
-
-        $this->emailOriginHelper = $this->createMock(EmailOriginHelper::class);
-
-        $emailOriginFromType = new EmailOriginFromType(
-            $this->tokenAccessor,
-            $relatedEmailsProvider,
-            $helper,
-            $this->mailboxManager,
-            $this->doctrine,
-            $this->emailOriginHelper
-        );
-
-        $emailAddressFromType = new EmailAddressFromType(
-            $this->tokenAccessor,
-            $relatedEmailsProvider,
-            $this->mailboxManager
-        );
-        $emailAddressRecipientsType = new EmailAddressRecipientsType($configManager);
-
-        $configManager = $this->createMock(ConfigManager::class);
         $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
         $htmlTagProvider->expects($this->any())
             ->method('getAllowedElements')
             ->willReturn(['br', 'a']);
-        $context = $this->createMock(ContextInterface::class);
-        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
-        $richTextType = new OroRichTextType($configManager, $htmlTagProvider, $context, $htmlTagHelper);
-        $resizableRichTextType = new OroResizeableRichTextType();
-        $this->em = $this->createMock(EntityManager::class);
+
+        $this->doctrine->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->em);
+
         $metadata = $this->createMock(ClassMetadataInfo::class);
         $metadata->expects($this->any())
             ->method('getName');
@@ -171,10 +130,6 @@ class EmailTypeTest extends TypeTestCase
         $this->em->expects($this->any())
             ->method('getRepository')
             ->willReturn($repo);
-        $configManager = $this->createMock(\Oro\Bundle\EntityConfigBundle\Config\ConfigManager::class);
-        $translator = $this->createMock(DataCollectorTranslator::class);
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $entityTitleResolver = $this->createMock(EntityNameResolver::class);
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->any())
@@ -185,26 +140,36 @@ class EmailTypeTest extends TypeTestCase
             ->with(Form::class)
             ->willReturn($this->createMock(ClassMetadata::class));
 
-        $contextsSelectType = new ContextsSelectType(
-            $this->em,
-            $configManager,
-            $translator,
-            $eventDispatcher,
-            $entityTitleResolver,
-            $this->createMock(FeatureChecker::class)
-        );
-
         return [
             new PreloadedExtension(
                 [
-                    EmailType::class => $this->createEmailType(),
-                    TranslatableEntityType::class      => $translatableType,
-                    $richTextType->getName()          => $richTextType,
-                    $resizableRichTextType->getName() => $resizableRichTextType,
-                    ContextsSelectType::class          => $contextsSelectType,
-                    $emailAddressFromType->getName()       => $emailAddressFromType,
-                    $emailAddressRecipientsType->getName() => $emailAddressRecipientsType,
-                    $emailOriginFromType->getName() => $emailOriginFromType
+                    $this->formType,
+                    TranslatableEntityType::class => $this->createMock(TranslatableEntityType::class),
+                    new OroRichTextType(
+                        $this->createMock(ConfigManager::class),
+                        $htmlTagProvider,
+                        $this->createMock(ContextInterface::class),
+                        $this->createMock(HtmlTagHelper::class)
+                    ),
+                    new OroResizeableRichTextType(),
+                    new ContextsSelectType(
+                        $this->em,
+                        $this->createMock(EntityConfigManager::class),
+                        $this->createMock(DataCollectorTranslator::class),
+                        $this->createMock(EventDispatcher::class),
+                        $this->createMock(EntityNameResolver::class),
+                        $this->createMock(FeatureChecker::class)
+                    ),
+                    new EmailAddressFromType($this->tokenAccessor, $relatedEmailsProvider, $this->mailboxManager),
+                    new EmailAddressRecipientsType($this->createMock(ConfigManager::class)),
+                    new EmailOriginFromType(
+                        $this->tokenAccessor,
+                        $relatedEmailsProvider,
+                        $this->emailModelBuilderHelper,
+                        $this->mailboxManager,
+                        $this->doctrine,
+                        $this->emailOriginHelper
+                    )
                 ],
                 []
             ),
@@ -231,9 +196,6 @@ class EmailTypeTest extends TypeTestCase
         $this->mailboxManager->expects(self::once())
             ->method('findAvailableMailboxes')
             ->willReturn($response);
-        $this->doctrine->expects(self::once())
-            ->method('getManager')
-            ->willReturn($this->em);
 
         $form = $this->factory->create(EmailType::class);
 
@@ -256,16 +218,9 @@ class EmailTypeTest extends TypeTestCase
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with(
-                [
-                    'data_class'      => Email::class,
-                    'csrf_token_id'   => 'email',
-                    'csrf_protection' => true,
-                ]
-            );
+            ->with(['data_class' => Email::class, 'csrf_token_id' => 'email', 'csrf_protection' => true]);
 
-        $type = $this->createEmailType();
-        $type->configureOptions($resolver);
+        $this->formType->configureOptions($resolver);
     }
 
     public function messageDataProvider(): array
@@ -325,25 +280,17 @@ class EmailTypeTest extends TypeTestCase
      */
     public function testFillFormByTemplate(Email $inputData = null, array $expectedData = [])
     {
-        $this->markTestSkipped(
-            'Test Skipped because of unresolved relation to \Oro\Component\Testing\Unit\Form\Type\Stub\EntityType'
-        );
         $emailTemplate = $this->createEmailTemplate();
-        $this->emailRenderer
-            ->expects($this->any())
+        $this->emailRenderer->expects($this->any())
             ->method('compileMessage')
             ->with($emailTemplate)
-            ->willReturn(
-                [
-                    $emailTemplate->getSubject(),
-                    $emailTemplate->getContent()
-                ]
-            );
+            ->willReturn([$emailTemplate->getSubject(), $emailTemplate->getContent()]);
 
-        $formType = $this->createEmailType();
-        $form = $this->factory->create($formType, $inputData);
+        $this->mailboxManager->expects($this->any())
+            ->method('findAvailableMailboxes')
+            ->willReturn([]);
 
-        $formType->fillFormByTemplate(new FormEvent($form, $inputData));
+        $form = $this->factory->create(EmailType::class, $inputData);
 
         $formData = $form->getData();
 

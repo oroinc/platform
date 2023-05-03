@@ -32,6 +32,13 @@ services:
         tags:
             - { name: 'cli.controller', priority: 500 }
 
+    cli.controller.disable_mq:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\DoNotRunConsumerOptionController
+        arguments:
+            - '@oro_test.listener.job_status_subcriber'
+        tags:
+            - { name: 'cli.controller', priority: 200 }
+
     cli.controller.health_check_controller:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\HealthCheckController
         arguments:
@@ -47,6 +54,5 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController
         arguments:
             - '@oro_behat_extension.isolation.test_isolation_subscriber'
-            - '@oro_behat_extension.isolation.message_queue_isolation_subscriber'
         tags:
             - { name: 'cli.controller', priority: 100 }

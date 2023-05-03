@@ -38,13 +38,12 @@ class ActionsConfigLoader extends AbstractConfigLoader
         ConfigUtil::POST_PROCESSOR_OPTIONS => 'setPostProcessorOptions'
     ];
 
-    /** @var StatusCodesConfigLoader */
-    protected $statusCodesConfigLoader;
+    private ?StatusCodesConfigLoader $statusCodesConfigLoader = null;
 
     /**
      * {@inheritdoc}
      */
-    public function load(array $config)
+    public function load(array $config): mixed
     {
         $actions = new ActionsConfig();
         foreach ($config as $key => $value) {
@@ -56,12 +55,7 @@ class ActionsConfigLoader extends AbstractConfigLoader
         return $actions;
     }
 
-    /**
-     * @param array $config
-     *
-     * @return ActionConfig
-     */
-    protected function loadAction(array $config)
+    private function loadAction(array $config): ActionConfig
     {
         $action = new ActionConfig();
         foreach ($config as $key => $value) {
@@ -77,7 +71,7 @@ class ActionsConfigLoader extends AbstractConfigLoader
         return $action;
     }
 
-    protected function loadStatusCodes(ActionConfig $action, array $statusCodes)
+    private function loadStatusCodes(ActionConfig $action, array $statusCodes): void
     {
         if (!empty($statusCodes)) {
             if (null === $this->statusCodesConfigLoader) {
@@ -87,7 +81,7 @@ class ActionsConfigLoader extends AbstractConfigLoader
         }
     }
 
-    protected function loadFields(ActionConfig $action, array $fields = null)
+    private function loadFields(ActionConfig $action, ?array $fields): void
     {
         if (!empty($fields)) {
             foreach ($fields as $name => $config) {
@@ -96,12 +90,7 @@ class ActionsConfigLoader extends AbstractConfigLoader
         }
     }
 
-    /**
-     * @param array|null $config
-     *
-     * @return ActionFieldConfig
-     */
-    protected function loadField(array $config = null)
+    private function loadField(?array $config): ActionFieldConfig
     {
         $field = new ActionFieldConfig();
         if (!empty($config)) {

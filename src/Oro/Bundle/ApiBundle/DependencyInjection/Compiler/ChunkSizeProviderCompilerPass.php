@@ -13,9 +13,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class ChunkSizeProviderCompilerPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $config = DependencyInjectionUtil::getConfig($container);
         $batchApiConfig = $config['batch_api'];

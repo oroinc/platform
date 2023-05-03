@@ -11,11 +11,8 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
  */
 class TraceableProcessorRegistry implements ProcessorRegistryInterface
 {
-    /** @var ProcessorRegistryInterface */
-    private $processorRegistry;
-
-    /** @var TraceLogger */
-    private $logger;
+    private ProcessorRegistryInterface $processorRegistry;
+    private TraceLogger $logger;
 
     public function __construct(ProcessorRegistryInterface $processorRegistry, TraceLogger $logger)
     {
@@ -24,7 +21,7 @@ class TraceableProcessorRegistry implements ProcessorRegistryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getProcessor(string $processorId): ProcessorInterface
     {

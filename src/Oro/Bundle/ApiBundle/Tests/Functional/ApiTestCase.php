@@ -245,6 +245,17 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * Resolves "{baseUrl}" placeholders and all entity references in the given expected content.
+     */
+    protected function getExpectedContentWithPaginationLinks(array $expectedContent): array
+    {
+        $content = Yaml::dump($expectedContent);
+        $content = str_replace('{baseUrl}', $this->getApiBaseUrl(), $content);
+
+        return self::processTemplateData(Yaml::parse($content));
+    }
+
+    /**
      * Replaces all values in the given expected response content
      * with corresponding value from the actual response content
      * when the key of an element is equal to the given key
@@ -602,5 +613,18 @@ abstract class ApiTestCase extends WebTestCase
     protected function getCustomizeFormDataLogger(): ?BufferingLogger
     {
         return $this->client?->getContainer()->get('oro_api.tests.customize_form_data_logger');
+    }
+
+    protected function checkTwigState(): void
+    {
+        $this->enableTwig(null);
+    }
+
+    /**
+     * @see \Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestTwigExtension
+     */
+    protected function enableTwig(?bool $enable = true): void
+    {
+        self::getContainer()->get('oro_api.tests.twig_state')->enableTwig($enable);
     }
 }

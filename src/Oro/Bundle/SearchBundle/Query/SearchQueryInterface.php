@@ -170,14 +170,50 @@ interface SearchQueryInterface
      * @param string $name Name of the aggregating
      * @param string $field Fields that should be used to perform aggregating
      * @param string $function Applied aggregating function
+     * @param array $parameters Additional aggregation parameters
      * @return SearchQueryInterface
      */
-    public function addAggregate($name, $field, $function);
+    public function addAggregate($name, $field, $function, array $parameters = []);
 
     /**
      * Return list of all applied aggregating operations
      *
-     * @return array ['<name>' => ['field' => <field>, 'function' => '<function>']]
+     * @return array ['<name>' => ['field' => <field>, 'function' => '<function>', 'parameters' => <params>]]
      */
     public function getAggregations();
+
+    /**
+     * Sets a query hint. If the hint name is not recognized, it is silently ignored.
+     *
+     * @param string $name  The name of the hint.
+     * @param mixed  $value The value of the hint.
+     *
+     * @return $this
+     */
+    public function setHint(string $name, $value): self;
+
+    /**
+     * Gets the value of a query hint. If the hint name is not recognized, FALSE is returned.
+     *
+     * @param string $name The name of the hint.
+     *
+     * @return mixed The value of the hint or FALSE, if the hint name is not recognized.
+     */
+    public function getHint(string $name);
+
+    /**
+     * Check if the query has a hint
+     *
+     * @param string $name The name of the hint
+     *
+     * @return bool False if the query does not have any hint
+     */
+    public function hasHint(string $name): bool;
+
+    /**
+     * Return the key value map of query hints that are currently set.
+     *
+     * @return array<string,mixed>
+     */
+    public function getHints(): array;
 }

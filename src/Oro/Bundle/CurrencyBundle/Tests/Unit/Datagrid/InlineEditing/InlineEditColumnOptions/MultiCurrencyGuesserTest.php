@@ -8,7 +8,7 @@ use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 
 class MultiCurrencyGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var CurrencyNameHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $currencyHelper;
 
     /** @var MultiCurrencyGuesser */
@@ -34,24 +34,15 @@ class MultiCurrencyGuesserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $column
-     * @param array $expected
-     * @param bool  $isEnabledInline
-     * @param array $choices
-     *
      * @dataProvider setParametersDataProvider
      */
-    public function testRelationGuess($column, $expected, $isEnabledInline, $choices)
+    public function testRelationGuess(array $column, array $expected, bool $isEnabledInline, array $choices)
     {
         if (empty($choices)) {
-            $this
-                ->currencyHelper
-                ->expects($this->never())
+            $this->currencyHelper->expects($this->never())
                 ->method('getCurrencyChoices');
         } else {
-            $this
-                ->currencyHelper
-                ->expects($this->once())
+            $this->currencyHelper->expects($this->once())
                 ->method('getCurrencyChoices')
                 ->willReturn($choices);
         }

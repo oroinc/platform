@@ -8,11 +8,9 @@ namespace Oro\Bundle\ApiBundle\Provider;
  */
 class EntityOverrideProvider implements EntityOverrideProviderInterface
 {
-    /** @var ConfigCache */
-    private $configCache;
-
-    /** @var string[] [class name => substitute class name, ...] */
-    private $substitutions;
+    private ConfigCache $configCache;
+    /** @var string[]|null [class name => substitute class name, ...] */
+    private ?array $substitutions = null;
 
     public function __construct(ConfigCache $configCache)
     {
@@ -20,7 +18,7 @@ class EntityOverrideProvider implements EntityOverrideProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getSubstituteEntityClass(string $entityClass): ?string
     {
@@ -28,15 +26,11 @@ class EntityOverrideProvider implements EntityOverrideProviderInterface
             $this->substitutions = $this->configCache->getSubstitutions();
         }
 
-        if (!isset($this->substitutions[$entityClass])) {
-            return null;
-        }
-
-        return $this->substitutions[$entityClass];
+        return $this->substitutions[$entityClass] ?? null;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getEntityClass(string $substituteClass): ?string
     {
@@ -44,7 +38,7 @@ class EntityOverrideProvider implements EntityOverrideProviderInterface
             $this->substitutions = $this->configCache->getSubstitutions();
         }
 
-        $entityClass = \array_search($substituteClass, $this->substitutions, true);
+        $entityClass = array_search($substituteClass, $this->substitutions, true);
         if (false === $entityClass) {
             return null;
         }

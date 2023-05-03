@@ -14,7 +14,7 @@ class LoadTestResourceWithoutIdentifierEntity implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         $context->setResult(new TestResourceWithoutIdentifier());
     }

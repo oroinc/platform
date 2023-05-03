@@ -76,7 +76,7 @@ class DraftableFilterExtensionTest extends \PHPUnit\Framework\TestCase
     public function testVisitDatasource(): void
     {
         $className = 'className';
-        $config = $this->getDatagridConfigurationMock($className);
+        $config = $this->getDatagridConfiguration($className);
         $datasource = $this->createMock(DatasourceInterface::class);
 
         $this->filterManager->expects($this->once())
@@ -93,7 +93,7 @@ class DraftableFilterExtensionTest extends \PHPUnit\Framework\TestCase
     public function testVisitResult(): void
     {
         $className = 'className';
-        $config = $this->getDatagridConfigurationMock($className);
+        $config = $this->getDatagridConfiguration($className);
         $datasource = $this->createMock(DatasourceInterface::class);
 
         $this->filterManager->expects($this->once())
@@ -116,11 +116,7 @@ class DraftableFilterExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitResult($config, $resultsObject);
     }
 
-    /**
-     * @param string $className
-     * @return DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getDatagridConfigurationMock(string $className)
+    private function getDatagridConfiguration(string $className): DatagridConfiguration
     {
         $fromPart = [['table' => $className]];
 

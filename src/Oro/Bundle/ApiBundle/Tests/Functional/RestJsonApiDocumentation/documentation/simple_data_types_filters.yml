@@ -23,6 +23,10 @@ filters:
         requirement: '-?\d*\.?\d+(,-?\d*\.?\d+)*|-?\d*\.?\d+..-?\d*\.?\d+'
         type: 'decimal or array or range'
         operators: 'eq,neq,lt,lte,gt,gte,exists,neq_or_null'
+    'filter[fieldDecimalDefault]':
+        requirement: '-?\d*\.?\d+(,-?\d*\.?\d+)*|-?\d*\.?\d+..-?\d*\.?\d+'
+        type: 'decimal or array or range'
+        operators: 'eq,neq,lt,lte,gt,gte,exists,neq_or_null'
     'filter[fieldDuration]':
         requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
         type: 'integer or array or range'
@@ -63,6 +67,10 @@ filters:
         requirement: '.+'
         type: 'string'
         operators: 'eq,neq,exists,neq_or_null'
+    'filter[fieldText]':
+        requirement: '.+'
+        type: 'string'
+        operators: 'exists'
     'filter[fieldTime]':
         requirement: '\d{2}:\d{2}(:\d{2}(\.\d+)?)?|\d{2}:\d{2}(:\d{2}(\.\d+)?)?..\d{2}:\d{2}(:\d{2}(\.\d+)?)?'
         type: 'time or range'
@@ -71,3 +79,16 @@ filters:
         requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
         type: 'integer or array or range'
         operators: 'eq,neq,lt,lte,gt,gte'
+    'fields[testapialldatatypes]':
+        requirement: '.+'
+    meta:
+        requirement: '.+'
+    'page[number]':
+        requirement: '\d+'
+        default: '1'
+    'page[size]':
+        requirement: '-?\d+'
+        default: '10'
+    sort:
+        requirement: '-?[\w\.]+(,-?[\w\.]+)*'
+        default: 'id'

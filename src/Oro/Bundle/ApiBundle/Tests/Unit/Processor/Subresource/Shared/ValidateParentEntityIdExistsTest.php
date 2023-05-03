@@ -22,6 +22,8 @@ class ValidateParentEntityIdExistsTest extends GetSubresourceProcessorTestCase
     {
         $this->context->setParentId(123);
         $this->processor->process($this->context);
+
+        self::assertCount(0, $this->context->getErrors());
     }
 
     public function testProcessWhenParentEntityIdDoesNotExist()

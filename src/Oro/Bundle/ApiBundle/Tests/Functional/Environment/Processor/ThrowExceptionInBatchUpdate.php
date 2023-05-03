@@ -13,11 +13,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ThrowExceptionInBatchUpdate implements ProcessorInterface
 {
-    /** @var BatchUpdateExceptionController */
-    private $exceptionController;
-
-    /** @var string|null */
-    private $stage;
+    private BatchUpdateExceptionController $exceptionController;
+    private ?string $stage;
 
     public function __construct(BatchUpdateExceptionController $exceptionController, string $stage = null)
     {
@@ -29,7 +26,7 @@ class ThrowExceptionInBatchUpdate implements ProcessorInterface
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */
 

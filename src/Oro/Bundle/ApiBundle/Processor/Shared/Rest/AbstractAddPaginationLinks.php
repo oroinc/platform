@@ -23,14 +23,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class AbstractAddPaginationLinks implements ProcessorInterface
 {
-    /** @var RestRoutesRegistry */
-    private $routesRegistry;
-
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
-
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
+    private RestRoutesRegistry $routesRegistry;
+    private FilterNamesRegistry $filterNamesRegistry;
+    private UrlGeneratorInterface $urlGenerator;
 
     public function __construct(
         RestRoutesRegistry $routesRegistry,

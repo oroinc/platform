@@ -14,9 +14,9 @@ class ResourcesCacheWarmerCompilerPass implements CompilerPassInterface
     private const RESOURCES_CACHE_WARMER_SERVICE = 'oro_api.resources.cache_warmer';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $requestTypes = [];
         $views = $this->getApiDocViews($container);

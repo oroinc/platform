@@ -14,24 +14,15 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var string */
-    private $bundleDir;
+    private string $bundleDir;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $tmpDir = $this->copyToTempDir('test_data', realpath(__DIR__ . '/../Fixtures'));
         $this->bundleDir = $tmpDir . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle1';
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    private function getPath($path)
+    private function getPath(string $path): string
     {
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
@@ -48,7 +39,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         /** @var CumulativeResourceInfo[] $result */
         $result = $loader->load($bundleClass, $bundleDir);
 
-        self::assertTrue(is_array($result));
+        self::assertIsArray($result);
         self::assertCount(3, $result);
         usort(
             $result,
@@ -223,10 +214,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, 0);
     }
 
-    /**
-     * @return FolderingCumulativeFileLoader
-     */
-    protected function createLoader()
+    private function createLoader(): FolderingCumulativeFileLoader
     {
         return new FolderingCumulativeFileLoader(
             '{folder}',
@@ -239,10 +227,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return string
-     */
-    protected function getExpectedResource()
+    private function getExpectedResource(): string
     {
         return
             'Foldering:'
@@ -251,12 +236,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
             . 'Resources/config/another non word/test.yml';
     }
 
-    /**
-     * @param string $bundleDir
-     *
-     * @return int
-     */
-    protected function getLastMTime($bundleDir)
+    private function getLastMTime(string $bundleDir): int
     {
         $files = [
             $bundleDir . '/Resources/config/another non word/test.yml',

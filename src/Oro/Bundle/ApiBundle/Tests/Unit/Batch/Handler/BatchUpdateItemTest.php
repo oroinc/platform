@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Batch\Processor\Update\BatchUpdateContext;
 use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\BatchUpdateItemContext;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
+use Oro\Component\ChainProcessor\ProcessorBagInterface;
 
 class BatchUpdateItemTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,8 +25,8 @@ class BatchUpdateItemTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->processor = $this->getMockBuilder(BatchUpdateItemProcessor::class)
-            ->disableOriginalConstructor()
             ->onlyMethods(['process'])
+            ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'batch_update_item'])
             ->getMock();
         $this->updateContext = new BatchUpdateContext();
         $this->updateContext->setVersion('1.2');

@@ -20,15 +20,12 @@ class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $sameSiteUrlHelper = $this->createMock(SameSiteUrlHelper::class);
-        $sameSiteUrlHelper
-            ->expects(self::any())
+        $sameSiteUrlHelper->expects(self::any())
             ->method('getSameSiteReferer')
             ->with(self::isInstanceOf(Request::class))
-            ->willReturnCallback(
-                static function (Request $request) {
-                    return $request->headers->get('referer') ? $request->headers->get('referer') . '/safe' : '';
-                }
-            );
+            ->willReturnCallback(static function (Request $request) {
+                return $request->headers->get('referer') ? $request->headers->get('referer') . '/safe' : '';
+            });
 
         $this->processor = new FormSubmitLayoutRedirectProcessor($sameSiteUrlHelper);
     }

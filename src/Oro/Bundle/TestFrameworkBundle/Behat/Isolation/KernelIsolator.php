@@ -10,6 +10,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Behat tests kernel isolator.
+ */
 class KernelIsolator implements IsolatorInterface
 {
     /**
@@ -26,12 +29,14 @@ class KernelIsolator implements IsolatorInterface
     public function start(BeforeStartTestsEvent $event)
     {
         $event->writeln('<info>Booting the Kernel</info>');
+        $this->kernel->shutdown();
         $this->kernel->boot();
     }
 
     /** {@inheritdoc} */
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
+        $this->kernel->shutdown();
         $this->kernel->boot();
     }
 

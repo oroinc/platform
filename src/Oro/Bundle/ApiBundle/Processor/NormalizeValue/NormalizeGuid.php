@@ -17,7 +17,7 @@ class NormalizeGuid implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var NormalizeValueContext $context */
 
@@ -57,9 +57,7 @@ class NormalizeGuid implements ProcessorInterface
     private function validateValue(string $value): void
     {
         if (!$this->isValidGuid($value)) {
-            throw new \UnexpectedValueException(
-                sprintf('Expected GUID value. Given "%s".', $value)
-            );
+            throw new \UnexpectedValueException(sprintf('Expected GUID value. Given "%s".', $value));
         }
     }
 
@@ -69,20 +67,18 @@ class NormalizeGuid implements ProcessorInterface
      *
      * @return string[]|string
      */
-    private function normalizeArrayValue($value, $arrayDelimiter)
+    private function normalizeArrayValue(string $value, string $arrayDelimiter): array|string
     {
         $values = explode($arrayDelimiter, $value);
-        if (count($values) === 1) {
+        if (\count($values) === 1) {
             $this->validateValue($value);
 
             return $value;
         }
 
-        foreach ($values as $key => $val) {
+        foreach ($values as $val) {
             if (!$this->isValidGuid($val)) {
-                throw new \UnexpectedValueException(
-                    sprintf('Expected an array of GUIDs. Given "%s".', $value)
-                );
+                throw new \UnexpectedValueException(sprintf('Expected an array of GUIDs. Given "%s".', $value));
             }
         }
 

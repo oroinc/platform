@@ -64,17 +64,13 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function expectsJsonResponseWithContent(JsonResponse $response, array $expectedContent)
+    private function expectsJsonResponseWithContent(JsonResponse $response, array $expectedContent): void
     {
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(json_encode($expectedContent), $response->getContent());
         $this->assertEquals(JsonResponse::HTTP_OK, $response->getStatusCode());
     }
 
-    /**
-     * @param ConfigInterface|\PHPUnit\Framework\MockObject\MockBuilder $fieldConfig
-     * @param ConfigInterface|\PHPUnit\Framework\MockObject\MockBuilder $entityConfig
-     */
     private function expectsConfigManagerPersistAndFlush(ConfigInterface $fieldConfig, ConfigInterface $entityConfig)
     {
         $this->configManager->expects($this->exactly(2))
@@ -227,7 +223,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleRestoreWhenFieldCanBeRestoredAndEntityClassNotManaged()
     {
-        $entityClassName = '\stdClass';
+        $entityClassName = \stdClass::class;
         $expectedState = ExtendScope::STATE_NEW;
 
         $this->prepareConfigMocksForRestoreCalls($entityClassName, $expectedState);
@@ -295,12 +291,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectsJsonResponseWithContent($response, $expectedContent);
     }
 
-    /**
-     * @dataProvider fieldExistenceDataProvider
-     * @param bool $hasField
-     * @param bool $hasAssociation
-     */
-    public function testHandleRestoreWhenFieldCanBeRestoredAndClassNameAndFieldExist($hasField, $hasAssociation)
+    public function testHandleRestoreWhenFieldCanBeRestoredAndClassNameAndFieldExist()
     {
         $entityClassName = TestActivityTarget::class;
         $expectedState = ExtendScope::STATE_RESTORE;
@@ -345,18 +336,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectsJsonResponseWithContent($response, $expectedContent);
     }
 
-    public function fieldExistenceDataProvider(): array
-    {
-        return [
-            'field' => [true, false],
-            'association' => [false, true]
-        ];
-    }
-
-    /**
-     * @param string $entityClassName
-     */
-    private function prepareEntityConfigModel($entityClassName)
+    private function prepareEntityConfigModel(string $entityClassName): void
     {
         $entity = $this->createMock(EntityConfigModel::class);
         $entity->expects($this->any())
@@ -368,7 +348,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entity);
     }
 
-    private function prepareEntityConfig(): \PHPUnit\Framework\MockObject\MockObject
+    private function prepareEntityConfig(): ConfigInterface
     {
         $entityConfig = $this->createMock(ConfigInterface::class);
         $entityConfig->expects($this->once())
@@ -383,7 +363,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         return $entityConfig;
     }
 
-    private function prepareFieldConfig(): \PHPUnit\Framework\MockObject\MockObject
+    private function prepareFieldConfig(): ConfigInterface|\PHPUnit\Framework\MockObject\MockObject
     {
         $fieldConfig = $this->createMock(ConfigInterface::class);
         $this->configHelper->expects($this->once())
@@ -394,11 +374,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         return $fieldConfig;
     }
 
-    /**
-     * @param string $entityClassName
-     * @param string $expectedState
-     */
-    private function prepareConfigMocksForRestoreCalls($entityClassName, $expectedState)
+    private function prepareConfigMocksForRestoreCalls(string $entityClassName, string $expectedState): void
     {
         $flashBag = $this->createMock(FlashBagInterface::class);
         $flashBag->expects($this->once())

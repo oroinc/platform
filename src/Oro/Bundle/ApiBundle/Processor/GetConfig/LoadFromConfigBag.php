@@ -24,35 +24,16 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadFromConfigBag implements ProcessorInterface
 {
-    /** @var ConfigExtensionRegistry */
-    private $configExtensionRegistry;
-
-    /** @var ConfigLoaderFactory */
-    private $configLoaderFactory;
-
-    /** @var EntityConfigMerger */
-    private $entityConfigMerger;
-
-    /** @var ConfigBagRegistry */
-    private $configBagRegistry;
-
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var MergeParentResourceHelper */
-    private $mergeParentResourceHelper;
-
-    /** @var MergeActionConfigHelper */
-    private $mergeActionConfigHelper;
-
-    /** @var MergeSubresourceConfigHelper */
-    private $mergeSubresourceConfigHelper;
-
-    /** @var string|null */
-    private $entityClass;
-
-    /** @var string|null */
-    private $parentResourceClass;
+    private ConfigExtensionRegistry $configExtensionRegistry;
+    private ConfigLoaderFactory $configLoaderFactory;
+    private EntityConfigMerger $entityConfigMerger;
+    private ConfigBagRegistry $configBagRegistry;
+    private ResourcesProvider $resourcesProvider;
+    private MergeParentResourceHelper $mergeParentResourceHelper;
+    private MergeActionConfigHelper $mergeActionConfigHelper;
+    private MergeSubresourceConfigHelper $mergeSubresourceConfigHelper;
+    private ?string $entityClass = null;
+    private ?string $parentResourceClass = null;
 
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
@@ -77,7 +58,7 @@ class LoadFromConfigBag implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -89,7 +70,7 @@ class LoadFromConfigBag implements ProcessorInterface
         $this->processConfig($context);
     }
 
-    private function processConfig(ConfigContext $context)
+    private function processConfig(ConfigContext $context): void
     {
         $this->entityClass = $context->getClassName();
         try {
@@ -106,14 +87,7 @@ class LoadFromConfigBag implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return array
-     */
-    private function buildConfig($entityClass, $version, RequestType $requestType)
+    private function buildConfig(string $entityClass, string $version, RequestType $requestType): array
     {
         $config = $this->getConfig($entityClass, $version, $requestType);
         $isInherit = true;
@@ -139,12 +113,12 @@ class LoadFromConfigBag implements ProcessorInterface
                 }
                 $parentClass = $parentClass->getParentClass();
             }
-            if (count($configs) === 1) {
+            if (\count($configs) === 1) {
                 $config = $configs[0];
             } else {
                 $config = array_pop($configs);
                 while (!empty($configs)) {
-                    $config = $this->mergeConfigs(array_pop($configs), $config);
+                    $config = $this->entityConfigMerger->merge(array_pop($configs), $config);
                 }
             }
         }
@@ -161,7 +135,7 @@ class LoadFromConfigBag implements ProcessorInterface
      *                          null if if a configuration does not exist,
      *                          and FALSE if loading of a configuration of parent classes should be stopped
      */
-    private function getConfig($entityClass, $version, RequestType $requestType)
+    private function getConfig(string $entityClass, string $version, RequestType $requestType): array|null|false
     {
         if ($this->entityClass
             && $entityClass !== $this->entityClass
@@ -184,7 +158,7 @@ class LoadFromConfigBag implements ProcessorInterface
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function saveConfig(ConfigContext $context, array $config)
+    private function saveConfig(ConfigContext $context, array $config): void
     {
         $hasDescriptionsConfigExtra = $context->hasExtra(DescriptionsConfigExtra::NAME);
         $action = $context->getTargetAction();
@@ -245,34 +219,12 @@ class LoadFromConfigBag implements ProcessorInterface
         }
     }
 
-    /**
-     * @param array $config
-     * @param array $parentConfig
-     *
-     * @return array
-     */
-    private function mergeConfigs(array $config, array $parentConfig)
-    {
-        return $this->entityConfigMerger->merge($config, $parentConfig);
-    }
-
-    /**
-     * @param string $configType
-     * @param array  $config
-     *
-     * @return object
-     */
-    private function loadConfigObject($configType, $config)
+    private function loadConfigObject(string $configType, array $config): object
     {
         return $this->configLoaderFactory->getLoader($configType)->load($config);
     }
 
-    /**
-     * @param array $config
-     *
-     * @return bool
-     */
-    private function getInheritAndThenRemoveIt(array &$config)
+    private function getInheritAndThenRemoveIt(array &$config): bool
     {
         if (\array_key_exists(ConfigUtil::INHERIT, $config)) {
             $isInherit = $config[ConfigUtil::INHERIT];

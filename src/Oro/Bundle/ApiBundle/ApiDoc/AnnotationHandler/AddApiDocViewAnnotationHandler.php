@@ -10,11 +10,8 @@ use Symfony\Component\Routing\Route;
  */
 class AddApiDocViewAnnotationHandler implements ApiDocAnnotationHandlerInterface
 {
-    /** @var string */
-    private $additionalView;
-
-    /** @var string */
-    private $existingView;
+    private string $additionalView;
+    private string $existingView;
 
     public function __construct(string $additionalView, string $existingView)
     {
@@ -23,9 +20,9 @@ class AddApiDocViewAnnotationHandler implements ApiDocAnnotationHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function handle(ApiDoc $annotation, Route $route)
+    public function handle(ApiDoc $annotation, Route $route): void
     {
         $views = $annotation->getViews();
         if (!empty($views)

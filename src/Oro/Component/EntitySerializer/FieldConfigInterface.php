@@ -31,17 +31,11 @@ interface FieldConfigInterface
 
     /**
      * Gets the path of the field value.
-     *
-     * @param string|null $defaultValue
-     *
-     * @return string|null
      */
     public function getPropertyPath(string $defaultValue = null): ?string;
 
     /**
      * Sets the path of the field value.
-     *
-     * @param string|null $propertyPath
      */
     public function setPropertyPath(string $propertyPath = null): void;
 }

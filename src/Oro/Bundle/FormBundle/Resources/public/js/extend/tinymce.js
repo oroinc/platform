@@ -6,6 +6,11 @@ require.context(
     /.*/
 );
 require.context(
+    '!file-loader?name=[path][name].[ext]&outputPath=../_static/&context=tinymce!tinymce/models',
+    true,
+    /.*/
+);
+require.context(
     '!file-loader?name=[path][name].[ext]&outputPath=../_static/&context=tinymce!tinymce/plugins',
     true,
     /.*/

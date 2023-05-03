@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,19 +13,13 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\TestComment;
 use Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\TestOrder;
 use Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\TestProduct;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class OrmManyRelationBuilderTest extends OrmTestCase
 {
-    /** @var EntityManagerMock */
-    private $em;
-
-    /** @var OrmManyRelationBuilder */
-    private $builder;
-
-    /** @var int */
-    private $paramIndex;
+    private EntityManagerInterface $em;
+    private OrmManyRelationBuilder $builder;
+    private int $paramIndex;
 
     protected function setUp(): void
     {

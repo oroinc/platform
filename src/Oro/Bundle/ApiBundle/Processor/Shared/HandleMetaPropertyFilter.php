@@ -21,11 +21,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class HandleMetaPropertyFilter implements ProcessorInterface
 {
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
-
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
+    private FilterNamesRegistry $filterNamesRegistry;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct(FilterNamesRegistry $filterNamesRegistry, ValueNormalizer $valueNormalizer)
     {
@@ -36,7 +33,7 @@ class HandleMetaPropertyFilter implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

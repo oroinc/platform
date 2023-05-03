@@ -26,6 +26,16 @@ trait SearchExtensionTrait
         return self::getContainer()->get('oro_search.mapper');
     }
 
+    protected static function getIndexAgent()
+    {
+        return self::getContainer()->get('oro_elasticsearch.engine.index_agent');
+    }
+
+    protected static function getIndexPrefix()
+    {
+        return static::getContainer()->get('oro_search.engine.parameters')->getParamValue('prefix');
+    }
+
     /**
      * Ensure that items are loaded to search index.
      */
@@ -117,5 +127,18 @@ trait SearchExtensionTrait
     protected static function reindex(array|string|null $class = null, array $context = []): void
     {
         self::getSearchIndexer()->reindex($class, $context);
+    }
+
+    protected static function deleteIndices($indexAgent = null)
+    {
+        if (!$indexAgent) {
+            $indexAgent = static::getIndexAgent();
+        }
+
+        $indexPrefix = static::getIndexPrefix();
+        $indices = $indexAgent->getClient()->indices()->get(['index' => $indexPrefix . '*'])->asArray();
+        foreach (array_chunk($indices, 10, true) as $chunk) {
+            $indexAgent->getClient()->indices()->delete(['index' => implode(',', array_keys($chunk))]);
+        }
     }
 }

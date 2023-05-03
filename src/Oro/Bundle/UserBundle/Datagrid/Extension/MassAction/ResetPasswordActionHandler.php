@@ -11,6 +11,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Handler for reset password request.
+ */
 class ResetPasswordActionHandler implements MassActionHandlerInterface
 {
     const SUCCESS_MESSAGE = 'oro.user.password.force_reset.mass_action.success';
@@ -40,8 +43,6 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
      */
     public function handle(MassActionHandlerArgs $args)
     {
-        // current user will be processed last
-        $processCurrent = false;
         $currentUser = $this->tokenAccessor->getUser();
         $currentUserId = $currentUser ? $currentUser->getId() : null;
 
@@ -57,17 +58,12 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
                 continue;
             }
 
+            // current user should not be able to reset own password
             if ($currentUserId === $user->getId()) {
-                $processCurrent = true;
-
                 continue;
             }
 
             $count += $this->disableLoginAndNotify($user);
-        }
-
-        if ($processCurrent) {
-            $count += $this->disableLoginAndNotify($currentUser);
         }
 
         $results->getSource()->getEntityManager()->flush();

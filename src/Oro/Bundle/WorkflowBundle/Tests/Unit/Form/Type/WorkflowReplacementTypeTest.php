@@ -72,13 +72,9 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param bool $isValid
-     * @param array $submittedData
-     * @param array $expectedData
-     *
      * @dataProvider submitProvider
      */
-    public function testSubmit($isValid, array $submittedData, array $expectedData)
+    public function testSubmit(bool $isValid, array $submittedData, array $expectedData)
     {
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition->setName('test');
@@ -136,11 +132,7 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getWorkflow($name)
+    private function getWorkflow(string $name): Workflow
     {
         $definition = new WorkflowDefinition();
         $definition->setName($name);
@@ -157,15 +149,15 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension(
                 [
                     $this->formType,
-                    OroChoiceType::class => new OroChoiceType()
+                    new OroChoiceType()
                 ],
                 []
             ),

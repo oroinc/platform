@@ -1,5 +1,7 @@
 oro_icon_select:
     adjust:                 fa-adjust
+    address-card:           fa-address-card
+    address-card-o:         fa-address-card-o
     anchor:                 fa-anchor
     archive:                fa-archive
     asterisk:               fa-asterisk

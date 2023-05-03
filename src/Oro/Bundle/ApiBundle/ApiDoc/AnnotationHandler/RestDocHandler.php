@@ -26,25 +26,13 @@ class RestDocHandler implements HandlerInterface
     private const ID_PLACEHOLDER = '{id}';
 
     /** @var string The group of routes that should be processed by this handler */
-    private $routeGroup;
-
-    /** @var RestDocViewDetector */
-    private $docViewDetector;
-
-    /** @var RestDocContextProvider */
-    private $contextProvider;
-
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var RestDocIdentifierHandler */
-    private $identifierHandler;
-
-    /** @var RestDocFiltersHandler */
-    private $filtersHandler;
-
-    /** @var RestDocStatusCodesHandler */
-    private $statusCodesHandler;
+    private string $routeGroup;
+    private RestDocViewDetector $docViewDetector;
+    private RestDocContextProvider $contextProvider;
+    private ValueNormalizer $valueNormalizer;
+    private RestDocIdentifierHandler $identifierHandler;
+    private RestDocFiltersHandler $filtersHandler;
+    private RestDocStatusCodesHandler $statusCodesHandler;
 
     public function __construct(
         string $routeGroup,

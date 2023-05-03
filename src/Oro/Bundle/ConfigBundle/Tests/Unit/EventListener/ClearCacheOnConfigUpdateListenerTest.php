@@ -29,8 +29,7 @@ class ClearCacheOnConfigUpdateListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnUpdateAfterWhenNotChanged(): void
     {
         $cacheToClear = $this->createMock(CacheItemPoolInterface::class);
-        $cacheToClear
-            ->expects(self::never())
+        $cacheToClear->expects(self::never())
             ->method(self::anything());
 
         $this->listener->addCacheToClear($cacheToClear);
@@ -40,8 +39,7 @@ class ClearCacheOnConfigUpdateListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnUpdateAfter(): void
     {
         $cacheToClear = $this->createMock(CacheItemPoolInterface::class);
-        $cacheToClear
-            ->expects(self::once())
+        $cacheToClear->expects(self::once())
             ->method('clear');
 
         $this->listener->addCacheToClear($cacheToClear);

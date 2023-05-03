@@ -5,23 +5,31 @@ namespace Oro\Bundle\DataGridBundle\Async\Topic;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Defines MQ topic that initializes the datagrid data export.
  */
-class DatagridPreExportTopic extends AbstractTopic
+class DatagridPreExportTopic extends AbstractTopic implements JobAwareTopicInterface
 {
     private int $batchSize;
 
     /** @var string[] */
     private array $outputFormats;
 
-    public function __construct(int $batchSize, array $outputFormats = ['csv', 'xlsx'])
-    {
+    private TokenAccessorInterface $tokenAccessor;
+
+    public function __construct(
+        int                    $batchSize,
+        TokenAccessorInterface $tokenAccessor,
+        array                  $outputFormats = ['csv', 'xlsx'],
+    ) {
         $this->batchSize = $batchSize;
+        $this->tokenAccessor = $tokenAccessor;
         $this->outputFormats = $outputFormats;
     }
 
@@ -91,5 +99,19 @@ class DatagridPreExportTopic extends AbstractTopic
 
                 return $value;
             });
+    }
+
+    public function createJobName($messageBody): string
+    {
+        $gridName = $messageBody['contextParameters']['gridName'];
+        $outputFormat = $messageBody['outputFormat'];
+
+        return sprintf(
+            '%s.%s.user_%s.%s',
+            DatagridExportTopic::getName(),
+            $gridName,
+            $this->tokenAccessor->getUserId(),
+            $outputFormat
+        );
     }
 }

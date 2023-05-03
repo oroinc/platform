@@ -7,23 +7,16 @@ namespace Oro\Bundle\ApiBundle\Batch\Model;
  */
 final class ChunkFile
 {
-    /** @var string */
-    private $fileName;
-
-    /** @var int */
-    private $fileIndex;
-
-    /** @var int */
-    private $firstRecordOffset;
-
-    /** @var string|null */
-    private $sectionName;
+    private string $fileName;
+    private int $fileIndex;
+    private int $firstRecordOffset;
+    private ?string $sectionName;
 
     public function __construct(
         string $fileName,
         int $fileIndex,
         int $firstRecordOffset,
-        string $sectionName = null
+        ?string $sectionName = null
     ) {
         $this->fileName = $fileName;
         $this->fileIndex = $fileIndex;

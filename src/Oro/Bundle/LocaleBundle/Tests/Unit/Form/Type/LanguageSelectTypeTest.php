@@ -125,9 +125,9 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $choiceType = $this->createMock(OroChoiceType::class);
         $choiceType->expects($this->any())
@@ -137,8 +137,8 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    LanguageSelectType::class => $this->formType,
-                    OroChoiceType::class => $choiceType
+                    $this->formType,
+                    $choiceType
                 ],
                 []
             )

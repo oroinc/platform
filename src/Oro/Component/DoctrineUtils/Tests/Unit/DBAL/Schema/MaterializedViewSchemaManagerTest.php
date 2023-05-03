@@ -9,9 +9,11 @@ use Oro\Component\DoctrineUtils\DBAL\Schema\MaterializedViewSchemaManager;
 
 class MaterializedViewSchemaManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private Connection|\PHPUnit\Framework\MockObject\MockObject $connection;
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
+    private $connection;
 
-    private MaterializedViewSchemaManager $manager;
+    /** @var MaterializedViewSchemaManager */
+    private $manager;
 
     protected function setUp(): void
     {
@@ -19,8 +21,7 @@ class MaterializedViewSchemaManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager = new MaterializedViewSchemaManager($this->connection);
 
         $platform = new PostgreSQL100Platform();
-        $this->connection
-            ->expects(self::any())
+        $this->connection->expects(self::any())
             ->method('getDatabasePlatform')
             ->willReturn($platform);
     }
@@ -31,8 +32,7 @@ class MaterializedViewSchemaManagerTest extends \PHPUnit\Framework\TestCase
     public function testCreate(bool $withData, bool $ifNotExists, string $expected): void
     {
         $materializedView = new MaterializedView('sample_name', 'SELECT 1', $withData);
-        $this->connection
-            ->expects(self::once())
+        $this->connection->expects(self::once())
             ->method('executeStatement')
             ->with($expected);
 
@@ -69,8 +69,7 @@ class MaterializedViewSchemaManagerTest extends \PHPUnit\Framework\TestCase
         bool $cascade,
         string $expected
     ): void {
-        $this->connection
-            ->expects(self::once())
+        $this->connection->expects(self::once())
             ->method('executeStatement')
             ->with($expected);
 
@@ -149,8 +148,7 @@ class MaterializedViewSchemaManagerTest extends \PHPUnit\Framework\TestCase
         bool $withData,
         string $expected
     ): void {
-        $this->connection
-            ->expects(self::once())
+        $this->connection->expects(self::once())
             ->method('executeStatement')
             ->with($expected);
 

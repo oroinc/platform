@@ -84,12 +84,9 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
             return self::REJECT;
         }
 
-        $jobUniqueName = $this->getJobUniqueName($messageBody);
-
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            $jobUniqueName,
-            $this->getRunUniqueJobCallback($jobUniqueName, $messageBody)
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
+            $this->getRunUniqueJobCallback($messageBody)
         );
 
         return $result ? self::ACK : self::REJECT;
@@ -106,12 +103,13 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
      *
      * @return \Closure
      */
-    protected function getRunUniqueJobCallback($jobUniqueName, array $body)
+    protected function getRunUniqueJobCallback(array $body)
     {
-        return function (JobRunner $jobRunner, Job $job) use ($jobUniqueName, $body) {
+        return function (JobRunner $jobRunner, Job $job) use ($body) {
             $this->addDependentJob($job->getRootJob(), $body);
             $exportingEntityIds = $this->getExportingEntityIds($body);
 
+            $jobUniqueName = $job->getName();
             $ids = $this->splitOnBatch($exportingEntityIds);
             if (empty($ids)) {
                 $jobRunner->createDelayed(
@@ -178,13 +176,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
 
         $this->dependentJob->saveDependentJob($context);
     }
-
-    /**
-     * @param array $body
-     *
-     * @return string
-     */
-    abstract protected function getJobUniqueName(array $body);
 
     /**
      * @param array $body

@@ -21,22 +21,15 @@ class ConfigurablePermissionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isCapabilityConfigurableDataProvider
-     *
-     * @param bool $default
-     * @param array $capabilities
-     * @param bool $expected
      */
-    public function testIsCapabilityConfigurable($default, array $capabilities, $expected)
+    public function testIsCapabilityConfigurable(bool $default, array $capabilities, bool $expected)
     {
         $model = new ConfigurablePermission('test_name', $default, [], $capabilities);
 
         $this->assertEquals($expected, $model->isCapabilityConfigurable(self::CAPABILITY));
     }
 
-    /**
-     * @return array
-     */
-    public function isCapabilityConfigurableDataProvider()
+    public function isCapabilityConfigurableDataProvider(): array
     {
         return [
             'capabilities contains true' => [
@@ -64,22 +57,15 @@ class ConfigurablePermissionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isEntityPermissionConfigurableDataProvider
-     *
-     * @param bool $default
-     * @param array $entities
-     * @param bool $expected
      */
-    public function testIsEntityPermissionConfigurable($default, array $entities, $expected)
+    public function testIsEntityPermissionConfigurable(bool $default, array $entities, bool $expected)
     {
         $model = new ConfigurablePermission('test_name', $default, $entities);
 
         $this->assertEquals($expected, $model->isEntityPermissionConfigurable(self::ENTITY_CLASS, self::PERMISSION));
     }
 
-    /**
-     * @return array
-     */
-    public function isEntityPermissionConfigurableDataProvider()
+    public function isEntityPermissionConfigurableDataProvider(): array
     {
         return [
             'default true, not contains entity' => [
@@ -122,22 +108,15 @@ class ConfigurablePermissionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isWorkflowPermissionConfigurableDataProvider
-     *
-     * @param bool $default
-     * @param array $workflows
-     * @param bool $expected
      */
-    public function testIsWorkflowPermissionConfigurable($default, array $workflows, $expected)
+    public function testIsWorkflowPermissionConfigurable(bool $default, array $workflows, bool $expected)
     {
         $model = new ConfigurablePermission('test_name', $default, [], [], $workflows);
 
         $this->assertEquals($expected, $model->isWorkflowPermissionConfigurable(self::WORKFLOW, self::PERMISSION));
     }
 
-    /**
-     * @return array
-     */
-    public function isWorkflowPermissionConfigurableDataProvider()
+    public function isWorkflowPermissionConfigurableDataProvider(): array
     {
         return [
             'default true, not contains workflow' => [

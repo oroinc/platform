@@ -68,17 +68,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->query->setConnection($this->connection);
     }
 
-    /**
-     * @param int      $id
-     * @param int      $sid
-     * @param int      $classId
-     * @param int|null $oid
-     * @param int      $order
-     * @param int      $mask
-     *
-     * @return array
-     */
-    private function getAceRow(int $id, int $sid, int $classId, ?int $oid, int $order, int $mask)
+    private function getAceRow(int $id, int $sid, int $classId, ?int $oid, int $order, int $mask): array
     {
         return [
             'id'                   => (string)$id,
@@ -92,16 +82,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param int      $id
-     * @param int      $sid
-     * @param int      $classId
-     * @param int|null $oid
-     * @param int      $order
-     *
-     * @return array
-     */
-    private function getUpdateOrderAceRow(int $id, int $sid, int $classId, ?int $oid, int $order)
+    private function getUpdateOrderAceRow(int $id, int $sid, int $classId, ?int $oid, int $order): array
     {
         return [
             'id'                   => (string)$id,

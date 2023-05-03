@@ -58,3 +58,14 @@ services:
 
     Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder:
         alias: oro_chart.options_builder
+
+    oro_chart.factory.chart_view_builder_factory:
+        class: Oro\Bundle\ChartBundle\Factory\ChartViewBuilderFactory
+        shared: false
+        arguments:
+            - '@oro_chart.view_builder'
+            - '@oro_chart.config_provider'
+
+    oro_chart.data_transformer.overlaid_multi_set:
+        class: Oro\Bundle\ChartBundle\Model\Data\Transformer\OverlaidMultiSetDataTransformer
+        public: true

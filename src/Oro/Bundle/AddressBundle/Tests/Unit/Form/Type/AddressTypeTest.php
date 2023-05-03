@@ -5,22 +5,17 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressIdentifierSubscriber;
 use Oro\Bundle\AddressBundle\Form\Type\AddressType;
-use Oro\Component\Testing\Unit\AddressFormExtensionTestCase;
-use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\Testing\Unit\Form\EventListener\Stub\AddressCountryAndRegionSubscriberStub;
+use Oro\Bundle\AddressBundle\Tests\Unit\Form\EventListener\Stub\AddressCountryAndRegionSubscriberStub;
+use Oro\Component\Testing\ReflectionUtil;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class AddressTypeTest extends AddressFormExtensionTestCase
 {
-    use EntityTrait;
-
-    /**
-     * @var AddressType
-     */
-    private $type;
+    private AddressType $formType;
 
     protected function setUp(): void
     {
-        $this->type = new AddressType(
+        $this->formType = new AddressType(
             new AddressCountryAndRegionSubscriberStub(),
             new AddressIdentifierSubscriber()
         );
@@ -29,12 +24,22 @@ class AddressTypeTest extends AddressFormExtensionTestCase
     }
 
     /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
+    {
+        return array_merge(parent::getExtensions(), [
+            new PreloadedExtension([$this->formType], [])
+        ]);
+    }
+
+    /**
      * Test that ID from the entity passed to mapped=>false field ID of the form by AddressIdentifierSubscriber
      */
     public function testEntityIdPassedToForm()
     {
-        /** @var Address $address */
-        $address = $this->getEntity(Address::class, ['id' => 5]);
+        $address = new Address();
+        ReflectionUtil::setId($address, 5);
 
         $form = $this->factory->create(AddressType::class, $address);
         $this->assertEquals($address->getId(), $form->get('id')->getData());
@@ -46,12 +51,9 @@ class AddressTypeTest extends AddressFormExtensionTestCase
     }
 
     /**
-     * @param mixed $defaultData
-     * @param array $submittedData
-     * @param mixed $expectedData
      * @dataProvider submitProvider
      */
-    public function testSubmit($defaultData, $submittedData, $expectedData)
+    public function testSubmit(mixed $defaultData, array $submittedData, mixed $expectedData)
     {
         $form = $this->factory->create(AddressType::class, $defaultData);
 

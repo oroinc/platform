@@ -21,7 +21,7 @@ class JsonArrayChoiceFilter extends AbstractFilter
      */
     public function getMetadata()
     {
-        $formView = $this->getForm()->createView();
+        $formView = $this->getFormView();
         $fieldView = $formView->children['value'];
 
         $metadata = parent::getMetadata();
@@ -72,7 +72,7 @@ class JsonArrayChoiceFilter extends AbstractFilter
     /**
      * {@inheritDoc}
      */
-    protected function getFormType()
+    protected function getFormType(): string
     {
         return ChoiceFilterType::class;
     }

@@ -13,13 +13,9 @@ use Psr\Container\ContainerInterface;
 class ObjectNormalizerRegistry
 {
     /** @var array [[normalizer service id, object class, request type expression], ...] */
-    private $normalizers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $normalizers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $normalizers [[service id, object class, request type expression], ...]
@@ -35,16 +31,11 @@ class ObjectNormalizerRegistry
 
     /**
      * Gets a normalizer for a given object.
-     *
-     * @param object      $object
-     * @param RequestType $requestType
-     *
-     * @return ObjectNormalizerInterface|null
      */
-    public function getObjectNormalizer($object, RequestType $requestType): ?ObjectNormalizerInterface
+    public function getObjectNormalizer(object $object, RequestType $requestType): ?ObjectNormalizerInterface
     {
         $result = null;
-        foreach ($this->normalizers as list($serviceId, $objectClass, $expression)) {
+        foreach ($this->normalizers as [$serviceId, $objectClass, $expression]) {
             if (is_a($object, $objectClass)
                 && (!$expression || $this->matcher->matchValue($expression, $requestType))
             ) {

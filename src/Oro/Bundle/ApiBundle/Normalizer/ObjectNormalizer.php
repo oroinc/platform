@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Provider\AssociationAccessExclusionProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\AssociationAccessExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Component\EntitySerializer\ConfigUtil;
 use Oro\Component\EntitySerializer\DataAccessorInterface;
 use Oro\Component\EntitySerializer\DataNormalizer;
@@ -132,7 +133,7 @@ class ObjectNormalizer
     private function normalizePlainObject(object $object, int $level, array $context): array
     {
         $result = [];
-        $refl = new \ReflectionClass($object);
+        $refl = new EntityReflectionClass($object);
 
         $nextLevel = $level + 1;
 
@@ -344,7 +345,7 @@ class ObjectNormalizer
                     $value = $this->normalizeEntity($value, $level, $context);
                 } else {
                     $entityId = $this->doctrineHelper->getEntityIdentifier($value);
-                    $count = count($entityId);
+                    $count = \count($entityId);
                     if ($count === 1) {
                         $value = reset($entityId);
                     } elseif ($count > 1) {

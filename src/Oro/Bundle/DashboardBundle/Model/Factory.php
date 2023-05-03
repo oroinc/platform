@@ -2,43 +2,46 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
+use Oro\Bundle\DashboardBundle\DashboardType\DashboardTypeConfigProviderInterface;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 
+/**
+ * Dashboard model factory.
+ */
 class Factory
 {
-    /** @var ConfigProvider */
-    protected $configProvider;
+    private ConfigProvider $configProvider;
+    private StateManager $stateManager;
+    private WidgetConfigs $widgetConfigs;
 
-    /** @var StateManager */
-    protected $stateManager;
-
-    /** @var WidgetConfigs */
-    protected $widgetConfigs;
+    /** @var iterable|DashboardTypeConfigProviderInterface[]  */
+    private iterable $dashboardTypeConfigProviders;
 
     public function __construct(
         ConfigProvider $configProvider,
         StateManager $stateManager,
-        WidgetConfigs $widgetConfigs
+        WidgetConfigs $widgetConfigs,
+        iterable $dashboardTypeConfigProviders
     ) {
         $this->configProvider = $configProvider;
         $this->stateManager   = $stateManager;
         $this->widgetConfigs  = $widgetConfigs;
+        $this->dashboardTypeConfigProviders = $dashboardTypeConfigProviders;
     }
 
     /**
-     * Get dashboard model from dashboard entity
-     *
-     * @param Dashboard $dashboard
-     * @return DashboardModel
+     * Get dashboard model from dashboard entity.
      */
-    public function createDashboardModel(Dashboard $dashboard)
+    public function createDashboardModel(Dashboard $dashboard): DashboardModel
     {
-        $dashboardName = $dashboard->getName();
-        if (!empty($dashboardName)) {
-            $dashboardConfig = $this->configProvider->getDashboardConfig($dashboardName);
-        } else {
-            $dashboardConfig = array();
+        $dashboardConfig = [];
+        $dashboardType = $dashboard->getDashboardType()?->getId();
+        foreach ($this->dashboardTypeConfigProviders as $dashboardTypeConfigProvider) {
+            if ($dashboardTypeConfigProvider->isSupported($dashboardType)) {
+                $dashboardConfig = $dashboardTypeConfigProvider->getConfig($dashboard);
+                break;
+            }
         }
 
         return new DashboardModel(
@@ -48,11 +51,7 @@ class Factory
         );
     }
 
-    /**
-     * @param Widget $widget
-     * @return WidgetModel
-     */
-    public function createWidgetModel(Widget $widget)
+    public function createWidgetModel(Widget $widget): WidgetModel
     {
         $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
         $widgetState  = $this->stateManager->getWidgetState($widget);
@@ -60,11 +59,7 @@ class Factory
         return new WidgetModel($widget, $widgetConfig, $widgetState);
     }
 
-    /**
-     * @param Widget $widget
-     * @return WidgetModel|null
-     */
-    public function createVisibleWidgetModel(Widget $widget)
+    public function createVisibleWidgetModel(Widget $widget): ?WidgetModel
     {
         $widgetConfig = $this->widgetConfigs->getWidgetConfig($widget->getName());
         if (!$widgetConfig) {
@@ -76,11 +71,7 @@ class Factory
         return new WidgetModel($widget, $widgetConfig, $widgetState);
     }
 
-    /**
-     * @param Dashboard $dashboard
-     * @return WidgetCollection
-     */
-    public function createWidgetCollection(Dashboard $dashboard)
+    public function createWidgetCollection(Dashboard $dashboard): WidgetCollection
     {
         return new WidgetCollection($dashboard, $this);
     }

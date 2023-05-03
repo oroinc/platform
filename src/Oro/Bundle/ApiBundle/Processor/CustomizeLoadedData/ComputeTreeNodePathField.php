@@ -106,7 +106,7 @@ class ComputeTreeNodePathField implements ProcessorInterface
             $parentIds = [];
             $materializedPath = explode($this->materializedPathDelimiter, $item[$this->materializedPathField]);
             // skip the last element because it is the same as the current node id
-            $lastIndex = count($materializedPath) - 2;
+            $lastIndex = \count($materializedPath) - 2;
             for ($i = 0; $i <= $lastIndex; $i++) {
                 $parentIds[] = (int)$materializedPath[$i];
             }

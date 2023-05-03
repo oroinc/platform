@@ -14,10 +14,9 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
     public const NAME = 'expand_related_entities';
 
     /** @var string[] */
-    private $expandedEntities;
-
+    private array $expandedEntities;
     /** @var array|null */
-    private $map;
+    private ?array $map = null;
 
     /**
      * @param string[] $expandedEntities The list of related entities.
@@ -40,7 +39,7 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
      *
      * @return string[]
      */
-    public function getExpandedEntities()
+    public function getExpandedEntities(): array
     {
         return $this->expandedEntities;
     }
@@ -60,7 +59,7 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -68,7 +67,7 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(ConfigContext $context)
+    public function configureContext(ConfigContext $context): void
     {
         $context->set(self::NAME, $this->expandedEntities);
     }
@@ -76,7 +75,7 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function isPropagable()
+    public function isPropagable(): bool
     {
         return false;
     }
@@ -84,7 +83,7 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         return 'expand:' . implode(',', $this->expandedEntities);
     }
@@ -98,9 +97,9 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
                     break;
                 }
                 $map[$path] = true;
-                $lastDelimiter = \strrpos($path, ConfigUtil::PATH_DELIMITER);
+                $lastDelimiter = strrpos($path, ConfigUtil::PATH_DELIMITER);
                 $path = false !== $lastDelimiter
-                    ? \substr($path, 0, $lastDelimiter)
+                    ? substr($path, 0, $lastDelimiter)
                     : null;
             } while ($path);
         }

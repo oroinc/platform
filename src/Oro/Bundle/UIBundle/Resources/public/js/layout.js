@@ -65,12 +65,13 @@ define(function(require) {
         },
 
         initPopover: function(container, options) {
-            const $items = container.find('[data-toggle="popover"]').filter(function() {
+            const $items = container.find('[data-toggle="popover"]')
                 // skip already initialized popovers
-                return !$(this).data(Popover.DATA_KEY);
-            });
+                .filter((i, elem) => !$(elem).data(Popover.DATA_KEY));
 
-            this.initPopoverForElements($items, options);
+            if ($items.length) {
+                this.initPopoverForElements($items, options);
+            }
         },
 
         initPopoverForElements: function($items, options, overrideOptionsByData) {
@@ -301,8 +302,13 @@ define(function(require) {
             $parents.each(function() {
                 heightDiff += this.scrollTop;
             });
-            heightDiff -= documentHeight - $('#container')[0].getBoundingClientRect().bottom;
-            heightDiff -= this.PAGE_BOTTOM_PADDING;
+            const parentDialogWidgetElem = $mainEl.closest('.ui-dialog-content .widget-content')[0];
+            if (parentDialogWidgetElem) {
+                heightDiff -= documentHeight - parentDialogWidgetElem.getBoundingClientRect().bottom;
+            } else {
+                heightDiff -= documentHeight - $('#container')[0].getBoundingClientRect().bottom;
+                heightDiff -= this.PAGE_BOTTOM_PADDING;
+            }
             return heightDiff;
         },
 
@@ -354,7 +360,7 @@ define(function(require) {
          */
         enablePageScroll: function() {
             if (this._scrollDisabledElements && this._scrollDisabledElements.length) {
-                this._scrollDisabledElements.parents().removeClass('disable-scroll');
+                this._scrollDisabledElements.removeClass('disable-scroll');
                 delete this._scrollDisabledElements;
             }
         },

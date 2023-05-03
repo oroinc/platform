@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 /**
- * A filter that can be used to filter data by an association with composite identifier.
+ * The filter that can be used to filter data by an association with a composite identifier.
  * This filter supports only "equal" and "not equal" comparisons.
  * Also filtering by several identifiers is supported.
  */

@@ -9,7 +9,6 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -17,6 +16,8 @@ use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\ExportPreGetIds;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\ImportExportBundle\ORM\Query\ExportBufferedIdentityQueryResultIterator;
+use Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -169,10 +170,10 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
             $options
         );
 
-        $event = new ExportPreGetIds($queryBuilder, $options);
+        $event = new ExportPreGetIds($queryBuilder, $options + ['entityName' => $entityName]);
         $this->dispatcher->dispatch($event, Events::BEFORE_EXPORT_GET_IDS);
 
-        $organization = isset($options['organization']) ? $options['organization'] : null;
+        $organization = $options['organization'] ?? null;
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
         $this->applyAcl($queryBuilder);
         $result = $queryBuilder->getQuery()->getResult(AbstractQuery::HYDRATE_ARRAY);
@@ -239,7 +240,14 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
      */
     protected function createSourceIterator($source)
     {
-        return (new BufferedIdentityQueryResultIterator($source))
+        if ($this->stepExecution) {
+            // Only the ExportBufferedIdentityQueryResultIterator can be responsible for cleaning the doctrine manager,
+            // since the iterator does not provide details of the data processing.
+            $this->getContext()->setValue(DoctrineClearWriter::SKIP_CLEAR, true);
+        }
+
+        return (new ExportBufferedIdentityQueryResultIterator($source))
+            ->setPageCallback(fn () => $this->registry->getManager()->clear())
             ->setPageLoadedCallback(function (array $rows) {
                 if (!$this->dispatcher->hasListeners(Events::AFTER_ENTITY_PAGE_LOADED)) {
                     return $rows;

@@ -119,6 +119,7 @@ services:
             - '@security.authorization_checker'
             - '@security.token_storage'
             - '@oro_datagrid.inline_editing_configurator'
+            - '@oro_featuretoggle.checker.feature_checker'
         calls:
             - [addUnsupportedGridPrefix, ['oro_report']]
             - [addUnsupportedGridPrefix, ['oro_segment']]

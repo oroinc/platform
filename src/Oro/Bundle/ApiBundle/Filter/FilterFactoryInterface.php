@@ -12,11 +12,6 @@ interface FilterFactoryInterface
 
     /**
      * Creates a new instance of filter.
-     *
-     * @param string $filterType The type of a filter.
-     * @param array  $options    The filter options.
-     *
-     * @return StandaloneFilter|null
      */
     public function createFilter(string $filterType, array $options = []): ?StandaloneFilter;
 }

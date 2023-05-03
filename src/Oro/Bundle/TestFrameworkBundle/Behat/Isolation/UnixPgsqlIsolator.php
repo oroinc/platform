@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
  * Restore and backup PostgreSQL database between features
@@ -21,8 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class UnixPgsqlIsolator extends AbstractDbOsRelatedIsolator
 {
-    /** @var string */
-    protected $dbTemp;
+    protected string $dbTemp = '';
 
     /** {@inheritdoc} */
     public function getName()
@@ -33,9 +32,7 @@ class UnixPgsqlIsolator extends AbstractDbOsRelatedIsolator
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
     {
-        return self::isApplicableOS()
-            && DatabaseDriverInterface::DRIVER_POSTGRESQL === $container->getParameter('database_driver')
-            && false == getenv('BEHAT_DATABASE_LOCATION');
+        return self::isApplicableOS() && false == getenv('BEHAT_DATABASE_LOCATION');
     }
 
     /** {@inheritdoc} */
@@ -139,9 +136,20 @@ class UnixPgsqlIsolator extends AbstractDbOsRelatedIsolator
 
     protected function dropDb(string $dbName): void
     {
-        $this->killConnections();
-
-        parent::dropDb($dbName);
+        $attempts = 1;
+        while (true) {
+            try {
+                $this->killConnections();
+                parent::dropDb($dbName);
+            } catch (ProcessFailedException $e) {
+                if ($attempts < 5) {
+                    $attempts++;
+                    continue;
+                }
+                throw $e;
+            }
+            break;
+        }
     }
 
     private function killConnections()

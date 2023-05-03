@@ -57,6 +57,9 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
 
     protected function startCopyDumpToTempDir()
     {
+        // remove old cache dirs
+        $this->runProcess(sprintf('rm -rf %s', $this->cacheDir.'_old'));
+
         $command = sprintf(
             'exec cp -rp %s %s',
             $this->cacheDumpDir.'/*',
@@ -114,20 +117,23 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
 
     protected function removeCacheDirs()
     {
-        $commands = [];
+        $commands = [
+            sprintf('mkdir %s', $this->cacheDir.'_old')
+        ];
         foreach ($this->cacheDirectories as $directory) {
             $cacheDirPath = $this->cacheDir.DIRECTORY_SEPARATOR.$directory;
+            $oldCacheDirPath = $this->cacheDir.'_old'.DIRECTORY_SEPARATOR.$directory;
             if (!is_dir($cacheDirPath)) {
                 continue;
             }
-            $commands[] = sprintf('rm -rf %s', $cacheDirPath);
+            $commands[] = sprintf('mv %s %s', $cacheDirPath, $oldCacheDirPath);
         }
         foreach ($this->cacheFiles as $file) {
             $cacheFilePath = $this->cacheDir.DIRECTORY_SEPARATOR.$file;
             if (!is_file($cacheFilePath)) {
                 continue;
             }
-            $commands[] = sprintf('rm -f %s', $cacheFilePath);
+            $commands[] = sprintf('mv %s %s', $cacheFilePath, $oldCacheDirPath);
         }
 
         $this->runProcess(implode(' && ', $commands));

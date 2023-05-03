@@ -10,9 +10,9 @@ use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 class GetProcessor extends RequestActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): GetContext
     {
         return new GetContext($this->configProvider, $this->metadataProvider);
     }

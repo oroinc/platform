@@ -26,7 +26,7 @@ class ApiDocAnnotationParser implements ParserInterface
     {
         return
             isset($item['fields'])
-            && is_array($item['fields']);
+            && \is_array($item['fields']);
     }
 
     /**
@@ -39,7 +39,7 @@ class ApiDocAnnotationParser implements ParserInterface
             $fieldName = $fieldData['name'];
             unset($fieldData['name']);
 
-            if (!array_key_exists('required', $fieldData)) {
+            if (!\array_key_exists('required', $fieldData)) {
                 $fieldData['required'] = false;
             }
 

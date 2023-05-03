@@ -154,7 +154,7 @@ class ControllersResetTest extends WebTestCase
         self::assertStringContainsString($expectedResponse, $result->getContent());
 
         $user = $this->getContainer()->get('doctrine')->getRepository(User::class)->find($user->getId());
-        $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
+        $this->assertEquals(UserManager::STATUS_RESET, $user->getAuthStatus()->getId());
     }
 
     public function testMassPasswordResetAction()
@@ -194,7 +194,7 @@ class ControllersResetTest extends WebTestCase
         $user = $repo->find($user->getId());
         $user2 = $repo->find($user2->getId());
 
-        $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
+        $this->assertEquals(UserManager::STATUS_RESET, $user->getAuthStatus()->getId());
         $this->assertEquals(UserManager::STATUS_ACTIVE, $user2->getAuthStatus()->getId());
     }
 

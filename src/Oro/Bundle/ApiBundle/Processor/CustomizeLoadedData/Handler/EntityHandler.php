@@ -15,29 +15,15 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
  */
 class EntityHandler
 {
-    /** @var ActionProcessorInterface */
-    private $customizationProcessor;
-
-    /** @var string */
-    private $version;
-
-    /** @var RequestType */
-    private $requestType;
-
-    /** @var string */
-    private $entityClass;
-
-    /** @var EntityDefinitionConfig */
-    private $config;
-
+    private ActionProcessorInterface $customizationProcessor;
+    private string $version;
+    private RequestType $requestType;
+    private string $entityClass;
+    private EntityDefinitionConfig $config;
     /** @var ConfigExtraInterface[] */
-    private $configExtras;
-
-    /** @var bool */
-    private $collection;
-
-    /** @var callable|null */
-    private $previousHandler;
+    private array $configExtras;
+    private bool $collection;
+    private mixed $previousHandler;
 
     /**
      * @param ActionProcessorInterface $customizationProcessor
@@ -71,13 +57,8 @@ class EntityHandler
 
     /**
      * Handles the given data.
-     *
-     * @param array $data
-     * @param array $context
-     *
-     * @return mixed
      */
-    public function __invoke(array $data, array $context)
+    public function __invoke(array $data, array $context): mixed
     {
         if (null !== $this->previousHandler) {
             $data = \call_user_func($this->previousHandler, $data, $context);
@@ -126,7 +107,7 @@ class EntityHandler
             $handler instanceof self
             && $this->version === $handler->version
             && (string)$this->requestType === (string)$handler->requestType
-            && \is_a($this->entityClass, $handler->entityClass, true);
+            && is_a($this->entityClass, $handler->entityClass, true);
     }
 
     private function adjustPropertyPath(CustomizeLoadedDataContext $customizationContext): void

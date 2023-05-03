@@ -82,7 +82,7 @@ class ProfilingEntityManager extends OroEntityManager
     /**
      * {@inheritdoc}
      */
-    public function refresh($entity)
+    public function refresh($entity, ?int $lockMode = null)
     {
         $logger = $this->getProfilingLogger();
         if ($logger) {

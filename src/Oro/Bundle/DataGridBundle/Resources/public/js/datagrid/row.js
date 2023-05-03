@@ -83,29 +83,18 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        initialize: function(options) {
-            // itemView function is called as new this.itemView
-            // it is placed here to pass THIS within closure
-            const rowView = this;
+        initialize(options) {
             // let descendants override itemView
             if (!this.itemView) {
+                // itemView function is called as new this.itemView
+                // it is placed here to pass THIS within closure
+                const rowView = this;
                 this.itemView = function(options) {
                     const column = options.model;
                     const cellOptions = rowView.getConfiguredCellOptions(column);
                     cellOptions.model = rowView.model;
                     const Cell = column.get('cell');
-                    const cell = new Cell(cellOptions);
-                    cell.$el.attr({
-                        'data-column-label': column.get('label')
-                    });
-                    if (column.has('align')) {
-                        cell.$el.removeClass('align-left align-center align-right');
-                        cell.$el.addClass('align-' + column.get('align'));
-                    }
-                    if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
-                        cell.$el.addClass('skip-row-click');
-                    }
-                    return cell;
+                    return new Cell(cellOptions);
                 };
             }
 
@@ -123,6 +112,23 @@ define(function(require) {
 
             Row.__super__.initialize.call(this, options);
             this.cells = this.subviews;
+        },
+
+        initItemView(model) {
+            const column = model;
+            const cell = Row.__super__.initItemView.call(this, model);
+
+            cell.$el.attr({
+                'data-column-label': column.get('label')
+            });
+            if (column.has('align')) {
+                cell.$el.removeClass('align-left align-center align-right');
+                cell.$el.addClass('align-' + column.get('align'));
+            }
+            if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
+                cell.$el.addClass('skip-row-click');
+            }
+            return cell;
         },
 
         getConfiguredCellOptions: function(column) {

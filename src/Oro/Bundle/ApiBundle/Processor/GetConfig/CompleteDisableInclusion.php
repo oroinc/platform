@@ -17,7 +17,7 @@ class CompleteDisableInclusion implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -32,7 +32,7 @@ class CompleteDisableInclusion implements ProcessorInterface
             return;
         }
 
-        if (!\is_a($context->getClassName(), EntityIdentifier::class, true)
+        if (!is_a($context->getClassName(), EntityIdentifier::class, true)
             && !$this->hasAssociations($definition)
         ) {
             $definition->disableInclusion();

@@ -10,23 +10,19 @@ use Oro\Bundle\ApiBundle\Collection\Join;
  * * sets missing join aliases
  * * adds required joins
  * * replaces LEFT JOIN with INNER JOIN where it is possible
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CriteriaNormalizer
 {
     private const JOIN_ALIAS_TEMPLATE = 'alias%d';
 
-    private const FIELD_OPTION         = 'field';
-    private const PARENT_PATH_OPTION   = 'parentPath';
+    private const FIELD_OPTION = 'field';
+    private const PARENT_PATH_OPTION = 'parentPath';
     private const NESTING_LEVEL_OPTION = 'nestingLevel';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var RequireJoinsFieldVisitorFactory */
-    private $requireJoinsFieldVisitorFactory;
-
-    /** @var OptimizeJoinsFieldVisitorFactory */
-    private $optimizeJoinsFieldVisitorFactory;
+    private DoctrineHelper $doctrineHelper;
+    private RequireJoinsFieldVisitorFactory $requireJoinsFieldVisitorFactory;
+    private OptimizeJoinsFieldVisitorFactory $optimizeJoinsFieldVisitorFactory;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -98,6 +94,7 @@ class CriteriaNormalizer
 
     /**
      * Replaces LEFT JOIN with INNER JOIN where it is possible.
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function optimizeJoins(Criteria $criteria): void
     {
@@ -108,8 +105,14 @@ class CriteriaNormalizer
                 $join->setJoinType(Join::INNER_JOIN);
             }
             $lastDelimiter = strrpos($field, '.');
+            if (false === $lastDelimiter && $this->isPlaceholder($field)) {
+                $lastDelimiter = \strlen($field);
+            }
             while (false !== $lastDelimiter) {
                 $field = substr($field, 0, $lastDelimiter);
+                if ($this->isPlaceholder($field)) {
+                    $field = substr($field, 1, -1);
+                }
                 $lastDelimiter = false;
                 $join = $criteria->getJoin($field);
                 if (null !== $join && Join::LEFT_JOIN === $join->getJoinType()) {
@@ -138,23 +141,28 @@ class CriteriaNormalizer
     private function getJoinPathMap(Criteria $criteria, string $rootEntityClass): array
     {
         $pathMap = [];
+        $existingJoinPaths = [];
 
         $joins = $criteria->getJoins();
         foreach ($joins as $path => $join) {
             $pathMap[$path] = $this->buildJoinPathMapValue($path);
+            $existingJoinPaths[] = $path;
         }
 
         $rootMetadata = $this->doctrineHelper->getEntityMetadataForClass($rootEntityClass);
         $rootPath = substr(Criteria::ROOT_ALIAS_PLACEHOLDER, 1, -1);
         $fields = $this->getFields($criteria);
         foreach ($fields as $field) {
-            $path = $this->getPath($field, $rootPath);
+            $path = $this->getPath($field, $rootPath, $existingJoinPaths);
             if (!isset($pathMap[$field])) {
                 if ($path) {
                     if (null !== $this->doctrineHelper->findEntityMetadataByPath($rootEntityClass, $field)) {
                         $pathMap[$field] = $this->buildJoinPathMapValue($field);
                     }
-                } elseif ($rootMetadata->hasAssociation($field)) {
+                } elseif (!str_starts_with($field, Criteria::PLACEHOLDER_START)
+                    && !str_contains($field, '.')
+                    && $rootMetadata->hasAssociation($field)
+                ) {
                     $pathMap[$field] = $this->buildJoinPathMapValue($field);
                 }
             }
@@ -162,27 +170,25 @@ class CriteriaNormalizer
                 if (Criteria::ROOT_ALIAS_PLACEHOLDER !== $path && !isset($pathMap[$path])) {
                     $pathMap[$path] = $this->buildJoinPathMapValue($path);
                 }
-                $path = $this->getPath($path, $rootPath);
+                $path = $this->getPath($path, $rootPath, $existingJoinPaths);
             }
         }
 
         return $pathMap;
     }
 
-    private function getPath(string $field, string $rootPath): ?string
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function getPath(string $field, string $rootPath, array $joinPaths): ?string
     {
         $path = null;
-        if (str_starts_with($field, '{')) {
-            if (str_ends_with($field, '}')) {
-                $path = substr($field, 1, -2);
-                if ($rootPath === $path) {
-                    $path = null;
-                }
-            } else {
+        if (str_starts_with($field, Criteria::PLACEHOLDER_START)) {
+            if (!str_ends_with($field, Criteria::PLACEHOLDER_END)) {
                 $lastDelimiter = strrpos($field, '.');
-                if (false !== $lastDelimiter && '}' === $field[$lastDelimiter - 1]) {
+                if (false !== $lastDelimiter && Criteria::PLACEHOLDER_END === $field[$lastDelimiter - 1]) {
                     $path = substr($field, 1, $lastDelimiter - 2);
-                    if ($rootPath === $path) {
+                    if ($rootPath === $path || \in_array($path, $joinPaths, true)) {
                         $path = null;
                     }
                 }
@@ -273,5 +279,12 @@ class CriteriaNormalizer
                 return $a[self::NESTING_LEVEL_OPTION] < $b[self::NESTING_LEVEL_OPTION] ? -1 : 1;
             }
         );
+    }
+
+    private function isPlaceholder(string $value): bool
+    {
+        return
+            str_starts_with($value, Criteria::PLACEHOLDER_START)
+            && str_ends_with($value, Criteria::PLACEHOLDER_END);
     }
 }

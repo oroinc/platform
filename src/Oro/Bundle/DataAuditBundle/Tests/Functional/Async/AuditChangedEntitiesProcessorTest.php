@@ -11,7 +11,6 @@ use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditData
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
@@ -112,9 +111,15 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
 
         $this->processor->process($message, $this->getConnection()->createSession());
 
+        $auditChangedEntitiesRelationsTopicExpectedBody = $expectedBody;
+        unset(
+            $auditChangedEntitiesRelationsTopicExpectedBody['entities_inserted'],
+            $auditChangedEntitiesRelationsTopicExpectedBody['entities_updated'],
+            $auditChangedEntitiesRelationsTopicExpectedBody['entities_deleted']
+        );
         $this->assertMessageSent(
             AuditChangedEntitiesRelationsTopic::getName(),
-            $expectedBody
+            $auditChangedEntitiesRelationsTopicExpectedBody
         );
         self::assertMessageSentWithPriority(
             AuditChangedEntitiesRelationsTopic::getName(),

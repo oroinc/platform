@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    const viewportManager = require('oroui/js/viewport-manager');
+    const viewportManager = require('oroui/js/viewport-manager').default;
     const mediator = require('oroui/js/mediator');
     const $ = require('jquery');
     const _ = require('underscore');
@@ -11,9 +11,7 @@ define(function(require) {
     require('styled-scroll-bar');
 
     const StickedScrollbarPlugin = BasePlugin.extend({
-        viewport: {
-            minScreenType: 'any'
-        },
+        viewport: 'all',
 
         domCache: null,
 
@@ -28,7 +26,7 @@ define(function(require) {
             this.onViewportChange = this.onViewportChange.bind(this);
             // add the event handler, that won't be removed through disable action
             // (has to be removed only in dispose)
-            mediator.on('viewport:change', this.onViewportChange);
+            mediator.on(`viewport:${this.viewport}`, this.onViewportChange);
 
             return StickedScrollbarPlugin.__super__.initialize.call(this, grid, options);
         },
@@ -44,7 +42,7 @@ define(function(require) {
          * @inheritdoc
          */
         enable: function() {
-            if (this.enabled || !this.grid.rendered || !this.isApplicable(viewportManager.getViewport())) {
+            if (this.enabled || !this.grid.rendered || !viewportManager.isApplicable(this.viewport)) {
                 return;
             }
 
@@ -96,7 +94,7 @@ define(function(require) {
 
             this.disable();
             delete this.domCache;
-            mediator.off('viewport:change', this.onViewportChange);
+            mediator.off(`viewport:${this.viewport}`, this.onViewportChange);
 
             return StickedScrollbarPlugin.__super__.dispose.call(this);
         },
@@ -193,10 +191,6 @@ define(function(require) {
             return viewportBottom > 0 || viewportLowLevel < containerOffsetTop;
         },
 
-        isApplicable: function(viewport) {
-            return viewport.isApplicable(this.viewport);
-        },
-
         attachScrollbar: function() {
             this.domCache.$scrollbar.removeAttr('style');
         },
@@ -231,8 +225,8 @@ define(function(require) {
             }
         },
 
-        onViewportChange: function(viewport) {
-            if (this.isApplicable(viewport)) {
+        onViewportChange: function(e) {
+            if (e.matches) {
                 this.enable();
             } else {
                 this.disable();

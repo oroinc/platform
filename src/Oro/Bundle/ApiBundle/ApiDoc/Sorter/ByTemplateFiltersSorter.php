@@ -8,10 +8,8 @@ namespace Oro\Bundle\ApiBundle\ApiDoc\Sorter;
 class ByTemplateFiltersSorter implements FiltersSorterInterface
 {
     /** @var string[] */
-    private $sortingTemplate;
-
-    /** @var bool */
-    private $addOtherFiltersToBegin;
+    private array $sortingTemplate;
+    private bool $addOtherFiltersToBegin;
 
     /**
      * @param string[] $sortingTemplate [filter key prefix, ...]

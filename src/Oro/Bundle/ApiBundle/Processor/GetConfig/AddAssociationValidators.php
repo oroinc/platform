@@ -119,7 +119,7 @@ class AddAssociationValidators implements ProcessorInterface
             foreach ($constraints as $constraint) {
                 if ($constraint instanceof Assert\HasAdderAndRemover
                     && $constraint->property === $fieldName
-                    && \is_a($entityClass, $constraint->class, true)
+                    && is_a($entityClass, $constraint->class, true)
                 ) {
                     $hasConstraint = true;
                     break;

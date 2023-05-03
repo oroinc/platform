@@ -10,8 +10,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Client\EmailClient;
 use Oro\Bundle\TestFrameworkBundle\Behat\Client\FileDownloader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -19,11 +17,12 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwareInterface
+class EmailContext extends OroFeatureContext
 {
-    use AssertTrait, MessageQueueProcessorAwareTrait;
+    use AssertTrait;
 
     private string $downloadedFile = '';
+    private array $rememberedData = [];
 
     public function __construct(private EmailClient $emailClient)
     {
@@ -31,7 +30,6 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
 
     /**
      * @BeforeScenario
-     * @AfterScenario
      */
     public function clear()
     {
@@ -50,24 +48,28 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         self::assertNotEmpty($text, 'Assertion text can\'t be empty.');
 
         $pattern = $this->getPattern($text);
-        $found = false;
+        $messages = [];
+        $found = $this->spin(function () use ($pattern, &$messages) {
+            $found = false;
+            $messages = $this->getSentMessages();
 
-        $messages = $this->getSentMessages();
+            foreach ($messages as $message) {
+                $data = array_map(
+                    function ($field) use ($message) {
+                        return $this->getMessageData($message, $field);
+                    },
+                    ['From', 'To', 'Subject', 'Body']
+                );
+                $data = preg_replace('/\s+/u', ' ', implode(' ', $data));
 
-        foreach ($messages as $message) {
-            $data = array_map(
-                function ($field) use ($message) {
-                    return $this->getMessageData($message, $field);
-                },
-                ['From', 'To', 'Subject', 'Body']
-            );
-            $data = preg_replace('/\s+/u', ' ', implode(' ', $data));
-
-            $found = (bool)preg_match($pattern, $data);
-            if ($found !== false) {
-                break;
+                $found = (bool)preg_match($pattern, $data);
+                if ($found !== false) {
+                    break;
+                }
             }
-        }
+
+            return $found;
+        }, 300);
 
         self::assertNotFalse(
             $found,
@@ -101,27 +103,32 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
             //Keys makes possible to use multiple Body field in expected table
             $expectedRows[] = ['field' => $field, 'pattern' => $this->getPattern($text)];
         }
+        $expectedContent = [];
+        $sentMessages = [];
+        $found = $this->spin(function () use ($expectedRows, &$expectedContent, &$sentMessages) {
+            $sentMessages = $this->getSentMessages();
 
-        $sentMessages = $this->getSentMessages();
+            self::assertNotEmpty($sentMessages, 'There are no sent messages');
 
-        self::assertNotEmpty($sentMessages, 'There are no sent messages');
+            $found = false;
+            foreach ($sentMessages as $message) {
+                foreach ($expectedRows as $expectedContent) {
+                    $found = (bool)preg_match(
+                        $expectedContent['pattern'],
+                        $this->getMessageData($message, $expectedContent['field'])
+                    );
+                    if ($found === false) {
+                        break;
+                    }
+                }
 
-        $found = false;
-        foreach ($sentMessages as $message) {
-            foreach ($expectedRows as $expectedContent) {
-                $found = (bool)preg_match(
-                    $expectedContent['pattern'],
-                    $this->getMessageData($message, $expectedContent['field'])
-                );
-                if ($found === false) {
+                if ($found) {
                     break;
                 }
             }
 
-            if ($found) {
-                break;
-            }
-        }
+            return $found;
+        });
 
         self::assertNotFalse(
             $found,
@@ -206,16 +213,19 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
     public function downloadFileFromEmail()
     {
         $pattern = '/<a\s+(?:[^>]*?\s+)?href=(["\'])(.*?)\1/mi';
-        $found = null;
 
-        foreach ($this->getSentMessages() as $message) {
-            if (!preg_match($pattern, $message['body'], $matches)) {
-                continue;
+        $found = $this->spin(function () use ($pattern) {
+            foreach ($this->getSentMessages() as $message) {
+                if (!preg_match($pattern, $message['body'], $matches)) {
+                    continue;
+                }
+
+                $found = $matches[2];
+                break;
             }
 
-            $found = $matches[2];
-            break;
-        }
+            return $found;
+        });
 
         if ($found) {
             $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'email';
@@ -265,7 +275,7 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
 
                 // Ensure that at least expected data is present.
                 foreach ($expectedEntityData as $property => $value) {
-                    static::assertEquals($value, $entityDataFromCsv[$property]);
+                    static::assertEquals($this->processFunctions($value), $entityDataFromCsv[$property]);
                 }
             }
 
@@ -297,22 +307,24 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         foreach ($table->getRows() as [$field, $text]) {
             $expectedContent[$field] = $this->getPattern($text);
         }
+        $messages = [];
+        $found = $this->spin(function () use ($searchText, $searchField, $expectedContent, &$messages) {
+            $messages = $this->getSentMessages();
+            foreach ($messages as $message) {
+                if ($searchText !== $this->getMessageData($message, $searchField)) {
+                    continue;
+                }
 
-        $found = false;
-
-        $messages = $this->getSentMessages();
-        foreach ($messages as $message) {
-            if ($searchText !== $this->getMessageData($message, $searchField)) {
-                continue;
-            }
-
-            foreach ($expectedContent as $field => $pattern) {
-                $found = (bool)preg_match($pattern, $this->getMessageData($message, $field));
-                if ($found === false) {
-                    break 2;
+                foreach ($expectedContent as $field => $pattern) {
+                    $found = (bool)preg_match($pattern, $this->getMessageData($message, $field));
+                    if ($found === false) {
+                        break 2;
+                    }
                 }
             }
-        }
+
+            return $found;
+        });
 
         self::assertNotFalse(
             $found,
@@ -348,29 +360,32 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
      */
     public function assertDateInEmail(string $condition, string $expectedDate)
     {
-        $found = null;
-        foreach ($this->getSentMessages() as $message) {
-            $found = (bool)preg_match(
-                '/\D{2,3}\s\d{1,2},\s\d{4} at \d{1,2}:\d{2}\s(AM|PM)/',
-                $message['body'],
-                $matches
-            );
-            if ($found) {
-                $date = \DateTime::createFromFormat('M d, Y ?? h:i A', $matches[0], new \DateTimeZone('UTC'));
-                $result = null;
-                switch ($condition) {
-                    case 'less':
-                        $result = $date < new \DateTime($expectedDate, new \DateTimeZone('UTC'));
-                        break;
-                    case 'greater':
-                        $result = $date > new \DateTime($expectedDate, new \DateTimeZone('UTC'));
-                        break;
-                }
-                self::assertTrue($result, sprintf('Email date is not %s than %s', $condition, $expectedDate));
+        $found = $this->spin(function () use ($condition, $expectedDate) {
+            foreach ($this->getSentMessages() as $message) {
+                $found = (bool)preg_match(
+                    '/\D{2,3}\s\d{1,2},\s\d{4} at \d{1,2}:\d{2}\s(AM|PM)/',
+                    $message['body'],
+                    $matches
+                );
+                if ($found) {
+                    $date = \DateTime::createFromFormat('M d, Y ?? h:i A', $matches[0], new \DateTimeZone('UTC'));
+                    $result = null;
+                    switch ($condition) {
+                        case 'less':
+                            $result = $date < new \DateTime($expectedDate, new \DateTimeZone('UTC'));
+                            break;
+                        case 'greater':
+                            $result = $date > new \DateTime($expectedDate, new \DateTimeZone('UTC'));
+                            break;
+                    }
+                    self::assertTrue($result, sprintf('Email date is not %s than %s', $condition, $expectedDate));
 
-                break;
+                    break;
+                }
             }
-        }
+
+            return $found;
+        });
 
         self::assertTrue($found, 'Sent emails bodies don\'t contain dates.');
     }
@@ -427,6 +442,33 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
         self::assertNotNull($url, sprintf('"%s" link not found in the email', $linkCaption));
 
         $this->visitPath($url);
+    }
+
+    /**
+     * Example: I remember "Confirm" link from the email
+     *
+     * @Then /^I remember "(?P<linkCaption>[^"]+)" link from the email$/
+     * @param string $imageType
+     */
+    public function iRememberLinkFromEmail($linkCaption)
+    {
+        $url = $this->getLinkUrlFromEmail($linkCaption);
+
+        self::assertNotNull($url, sprintf('"%s" link not found in the email', $linkCaption));
+
+        $this->rememberedData[$linkCaption] = $url;
+    }
+
+    /**
+     * Example: Then I follow remembered "Confirm" link from the email
+     *
+     * @Given /^(?:|I )follow remembered "(?P<linkCaption>[^"]+)" link from the email$/
+     */
+    public function followRememberedLinkFromEmail(string $linkCaption)
+    {
+        self::assertTrue(isset($this->rememberedData[$linkCaption]));
+
+        $this->visitPath($this->rememberedData[$linkCaption]);
     }
 
     public function getLinkUrlFromEmail(string $linkCaption): ?string
@@ -516,11 +558,25 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
 
     private function getSentMessages(): array
     {
-        $this->messageQueueProcessor->waitWhileProcessingMessages();
         $emailClient = $this->emailClient;
 
         return $this->spin(static function () use ($emailClient) {
             return $emailClient->getMessages();
         }) ?? [];
+    }
+
+    private function processFunctions(mixed $value): mixed
+    {
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        switch (true) {
+            case preg_match('/\<eol\("(?P<value>(?:[^"]|\\")+)"\)\>/i', $value, $matches):
+                $value = str_replace('\r\n', PHP_EOL, $matches['value']);
+                break;
+        }
+
+        return $value;
     }
 }

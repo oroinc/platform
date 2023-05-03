@@ -17,11 +17,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ActionGroupExecutor
 {
-    /** @var ActionGroupRegistry */
-    private $actionGroupRegistry;
-
-    /** @var TranslatorInterface */
-    private $translator;
+    private ActionGroupRegistry $actionGroupRegistry;
+    private TranslatorInterface $translator;
 
     public function __construct(
         ActionGroupRegistry $actionGroupRegistry,

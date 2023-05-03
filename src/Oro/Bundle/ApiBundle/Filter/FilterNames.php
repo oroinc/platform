@@ -7,35 +7,22 @@ namespace Oro\Bundle\ApiBundle\Filter;
  */
 class FilterNames
 {
-    /** @var string */
-    private $sortFilterName;
-
-    /** @var string */
-    private $pageNumberFilterName;
-
-    /** @var string */
-    private $pageSizeFilterName;
-
-    /** @var string */
-    private $metaPropertyFilterName;
-
-    /** @var string|null */
-    private $dataFilterGroupName;
-
-    /** @var string|null */
-    private $fieldsFilterGroupName;
-
-    /** @var string|null */
-    private $includeFilterName;
+    private string $sortFilterName;
+    private string $pageNumberFilterName;
+    private string $pageSizeFilterName;
+    private string $metaPropertyFilterName;
+    private ?string $dataFilterGroupName;
+    private ?string $fieldsFilterGroupName;
+    private ?string $includeFilterName;
 
     public function __construct(
         string $sortFilterName,
         string $pageNumberFilterName,
         string $pageSizeFilterName,
         string $metaPropertyFilterName,
-        string $dataFilterGroupName = null,
-        string $fieldsFilterGroupName = null,
-        string $includeFilterName = null
+        ?string $dataFilterGroupName = null,
+        ?string $fieldsFilterGroupName = null,
+        ?string $includeFilterName = null
     ) {
         $this->sortFilterName = $sortFilterName;
         $this->pageNumberFilterName = $pageNumberFilterName;

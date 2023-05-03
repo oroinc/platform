@@ -5,32 +5,23 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
-use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
-use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BooleanFilterTypeTest extends AbstractTypeTestCase
+class BooleanFilterTypeTest extends FormIntegrationTestCase
 {
-    /** @var BooleanFilterType */
-    private $type;
-
     private array $booleanChoices = [
         'oro.filter.form.label_type_yes' => BooleanFilterType::TYPE_YES,
         'oro.filter.form.label_type_no' => BooleanFilterType::TYPE_NO,
     ];
 
+    private BooleanFilterType $type;
+
     protected function setUp(): void
     {
-        $translator = $this->createMockTranslator();
-
-        $types = [
-            new FilterType($translator),
-            new ChoiceFilterType($translator)
-        ];
-
-        $this->type = new BooleanFilterType($translator);
-        $this->formExtensions[] = new CustomFormExtension($types);
-        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
+        $this->type = new BooleanFilterType();
 
         parent::setUp();
     }
@@ -38,31 +29,61 @@ class BooleanFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getTestFormType()
+    protected function getExtensions(): array
     {
-        return $this->type;
-    }
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($id) {
+                return $id . ' (translated)';
+            });
 
-    /**
-     * {@inheritDoc}
-     */
-    public function configureOptionsDataProvider()
-    {
         return [
-            [
-                'defaultOptions' => [
-                    'field_options' => [
-                        'choices' => $this->booleanChoices,
-                    ],
-                ],
-            ],
+            new PreloadedExtension([
+                $this->type,
+                new FilterType($translator),
+                new ChoiceFilterType($translator)
+            ], [])
         ];
     }
 
+    public function testConfigureOptions(): void
+    {
+        $resolver = $this->createMock(OptionsResolver::class);
+
+        $resolver->expects(self::once())
+            ->method('setDefault')
+            ->with('field_options', ['choices' => $this->booleanChoices])
+            ->willReturnSelf();
+
+        $this->type->configureOptions($resolver);
+    }
+
     /**
-     * {@inheritDoc}
+     * @dataProvider bindDataProvider
      */
-    public function bindDataProvider()
+    public function testBindData(
+        array $bindData,
+        array $formData,
+        array $viewData,
+        array $customOptions = []
+    ): void {
+        $form = $this->factory->create(BooleanFilterType::class, null, $customOptions);
+
+        $form->submit($bindData);
+
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($formData, $form->getData());
+
+        $view = $form->createView();
+
+        foreach ($viewData as $key => $value) {
+            self::assertArrayHasKey($key, $view->vars);
+            self::assertEquals($value, $view->vars[$key]);
+        }
+    }
+
+    public function bindDataProvider(): array
     {
         return [
             'empty' => [

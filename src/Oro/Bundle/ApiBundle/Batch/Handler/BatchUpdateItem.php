@@ -14,17 +14,10 @@ use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
  */
 class BatchUpdateItem
 {
-    /** @var StepExecutor */
-    private $stepExecutor;
-
-    /** @var BatchUpdateContext */
-    private $updateContext;
-
-    /** @var int */
-    private $index;
-
-    /** @var BatchUpdateItemContext */
-    private $context;
+    private StepExecutor $stepExecutor;
+    private BatchUpdateContext $updateContext;
+    private int $index;
+    private ?BatchUpdateItemContext $context = null;
 
     public function __construct(
         int $index,
@@ -71,10 +64,8 @@ class BatchUpdateItem
 
     /**
      * Initializes the related target action.
-     *
-     * @param mixed $data
      */
-    public function initialize($data): void
+    public function initialize(mixed $data): void
     {
         $context = $this->getContext();
         $context->setRequestData($data);

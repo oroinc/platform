@@ -10,11 +10,8 @@ use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
  */
 class ConfigCacheFile extends BaseConfigCache implements WarmableConfigCacheInterface
 {
-    /** @var string */
-    private $configKey;
-
-    /** @var ConfigCacheWarmer */
-    private $configCacheWarmer;
+    private string $configKey;
+    private ConfigCacheWarmer $configCacheWarmer;
 
     public function __construct(
         string $file,
@@ -28,7 +25,7 @@ class ConfigCacheFile extends BaseConfigCache implements WarmableConfigCacheInte
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function warmUpCache(): void
     {

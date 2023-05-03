@@ -28,10 +28,9 @@ class EqualToTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         $options = ['left' => new PropertyPath('foo'), 'right' => new PropertyPath('bar')];
 
@@ -88,7 +87,7 @@ class EqualToTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -132,7 +131,7 @@ class EqualToTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [

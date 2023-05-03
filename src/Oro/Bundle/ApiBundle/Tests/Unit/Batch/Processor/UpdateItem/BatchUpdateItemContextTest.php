@@ -10,8 +10,7 @@ use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BatchUpdateItemContext */
-    private $context;
+    private BatchUpdateItemContext $context;
 
     protected function setUp(): void
     {

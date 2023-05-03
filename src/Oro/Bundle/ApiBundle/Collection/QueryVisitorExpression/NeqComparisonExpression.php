@@ -17,8 +17,8 @@ class NeqComparisonExpression implements ComparisonExpressionInterface
         string $field,
         string $expression,
         string $parameterName,
-        $value
-    ) {
+        mixed $value
+    ): mixed {
         if (null === $value) {
             return $visitor->getExpressionBuilder()->isNotNull($expression);
         }

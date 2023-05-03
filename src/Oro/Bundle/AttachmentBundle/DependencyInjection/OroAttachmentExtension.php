@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\DependencyInjection;
 
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -17,11 +18,12 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
     private const IMAGINE_FILE_MANAGER = 'oro_attachment.manager.public_mediacache';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        $container->prependExtensionConfig($this->getAlias(), SettingsBuilder::getSettings($config));
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
@@ -30,6 +32,8 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
         $loader->load('controllers_api.yml');
+        $loader->load('mq_topics.yml');
+        $loader->load('mq_processors.yml');
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
@@ -41,15 +45,26 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         $container->setParameter('oro_attachment.processors_allowed', $config['processors_allowed']);
         $container->setParameter('oro_attachment.png_quality', $config['png_quality']);
         $container->setParameter('oro_attachment.jpeg_quality', $config['jpeg_quality']);
-
-        $webpStrategy = function_exists('imagewebp') ? $config['webp_strategy'] : WebpConfiguration::DISABLED;
-        $container->setParameter('oro_attachment.webp_strategy', $webpStrategy);
+        $container->setParameter(
+            'oro_attachment.webp_strategy',
+            \function_exists('imagewebp') ? $config['webp_strategy'] : WebpConfiguration::DISABLED
+        );
+        $container->setParameter(
+            'oro_attachment.collect_attachment_files_batch_size',
+            $config['cleanup']['collect_attachment_files_batch_size']
+        );
+        $container->setParameter(
+            'oro_attachment.load_existing_attachments_batch_size',
+            $config['cleanup']['load_existing_attachments_batch_size']
+        );
+        $container->setParameter(
+            'oro_attachment.load_attachments_batch_size',
+            $config['cleanup']['load_attachments_batch_size']
+        );
 
         $yaml = new Parser();
         $value = $yaml->parse(file_get_contents(__DIR__ . '/../Resources/config/files.yml'));
         $container->setParameter('oro_attachment.files', $value['file-icons']);
-
-        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 
     /**
@@ -65,7 +80,6 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
     private function configureImagine(ExtendedContainerBuilder $container): void
     {
         $configs = $this->ensureImagineDefaultConfigSet($container->getExtensionConfig('liip_imagine'));
-
         /**
          * add empty config for "default" loader and resolver to each config item to avoid misconfiguration
          * @see \Liip\ImagineBundle\DependencyInjection\Configuration::getConfigTreeBuilder
@@ -96,7 +110,7 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
                 'loaders'   => ['default' => ['filesystem' => null]],
                 'resolvers' => ['default' => ['oro_gaufrette' => null]]
             ];
-            $i = count($configs) - 1;
+            $i = \count($configs) - 1;
         }
         if ($this->isImagineDefaultLoaderFilesystem($configs)) {
             if (!$this->hasImagineDefaultLoaderDataRoot($configs[$i])) {

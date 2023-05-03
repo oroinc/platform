@@ -79,14 +79,10 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param File $file
-     * @param string $rawResizedImage
-     *
-     * @return GaufretteFileManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function mockMediaCacheManager(File $file, string $rawResizedImage): GaufretteFileManager
-    {
+    private function mockMediaCacheManager(
+        File $file,
+        string $rawResizedImage
+    ): GaufretteFileManager|\PHPUnit\Framework\MockObject\MockObject {
         $this->mediaCacheManagerRegistry->expects(self::once())
             ->method('getManagerForFile')
             ->with($file)

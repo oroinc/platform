@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit;
 
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -106,17 +106,16 @@ class TestHelper
             $ownerTree = new OwnerTree();
         }
 
-        $treeProviderMock = $this->testCase->getMockBuilder(OwnerTreeProvider::class)
+        $treeProvider = $this->testCase->getMockBuilder(OwnerTreeProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $treeProviderMock->expects($this->testCase->any())
+        $treeProvider->expects($this->testCase->any())
             ->method('getTree')
             ->willReturn($ownerTree);
 
         if (!$decisionMaker) {
             $decisionMaker = new EntityOwnershipDecisionMaker(
-                $treeProviderMock,
+                $treeProvider,
                 $idAccessor,
                 new EntityOwnerAccessor($metadataProvider, (new InflectorFactory())->build()),
                 $metadataProvider,
@@ -133,8 +132,7 @@ class TestHelper
                 'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'
             ]);
 
-        $em = $this->testCase->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
+        $em = $this->testCase->getMockBuilder(EntityManagerInterface::class)->getMock();
         $em->expects($this->testCase->any())
             ->method('getConfiguration')->willReturn($config);
 
@@ -201,11 +199,10 @@ class TestHelper
             $ownerTree = new OwnerTree();
         }
 
-        $treeProviderMock = $this->testCase->getMockBuilder(OwnerTreeProvider::class)
+        $treeProvider = $this->testCase->getMockBuilder(OwnerTreeProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $treeProviderMock->expects($this->testCase->any())
+        $treeProvider->expects($this->testCase->any())
             ->method('getTree')
             ->willReturn($ownerTree);
 
@@ -213,7 +210,7 @@ class TestHelper
 
         if (!$decisionMaker) {
             $decisionMaker = new EntityOwnershipDecisionMaker(
-                $treeProviderMock,
+                $treeProvider,
                 $idAccessor,
                 $entityOwnerAccessor,
                 $metadataProvider,
@@ -230,9 +227,7 @@ class TestHelper
                 'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'
             ]);
 
-        $em = $this->testCase->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->testCase->getMockBuilder(EntityManagerInterface::class)->getMock();
         $em->expects($this->testCase->any())
             ->method('getConfiguration')
             ->willReturn($config);
@@ -301,11 +296,11 @@ class TestHelper
      */
     private function getGroupProviderMock(\PHPUnit\Framework\TestCase $testCase)
     {
-        $mock = $testCase->getMockBuilder(AclGroupProviderInterface::class)->getMock();
-        $mock->expects($testCase->any())
+        $aclGroupProvider = $testCase->getMockBuilder(AclGroupProviderInterface::class)->getMock();
+        $aclGroupProvider->expects($testCase->any())
             ->method('getGroup')
             ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
 
-        return $mock;
+        return $aclGroupProvider;
     }
 }

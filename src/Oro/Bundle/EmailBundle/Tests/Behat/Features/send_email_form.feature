@@ -1,4 +1,4 @@
-@container-incompatible
+@behat-test-env
 @ticket-BAP-16290
 @fixture-OroUserBundle:user.yml
 Feature: Send email form

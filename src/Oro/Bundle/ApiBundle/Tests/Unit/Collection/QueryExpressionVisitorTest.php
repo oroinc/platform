@@ -11,6 +11,7 @@ use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EmptyValueComparisonExpression;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\InComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
@@ -308,7 +309,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->walkComparison($comparison);
     }
 
-    public function testWalkComparisonWithUnknownCaseInsensitiveModifierOfOperator()
+    public function testWalkComparisonWithCaseInsensitiveModifierOfOperator()
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -330,6 +331,32 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
+    public function testWalkComparisonForEmptyValueOperator()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            ['empty' => new EmptyValueComparisonExpression()],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        $expressionVisitor->setQueryAliases(['e']);
+        $comparison = new Comparison('e.test', 'empty/:string', true);
+        $result = $expressionVisitor->walkComparison($comparison);
+
+        self::assertEquals(
+            new QueryExpr\Orx([
+                'e.test IS NULL',
+                new QueryExpr\Comparison('e.test', '=', ':e_test')
+            ]),
+            $result
+        );
+        self::assertEquals(
+            [new Parameter('e_test', '')],
+            $expressionVisitor->getParameters()
+        );
+        self::assertNull($expressionVisitor->getFieldDataType());
+    }
+
     public function testWalkComparisonWithUnsafeFieldName()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -344,6 +371,30 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->setQueryAliases(['e']);
         $comparison = new Comparison('1=1 OR e.test', '=', 'test value');
         $expressionVisitor->walkComparison($comparison);
+    }
+
+    public function testWalkComparisonWithComputedField()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            ['IN' => new InComparisonExpression()],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        $expressionVisitor->setQueryAliases(['e']);
+        $comparison = new Comparison('{test}', 'IN', [1, 2, 3]);
+        $result = $expressionVisitor->walkComparison($comparison);
+
+        self::assertEquals(
+            new QueryExpr\Func('test IN', [':test']),
+            $result
+        );
+        self::assertEquals(
+            [
+                new Parameter('test', [1, 2, 3])
+            ],
+            $expressionVisitor->getParameters()
+        );
     }
 
     public function testCreateSubqueryWithoutQuery()

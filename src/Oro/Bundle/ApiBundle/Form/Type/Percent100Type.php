@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Form\Type;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\Percent100ToLocalizedStringTransformer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -16,7 +15,7 @@ class Percent100Type extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addViewTransformer(new Percent100ToLocalizedStringTransformer(
             $options['scale'],
@@ -28,25 +27,22 @@ class Percent100Type extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            // default scale is locale specific (usually around 3)
-            'scale' => null,
-            'grouping' => false,
-            'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALF_UP,
-            'compound' => false
-        ]);
-
-        $resolver->setAllowedValues('rounding_mode', [
-            NumberToLocalizedStringTransformer::ROUND_FLOOR,
-            NumberToLocalizedStringTransformer::ROUND_DOWN,
-            NumberToLocalizedStringTransformer::ROUND_HALF_DOWN,
-            NumberToLocalizedStringTransformer::ROUND_HALF_EVEN,
-            NumberToLocalizedStringTransformer::ROUND_HALF_UP,
-            NumberToLocalizedStringTransformer::ROUND_UP,
-            NumberToLocalizedStringTransformer::ROUND_CEILING,
-        ]);
-        $resolver->setAllowedTypes('scale', ['null', 'int']);
+        $resolver
+            ->setDefault('scale', null) // default scale is locale specific (usually around 3)
+            ->setDefault('grouping', false)
+            ->setDefault('rounding_mode', \NumberFormatter::ROUND_HALFUP)
+            ->setDefault('compound', false)
+            ->setAllowedValues('rounding_mode', [
+                \NumberFormatter::ROUND_FLOOR,
+                \NumberFormatter::ROUND_DOWN,
+                \NumberFormatter::ROUND_HALFDOWN,
+                \NumberFormatter::ROUND_HALFEVEN,
+                \NumberFormatter::ROUND_HALFUP,
+                \NumberFormatter::ROUND_UP,
+                \NumberFormatter::ROUND_CEILING
+            ])
+            ->setAllowedTypes('scale', ['null', 'int']);
     }
 }

@@ -15,7 +15,7 @@ class BuildResultDocument extends BaseBuildResultDocument
     /**
      * {@inheritdoc}
      */
-    protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context)
+    protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context): void
     {
         throw new RuntimeException('Invalid error handling: the context must contain an error object.');
     }

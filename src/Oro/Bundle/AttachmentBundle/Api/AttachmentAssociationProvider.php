@@ -28,9 +28,9 @@ class AttachmentAssociationProvider implements ResetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->attachmentAssociationNames = [];
     }

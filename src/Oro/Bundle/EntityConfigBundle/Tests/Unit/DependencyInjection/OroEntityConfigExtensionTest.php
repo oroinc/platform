@@ -3,20 +3,18 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\OroEntityConfigExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroEntityConfigExtensionTest extends ExtensionTestCase
+class OroEntityConfigExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testExtension()
+    public function testLoad(): void
     {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
         $extension = new OroEntityConfigExtension();
+        $extension->load([], $container);
 
-        $this->loadExtension($extension);
-
-        $expectedDefinitions = [
-            'oro_entity_config.importexport.configuration_provider.field_config_model',
-            'oro_entity_config.importexport.configuration_provider.field_config_model_attribute',
-        ];
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
     }
 }

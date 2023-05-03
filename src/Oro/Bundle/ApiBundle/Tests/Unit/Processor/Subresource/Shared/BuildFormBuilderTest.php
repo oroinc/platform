@@ -19,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -29,10 +29,10 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     private const TEST_PARENT_CLASS_NAME = 'Test\Entity';
     private const TEST_ASSOCIATION_NAME = 'testAssociation';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $formFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
     /** @var BuildFormBuilder */
@@ -48,8 +48,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $this->processor = new BuildFormBuilder(
             new FormHelper(
                 $this->formFactory,
-                $this->createMock(DataTypeGuesser::class),
-                $this->createMock(PropertyAccessorInterface::class),
+                new DataTypeGuesser([]),
+                PropertyAccess::createPropertyAccessor(),
                 $this->container
             )
         );
@@ -121,11 +121,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with(
-                self::TEST_ASSOCIATION_NAME,
-                null,
-                []
-            );
+            ->with(self::TEST_ASSOCIATION_NAME, null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
@@ -166,11 +163,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with(
-                self::TEST_ASSOCIATION_NAME,
-                null,
-                []
-            );
+            ->with(self::TEST_ASSOCIATION_NAME, null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setParentConfig($parentConfig);
@@ -212,11 +206,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with(
-                self::TEST_ASSOCIATION_NAME,
-                null,
-                []
-            );
+            ->with(self::TEST_ASSOCIATION_NAME, null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setParentConfig($parentConfig);
@@ -264,7 +255,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 self::TEST_ASSOCIATION_NAME,
                 'customType',
                 ['property_path' => 'realAssociationName', 'trim' => false]
-            );
+            )
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
@@ -303,11 +295,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with(
-                self::TEST_ASSOCIATION_NAME,
-                null,
-                ['mapped' => false]
-            );
+            ->with(self::TEST_ASSOCIATION_NAME, null, ['mapped' => false])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
@@ -357,7 +346,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->with(self::identicalTo($eventSubscriber));
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with(self::TEST_ASSOCIATION_NAME, null, []);
+            ->with(self::TEST_ASSOCIATION_NAME, null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
@@ -401,7 +391,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->with(self::identicalTo($eventSubscriber));
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with(self::TEST_ASSOCIATION_NAME, null, []);
+            ->with(self::TEST_ASSOCIATION_NAME, null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
@@ -446,7 +437,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->method('addEventSubscriber');
         $formBuilder->expects(self::once())
             ->method('add')
-            ->with(self::TEST_ASSOCIATION_NAME, null, []);
+            ->with(self::TEST_ASSOCIATION_NAME, null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
 
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);

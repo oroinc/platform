@@ -7,12 +7,14 @@ use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
 
+/**
+ * Walks an expression graph and replaces a placeholder in a field path with corresponding object names.
+ */
 class NormalizeExpressionVisitor extends ExpressionVisitor
 {
     use NormalizeFieldTrait;
 
-    /** @var array */
-    protected $placeholders;
+    private array $placeholders;
 
     public function __construct(array $placeholders)
     {

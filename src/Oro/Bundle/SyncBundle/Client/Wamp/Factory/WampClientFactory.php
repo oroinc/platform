@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SyncBundle\Client\Wamp\Factory;
 
 use Oro\Bundle\SyncBundle\Client\Wamp\WampClient;
+use Oro\Bundle\SyncBundle\Provider\WebsocketClientParametersProviderInterface;
 
 /**
  * Creates websocket server client.
@@ -12,14 +13,14 @@ class WampClientFactory implements WampClientFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createClient(ClientAttributes $clientAttributes): WampClient
+    public function createClient(WebsocketClientParametersProviderInterface $clientParametersProvider): WampClient
     {
-        $options = $clientAttributes->getContextOptions();
+        $options = $clientParametersProvider->getContextOptions();
 
         return new WampClient(
-            $clientAttributes->getHost(),
-            $clientAttributes->getPort(),
-            $clientAttributes->getTransport(),
+            $clientParametersProvider->getHost(),
+            $clientParametersProvider->getPort(),
+            $clientParametersProvider->getTransport(),
             $options ? ['ssl' => $options] : [],
             // We don't have to check origin when connecting from backend.
             '127.0.0.1'

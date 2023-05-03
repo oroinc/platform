@@ -13,13 +13,9 @@ use Psr\Container\ContainerInterface;
 class FilterNamesRegistry
 {
     /** @var array [data type => [[provider service id, request type expression], ...], ...] */
-    private $providers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $providers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $providers [[provider service id, request type expression], ...]
@@ -38,14 +34,15 @@ class FilterNamesRegistry
      */
     public function getFilterNames(RequestType $requestType): FilterNames
     {
-        foreach ($this->providers as list($serviceId, $expression)) {
+        foreach ($this->providers as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 return $this->container->get($serviceId);
             }
         }
 
-        throw new \LogicException(
-            sprintf('Cannot find a filter names provider for the request "%s".', (string)$requestType)
-        );
+        throw new \LogicException(sprintf(
+            'Cannot find a filter names provider for the request "%s".',
+            (string)$requestType
+        ));
     }
 }

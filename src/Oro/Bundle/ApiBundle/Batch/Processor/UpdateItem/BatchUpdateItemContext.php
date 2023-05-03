@@ -19,26 +19,14 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
     /** the name of the target action */
     private const TARGET_ACTION = 'targetAction';
 
-    /** @var mixed */
-    private $id;
-
-    /** @var BatchSummary */
-    private $summary;
-
+    private mixed $id = null;
+    private ?BatchSummary $summary = null;
     /** @var string[] */
-    private $supportedEntityClasses = [];
-
-    /** @var array|null */
-    private $requestData;
-
-    /** @var ActionProcessorInterface|null */
-    private $targetProcessor;
-
-    /** @var Context|null */
-    private $targetContext;
-
-    /** @var ParameterBagInterface|null */
-    private $sharedData;
+    private array $supportedEntityClasses = [];
+    private ?array $requestData = null;
+    private ?ActionProcessorInterface $targetProcessor = null;
+    private ?Context $targetContext = null;
+    private ParameterBagInterface $sharedData;
 
     /**
      * Gets FQCN of an entity.
@@ -51,7 +39,7 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
     /**
      * Sets FQCN of an entity.
      */
-    public function setClassName(string $className = null): void
+    public function setClassName(?string $className): void
     {
         if (null === $className) {
             $this->remove(self::CLASS_NAME);
@@ -62,20 +50,16 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Gets an identifier of an entity.
-     *
-     * @return mixed|null
      */
-    public function getId()
+    public function getId(): mixed
     {
         return $this->id;
     }
 
     /**
      * Sets an identifier of an entity.
-     *
-     * @param mixed $id
      */
-    public function setId($id): void
+    public function setId(mixed $id): void
     {
         $this->id = $id;
     }
@@ -128,7 +112,7 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
     /**
      * Sets the request data.
      */
-    public function setRequestData(array $requestData = null): void
+    public function setRequestData(?array $requestData): void
     {
         $this->requestData = $requestData;
     }
@@ -144,7 +128,7 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
     /**
      * Sets the name of the target action.
      */
-    public function setTargetAction(string $action = null): void
+    public function setTargetAction(?string $action): void
     {
         if (null === $action) {
             $this->remove(self::TARGET_ACTION);
@@ -164,7 +148,7 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
     /**
      * Sets the processor responsible to process the request data.
      */
-    public function setTargetProcessor(ActionProcessorInterface $processor = null): void
+    public function setTargetProcessor(?ActionProcessorInterface $processor): void
     {
         $this->targetProcessor = $processor;
     }
@@ -180,7 +164,7 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
     /**
      * Sets the context which should be used when processing the request data.
      */
-    public function setTargetContext(Context $context = null): void
+    public function setTargetContext(?Context $context): void
     {
         $this->targetContext = $context;
     }

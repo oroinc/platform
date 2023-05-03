@@ -16,8 +16,7 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
  */
 class OptimizedProcessorBag extends ProcessorBag
 {
-    /** @var ProcessorIteratorFactoryInterface */
-    private $ungroupedProcessorIteratorFactory;
+    private ProcessorIteratorFactoryInterface $ungroupedProcessorIteratorFactory;
 
     public function __construct(
         ProcessorBagConfigProviderInterface $configProvider,

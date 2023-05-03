@@ -3,14 +3,11 @@ Oro\Bundle\TranslationBundle\Entity\Language:
         code: 'en_CA'
         enabled: false
         organization: '@organization'
-        owner: '@admin'
     language2:
         code: 'fr_FR'
         enabled: true
         organization: '@organization'
-        owner: '@admin'
     language3:
         code: 'en_US'
         enabled: true
         organization: '@organization'
-        owner: '@ethan'

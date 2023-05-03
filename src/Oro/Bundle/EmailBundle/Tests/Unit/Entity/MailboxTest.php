@@ -9,30 +9,21 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class MailboxTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $user;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var UserEmailOrigin|\PHPUnit\Framework\MockObject\MockObject */
     private $origin;
 
     protected function setUp(): void
     {
-        $this->user = $this->createMock(User::class);
         $this->origin = $this->createMock(UserEmailOrigin::class);
-
         $this->origin->expects($this->any())
             ->method('getUser')
-            ->willReturn($this->user);
+            ->willReturn($this->createMock(User::class));
     }
 
     /**
-     * @param bool $skipOrigin
-     * @param string $accessToken
-     * @param string $accountType
-     *
-     * @dataProvider setDataProviderAccountType
+     * @dataProvider getAccountTypeDataProvider
      */
-    public function testGetAccountType($skipOrigin, $accessToken, $accountType)
+    public function testGetAccountType(bool $skipOrigin, string $accessToken, string $accountType)
     {
         $mailbox = new Mailbox();
 
@@ -51,10 +42,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function setDataProviderAccountType()
+    public function getAccountTypeDataProvider(): array
     {
         return [
             'empty origin' => [

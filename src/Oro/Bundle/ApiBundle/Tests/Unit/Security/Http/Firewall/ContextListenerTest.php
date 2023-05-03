@@ -60,7 +60,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         return new RequestEvent(
             $kernel,
             $request,
-            HttpKernelInterface::MASTER_REQUEST
+            HttpKernelInterface::MAIN_REQUEST
         );
     }
 

@@ -5,10 +5,13 @@ namespace Oro\Bundle\WorkflowBundle\Form;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * Transformer for variable data.
+ */
 class WorkflowVariableDataTransformer implements DataTransformerInterface
 {
     /** @var ManagerRegistry */

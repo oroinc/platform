@@ -8,7 +8,6 @@ Feature: Email rendering
 
   Scenario: Dashboard widget
     Given I login as administrator
-    When I go to Dashboards/Dashboard
     Then I should see text matching "Recent Emails"
     When I click "Unread Emails"
     And I should not see alert

@@ -19,26 +19,26 @@ class FormCompilerPass implements CompilerPassInterface
 {
     use ApiTaggedServiceTrait;
 
-    private const FORM_REGISTRY_SERVICE_ID                 = 'form.registry';
-    private const FORM_EXTENSION_SERVICE_ID                = 'form.extension';
-    private const FORM_TYPE_TAG                            = 'form.type';
-    private const FORM_TYPE_EXTENSION_TAG                  = 'form.type_extension';
-    private const FORM_TYPE_GUESSER_TAG                    = 'form.type_guesser';
-    private const FORM_TYPE_FACTORY_SERVICE_ID             = 'form.resolved_type_factory';
-    private const API_FORM_TYPE_FACTORY_SERVICE_ID         = 'oro_api.form.resolved_type_factory';
-    private const API_FORM_EXTENSION_STATE_SERVICE_ID      = 'oro_api.form.state';
+    private const FORM_REGISTRY_SERVICE_ID = 'form.registry';
+    private const FORM_EXTENSION_SERVICE_ID = 'form.extension';
+    private const FORM_TYPE_TAG = 'form.type';
+    private const FORM_TYPE_EXTENSION_TAG = 'form.type_extension';
+    private const FORM_TYPE_GUESSER_TAG = 'form.type_guesser';
+    private const FORM_TYPE_FACTORY_SERVICE_ID = 'form.resolved_type_factory';
+    private const API_FORM_TYPE_FACTORY_SERVICE_ID = 'oro_api.form.resolved_type_factory';
+    private const API_FORM_EXTENSION_STATE_SERVICE_ID = 'oro_api.form.state';
     private const API_FORM_SWITCHABLE_EXTENSION_SERVICE_ID = 'oro_api.form.switchable_extension';
-    private const API_FORM_EXTENSION_SERVICE_ID            = 'oro_api.form.extension';
-    private const API_FORM_TYPE_TAG                        = 'oro.api.form.type';
-    private const API_FORM_TYPE_EXTENSION_TAG              = 'oro.api.form.type_extension';
-    private const API_FORM_TYPE_GUESSER_TAG                = 'oro.api.form.type_guesser';
-    private const API_FORM_DATA_TYPE_GUESSER_SERVICE_ID    = 'oro_api.form.guesser.data_type';
+    private const API_FORM_EXTENSION_SERVICE_ID = 'oro_api.form.extension';
+    private const API_FORM_TYPE_TAG = 'oro.api.form.type';
+    private const API_FORM_TYPE_EXTENSION_TAG = 'oro.api.form.type_extension';
+    private const API_FORM_TYPE_GUESSER_TAG = 'oro.api.form.type_guesser';
+    private const API_FORM_DATA_TYPE_GUESSER_SERVICE_ID = 'oro_api.form.guesser.data_type';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition(self::FORM_REGISTRY_SERVICE_ID) ||
             !$container->hasDefinition(self::API_FORM_SWITCHABLE_EXTENSION_SERVICE_ID)
@@ -132,7 +132,7 @@ class FormCompilerPass implements CompilerPassInterface
         }
     }
 
-    private function decorateFormTypeFactory(ContainerBuilder $container)
+    private function decorateFormTypeFactory(ContainerBuilder $container): void
     {
         $container
             ->register(self::API_FORM_TYPE_FACTORY_SERVICE_ID, ApiResolvedFormTypeFactory::class)
@@ -144,7 +144,7 @@ class FormCompilerPass implements CompilerPassInterface
             ->setDecoratedService(self::FORM_TYPE_FACTORY_SERVICE_ID);
     }
 
-    private function assertExistingFormRegistry(Definition $formRegistryDef, ContainerBuilder $container)
+    private function assertExistingFormRegistry(Definition $formRegistryDef, ContainerBuilder $container): void
     {
         $formRegistryClass = $formRegistryDef->getClass();
         if (str_starts_with($formRegistryClass, '%')) {
@@ -160,14 +160,15 @@ class FormCompilerPass implements CompilerPassInterface
         }
 
         $formExtensions = $formRegistryDef->getArgument(0);
-        if (!is_array($formExtensions)) {
+        if (!\is_array($formExtensions)) {
             throw new LogicException(sprintf(
                 'Cannot register API form extension because it is expected'
                 . ' that the first argument of "%s" service is array. "%s" given.',
                 self::FORM_REGISTRY_SERVICE_ID,
-                is_object($formExtensions) ? get_class($formExtensions) : gettype($formExtensions)
+                get_debug_type($formExtensions)
             ));
-        } elseif (count($formExtensions) !== 1) {
+        }
+        if (\count($formExtensions) !== 1) {
             throw new LogicException(sprintf(
                 'Cannot register API form extension because it is expected'
                 . ' that the first argument of "%s" service is array contains only one element.'
@@ -186,14 +187,12 @@ class FormCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string[]         $serviceIds
-     * @param string           $tagName
-     * @param string           $apiTagName
-     */
-    private function addFormApiTag(ContainerBuilder $container, array $serviceIds, $tagName, $apiTagName)
-    {
+    private function addFormApiTag(
+        ContainerBuilder $container,
+        array $serviceIds,
+        string $tagName,
+        string $apiTagName
+    ): void {
         foreach ($serviceIds as $serviceId) {
             if ($container->hasDefinition($serviceId)) {
                 $definition = $container->getDefinition($serviceId);
@@ -205,13 +204,7 @@ class FormCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string[]         $formTypeClassNames
-     *
-     * @return array
-     */
-    private function getApiFormTypes(ContainerBuilder $container, array $formTypeClassNames)
+    private function getApiFormTypes(ContainerBuilder $container, array $formTypeClassNames): array
     {
         $types = array_fill_keys($formTypeClassNames, null);
         foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_TAG) as $id => $tags) {
@@ -222,28 +215,18 @@ class FormCompilerPass implements CompilerPassInterface
         return $types;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
-    private function getApiFormTypeExtensions(ContainerBuilder $container)
+    private function getApiFormTypeExtensions(ContainerBuilder $container): array
     {
         $typeExtensions = [];
         foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_EXTENSION_TAG) as $id => $tags) {
-            $alias = $this->getAttribute($tags[0], $this->getTagKeyForExtension(), $id);
+            $alias = $this->getAttribute($tags[0], 'extended_type', $id);
             $typeExtensions[$alias][] = $id;
         }
 
         return $typeExtensions;
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
-    private function getApiFormTypeGuessers(ContainerBuilder $container)
+    private function getApiFormTypeGuessers(ContainerBuilder $container): array
     {
         $guessers = [];
         foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_GUESSER_TAG) as $id => $tags) {
@@ -254,16 +237,5 @@ class FormCompilerPass implements CompilerPassInterface
         arsort($guessers, SORT_NUMERIC);
 
         return array_keys($guessers);
-    }
-
-    /**
-     * Provide compatibility between Symfony 2.8 and version below this
-     * @return string
-     */
-    public function getTagKeyForExtension()
-    {
-        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
-            ? 'extended_type'
-            : 'alias';
     }
 }

@@ -40,7 +40,6 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
         /** Default language must be in list by default, because we already have translations in *.en.yml files */
         $this->getLanguage($manager, Translator::DEFAULT_LOCALE)
             ->setEnabled(true)
-            ->setOwner($user)
             ->setOrganization($user->getOrganization());
 
         $manager->flush();

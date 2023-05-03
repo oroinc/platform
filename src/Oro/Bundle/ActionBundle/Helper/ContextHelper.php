@@ -6,7 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Contains methods for action Context/parameters
@@ -29,17 +29,17 @@ class ContextHelper
     /** @var array */
     protected $actionDatas = [];
 
-    /** @var  PropertyAccessor */
+    /** @var  PropertyAccessorInterface */
     protected $propertyAccessor;
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param PropertyAccessor $propertyAccessor
+     * @param PropertyAccessorInterface $propertyAccessor
      * @param RequestStack $requestStack
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        PropertyAccessor $propertyAccessor,
+        PropertyAccessorInterface $propertyAccessor,
         RequestStack $requestStack = null
     ) {
         $this->doctrineHelper = $doctrineHelper;

@@ -727,6 +727,18 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
 
         $flashMessage = 'Import started successfully. You will receive an email notification upon completion.';
         $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
+        usleep(150000);
+    }
+
+    /**
+     * @When /^(?:|I )import file with strategy "(?P<strategy>([\w\s\.]+))"$/
+     */
+    public function iImportFileWithStrategy($strategy)
+    {
+        $this->tryImportFileWithStrategy($strategy);
+
+        $flashMessage = 'Import started successfully. You will receive an email notification upon completion.';
+        $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
     }
 
     /**
@@ -745,6 +757,19 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
     }
 
     /**
+     * @When /^(?:|I )try import file with strategy "(?P<strategy>([\w\s\.]+))"$/
+     */
+    public function tryImportFileWithStrategy($strategy)
+    {
+        $importSubmitButton = $this->openImportModalAndReturnImportSubmitButton();
+        $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
+        $this->createElement('ActiveImportStrategyField')->selectOption($strategy);
+
+        $importSubmitButton->press();
+        $this->getDriver()->waitForAjax(240000);
+    }
+
+    /**
      * Example: When I validate file
      *
      * @When /^(?:|I )validate file$/
@@ -755,6 +780,24 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
 
         $importSubmitButton->press();
+        $this->getDriver()->waitForAjax(240000); // wait max 4 minutes
+
+        $flashMessage = 'Validation started successfully. You will receive an email notification upon completion.';
+        $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
+    }
+
+    /**
+     * Example: When I validate file with strategy "Reset and Add"
+     *
+     * @When /^(?:|I )validate file with strategy "(?P<strategy>([\w\s\.]+))"$/
+     */
+    public function iValidateFileWithStrategy($strategy)
+    {
+        $validateSubmitButton = $this->openImportModalAndReturnValidateButton();
+        $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
+        $this->createElement('ActiveImportStrategyField')->selectOption($strategy);
+
+        $validateSubmitButton->press();
         $this->getDriver()->waitForAjax(240000); // wait max 4 minutes
 
         $flashMessage = 'Validation started successfully. You will receive an email notification upon completion.';

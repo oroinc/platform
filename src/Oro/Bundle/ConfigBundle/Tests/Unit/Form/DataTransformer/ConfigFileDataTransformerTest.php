@@ -58,8 +58,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($file);
 
         $entityManager = $this->createMock(ObjectManager::class);
-        $entityManager
-            ->expects($this->once())
+        $entityManager->expects($this->once())
             ->method('detach');
 
         $this->doctrineHelper->expects(self::once())
@@ -67,8 +66,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
             ->with(File::class)
             ->willReturn($repo);
 
-        $this->doctrineHelper
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getManager')
             ->willReturn($entityManager);
 

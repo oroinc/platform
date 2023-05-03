@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Ownership\EntityOwnershipAssociationsSetter;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
@@ -10,7 +11,6 @@ use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
 {

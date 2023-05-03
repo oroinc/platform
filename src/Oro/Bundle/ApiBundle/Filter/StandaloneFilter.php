@@ -10,20 +10,12 @@ use Doctrine\Common\Collections\Criteria;
  */
 class StandaloneFilter implements FilterInterface
 {
-    /** @var string */
-    private $dataType;
-
-    /** @var bool */
-    private $arrayAllowed = false;
-
-    /** @var bool */
-    private $rangeAllowed = false;
-
-    /** @var string|null */
-    private $description;
-
+    private string $dataType;
+    private ?string $description;
     /** @var string[] */
-    private $operators;
+    private array $operators;
+    private bool $arrayAllowed = false;
+    private bool $rangeAllowed = false;
 
     public function __construct(string $dataType, string $description = null)
     {
@@ -117,7 +109,7 @@ class StandaloneFilter implements FilterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {

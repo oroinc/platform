@@ -5,9 +5,9 @@ namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Reflector;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class FileReflectorTest extends \PHPUnit\Framework\TestCase
 {

@@ -7,20 +7,14 @@ namespace Oro\Bundle\ApiBundle\Request\Rest;
  */
 final class CorsSettings
 {
-    /** @var int */
-    private $preflightMaxAge;
-
+    private int $preflightMaxAge;
     /** @var string[] */
-    private $allowedOrigins;
-
-    /** @var bool */
-    private $isCredentialsAllowed;
-
+    private array $allowedOrigins;
+    private bool $isCredentialsAllowed;
     /** @var string[] */
-    private $allowedHeaders;
-
+    private array $allowedHeaders;
     /** @var string[] */
-    private $exposableHeaders;
+    private array $exposableHeaders;
 
     /**
      * @param int      $preflightMaxAge

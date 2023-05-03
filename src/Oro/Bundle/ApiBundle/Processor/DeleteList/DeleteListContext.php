@@ -11,15 +11,10 @@ use Oro\Bundle\ApiBundle\Processor\ListContext;
 class DeleteListContext extends ListContext implements ChangeContextInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getAllEntities(bool $mainOnly = false): array
     {
-        $entities = $this->getResult();
-        if (null === $entities) {
-            return [];
-        }
-
-        return $entities;
+        return $this->getResult() ?? [];
     }
 }

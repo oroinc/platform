@@ -4,7 +4,7 @@ namespace Oro\Bundle\DraftBundle\Manager;
 
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Helper\DraftHelper;
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
@@ -24,7 +24,7 @@ class Publisher
 
     public function create(DraftableInterface $source): DraftableInterface
     {
-        $accessor = new PropertyAccessor();
+        $accessor = PropertyAccess::createPropertyAccessor();
         $target = $source->getDraftSource();
         $properties = $this->draftHelper->getDraftableProperties($source);
         foreach ($properties as $property) {

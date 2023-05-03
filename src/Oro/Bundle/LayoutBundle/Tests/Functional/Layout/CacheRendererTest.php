@@ -41,8 +41,6 @@ class CacheRendererTest extends LayoutTestCase
         $this->getContainer()->get('request_stack')->push(Request::create(''));
 
         $this->context = new LayoutContext(['theme' => 'default', 'widget_container' => 'non-existent']);
-        $this->getContainer()->get('oro_layout.layout_context_holder')
-            ->setContext($this->context);
         $this->layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
         $this->cache = $this->getContainer()->get('cache.oro_layout.render');
         $this->cache->clear();

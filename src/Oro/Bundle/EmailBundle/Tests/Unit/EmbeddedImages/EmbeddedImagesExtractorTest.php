@@ -18,10 +18,6 @@ class EmbeddedImagesExtractorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider extractEmbeddedImagesDataProvider
-     *
-     * @param string $content
-     * @param string $expectedContent
-     * @param array $expectedEmbeddedImages
      */
     public function testExtractEmbeddedImages(
         string $content,

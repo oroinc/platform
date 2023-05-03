@@ -2,20 +2,32 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\DataGridBundle\Controller\Api\Rest\GridViewController;
 use Oro\Bundle\DataGridBundle\DependencyInjection\OroDataGridExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroDataGridExtensionTest extends ExtensionTestCase
+class OroDataGridExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroDataGridExtension());
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
-        $expectedDefinitions = [
-            GridViewController::class,
-        ];
+        $extension = new OroDataGridExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
+        self::assertSame(
+            [
+                [
+                    'settings' => [
+                        'resolved' => true,
+                        'default_per_page' => ['value' => 25, 'scope' => 'app'],
+                        'full_screen_layout_enabled' => ['value' => true, 'scope' => 'app'],
+                        'row_link_enabled' => ['value' => true, 'scope' => 'app'],
+                    ]
+                ]
+            ],
+            $container->getExtensionConfig('oro_data_grid')
+        );
     }
 }

@@ -1,5 +1,8 @@
 /* @theme: admin.oro; */
 
+@use 'sass:map';
+@use 'sass:color';
+
 @import 'permissions-variables';
 @import 'workflow';
 
@@ -23,19 +26,19 @@ $jsplumb-start-source-offset: 5px !default;
 
 $flowchart-step-font-size: 14px !default;
 $flowchart-step-height: 32px !default;
-$flowchart-step-border-radius: $flowchart-step-height*.5 !default;
+$flowchart-step-border-radius: $flowchart-step-height * .5 !default;
 $flowchart-step-v-padding: 5px !default;
 $flowchart-step-h-padding: 16px !default;
 $flowchart-step-max-width: 180px !default;
 $flowchart-step-z-index: 100 !default;
 $flowchart-step-color: $primary-inverse !default;
-$flowchart-step-bg-color: map-get($btn-theme-primary, 'background') !default;
-$flowchart-step-hover-bg-color: darken($flowchart-step-bg-color, 8%) !default;
+$flowchart-step-bg-color: map.get($btn-theme-primary, 'background') !default;
+$flowchart-step-hover-bg-color: color.adjust($flowchart-step-bg-color, $lightness: -8%) !default;
 $flowchart-start-step-width: 88px !default;
 $flowchart-start-step-height: 88px !default;
 $flowchart-start-step-border-radius: $flowchart-start-step-height * .5 !default;
-$flowchart-start-step-bg-color: map-get($btn-theme-success, 'background') !default;
-$flowchart-start-step-hover-bg-color: darken($flowchart-start-step-bg-color, 8%) !default;
+$flowchart-start-step-bg-color: map.get($btn-theme-success, 'background') !default;
+$flowchart-start-step-hover-bg-color: color.adjust($flowchart-start-step-bg-color, $lightness: -8%) !default;
 $flowchart-final-step-bg-color: $flowchart-start-step-bg-color !default;
 $flowchart-final-step-hover-bg-color: $flowchart-start-step-hover-bg-color !default;
 

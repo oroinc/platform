@@ -13,13 +13,12 @@ use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
  */
 class EntityAliasLoader extends BaseEntityAliasLoader
 {
-    /** @var EntityOverrideProviderInterface */
-    private $entityOverrideProvider;
+    private EntityOverrideProviderInterface $entityOverrideProvider;
 
     /**
-     * @param iterable|EntityClassProviderInterface[] $entityClassProviders
-     * @param iterable|EntityAliasProviderInterface[] $entityAliasProviders
-     * @param EntityOverrideProviderInterface         $entityOverrideProvider
+     * @param iterable<EntityClassProviderInterface> $entityClassProviders
+     * @param iterable<EntityAliasProviderInterface> $entityAliasProviders
+     * @param EntityOverrideProviderInterface        $entityOverrideProvider
      */
     public function __construct(
         iterable $entityClassProviders,
@@ -31,7 +30,7 @@ class EntityAliasLoader extends BaseEntityAliasLoader
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getEntityAlias(string $entityClass): ?EntityAlias
     {

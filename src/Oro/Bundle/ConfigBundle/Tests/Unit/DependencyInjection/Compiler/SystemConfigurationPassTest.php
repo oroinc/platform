@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
-use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Bundle\ConfigBundle\Tests\Unit\Fixtures\TestBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\Alias;
@@ -12,16 +11,17 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SystemConfigurationPass */
-    private $compiler;
-
     /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
+    /** @var SystemConfigurationPass */
+    private $compiler;
+
     protected function setUp(): void
     {
-        $this->compiler = new SystemConfigurationPass();
         $this->container = $this->createMock(ContainerBuilder::class);
+
+        $this->compiler = new SystemConfigurationPass();
     }
 
     /**
@@ -39,17 +39,10 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['test_bundle' => null]);
 
         $config = [
-            SettingsBuilder::RESOLVED_KEY => true,
-            'some_field'                  => [
-                'value' => 'some_val',
-                'scope' => 'app',
-            ],
-            'some_another_field'          => [
-                'value' => 'some_another_val',
-            ],
-            'service_another_field'       => [
-                'value' => null,
-            ],
+            'resolved' => true,
+            'some_field' => ['value' => 'some_val', 'scope' => 'app'],
+            'some_another_field' => ['value' => 'some_another_val'],
+            'service_another_field' => ['value' => null],
         ];
 
         $this->container->expects($this->once())
@@ -148,17 +141,10 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->willReturn([
                 [
                     'settings' => [
-                        'resolved'              => true,
-                        'some_field'            => [
-                            'value' => 'some_val',
-                            'scope' => 'app',
-                        ],
-                        'some_another_field'    => [
-                            'value' => 'some_another_val',
-                        ],
-                        'service_another_field' => [
-                            'value' => '@oro_config.default_provider',
-                        ],
+                        'resolved' => true,
+                        'some_field' => ['value' => 'some_val', 'scope' => 'app'],
+                        'some_another_field' => ['value' => 'some_another_val'],
+                        'service_another_field' => ['value' => '@oro_config.default_provider'],
                     ],
                 ]
             ]);
@@ -199,17 +185,10 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->method('replaceArgument')
             ->with($this->equalTo(0), [
                 'test_bundle' => [
-                    'resolved'              => true,
-                    'some_field'            => [
-                        'value' => 'some_val',
-                        'scope' => 'app',
-                    ],
-                    'some_another_field'    => [
-                        'value' => 'some_another_val',
-                    ],
-                    'service_another_field' => [
-                        'value' => $defaultProviderMock,
-                    ],
+                    'resolved' => true,
+                    'some_field' => ['value' => 'some_val', 'scope' => 'app'],
+                    'some_another_field' => ['value' => 'some_another_val'],
+                    'service_another_field' => ['value' => $defaultProviderMock],
                 ],
             ]);
 

@@ -25,17 +25,12 @@ class ExportTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    ExportType::class => $this->exportType
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->exportType], [])
         ];
     }
 

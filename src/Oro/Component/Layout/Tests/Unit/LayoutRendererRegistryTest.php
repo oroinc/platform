@@ -2,13 +2,13 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
 
 class LayoutRendererRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutRendererRegistry */
-    private $registry;
+    private LayoutRendererRegistry $registry;
 
     protected function setUp(): void
     {
@@ -17,7 +17,7 @@ class LayoutRendererRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUndefinedDefaultRenderer()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The layout renderer named "" was not found.');
 
         $this->registry->getRenderer();
@@ -25,7 +25,7 @@ class LayoutRendererRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUndefinedRenderer()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The layout renderer named "undefined" was not found.');
 
         $this->registry->getRenderer('undefined');

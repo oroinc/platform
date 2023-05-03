@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Common;
 
 use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
-use Oro\Bundle\ApiBundle\Form\FormPropertyAccessor;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -14,14 +13,14 @@ use Oro\Bundle\ApiBundle\Tests\Functional\TestMetadataAccessor;
 use Oro\Bundle\ApiBundle\Tests\Functional\TestObject;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -36,7 +35,7 @@ class FormTest extends WebTestCase
     protected function tearDown(): void
     {
         $this->switchToDefaultFormExtension();
-        $this->setMetadataAccessor();
+        $this->setMetadataAccessor(null);
         parent::tearDown();
     }
 
@@ -289,7 +288,7 @@ class FormTest extends WebTestCase
         $formExtensionSwitcher->switchToApiFormExtension();
     }
 
-    private function setMetadataAccessor(MetadataAccessorInterface $metadataAccessor = null): void
+    private function setMetadataAccessor(?MetadataAccessorInterface $metadataAccessor): void
     {
         /** @var MetadataTypeGuesser $metadataTypeGuesser */
         $metadataTypeGuesser = self::getContainer()->get('oro_api.form.guesser.metadata');
@@ -324,7 +323,9 @@ class FormTest extends WebTestCase
 
         return self::getContainer()->get('form.factory')
             ->createBuilder(FormType::class, null, $options)
-            ->setDataMapper(new PropertyPathMapper(new FormPropertyAccessor(new PropertyAccessor())))
+            ->setDataMapper(new DataMapper(new PropertyPathAccessor(
+                self::getContainer()->get('oro_api.form_property_accessor')
+            )))
             ->getForm();
     }
 

@@ -1,0 +1,4 @@
+oro_form:
+  settings:
+    wysiwyg_enabled:
+      value: false

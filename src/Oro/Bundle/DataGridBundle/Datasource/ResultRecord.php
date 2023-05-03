@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -125,5 +125,10 @@ class ResultRecord implements ResultRecordInterface
         }
 
         return $this->propertyAccessor;
+    }
+
+    public function getDataArray(): array
+    {
+        return array_merge(...array_reverse(array_filter($this->valueContainers, 'is_array')));
     }
 }

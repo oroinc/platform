@@ -2,31 +2,41 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
+use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Exception\JobNotFoundException;
 use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Exception\JobRuntimeException;
 use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
 use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
+use Oro\Component\MessageQueue\Topic\TopicRegistry;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 
 /**
  * Provides possibility to run unique or delayed jobs.
  */
 class JobRunner
 {
-    /** @var JobProcessor */
-    private $jobProcessor;
+    private JobProcessor $jobProcessor;
+    private ExtensionInterface $jobExtension;
+    private TopicRegistry $topicRegistry;
+    private ?Job $rootJob;
 
-    /** @var ExtensionInterface */
-    private $jobExtension;
-
-    /** @var Job */
-    private $rootJob;
-
-    public function __construct(JobProcessor $jobProcessor, ExtensionInterface $jobExtension, Job $rootJob = null)
-    {
+    public function __construct(
+        JobProcessor $jobProcessor,
+        ExtensionInterface $jobExtension,
+        TopicRegistry $topicRegistry,
+        Job $rootJob = null
+    ) {
         $this->jobProcessor = $jobProcessor;
         $this->jobExtension = $jobExtension;
+        $this->topicRegistry = $topicRegistry;
         $this->rootJob = $rootJob;
+    }
+
+    public function createUnique(string $ownerId, string $name): ?Job
+    {
+        return $this->jobProcessor->createRootJob($ownerId, $name, true);
     }
 
     /**
@@ -70,6 +80,20 @@ class JobRunner
         $this->jobExtension->onPostRunUnique($childJob, $result);
 
         return $result;
+    }
+
+    public function cancelUniqueIfStatusNew(string $ownerId, string $name): void
+    {
+        $job = $this->jobProcessor->findRootJobByJobNameAndStatuses($name, [Job::STATUS_NEW]);
+        if (!$job) {
+            return;
+        }
+
+        if ($job->getOwnerId() !== $ownerId) {
+            return;
+        }
+
+        $this->jobProcessor->interruptRootJob($job);
     }
 
     /**
@@ -166,7 +190,7 @@ class JobRunner
      */
     public function getJobRunnerForChildJob(Job $rootJob)
     {
-        return new JobRunner($this->jobProcessor, $this->jobExtension, $rootJob);
+        return new JobRunner($this->jobProcessor, $this->jobExtension, $this->topicRegistry, $rootJob);
     }
 
     /**
@@ -217,5 +241,42 @@ class JobRunner
                 $job->getId()
             ), 0, $e);
         }
+    }
+
+    public function runUniqueByMessage(
+        MessageInterface $message,
+        \Closure $runCallback
+    ) {
+        $jobName = $this->getJobNameByMessage($message);
+
+        $ownerId = $message->getMessageId();
+
+        $rootJob = $this->jobProcessor->findJobByName($ownerId, $jobName);
+
+        if (!$rootJob || $rootJob->getStatus() === Job::STATUS_CANCELLED) {
+            return null;
+        }
+
+        return $this->runUnique($ownerId, $jobName, $runCallback);
+    }
+
+    /**
+     * @param MessageInterface $message
+     * @return string
+     */
+    public function getJobNameByMessage(MessageInterface $message): string
+    {
+        $jobName = $message->getProperty(JobAwareTopicInterface::UNIQUE_JOB_NAME);
+        if (!$jobName) {
+            $topic = $this->topicRegistry->get($message->getProperty(Config::PARAMETER_TOPIC_NAME));
+            if (!$topic instanceof JobAwareTopicInterface) {
+                throw new \RuntimeException(
+                    sprintf('Topic %s must implement JobAwareTopicInterface', get_class($topic))
+                );
+            }
+            $jobName = $topic->createJobName($message->getBody());
+        }
+
+        return $jobName;
     }
 }

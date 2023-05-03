@@ -4,3 +4,4 @@ oro:
             unique_pinbar_tab_url.error: 'This pin already exists'
             menu_update:
                 not_dangerous_protocol.message: '"{{ protocol }}" pseudo-protocol is not allowed in menu URIs.'
+                max_nested_level.message: 'Item {{ label }} cannot be saved. Max nesting level is reached.'

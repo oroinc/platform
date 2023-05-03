@@ -3,17 +3,23 @@ services:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\TestIsolationSubscriber'
     arguments:
       - ~
+      - '@fob_symfony.kernel'
     tags:
       - { name: 'event_dispatcher.subscriber', priority: 100 }
 
-  oro_behat_extension.isolation.message_queue_isolation_subscriber:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\MessageQueueIsolationSubscriber'
+  oro_behat_extension.isolation.enable_maintenance_mode_isolator:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EnableMaintenanceModeIsolator
     arguments:
       - '@fob_symfony.kernel'
-    calls:
-      - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
     tags:
-      - { name: 'event_dispatcher.subscriber', priority: 150 }
+      - { name: 'oro_behat.isolator', priority: 50 }
+
+  oro_behat_extension.isolation.disable_maintenance_mode_isolator:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DisableMaintenanceModeIsolator
+    arguments:
+      - '@fob_symfony.kernel'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 500 }
 
   oro_behat_extension.isolation.mail_catcher_isolator:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MailCatcherIsolator
@@ -48,20 +54,6 @@ services:
     tags:
       - { name: 'oro_behat.isolator', priority: 100 }
 
-  oro_behat_extension.isolation.windows_mysql_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\WindowsMysqlIsolator'
-    arguments:
-      - '@fob_symfony.kernel'
-    tags:
-      - { name: 'oro_behat.isolator', priority: 110 }
-
-  oro_behat_extension.isolation.unix_mysql_simple_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixMysqlIsolator'
-    arguments:
-      - '@fob_symfony.kernel'
-    tags:
-      - { name: 'oro_behat.isolator', priority: 110 }
-
   oro_behat_extension.isolation.unix_pgsql_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixPgsqlIsolator'
     arguments:
@@ -83,20 +75,6 @@ services:
     tags:
       - { name: 'oro_behat.isolator', priority: 110 }
 
-  oro_behat_extension.isolation.docker_mysql_isolator:
-    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerMysqlIsolator
-    arguments:
-      - '@fob_symfony.kernel'
-    tags:
-      - { name: 'oro_behat.isolator', priority: 110 }
-
-  oro_behat_extension.isolation.docker_compose_mysql_isolator:
-    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerComposeMysqlIsolator
-    arguments:
-      - '@fob_symfony.kernel'
-    tags:
-      - { name: 'oro_behat.isolator', priority: 110 }
-
   oro_behat_extension.isolation.kernel_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\KernelIsolator'
     arguments:
@@ -104,21 +82,13 @@ services:
     tags:
       - { name: 'oro_behat.isolator', priority: 120 }
 
-  oro_behat_extension.isolation.inital_massage_queue_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\InitalMessageQueueIsolator'
-    arguments:
-      - '@fob_symfony.kernel'
-    calls:
-      - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
-    tags:
-      - { name: 'oro_behat.isolator', priority: 50 }
-
   oro_behat_extension.isolation.doctrine_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator'
     arguments:
       - '@fob_symfony.kernel'
       - '@oro_test.context.fixture_loader'
       - '@oro_test.alice_loader'
+      - '@nelmio_alice.generator.resolver.value.chainable.fixture_reference_resolver'
     tags:
       - { name: 'oro_behat.isolator', priority: 300 }
 

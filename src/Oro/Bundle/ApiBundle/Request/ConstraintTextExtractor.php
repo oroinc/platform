@@ -15,9 +15,9 @@ use Symfony\Component\Validator;
 class ConstraintTextExtractor implements ConstraintTextExtractorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getConstraintStatusCode(Validator\Constraint $constraint)
+    public function getConstraintStatusCode(Validator\Constraint $constraint): ?int
     {
         if ($constraint instanceof ConstraintWithStatusCodeInterface) {
             return $constraint->getStatusCode();
@@ -30,17 +30,17 @@ class ConstraintTextExtractor implements ConstraintTextExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getConstraintCode(Validator\Constraint $constraint)
+    public function getConstraintCode(Validator\Constraint $constraint): ?string
     {
         return null;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getConstraintType(Validator\Constraint $constraint)
+    public function getConstraintType(Validator\Constraint $constraint): ?string
     {
         $suffix = 'Constraint';
         if ($constraint instanceof NamedValidationConstraint) {

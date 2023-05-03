@@ -4,3 +4,9 @@ services:
             - { name: oro_message_queue.topic }
 
     Oro\Bundle\EntityConfigBundle\Async\Topic\AttributeRemovedFromFamilyTopic: ~
+    Oro\Bundle\EntityConfigBundle\Async\Topic\AttributePreImportTopic:
+        arguments:
+            - '%oro_importexport.import.size_of_batch%'
+    Oro\Bundle\EntityConfigBundle\Async\Topic\AttributeImportTopic:
+        arguments:
+            - '%oro_importexport.import.size_of_batch%'

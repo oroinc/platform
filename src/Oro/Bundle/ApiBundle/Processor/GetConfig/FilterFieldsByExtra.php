@@ -21,11 +21,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class FilterFieldsByExtra implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private DoctrineHelper $doctrineHelper;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -38,7 +35,7 @@ class FilterFieldsByExtra implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -76,7 +73,7 @@ class FilterFieldsByExtra implements ProcessorInterface
         }
     }
 
-    protected function isSupported(ConfigContext $context, array $normalizedFieldFilters): bool
+    private function isSupported(ConfigContext $context, array $normalizedFieldFilters): bool
     {
         $result = false;
         if (!empty($normalizedFieldFilters) && $context->getParentClassName() && $context->getAssociationName()) {
@@ -92,13 +89,8 @@ class FilterFieldsByExtra implements ProcessorInterface
 
         return $result;
     }
-    /**
-     * @param array       $fieldFilters
-     * @param RequestType $requestType
-     *
-     * @return array
-     */
-    protected function normalizeFieldFilters(array $fieldFilters, RequestType $requestType)
+
+    private function normalizeFieldFilters(array $fieldFilters, RequestType $requestType): array
     {
         $result = [];
         foreach ($fieldFilters as $entity => $fields) {
@@ -119,16 +111,13 @@ class FilterFieldsByExtra implements ProcessorInterface
     }
 
     /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
-     * @param array                  $fieldFilters
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function filterEntityFields(
+    private function filterEntityFields(
         EntityDefinitionConfig $definition,
-        $entityClass,
+        string $entityClass,
         array $fieldFilters
-    ) {
+    ): void {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
         $allowedFields = $this->getAllowedFields($metadata, $fieldFilters);
@@ -138,8 +127,8 @@ class FilterFieldsByExtra implements ProcessorInterface
             foreach ($fields as $fieldName => $field) {
                 if (!$field->isExcluded()
                     && !$field->isMetaProperty()
-                    && !in_array($fieldName, $allowedFields, true)
-                    && !in_array($fieldName, $idFieldNames, true)
+                    && !\in_array($fieldName, $allowedFields, true)
+                    && !\in_array($fieldName, $idFieldNames, true)
                 ) {
                     $field->setExcluded();
                 }
@@ -161,13 +150,7 @@ class FilterFieldsByExtra implements ProcessorInterface
         }
     }
 
-    /**
-     * @param ClassMetadata          $metadata
-     * @param EntityDefinitionConfig $definition
-     *
-     * @return array
-     */
-    protected function getEntityIdentifierFieldNames(ClassMetadata $metadata, EntityDefinitionConfig $definition)
+    private function getEntityIdentifierFieldNames(ClassMetadata $metadata, EntityDefinitionConfig $definition): array
     {
         $idFieldNames = $definition->getIdentifierFieldNames();
         if (empty($idFieldNames)) {
@@ -182,16 +165,13 @@ class FilterFieldsByExtra implements ProcessorInterface
     }
 
     /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
-     * @param array                  $fieldFilters
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function filterObjectFields(
+    private function filterObjectFields(
         EntityDefinitionConfig $definition,
-        $entityClass,
+        string $entityClass,
         array $fieldFilters
-    ) {
+    ): void {
         if (!isset($fieldFilters[$entityClass])) {
             return;
         }
@@ -202,8 +182,8 @@ class FilterFieldsByExtra implements ProcessorInterface
             $fields = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
                 if (!$field->isExcluded()
-                    && !in_array($fieldName, $allowedFields, true)
-                    && !in_array($fieldName, $idFieldNames, true)
+                    && !\in_array($fieldName, $allowedFields, true)
+                    && !\in_array($fieldName, $idFieldNames, true)
                 ) {
                     $field->setExcluded();
                 }
@@ -211,7 +191,7 @@ class FilterFieldsByExtra implements ProcessorInterface
         }
 
         $fields = $definition->getFields();
-        foreach ($fields as $fieldName => $field) {
+        foreach ($fields as $field) {
             $targetClass = $field->getTargetClass();
             if ($targetClass && $field->hasTargetEntity()) {
                 $this->filterObjectFields($field->getTargetEntity(), $targetClass, $fieldFilters);
@@ -225,7 +205,7 @@ class FilterFieldsByExtra implements ProcessorInterface
      *
      * @return string[]|null
      */
-    protected function getAllowedFields(ClassMetadata $metadata, array $fieldFilters)
+    private function getAllowedFields(ClassMetadata $metadata, array $fieldFilters): ?array
     {
         $allowedFields = null;
         if ($metadata->isInheritanceTypeNone()) {

@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\CallbackLayoutUpdate;
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
@@ -295,7 +296,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
 
     public function testRedefineAlias()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
             'Cannot add "test_alias" alias for "root" item.'
             . ' Reason: The "test_alias" string cannot be used as an alias for "root" item'

@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadDictionaries implements ProcessorInterface
 {
-    /** @var ChainDictionaryValueListProvider */
-    protected $dictionaryProvider;
+    private ChainDictionaryValueListProvider $dictionaryProvider;
 
     public function __construct(ChainDictionaryValueListProvider $dictionaryProvider)
     {
@@ -23,7 +22,7 @@ class LoadDictionaries implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */
 

@@ -16,8 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ScalarObjectType extends AbstractType
 {
-    /** @var FormHelper */
-    private $formHelper;
+    private FormHelper $formHelper;
 
     public function __construct(FormHelper $formHelper)
     {
@@ -25,9 +24,9 @@ class ScalarObjectType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var EntityMetadata $metadata */
         $metadata = $options['metadata'];
@@ -48,9 +47,9 @@ class ScalarObjectType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefault('error_bubbling', false)

@@ -8,17 +8,13 @@ namespace Oro\Bundle\ApiBundle\Filter;
 class FilterHelper
 {
     private const PAGE_NUMBER_FIELD_NAME = '__page_number__';
-    private const PAGE_SIZE_FIELD_NAME   = '__page_size__';
-    private const SORT_FIELD_NAME        = '__sort__';
+    private const PAGE_SIZE_FIELD_NAME = '__page_size__';
+    private const SORT_FIELD_NAME = '__sort__';
 
-    /** @var FilterCollection */
-    private $filters;
-
-    /** @var FilterValueAccessorInterface */
-    private $filterValues;
-
-    /** @var array [field name => [FilterValue|null, filterKey, filter], ...] */
-    private $filterMap;
+    private FilterCollection $filters;
+    private FilterValueAccessorInterface $filterValues;
+    /** @var array|null [field name => [FilterValue|null, filterKey, filter], ...] */
+    private ?array $filterMap = null;
 
     public function __construct(FilterCollection $filters, FilterValueAccessorInterface $filterValues)
     {
@@ -31,13 +27,7 @@ class FilterHelper
      */
     public function getPageNumber(): ?int
     {
-        $result = null;
-        $filterValue = $this->getFilterValue(self::PAGE_NUMBER_FIELD_NAME);
-        if ($filterValue) {
-            $result = $filterValue->getValue();
-        }
-
-        return $result;
+        return $this->getFilterValue(self::PAGE_NUMBER_FIELD_NAME)?->getValue();
     }
 
     /**
@@ -45,13 +35,7 @@ class FilterHelper
      */
     public function getPageSize(): ?int
     {
-        $result = null;
-        $filterValue = $this->getFilterValue(self::PAGE_SIZE_FIELD_NAME);
-        if ($filterValue) {
-            $result = $filterValue->getValue();
-        }
-
-        return $result;
+        return $this->getFilterValue(self::PAGE_SIZE_FIELD_NAME)?->getValue();
     }
 
     /**
@@ -61,13 +45,7 @@ class FilterHelper
      */
     public function getOrderBy(): ?array
     {
-        $result = null;
-        $filterValue = $this->getFilterValue(self::SORT_FIELD_NAME);
-        if ($filterValue) {
-            $result = $filterValue->getValue();
-        }
-
-        return $result;
+        return $this->getFilterValue(self::SORT_FIELD_NAME)?->getValue();
     }
 
     /**

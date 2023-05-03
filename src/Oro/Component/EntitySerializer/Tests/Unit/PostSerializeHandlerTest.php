@@ -6,26 +6,14 @@ use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User;
 
 class PostSerializeHandlerTest extends EntitySerializerTestCase
 {
-    /**
-     * @param array $item
-     * @param array $context
-     *
-     * @return array
-     */
-    public function postSerializeCallback(array $item, array $context)
+    public function postSerializeCallback(array $item, array $context): array
     {
         $item['additional'] = sprintf('%s_additional[%s]', $item['name'] ?? '', $context['key']);
 
         return $item;
     }
 
-    /**
-     * @param array $items
-     * @param array $context
-     *
-     * @return array
-     */
-    public function postSerializeCollectionCallback(array $items, array $context)
+    public function postSerializeCollectionCallback(array $items, array $context): array
     {
         $ids = [];
         foreach ($items as $item) {
@@ -45,7 +33,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSimpleEntityWithPostSerializeAsClosure()
+    public function testSimpleEntityWithPostSerializeAsClosure(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -155,7 +143,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSimpleEntityWithPostSerializeAsCallable()
+    public function testSimpleEntityWithPostSerializeAsCallable(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -250,7 +238,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testPostSerializeForNullChild()
+    public function testPostSerializeForNullChild(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -307,7 +295,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testManyToManyBidirectionalWithPostSerialize()
+    public function testManyToManyBidirectionalWithPostSerialize(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')

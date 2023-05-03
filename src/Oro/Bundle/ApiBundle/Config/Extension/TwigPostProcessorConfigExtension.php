@@ -13,7 +13,7 @@ class TwigPostProcessorConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritDoc}
      */
-    public function getConfigureCallbacks()
+    public function getConfigureCallbacks(): array
     {
         return [
             'entities.entity.field'                 => function (NodeBuilder $node) {

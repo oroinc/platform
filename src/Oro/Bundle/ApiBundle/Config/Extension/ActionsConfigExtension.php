@@ -12,8 +12,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class ActionsConfigExtension extends AbstractConfigExtension
 {
-    /** @var ActionProcessorBagInterface */
-    protected $actionProcessorBag;
+    protected ActionProcessorBagInterface $actionProcessorBag;
 
     public function __construct(ActionProcessorBagInterface $actionProcessorBag)
     {
@@ -23,7 +22,7 @@ class ActionsConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationSections()
+    public function getEntityConfigurationSections(): array
     {
         return [ConfigUtil::ACTIONS => new ActionsConfiguration($this->actionProcessorBag->getActions())];
     }
@@ -31,7 +30,7 @@ class ActionsConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationLoaders()
+    public function getEntityConfigurationLoaders(): array
     {
         return [ConfigUtil::ACTIONS => new ActionsConfigLoader()];
     }

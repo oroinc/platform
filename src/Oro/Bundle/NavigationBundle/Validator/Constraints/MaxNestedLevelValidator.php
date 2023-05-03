@@ -3,59 +3,74 @@
 namespace Oro\Bundle\NavigationBundle\Validator\Constraints;
 
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\MenuUpdateApplierInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
+/**
+ * Constraint validator that checks that the target menu item of MenuUpdate does not exceed max nesting level.
+ */
 class MaxNestedLevelValidator extends ConstraintValidator
 {
-    /** @var BuilderChainProvider */
-    private $builderChainProvider;
+    private BuilderChainProvider $builderChainProvider;
 
-    /** @var LocalizationHelper */
-    private $localizationHelper;
+    private MenuUpdateApplierInterface $menuUpdateApplier;
 
-    public function __construct(BuilderChainProvider $builderChainProvider, LocalizationHelper $localizationHelper)
-    {
+    public function __construct(
+        BuilderChainProvider $builderChainProvider,
+        MenuUpdateApplierInterface $menuUpdateApplier
+    ) {
         $this->builderChainProvider = $builderChainProvider;
-        $this->localizationHelper = $localizationHelper;
+        $this->menuUpdateApplier = $menuUpdateApplier;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param MenuUpdateInterface $entity
+     * @param MenuUpdateInterface $value
      */
-    public function validate($entity, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
+        if (!$value instanceof MenuUpdateInterface) {
+            throw new UnexpectedValueException($value, MenuUpdateInterface::class);
+        }
+
+        if (!$constraint instanceof MaxNestedLevel) {
+            throw new UnexpectedTypeException($constraint, MaxNestedLevel::class);
+        }
+
         $options = [
             'ignoreCache' => true,
-            MenuUpdateProvider::SCOPE_CONTEXT_OPTION => $entity->getScope()
+            MenuUpdateProvider::SCOPE_CONTEXT_OPTION => $value->getScope(),
         ];
 
-        $menu = $this->builderChainProvider->get($entity->getMenu(), $options);
+        $menu = $this->builderChainProvider->get($value->getMenu(), $options);
 
-        $itemExist = MenuUpdateUtils::findMenuItem($menu, $entity->getKey()) ? true : false;
+        $itemExists = (bool)MenuUpdateUtils::findMenuItem($menu, $value->getKey());
 
-        MenuUpdateUtils::updateMenuItem($entity, $menu, $this->localizationHelper);
+        $this->menuUpdateApplier->applyMenuUpdate($value, $menu, $options, null);
+        $item = MenuUpdateUtils::findMenuItem($menu, $value->getKey());
 
-        /** @var ItemInterface $item */
-        foreach ($menu->getChildren() as $item) {
-            $item = MenuUpdateUtils::getItemExceededMaxNestingLevel($menu, $item);
-            if ($item) {
-                $this->context->addViolation(
-                    sprintf("Item \"%s\" can't be saved. Max nesting level is reached.", $item->getLabel())
-                );
+        if ($item instanceof ItemInterface) {
+            $maxNestingLevel = $menu->getExtra('max_nesting_level', 0);
 
-                if (!$itemExist) {
-                    $item->getParent()->removeChild($item->getName());
+            if ($maxNestingLevel > 0 && $item->getLevel() > $maxNestingLevel) {
+                $this->context
+                    ->buildViolation($constraint->message)
+                    ->setParameter('{{ label }}', $this->formatValue($item->getLabel()))
+                    ->setParameter('{{ max }}', $this->formatValue($maxNestingLevel))
+                    ->setCode(MaxNestedLevel::MAX_NESTING_LEVEL_ERROR)
+                    ->addViolation();
+
+                if (!$itemExists) {
+                    $item->getParent()?->removeChild($item->getName());
                 }
-
-                break;
             }
         }
     }

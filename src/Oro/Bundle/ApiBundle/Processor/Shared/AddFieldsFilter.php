@@ -25,11 +25,8 @@ class AddFieldsFilter implements ProcessorInterface
     public const FILTER_DESCRIPTION_TEMPLATE =
         'A list of fields of \'%s\' entity that will be returned in the response.';
 
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
-
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
+    private FilterNamesRegistry $filterNamesRegistry;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct(FilterNamesRegistry $filterNamesRegistry, ValueNormalizer $valueNormalizer)
     {
@@ -40,7 +37,7 @@ class AddFieldsFilter implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

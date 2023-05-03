@@ -16,49 +16,30 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalSessionInterface;
  */
 class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
 {
-    /**
-     * @var int
-     */
-    private $checkInterval = 60; // 1 min
+    private int $checkInterval = 60; // 1 min
 
-    /**
-     * @var int
-     */
-    private $lastCheckTime = 0;
+    private int $lastCheckTime = 0;
 
-    /**
-     * @var bool
-     */
-    private $processPidSaved;
+    private bool $processPidSaved;
 
-    /**
-     * @var DbalPidFileManager
-     */
-    private $pidFileManager;
+    private DbalPidFileManager $pidFileManager;
 
-    /**
-     * @var DbalCliProcessManager
-     */
-    private $cliProcessManager;
+    private DbalCliProcessManager $cliProcessManager;
 
-    /**
-     * @var string
-     */
-    private $consumerProcessPattern;
+    private string $consumerProcessPattern;
 
-    /**
-     * @param DbalPidFileManager $pidFileManager
-     * @param DbalCliProcessManager $cliProcessManager
-     * @param string $consumerProcessPattern
-     */
+    private string $activeTransportName;
+
     public function __construct(
         DbalPidFileManager $pidFileManager,
         DbalCliProcessManager $cliProcessManager,
-        $consumerProcessPattern
+        string $consumerProcessPattern,
+        string $activeTransportName = 'dbal',
     ) {
         $this->pidFileManager = $pidFileManager;
         $this->cliProcessManager = $cliProcessManager;
         $this->consumerProcessPattern = $consumerProcessPattern;
+        $this->activeTransportName = $activeTransportName;
         $this->processPidSaved = false;
     }
 
@@ -67,6 +48,10 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
      */
     public function onBeforeReceive(Context $context)
     {
+        if (!$this->isApplicable()) {
+            return;
+        }
+
         /** @var DbalSessionInterface $session */
         $session = $context->getSession();
         if (false == $session instanceof DbalSessionInterface) {
@@ -92,6 +77,10 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
      */
     public function onInterrupted(Context $context)
     {
+        if (!$this->isApplicable()) {
+            return;
+        }
+
         /** @var DbalSessionInterface $session */
         $session = $context->getSession();
         if (false == $session instanceof DbalSessionInterface) {
@@ -183,5 +172,10 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
         $this->lastCheckTime = $time;
 
         return true;
+    }
+
+    private function isApplicable(): bool
+    {
+        return $this->activeTransportName === 'dbal';
     }
 }

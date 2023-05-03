@@ -24,112 +24,86 @@ interface ContextInterface extends SharedDataAwareContextInterface
 {
     /**
      * Gets FQCN of an entity.
-     *
-     * @return string
      */
-    public function getClassName();
+    public function getClassName(): ?string;
 
     /**
      * Sets FQCN of an entity.
-     *
-     * @param string $className
      */
-    public function setClassName($className);
+    public function setClassName(string $className): void;
 
     /**
      * Returns the API resource class if it is a manageable entity;
      * otherwise, checks if the API resource is based on a manageable entity, and if so,
      * returns the class name of this entity.
      * If both the API resource class and its parent are not manageable entities, returns NULL.
-     *
-     * @param DoctrineHelper $doctrineHelper
-     *
-     * @return string|null
      */
-    public function getManageableEntityClass(DoctrineHelper $doctrineHelper);
+    public function getManageableEntityClass(DoctrineHelper $doctrineHelper): ?string;
 
     /**
      * Checks whether metadata of an entity has at least one identifier field.
-     *
-     * @return bool
      */
-    public function hasIdentifierFields();
+    public function hasIdentifierFields(): bool;
 
     /**
      * Gets request headers.
-     *
-     * @return ParameterBagInterface
      */
-    public function getRequestHeaders();
+    public function getRequestHeaders(): ParameterBagInterface;
 
     /**
      * Sets an object that will be used to accessing request headers.
      */
-    public function setRequestHeaders(ParameterBagInterface $parameterBag);
+    public function setRequestHeaders(ParameterBagInterface $parameterBag): void;
 
     /**
      * Gets response headers.
-     *
-     * @return ParameterBagInterface
      */
-    public function getResponseHeaders();
+    public function getResponseHeaders(): ParameterBagInterface;
 
     /**
      * Sets an object that will be used to accessing response headers.
      */
-    public function setResponseHeaders(ParameterBagInterface $parameterBag);
+    public function setResponseHeaders(ParameterBagInterface $parameterBag): void;
 
     /**
      * Gets the response status code.
-     *
-     * @return int|null
      */
-    public function getResponseStatusCode();
+    public function getResponseStatusCode(): ?int;
 
     /**
      * Sets the response status code.
-     *
-     * @param int $statusCode
      */
-    public function setResponseStatusCode($statusCode);
+    public function setResponseStatusCode(int $statusCode): void;
 
     /**
      * Indicates whether a result document represents a success response.
-     *
-     * @return bool
      */
-    public function isSuccessResponse();
+    public function isSuccessResponse(): bool;
 
     /**
      * Gets the response document builder.
-     *
-     * @return DocumentBuilderInterface|null
      */
-    public function getResponseDocumentBuilder();
+    public function getResponseDocumentBuilder(): ?DocumentBuilderInterface;
 
     /**
      * Sets the response document builder.
      */
-    public function setResponseDocumentBuilder(?DocumentBuilderInterface $documentBuilder);
+    public function setResponseDocumentBuilder(?DocumentBuilderInterface $documentBuilder): void;
 
     /**
      * Gets a list of filters is used to add additional restrictions to a query is used to get result data.
-     *
-     * @return FilterCollection
      */
-    public function getFilters();
+    public function getFilters(): FilterCollection;
 
     /**
      * Gets a collection of the FilterValue objects that contains all incoming filters.
-     *
-     * @return FilterValueAccessorInterface
      */
-    public function getFilterValues();
+    public function getFilterValues(): FilterValueAccessorInterface;
 
     /**
      * Sets an object that will be used to accessing incoming filters.
      */
-    public function setFilterValues(FilterValueAccessorInterface $accessor);
+    public function setFilterValues(FilterValueAccessorInterface $accessor): void;
 
     /**
      * Indicates whether the current action processes a master API request
@@ -163,7 +137,7 @@ interface ContextInterface extends SharedDataAwareContextInterface
     /**
      * Sets a flag indicates whether HATEOAS is enabled.
      */
-    public function setHateoas(bool $flag);
+    public function setHateoas(bool $flag): void;
 
     /**
      * Gets a context for response data normalization.
@@ -193,11 +167,8 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Adds a record that contains an additional information about collections.
-     *
-     * @param string $key
-     * @param mixed  $value
      */
-    public function addInfoRecord(string $key, $value): void;
+    public function addInfoRecord(string $key, mixed $value): void;
 
     /**
      * Adds records that contain an additional information about a collection valued association.
@@ -228,76 +199,62 @@ interface ContextInterface extends SharedDataAwareContextInterface
 
     /**
      * Checks whether a query is used to get result data exists.
-     *
-     * @return bool
      */
-    public function hasQuery();
+    public function hasQuery(): bool;
 
     /**
      * Gets a query is used to get result data.
-     *
-     * @return mixed
      */
-    public function getQuery();
+    public function getQuery(): mixed;
 
     /**
      * Sets a query is used to get result data.
-     *
-     * @param mixed $query
      */
-    public function setQuery($query);
+    public function setQuery(mixed $query): void;
 
     /**
      * Gets the Criteria object is used to add additional restrictions to a query is used to get result data.
-     *
-     * @return Criteria|null
      */
-    public function getCriteria();
+    public function getCriteria(): ?Criteria;
 
     /**
      * Sets the Criteria object is used to add additional restrictions to a query is used to get result data.
      */
-    public function setCriteria(Criteria $criteria = null);
+    public function setCriteria(?Criteria $criteria): void;
 
     /**
      * Whether any error occurred when processing an action.
-     *
-     * @return bool
      */
-    public function hasErrors();
+    public function hasErrors(): bool;
 
     /**
      * Gets all errors occurred when processing an action.
      *
      * @return Error[]
      */
-    public function getErrors();
+    public function getErrors(): array;
 
     /**
      * Registers an error.
      */
-    public function addError(Error $error);
+    public function addError(Error $error): void;
 
     /**
      * Removes all errors.
      */
-    public function resetErrors();
+    public function resetErrors(): void;
 
     /**
      * Gets a value indicates whether errors should just stop processing
      * or an exception should be thrown is any error occurred.
-     *
-     * @return bool
      */
-    public function isSoftErrorsHandling();
+    public function isSoftErrorsHandling(): bool;
 
     /**
      * Sets a value indicates whether errors should just stop processing
      * or an exception should be thrown is any error occurred.
-     *
-     * @param bool $softErrorsHandling
      */
-    public function setSoftErrorsHandling($softErrorsHandling);
+    public function setSoftErrorsHandling(bool $softErrorsHandling): void;
 
     /**
      * Marks a work as already done.
@@ -305,33 +262,25 @@ interface ContextInterface extends SharedDataAwareContextInterface
      * when a work is already done just checking a state of a context.
      * But if a processor does a complex work, it might be required
      * to directly mark the work as already done.
-     *
-     * @param string $operationName The name of an operation that represents some work
      */
-    public function setProcessed($operationName);
+    public function setProcessed(string $operationName): void;
 
     /**
      * Marks a work as not done yet.
-     *
-     * @param string $operationName The name of an operation that represents some work
      */
-    public function clearProcessed($operationName);
+    public function clearProcessed(string $operationName): void;
 
     /**
      * Checks whether a work is already done.
-     *
-     * @param string $operationName The name of an operation that represents some work
-     *
-     * @return bool
      */
-    public function isProcessed($operationName);
+    public function isProcessed(string $operationName): bool;
 
     /**
      * Gets a list of requests for configuration data.
      *
      * @return ConfigExtraInterface[]
      */
-    public function getConfigExtras();
+    public function getConfigExtras(): array;
 
     /**
      * Sets a list of requests for configuration data.
@@ -340,142 +289,107 @@ interface ContextInterface extends SharedDataAwareContextInterface
      *
      * @throws \InvalidArgumentException if $extras has invalid elements
      */
-    public function setConfigExtras(array $extras);
+    public function setConfigExtras(array $extras): void;
 
     /**
      * Checks whether some configuration data is requested.
-     *
-     * @param string $extraName
-     *
-     * @return bool
      */
-    public function hasConfigExtra($extraName);
+    public function hasConfigExtra(string $extraName): bool;
 
     /**
      * Gets a request for configuration data by its name.
-     *
-     * @param string $extraName
-     *
-     * @return ConfigExtraInterface|null
      */
-    public function getConfigExtra($extraName);
+    public function getConfigExtra(string $extraName): ?ConfigExtraInterface;
 
     /**
      * Adds a request for some configuration data.
      *
      * @throws \InvalidArgumentException if a config extra with the same name already exists
      */
-    public function addConfigExtra(ConfigExtraInterface $extra);
+    public function addConfigExtra(ConfigExtraInterface $extra): void;
 
     /**
      * Removes a request for some configuration data.
-     *
-     * @param string $extraName
      */
-    public function removeConfigExtra($extraName);
+    public function removeConfigExtra(string $extraName): void;
 
     /**
      * Gets names of all requested configuration sections.
      *
      * @return string[]
      */
-    public function getConfigSections();
+    public function getConfigSections(): array;
 
     /**
      * Checks whether a configuration of an entity exists.
-     *
-     * @return bool
      */
-    public function hasConfig();
+    public function hasConfig(): bool;
 
     /**
      * Gets a configuration of an entity.
-     *
-     * @return EntityDefinitionConfig|null
      */
-    public function getConfig();
+    public function getConfig(): ?EntityDefinitionConfig;
 
     /**
      * Sets a configuration of an entity.
      */
-    public function setConfig(?EntityDefinitionConfig $definition);
+    public function setConfig(?EntityDefinitionConfig $definition): void;
 
     /**
      * Checks whether a configuration of filters for an entity exists.
-     *
-     * @return bool
      */
-    public function hasConfigOfFilters();
+    public function hasConfigOfFilters(): bool;
 
     /**
      * Gets a configuration of filters for an entity.
-     *
-     * @return FiltersConfig|null
      */
-    public function getConfigOfFilters();
+    public function getConfigOfFilters(): ?FiltersConfig;
 
     /**
      * Sets a configuration of filters for an entity.
      */
-    public function setConfigOfFilters(?FiltersConfig $config);
+    public function setConfigOfFilters(?FiltersConfig $config): void;
 
     /**
      * Checks whether a configuration of sorters for an entity exists.
-     *
-     * @return bool
      */
-    public function hasConfigOfSorters();
+    public function hasConfigOfSorters(): bool;
 
     /**
      * Gets a configuration of sorters for an entity.
-     *
-     * @return SortersConfig|null
      */
-    public function getConfigOfSorters();
+    public function getConfigOfSorters(): ?SortersConfig;
 
     /**
      * Sets a configuration of sorters for an entity.
      */
-    public function setConfigOfSorters(?SortersConfig $config);
+    public function setConfigOfSorters(?SortersConfig $config): void;
 
     /**
      * Checks whether a configuration of the given section exists.
-     *
-     * @param string $configSection
-     *
-     * @return bool
-     *
-     * @throws \InvalidArgumentException if undefined configuration section is specified
      */
-    public function hasConfigOf($configSection);
+    public function hasConfigOf(string $configSection): bool;
 
     /**
      * Gets a configuration from the given section.
      *
-     * @param string $configSection
-     *
-     * @return mixed
-     *
      * @throws \InvalidArgumentException if undefined configuration section is specified
      */
-    public function getConfigOf($configSection);
+    public function getConfigOf(string $configSection): mixed;
 
     /**
      * Sets a configuration for the given section.
      *
-     * @param string $configSection
-     * @param mixed  $config
-     *
      * @throws \InvalidArgumentException if undefined configuration section is specified
      */
-    public function setConfigOf($configSection, $config);
+    public function setConfigOf(string $configSection, mixed $config): void;
 
     /**
      * Gets a list of requests for additional metadata info.
      *
      * @return MetadataExtraInterface[]
      */
-    public function getMetadataExtras();
+    public function getMetadataExtras(): array;
 
     /**
      * Sets a list of requests for additional metadata info.
@@ -484,56 +398,42 @@ interface ContextInterface extends SharedDataAwareContextInterface
      *
      * @throws \InvalidArgumentException if $extras has invalid elements
      */
-    public function setMetadataExtras(array $extras);
+    public function setMetadataExtras(array $extras): void;
 
     /**
      * Checks whether some additional metadata info is requested.
-     *
-     * @param string $extraName
-     *
-     * @return bool
      */
-    public function hasMetadataExtra($extraName);
+    public function hasMetadataExtra(string $extraName): bool;
 
     /**
      * Gets a request for some additional metadata info by its name.
-     *
-     * @param string $extraName
-     *
-     * @return MetadataExtraInterface|null
      */
-    public function getMetadataExtra($extraName);
+    public function getMetadataExtra(string $extraName): ?MetadataExtraInterface;
 
     /**
      * Adds a request for some additional metadata info.
      *
      * @throws \InvalidArgumentException if a metadata extra with the same name already exists
      */
-    public function addMetadataExtra(MetadataExtraInterface $extra);
+    public function addMetadataExtra(MetadataExtraInterface $extra): void;
 
     /**
      * Removes a request for some additional metadata info.
-     *
-     * @param string $extraName
      */
-    public function removeMetadataExtra($extraName);
+    public function removeMetadataExtra(string $extraName): void;
 
     /**
      * Checks whether metadata of an entity exists.
-     *
-     * @return bool
      */
-    public function hasMetadata();
+    public function hasMetadata(): bool;
 
     /**
      * Gets metadata of an entity.
-     *
-     * @return EntityMetadata|null
      */
-    public function getMetadata();
+    public function getMetadata(): ?EntityMetadata;
 
     /**
      * Sets metadata of an entity.
      */
-    public function setMetadata(?EntityMetadata $metadata);
+    public function setMetadata(?EntityMetadata $metadata): void;
 }

@@ -13,20 +13,13 @@ class PlaceholderConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var PlaceholderConfigurationProvider */
-    private $configurationProvider;
+    private PlaceholderConfigurationProvider $configurationProvider;
 
-    /** @var string */
-    private $cacheFile;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('PlaceholderConfigurationProvider');
+        $cacheFile = $this->getTempFile('PlaceholderConfigurationProvider');
 
-        $this->configurationProvider = new PlaceholderConfigurationProvider($this->cacheFile, false);
+        $this->configurationProvider = new PlaceholderConfigurationProvider($cacheFile, false);
     }
 
     /**

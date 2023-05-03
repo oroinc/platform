@@ -3,87 +3,75 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\EventListener;
 
 use Oro\Bundle\EntityExtendBundle\Event\UpdateSchemaEvent;
+use Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension;
 use Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UpdateSchemaListenerTest extends WebTestCase
 {
+    private CacheItemPoolInterface $interruptConsumptionCache;
+
     protected function setUp(): void
     {
         $this->initClient();
+
+        $this->interruptConsumptionCache = self::getContainer()->get('oro_message_queue.interrupt_consumption.cache');
+        $this->interruptConsumptionCache->clear();
     }
 
     protected function tearDown(): void
     {
-        $filePath = $this->getContainer()->getParameter('oro_message_queue.consumption.interrupt_filepath');
-
-        if (file_exists($filePath)) {
-            unlink($filePath);
-        }
+        $this->interruptConsumptionCache->clear();
 
         parent::tearDown();
     }
 
-    public function testMustBeListeningForUpdateSchemaEvent()
+    public function testMustBeListeningForUpdateSchemaEvent(): void
     {
         $dispatcher = $this->getEventDispatcher();
 
         $isListenerExist = false;
         foreach ($dispatcher->getListeners(UpdateSchemaEvent::NAME) as $listener) {
-            if (! $listener[0] instanceof UpdateSchemaListener) {
+            if ($listener[0] instanceof UpdateSchemaListener) {
                 $isListenerExist = true;
                 break;
             }
         }
 
-        $this->assertTrue($isListenerExist);
+        self::assertTrue($isListenerExist);
     }
 
-    public function testMustCreateFileIfNotExistOnUpdateSchemaEvent()
+    public function testOnSchemaUpdateMustClearCacheItem(): void
     {
-        $filePath = $this->getContainer()->getParameter('oro_message_queue.consumption.interrupt_filepath');
+        self::getContainer()->get('oro_message_queue.consumption.interrupt_consumption_extension');
 
-        $this->assertFileDoesNotExist($filePath);
+        $interruptConsumptionCache = $this->interruptConsumptionCache->getItem(
+            InterruptConsumptionExtension::CACHE_KEY
+        );
+
+        self::assertTrue($interruptConsumptionCache->isHit());
 
         $this->removeListenersForEventExceptTested();
-
         $this->dispatchUpdateSchemaEvent();
 
-        $this->assertFileExists($filePath);
-    }
+        $interruptConsumptionCache = $this->interruptConsumptionCache->getItem(
+            InterruptConsumptionExtension::CACHE_KEY
+        );
 
-    public function testMustUpdateFileMetadataOnUpdateSchemaEvent()
-    {
-        $filePath = $this->getContainer()->getParameter('oro_message_queue.consumption.interrupt_filepath');
-        $directory = dirname($filePath);
-
-        @mkdir($directory, 0777, true);
-        touch($filePath);
-
-        $this->assertFileExists($filePath);
-
-        $timestamp = filemtime($filePath);
-        sleep(1);
-
-        $this->removeListenersForEventExceptTested();
-
-        $this->dispatchUpdateSchemaEvent();
-
-        clearstatcache(true, $filePath);
-
-        $this->assertGreaterThan($timestamp, filemtime($filePath));
+        self::assertFalse($interruptConsumptionCache->isHit());
     }
 
     /**
      * Remove all listeners except UpdateSchemaListener for UpdateSchemaEvent
      */
-    private function removeListenersForEventExceptTested()
+    private function removeListenersForEventExceptTested(): void
     {
         $dispatcher = $this->getEventDispatcher();
 
         foreach ($dispatcher->getListeners(UpdateSchemaEvent::NAME) as $listener) {
-            if (! $listener[0] instanceof UpdateSchemaListener) {
+            if (!$listener[0] instanceof UpdateSchemaListener) {
                 $dispatcher->removeListener(UpdateSchemaEvent::NAME, $listener);
             }
         }
@@ -92,7 +80,7 @@ class UpdateSchemaListenerTest extends WebTestCase
     /**
      * Dispatch UpdateSchemaEvent
      */
-    private function dispatchUpdateSchemaEvent()
+    private function dispatchUpdateSchemaEvent(): void
     {
         $dispatcher = $this->getEventDispatcher();
 
@@ -100,11 +88,8 @@ class UpdateSchemaListenerTest extends WebTestCase
         $dispatcher->dispatch($event, UpdateSchemaEvent::NAME);
     }
 
-    /**
-     * @return EventDispatcherInterface
-     */
-    private function getEventDispatcher()
+    private function getEventDispatcher(): EventDispatcherInterface
     {
-        return $this->getContainer()->get('event_dispatcher');
+        return self::getContainer()->get('event_dispatcher');
     }
 }

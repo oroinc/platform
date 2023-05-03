@@ -14,8 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class AddPageNumberToInfoRecord implements ProcessorInterface
 {
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
+    private FilterNamesRegistry $filterNamesRegistry;
 
     public function __construct(FilterNamesRegistry $filterNamesRegistry)
     {
@@ -25,7 +24,7 @@ class AddPageNumberToInfoRecord implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -48,11 +47,7 @@ class AddPageNumberToInfoRecord implements ProcessorInterface
 
     protected function getPageNumber(FilterValueAccessorInterface $filterValues, string $pageNumberFilterName): int
     {
-        $pageNumber = null;
-        $pageNumberFilterValue = $filterValues->get($pageNumberFilterName);
-        if (null !== $pageNumberFilterValue) {
-            $pageNumber = $pageNumberFilterValue->getValue();
-        }
+        $pageNumber = $filterValues->get($pageNumberFilterName)?->getValue();
         if (null === $pageNumber) {
             $pageNumber = 1;
         }

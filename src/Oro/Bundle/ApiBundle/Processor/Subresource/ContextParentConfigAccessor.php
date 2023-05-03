@@ -11,8 +11,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
  */
 class ContextParentConfigAccessor implements ConfigAccessorInterface
 {
-    /** @var SubresourceContext */
-    protected $context;
+    private SubresourceContext $context;
 
     public function __construct(SubresourceContext $context)
     {
@@ -24,7 +23,7 @@ class ContextParentConfigAccessor implements ConfigAccessorInterface
      */
     public function getConfig(string $className): ?EntityDefinitionConfig
     {
-        return \is_a($this->context->getParentClassName(), $className, true)
+        return is_a($this->context->getParentClassName(), $className, true)
             ? $this->context->getParentConfig()
             : null;
     }

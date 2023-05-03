@@ -16,11 +16,8 @@ class ComputeFileContent implements ProcessorInterface
 {
     private const CONTENT_FIELD_NAME = 'content';
 
-    /** @var FileManager */
-    private $fileManager;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private FileManager $fileManager;
+    private LoggerInterface $logger;
 
     public function __construct(FileManager $fileManager, LoggerInterface $logger)
     {
@@ -31,17 +28,18 @@ class ComputeFileContent implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */
 
         $data = $context->getData();
 
-        if (!$context->isFieldRequested(self::CONTENT_FIELD_NAME, $data)) {
+        if (!$context->isFieldRequested(self::CONTENT_FIELD_NAME, $data) || $this->isExternalFile($context)) {
             return;
         }
 
         $fileNameFieldName = $context->getResultFieldName('filename');
+
         if (!$fileNameFieldName || empty($data[$fileNameFieldName])) {
             return;
         }
@@ -69,5 +67,13 @@ class ComputeFileContent implements ProcessorInterface
         }
 
         return $content;
+    }
+
+    private function isExternalFile(ContextInterface $context): bool
+    {
+        $externalUrlFieldName = $context->getResultFieldName('externalUrl');
+        $data = $context->getData();
+
+        return $externalUrlFieldName && !empty($data[$externalUrlFieldName]);
     }
 }

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
@@ -12,6 +11,15 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
  */
 interface MenuUpdateInterface
 {
+    public const TITLES = 'titles';
+    public const DESCRIPTION = 'description';
+    public const IS_DIVIDER = 'divider';
+    public const IS_TRANSLATE_DISABLED = 'translate_disabled';
+    public const IS_CUSTOM = 'custom';
+    public const IS_SYNTHETIC = 'synthetic';
+    public const POSITION = 'position';
+    public const ICON = 'icon';
+
     /**
      * @return int
      */
@@ -66,30 +74,6 @@ interface MenuUpdateInterface
     public function removeTitle(LocalizedFallbackValue $title);
 
     /**
-     * @param Localization $localization
-     *
-     * @return LocalizedFallbackValue
-     */
-    public function getTitle(Localization $localization = null);
-
-    /**
-     * @return LocalizedFallbackValue
-     */
-    public function getDefaultTitle();
-
-    /**
-     * @param string $value
-     *
-     * @return LocalizedFallbackValue
-     */
-    public function setDefaultTitle($value);
-
-    /**
-     * @return Collection|LocalizedFallbackValue[]
-     */
-    public function getDescriptions();
-
-    /**
      * @param LocalizedFallbackValue $description
      *
      * @return MenuUpdateInterface
@@ -102,25 +86,6 @@ interface MenuUpdateInterface
      * @return MenuUpdateInterface
      */
     public function removeDescription(LocalizedFallbackValue $description);
-
-    /**
-     * @param Localization $localization
-     *
-     * @return LocalizedFallbackValue
-     */
-    public function getDescription(Localization $localization = null);
-
-    /**
-     * @return LocalizedFallbackValue
-     */
-    public function getDefaultDescription();
-
-    /**
-     * @param string $value
-     *
-     * @return LocalizedFallbackValue
-     */
-    public function setDefaultDescription($value);
 
     /**
      * @return string
@@ -197,11 +162,11 @@ interface MenuUpdateInterface
     public function setCustom($custom);
 
     /**
-     * Get array of extra data that is not declared in MenuUpdateInterface model
-     *
-     * @return array
+     * Synthetic is a non-custom menu item that should remain in tree even if target item does not exist.
      */
-    public function getExtras();
+    public function isSynthetic(): bool;
+
+    public function setSynthetic(bool $synthetic): self;
 
     /**
      * Get array of link attributes

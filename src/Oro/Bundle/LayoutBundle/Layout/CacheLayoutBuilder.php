@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Layout;
 
 use Oro\Bundle\LayoutBundle\Cache\RenderCache;
+use Oro\Bundle\LayoutBundle\Event\LayoutBuildAfterEvent;
 use Oro\Component\Layout\BlockFactoryInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockViewCache;
@@ -10,21 +11,23 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessor;
 use Oro\Component\Layout\DeferredLayoutManipulatorInterface;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
+use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutBuilder;
+use Oro\Component\Layout\LayoutContextStack;
 use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\LayoutRendererRegistryInterface;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\RawLayoutBuilderInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Overrides LayoutBuilder to calculate cache metadata in advance and to remove children of cached blocks.
  */
 class CacheLayoutBuilder extends LayoutBuilder
 {
-    /**
-     * @var RenderCache
-     */
-    private $renderCache;
+    private RenderCache $renderCache;
+
+    private ?EventDispatcherInterface $eventDispatcher = null;
 
     public function __construct(
         LayoutRegistryInterface $registry,
@@ -33,10 +36,13 @@ class CacheLayoutBuilder extends LayoutBuilder
         BlockFactoryInterface $blockFactory,
         LayoutRendererRegistryInterface $rendererRegistry,
         ExpressionProcessor $expressionProcessor,
+        LayoutContextStack $layoutContextStack,
         RenderCache $renderCache,
         BlockViewCache $blockViewCache = null
     ) {
         $this->renderCache = $renderCache;
+        $this->layoutContextStack = $layoutContextStack;
+
         parent::__construct(
             $registry,
             $rawLayoutBuilder,
@@ -44,8 +50,23 @@ class CacheLayoutBuilder extends LayoutBuilder
             $blockFactory,
             $rendererRegistry,
             $expressionProcessor,
+            $layoutContextStack,
             $blockViewCache
         );
+    }
+
+    public function setEventDispatcher(?EventDispatcherInterface $eventDispatcher): void
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    public function getLayout(ContextInterface $context, $rootId = null): Layout
+    {
+        $layout = parent::getLayout($context, $rootId);
+
+        $this->eventDispatcher?->dispatch(new LayoutBuildAfterEvent($layout, $this));
+
+        return $layout;
     }
 
     /**
@@ -106,7 +127,7 @@ class CacheLayoutBuilder extends LayoutBuilder
             $this->expressionProcessor->processExpressions($values, $context, $data, true, $encoding);
             $blockView->vars['cache'] = $values['cache'];
 
-            $cached = $this->renderCache->isCached($blockView);
+            $cached = $this->renderCache->isCached($blockView, $context);
             if ($cached) {
                 $blockView->vars['_cached'] = $cached;
             }

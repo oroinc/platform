@@ -23,9 +23,7 @@ class IterableResultFactoryTest extends SearchBundleWebTestCase
     {
         $this->initClient();
 
-        $engine = static::getContainer()
-            ->get('oro_search.engine.parameters')
-            ->getEngineName();
+        $engine = self::getContainer()->get('oro_search.engine.parameters')->getEngineName();
         if ($engine !== 'orm') {
             $this->markTestSkipped('Should be tested only with ORM search engine');
         }

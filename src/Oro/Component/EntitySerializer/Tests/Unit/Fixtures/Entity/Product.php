@@ -17,24 +17,24 @@ class Product
      * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private ?int $id;
 
     /**
      * @ORM\Column(name="name", type="string", length=50)
      */
-    protected $name;
+    private ?string $name = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="Category")
      * @ORM\JoinColumn(name="category_name", referencedColumnName="name")
      */
-    protected $category;
+    private ?Category $category = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="products")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
      */
-    protected $owner;
+    private ?User $owner = null;
 
     /**
      * @ORM\ManyToMany(targetEntity="Group")
@@ -43,79 +43,49 @@ class Product
      *      inverseJoinColumns={@ORM\JoinColumn(name="product_group_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      */
-    protected $groups;
+    private Collection $groups;
 
-    /**
-     * @param int|null $id
-     */
-    public function __construct($id = null)
+    public function __construct(int $id = null)
     {
-        $this->id     = $id;
+        $this->id = $id;
         $this->groups = new ArrayCollection();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return self
-     */
-    public function setName($name)
+    public function setName(?string $name): static
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @return Category
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    /**
-     * @param Category $category
-     *
-     * @return self
-     */
-    public function setCategory($category)
+    public function setCategory(?Category $category): static
     {
         $this->category = $category;
 
         return $this;
     }
 
-    /**
-     * @return User
-     */
-    public function getOwner()
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
 
-    /**
-     * @param User|null $owner
-     *
-     * @return self
-     */
-    public function setOwner($owner)
+    public function setOwner(?User $owner): static
     {
         $this->owner = $owner;
 
@@ -123,19 +93,14 @@ class Product
     }
 
     /**
-     * @return Group[]|Collection
+     * @return Collection<Group>
      */
-    public function getGroups()
+    public function getGroups(): Collection
     {
         return $this->groups;
     }
 
-    /**
-     * @param Group $group
-     *
-     * @return self
-     */
-    public function addGroup(Group $group)
+    public function addGroup(Group $group): static
     {
         if (!$this->groups->contains($group)) {
             $this->groups->add($group);
@@ -144,12 +109,7 @@ class Product
         return $this;
     }
 
-    /**
-     * @param Group $group
-     *
-     * @return self
-     */
-    public function removeGroup(Group $group)
+    public function removeGroup(Group $group): static
     {
         if ($this->groups->contains($group)) {
             $this->groups->removeElement($group);

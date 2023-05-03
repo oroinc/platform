@@ -116,9 +116,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->expectExceptionMessage('The "data" property of "/included/0" element should be an array.');
 
         $includedData = [
-            [
-                'data' => null
-            ]
+            ['data' => null]
         ];
 
         $this->context->setIncludedData($includedData);
@@ -144,6 +142,8 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->with($normalizedType)
             ->willReturn($includedEntity);
 
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
         $this->context->setIncludedData($includedData);
         $this->processor->process($this->context);
 
@@ -255,6 +255,8 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->with($normalizedType)
             ->willReturn($includedEntity);
 
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
@@ -373,6 +375,8 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->with('testId', self::identicalTo($metadata))
             ->willReturn($normalizedId);
 
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 

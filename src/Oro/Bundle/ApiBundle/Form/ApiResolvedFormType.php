@@ -13,62 +13,60 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\SubmitButtonTypeInterface;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * A wrapper for an API form type and its extensions.
  */
 class ApiResolvedFormType implements ResolvedFormTypeInterface
 {
-    /** @var ResolvedFormTypeInterface */
-    private $innerType;
+    private ResolvedFormTypeInterface $innerType;
 
     public function __construct(ResolvedFormTypeInterface $innerType)
     {
         $this->innerType = $innerType;
     }
 
-    public function getBlockPrefix()
+    /**
+     * {@inheritDoc}
+     */
+    public function getBlockPrefix(): string
     {
         return $this->innerType->getBlockPrefix();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getParent()
+    public function getParent(): ?ResolvedFormTypeInterface
     {
         return $this->innerType->getParent();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getInnerType()
+    public function getInnerType(): FormTypeInterface
     {
         return $this->innerType->getInnerType();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getTypeExtensions()
+    public function getTypeExtensions(): array
     {
         return $this->innerType->getTypeExtensions();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOptionsResolver()
-    {
-        return $this->innerType->getOptionsResolver();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createBuilder(FormFactoryInterface $factory, $name, array $options = [])
-    {
+    public function createBuilder(
+        FormFactoryInterface $factory,
+        string $name,
+        array $options = []
+    ): FormBuilderInterface {
         if ($this->innerType instanceof ButtonTypeInterface) {
             throw new UnexpectedTypeException($this->innerType, FormTypeInterface::class);
         }
@@ -102,34 +100,42 @@ class ApiResolvedFormType implements ResolvedFormTypeInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function createView(FormInterface $form, FormView $parent = null)
+    public function createView(FormInterface $form, FormView $parent = null): FormView
     {
         return $this->innerType->createView($form, $parent);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->innerType->buildForm($builder, $options);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $this->innerType->buildView($view, $form, $options);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $this->innerType->finishView($view, $form, $options);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOptionsResolver(): OptionsResolver
+    {
+        return $this->innerType->getOptionsResolver();
     }
 }

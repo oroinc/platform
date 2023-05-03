@@ -12,166 +12,91 @@ use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UIBundle\Model\TreeItem;
 
 class MenuUpdateManagerTest extends WebTestCase
 {
     private const MENU_NAME = 'application_menu';
 
-    /** @var EntityRepository */
-    private $repository;
+    private EntityRepository $repository;
 
-    /** @var MenuUpdateManager */
-    private $manager;
+    private MenuUpdateManager $manager;
 
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->loadFixtures([MenuUpdateData::class]);
 
-        $this->manager = $this->getContainer()->get('oro_navigation.manager.menu_update');
+        $this->manager = self::getContainer()->get('oro_navigation.manager.menu_update');
         $this->repository = self::getContainer()->get('doctrine')->getRepository(MenuUpdate::class);
     }
 
-    public function testCreateMenuUpdate()
+    public function testCreateMenuUpdateWhenCustom(): void
     {
         $scope = $this->getScope();
+        $menu = $this->getMenu();
+
         $actualMenuUpdate = $this->manager->createMenuUpdate(
-            $this->getMenu(),
+            $menu,
+            $scope,
             [
                 'key' => 'unique_item_key',
-                'custom' => true,
-                'menu' => 'application_menu',
-                'scope' => $scope,
                 'parentKey' => null,
-                'isDivider' => false
+                'divider' => false,
             ]
         );
         $expectedMenuUpdate = new MenuUpdate();
         $expectedMenuUpdate->setKey('unique_item_key')
             ->setCustom(true)
-            ->setMenu('application_menu')
+            ->setMenu(self::MENU_NAME)
             ->setParentKey(null)
             ->setDivider(false)
-            ->setScope($scope);
-        $this->assertEquals($expectedMenuUpdate, $actualMenuUpdate);
+            ->setScope($scope)
+            ->setPriority(count($menu->getChildren()));
+
+        self::assertEquals($expectedMenuUpdate, $actualMenuUpdate);
     }
 
-    public function testUpdateMenuUpdate()
+    public function testCreateMenuUpdateWhenNotCustom(): void
     {
         $menu = $this->getMenu();
         $item = MenuUpdateUtils::findMenuItem($menu, 'oro_organization_list');
-        $update = new MenuUpdate();
-        $update->setKey('oro_organization_list')
-            ->setParentKey('dashboard_tab');
+        $item->setExtra('position', 42);
 
-        $this->manager->updateMenuUpdate($update, $item, 'menu');
-        $this->assertEquals('oro_organization_list', $update->getKey());
-        $this->assertEquals('dashboard_tab', $update->getParentKey());
+        $menuUpdate = $this->manager->createMenuUpdate(
+            $this->getMenu(),
+            $this->getScope(),
+            ['key' => $item->getName()]
+        );
+
+        self::assertEquals($item->getName(), $menuUpdate->getKey());
+        self::assertEquals($item->getParent()->getName(), $menuUpdate->getParentKey());
+        self::assertEquals(42, $menuUpdate->getPriority());
     }
 
-    public function testFindOrCreateMenuUpdate()
+    public function testFindOrCreateMenuUpdate(): void
     {
         $scope = $this->getScope();
+        $menu = $this->getMenu();
+
         $expectedMenuUpdate = new MenuUpdate();
         $expectedMenuUpdate->setKey('unique_item_key')
             ->setCustom(true)
-            ->setMenu('application_menu')
+            ->setMenu(self::MENU_NAME)
             ->setParentKey(null)
             ->setScope($scope)
-            ->setDivider(false);
+            ->setDivider(false)
+            ->setPriority(count($menu->getChildren()));
 
-        $actualMenuUpdate = $this->manager->findOrCreateMenuUpdate($this->getMenu(), 'unique_item_key', $scope);
-        $this->assertEquals($expectedMenuUpdate, $actualMenuUpdate);
-    }
-
-    public function testShowMenuItem()
-    {
-        $scope = $this->getScope();
-        $this->manager->showMenuItem($this->getMenu(), MenuUpdateData::MENU_UPDATE_2_1, $scope);
-
-        /** @var MenuUpdate[] $result */
-        $result = $this->repository->findBy([
-            'menu'  => self::MENU_NAME,
-            'key'   => [
-                MenuUpdateData::MENU_UPDATE_2,
-                MenuUpdateData::MENU_UPDATE_2_1,
-                MenuUpdateData::MENU_UPDATE_2_1_1
-            ],
-            'scope' => $scope,
-        ]);
-
-        foreach ($result as $entity) {
-            $this->assertTrue($entity->isActive());
-        }
-    }
-
-    public function testHideMenuItem()
-    {
-        $scope = $this->getScope();
-        $this->manager->hideMenuItem($this->getMenu(), MenuUpdateData::MENU_UPDATE_1, $scope);
-
-        /** @var MenuUpdate[] $result */
-        $result = $this->repository->findBy([
-            'menu'  => self::MENU_NAME,
-            'key'   => [MenuUpdateData::MENU_UPDATE_1, MenuUpdateData::MENU_UPDATE_1_1],
-            'scope' => $scope
-        ]);
-
-        foreach ($result as $entity) {
-            $this->assertFalse($entity->isActive());
-        }
-    }
-
-    public function testMoveMenuItem()
-    {
-        $updates = $this->manager->moveMenuItem(
-            $this->getMenu(),
-            MenuUpdateData::MENU_UPDATE_3_1,
-            $this->getScope(),
-            MenuUpdateData::MENU_UPDATE_2,
-            0
+        $actualMenuUpdate = $this->manager->findOrCreateMenuUpdate(
+            $menu,
+            $scope,
+            ['key' => 'unique_item_key']
         );
 
-        $this->assertCount(2, $updates);
-
-        $this->assertEquals(0, $updates[0]->getPriority());
-        $this->assertEquals(MenuUpdateData::MENU_UPDATE_3_1, $updates[0]->getKey());
-        $this->assertEquals(MenuUpdateData::MENU_UPDATE_2, $updates[0]->getParentKey());
-
-        $this->assertEquals(MenuUpdateData::MENU_UPDATE_2_1, $updates[1]->getKey());
-        $this->assertEquals(1, $updates[1]->getPriority());
+        self::assertEquals($expectedMenuUpdate, $actualMenuUpdate);
     }
 
-    public function testMoveMenuItems()
-    {
-        $updates = $this->manager->moveMenuItems(
-            $this->getMenu(),
-            [
-                new TreeItem(MenuUpdateData::MENU_UPDATE_3_1),
-                new TreeItem(MenuUpdateData::MENU_UPDATE_3)
-            ],
-            $this->getScope(),
-            MenuUpdateData::MENU_UPDATE_2,
-            0
-        );
-
-        $this->assertCount(3, $updates);
-
-        $this->assertEquals(MenuUpdateData::MENU_UPDATE_3_1, $updates[0]->getKey());
-        $this->assertEquals(MenuUpdateData::MENU_UPDATE_3, $updates[1]->getKey());
-        $this->assertEquals(MenuUpdateData::MENU_UPDATE_2_1, $updates[2]->getKey());
-
-        $this->assertEquals(MenuUpdateData::MENU_UPDATE_2, $updates[0]->getParentKey());
-        $this->assertEquals(MenuUpdateData::MENU_UPDATE_2, $updates[1]->getParentKey());
-        $this->assertEquals(MenuUpdateData::MENU_UPDATE_2, $updates[2]->getParentKey());
-
-        $this->assertEquals(0, $updates[0]->getPriority());
-        $this->assertEquals(1, $updates[1]->getPriority());
-        $this->assertEquals(2, $updates[2]->getPriority());
-    }
-
-    public function testDeleteMenuUpdates()
+    public function testDeleteMenuUpdates(): void
     {
         $scope = $this->getScope();
         $this->manager->deleteMenuUpdates($scope, self::MENU_NAME);
@@ -179,25 +104,25 @@ class MenuUpdateManagerTest extends WebTestCase
         /** @var MenuUpdate[] $result */
         $result = $this->repository->findBy(['menu' => self::MENU_NAME, 'scope' => $scope]);
 
-        $this->assertCount(0, $result);
+        self::assertCount(0, $result);
     }
 
-    public function testGetRepository()
+    public function testGetRepository(): void
     {
         $repository = $this->manager->getRepository();
-        $this->assertInstanceOf(MenuUpdateRepository::class, $repository);
+        self::assertInstanceOf(MenuUpdateRepository::class, $repository);
     }
 
     private function getScope(): Scope
     {
         /** @var ScopeManager $scopeManager */
-        $scopeManager = $this->getContainer()->get('oro_scope.scope_manager');
+        $scopeManager = self::getContainer()->get('oro_scope.scope_manager');
 
         return $scopeManager->findOrCreate('menu_default_visibility', []);
     }
 
     private function getMenu(): ItemInterface
     {
-        return $this->getContainer()->get('oro_menu.builder_chain')->get(self::MENU_NAME);
+        return self::getContainer()->get('oro_menu.builder_chain')->get(self::MENU_NAME);
     }
 }

@@ -15,16 +15,11 @@ use Psr\Container\ContainerInterface;
 class EntityAliasResolverRegistry implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {
     /** @var array [[resolver service id, request type expression], ...] */
-    private $entityAliasResolvers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
-
+    private array $entityAliasResolvers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
     /** @var EntityAliasResolver[] [request type => EntityAliasResolver, ...] */
-    private $cache = [];
+    private array $cache = [];
 
     /**
      * @param array                    $entityAliasResolvers [[resolver service id, request type expression], ...]
@@ -54,16 +49,17 @@ class EntityAliasResolverRegistry implements WarmableConfigCacheInterface, Clear
         }
 
         $entityAliasResolverServiceId = null;
-        foreach ($this->entityAliasResolvers as list($serviceId, $expression)) {
+        foreach ($this->entityAliasResolvers as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $entityAliasResolverServiceId = $serviceId;
                 break;
             }
         }
         if (null === $entityAliasResolverServiceId) {
-            throw new \LogicException(
-                sprintf('Cannot find an entity alias resolver for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find an entity alias resolver for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         /** @var EntityAliasResolver $entityAliasResolver */
@@ -79,7 +75,7 @@ class EntityAliasResolverRegistry implements WarmableConfigCacheInterface, Clear
     public function warmUpCache(): void
     {
         $this->cache = [];
-        foreach ($this->entityAliasResolvers as list($serviceId, $expression)) {
+        foreach ($this->entityAliasResolvers as [$serviceId, $expression]) {
             /** @var EntityAliasResolver $entityAliasResolver */
             $entityAliasResolver = $this->container->get($serviceId);
             $entityAliasResolver->warmUpCache();
@@ -92,7 +88,7 @@ class EntityAliasResolverRegistry implements WarmableConfigCacheInterface, Clear
     public function clearCache(): void
     {
         $this->cache = [];
-        foreach ($this->entityAliasResolvers as list($serviceId, $expression)) {
+        foreach ($this->entityAliasResolvers as [$serviceId, $expression]) {
             /** @var EntityAliasResolver $entityAliasResolver */
             $entityAliasResolver = $this->container->get($serviceId);
             $entityAliasResolver->clearCache();

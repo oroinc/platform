@@ -3,29 +3,23 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource\Orm;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutor;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity\Test as Entity;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class QueryExecutorTest extends OrmTestCase
 {
-    /** @var EntityManagerMock */
-    private $em;
-
-    /** @var QueryExecutor */
-    private $queryExecutor;
+    private EntityManagerInterface $em;
+    private QueryExecutor $queryExecutor;
 
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity'
-        ));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->queryExecutor = new QueryExecutor();
     }
@@ -82,12 +76,7 @@ class QueryExecutorTest extends OrmTestCase
         self::assertEquals([['id' => 1, 'name' => 'test']], $result);
     }
 
-    /**
-     * @param Query $query
-     *
-     * @return mixed
-     */
-    public function executeQuery(Query $query)
+    public function executeQuery(Query $query): mixed
     {
         return $query->execute();
     }

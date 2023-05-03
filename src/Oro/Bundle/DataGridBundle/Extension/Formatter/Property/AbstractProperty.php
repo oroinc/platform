@@ -11,7 +11,7 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
  */
 abstract class AbstractProperty implements PropertyInterface
 {
-    /** @var array */
+    /** @var PropertyConfiguration */
     protected $params;
 
     /**

@@ -3,89 +3,53 @@
 namespace Oro\Bundle\LayoutBundle\Cache\Metadata;
 
 use Oro\Bundle\LayoutBundle\Exception\InvalidLayoutCacheMetadataException;
-use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\ContextInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * General provider for layout cache metadata with the fallback to default provider.
  */
-class CacheMetadataProvider implements ResetInterface
+class CacheMetadataProvider implements CacheMetadataProviderInterface, ResetInterface
 {
-    /**
-     * @var CacheMetadataProviderInterface
-     */
-    private $defaultProvider;
+    private CacheMetadataProviderInterface $defaultProvider;
 
-    /**
-     * @var iterable|CacheMetadataProviderInterface[]
-     */
-    private $providers;
+    /** @var iterable<CacheMetadataProviderInterface> */
+    private iterable $providers;
 
-    /**
-     * @var LayoutContextHolder
-     */
-    private $contextHolder;
+    /** @var LayoutCacheMetadata[] */
+    private array $metadataByBlockCacheKey = [];
 
-    /**
-     * @var LayoutCacheMetadata[]
-     */
-    private $metadataByBlockCacheKey = [];
+    private LoggerInterface $logger;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private bool $debug;
 
-    /**
-     * @var bool
-     */
-    private $debug;
-
-    /**
-     * @param CacheMetadataProviderInterface            $defaultProvider
-     * @param CacheMetadataProviderInterface[]|iterable $providers
-     * @param LayoutContextHolder                       $contextHolder
-     * @param LoggerInterface                           $logger
-     * @param bool                                      $debug
-     */
     public function __construct(
         CacheMetadataProviderInterface $defaultProvider,
         iterable $providers,
-        LayoutContextHolder $contextHolder,
         LoggerInterface $logger,
         bool $debug
     ) {
         $this->defaultProvider = $defaultProvider;
         $this->providers = $providers;
-        $this->contextHolder = $contextHolder;
         $this->logger = $logger;
         $this->debug = $debug;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getCacheMetadata(BlockView $blockView): ?LayoutCacheMetadata
+    public function getCacheMetadata(BlockView $blockView, ContextInterface $context): ?LayoutCacheMetadata
     {
         $blockCacheKey = $blockView->vars['cache_key'];
 
         if (!array_key_exists($blockCacheKey, $this->metadataByBlockCacheKey)) {
-            $this->metadataByBlockCacheKey[$blockCacheKey] = $this->doGetMetadata($blockView);
+            $this->metadataByBlockCacheKey[$blockCacheKey] = $this->doGetMetadata($blockView, $context);
         }
 
         return $this->metadataByBlockCacheKey[$blockCacheKey];
     }
 
-    private function doGetMetadata(BlockView $blockView): ?LayoutCacheMetadata
+    private function doGetMetadata(BlockView $blockView, ContextInterface $context): ?LayoutCacheMetadata
     {
-        $context = $this->contextHolder->getContext();
-
-        if (!$context) {
-            return null;
-        }
-
         try {
             foreach ($this->providers as $provider) {
                 $metadata = $provider->getCacheMetadata($blockView, $context);

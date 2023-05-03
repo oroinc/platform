@@ -28,7 +28,7 @@ class HasAdderAndRemoverValidator extends ConstraintValidator
         $methods = ReflectionUtil::findAdderAndRemover($constraint->class, $constraint->property);
         if (!$methods) {
             $pairs = ReflectionUtil::getAdderAndRemoverNames($constraint->property);
-            if (1 === count($pairs)) {
+            if (1 === \count($pairs)) {
                 $this->context->addViolation(
                     $constraint->message,
                     [

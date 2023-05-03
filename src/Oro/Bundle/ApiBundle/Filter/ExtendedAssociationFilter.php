@@ -56,9 +56,9 @@ class ExtendedAssociationFilter extends AssociationFilter implements ConfigAware
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function doBuildExpression(string $field, string $path, string $operator, $value): ?Expression
+    protected function doBuildExpression(string $field, string $path, string $operator, mixed $value): ?Expression
     {
         $this->assertFilterValuePath($field, $path);
 

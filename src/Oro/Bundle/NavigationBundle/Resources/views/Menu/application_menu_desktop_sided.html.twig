@@ -82,7 +82,13 @@
     {% endif %}
 
     <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}>
-        <span class="title {{ 'title-level-' ~ item.getLevel()}}" title="{{ item.getLabel()|trans }}">{{ block('label')|trim|raw }}</span>
+        <span class="title {{ 'title-level-' ~ item.getLevel()}}" title="
+        {%- if item.getExtra('translate_disabled', false) == false %}
+            {{- item.getLabel()|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages')) -}}
+        {% else %}
+            {{- item.getLabel() -}}
+        {% endif -%}
+        ">{{ block('label')|trim|raw }}</span>
     </a>
 {% endblock %}
 

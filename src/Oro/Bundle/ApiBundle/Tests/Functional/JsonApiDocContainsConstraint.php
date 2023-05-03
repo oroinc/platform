@@ -25,20 +25,20 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function matches($other): bool
     {
         if (parent::matches($other)
-            && is_array($this->expected)
-            && is_array($other)
+            && \is_array($this->expected)
+            && \is_array($other)
             && \array_key_exists(JsonApiDoc::DATA, $this->expected)
             && \array_key_exists(JsonApiDoc::DATA, $other)
         ) {
             // test the primary data collection count and order
             $expectedData = $this->expected[JsonApiDoc::DATA];
-            if (is_array($expectedData)) {
+            if (\is_array($expectedData)) {
                 if (empty($expectedData)) {
                     \PHPUnit\Framework\Assert::assertSame($this->expected, $other);
                 }
@@ -59,7 +59,10 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
                             )
                         );
                     } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-                        $this->errors[] = [[JsonApiDoc::DATA], $e->getMessage()];
+                        $this->errors[] = [
+                            [JsonApiDoc::DATA],
+                            $e->getMessage() . PHP_EOL . $e->getComparisonFailure()?->toString()
+                        ];
 
                         return false;
                     }
@@ -71,13 +74,13 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function matchAssocArray(array $expected, array $actual, array $path)
+    protected function matchAssocArray(array $expected, array $actual, array $path): void
     {
         parent::matchAssocArray($expected, $actual, $path);
         // test links count
-        if (count($path) > 0 && JsonApiDoc::LINKS === $path[count($path) - 1]) {
+        if (\count($path) > 0 && JsonApiDoc::LINKS === $path[\count($path) - 1]) {
             $expectedLinks = array_keys($expected);
             $actualLinks = array_keys($actual);
             sort($expectedLinks);
@@ -95,20 +98,20 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function matchIndexedArray(array $expected, array $actual, array $path)
+    protected function matchIndexedArray(array $expected, array $actual, array $path): void
     {
         parent::matchIndexedArray($expected, $actual, $path);
 
         // test items count for to-many relationship
-        $indexOfLastPathItem = count($path) - 1;
+        $indexOfLastPathItem = \count($path) - 1;
         if ($indexOfLastPathItem >= 3
             && JsonApiDoc::DATA === $path[$indexOfLastPathItem]
             && JsonApiDoc::RELATIONSHIPS === $path[$indexOfLastPathItem - 2]
         ) {
             try {
-                \PHPUnit\Framework\Assert::assertCount(count($expected), $actual, 'Failed asserting items count.');
+                \PHPUnit\Framework\Assert::assertCount(\count($expected), $actual, 'Failed asserting items count.');
             } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
                 $this->errors[] = [$path, $e->getMessage()];
             }

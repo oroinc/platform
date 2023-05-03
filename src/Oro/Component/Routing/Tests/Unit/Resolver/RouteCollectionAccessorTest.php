@@ -231,7 +231,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
     }
 
-    public function insertDataProvider()
+    public function insertDataProvider(): array
     {
         return [
             [null, false, ['route1', 'route2', 'test']],

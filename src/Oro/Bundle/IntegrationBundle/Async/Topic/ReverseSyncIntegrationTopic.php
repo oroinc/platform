@@ -3,12 +3,13 @@
 namespace Oro\Bundle\IntegrationBundle\Async\Topic;
 
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Topic for reverse integration syncing.
  */
-class ReverseSyncIntegrationTopic extends AbstractTopic
+class ReverseSyncIntegrationTopic extends AbstractTopic implements JobAwareTopicInterface
 {
     public static function getName(): string
     {
@@ -38,5 +39,10 @@ class ReverseSyncIntegrationTopic extends AbstractTopic
             ->addAllowedTypes('integration_id', ['string', 'int'])
             ->addAllowedTypes('connector', ['null', 'string'])
             ->addAllowedTypes('connector_parameters', 'array');
+    }
+
+    public function createJobName($messageBody): string
+    {
+        return 'oro_integration:revers_sync_integration:' . $messageBody['integration_id'];
     }
 }

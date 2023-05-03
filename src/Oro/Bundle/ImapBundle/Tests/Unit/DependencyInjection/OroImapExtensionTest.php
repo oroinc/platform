@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\ImapBundle\Controller as ImapControllers;
 use Oro\Bundle\ImapBundle\DependencyInjection\OroImapExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -10,32 +9,41 @@ class OroImapExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $containerBuilder = new ContainerBuilder();
-        $extension = new OroImapExtension();
+        $container = new ContainerBuilder();
 
-        $extension->load([], $containerBuilder);
+        $extension = new OroImapExtension();
+        $extension->load([], $container);
+
+        self::assertNotEmpty($container->getDefinitions());
+        self::assertSame(
+            [
+                [
+                    'settings' => [
+                        'resolved' => true,
+                        'enable_google_imap' => ['value' => false, 'scope' => 'app'],
+                        'enable_microsoft_imap' => ['value' => false, 'scope' => 'app'],
+                    ]
+                ]
+            ],
+            $container->getExtensionConfig('oro_imap')
+        );
 
         self::assertEquals(
             'oro_user_email_origin',
-            $containerBuilder->getParameter('oro_imap.user_email_origin_transport')
+            $container->getParameter('oro_imap.user_email_origin_transport')
         );
-
-        self::assertTrue($containerBuilder->has(ImapControllers\CheckConnectionController::class));
-        self::assertTrue($containerBuilder->has(ImapControllers\ConnectionController::class));
-        self::assertTrue($containerBuilder->has(ImapControllers\GmailAccessTokenController::class));
-        self::assertTrue($containerBuilder->has(ImapControllers\MicrosoftAccessTokenController::class));
     }
 
-    public function testLoadWithCustomUserEmailOriginTransport(): void
+    public function testLoadWithCustomConfigs(): void
     {
-        $containerBuilder = new ContainerBuilder();
-        $extension = new OroImapExtension();
+        $container = new ContainerBuilder();
 
-        $extension->load(['oro_imap' => ['user_email_origin_transport' => 'sample_transport']], $containerBuilder);
+        $extension = new OroImapExtension();
+        $extension->load(['oro_imap' => ['user_email_origin_transport' => 'sample_transport']], $container);
 
         self::assertEquals(
             'sample_transport',
-            $containerBuilder->getParameter('oro_imap.user_email_origin_transport')
+            $container->getParameter('oro_imap.user_email_origin_transport')
         );
     }
 }

@@ -29,9 +29,6 @@ class ButtonProviderTest extends WebTestCase
     /** @var PhpArrayConfigCacheModifier */
     private $configModifier;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
@@ -49,13 +46,8 @@ class ButtonProviderTest extends WebTestCase
 
     /**
      * @dataProvider stubButtonProvider
-     *
-     * @param callable $findButton
-     * @param callable $isAvailable
-     * @param int $countAll
-     * @param int $countAvailable
      */
-    public function testFindButtons(callable $findButton, callable $isAvailable, $countAll, $countAvailable)
+    public function testFindButtons(callable $findButton, callable $isAvailable, int $countAll, int $countAvailable)
     {
         $config = $this->getConfig('oro_action_test_operation', [self::ROUTE_NAME]);
         $this->setOperationsConfig($config);
@@ -76,17 +68,14 @@ class ButtonProviderTest extends WebTestCase
         $this->assertCount($countAvailable + 1, $buttons);
     }
 
-    /**
-     * @return array
-     */
-    public function stubButtonProvider()
+    public function stubButtonProvider(): array
     {
         $falseCallable = function () {
             return false;
         };
 
         $buttonCallable = function (ButtonInterface $button, ButtonSearchContext $buttonSearchContext) {
-            return $button instanceof ButtonInterface && $buttonSearchContext->getRouteName() === self::ROUTE_NAME;
+            return $buttonSearchContext->getRouteName() === self::ROUTE_NAME;
         };
 
         $twoButtons = function () {
@@ -144,18 +133,12 @@ class ButtonProviderTest extends WebTestCase
         $this->assertInstanceOf(OperationButton::class, $operationButton);
         /** @var ActionData $actionData */
         $actionData = $operationButton->getTemplateData()['actionData'];
-        $this->assertEquals($actionData->get('test'), 'test_value');
+        $this->assertEquals('test_value', $actionData->get('test'));
     }
 
-    /**
-     * @param $name
-     * @param array $routes
-     * @param array $entities
-     * @return array
-     */
-    private function getConfig($name, array $routes = [], array $entities = [])
+    private function getConfig(string $name, array $routes = [], array $entities = []): array
     {
-        $config = [
+        return [
             $name => [
                 'label' => 'test_label',
                 'enabled' => true,
@@ -172,11 +155,9 @@ class ButtonProviderTest extends WebTestCase
                 'for_all_datagrids' => false
             ]
         ];
-
-        return $config;
     }
 
-    private function setOperationsConfig(array $operations)
+    private function setOperationsConfig(array $operations): void
     {
         $config = $this->configProvider->getConfiguration();
         $config['operations'] = $operations;

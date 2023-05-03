@@ -12,11 +12,9 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\BaseContextInitProcessor;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Context\ResultTypeStub;
-use Oro\Component\ChainProcessor\Context;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Suppressing for stubs and mock classes
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
@@ -31,18 +29,6 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);
         $this->processor = new BaseContextInitProcessor($this->workflowManager);
-    }
-
-    public function testIncorrectContext()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Oro\Bundle\WorkflowBundle\Processor\Transition\BaseContextInitProcessor supports only ' .
-            'Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext context, but ' .
-            'Oro\Component\ChainProcessor\Context given.'
-        );
-
-        $this->processor->process(new Context());
     }
 
     public function testTransitionSpecified()
@@ -158,12 +144,6 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->get(TransitionContext::CUSTOM_FORM));
     }
 
-    /**
-     * @param string $workflowName
-     * @param string $transitionName
-     *
-     * @return array [<Workflow>, <Transition>]
-     */
     private function extractWorkflowAndTransition(string $workflowName, string $transitionName): array
     {
         $transition = $this->createMock(Transition::class);

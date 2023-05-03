@@ -83,11 +83,8 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param string|array $submittedData
-     * @param array $expected
      */
-    public function testSubmitEmptyData($submittedData, array $expected)
+    public function testSubmitEmptyData(string|array $submittedData, array $expected)
     {
         $form = $this->factory->create(RoleMultiSelectType::class, null, ['entity_class' => Role::class]);
         $form->submit($submittedData);
@@ -110,7 +107,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $searchHandler = $this->createMock(SearchHandlerInterface::class);
         $searchHandler->expects($this->any())
@@ -123,16 +120,14 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
             ->with('roles')
             ->willReturn($searchHandler);
 
-        $configProvider = $this->createMock(ConfigProvider::class);
-
         return [
             new PreloadedExtension(
                 [
                     $this->formType,
-                    OroJquerySelect2HiddenType::class => new OroJquerySelect2HiddenType(
+                    new OroJquerySelect2HiddenType(
                         $this->em,
                         $searchRegistry,
-                        $configProvider
+                        $this->createMock(ConfigProvider::class)
                     )
                 ],
                 []

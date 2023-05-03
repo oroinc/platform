@@ -9,9 +9,11 @@ define(['underscore', 'backgrid', 'oroui/js/tools/text-util'
      * @class   orodatagrid.datagrid.formatter.CellFormatter
      * @extends Backgrid.CellFormatter
      */
-    const CellFormatter = function() {};
+    const CellFormatter = function() {
+        Backgrid.CellFormatter.call(this);
+    };
 
-    CellFormatter.prototype = new Backgrid.CellFormatter();
+    CellFormatter.prototype = Object.create(Backgrid.CellFormatter.prototype);
 
     _.extend(CellFormatter.prototype, {
         /**

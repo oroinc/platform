@@ -27,7 +27,7 @@ class FiltersConfigLoader extends AbstractConfigLoader
     /**
      * {@inheritdoc}
      */
-    public function load(array $config)
+    public function load(array $config): mixed
     {
         $filters = new FiltersConfig();
         foreach ($config as $key => $value) {
@@ -41,7 +41,7 @@ class FiltersConfigLoader extends AbstractConfigLoader
         return $filters;
     }
 
-    protected function loadFields(FiltersConfig $filters, array $fields = null)
+    private function loadFields(FiltersConfig $filters, ?array $fields): void
     {
         if (!empty($fields)) {
             foreach ($fields as $name => $config) {
@@ -50,12 +50,7 @@ class FiltersConfigLoader extends AbstractConfigLoader
         }
     }
 
-    /**
-     * @param array|null $config
-     *
-     * @return FilterFieldConfig
-     */
-    protected function loadField(array $config = null)
+    private function loadField(?array $config): FilterFieldConfig
     {
         $filter = new FilterFieldConfig();
         if (!empty($config)) {

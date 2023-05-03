@@ -46,9 +46,8 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
     {
         $classes = $message->getBody();
 
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            ReindexTopic::getName(),
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
             function (JobRunner $jobRunner) use ($classes) {
                 $entityClasses = $this->getClassesForReindex($classes);
 

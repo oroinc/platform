@@ -41,11 +41,11 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnBuildBefore(): void
     {
         $datagridConfiguration = $this->getStubConfiguration();
-        $mockEvent = $this->createMock(BuildBefore::class);
-        $mockEvent->expects($this->atLeastOnce())
+        $event = $this->createMock(BuildBefore::class);
+        $event->expects($this->atLeastOnce())
             ->method('getConfig')
             ->willReturn($datagridConfiguration);
-        $this->listener->onBuildBefore($mockEvent);
+        $this->listener->onBuildBefore($event);
 
         //Verify Step Name Column
         $this->assertEquals(
@@ -113,8 +113,6 @@ class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return DatagridConfiguration
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     private function getStubConfiguration(): DatagridConfiguration

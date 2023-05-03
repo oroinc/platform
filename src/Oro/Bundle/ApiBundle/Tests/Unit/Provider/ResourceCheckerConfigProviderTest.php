@@ -10,13 +10,13 @@ class ResourceCheckerConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    private string $cacheFile;
     private ResourceCheckerConfigProvider $provider;
 
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('ResourceCheckerConfigProvider');
-        $this->provider = new ResourceCheckerConfigProvider($this->cacheFile);
+        $this->provider = new ResourceCheckerConfigProvider(
+            $this->getTempFile('ResourceCheckerConfigProvider')
+        );
     }
 
     private function buildCache(): void

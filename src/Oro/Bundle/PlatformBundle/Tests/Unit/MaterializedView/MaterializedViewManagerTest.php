@@ -21,17 +21,23 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private MaterializedViewByQueryFactory|\PHPUnit\Framework\MockObject\MockObject $materializedViewByQueryFactory;
+    /** @var MaterializedViewByQueryFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $materializedViewByQueryFactory;
 
-    private MaterializedViewSchemaManager|\PHPUnit\Framework\MockObject\MockObject $materializedViewSchemaManager;
+    /** @var MaterializedViewSchemaManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $materializedViewSchemaManager;
 
+    /** @var MaterializedViewEntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityRepository;
+
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
+
+    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
+    private $unitOfWork;
+
+    /** @var MaterializedViewManager */
     private MaterializedViewManager $manager;
-
-    private MaterializedViewEntityRepository|\PHPUnit\Framework\MockObject\MockObject $entityRepository;
-
-    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
-
-    private UnitOfWork|\PHPUnit\Framework\MockObject\MockObject $unitOfWork;
 
     protected function setUp(): void
     {
@@ -51,36 +57,30 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->entityRepository = $this->createMock(MaterializedViewEntityRepository::class);
         $this->entityManager = $this->createMock(EntityManager::class);
-        $managerRegistry
-            ->expects(self::any())
+        $managerRegistry->expects(self::any())
             ->method('getManagerForClass')
             ->with(MaterializedViewEntity::class)
             ->willReturn($this->entityManager);
 
-        $managerRegistry
-            ->expects(self::any())
+        $managerRegistry->expects(self::any())
             ->method('getRepository')
             ->with(MaterializedViewEntity::class)
             ->willReturn($this->entityRepository);
 
         $configuration = $this->createMock(Configuration::class);
-        $configuration
-            ->expects(self::any())
+        $configuration->expects(self::any())
             ->method('getDefaultQueryHints')
             ->willReturn([]);
-        $configuration
-            ->expects(self::any())
+        $configuration->expects(self::any())
             ->method('isSecondLevelCacheEnabled')
             ->willReturn(false);
 
-        $this->entityManager
-            ->expects(self::any())
+        $this->entityManager->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($configuration);
 
         $this->unitOfWork = $this->createMock(UnitOfWork::class);
-        $this->entityManager
-            ->expects(self::any())
+        $this->entityManager->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($this->unitOfWork);
     }
@@ -88,8 +88,7 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
     public function testCreateByQueryWhenAlreadyExists(): void
     {
         $name = 'already_existing';
-        $this->entityRepository
-            ->expects(self::once())
+        $this->entityRepository->expects(self::once())
             ->method('findOneBy')
             ->with(['name' => $name])
             ->willReturn(new MaterializedViewEntity());
@@ -104,28 +103,24 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateByQuery(?string $name, bool $withData): void
     {
-        $this->entityRepository
-            ->expects(self::once())
+        $this->entityRepository->expects(self::once())
             ->method('findOneBy')
             ->willReturn(null);
 
         $query = new Query($this->entityManager);
 
-        $this->materializedViewByQueryFactory
-            ->expects(self::once())
+        $this->materializedViewByQueryFactory->expects(self::once())
             ->method('createByQuery')
             ->with($query, self::isType('string'), $withData)
             ->willReturnCallback(function (Query $query, ?string $name, bool $withData) use (&$generatedName) {
                 $materializedViewModel = new MaterializedView($name, 'SELECT 1', $withData);
                 $generatedName = $name;
 
-                $this->materializedViewSchemaManager
-                    ->expects(self::once())
+                $this->materializedViewSchemaManager->expects(self::once())
                     ->method('create')
                     ->with($materializedViewModel);
 
-                $this->loggerMock
-                    ->expects(self::once())
+                $this->loggerMock->expects(self::once())
                     ->method('info')
                     ->with(
                         'Created materialized view {name} (with data: {withData}) from ORM query.',
@@ -138,13 +133,11 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
                 return $materializedViewModel;
             });
 
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('persist')
             ->with(self::isInstanceOf(MaterializedViewEntity::class));
 
-        $this->unitOfWork
-            ->expects(self::once())
+        $this->unitOfWork->expects(self::once())
             ->method('commit')
             ->with(self::isInstanceOf(MaterializedViewEntity::class));
 
@@ -165,18 +158,15 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
     public function testDeleteWhenNotExists(): void
     {
         $name = 'sample_name';
-        $this->materializedViewSchemaManager
-            ->expects(self::once())
+        $this->materializedViewSchemaManager->expects(self::once())
             ->method('drop')
             ->with($name);
 
-        $this->entityRepository
-            ->expects(self::once())
+        $this->entityRepository->expects(self::once())
             ->method('findOneBy')
             ->willReturn(null);
 
-        $this->entityManager
-            ->expects(self::never())
+        $this->entityManager->expects(self::never())
             ->method(self::anything());
 
         $this->manager->delete($name);
@@ -185,29 +175,24 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
     public function testDelete(): void
     {
         $name = 'sample_name';
-        $this->materializedViewSchemaManager
-            ->expects(self::once())
+        $this->materializedViewSchemaManager->expects(self::once())
             ->method('drop')
             ->with($name);
 
         $materializedViewEntity = new MaterializedViewEntity();
-        $this->entityRepository
-            ->expects(self::once())
+        $this->entityRepository->expects(self::once())
             ->method('findOneBy')
             ->willReturn($materializedViewEntity);
 
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('remove')
             ->with($materializedViewEntity);
 
-        $this->unitOfWork
-            ->expects(self::once())
+        $this->unitOfWork->expects(self::once())
             ->method('commit')
             ->with($materializedViewEntity);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('info')
             ->with('Deleted materialized view {name}', ['name' => $name]);
 
@@ -217,8 +202,7 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
     public function testRefreshWhenNotExists(): void
     {
         $name = 'sample_name';
-        $this->entityRepository
-            ->expects(self::once())
+        $this->entityRepository->expects(self::once())
             ->method('findOneBy')
             ->with(['name' => $name])
             ->willReturn(null);
@@ -237,31 +221,26 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
         $materializedViewEntity = (new MaterializedViewEntity())
             ->setName($name);
 
-        $this->entityRepository
-            ->expects(self::once())
+        $this->entityRepository->expects(self::once())
             ->method('findOneBy')
             ->with(['name' => $name])
             ->willReturn($materializedViewEntity);
 
-        $this->materializedViewSchemaManager
-            ->expects(self::once())
+        $this->materializedViewSchemaManager->expects(self::once())
             ->method('refresh')
             ->with($name, $concurrently, $withData);
 
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('persist')
             ->willReturnCallback(function (MaterializedViewEntity $entity) use ($withData) {
                 self::assertEquals($withData, $entity->isWithData());
             });
 
-        $this->unitOfWork
-            ->expects(self::once())
+        $this->unitOfWork->expects(self::once())
             ->method('commit')
             ->with(self::isInstanceOf(MaterializedViewEntity::class));
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('info')
             ->with('Refreshed materialized view {name} (with data: {withData})', [
                 'name' => $name,
@@ -285,8 +264,7 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
     public function testFindByNameWhenNotFound(): void
     {
         $name = 'sample_name';
-        $this->entityRepository
-            ->expects(self::once())
+        $this->entityRepository->expects(self::once())
             ->method('findOneBy')
             ->with(['name' => $name])
             ->willReturn(null);
@@ -300,8 +278,7 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
         $materializedViewEntity = (new MaterializedViewEntity())
             ->setName($name);
 
-        $this->entityRepository
-            ->expects(self::once())
+        $this->entityRepository->expects(self::once())
             ->method('findOneBy')
             ->with(['name' => $name])
             ->willReturn($materializedViewEntity);

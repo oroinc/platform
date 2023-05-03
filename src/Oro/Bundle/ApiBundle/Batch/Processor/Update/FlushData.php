@@ -19,15 +19,12 @@ class FlushData implements ProcessorInterface
 {
     public const OPERATION_NAME = 'flush_data';
 
-    private const NO_ERRORS       = 0;
-    private const HAS_ERRORS      = 1;
+    private const NO_ERRORS = 0;
+    private const HAS_ERRORS = 1;
     private const FLUSH_EXCEPTION = 2;
 
-    /** @var BatchFlushDataHandlerFactoryRegistry */
-    private $flushDataHandlerFactoryRegistry;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private BatchFlushDataHandlerFactoryRegistry $flushDataHandlerFactoryRegistry;
+    private LoggerInterface $logger;
 
     public function __construct(
         BatchFlushDataHandlerFactoryRegistry $flushDataHandlerFactoryRegistry,
@@ -41,7 +38,7 @@ class FlushData implements ProcessorInterface
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */
 
@@ -132,7 +129,7 @@ class FlushData implements ProcessorInterface
                     ]
                 );
             }
-            if (count($items) === 1) {
+            if (\count($items) === 1) {
                 $item = reset($items);
                 if ($isUniqueConstraintViolationException) {
                     $item->getContext()->addError(
@@ -179,10 +176,7 @@ class FlushData implements ProcessorInterface
     {
         $flushHandler = $this->flushDataHandlerFactoryRegistry->getFactory($entityClass)->createHandler($entityClass);
         if (null === $flushHandler) {
-            throw new \LogicException(sprintf(
-                'The flush data handler is not registered for %s.',
-                $entityClass
-            ));
+            throw new \LogicException(sprintf('The flush data handler is not registered for %s.', $entityClass));
         }
 
         return $flushHandler;

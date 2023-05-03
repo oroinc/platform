@@ -14,7 +14,7 @@ abstract class AbstractProcessor implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var NormalizeValueContext $context */
 
@@ -28,23 +28,19 @@ abstract class AbstractProcessor implements ProcessorInterface
 
     /**
      * Gets a human-readable representation of a data-type this normalization processor works with.
-     *
-     * @return string
      */
-    abstract protected function getDataTypeString();
+    abstract protected function getDataTypeString(): string;
 
     /**
      * Gets a human-readable representation in plural of a data-type this normalization processor works with.
-     *
-     * @return string
      */
-    abstract protected function getDataTypePluralString();
+    abstract protected function getDataTypePluralString(): string;
 
     /**
      * Adds to the context a regular expression that can be used to validate a value
      * of a data-type this processor works with.
      */
-    protected function processRequirement(NormalizeValueContext $context)
+    protected function processRequirement(NormalizeValueContext $context): void
     {
         if ($context->isArrayAllowed()) {
             $requirement = $this->getArrayRequirement($context->getArrayDelimiter());
@@ -63,31 +59,21 @@ abstract class AbstractProcessor implements ProcessorInterface
 
     /**
      * Gets a requirement for a single value.
-     *
-     * @return string
      */
-    abstract protected function getRequirement();
+    abstract protected function getRequirement(): string;
 
     /**
      * Gets a requirement for a list of values.
-     *
-     * @param string $arrayDelimiter
-     *
-     * @return string
      */
-    protected function getArrayRequirement($arrayDelimiter)
+    protected function getArrayRequirement(string $arrayDelimiter): string
     {
         return sprintf('%1$s(%2$s%1$s)*', $this->getRequirement(), $arrayDelimiter);
     }
 
     /**
      * Gets a requirement for a pair of "from" and "to" values.
-     *
-     * @param string $rangeDelimiter
-     *
-     * @return string
      */
-    protected function getRangeRequirement($rangeDelimiter)
+    protected function getRangeRequirement(string $rangeDelimiter): string
     {
         return sprintf('%1$s%2$s%1$s', $this->getRequirement(), $rangeDelimiter);
     }
@@ -95,7 +81,7 @@ abstract class AbstractProcessor implements ProcessorInterface
     /**
      * Does a value normalization (conversion to a concrete data-type) if needed.
      */
-    protected function processNormalization(NormalizeValueContext $context)
+    protected function processNormalization(NormalizeValueContext $context): void
     {
         $value = $context->getResult();
         if (null !== $value && $this->isValueNormalizationRequired($value)) {
@@ -113,30 +99,19 @@ abstract class AbstractProcessor implements ProcessorInterface
 
     /**
      * Checks whether the given value need to be converted to a data-type this processor works with.
-     *
-     * @param mixed $value
-     *
-     * @return bool
      */
-    protected function isValueNormalizationRequired($value)
+    protected function isValueNormalizationRequired(mixed $value): bool
     {
-        return is_string($value);
+        return \is_string($value);
     }
 
-    /**
-     * @param string $value
-     * @param string $arrayDelimiter
-     *
-     * @return mixed
-     * @throws \Exception
-     */
-    protected function normalizeArrayValue($value, $arrayDelimiter)
+    protected function normalizeArrayValue(string $value, string $arrayDelimiter): mixed
     {
         $values = explode($arrayDelimiter, $value);
         try {
             $normalizedValue = $this->normalizeValues($values);
         } catch (\Exception $e) {
-            if (count($values) === 1) {
+            if (\count($values) === 1) {
                 throw $e;
             }
             throw new \UnexpectedValueException(
@@ -146,21 +121,14 @@ abstract class AbstractProcessor implements ProcessorInterface
             );
         }
 
-        if (count($normalizedValue) === 1) {
+        if (\count($normalizedValue) === 1) {
             $normalizedValue = reset($normalizedValue);
         }
 
         return $normalizedValue;
     }
 
-    /**
-     * @param string $value
-     * @param string $rangeDelimiter
-     *
-     * @return Range
-     * @throws \Exception
-     */
-    protected function normalizeRangeValue($value, $rangeDelimiter)
+    protected function normalizeRangeValue(string $value, string $rangeDelimiter): Range
     {
         $delimiterPos = strpos($value, $rangeDelimiter);
         $values = [
@@ -186,31 +154,20 @@ abstract class AbstractProcessor implements ProcessorInterface
         return new Range($normalizedValues[0], $normalizedValues[1]);
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    abstract protected function normalizeValue($value);
+    abstract protected function normalizeValue(mixed $value): mixed;
 
-    /**
-     * @param string $value
-     */
-    protected function validateValue($value)
+    protected function validateValue(string $value): void
     {
         if (!preg_match('/^' . $this->getRequirement() . '$/', $value)) {
-            throw new \UnexpectedValueException(
-                sprintf('Expected %s value. Given "%s".', $this->getDataTypeString(), $value)
-            );
+            throw new \UnexpectedValueException(sprintf(
+                'Expected %s value. Given "%s".',
+                $this->getDataTypeString(),
+                $value
+            ));
         }
     }
 
-    /**
-     * @param array $values
-     *
-     * @return array
-     */
-    protected function normalizeValues(array $values)
+    protected function normalizeValues(array $values): array
     {
         $normalizedValues = [];
         foreach ($values as $key => $val) {

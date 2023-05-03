@@ -128,7 +128,7 @@ class MetadataProviderTest extends \PHPUnit\Framework\TestCase
         $result = $this->metadataProvider->getMetadata($className, $version, $requestType, $config);
         self::assertNull($result);
 
-        // test that the metadata is cached even if does not exist
+        // test that the metadata is cached even if it does not exist
         $anotherResult = $this->metadataProvider->getMetadata($className, $version, $requestType, $config);
         self::assertNull($anotherResult);
     }

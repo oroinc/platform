@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class AssociationChoiceTypeTest extends AssociationTypeTestCase
@@ -14,7 +15,7 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getFormType()
+    protected function getFormType(): AbstractType
     {
         $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $entityClassResolver->expects($this->any())
@@ -58,9 +59,9 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
         ];
     }
 
-    public function testGetName()
+    public function testGetBlockPrefix()
     {
-        $this->assertEquals('oro_entity_extend_association_choice', $this->getFormType()->getName());
+        $this->assertEquals('oro_entity_extend_association_choice', $this->getFormType()->getBlockPrefix());
     }
 
     public function testGetParent()

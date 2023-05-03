@@ -474,7 +474,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * Assert main menu item existing
      *
-     * @Given /^(?:|I )should(?P<negotiation>(\s| not ))see (?P<path>[\/\w\s]+) in main menu$/
+     * @Given /^(?:|I )should(?P<negotiation>(\s| not ))see (?P<path>[\/\w\s\&]+) in main menu$/
      */
     public function iShouldSeeOrNotInMainMenu($negotiation, $path)
     {
@@ -507,7 +507,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iClickLinkInMenuTree($record)
     {
-        $menuTree = $this->createElement('MenuTree');
+        $menuTree = $this->createElement('Sidebar Menu Tree');
         self::assertTrue($menuTree->isValid());
         $menuTree->clickLink($record);
     }

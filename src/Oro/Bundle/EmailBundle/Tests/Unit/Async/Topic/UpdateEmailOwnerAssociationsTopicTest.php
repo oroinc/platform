@@ -50,4 +50,12 @@ class UpdateEmailOwnerAssociationsTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro.email.update_email_owner_associations:class:'.md5(implode(',', ['42', '142'])),
+            $this->getTopic()->createJobName(['ownerClass' => 'class', 'ownerIds' => ['42', '142']])
+        );
+    }
 }

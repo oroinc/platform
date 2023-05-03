@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -27,7 +27,7 @@ class FileListener
 
     public function prePersist(File $entity, LifecycleEventArgs $args)
     {
-        $entityManager = $args->getEntityManager();
+        $entityManager = $args->getObjectManager();
 
         if ($entity->isEmptyFile() && $entityManager->contains($entity)) {
             // Skips updates if file is going to be deleted.
@@ -57,7 +57,7 @@ class FileListener
 
     public function postPersist(File $entity, LifecycleEventArgs $args)
     {
-        $entityManager = $args->getEntityManager();
+        $entityManager = $args->getObjectManager();
 
         // Delete File if it is marked for deletion and new file is not provided.
         if ($entity->isEmptyFile() && !$entity->getFile()) {

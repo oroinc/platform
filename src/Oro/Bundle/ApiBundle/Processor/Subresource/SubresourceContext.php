@@ -41,19 +41,14 @@ class SubresourceContext extends Context
     /** metadata of the parent entity */
     private const PARENT_METADATA = 'parentMetadata';
 
-    /** @var mixed */
-    private $parentId;
-
-    /** @var ConfigExtraCollection|null */
-    private $parentConfigExtras;
-
-    /** @var MetadataExtraCollection|null */
-    private $parentMetadataExtras;
+    private mixed $parentId = null;
+    private ?ConfigExtraCollection $parentConfigExtras = null;
+    private ?MetadataExtraCollection $parentMetadataExtras = null;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         parent::initialize();
         $this->set(self::COLLECTION, false);
@@ -61,80 +56,72 @@ class SubresourceContext extends Context
 
     /**
      * Gets FQCN of the parent entity.
-     *
-     * @return string
      */
-    public function getParentClassName()
+    public function getParentClassName(): ?string
     {
         return $this->get(self::PARENT_CLASS_NAME);
     }
 
     /**
      * Sets FQCN of the parent entity.
-     *
-     * @param string $parentClassName
      */
-    public function setParentClassName($parentClassName)
+    public function setParentClassName(?string $parentClassName): void
     {
-        $this->set(self::PARENT_CLASS_NAME, $parentClassName);
+        if (null === $parentClassName) {
+            $this->remove(self::PARENT_CLASS_NAME);
+        } else {
+            $this->set(self::PARENT_CLASS_NAME, $parentClassName);
+        }
     }
 
     /**
      * Gets an identifier of the parent entity.
-     *
-     * @return mixed
      */
-    public function getParentId()
+    public function getParentId(): mixed
     {
         return $this->parentId;
     }
 
     /**
      * Sets an identifier of the parent entity.
-     *
-     * @param mixed $parentId
      */
-    public function setParentId($parentId)
+    public function setParentId(mixed $parentId): void
     {
         $this->parentId = $parentId;
     }
 
     /**
      * Gets the association name the sub-resource represents.
-     *
-     * @return string
      */
-    public function getAssociationName()
+    public function getAssociationName(): ?string
     {
         return $this->get(self::ASSOCIATION);
     }
 
     /**
      * Sets the association name the sub-resource represents.
-     *
-     * @param string $associationName
      */
-    public function setAssociationName($associationName)
+    public function setAssociationName(?string $associationName): void
     {
-        $this->set(self::ASSOCIATION, $associationName);
+        if (null === $associationName) {
+            $this->remove(self::ASSOCIATION);
+        } else {
+            $this->set(self::ASSOCIATION, $associationName);
+        }
     }
 
     /**
      * Whether an association represents "to-many" or "to-one" relationship.
-     *
-     * @return bool
      */
-    public function isCollection()
+    public function isCollection(): bool
     {
         return (bool)$this->get(self::COLLECTION);
     }
 
     /**
      * Sets a flag indicates whether an association represents "to-many" or "to-one" relationship.
-     *
-     * @param bool $value TRUE for "to-many" relationship, FALSE for "to-one" relationship
      */
-    public function setIsCollection($value)
+    public function setIsCollection(bool $value): void
     {
         $this->set(self::COLLECTION, $value);
     }
@@ -145,10 +132,8 @@ class SubresourceContext extends Context
      * the target class will be Oro\Bundle\ApiBundle\Model\EntityIdentifier
      * and the base target class will be a mapped superclass
      * or a parent class for table inheritance association.
-     *
-     * @return string|null
      */
-    public function getAssociationBaseTargetClassName()
+    public function getAssociationBaseTargetClassName(): ?string
     {
         $parentMetadata = $this->getParentMetadata();
         if (null === $parentMetadata) {
@@ -163,19 +148,16 @@ class SubresourceContext extends Context
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getManageableEntityClass(DoctrineHelper $doctrineHelper)
+    public function getManageableEntityClass(DoctrineHelper $doctrineHelper): ?string
     {
         $entityClass = $this->getClassName();
         if (is_a($entityClass, EntityIdentifier::class, true)) {
             $entityClass = $this->getAssociationBaseTargetClassName();
         }
         if ($entityClass) {
-            $entityClass = $doctrineHelper->getManageableEntityClass(
-                $entityClass,
-                $this->getConfig()
-            );
+            $entityClass = $doctrineHelper->getManageableEntityClass($entityClass, $this->getConfig());
         }
 
         return $entityClass;
@@ -185,12 +167,8 @@ class SubresourceContext extends Context
      * Returns the parent class of API resource if it is a manageable entity;
      * otherwise, checks if the parent API resource is based on a manageable entity, and if so,
      * returns the class name of this entity.
-     *
-     * @param DoctrineHelper $doctrineHelper
-     *
-     * @return string|null
      */
-    public function getManageableParentEntityClass(DoctrineHelper $doctrineHelper)
+    public function getManageableParentEntityClass(DoctrineHelper $doctrineHelper): ?string
     {
         return $doctrineHelper->getManageableEntityClass(
             $this->getParentClassName(),
@@ -203,7 +181,7 @@ class SubresourceContext extends Context
      *
      * @return ConfigExtraInterface[]
      */
-    public function getParentConfigExtras()
+    public function getParentConfigExtras(): array
     {
         $this->ensureParentConfigExtrasInitialized();
 
@@ -217,7 +195,7 @@ class SubresourceContext extends Context
      *
      * @throws \InvalidArgumentException if $extras has invalid elements
      */
-    public function setParentConfigExtras(array $extras)
+    public function setParentConfigExtras(array $extras): void
     {
         if (empty($extras)) {
             $this->parentConfigExtras = null;
@@ -234,12 +212,8 @@ class SubresourceContext extends Context
 
     /**
      * Checks whether some configuration data of the parent entity is requested.
-     *
-     * @param string $extraName
-     *
-     * @return bool
      */
-    public function hasParentConfigExtra($extraName)
+    public function hasParentConfigExtra(string $extraName): bool
     {
         $this->ensureParentConfigExtrasInitialized();
 
@@ -248,12 +222,8 @@ class SubresourceContext extends Context
 
     /**
      * Gets a request for configuration data of the parent entity by its name.
-     *
-     * @param string $extraName
-     *
-     * @return ConfigExtraInterface|null
      */
-    public function getParentConfigExtra($extraName)
+    public function getParentConfigExtra(string $extraName): ?ConfigExtraInterface
     {
         $this->ensureParentConfigExtrasInitialized();
 
@@ -265,7 +235,7 @@ class SubresourceContext extends Context
      *
      * @throws \InvalidArgumentException if a config extra with the same name already exists
      */
-    public function addParentConfigExtra(ConfigExtraInterface $extra)
+    public function addParentConfigExtra(ConfigExtraInterface $extra): void
     {
         $this->ensureParentConfigExtrasInitialized();
         $this->parentConfigExtras->addConfigExtra($extra);
@@ -273,19 +243,17 @@ class SubresourceContext extends Context
 
     /**
      * Removes a request for some configuration data of the parent entity.
-     *
-     * @param string $extraName
      */
-    public function removeParentConfigExtra($extraName)
+    public function removeParentConfigExtra(string $extraName): void
     {
         $this->ensureParentConfigExtrasInitialized();
         $this->parentConfigExtras->removeConfigExtra($extraName);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setHateoas(bool $flag)
+    public function setHateoas(bool $flag): void
     {
         parent::setHateoas($flag);
         if (null !== $this->parentConfigExtras) {
@@ -306,20 +274,16 @@ class SubresourceContext extends Context
 
     /**
      * Checks whether a configuration of the parent entity exists.
-     *
-     * @return bool
      */
-    public function hasParentConfig()
+    public function hasParentConfig(): bool
     {
         return $this->has(self::PARENT_CONFIG);
     }
 
     /**
      * Gets a configuration of the parent entity.
-     *
-     * @return EntityDefinitionConfig|null
      */
-    public function getParentConfig()
+    public function getParentConfig(): ?EntityDefinitionConfig
     {
         if (!$this->has(self::PARENT_CONFIG)) {
             $this->loadParentConfig();
@@ -331,7 +295,7 @@ class SubresourceContext extends Context
     /**
      * Sets a configuration of the parent entity.
      */
-    public function setParentConfig(EntityDefinitionConfig $definition = null)
+    public function setParentConfig(?EntityDefinitionConfig $definition): void
     {
         if ($definition) {
             $this->set(self::PARENT_CONFIG, $definition);
@@ -345,9 +309,9 @@ class SubresourceContext extends Context
      *
      * @return ConfigExtraInterface[]
      */
-    protected function createParentConfigExtras()
+    protected function createParentConfigExtras(): array
     {
-        $extras = [new EntityDefinitionConfigExtra($this->getAction())];
+        $extras = [new EntityDefinitionConfigExtra($this->get(self::ACTION))];
         if ($this->isHateoasEnabled()) {
             $extras[] = new HateoasConfigExtra();
         }
@@ -358,7 +322,7 @@ class SubresourceContext extends Context
     /**
      * Makes sure that a list of requests for configuration data of the parent entity is initialized.
      */
-    private function ensureParentConfigExtrasInitialized()
+    private function ensureParentConfigExtrasInitialized(): void
     {
         if (null === $this->parentConfigExtras) {
             $this->parentConfigExtras = new ConfigExtraCollection();
@@ -369,10 +333,10 @@ class SubresourceContext extends Context
     /**
      * Loads the parent entity configuration.
      */
-    protected function loadParentConfig()
+    protected function loadParentConfig(): void
     {
-        $parentEntityClass = $this->getParentClassName();
-        if (empty($parentEntityClass)) {
+        $parentEntityClass = $this->get(self::PARENT_CLASS_NAME);
+        if (!$parentEntityClass) {
             $this->set(self::PARENT_CONFIG, null);
 
             throw new RuntimeException(
@@ -395,7 +359,7 @@ class SubresourceContext extends Context
      *
      * @return MetadataExtraInterface[]
      */
-    public function getParentMetadataExtras()
+    public function getParentMetadataExtras(): array
     {
         $this->ensureParentMetadataExtrasInitialized();
 
@@ -409,7 +373,7 @@ class SubresourceContext extends Context
      *
      * @throws \InvalidArgumentException if $extras has invalid elements
      */
-    public function setParentMetadataExtras(array $extras)
+    public function setParentMetadataExtras(array $extras): void
     {
         if (empty($extras)) {
             $this->parentMetadataExtras = null;
@@ -428,20 +392,16 @@ class SubresourceContext extends Context
 
     /**
      * Checks whether metadata of the parent entity exists.
-     *
-     * @return bool
      */
-    public function hasParentMetadata()
+    public function hasParentMetadata(): bool
     {
         return $this->has(self::PARENT_METADATA);
     }
 
     /**
      * Gets metadata of the parent entity.
-     *
-     * @return EntityMetadata|null
      */
-    public function getParentMetadata()
+    public function getParentMetadata(): ?EntityMetadata
     {
         if (!$this->has(self::PARENT_METADATA)) {
             $this->loadParentMetadata();
@@ -453,7 +413,7 @@ class SubresourceContext extends Context
     /**
      * Sets metadata of the parent entity.
      */
-    public function setParentMetadata(?EntityMetadata $metadata)
+    public function setParentMetadata(?EntityMetadata $metadata): void
     {
         if ($metadata) {
             $this->set(self::PARENT_METADATA, $metadata);
@@ -467,10 +427,10 @@ class SubresourceContext extends Context
      *
      * @return MetadataExtraInterface[]
      */
-    protected function createParentMetadataExtras()
+    protected function createParentMetadataExtras(): array
     {
         $extras = [];
-        $action = $this->getAction();
+        $action = $this->get(self::ACTION);
         if ($action) {
             $extras[] = new ActionMetadataExtra($action);
         }
@@ -484,7 +444,7 @@ class SubresourceContext extends Context
     /**
      * Makes sure that a list of requests for additional metadata info of the parent entity is initialized.
      */
-    private function ensureParentMetadataExtrasInitialized()
+    private function ensureParentMetadataExtrasInitialized(): void
     {
         if (null === $this->parentMetadataExtras) {
             $this->parentMetadataExtras = new MetadataExtraCollection();
@@ -495,10 +455,10 @@ class SubresourceContext extends Context
     /**
      * Loads the parent entity metadata.
      */
-    protected function loadParentMetadata()
+    protected function loadParentMetadata(): void
     {
-        $parentEntityClass = $this->getParentClassName();
-        if (empty($parentEntityClass)) {
+        $parentEntityClass = $this->get(self::PARENT_CLASS_NAME);
+        if (!$parentEntityClass) {
             $this->set(self::PARENT_METADATA, null);
 
             return;

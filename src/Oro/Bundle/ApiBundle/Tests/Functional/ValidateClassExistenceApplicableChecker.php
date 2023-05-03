@@ -7,15 +7,14 @@ use Oro\Component\ChainProcessor\ContextInterface;
 
 class ValidateClassExistenceApplicableChecker implements ApplicableCheckerInterface
 {
-    /** @var array */
-    private $classAttributes = ['class', 'parentClass'];
+    private const CLASS_ATTRIBUTES = ['class', 'parentClass'];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isApplicable(ContextInterface $context, array $processorAttributes)
+    public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
-        foreach ($this->classAttributes as $attributeName) {
+        foreach (self::CLASS_ATTRIBUTES as $attributeName) {
             if (isset($processorAttributes[$attributeName])
                 && !class_exists($processorAttributes[$attributeName])
             ) {

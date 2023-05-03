@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\SidebarBundle\Controller\Api\Rest\SidebarController;
-use Oro\Bundle\SidebarBundle\Controller\Api\Rest\WidgetController;
 use Oro\Bundle\SidebarBundle\DependencyInjection\OroSidebarExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -16,6 +14,7 @@ class OroSidebarExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroSidebarExtension();
         $extension->load([], $container);
 
+        self::assertNotEmpty($container->getDefinitions());
         self::assertEquals(
             [
                 [
@@ -28,7 +27,5 @@ class OroSidebarExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             $container->getExtensionConfig('oro_sidebar')
         );
-        self::assertTrue($container->hasDefinition(SidebarController::class));
-        self::assertTrue($container->hasDefinition(WidgetController::class));
     }
 }

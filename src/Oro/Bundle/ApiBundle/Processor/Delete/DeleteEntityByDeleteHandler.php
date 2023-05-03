@@ -14,11 +14,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class DeleteEntityByDeleteHandler implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityDeleteHandlerRegistry */
-    private $deleteHandlerRegistry;
+    private DoctrineHelper $doctrineHelper;
+    private EntityDeleteHandlerRegistry $deleteHandlerRegistry;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -31,7 +28,7 @@ class DeleteEntityByDeleteHandler implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -51,16 +48,12 @@ class DeleteEntityByDeleteHandler implements ProcessorInterface
         $context->removeResult();
     }
 
-    /**
-     * @param mixed                        $data
-     * @param EntityDeleteHandlerInterface $handler
-     */
-    private function processDelete($data, EntityDeleteHandlerInterface $handler)
+    private function processDelete(mixed $data, EntityDeleteHandlerInterface $handler): void
     {
         if (!\is_object($data)) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The result property of the context should be an object, "%s" given.',
-                \is_object($data) ? \get_class($data) : \gettype($data)
+                get_debug_type($data)
             ));
         }
 

@@ -3,27 +3,44 @@
 namespace Oro\Bundle\DashboardBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Types;
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class OroDashboardBundleInstaller implements Installation
+class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareInterface
 {
+    private ExtendExtension $extendExtension;
+
     /**
      * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
+        return 'v1_8';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function setExtendExtension(ExtendExtension $extendExtension): void
+    {
+        $this->extendExtension = $extendExtension;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroDashboardActiveTable($schema);
@@ -36,12 +53,14 @@ class OroDashboardBundleInstaller implements Installation
         $this->addOroDashboardForeignKeys($schema);
         $this->addOroDashboardWidgetForeignKeys($schema);
         $this->addOroDashboardWidgetStateForeignKeys($schema);
+
+        $this->addDashboardTypeEnumField($schema, $queries);
     }
 
     /**
      * Create oro_dashboard_active table
      */
-    protected function createOroDashboardActiveTable(Schema $schema)
+    protected function createOroDashboardActiveTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_dashboard_active');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -57,7 +76,7 @@ class OroDashboardBundleInstaller implements Installation
     /**
      * Create oro_dashboard table
      */
-    protected function createOroDashboardTable(Schema $schema)
+    protected function createOroDashboardTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_dashboard');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -77,7 +96,7 @@ class OroDashboardBundleInstaller implements Installation
     /**
      * Create oro_dashboard_widget table
      */
-    protected function createOroDashboardWidgetTable(Schema $schema)
+    protected function createOroDashboardWidgetTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_dashboard_widget');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -92,7 +111,7 @@ class OroDashboardBundleInstaller implements Installation
     /**
      * Create oro_dashboard_widget_state table
      */
-    protected function createOroDashboardWidgetStateTable(Schema $schema)
+    protected function createOroDashboardWidgetStateTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_dashboard_widget_state');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -107,7 +126,7 @@ class OroDashboardBundleInstaller implements Installation
     /**
      * Add oro_dashboard_active foreign keys.
      */
-    protected function addOroDashboardActiveForeignKeys(Schema $schema)
+    protected function addOroDashboardActiveForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_dashboard_active');
         $table->addForeignKeyConstraint(
@@ -133,7 +152,7 @@ class OroDashboardBundleInstaller implements Installation
     /**
      * Add oro_dashboard foreign keys.
      */
-    protected function addOroDashboardForeignKeys(Schema $schema)
+    protected function addOroDashboardForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_dashboard');
         $table->addForeignKeyConstraint(
@@ -153,7 +172,7 @@ class OroDashboardBundleInstaller implements Installation
     /**
      * Add oro_dashboard_widget foreign keys.
      */
-    protected function addOroDashboardWidgetForeignKeys(Schema $schema)
+    protected function addOroDashboardWidgetForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_dashboard_widget');
         $table->addForeignKeyConstraint(
@@ -167,7 +186,7 @@ class OroDashboardBundleInstaller implements Installation
     /**
      * Add oro_dashboard_widget_state foreign keys.
      */
-    protected function addOroDashboardWidgetStateForeignKeys(Schema $schema)
+    protected function addOroDashboardWidgetStateForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_dashboard_widget_state');
         $table->addForeignKeyConstraint(
@@ -182,5 +201,51 @@ class OroDashboardBundleInstaller implements Installation
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
+    }
+
+    /**
+     * Add dashboard_type enum field to the oro_dashboard table and adds widgets default dashboard type.
+     */
+    protected function addDashboardTypeEnumField(Schema $schema, QueryBag $queries): void
+    {
+        $enumTable = $this->extendExtension->addEnumField(
+            $schema,
+            $schema->getTable('oro_dashboard'),
+            'dashboard_type',
+            'dashboard_type',
+            false,
+            false,
+            [
+                'extend'    => ['owner' => ExtendScope::OWNER_SYSTEM],
+                'datagrid'  => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE, 'show_filter' => false],
+                'form'      => ['is_enabled' => false],
+                'view'      => ['is_displayable' => false],
+                'merge'     => ['display' => false],
+                'dataaudit' => ['auditable' => false]
+            ]
+        );
+
+        $options = new OroOptions();
+        $options->set('enum', 'immutable_codes', ['widgets']);
+        $enumTable->addOption(OroOptions::KEY, $options);
+
+        $queries->addPostQuery(new ParametrizedSqlMigrationQuery(
+            sprintf(
+                'INSERT INTO %s (id, name, priority, is_default) VALUES (:id, :name, :priority, :is_default)',
+                $enumTable->getName()
+            ),
+            [
+                'id' => 'widgets',
+                'name' => 'Widgets',
+                'priority' => 1,
+                'is_default' => true
+            ],
+            [
+                'id' => Types::STRING,
+                'name' => Types::STRING,
+                'priority' => Types::INTEGER,
+                'is_default' => Types::BOOLEAN
+            ]
+        ));
     }
 }

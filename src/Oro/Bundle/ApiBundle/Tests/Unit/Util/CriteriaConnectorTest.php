@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Doctrine\Common\Collections\Criteria as CommonCriteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\Value;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
@@ -34,15 +35,13 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /** @var CriteriaConnector */
     private $criteriaConnector;
 
-    /** @var QueryExpressionVisitorFactory */
-    private $expressionVisitorFactory;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->entityClassResolver = new EntityClassResolver($this->doctrine);
-        $this->expressionVisitorFactory = new QueryExpressionVisitorFactory(
+
+        $expressionVisitorFactory = new QueryExpressionVisitorFactory(
             [
                 'NOT' => new Expression\NotCompositeExpression(),
                 'AND' => new Expression\AndCompositeExpression(),
@@ -61,6 +60,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             ],
             $this->entityClassResolver
         );
+
         $this->criteriaConnector = new CriteriaConnector(
             new CriteriaNormalizer(
                 $this->doctrineHelper,
@@ -68,7 +68,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
                 new OptimizeJoinsFieldVisitorFactory(new OptimizeJoinsDecisionMaker())
             ),
             new CriteriaPlaceholdersResolver(),
-            $this->expressionVisitorFactory,
+            $expressionVisitorFactory,
             $this->entityClassResolver
         );
     }
@@ -168,7 +168,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
             . ' INNER JOIN e.groups groups'
-            . ' WHERE e.category = :category AND e.groups = :groups'
+            . ' WHERE e.category = :e_category AND e.groups = :e_groups'
         );
     }
 
@@ -225,7 +225,8 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' LEFT JOIN e.category category'
             . ' INNER JOIN e.groups groups'
-            . ' WHERE (category.name NOT IN(:category_name) OR category.name IS NULL) AND groups.name = :groups_name'
+            . ' WHERE (category.name NOT IN(:category_name) OR category.name IS NULL)'
+            . ' AND groups.name = :groups_name'
         );
     }
 
@@ -245,12 +246,12 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
             . ' LEFT JOIN e.groups groups'
-            . ' WHERE e.category = :category'
-            . ' AND e.groups IN(:groups)'
+            . ' WHERE e.category = :e_category'
+            . ' AND e.groups IN(:e_groups)'
             . ' AND (NOT(EXISTS('
             . 'SELECT groups_subquery1'
             . ' FROM Test:Group groups_subquery1'
-            . ' WHERE groups_subquery1 = groups AND groups_subquery1 IN(:groups_2))))'
+            . ' WHERE groups_subquery1 = groups AND groups_subquery1 IN(:e_groups_2))))'
         );
     }
 
@@ -270,8 +271,8 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
             . ' LEFT JOIN e.groups groups'
-            . ' WHERE e.category = :category'
-            . ' AND e.groups IN(:groups)'
+            . ' WHERE e.category = :e_category'
+            . ' AND e.groups IN(:e_groups)'
             . ' AND NOT(EXISTS('
             . 'SELECT groups_subquery1'
             . ' FROM Test:Group groups_subquery1'
@@ -295,8 +296,8 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
             . ' INNER JOIN e.groups groups'
-            . ' WHERE e.category = :category'
-            . ' AND e.groups IN(:groups)'
+            . ' WHERE e.category = :e_category'
+            . ' AND e.groups IN(:e_groups)'
             . ' AND EXISTS('
             . 'SELECT groups_subquery1'
             . ' FROM Test:Group groups_subquery1'
@@ -320,12 +321,12 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
             . ' LEFT JOIN e.groups groups'
-            . ' WHERE e.category = :category'
-            . ' AND e.groups IN(:groups)'
-            . ' AND (:groups_2_expected = ('
+            . ' WHERE e.category = :e_category'
+            . ' AND e.groups IN(:e_groups)'
+            . ' AND (:e_groups_2_expected = ('
             . 'SELECT COUNT(groups_subquery1)'
             . ' FROM Test:Group groups_subquery1'
-            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:groups_2)))'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:e_groups_2)))'
         );
     }
 
@@ -345,12 +346,12 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
             . ' LEFT JOIN e.groups groups'
-            . ' WHERE e.category = :category'
-            . ' AND e.groups IN(:groups)'
-            . ' AND (:groups_2_expected = ('
+            . ' WHERE e.category = :e_category'
+            . ' AND e.groups IN(:e_groups)'
+            . ' AND (:e_groups_2_expected = ('
             . 'SELECT COUNT(groups_subquery1)'
             . ' FROM Test:Group groups_subquery1'
-            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:groups_2)))'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:e_groups_2)))'
         );
     }
 
@@ -368,7 +369,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             $criteria,
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
-            . ' WHERE e.category = :category'
+            . ' WHERE e.category = :e_category'
             . ' AND NOT(EXISTS('
             . 'SELECT groups_subquery1'
             . ' FROM Test:Group groups_subquery1'
@@ -390,7 +391,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             $criteria,
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
-            . ' WHERE e.category = :category'
+            . ' WHERE e.category = :e_category'
             . ' AND EXISTS('
             . 'SELECT groups_subquery1'
             . ' FROM Test:Group groups_subquery1'
@@ -451,10 +452,10 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $this->assertQuery(
             $criteria,
             'SELECT e FROM Test:User e'
-            . ' WHERE :groups_expected = ('
+            . ' WHERE :e_groups_expected = ('
             . 'SELECT COUNT(groups_subquery1)'
             . ' FROM Test:Group groups_subquery1'
-            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:groups))'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:e_groups))'
         );
     }
 
@@ -471,10 +472,10 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $this->assertQuery(
             $criteria,
             'SELECT e FROM Test:User e'
-            . ' WHERE :groups_expected = ('
+            . ' WHERE :e_groups_expected = ('
             . 'SELECT COUNT(groups_subquery1)'
             . ' FROM Test:Group groups_subquery1'
-            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:groups))'
+            . ' WHERE groups_subquery1 MEMBER OF e.groups AND groups_subquery1 IN(:e_groups))'
         );
     }
 
@@ -584,8 +585,8 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $this->assertQuery(
             $criteria,
             'SELECT e FROM Test:User e'
-            . ' LEFT JOIN e.products products'
-            . ' LEFT JOIN products.category category'
+            . ' INNER JOIN e.products products'
+            . ' INNER JOIN products.category category'
             . ' WHERE category.name = :category_name'
         );
     }
@@ -596,11 +597,13 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $criteria->addLeftJoin('category', '{root}.category');
         $criteria->addLeftJoin('products', '{root}.products');
         $criteria->addLeftJoin('products.category', '{products}.category');
+        $criteria->addLeftJoin('{owner}', '{root}.owner');
         $criteria->orderBy(
             [
                 '{root}.name'              => Criteria::ASC,
                 '{category}.name'          => Criteria::ASC,
-                '{products.category}.name' => Criteria::ASC
+                '{products.category}.name' => Criteria::ASC,
+                '{owner}'                  => Criteria::ASC
             ]
         );
 
@@ -610,7 +613,8 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             . ' LEFT JOIN e.category alias1'
             . ' LEFT JOIN e.products alias2'
             . ' LEFT JOIN alias2.category alias3'
-            . ' ORDER BY e.name ASC, alias1.name ASC, alias3.name ASC'
+            . ' LEFT JOIN e.owner alias4'
+            . ' ORDER BY e.name ASC, alias1.name ASC, alias3.name ASC, owner ASC'
         );
     }
 
@@ -620,21 +624,25 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $criteria->addLeftJoin('category', '{root}.category');
         $criteria->addLeftJoin('products', '{root}.products');
         $criteria->addLeftJoin('products.category', '{products}.category');
+        $criteria->addLeftJoin('{owner}', '{root}.owner');
         $criteria->andWhere(
             $criteria::expr()->andX(
                 $criteria::expr()->eq('{root}.name', 'test_user'),
                 $criteria::expr()->eq('{category}.name', 'test_category'),
-                $criteria::expr()->eq('{products.category}.name', 'test_category')
+                $criteria::expr()->eq('{products.category}.name', 'test_category'),
+                $criteria::expr()->eq('{owner}', 'test_owner')
             )
         );
 
         $this->assertQuery(
             $criteria,
             'SELECT e FROM Test:User e'
-            . ' LEFT JOIN e.category alias1'
-            . ' LEFT JOIN e.products alias2'
-            . ' LEFT JOIN alias2.category alias3'
-            . ' WHERE e.name = :e_name AND alias1.name = :alias1_name AND alias3.name = :alias3_name'
+            . ' INNER JOIN e.category alias1'
+            . ' INNER JOIN e.products alias2'
+            . ' INNER JOIN alias2.category alias3'
+            . ' INNER JOIN e.owner alias4'
+            . ' WHERE e.name = :e_name AND alias1.name = :alias1_name'
+            . ' AND alias3.name = :alias3_name AND owner = :owner'
         );
     }
 
@@ -664,7 +672,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $criteria = $this->createCriteria($isCommonCriteria);
         $this->criteriaConnector->applyCriteria($qb, $criteria);
 
-        self::assertNull($qb->getFirstResult());
+        self::assertEquals(0, $qb->getFirstResult());
     }
 
     /**
@@ -711,5 +719,36 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $this->criteriaConnector->applyCriteria($qb, $criteria);
 
         self::assertSame(3, $qb->getMaxResults());
+    }
+
+    public function testPlaceholdersForManuallyJoinedEntity()
+    {
+        $criteria = $this->createCriteria();
+        $criteria->andWhere($criteria::expr()->eq('{role}.name', 'test_role'));
+        $criteria->andWhere($criteria::expr()->eq('{account}.name', 'test_account'));
+        $criteria->andWhere($criteria::expr()->eq('name', 'test_user'));
+        $criteria->orderBy(['{role}.name' => Criteria::ASC, '{group}.id' => Criteria::ASC]);
+
+        $qb = new QueryBuilder($this->em);
+        $qb
+            ->select('e')
+            ->from(Entity\User::class, 'e')
+            ->innerJoin(Entity\Role::class, 'role', Join::WITH, '1 = 1')
+            ->leftJoin(Entity\Group::class, 'group', Join::WITH, '1 = 1')
+            ->leftJoin(Entity\Account::class, 'account', Join::WITH, '1 = 1')
+            ->leftJoin('account.roles', 'account_roles');
+
+        $this->criteriaConnector->applyCriteria($qb, $criteria);
+
+        self::assertEquals(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN Test:Role role WITH 1 = 1'
+            . ' LEFT JOIN Test:Group group WITH 1 = 1'
+            . ' INNER JOIN Test:Account account WITH 1 = 1'
+            . ' LEFT JOIN account.roles account_roles'
+            . ' WHERE (role.name = :role_name AND account.name = :account_name) AND e.name = :e_name'
+            . ' ORDER BY role.name ASC, group.id ASC',
+            str_replace(self::ENTITY_NAMESPACE, 'Test:', $qb->getDQL())
+        );
     }
 }

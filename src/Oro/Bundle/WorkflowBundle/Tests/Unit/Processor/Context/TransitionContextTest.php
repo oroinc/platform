@@ -10,14 +10,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Suppressing for stubs and mock classes
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class TransitionContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TransitionContext */
-    private $context;
+    private TransitionContext $context;
 
     protected function setUp(): void
     {
@@ -26,19 +24,13 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider constantMatch
-     *
-     * @param string $constantValue
-     * @param string $expectedValue
      */
-    public function testConstantsUsedForAttributeMatching($constantValue, $expectedValue)
+    public function testConstantsUsedForAttributeMatching(string $constantValue, string $expectedValue)
     {
         $this->assertSame($expectedValue, $constantValue);
     }
 
-    /**
-     * @return array
-     */
-    public function constantMatch()
+    public function constantMatch(): array
     {
         return [
             [TransitionContext::CUSTOM_FORM, 'customForm'],
@@ -81,23 +73,15 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider accessorsStorageHelpers
-     *
-     * @param string $setAccessor
-     * @param string $getAccessor
-     * @param string $storageProperty
-     * @param mixed $value
      */
-    public function testAccessorStores($setAccessor, $getAccessor, $storageProperty, $value)
+    public function testAccessorStores(string $setAccessor, string $getAccessor, string $storageProperty, mixed $value)
     {
         $this->context->{$setAccessor}($value);
         $this->assertSame($value, $this->context->{$getAccessor}());
         $this->assertSame($value, $this->context->get($storageProperty));
     }
 
-    /**
-     * @return array
-     */
-    public function accessorsStorageHelpers()
+    public function accessorsStorageHelpers(): array
     {
         return [
             ['setTransitionName', 'getTransitionName', TransitionContext::TRANSITION_NAME, 't1'],
@@ -134,20 +118,14 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider accessorsProperties
-     * @param string $setAccessor
-     * @param string $getAccessor
-     * @param mixed $value
      */
-    public function testContextOwnPropertiesAccessors($setAccessor, $getAccessor, $value)
+    public function testContextOwnPropertiesAccessors(string $setAccessor, string $getAccessor, mixed $value)
     {
         $this->context->{$setAccessor}($value);
         $this->assertSame($value, $this->context->{$getAccessor}());
     }
 
-    /**
-     * @return array
-     */
-    public function accessorsProperties()
+    public function accessorsProperties(): array
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())
@@ -169,12 +147,8 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
     /**
      * Strict prevent from unexpected value retrieval in processors from badly configured context
      * @dataProvider strictAccessors
-     *
-     * @param string $accessor
-     * @param null|string $storageKey
-     * @param null|string $storageValue
      */
-    public function testStrictGetters($accessor, $storageKey = null, $storageValue = null)
+    public function testStrictGetters(string $accessor, ?string $storageKey = null, ?string $storageValue = null)
     {
         if ($storageKey !== null) {
             $this->context->set($storageKey, $storageValue);
@@ -185,10 +159,7 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
         $this->context->{$accessor}();
     }
 
-    /**
-     * @return array
-     */
-    public function strictAccessors()
+    public function strictAccessors(): array
     {
         return [
             ['getTransitionName'],
@@ -205,22 +176,15 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider hasAccessors
-     *
-     * @param string $setter
-     * @param string $hasAccessor
-     * @param mixed $value
      */
-    public function testHas($setter, $hasAccessor, $value)
+    public function testHas(string $setter, string $hasAccessor, mixed $value)
     {
         $this->assertFalse($this->context->{$hasAccessor}());
         $this->context->{$setter}($value);
         $this->assertTrue($this->context->{$hasAccessor}());
     }
 
-    /**
-     * @return array
-     */
-    public function hasAccessors()
+    public function hasAccessors(): array
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())

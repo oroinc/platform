@@ -8,25 +8,21 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class CalendarTest extends TestCase
 {
-    /** @var Calendar */
-    private $calendar;
-
-    /** @var string */
-    private $defaultLocale;
+    private Calendar $calendar;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this);
 
         $this->calendar = new Calendar();
+
         $this->defaultLocale = \Locale::getDefault();
     }
 
     protected function tearDown(): void
     {
-        if ($this->defaultLocale) {
-            \Locale::setDefault($this->defaultLocale);
-        }
+        \Locale::setDefault($this->defaultLocale);
     }
 
     /**
@@ -95,7 +91,7 @@ class CalendarTest extends TestCase
         );
 
         foreach ($actual as $monthNum => $monthName) {
-            $expected = $formatter->format(\DateTime::createFromFormat('n', $monthNum));
+            $expected = $formatter->format(\DateTime::createFromFormat('n-d', $monthNum.'-1'));
             $this->assertEquals($expected, $actual[$monthNum], 'Incorrect month for month #' . $monthNum);
         }
     }

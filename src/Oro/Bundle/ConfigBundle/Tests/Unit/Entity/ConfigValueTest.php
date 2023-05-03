@@ -4,8 +4,8 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Testing\ReflectionUtil;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ConfigValueTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,11 +28,8 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider propertiesDataProvider
-     *
-     * @param string $property
-     * @param mixed  $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $obj = new ConfigValue();
 
@@ -54,11 +51,8 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider valuesDataProvider
-     *
-     * @param mixed  $value
-     * @param string $expectedType
      */
-    public function testValueSettersAndGetters($value, $expectedType)
+    public function testValueSettersAndGetters(mixed $value, string $expectedType)
     {
         $obj = new ConfigValue();
 
@@ -85,8 +79,8 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($obj->getUpdatedAt());
 
         $obj->beforeSave();
-        $this->assertInstanceOf('\DateTime', $obj->getCreatedAt());
-        $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
+        $this->assertInstanceOf(\DateTime::class, $obj->getCreatedAt());
+        $this->assertInstanceOf(\DateTime::class, $obj->getUpdatedAt());
     }
 
     public function testPreUpdate()
@@ -96,6 +90,6 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($obj->getUpdatedAt());
 
         $obj->doPreUpdate();
-        $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
+        $this->assertInstanceOf(\DateTime::class, $obj->getUpdatedAt());
     }
 }

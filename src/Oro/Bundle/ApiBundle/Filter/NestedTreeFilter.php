@@ -20,13 +20,10 @@ use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
  */
 class NestedTreeFilter extends StandaloneFilter implements FieldFilterInterface
 {
-    /** @var string|null */
-    private $field;
+    private ?string $field = null;
 
     /**
      * Sets an association name by which the data is filtered.
-     *
-     * @param string $field The association name
      */
     public function setField(string $field): void
     {
@@ -34,7 +31,7 @@ class NestedTreeFilter extends StandaloneFilter implements FieldFilterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {

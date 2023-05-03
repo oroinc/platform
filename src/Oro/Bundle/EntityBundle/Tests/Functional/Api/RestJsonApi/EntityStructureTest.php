@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Functional\Api\RestJsonApi;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\TagBundle\Entity\Tag;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 
 class EntityStructureTest extends RestJsonApiTestCase
 {
-    /**
-     * @param string   $entityId
-     * @param array    $expectedData
-     * @param Response $response
-     */
-    private function assertEntityData($entityId, array $expectedData, Response $response)
+    private function assertEntityData(string $entityId, array $expectedData, Response $response): void
     {
         $data = self::jsonToArray($response->getContent());
         $entityData = null;
@@ -26,10 +26,9 @@ class EntityStructureTest extends RestJsonApiTestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    private function getUserEntityData()
+    private function getUserEntityData(): array
     {
         return [
             'type'       => 'entitystructures',
@@ -39,7 +38,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                 'pluralLabel' => 'Users',
                 'alias'       => 'user',
                 'pluralAlias' => 'users',
-                'className'   => 'Oro\Bundle\UserBundle\Entity\User',
+                'className'   => User::class,
                 'icon'        => 'fa-user',
                 'options'     => ['auditable' => true],
                 'routes'      => ['name' => 'oro_user_index', 'view' => 'oro_user_view'],
@@ -81,7 +80,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'name'              => 'owner',
                         'type'              => 'ref-one',
                         'relationType'      => 'manyToOne',
-                        'relatedEntityName' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
+                        'relatedEntityName' => BusinessUnit::class,
                         'options'           => ['configurable' => true]
                     ],
                     [
@@ -89,11 +88,11 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'name'              => 'groups',
                         'type'              => 'ref-many',
                         'relationType'      => 'manyToMany',
-                        'relatedEntityName' => 'Oro\Bundle\UserBundle\Entity\Group',
+                        'relatedEntityName' => Group::class,
                         'options'           => ['configurable' => true, 'auditable' => true]
                     ],
                     [
-                        'label'             => 'Status',
+                        'label'             => 'Password status',
                         'name'              => 'auth_status',
                         'type'              => 'enum',
                         'relationType'      => 'manyToOne',
@@ -105,7 +104,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'name'              => 'business_units_id',
                         'type'              => 'dictionary',
                         'relationType'      => '',
-                        'relatedEntityName' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
+                        'relatedEntityName' => BusinessUnit::class,
                         'options'           => ['virtual' => true]
                     ],
                     [
@@ -113,7 +112,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'name'              => 'tag_field',
                         'type'              => 'tag',
                         'relationType'      => '',
-                        'relatedEntityName' => 'Oro\Bundle\TagBundle\Entity\Tag',
+                        'relatedEntityName' => Tag::class,
                         'options'           => ['virtual' => true]
                     ],
                     [
@@ -121,7 +120,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'name'              => 'tags_virtual',
                         'type'              => 'ManyToMany',
                         'relationType'      => 'manyToMany',
-                        'relatedEntityName' => 'Oro\Bundle\TagBundle\Entity\Tag',
+                        'relatedEntityName' => Tag::class,
                         'options'           => []
                     ],
                     [
@@ -129,7 +128,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'name'              => 'Oro\Bundle\TagBundle\Entity\Tag::owner',
                         'type'              => 'ref-one',
                         'relationType'      => 'manyToOne',
-                        'relatedEntityName' => 'Oro\Bundle\TagBundle\Entity\Tag',
+                        'relatedEntityName' => Tag::class,
                         'options'           => ['configurable' => true]
                     ],
                     [
@@ -137,7 +136,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'name'              => 'Oro\Bundle\ActivityListBundle\Entity\ActivityList::editor',
                         'type'              => 'ref-one',
                         'relationType'      => 'manyToOne',
-                        'relatedEntityName' => 'Oro\Bundle\ActivityListBundle\Entity\ActivityList',
+                        'relatedEntityName' => ActivityList::class,
                         'options'           => [
                             'configurable' => true
                         ]
@@ -147,10 +146,7 @@ class EntityStructureTest extends RestJsonApiTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getTestEntityData()
+    private function getTestEntityData(): array
     {
         return [
             'type'       => 'entitystructures',

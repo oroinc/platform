@@ -11,9 +11,7 @@ use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -30,14 +28,13 @@ class OroMessageQueueExtension extends Extension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $environment = $container->getParameter('kernel.environment');
-        $config = $this->processConfiguration(new Configuration($this->factories, $environment), $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('log.yml');
         $loader->load('job.yml');
@@ -45,6 +42,7 @@ class OroMessageQueueExtension extends Extension
         $loader->load('controllers.yml');
         $loader->load('controllers_api.yml');
         $loader->load('mq_topics.yml');
+        $loader->load('transport.yml');
 
         if (isset($config['client'])) {
             $loader->load('client.yml');
@@ -81,7 +79,7 @@ class OroMessageQueueExtension extends Extension
             $container->setParameter('oro_message_queue.client.noop_status', $config['client']['noop_status']);
         }
 
-        $this->createTransport($config, $container);
+        $this->createTransports($config, $container);
         $this->buildOptionalExtensions($config, $container);
         $this->setPersistenceServicesAndProcessors($config, $container);
         $this->setSecurityAgnosticTopicsAndProcessors($config, $container);
@@ -91,39 +89,26 @@ class OroMessageQueueExtension extends Extension
             ->registerForAutoconfiguration(TopicInterface::class)
             ->addTag('oro_message_queue.topic');
 
-        if ('test' === $environment) {
+        if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
+            $loader->load('mq_topics_test.yml');
             $this->configureTestEnvironment($container);
         }
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
-        $container->addResource(new FileResource((new \ReflectionClass(Configuration::class))->getFileName()));
-
         return new Configuration($this->factories, $container->getParameter('kernel.environment'));
     }
 
-    private function createTransport(array $config, ContainerBuilder $container): void
+    private function createTransports(array $config, ContainerBuilder $container): void
     {
-        $transportKey = $container->getParameter('message_queue_transport');
-        if (!$transportKey) {
-            throw new InvalidConfigurationException('Message queue transport key is not defined.');
+        foreach ($this->factories as $transportKey => $transportFactory) {
+            $transportFactory->create($container, $config['transport'][$transportKey]);
         }
-
-        if (!array_key_exists($transportKey, $this->factories)) {
-            throw new InvalidConfigurationException(
-                sprintf('Message queue transport with key "%s" is not found.', $transportKey)
-            );
-        }
-
-        $transportFactory = $this->factories[$transportKey];
-        $connectionId = $transportFactory->create($container, $config['transport'][$transportKey]);
-
-        $container->setAlias('oro_message_queue.transport.connection', $connectionId);
     }
 
     private function buildOptionalExtensions(array $config, ContainerBuilder $container): void

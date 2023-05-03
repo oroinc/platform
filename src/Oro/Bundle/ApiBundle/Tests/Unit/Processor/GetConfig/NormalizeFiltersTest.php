@@ -2,13 +2,21 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\NormalizeFilters;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NormalizeFiltersTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private const IDENTIFIER_FILTER_NAME = 'id';
+
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var NormalizeFilters */
@@ -498,5 +506,126 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
             ],
             $this->context->getFilters()
         );
+    }
+
+    public function testCompleteCompositeIdFiltersForEntityWithSingleIdentifier()
+    {
+        $definition = new EntityDefinitionConfig();
+        $definition->setIdentifierFieldNames(['id']);
+
+        $this->context->setResult($definition);
+        $this->context->setFilters(new FiltersConfig());
+        $this->processor->process($this->context);
+    }
+
+    public function testCompleteCompositeIdFiltersWhenIdFilterAlreadyExists()
+    {
+        $definition = new EntityDefinitionConfig();
+        $definition->setIdentifierFieldNames(['id1', 'id2']);
+        $filters = new FiltersConfig();
+        $filter = $filters->addField(self::IDENTIFIER_FILTER_NAME);
+        $filter->setType('custom_filter');
+
+        $this->context->setResult($definition);
+        $this->context->setFilters($filters);
+        $this->processor->process($this->context);
+
+        self::assertEquals('custom_filter', $filters->getField(self::IDENTIFIER_FILTER_NAME)->getType());
+    }
+
+    public function testCompleteCompositeIdFiltersWhenIdFilterDoesNotExist()
+    {
+        $definition = new EntityDefinitionConfig();
+        $definition->setIdentifierFieldNames(['id1', 'id2']);
+        $filters = new FiltersConfig();
+
+        $this->context->setResult($definition);
+        $this->context->setFilters($filters);
+        $this->processor->process($this->context);
+
+        $filter = $filters->getField(self::IDENTIFIER_FILTER_NAME);
+        self::assertNotNull($filter);
+        self::assertEquals('composite_identifier', $filter->getType());
+        self::assertEquals(DataType::STRING, $filter->getDataType());
+        self::assertTrue($filter->isArrayAllowed());
+    }
+
+    public function testCompleteCompositeIdFiltersForAssociationWithSingleIdentifier(): void
+    {
+        $definition = new EntityDefinitionConfig();
+        $definition->addField('field');
+        $association = $definition->addField('association');
+        $association->setTargetClass('Test\TargetEntity');
+        $associationTargetEntity = $association->createAndSetTargetEntity();
+        $associationTargetEntity->setIdentifierFieldNames(['id']);
+        $filters = new FiltersConfig();
+
+        $this->context->setResult($definition);
+        $this->context->setFilters($filters);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->getFilters()->hasField('field'));
+        self::assertFalse($this->context->getFilters()->hasField('association'));
+    }
+
+    public function testCompleteCompositeIdFiltersForAssociationWithCompositeIdentifier(): void
+    {
+        $definition = new EntityDefinitionConfig();
+        $definition->addField('field');
+        $association = $definition->addField('association');
+        $association->setTargetClass('Test\TargetEntity');
+        $associationTargetEntity = $association->createAndSetTargetEntity();
+        $associationTargetEntity->setIdentifierFieldNames(['id1', 'id2']);
+        $filters = new FiltersConfig();
+
+        $this->context->setResult($definition);
+        $this->context->setFilters($filters);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->getFilters()->hasField('field'));
+        $filter = $this->context->getFilters()->getField('association');
+        self::assertNotNull($filter);
+        self::assertEquals('association_composite_identifier', $filter->getType());
+        self::assertEquals(DataType::STRING, $filter->getDataType());
+        self::assertTrue($filter->isArrayAllowed());
+    }
+
+    public function testCompleteCompositeIdFiltersForExcludedAssociationWithCompositeIdentifier(): void
+    {
+        $definition = new EntityDefinitionConfig();
+        $definition->addField('field');
+        $association = $definition->addField('association');
+        $association->setExcluded();
+        $association->setTargetClass('Test\TargetEntity');
+        $associationTargetEntity = $association->createAndSetTargetEntity();
+        $associationTargetEntity->setIdentifierFieldNames(['id1', 'id2']);
+        $filters = new FiltersConfig();
+
+        $this->context->setResult($definition);
+        $this->context->setFilters($filters);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->getFilters()->hasField('field'));
+        self::assertFalse($this->context->getFilters()->hasField('association'));
+    }
+
+    public function testCompleteCompositeIdFiltersForAssociationWithCompositeIdentifierWhenFilterAlreadyExists(): void
+    {
+        $definition = new EntityDefinitionConfig();
+        $definition->addField('field');
+        $association = $definition->addField('association');
+        $association->setTargetClass('Test\TargetEntity');
+        $associationTargetEntity = $association->createAndSetTargetEntity();
+        $associationTargetEntity->setIdentifierFieldNames(['id1', 'id2']);
+        $filters = new FiltersConfig();
+        $associationFilter = $filters->addField('association');
+        $associationFilter->setType('custom_filter');
+
+        $this->context->setResult($definition);
+        $this->context->setFilters($filters);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->getFilters()->hasField('field'));
+        self::assertEquals('custom_filter', $filters->getField('association')->getType());
     }
 }

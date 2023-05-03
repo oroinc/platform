@@ -16,7 +16,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
  */
 class SearchIterableResultTest extends SearchBundleWebTestCase
 {
-    private $expectedNames = [
+    private array $expectedNames = [
         'item1@mail.com 0123-456100',
         'item2@mail.com 200987654',
         'item3@mail.com 0123-456300',
@@ -32,9 +32,7 @@ class SearchIterableResultTest extends SearchBundleWebTestCase
     {
         $this->initClient();
 
-        $engine = static::getContainer()
-            ->get('oro_search.engine.parameters')
-            ->getEngineName();
+        $engine = self::getContainer()->get('oro_search.engine.parameters')->getEngineName();
         if ($engine !== 'orm') {
             $this->markTestSkipped('Should be tested only with ORM search engine');
         }

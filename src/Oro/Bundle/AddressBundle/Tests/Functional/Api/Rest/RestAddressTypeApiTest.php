@@ -8,17 +8,14 @@ class RestAddressTypeApiTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateWsseAuthHeader());
     }
 
-    /**
-     * @return array
-     */
-    public function testGetAddressTypes()
+    public function testGetAddressTypes(): array
     {
         $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_addresstypes'));
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
 
@@ -36,7 +33,7 @@ class RestAddressTypeApiTest extends WebTestCase
                 $this->getUrl('oro_api_get_addresstype', ['name' => $addressType['name']])
             );
 
-            $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+            $result = self::getJsonResponseContent($this->client->getResponse(), 200);
             $this->assertEquals($addressType, $result);
         }
 
@@ -45,7 +42,7 @@ class RestAddressTypeApiTest extends WebTestCase
             $this->getUrl('oro_api_get_addresstype', ['name' => 'shipping'])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertEquals(
             [
                 'name'  => 'shipping',

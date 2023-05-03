@@ -9,7 +9,7 @@ services:
             - '@oro_sync.authentication.ticket_digest_generator'
             - '@oro_user.security.provider'
             - '%oro_sync.security.ticket_authentication_provider.key%'
-            - '%secret%'
+            - '%kernel.secret%'
             - '%oro_sync.security.ticket_authentication_provider.ticket_ttl%'
 
     oro_sync.authentication.websocket_authentication_by_ticket_provider:
@@ -43,13 +43,13 @@ services:
         class: Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDigestGenerator
         arguments:
             - '@oro_sync.authentication.encoder'
-            - '%secret%'
+            - '%kernel.secret%'
 
     oro_sync.authentication.ticket_provider:
         class: Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider
         arguments:
             - '@oro_sync.authentication.ticket_digest_generator'
-            - '%secret%'
+            - '%kernel.secret%'
 
     Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider:
         alias: oro_sync.authentication.ticket_provider

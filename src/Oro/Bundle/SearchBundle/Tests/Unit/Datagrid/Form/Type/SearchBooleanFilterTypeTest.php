@@ -8,27 +8,25 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchBooleanFilterType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var SearchBooleanFilterType
-     */
+    /** @var SearchBooleanFilterType */
     private $type;
 
     protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
-        $this->type = new SearchBooleanFilterType($translator);
+        $this->type = new SearchBooleanFilterType();
         $this->formExtensions[] = new CustomFormExtension(
             [
-                new BooleanFilterType($translator),
+                new BooleanFilterType(),
                 new ChoiceFilterType($translator),
                 new FilterType($translator),
                 $this->type
-            ],
-            []
+            ]
         );
         parent::setUp();
     }
@@ -36,7 +34,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getTestFormType()
+    protected function getTestFormType(): AbstractType
     {
         return $this->type;
     }
@@ -55,7 +53,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function configureOptionsDataProvider()
+    public function configureOptionsDataProvider(): array
     {
         return [];
     }
@@ -63,7 +61,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function bindDataProvider()
+    public function bindDataProvider(): array
     {
         return [
             'yes' => [
@@ -90,14 +88,9 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
         ];
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(SearchBooleanFilterType::NAME, $this->type->getName());
-    }
-
     public function testGetBlockPrefix()
     {
-        $this->assertEquals(SearchBooleanFilterType::NAME, $this->type->getBlockPrefix());
+        $this->assertEquals('oro_search_type_boolean_filter', $this->type->getBlockPrefix());
     }
 
     public function testGetParent()

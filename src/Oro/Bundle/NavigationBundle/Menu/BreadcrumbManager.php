@@ -3,7 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Knp\Menu\ItemInterface;
-use Knp\Menu\Matcher\Matcher;
+use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
 
@@ -13,7 +13,7 @@ use Knp\Menu\Util\MenuManipulator;
 class BreadcrumbManager implements BreadcrumbManagerInterface
 {
     /**
-     * @var Matcher
+     * @var MatcherInterface
      */
     protected $matcher;
 
@@ -22,7 +22,7 @@ class BreadcrumbManager implements BreadcrumbManagerInterface
      */
     protected $provider;
 
-    public function __construct(MenuProviderInterface $provider, Matcher $matcher)
+    public function __construct(MenuProviderInterface $provider, MatcherInterface $matcher)
     {
         $this->matcher = $matcher;
         $this->provider = $provider;

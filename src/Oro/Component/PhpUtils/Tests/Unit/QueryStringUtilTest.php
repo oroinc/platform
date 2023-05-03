@@ -20,7 +20,7 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function buildQueryStringDataProvider()
+    public function buildQueryStringDataProvider(): array
     {
         return [
             'empty'            => [
@@ -85,7 +85,7 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function addQueryStringDataProvider()
+    public function addQueryStringDataProvider(): array
     {
         return [
             'empty query string' => [
@@ -120,7 +120,7 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function addParameterDataProvider()
+    public function addParameterDataProvider(): array
     {
         return [
             'empty query string'                                                     => [
@@ -242,7 +242,7 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function removeParameterDataProvider()
+    public function removeParameterDataProvider(): array
     {
         return [
             'empty query string'                                                   => [

@@ -28,6 +28,7 @@ define(function(require) {
             name: null,
             removedElement: null,
             selectionUrl: null,
+            selectionUrlMethod: null,
             selectionRouteName: null,
             selectionRouteParams: {},
             selectorWindowTitle: null,
@@ -195,6 +196,7 @@ define(function(require) {
 
                 this.selectorDialog = new DialogWidget({
                     url: url,
+                    method: this.options.selectionUrlMethod || 'GET',
                     title: this.options.selectorWindowTitle,
                     stateEnabled: false,
                     dialogOptions: {

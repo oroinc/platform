@@ -5,41 +5,31 @@ namespace Oro\Component\ChainProcessor\Debug;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Decorates a processor to log information about execution of the processor.
+ */
 class TraceableProcessor implements ProcessorInterface
 {
-    /** @var ProcessorInterface */
-    protected $processor;
+    private ProcessorInterface $processor;
+    private string $processorId;
+    private TraceLogger $logger;
 
-    /** @var string */
-    protected $processorId;
-
-    /** @var TraceLogger */
-    protected $logger;
-
-    /**
-     * @param ProcessorInterface $processor
-     * @param string             $processorId
-     * @param TraceLogger        $logger
-     */
-    public function __construct(ProcessorInterface $processor, $processorId, TraceLogger $logger)
+    public function __construct(ProcessorInterface $processor, string $processorId, TraceLogger $logger)
     {
         $this->processor = $processor;
         $this->processorId = $processorId;
         $this->logger = $logger;
     }
 
-    /**
-     * @return ProcessorInterface
-     */
-    public function getProcessor()
+    public function getProcessor(): ProcessorInterface
     {
         return $this->processor;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         $this->logger->startProcessor($this->processorId);
         try {

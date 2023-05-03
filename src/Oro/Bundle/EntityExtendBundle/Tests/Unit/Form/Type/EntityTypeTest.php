@@ -40,20 +40,14 @@ class EntityTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension(
-                [
-                    EntityType::class => $this->type
-                ],
-                [
-                    FormType::class => [
-                        new DataBlockExtension()
-                    ]
-                ]
+                [$this->type],
+                [FormType::class => [new DataBlockExtension()]]
             ),
             $this->getValidatorExtension(true)
         ];

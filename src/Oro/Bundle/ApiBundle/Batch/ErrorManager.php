@@ -14,28 +14,23 @@ use Psr\Log\LoggerInterface;
  */
 class ErrorManager
 {
-    private const ITEM_FILE_NAME    = 0;
-    private const ITEM_FILE_INDEX   = 1;
+    private const ITEM_FILE_NAME = 0;
+    private const ITEM_FILE_INDEX = 1;
     private const ITEM_ERRORS_COUNT = 2;
 
-    private const ATTR_ITEM_INDEX    = 'i';
-    private const ATTR_STATUS_CODE   = 'c';
-    private const ATTR_CODE          = 'e';
-    private const ATTR_TITLE         = 't';
-    private const ATTR_DETAIL        = 'd';
-    private const ATTR_SOURCE        = 's';
-    private const ATTR_POINTER       = 'p';
+    private const ATTR_ITEM_INDEX = 'i';
+    private const ATTR_STATUS_CODE = 'c';
+    private const ATTR_CODE = 'e';
+    private const ATTR_TITLE = 't';
+    private const ATTR_DETAIL = 'd';
+    private const ATTR_SOURCE = 's';
+    private const ATTR_POINTER = 'p';
     private const ATTR_PROPERTY_PATH = 'pp';
-    private const ATTR_PARAMETER     = 'pr';
+    private const ATTR_PARAMETER = 'pr';
 
-    /** @var FileNameProvider */
-    private $fileNameProvider;
-
-    /** @var FileLockManager */
-    private $fileLockManager;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private FileNameProvider $fileNameProvider;
+    private FileLockManager $fileLockManager;
+    private LoggerInterface $logger;
 
     public function __construct(
         FileNameProvider $fileNameProvider,
@@ -114,7 +109,7 @@ class ErrorManager
                     $index++;
                 }
 
-                if (count($errors) - $skipNumber >= $limit) {
+                if (\count($errors) - $skipNumber >= $limit) {
                     return \array_slice($errors, $skipNumber, $limit);
                 }
             }
@@ -160,7 +155,7 @@ class ErrorManager
             if ($chunkFileIndex < 0) {
                 $foundDataItemIndex = $this->searchInErrorsIndex($errorsIndex, $chunkErrorsFileName);
                 if (null !== $foundDataItemIndex) {
-                    $errorsIndex[$foundDataItemIndex][self::ITEM_ERRORS_COUNT] += count($errors);
+                    $errorsIndex[$foundDataItemIndex][self::ITEM_ERRORS_COUNT] += \count($errors);
                     $serializedErrors = array_merge(
                         JsonUtil::decode($fileManager->getFileContent($chunkErrorsFileName)),
                         $serializedErrors
@@ -169,7 +164,7 @@ class ErrorManager
                 }
             }
             if (!$updated) {
-                $errorsIndex[] = [$chunkErrorsFileName, $chunkFileIndex, count($errors)];
+                $errorsIndex[] = [$chunkErrorsFileName, $chunkFileIndex, \count($errors)];
             }
             $fileManager->writeToStorage(JsonUtil::encode($serializedErrors), $chunkErrorsFileName);
             $fileManager->writeToStorage(JsonUtil::encode($errorsIndex), $indexFileName);

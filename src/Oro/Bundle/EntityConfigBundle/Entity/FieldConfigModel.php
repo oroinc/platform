@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Represents all(extended included) fields and relations for each Entity
  * @ORM\Table(name="oro_entity_config_field")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository")
  */
@@ -45,6 +46,8 @@ class FieldConfigModel extends ConfigModel
      * @ORM\Column(type="string", length=60, nullable=false)
      */
     protected $type;
+
+    protected $options;
 
     /**
      * @param string|null $fieldName

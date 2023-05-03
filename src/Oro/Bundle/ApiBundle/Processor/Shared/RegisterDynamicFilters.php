@@ -32,14 +32,9 @@ class RegisterDynamicFilters extends RegisterFilters
 {
     public const OPERATION_NAME = 'register_dynamic_filters';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var ConfigProvider */
-    private $configProvider;
-
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
+    private DoctrineHelper $doctrineHelper;
+    private ConfigProvider $configProvider;
+    private FilterNamesRegistry $filterNamesRegistry;
 
     public function __construct(
         FilterFactoryInterface $filterFactory,
@@ -58,7 +53,7 @@ class RegisterDynamicFilters extends RegisterFilters
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -125,11 +120,7 @@ class RegisterDynamicFilters extends RegisterFilters
         $context->setProcessed(self::OPERATION_NAME);
     }
 
-    /**
-     * @param FilterCollection $filterCollection
-     * @param string|null      $filterGroup
-     */
-    private function prepareFiltersForDocumentation(FilterCollection $filterCollection, $filterGroup): void
+    private function prepareFiltersForDocumentation(FilterCollection $filterCollection, ?string $filterGroup): void
     {
         if (!$filterGroup) {
             return;
@@ -154,7 +145,7 @@ class RegisterDynamicFilters extends RegisterFilters
      *
      * @return FilterValue[]
      */
-    private function getFilterValues(FilterValueAccessorInterface $allFilterValues, $filterGroup): array
+    private function getFilterValues(FilterValueAccessorInterface $allFilterValues, ?string $filterGroup): array
     {
         if ($filterGroup) {
             return $allFilterValues->getGroup($filterGroup);
@@ -238,9 +229,9 @@ class RegisterDynamicFilters extends RegisterFilters
         $filtersConfig = null;
         $associationPropertyPath = null;
 
-        $path = \explode('.', $propertyPath);
+        $path = explode('.', $propertyPath);
         if (\count($path) > 1) {
-            $fieldName = \array_pop($path);
+            $fieldName = array_pop($path);
             $associationInfo = $this->getAssociationInfo($path, $context, $metadata);
             if (null !== $associationInfo) {
                 [$filtersConfig, $associationPropertyPath] = $associationInfo;
@@ -311,6 +302,6 @@ class RegisterDynamicFilters extends RegisterFilters
             $associationPath[] = $associationPropertyPath;
         }
 
-        return [$filters, \implode('.', $associationPath)];
+        return [$filters, implode('.', $associationPath)];
     }
 }

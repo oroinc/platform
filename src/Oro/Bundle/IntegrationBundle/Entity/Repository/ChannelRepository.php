@@ -2,32 +2,20 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 /**
  * Doctrine repository for Channel entity
  */
-class ChannelRepository extends ServiceEntityRepository
+class ChannelRepository extends EntityRepository
 {
     const BUFFER_SIZE = 100;
-
-    /**
-     * @var AclHelper
-     */
-    private $aclHelper;
-
-    public function setAclHelper(AclHelper $aclHelper)
-    {
-        $this->aclHelper = $aclHelper;
-    }
 
     /**
      * Returns latest status for integration's connector and code if it exists.
@@ -162,60 +150,19 @@ class ChannelRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @param  $type
-     *
-     * @return int
-     */
-    public function countActiveIntegrations($type = null)
+    public function countActiveIntegrations(?string $type = null): int
     {
         $qb = $this->createQueryBuilder('c')
             ->select('COUNT(c.id)')
             ->where('c.enabled = :enabled')
-            ->setParameter('enabled', true)
-        ;
+            ->setParameter('enabled', true);
 
         if ($type) {
             $qb
                 ->andWhere('c.type = :type')
-                ->setParameter('type', $type)
-            ;
+                ->setParameter('type', $type);
         }
 
         return $qb->getQuery()->getSingleScalarResult();
-    }
-
-    /**
-     * @param string $type
-     *
-     * @return array|Integration[]
-     */
-    public function findByType($type)
-    {
-        return $this->findBy([
-            'type' => $type
-        ]);
-    }
-
-    /**
-     * @param string    $type
-     * @param Channel[]|int[] $excludedChannels
-     *
-     * @return Channel[]
-     */
-    public function findByTypeAndExclude($type, array $excludedChannels)
-    {
-        $qb = $this->createQueryBuilder('channel');
-        $qb
-            ->where($qb->expr()->eq('channel.type', ':type'))
-            ->setParameter('type', $type);
-
-        if (count($excludedChannels) > 0) {
-            $qb
-                ->andWhere($qb->expr()->notIn('channel', ':channels'))
-                ->setParameter('channels', $excludedChannels);
-        }
-
-        return $this->aclHelper->apply($qb)->getResult();
     }
 }

@@ -23,6 +23,7 @@
         flex-shrink: $dialog-titlebar-flex-shrink;
         align-items: $dialog-titlebar-falign-items;
         display: $dialog-titlebar-display;
+        position: relative;
 
         cursor: $dialog-titlebar-cursor;
 
@@ -102,6 +103,11 @@
             position: $dialog-content-widget-content-position;
             margin: $dialog-content-inner-offset;
 
+            &.disable-scroll {
+                overflow: hidden;
+                height: calc(100% - $dialog-content-inner-offset * 2);
+            }
+
             .flash-messages {
                 max-width: $dialog-content-flash-messages-max-width;
                 min-width: $dialog-content-flash-messages-min-width;
@@ -112,6 +118,8 @@
     .ui-dialog-messages {
         padding: $dialog-ui-dialog-messages-inner-offset;
         background: $primary-inverse;
+        display: grid;
+        row-gap: $dialog-ui-dialog-messages-vertical-gap;
 
         &:empty {
             display: none;
@@ -136,7 +144,8 @@
     }
 
     &.ui-resizable {
-        width: $dialog-resizable-width;
+        // stylelint-disable-next-line declaration-no-important
+        width: $dialog-resizable-width !important;
 
         &:not(.ui-dialog-buttons) {
             .ui-dialog-content {

@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
  */
 class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var KeyObjectCollection */
-    private $collection;
+    private KeyObjectCollection $collection;
 
     protected function setUp(): void
     {
@@ -30,26 +29,10 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testShouldAddThrowExceptionIfObjectIsNull()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected $object argument of type "object", "NULL" given.');
-
-        $this->collection->add(null, 'key');
-    }
-
-    public function testShouldAddThrowExceptionForNotObject()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected $object argument of type "object", "string" given.');
-
-        $this->collection->add('test', 'key');
-    }
-
     public function testShouldAddThrowExceptionForNullKey()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected $key argument of type "scalar", "NULL" given.');
+        $this->expectExceptionMessage('Expected $key argument of type "scalar", "null" given.');
 
         $this->collection->add(new \stdClass(), null);
     }

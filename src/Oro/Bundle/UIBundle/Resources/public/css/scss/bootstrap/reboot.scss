@@ -2,6 +2,11 @@
 
 @import '~@oroinc/bootstrap/scss/reboot';
 
+html {
+    // 100% does not work, font is scaled by mobile browser anyway
+    text-size-adjust: none;
+}
+
 body {
     text-align: left;
 }

@@ -14,23 +14,15 @@ use Symfony\Component\Form\FormTypeInterface;
  */
 class FormExtension implements FormExtensionInterface
 {
-    /** @var ContainerInterface */
-    private $container;
-
+    private ContainerInterface $container;
     /** @var array [form type name => service id or NULL, ...] */
-    private $types;
-
+    private array $types;
     /** @var array [extended form type name => [service id, ...], ...] */
-    private $typeExtensions;
-
+    private array $typeExtensions;
     /** @var string[] [service id, ...] */
-    private $guessers;
-
-    /** @var FormTypeGuesserInterface|null */
-    private $guesser;
-
-    /** @var bool */
-    private $guesserLoaded = false;
+    private array $guessers;
+    private ?FormTypeGuesserInterface $guesser = null;
+    private bool $guesserLoaded = false;
 
     /**
      * @param ContainerInterface $container
@@ -47,12 +39,12 @@ class FormExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getType($name)
     {
         if (!\array_key_exists($name, $this->types)) {
-            throw new InvalidArgumentException(\sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'The form type "%s" is not registered.',
                 $name
             ));
@@ -60,14 +52,14 @@ class FormExtension implements FormExtensionInterface
 
         $serviceId = $this->types[$name];
         if (null === $serviceId) {
-            if (!\class_exists($name)) {
-                throw new InvalidArgumentException(\sprintf(
+            if (!class_exists($name)) {
+                throw new InvalidArgumentException(sprintf(
                     'Could not load form type "%s": class does not exist.',
                     $name
                 ));
             }
-            if (!\is_subclass_of($name, FormTypeInterface::class)) {
-                throw new InvalidArgumentException(\sprintf(
+            if (!is_subclass_of($name, FormTypeInterface::class)) {
+                throw new InvalidArgumentException(sprintf(
                     'Could not load form type "%s": class does not implement "%s".',
                     $name,
                     FormTypeInterface::class
@@ -81,7 +73,7 @@ class FormExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasType($name)
     {
@@ -89,7 +81,7 @@ class FormExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getTypeExtensions($name)
     {
@@ -97,11 +89,12 @@ class FormExtension implements FormExtensionInterface
 
         if (isset($this->typeExtensions[$name])) {
             foreach ($this->typeExtensions[$name] as $serviceId) {
-                $extensions[] = $extension = $this->container->get($serviceId);
+                $extension = $this->container->get($serviceId);
+                $extensions[] = $extension;
 
                 // validate result of getExtendedType() to ensure it is consistent with the service definition
-                if (!in_array($name, $extension->getExtendedTypes(), true)) {
-                    throw new InvalidArgumentException(\sprintf(
+                if (!\in_array($name, $extension->getExtendedTypes(), true)) {
+                    throw new InvalidArgumentException(sprintf(
                         'The extended type specified for the service "%s" does not match the actual extended type.'
                         . ' Expected "%s", given "%s".',
                         $serviceId,
@@ -116,7 +109,7 @@ class FormExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasTypeExtensions($name)
     {
@@ -124,7 +117,7 @@ class FormExtension implements FormExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getTypeGuesser()
     {

@@ -1,9 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
+use Oro\Bundle\WorkflowBundle\Command\LoadWorkflowDefinitionsCommand;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
@@ -11,13 +14,11 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Component\Testing\Command\CommandOutputNormalizer;
 
 class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 {
-    private const NAME = 'oro:workflow:definitions:load';
-
-    /** @var WorkflowConfigFinderBuilder */
-    private $configFinderBuilder;
+    private WorkflowConfigFinderBuilder $configFinderBuilder;
 
     protected function setUp(): void
     {
@@ -83,7 +84,10 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             [
                 'expectedMessages' => [
                     'Loading workflow definitions...',
-                    'Please run command \'oro:translation:load\' to load translations.'
+                    \sprintf(
+                        "Please run command '%s' to load translations.",
+                        OroTranslationLoadCommand::getDefaultName()
+                    )
                 ],
                 'expectedDefinitions' => [
                     'first_workflow',
@@ -135,14 +139,123 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         ];
     }
 
-    private function assertCommandExecuted(array $messages)
+    public function testOutputVerbosityNormal()
     {
-        $result = $this->runCommand(self::NAME);
+        $this->configFinderBuilder->setSubDirectory(
+            '/Tests/Functional/Command/DataFixtures/ValidDefinitionsVerbosityNormal'
+        );
 
-        $this->assertNotEmpty($result);
+        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), []);
+
+        static::assertStringContainsString('Loading workflow definitions...', $output);
+        static::assertStringContainsString('Done.', $output);
+        static::assertStringNotContainsString(
+            'Processed 1 workflow definitions: updated 0 existing workflows, created 1 new workflows',
+            $output
+        );
+        static::assertStringNotContainsString('> workflow_verbosity_normal', $output);
+        static::assertStringNotContainsString(
+            $this->getWorkflowConfigurationDump('workflow_verbosity_normal'),
+            $output,
+            \sprintf(
+                '"%s -v" should not dump workflow configuration to output.',
+                LoadWorkflowDefinitionsCommand::getDefaultName()
+            )
+        );
+    }
+
+    public function testOutputVerbosityVerbose()
+    {
+        $this->configFinderBuilder->setSubDirectory('/Tests/Functional/Command/DataFixtures/ValidDefinitionsVerbose');
+
+        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), ['-v']);
+
+        static::assertStringContainsString('Loading workflow definitions...', $output);
+        static::assertStringContainsString('Done.', $output);
+        static::assertStringContainsString(
+            'Processed 1 workflow definitions: updated 0 existing workflows, created 1 new workflows',
+            $output
+        );
+        static::assertStringNotContainsString('> workflow_verbose', $output);
+        static::assertStringNotContainsString(
+            $this->getWorkflowConfigurationDump('workflow_verbose'),
+            $output,
+            \sprintf(
+                '"%s -v" should not dump workflow configuration to output.',
+                LoadWorkflowDefinitionsCommand::getDefaultName()
+            )
+        );
+    }
+
+    public function testOutputVerbosityVeryVerbose()
+    {
+        $this->configFinderBuilder->setSubDirectory(
+            '/Tests/Functional/Command/DataFixtures/ValidDefinitionsVeryVerbose'
+        );
+
+        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), ['-vv']);
+
+        static::assertStringContainsString('Loading workflow definitions...', $output);
+        static::assertStringContainsString('Done.', $output);
+        static::assertStringContainsString(
+            'Processed 1 workflow definitions: updated 0 existing workflows, created 1 new workflows',
+            $output
+        );
+        static::assertStringContainsString('> workflow_very_verbose', $output);
+        static::assertStringNotContainsString(
+            $this->getWorkflowConfigurationDump('workflow_very_verbose'),
+            $output,
+            \sprintf(
+                '"%s -vv" should not dump workflow configuration to output.',
+                LoadWorkflowDefinitionsCommand::getDefaultName()
+            )
+        );
+    }
+
+    public function testOutputVerbosityDebug()
+    {
+        $this->configFinderBuilder->setSubDirectory('/Tests/Functional/Command/DataFixtures/ValidDefinitionsDebug');
+
+        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), ['-vvv']);
+
+        static::assertStringContainsString('Loading workflow definitions...', $output);
+        static::assertStringContainsString('Done.', $output);
+        static::assertStringContainsString(
+            'Processed 1 workflow definitions: updated 0 existing workflows, created 1 new workflows',
+            $output
+        );
+        static::assertStringContainsString('> workflow_debug', $output);
+        static::assertStringContainsString(
+            $this->getWorkflowConfigurationDump('workflow_debug'),
+            $output,
+            \sprintf(
+                '"%s -vvv" should output workflow configuration dump.',
+                LoadWorkflowDefinitionsCommand::getDefaultName()
+            )
+        );
+    }
+
+    public function getWorkflowConfigurationDump(string $workflow): string
+    {
+        return \str_replace(
+            '%WORKFLOW%',
+            $workflow,
+            CommandOutputNormalizer::toSingleLine(
+                \file_get_contents(__DIR__ . '/DataFixtures/valid-workflow-dump.yml')
+            )
+        );
+    }
+
+    private function assertCommandExecuted(array $messages): string
+    {
+        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName());
+
+        $this->assertNotEmpty($output);
         foreach ($messages as $message) {
-            self::assertStringContainsString($message, $result);
+            self::assertStringContainsString($message, $output);
         }
+
+        return $output;
     }
 
     /**

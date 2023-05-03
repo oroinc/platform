@@ -10,11 +10,9 @@ use Oro\Component\Layout\LayoutContext;
 
 class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $themeManager;
+    private ThemeManager|\PHPUnit\Framework\MockObject\MockObject $themeManager;
 
-    /** @var ThemePathProvider */
-    private $provider;
+    private ThemePathProvider $provider;
 
     protected function setUp(): void
     {
@@ -25,100 +23,77 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider pathsDataProvider
-     *
-     * @param array       $expectedResults
-     * @param string|null $theme
-     * @param string|null $route
-     * @param string|null $action
-     * @param string|null $pageTemplateKey
      */
-    public function testGetPaths(array $expectedResults, $theme, $route, $action, $pageTemplateKey)
+    public function testGetPaths(array $expectedResults, ?string $theme, ?string $route, ?string $action): void
     {
         $context = new LayoutContext();
         $context->set('theme', $theme);
         $context->set('route_name', $route);
         $context->set('action', $action);
-        $context->set('page_template', $pageTemplateKey);
 
-        $pageTemplate = $pageTemplateKey ? new PageTemplate('', $pageTemplateKey, $route) : null;
-        $this->setUpThemeManager(
-            [
-                'black' => $this->getThemeMock('black', 'base', $pageTemplate),
-                'base'  => $this->getThemeMock('base')
-            ]
-        );
+        $this->themeManager
+            ->expects(self::any())
+            ->method('getThemesHierarchy')
+            ->willReturnMap([
+                ['base', [new Theme('base')]],
+                ['black', [new Theme('base'), new Theme('black', 'base')]],
+            ]);
+
         $this->provider->setContext($context);
-        $this->assertSame($expectedResults, $this->provider->getPaths([]));
+        self::assertSame($expectedResults, $this->provider->getPaths([]));
     }
 
-    /**
-     * @return array
-     */
-    public function pathsDataProvider()
+    public function pathsDataProvider(): array
     {
         return [
             [
                 'expectedResults' => [],
-                'theme'           => null,
-                'route'           => null,
-                'action'          => null,
-                'page_template'   => null,
-            ],
-            [
-                'expectedResults' => [
-                    'base'
-                ],
-                'theme'           => 'base',
-                'route'           => null,
-                'action'          => null,
-                'page_template'   => null,
+                'theme' => null,
+                'route' => null,
+                'action' => null,
+                'page_template' => null,
             ],
             [
                 'expectedResults' => [
                     'base',
-                    'base/route'
                 ],
-                'theme'           => 'base',
-                'route'           => 'route',
-                'action'          => null,
-                'page_template'   => null,
+                'theme' => 'base',
+                'route' => null,
+                'action' => null,
+                'page_template' => null,
+            ],
+            [
+                'expectedResults' => [
+                    'base',
+                    'base/route',
+                ],
+                'theme' => 'base',
+                'route' => 'route',
+                'action' => null,
+                'page_template' => null,
             ],
             [
                 'expectedResults' => [
                     'base',
                     'black',
                     'base/route',
-                    'black/route'
+                    'black/route',
                 ],
-                'theme'           => 'black',
-                'route'           => 'route',
-                'action'          => null,
-                'page_template'   => null,
+                'theme' => 'black',
+                'route' => 'route',
+                'action' => null,
+                'page_template' => null,
             ],
             [
                 'expectedResults' => [
                     'base',
                     'base/index',
-                    'base/route'
-                ],
-                'theme'           => 'base',
-                'route'           => 'route',
-                'action'          => 'index',
-                'page_template'   => null,
-            ],
-            [
-                'expectedResults' => [
-                    'base',
-                    'black',
-                    'base/index',
-                    'black/index',
                     'base/route',
-                    'black/route'
                 ],
-                'theme'           => 'black',
-                'route'           => 'route',
-                'action'          => 'index',
-                'page_template'   => null,
+                'theme' => 'base',
+                'route' => 'route',
+                'action' => 'index',
+                'page_template' => null,
             ],
             [
                 'expectedResults' => [
@@ -128,50 +103,51 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
                     'black/index',
                     'base/route',
                     'black/route',
-                    'base/route/page_template/sample_page_template',
-                    'black/route/page_template/sample_page_template'
                 ],
-                'theme'           => 'black',
-                'route'           => 'route',
-                'action'          => 'index',
-                'page_template'   => 'sample_page_template',
-            ]
+                'theme' => 'black',
+                'route' => 'route',
+                'action' => 'index',
+                'page_template' => null,
+            ],
         ];
     }
 
-    private function setUpThemeManager(array $themes)
+    public function testGetPathsWhenPageTemplate(): void
     {
-        $map = [];
+        $themeName = 'black';
+        $parentName = 'base';
+        $routeName = 'route';
+        $pageTemplate = 'sample_page_template';
 
-        foreach ($themes as $themeName => $theme) {
-            $map[] = [$themeName, $theme];
-        }
+        $context = new LayoutContext();
+        $context->set('theme', $themeName);
+        $context->set('route_name', $routeName);
+        $context->set('action', 'index');
+        $context->set('page_template', $pageTemplate);
 
-        $this->themeManager->expects($this->any())
-            ->method('getTheme')
-            ->willReturnMap($map);
-    }
+        $pageTemplate = new PageTemplate('', $pageTemplate, $routeName);
+        $theme = (new Theme($themeName, $parentName))
+            ->addPageTemplate($pageTemplate);
 
-    /**
-     * @param null|string  $directory
-     * @param null|string  $parent
-     * @param PageTemplate $pageTemplate
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getThemeMock($directory = null, $parent = null, PageTemplate $pageTemplate = null)
-    {
-        $theme = $this->createMock(Theme::class);
-        $theme->expects($this->any())
-            ->method('getParentTheme')
-            ->willReturn($parent);
-        $theme->expects($this->any())
-            ->method('getDirectory')
-            ->willReturn($directory);
-        $theme->expects($this->any())
-            ->method('getPageTemplate')
-            ->willReturn($pageTemplate);
+        $this->themeManager
+            ->expects(self::any())
+            ->method('getThemesHierarchy')
+            ->with($themeName)
+            ->willReturn([new Theme($parentName), $theme]);
 
-        return $theme;
+        $this->provider->setContext($context);
+        self::assertSame(
+            [
+                $parentName,
+                $themeName,
+                'base/index',
+                'black/index',
+                'base/route',
+                'black/route',
+                'base/route/page_template/sample_page_template',
+                'black/route/page_template/sample_page_template',
+            ],
+            $this->provider->getPaths([])
+        );
     }
 }

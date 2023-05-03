@@ -399,6 +399,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
 
         self::assertInstanceOf(JobResult::class, $result);
         self::assertFalse($result->isSuccessful());
+        self::assertNull($result->needRedelivery());
         self::assertEquals(['Error 1'], $result->getFailureExceptions());
     }
 

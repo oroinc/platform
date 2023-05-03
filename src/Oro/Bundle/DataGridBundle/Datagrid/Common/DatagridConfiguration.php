@@ -19,6 +19,7 @@ class DatagridConfiguration extends ConfigObject
     const COLUMN_PATH = '[columns][%s]';
     const SORTER_PATH = '[sorters][columns][%s]';
     const FILTER_PATH = '[filters][columns][%s]';
+    const PROPERTY_PATH = '[properties][%s]';
     const DATASOURCE_PATH = '[source]';
     const DATASOURCE_TYPE_PATH = '[source][type]';
     const BASE_DATAGRID_CLASS_PATH  = '[options][base_datagrid_class]';
@@ -255,6 +256,22 @@ class DatagridConfiguration extends ConfigObject
     {
         $this->offsetSetByPath(
             sprintf(self::SORTER_PATH, $name),
+            $definition
+        );
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param array  $definition
+     *
+     * @return self
+     */
+    public function addProperty($name, array $definition)
+    {
+        $this->offsetSetByPath(
+            sprintf(self::PROPERTY_PATH, $name),
             $definition
         );
 

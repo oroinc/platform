@@ -10,8 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class RequestHandler
 {
-    /** @var RequestActionHandler */
-    private $actionHandler;
+    private RequestActionHandler $actionHandler;
 
     public function __construct(RequestActionHandler $actionHandler)
     {

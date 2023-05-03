@@ -3,7 +3,7 @@
 // Variables for both checkbox and radio
 $checkbox-background: $primary-inverse !default;
 $checkbox-size: 16px !default;
-$checkbox-size-var: var(--checkbox-size, #{$checkbox-size}) !important !default;
+$checkbox-size-var: var(--checkbox-size, #{$checkbox-size}) !default;
 $checkbox-appearance: none !default;
 $checkbox-vertical-align: middle !default;
 $checkbox-margin: 0 !default;

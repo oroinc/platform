@@ -15,13 +15,12 @@ use Oro\Component\PhpUtils\ArrayUtil;
  */
 class TypedRequestDataValidator extends AbstractRequestDataValidator
 {
-    /** @var callable */
-    private $convertEntityTypeToClass;
+    private mixed $convertEntityTypeToClass;
 
     /**
      * @param callable $convertEntityTypeToClass function (string $entityType): ?string
      */
-    public function __construct($convertEntityTypeToClass)
+    public function __construct(callable $convertEntityTypeToClass)
     {
         $this->convertEntityTypeToClass = $convertEntityTypeToClass;
     }
@@ -43,7 +42,7 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
         array $requestData,
         bool $allowIncludedResources,
         string $primaryResourceClass,
-        $primaryResourceId = null
+        mixed $primaryResourceId = null
     ): array {
         return $this->doValidation(function () use (
             $requestData,
@@ -128,16 +127,10 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
         });
     }
 
-    /**
-     * @param array      $data
-     * @param string     $primaryResourceClass
-     * @param mixed|null $primaryResourceId
-     * @param string     $pointer
-     */
     protected function validatePrimaryDataObject(
         array $data,
         string $primaryResourceClass,
-        $primaryResourceId,
+        mixed $primaryResourceId,
         string $pointer
     ): void {
         $this->validateResourceObjectStructure($data, $pointer);
@@ -163,7 +156,7 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
         if ($dataClassName !== $primaryResourceClass) {
             $this->addConflictError(
                 $this->buildPointer($pointer, JsonApiDoc::TYPE),
-                \sprintf(
+                sprintf(
                     'The \'%s\' property of the primary data object should match the requested resource',
                     JsonApiDoc::TYPE
                 )
@@ -174,20 +167,13 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
         return $isValid;
     }
 
-    /**
-     * @param array  $data
-     * @param mixed  $primaryResourceId
-     * @param string $pointer
-     *
-     * @return bool
-     */
-    protected function validatePrimaryDataObjectId(array $data, $primaryResourceId, string $pointer): bool
+    protected function validatePrimaryDataObjectId(array $data, mixed $primaryResourceId, string $pointer): bool
     {
         // do matching only if the identifier is not normalized yet
         if (\is_string($primaryResourceId) && $primaryResourceId !== $data[JsonApiDoc::ID]) {
             $this->addConflictError(
                 $this->buildPointer($pointer, JsonApiDoc::ID),
-                \sprintf(
+                sprintf(
                     'The \'%1$s\' property of the primary data object'
                     . ' should match \'%1$s\' parameter of the query string',
                     JsonApiDoc::ID

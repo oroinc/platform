@@ -222,7 +222,7 @@ define(function(require, exports, module) {
          */
         show: function() {
             if (this.visible) {
-                this.$el.css('display', 'inline-block');
+                this.$el.show();
             }
             return this;
         },

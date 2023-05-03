@@ -14,7 +14,7 @@ class LoadNestedAssociation extends LoadCustomAssociation
     /**
      * {@inheritdoc}
      */
-    protected function isSupportedAssociation($dataType)
+    protected function isSupportedAssociation(string $dataType): bool
     {
         return DataType::isNestedAssociation($dataType);
     }
@@ -22,8 +22,11 @@ class LoadNestedAssociation extends LoadCustomAssociation
     /**
      * {@inheritdoc}
      */
-    protected function loadAssociationData(SubresourceContext $context, $associationName, $dataType)
-    {
+    protected function loadAssociationData(
+        SubresourceContext $context,
+        string $associationName,
+        string $dataType
+    ): void {
         $this->saveAssociationDataToContext(
             $context,
             $this->loadData($context, $associationName, false)

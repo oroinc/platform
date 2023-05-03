@@ -35,13 +35,12 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
         ConfigUtil::FORM_EVENT_SUBSCRIBER  => 'setFormEventSubscribers'
     ];
 
-    /** @var ConfigLoaderFactory */
-    protected $factory;
+    private ConfigLoaderFactory $factory;
 
     /**
      * {@inheritdoc}
      */
-    public function setConfigLoaderFactory(ConfigLoaderFactory $factory)
+    public function setConfigLoaderFactory(ConfigLoaderFactory $factory): void
     {
         $this->factory = $factory;
     }
@@ -49,7 +48,7 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
     /**
      * {@inheritdoc}
      */
-    public function load(array $config)
+    public function load(array $config): mixed
     {
         $field = new EntityDefinitionFieldConfig();
         $this->loadField($field, $config);
@@ -57,7 +56,7 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
         return $field;
     }
 
-    protected function loadField(EntityDefinitionFieldConfig $field, array $config = null)
+    private function loadField(EntityDefinitionFieldConfig $field, ?array $config): void
     {
         if (empty($config)) {
             return;
@@ -76,11 +75,7 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
         }
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param array|string|null           $fields
-     */
-    protected function loadTargetFields(EntityDefinitionFieldConfig $field, $fields)
+    private function loadTargetFields(EntityDefinitionFieldConfig $field, array|string|null $fields): void
     {
         if (!empty($fields)) {
             $targetEntity = $field->getOrCreateTargetEntity();
@@ -98,23 +93,17 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
         }
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param ConfigLoaderInterface       $loader
-     * @param string                      $sectionName
-     * @param array|null                  $config
-     */
-    protected function loadTargetSection(
+    private function loadTargetSection(
         EntityDefinitionFieldConfig $field,
         ConfigLoaderInterface $loader,
-        $sectionName,
-        array $config = null
-    ) {
+        string $sectionName,
+        ?array $config
+    ): void {
         if (!empty($config)) {
             $section = $loader->load($config);
             $isEmpty = false;
             if (\is_object($section)) {
-                if (\method_exists($section, 'isEmpty') && $section->isEmpty()) {
+                if (method_exists($section, 'isEmpty') && $section->isEmpty()) {
                     $isEmpty = true;
                 }
             } elseif (empty($section)) {

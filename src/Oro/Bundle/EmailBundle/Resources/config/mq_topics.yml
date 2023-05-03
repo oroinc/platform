@@ -15,6 +15,7 @@ services:
     Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationsTopic: ~
     Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationTopic: ~
     Oro\Bundle\EmailBundle\Async\Topic\RecalculateEmailVisibilityTopic: ~
+    Oro\Bundle\EmailBundle\Async\Topic\RecalculateEmailVisibilityChunkTopic: ~
     Oro\Bundle\EmailBundle\Async\Topic\UpdateVisibilitiesTopic: ~
     Oro\Bundle\EmailBundle\Async\Topic\UpdateVisibilitiesForOrganizationTopic: ~
     Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailVisibilitiesForOrganizationTopic: ~

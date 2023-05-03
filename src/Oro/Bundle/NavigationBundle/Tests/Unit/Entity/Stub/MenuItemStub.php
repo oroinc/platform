@@ -33,6 +33,9 @@ class MenuItemStub implements ItemInterface
     /** @var ItemInterface */
     private $parent = null;
 
+    /** @var bool */
+    protected $display = true;
+
     /**
      * {@inheritdoc}
      */
@@ -313,13 +316,17 @@ class MenuItemStub implements ItemInterface
      */
     public function isDisplayed(): bool
     {
+        return $this->display;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDisplay($bool): self
+    public function setDisplay(bool $bool): ItemInterface
     {
+        $this->display = $bool;
+
+        return $this;
     }
 
     /**
@@ -496,5 +503,6 @@ class MenuItemStub implements ItemInterface
      */
     public function count(): int
     {
+        return count($this->children);
     }
 }

@@ -16,7 +16,7 @@ class ConfigNormalizer
     /**
      * Prepares a configuration to be used by ObjectNormalizer
      */
-    public function normalizeConfig(EntityDefinitionConfig $config)
+    public function normalizeConfig(EntityDefinitionConfig $config): void
     {
         $this->preNormalizeConfig($config);
         $this->doNormalizeConfig($config);
@@ -25,7 +25,7 @@ class ConfigNormalizer
     /**
      * Remembers the current config state before it will be normalized
      */
-    protected function preNormalizeConfig(EntityDefinitionConfig $config)
+    protected function preNormalizeConfig(EntityDefinitionConfig $config): void
     {
         $excludedFields = [];
         $fields = $config->getFields();
@@ -60,7 +60,7 @@ class ConfigNormalizer
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function doNormalizeConfig(EntityDefinitionConfig $config)
+    protected function doNormalizeConfig(EntityDefinitionConfig $config): void
     {
         $toRemove = [];
         $renamedFields = [];
@@ -103,12 +103,7 @@ class ConfigNormalizer
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     *
-     * @return string|null
-     */
-    protected function getCollapseFieldName(EntityDefinitionConfig $config)
+    protected function getCollapseFieldName(EntityDefinitionConfig $config): ?string
     {
         $result = null;
         $fields = $config->getFields();
@@ -129,7 +124,7 @@ class ConfigNormalizer
      * @param EntityDefinitionConfig $config
      * @param string[]               $dependsOn
      */
-    protected function processDependentFields(EntityDefinitionConfig $config, array $dependsOn)
+    protected function processDependentFields(EntityDefinitionConfig $config, array $dependsOn): void
     {
         foreach ($dependsOn as $dependsOnPropertyPath) {
             $this->processDependentField($config, ConfigUtil::explodePropertyPath($dependsOnPropertyPath));
@@ -140,7 +135,7 @@ class ConfigNormalizer
      * @param EntityDefinitionConfig $config
      * @param string[]               $dependsOnPropertyPath
      */
-    protected function processDependentField(EntityDefinitionConfig $config, array $dependsOnPropertyPath)
+    protected function processDependentField(EntityDefinitionConfig $config, array $dependsOnPropertyPath): void
     {
         $dependsOnFieldName = $config->findFieldNameByPropertyPath($dependsOnPropertyPath[0]);
         if (!$dependsOnFieldName) {

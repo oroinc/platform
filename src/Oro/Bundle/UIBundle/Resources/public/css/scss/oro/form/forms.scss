@@ -49,7 +49,6 @@
 
             label {
                 position: relative;
-                display: inline;
             }
         }
 
@@ -249,7 +248,7 @@ input[type='checkbox'] + label {
 }
 
 .form-row {
-    padding: 0 0 $margin-bottom-box*.5;
+    padding: 0 0 $margin-bottom-box * .5;
 }
 
 label {

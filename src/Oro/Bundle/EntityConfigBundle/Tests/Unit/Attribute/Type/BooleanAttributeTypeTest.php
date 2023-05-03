@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\BooleanAttributeType;
 
 class BooleanAttributeTypeTest extends AttributeTypeTestCase
@@ -9,7 +10,7 @@ class BooleanAttributeTypeTest extends AttributeTypeTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeType()
+    protected function getAttributeType(): AttributeTypeInterface
     {
         return new BooleanAttributeType();
     }
@@ -17,12 +18,10 @@ class BooleanAttributeTypeTest extends AttributeTypeTestCase
     /**
      * {@inheritdoc}
      */
-    public function configurationMethodsDataProvider()
+    public function configurationMethodsDataProvider(): array
     {
-        yield [
-            'isSearchable' => false,
-            'isFilterable' => true,
-            'isSortable' => true
+        return [
+            ['isSearchable' => false, 'isFilterable' => true, 'isSortable' => true]
         ];
     }
 

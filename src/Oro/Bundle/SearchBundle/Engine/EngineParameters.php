@@ -48,11 +48,7 @@ class EngineParameters
         $this->user = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
         $this->password = '' !== ($parsedDsn['pass'] ?? '') ? urldecode($parsedDsn['pass']) : null;
         $this->port = $parsedDsn['port'] ?? null;
-
-        parse_str($parsedDsn['query'] ?? '', $query);
-        foreach ($query as $key => $value) {
-            $this->parameters[$key] = urldecode($value);
-        }
+        parse_str($parsedDsn['query'] ?? '', $this->parameters);
     }
 
     public function addEngineNameAlias(string $engineName, string $alias): void

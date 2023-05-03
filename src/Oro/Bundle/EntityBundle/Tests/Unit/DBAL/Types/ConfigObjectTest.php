@@ -4,35 +4,22 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType;
 use Oro\Component\Config\Common\ConfigObject;
 
 class ConfigObjectTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigObjectType */
-    private $type;
-
-    /** @var AbstractPlatform */
-    private $platform;
+    private ConfigObjectType $type;
 
     protected function setUp(): void
     {
-        if (!Type::hasType(ConfigObjectType::TYPE)) {
-            Type::addType(ConfigObjectType::TYPE, ConfigObjectType::class);
-        }
-        $this->type = Type::getType(ConfigObjectType::TYPE);
-        $this->platform = $this->createMock(AbstractPlatform::class);
+        $this->type = new ConfigObjectType();
     }
 
     /**
      * @dataProvider testConvertToPHPValueDataProvider
-     *
-     * @param mixed       $inputData
-     * @param null|string $expectedResult
-     * @param bool        $exception
      */
-    public function testConvertToPHPValue($inputData, $expectedResult, $exception = false)
+    public function testConvertToPHPValue(?bool $inputData, ?bool $expectedResult, bool $exception = false)
     {
         if ($exception) {
             $this->expectException(ConversionException::class);
@@ -43,29 +30,29 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             $expectedResult,
-            $this->type->convertToPHPValue($inputData, $this->platform)
+            $this->type->convertToPHPValue($inputData, $this->createMock(AbstractPlatform::class))
         );
     }
 
     public function testGetConfigObjectFromConvertToPHPValueMethod()
     {
         $testArray = ['name' => 'test'];
-        $result = $this->type->convertToPHPValue(json_encode($testArray), $this->platform);
+        $result = $this->type->convertToPHPValue(
+            json_encode($testArray, JSON_THROW_ON_ERROR),
+            $this->createMock(AbstractPlatform::class)
+        );
         $this->assertInstanceOf(ConfigObject::class, $result);
         $this->assertSame($testArray, $result->toArray());
     }
 
     /**
      * @dataProvider testConvertToDatabaseValueDataProvider
-     *
-     * @param mixed       $inputData
-     * @param null|string $expectedResult
      */
-    public function testConvertToDatabaseValue($inputData, $expectedResult)
+    public function testConvertToDatabaseValue(mixed $inputData, ?string $expectedResult)
     {
         $this->assertSame(
             $expectedResult,
-            $this->type->convertToDatabaseValue($inputData, $this->platform)
+            $this->type->convertToDatabaseValue($inputData, $this->createMock(AbstractPlatform::class))
         );
     }
 
@@ -93,11 +80,11 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
             ],
             'object input' => [
                 'input' => ConfigObject::create(['name' => 'test']),
-                'expected' => json_encode(['name' => 'test'])
+                'expected' => json_encode(['name' => 'test'], JSON_THROW_ON_ERROR)
             ],
             'incorrect input' => [
                 'input' => 'some incorrect value',
-                'expected' => json_encode([])
+                'expected' => json_encode([], JSON_THROW_ON_ERROR)
             ]
         ];
     }

@@ -20,7 +20,7 @@ define(function(require) {
         _create(...args) {
             this._uniqueName = _.uniqueId(this.widgetName);
             this.$outerTrigger = $(this.options.outerTrigger);
-            this.initialValue = this.element.val();
+            this.initialValue = this.options.initialValue || this.element.val();
 
             const superResult = this._superApply(args);
             const labelledby = [];
@@ -67,7 +67,7 @@ define(function(require) {
             this._bindHeaderEvents();
 
             const events = ['mousedown', 'clearMenus']
-                .map(eventName => `${eventName}.${this._namespaceID}`)
+                .map(eventName => `${eventName}${this._namespaceID}`)
                 .join(' ');
 
             // close each widget when clicking on any other element/anywhere else on the page
@@ -81,7 +81,7 @@ define(function(require) {
             // restored to their defaultValue prop on form reset, and the reset
             // handler fires before the form is actually reset.  delaying it a bit
             // gives the form inputs time to clear.
-            $(this.element[0].form).on(`reset.${this._namespaceID}`, () => {
+            $(this.element[0].form).on(`reset${this._namespaceID}`, () => {
                 setTimeout(this.refresh.bind(this), 10);
             });
         },
@@ -159,8 +159,12 @@ define(function(require) {
         open(...args) {
             if (!this.hasBeenOpened) {
                 this.hasBeenOpened = true;
-                // Actualize initial value when dropdown will be opened first time because
-                this.initialValue = this.element.val();
+                // Actualize initial value when dropdown will be opened first time,
+                // because in runtime some options might get disabled
+                const options = this.element.children(':enabled');
+                if (this.initialValue instanceof Array) {
+                    this.initialValue = this.initialValue.filter(name => options.is(`[value="${name}"]`));
+                }
                 this.refresh();
             }
             this._superApply(args);

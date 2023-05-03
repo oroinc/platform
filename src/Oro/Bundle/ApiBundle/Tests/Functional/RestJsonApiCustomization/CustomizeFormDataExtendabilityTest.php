@@ -331,53 +331,63 @@ class CustomizeFormDataExtendabilityTest extends RestJsonApiUpdateListTestCase
     {
         $departmentEntityType = $this->getEntityType(TestDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
-        $this->processUpdateList(
-            TestDepartment::class,
-            [
-                'data'     => [
-                    [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 1'],
-                        'relationships' => [
-                            'staff' => [
-                                'data' => [
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee1']
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 2'],
-                        'relationships' => [
-                            'staff' => [
-                                'data' => [
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee2'],
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee3']
-                                ]
+
+        $operationId = $this->sendUpdateListRequest(TestDepartment::class, [
+            'data' => [
+                [
+                    'type' => $departmentEntityType,
+                    'attributes' => ['title' => 'New Department 1'],
+                    'relationships' => [
+                        'staff' => [
+                            'data' => [
+                                ['type' => $employeeEntityType, 'id' => 'new_employee1']
                             ]
                         ]
                     ]
                 ],
-                'included' => [
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee1',
-                        'attributes' => ['name' => 'New Employee 1']
-                    ],
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee2',
-                        'attributes' => ['name' => 'New Employee 2']
-                    ],
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee3',
-                        'attributes' => ['name' => 'New Employee 3']
+                [
+                    'type' => $departmentEntityType,
+                    'attributes' => ['title' => 'New Department 2'],
+                    'relationships' => [
+                        'staff' => [
+                            'data' => [
+                                ['type' => $employeeEntityType, 'id' => 'new_employee2'],
+                                ['type' => $employeeEntityType, 'id' => 'new_employee3']
+                            ]
+                        ]
                     ]
                 ]
+            ],
+            'included' => [
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee1',
+                    'attributes' => ['name' => 'New Employee 1']
+                ],
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee2',
+                    'attributes' => ['name' => 'New Employee 2']
+                ],
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee3',
+                    'attributes' => ['name' => 'New Employee 3']
+                ]
             ]
-        );
+        ]);
+
+        $tokenStorage = $this->getTokenStorage();
+        $token = $this->getTokenStorage()->getToken();
+
+        $this->consumeMessages();
+
+        //refresh token after resetting in consumer
+        $tokenStorage->setToken($token);
+
+        $this->consumeMessages();
+
+        $this->assertAsyncOperationErrors([], $operationId);
 
         self::assertEquals(
             [

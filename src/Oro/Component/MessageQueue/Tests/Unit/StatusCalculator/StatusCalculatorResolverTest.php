@@ -5,6 +5,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\StatusCalculator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\StatusCalculator\CollectionCalculator;
@@ -13,24 +14,15 @@ use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 
 class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var StatusCalculatorResolver
-     */
-    private $statusCalculatorResolver;
-
-    /**
-     * @var QueryCalculator | \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var QueryCalculator|\PHPUnit\Framework\MockObject\MockObject */
     private $queryCalculator;
 
-    /**
-     * @var CollectionCalculator | \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var CollectionCalculator|\PHPUnit\Framework\MockObject\MockObject */
     private $collectionCalculator;
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @var StatusCalculatorResolver */
+    private $statusCalculatorResolver;
+
     protected function setUp(): void
     {
         $this->queryCalculator = $this->createMock(QueryCalculator::class);
@@ -42,21 +34,11 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        unset($this->queryCalculator);
-        unset($this->collectionCalculator);
-        unset($this->statusCalculatorResolver);
-    }
-
     public function testGetQueryCalculatorForPersistentCollection()
     {
         $childJobCollection = new PersistentCollection(
             $this->createMock(EntityManager::class),
-            Job::class,
+            $this->createMock(ClassMetadata::class),
             new ArrayCollection()
         );
 
@@ -95,12 +77,7 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
         $this->statusCalculatorResolver->getCalculatorForRootJob($rootJob);
     }
 
-    /**
-     * @param Collection $childJobCollection
-     *
-     * @return Job
-     */
-    private function getRootJobWithChildCollection(Collection $childJobCollection = null)
+    private function getRootJobWithChildCollection(?Collection $childJobCollection): Job
     {
         $rootJob = new Job();
         $rootJob->setChildJobs($childJobCollection);

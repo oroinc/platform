@@ -3,15 +3,16 @@
 namespace Oro\Component\ChainProcessor\Debug;
 
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ContextInterface;
 
+/**
+ * Decorates an action processor to log information about processor execution.
+ */
 class TraceableActionProcessor implements ActionProcessorInterface
 {
-    /** @var ActionProcessorInterface */
-    protected $actionProcessor;
-
-    /** @var TraceLogger */
-    protected $logger;
+    private ActionProcessorInterface $actionProcessor;
+    private TraceLogger $logger;
 
     public function __construct(ActionProcessorInterface $actionProcessor, TraceLogger $logger)
     {
@@ -20,25 +21,25 @@ class TraceableActionProcessor implements ActionProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getAction()
+    public function getAction(): string
     {
         return $this->actionProcessor->getAction();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function createContext()
+    public function createContext(): Context
     {
         return $this->actionProcessor->createContext();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         $this->logger->startAction($this->getAction());
         try {

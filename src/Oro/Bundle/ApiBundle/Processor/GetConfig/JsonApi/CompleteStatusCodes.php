@@ -16,8 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CompleteStatusCodes extends AbstractAddStatusCodes
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -27,7 +26,7 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -38,13 +37,11 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
         );
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
-     * @param string                 $targetAction
-     */
-    private function addStatusCodes(EntityDefinitionConfig $definition, $entityClass, $targetAction)
-    {
+    private function addStatusCodes(
+        EntityDefinitionConfig $definition,
+        string $entityClass,
+        string $targetAction
+    ): void {
         switch ($targetAction) {
             case ApiAction::CREATE:
                 $this->addStatusCodesForCreate($definition, $entityClass);
@@ -57,11 +54,8 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
 
     /**
      * Adds status codes for "create" action.
-     *
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
      */
-    private function addStatusCodesForCreate(EntityDefinitionConfig $definition, $entityClass)
+    private function addStatusCodesForCreate(EntityDefinitionConfig $definition, string $entityClass): void
     {
         $statusCodes = $definition->getStatusCodes();
         if (!$statusCodes->hasCode(Response::HTTP_CONFLICT)) {
@@ -76,7 +70,7 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
     /**
      * Adds status codes for "update" action.
      */
-    private function addStatusCodesForUpdate(StatusCodesConfig $statusCodes)
+    private function addStatusCodesForUpdate(StatusCodesConfig $statusCodes): void
     {
         $this->addStatusCode(
             $statusCodes,
@@ -85,20 +79,14 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
         );
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
-     *
-     * @return bool
-     */
-    private function hasIdGenerator(EntityDefinitionConfig $definition, $entityClass)
+    private function hasIdGenerator(EntityDefinitionConfig $definition, string $entityClass): bool
     {
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             return false;
         }
 
         $idFieldNames = $definition->getIdentifierFieldNames();
-        if (count($idFieldNames) !== 1) {
+        if (\count($idFieldNames) !== 1) {
             return false;
         }
 
@@ -114,6 +102,6 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
         }
         $idFieldNames = $classMetadata->getIdentifierFieldNames();
 
-        return count($idFieldNames) === 1 && reset($idFieldNames) === $idFieldName;
+        return \count($idFieldNames) === 1 && reset($idFieldNames) === $idFieldName;
     }
 }

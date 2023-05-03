@@ -23,6 +23,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
@@ -73,14 +74,27 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->modelManager = $this->createMock(ConfigModelManager::class);
         $this->auditManager = $this->createMock(AuditManager::class);
         $this->configCache = $this->createMock(ConfigCache::class);
+        $serviceProvider = new ServiceLocator([
+            'annotation_metadata_factory' => function () {
+                return $this->createMock(MetadataFactory::class);
+            },
+            'configuration_handler' => function () {
+                return ConfigurationHandlerMock::getInstance();
+            },
+            'event_dispatcher' => function () {
+                return $this->eventDispatcher;
+            },
+            'audit_manager' => function () {
+                return $this->auditManager;
+            },
+            'config_model_manager' => function () {
+                return $this->modelManager;
+            }
+        ]);
 
         $this->configManager = new ConfigManager(
-            $this->eventDispatcher,
-            $this->createMock(MetadataFactory::class),
-            $this->modelManager,
-            $this->auditManager,
             $this->configCache,
-            ConfigurationHandlerMock::getInstance()
+            $serviceProvider
         );
         $this->configManager->setProviderBag($configProviderBag);
     }
@@ -328,11 +342,13 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $em
-     * @param ConfigModel[]                            $models
+     * @param EntityManager|\PHPUnit\Framework\MockObject\MockObject $em
+     * @param ConfigModel[]                                          $models
      */
-    private function setFlushExpectations($em, array $models): void
-    {
+    private function setFlushExpectations(
+        EntityManager|\PHPUnit\Framework\MockObject\MockObject $em,
+        array $models
+    ): void {
         $this->configCache->expects($this->once())
             ->method('deleteAllConfigurable');
         $this->auditManager->expects($this->once())

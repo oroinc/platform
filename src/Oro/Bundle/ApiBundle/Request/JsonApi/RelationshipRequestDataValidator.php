@@ -59,7 +59,7 @@ class RelationshipRequestDataValidator extends AbstractBaseRequestDataValidator
         if (!\array_key_exists($rootSection, $data)) {
             $this->addError(
                 $this->buildPointer(self::ROOT_POINTER, $rootSection),
-                \sprintf('The "%s" top-level section should exist', $rootSection)
+                sprintf('The "%s" top-level section should exist', $rootSection)
             );
 
             return false;
@@ -68,11 +68,7 @@ class RelationshipRequestDataValidator extends AbstractBaseRequestDataValidator
         return true;
     }
 
-    /**
-     * @param mixed  $data
-     * @param string $pointer
-     */
-    protected function validatePrimarySingleItemDataObject($data, string $pointer): void
+    protected function validatePrimarySingleItemDataObject(mixed $data, string $pointer): void
     {
         if (null === $data) {
             return;
@@ -89,11 +85,7 @@ class RelationshipRequestDataValidator extends AbstractBaseRequestDataValidator
         $this->validateRelationshipObject($data, $pointer);
     }
 
-    /**
-     * @param mixed  $data
-     * @param string $pointer
-     */
-    protected function validatePrimaryCollectionDataObject($data, string $pointer): void
+    protected function validatePrimaryCollectionDataObject(mixed $data, string $pointer): void
     {
         if (!\is_array($data) || ArrayUtil::isAssoc($data)) {
             $this->addError(

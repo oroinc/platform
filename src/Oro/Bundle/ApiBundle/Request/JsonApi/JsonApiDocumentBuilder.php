@@ -20,23 +20,23 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
  */
 class JsonApiDocumentBuilder extends AbstractDocumentBuilder
 {
-    public const JSONAPI       = 'jsonapi';
-    public const LINKS         = 'links';
-    public const META          = 'meta';
-    public const INCLUDED      = 'included';
-    public const ATTRIBUTES    = 'attributes';
+    public const JSONAPI = 'jsonapi';
+    public const LINKS = 'links';
+    public const META = 'meta';
+    public const INCLUDED = 'included';
+    public const ATTRIBUTES = 'attributes';
     public const RELATIONSHIPS = 'relationships';
-    public const ID            = 'id';
-    public const TYPE          = 'type';
-    public const HREF          = 'href';
-    public const META_UPDATE   = 'update';
+    public const ID = 'id';
+    public const TYPE = 'type';
+    public const HREF = 'href';
+    public const META_UPDATE = 'update';
 
-    private const ERROR_STATUS    = 'status';
-    private const ERROR_CODE      = 'code';
-    private const ERROR_TITLE     = 'title';
-    private const ERROR_DETAIL    = 'detail';
-    private const ERROR_SOURCE    = 'source';
-    private const ERROR_POINTER   = 'pointer';
+    private const ERROR_STATUS = 'status';
+    private const ERROR_CODE = 'code';
+    private const ERROR_TITLE = 'title';
+    private const ERROR_DETAIL = 'detail';
+    private const ERROR_SOURCE = 'source';
+    private const ERROR_POINTER = 'pointer';
     private const ERROR_PARAMETER = 'parameter';
 
     /**
@@ -65,10 +65,28 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
+    public function setDataObject(mixed $object, RequestType $requestType, ?EntityMetadata $metadata): void
+    {
+        parent::setDataObject($object, $requestType, $metadata);
+        $this->removeRelatedObjectsThatDuplicatePrimaryObjects(false);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDataCollection($collection, RequestType $requestType, ?EntityMetadata $metadata): void
+    {
+        parent::setDataCollection($collection, $requestType, $metadata);
+        $this->removeRelatedObjectsThatDuplicatePrimaryObjects(true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function convertCollectionToArray(
-        $collection,
+        iterable $collection,
         RequestType $requestType,
-        EntityMetadata $metadata = null
+        ?EntityMetadata $metadata
     ): array {
         if (null !== $metadata) {
             return parent::convertCollectionToArray($collection, $requestType, $metadata);
@@ -76,7 +94,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
 
         $items = [];
         foreach ($collection as $object) {
-            $item = $this->convertObjectToArray($object, $requestType);
+            $item = $this->convertObjectToArray($object, $requestType, null);
             $items[] = $item[self::META];
         }
 
@@ -87,9 +105,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
      * {@inheritdoc}
      */
     protected function convertObjectToArray(
-        $object,
+        mixed $object,
         RequestType $requestType,
-        EntityMetadata $metadata = null
+        ?EntityMetadata $metadata
     ): array {
         $data = $this->objectAccessor->toArray($object);
         if (null === $metadata) {
@@ -236,7 +254,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function addMetaToCollectionResult(array &$result, string $name, $value): void
+    protected function addMetaToCollectionResult(array &$result, string $name, mixed $value): void
     {
         $result[self::META][$name] = $value;
     }
@@ -322,12 +340,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         }
     }
 
-    /**
-     * @param RequestType $requestType
-     * @param mixed       $item
-     * @param string      $itemId
-     */
-    protected function getAssociationData(RequestType $requestType, $item, string $itemId): array
+    protected function getAssociationData(RequestType $requestType, mixed $item, string $itemId): array
     {
         if (!\is_array($item)) {
             $item = [self::ID => $item];
@@ -374,10 +387,10 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
      * {@inheritdoc}
      */
     protected function processRelatedObject(
-        $object,
+        mixed $object,
         RequestType $requestType,
         AssociationMetadata $associationMetadata
-    ) {
+    ): mixed {
         $this->resultDataAccessor->addEntity();
         try {
             $targetMetadata = $this->getTargetMetadataProvider()
@@ -408,19 +421,11 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         }
     }
 
-    /**
-     * @param mixed               $object
-     * @param RequestType         $requestType
-     * @param string              $targetClassName
-     * @param EntityMetadata|null $targetMetadata
-     *
-     * @return array
-     */
     protected function prepareRelatedValue(
-        $object,
+        mixed $object,
         RequestType $requestType,
-        $targetClassName,
-        EntityMetadata $targetMetadata = null
+        string $targetClassName,
+        ?EntityMetadata $targetMetadata
     ): array {
         $idOnly = false;
         $targetEntityType = null;
@@ -435,7 +440,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                     $idOnly = true;
                     $idFieldNames = $targetMetadata->getIdentifierFieldNames();
                     if (\count($idFieldNames) === 1) {
-                        $object = $this->objectAccessor->getValue($object, \reset($idFieldNames));
+                        $object = $this->objectAccessor->getValue($object, reset($idFieldNames));
                     } else {
                         $data = [];
                         foreach ($idFieldNames as $fieldName) {
@@ -486,18 +491,41 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         ];
     }
 
-    /**
-     * @param string     $href
-     * @param array|null $properties
-     *
-     * @return array|string
-     */
-    protected function getLinkObject(string $href, ?array $properties)
+    protected function getLinkObject(string $href, ?array $properties): array|string
     {
         if (empty($properties)) {
             return $href;
         }
 
         return [self::HREF => $href, self::META => $properties];
+    }
+
+    private function removeRelatedObjectsThatDuplicatePrimaryObjects(bool $collection): void
+    {
+        if (empty($this->result[self::INCLUDED])) {
+            return;
+        }
+
+        $primaryEntities = [];
+        if ($collection) {
+            foreach ($this->result[self::DATA] as $item) {
+                $primaryEntities[$item[self::TYPE]][$item[self::ID]] = true;
+            }
+        } else {
+            $item = $this->result[self::DATA];
+            $primaryEntities[$item[self::TYPE]][$item[self::ID]] = true;
+        }
+        $toRemoveKeys = [];
+        foreach ($this->result[self::INCLUDED] as $key => $item) {
+            if (isset($primaryEntities[$item[self::TYPE]][$item[self::ID]])) {
+                $toRemoveKeys[] = $key;
+            }
+        }
+        if ($toRemoveKeys) {
+            foreach ($toRemoveKeys as $key) {
+                unset($this->result[self::INCLUDED][$key]);
+            }
+            $this->result[self::INCLUDED] = array_values($this->result[self::INCLUDED]);
+        }
     }
 }

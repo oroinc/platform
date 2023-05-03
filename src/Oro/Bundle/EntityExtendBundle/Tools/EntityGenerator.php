@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractEntityGeneratorExtension;
 use Oro\Component\PhpUtils\ClassGenerator;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Builds proxy classes and ORM mapping for extended entities.
@@ -19,7 +18,7 @@ class EntityGenerator
     private $extensions;
 
     /**
-     * @param string                                      $cacheDir
+     * @param string $cacheDir
      * @param iterable|AbstractEntityGeneratorExtension[] $extensions
      */
     public function __construct(string $cacheDir, iterable $extensions)
@@ -54,7 +53,6 @@ class EntityGenerator
                 $aliases[$schema['entity']] = $schema['parent'];
             }
             $classes .= $this->buildPhpClass($schema);
-            $this->writeOrmMapping($schema);
         }
         // writes PHP classes for extended entity proxy to PHP file contains all such classes
         $this->writePhpFile($this->entityClassesPath, $this->buildPhpFileHeader() . $classes);
@@ -67,7 +65,7 @@ class EntityGenerator
     }
 
     /**
-     * Generates PHP class for extended entity proxy and YAML file with ORM mapping.
+     * Generates PHP class for extended entity proxy
      */
     public function generateSchemaFiles(array $schema): void
     {
@@ -82,7 +80,6 @@ class EntityGenerator
             $classes = $this->buildPhpFileHeader() . $class;
         }
         $this->writePhpFile($this->entityClassesPath, $classes);
-        $this->writeOrmMapping($schema);
     }
 
     private function ensureEntityCacheDirExistsAndEmpty(): void
@@ -136,6 +133,10 @@ class EntityGenerator
      */
     private function buildPhpClass(array $schema): string
     {
+        // Skip all classes except enums and custom entities
+        if (!str_starts_with($schema['class'], ExtendClassLoadingUtils::getEntityNamespace())) {
+            return '';
+        }
         $class = new ClassGenerator($schema['entity']);
         if ('mappedSuperclass' === $schema['doctrine'][$schema['entity']]['type']) {
             $class->setAbstract();
@@ -187,17 +188,5 @@ class EntityGenerator
         file_put_contents($path, $content);
 
         clearstatcache(true, $path);
-    }
-
-    /**
-     * Writes ORM mapping in separate YAML file.
-     */
-    private function writeOrmMapping(array $schema): void
-    {
-        $shortClassName = ExtendHelper::getShortClassName($schema['entity']);
-        file_put_contents(
-            $this->entityCacheDir . DIRECTORY_SEPARATOR . $shortClassName . '.orm.yml',
-            Yaml::dump($schema['doctrine'], 5)
-        );
     }
 }

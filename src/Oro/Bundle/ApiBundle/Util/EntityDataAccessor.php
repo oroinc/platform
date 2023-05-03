@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Component\EntitySerializer\EntityDataAccessor as BaseEntityDataAccessor;
 
 /**
@@ -10,41 +11,10 @@ use Oro\Component\EntitySerializer\EntityDataAccessor as BaseEntityDataAccessor;
 class EntityDataAccessor extends BaseEntityDataAccessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function hasGetter($className, $property): bool
+    protected function createReflectionClass(string $className): \ReflectionClass
     {
-        $result = parent::hasGetter($className, $property)
-            || $this->getReflectionClass($className)->hasMethod('__get');
-
-        if (!$result && is_a($className, \ArrayAccess::class, true)) {
-            $result = true;
-        }
-
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function tryGetValue($object, $property, &$value)
-    {
-        $result = parent::tryGetValue($object, $property, $value);
-
-        if (!$result && is_object($object)
-            && $this->getReflectionClass(get_class($object))->hasMethod('__get')
-        ) {
-            try {
-                [$result, $value] = [true, $object->__get($property)];
-            } catch (\Exception $e) {
-            }
-        }
-
-        if (!$result && $object instanceof \ArrayAccess && $object->offsetExists($property)) {
-            $value = $object->offsetGet($property);
-            $result = true;
-        }
-
-        return $result;
+        return new EntityReflectionClass($className);
     }
 }

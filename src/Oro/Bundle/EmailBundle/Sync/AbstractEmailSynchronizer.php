@@ -400,7 +400,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     protected function changeOriginSyncState(
         EmailOrigin $origin,
         int $syncCode,
-        ?\DateTime$synchronizedAt = null,
+        ?\DateTime $synchronizedAt = null,
         bool $disableSync = false
     ): bool {
         $repo = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
@@ -511,11 +511,11 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
                 . ' - (CASE o.syncCode WHEN :success THEN 0 ELSE :timeShift END)) AS HIDDEN p2'
             )
             ->where('o.isActive = :isActive AND (o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border)')
-            ->andWhere('o.isSyncEnabled != :isSyncEnabled')
+            ->andWhere('(o.isSyncEnabled is NULL or o.isSyncEnabled = :isSyncEnabled)')
             ->orderBy('p1, p2 DESC, o.syncCodeUpdatedAt')
             ->setParameter('inProcess', self::SYNC_CODE_IN_PROCESS)
             ->setParameter('inProcessForce', self::SYNC_CODE_IN_PROCESS_FORCE)
-            ->setParameter('isSyncEnabled', false)
+            ->setParameter('isSyncEnabled', true)
             ->setParameter('success', self::SYNC_CODE_SUCCESS)
             ->setParameter('isActive', true)
             ->setParameter('now', $now, Types::DATETIME_MUTABLE)

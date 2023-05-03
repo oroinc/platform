@@ -80,7 +80,7 @@ class AssociationMetadataLoader
     {
         $dataType = null;
         $idFieldNames = $targetMetadata->getIdentifierFieldNames();
-        if (count($idFieldNames) === 1) {
+        if (\count($idFieldNames) === 1) {
             $idField = $targetMetadata->getProperty(reset($idFieldNames));
             if (null !== $idField) {
                 $dataType = $idField->getDataType();

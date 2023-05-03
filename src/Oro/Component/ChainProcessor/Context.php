@@ -10,97 +10,89 @@ class Context extends ParameterBag implements ContextInterface
     /** action name */
     public const ACTION = 'action';
 
-    /** @var string|null */
-    private $firstGroup;
-
-    /** @var string|null */
-    private $lastGroup;
-
+    private ?string $firstGroup = null;
+    private ?string $lastGroup = null;
     /** @var string[] */
-    private $skippedGroups = [];
-
-    /** @var mixed */
-    private $result;
-
-    /** @var bool */
-    private $resultExists = false;
+    private array $skippedGroups = [];
+    private mixed $result = null;
+    private bool $resultExists = false;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getAction()
+    public function getAction(): string
     {
         return $this->get(self::ACTION);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setAction($action)
+    public function setAction(string $action): void
     {
         $this->set(self::ACTION, $action);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getFirstGroup()
+    public function getFirstGroup(): ?string
     {
         return $this->firstGroup;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setFirstGroup($group)
+    public function setFirstGroup(?string $group): void
     {
         $this->firstGroup = $group;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getLastGroup()
+    public function getLastGroup(): ?string
     {
         return $this->lastGroup;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setLastGroup($group)
+    public function setLastGroup(?string $group): void
     {
         $this->lastGroup = $group;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function hasSkippedGroups()
+    public function hasSkippedGroups(): bool
     {
         return !empty($this->skippedGroups);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getSkippedGroups()
+    public function getSkippedGroups(): array
     {
         return $this->skippedGroups;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function resetSkippedGroups()
+    public function resetSkippedGroups(): void
     {
         $this->skippedGroups = [];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function skipGroup($group)
+    public function skipGroup(string $group): void
     {
         if (!\in_array($group, $this->skippedGroups, true)) {
             $this->skippedGroups[] = $group;
@@ -108,46 +100,46 @@ class Context extends ParameterBag implements ContextInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function undoGroupSkipping($group)
+    public function undoGroupSkipping(string $group): void
     {
-        $key = \array_search($group, $this->skippedGroups, true);
+        $key = array_search($group, $this->skippedGroups, true);
         if (false !== $key) {
             unset($this->skippedGroups[$key]);
-            $this->skippedGroups = \array_values($this->skippedGroups);
+            $this->skippedGroups = array_values($this->skippedGroups);
         }
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function hasResult()
+    public function hasResult(): bool
     {
         return $this->resultExists;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getResult()
+    public function getResult(): mixed
     {
         return $this->result;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setResult($data)
+    public function setResult(mixed $data): void
     {
         $this->result = $data;
         $this->resultExists = true;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function removeResult()
+    public function removeResult(): void
     {
         $this->result = null;
         $this->resultExists = false;

@@ -10,8 +10,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 abstract class AbstractConfigurationSection implements ConfigurationSectionInterface
 {
-    /** @var ConfigurationSettingsInterface */
-    protected $settings;
+    protected ConfigurationSettingsInterface $settings;
 
     /**
      * {@inheritdoc}
@@ -33,30 +32,25 @@ abstract class AbstractConfigurationSection implements ConfigurationSectionInter
     {
         $callbacks = $this->settings->getConfigureCallbacks($section);
         foreach ($callbacks as $callback) {
-            \call_user_func($callback, $node);
+            $callback($node);
         }
     }
 
-    /**
-     * @param ArrayNodeDefinition $node
-     * @param string              $section
-     * @param callable|null       $customPreProcessCallback
-     */
     protected function addPreProcessCallbacks(
         ArrayNodeDefinition $node,
         string $section,
-        $customPreProcessCallback = null
+        callable $customPreProcessCallback = null
     ): void {
         $node
             ->beforeNormalization()
             ->always(
                 function ($value) use ($section, $customPreProcessCallback) {
                     if (null !== $customPreProcessCallback) {
-                        $value = \call_user_func($customPreProcessCallback, $value);
+                        $value = $customPreProcessCallback($value);
                     }
                     $callbacks = $this->settings->getPreProcessCallbacks($section);
                     foreach ($callbacks as $callback) {
-                        $value = \call_user_func($callback, $value);
+                        $value = $callback($value);
                     }
 
                     return $value;
@@ -64,26 +58,21 @@ abstract class AbstractConfigurationSection implements ConfigurationSectionInter
             );
     }
 
-    /**
-     * @param ArrayNodeDefinition $node
-     * @param string              $section
-     * @param callable|null       $customPostProcessCallback
-     */
     protected function addPostProcessCallbacks(
         ArrayNodeDefinition $node,
         string $section,
-        $customPostProcessCallback = null
+        callable $customPostProcessCallback = null
     ): void {
         $node
             ->validate()
             ->always(
                 function ($value) use ($section, $customPostProcessCallback) {
                     if (null !== $customPostProcessCallback) {
-                        $value = \call_user_func($customPostProcessCallback, $value);
+                        $value = $customPostProcessCallback($value);
                     }
                     $callbacks = $this->settings->getPostProcessCallbacks($section);
                     foreach ($callbacks as $callback) {
-                        $value = \call_user_func($callback, $value);
+                        $value = $callback($value);
                     }
 
                     return $value;

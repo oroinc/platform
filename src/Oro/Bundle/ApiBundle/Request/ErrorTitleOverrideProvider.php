@@ -8,11 +8,10 @@ namespace Oro\Bundle\ApiBundle\Request;
  */
 class ErrorTitleOverrideProvider
 {
-    /** @var string[] [error title => substitute error title, ...] */
-    private $substitutions;
+    private array $substitutions;
 
     /**
-     * @param string[] $substitutions
+     * @param string[] $substitutions [error title => substitute error title, ...]
      */
     public function __construct(array $substitutions)
     {
@@ -21,11 +20,6 @@ class ErrorTitleOverrideProvider
 
     /**
      * Returns the error title that should be used instead the given error title.
-     *
-     * @param string $errorTitle
-     *
-     * @return string|null The error title that substitutes the given error title
-     *                     or NULL if there is no substitution
      */
     public function getSubstituteErrorTitle(string $errorTitle): ?string
     {

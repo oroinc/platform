@@ -67,13 +67,13 @@ class ConfigurationResolver
                     $val = constant("$class::$method");
                 }
                 break;
-            // service method call @service->method
+                // service method call @service->method
             case preg_match('/^@([\w\.\_]+)->([\w\.\_]+)$/', $val, $match):
                 $service = $match[1];
                 $method  = $match[2];
                 $val     = $this->container->get($service)->$method();
                 break;
-            // service pass @service
+                // service pass @service
             case preg_match('/^@([\w\.\_]+)$/', $val, $match):
                 $val = $this->container->get($match[1]);
                 break;

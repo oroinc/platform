@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Helper;
 
+use Carbon\Carbon;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
@@ -16,11 +17,13 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class DateHelper
 {
-    const YEAR_TYPE_DAYS  = 1460;
-    const MONTH_TYPE_DAYS = 93;
-    const WEEK_TYPE_DAYS  = 60;
-    const DAY_TYPE_DAYS   = 2;
-    const MIN_DATE        = '1900-01-01';
+    public const MIN_DATE = '1900-01-01';
+
+    private const DAYS_IN_53_WEEKS = 371;
+    private const YEAR_TYPE_DAYS  = 1460;
+    private const MONTH_TYPE_DAYS = 93;
+    private const WEEK_TYPE_DAYS  = 60;
+    private const DAY_TYPE_DAYS   = 2;
 
     /** @var string */
     protected $offset;
@@ -44,21 +47,30 @@ class DateHelper
     /**
      * @param \DateTime $from
      * @param \DateTime $to
-     * @param array     $data
-     * @param string    $rowKey
-     * @param string    $dataKey
+     * @param array $data
+     * @param string $rowKey
+     * @param string $dataKey
+     * @param bool $isConvertEmptyData
+     * @param ?string $scaleType
      *
      * @return array
      */
-    public function convertToCurrentPeriod(\DateTime $from, \DateTime $to, array $data, $rowKey, $dataKey)
-    {
-        if (empty($data)) {
+    public function convertToCurrentPeriod(
+        \DateTime $from,
+        \DateTime $to,
+        array $data,
+        string $rowKey,
+        string $dataKey,
+        bool $isConvertEmptyData = false,
+        string $scaleType = null
+    ): array {
+        if ($isConvertEmptyData === false && empty($data)) {
             return [];
         }
 
-        $items = $this->getDatePeriod($from, $to);
+        $items = $this->getDatePeriod($from, $to, $scaleType);
         foreach ($data as $row) {
-            $key                   = $this->getKey($from, $to, $row);
+            $key                   = $this->getKey($from, $to, $row, $scaleType);
             $items[$key][$dataKey] = $row[$rowKey];
         }
 
@@ -131,14 +143,17 @@ class DateHelper
     /**
      * @param \DateTime $start
      * @param \DateTime $end
+     * @param ?string $scaleType
      *
      * @return array
      */
-    public function getDatePeriod(\DateTime $start, \DateTime $end)
+    public function getDatePeriod(\DateTime $start, \DateTime $end, string $scaleType = null)
     {
         $start      = clone $start;
         $end        = clone $end;
-        $config     = self::getFormatStrings($start, $end);
+        $config     = $scaleType
+            ? $this->getDateIntervalConfigByScaleType($scaleType)
+            : $this->getFormatStrings($start, $end);
         $interval   = new \DateInterval($config['intervalString']);
         $datePeriod = new \DatePeriod($start, $interval, $end);
         $increment  = 0;
@@ -146,43 +161,66 @@ class DateHelper
         // create dates by date period
         /** @var \DateTime $dt */
         foreach ($datePeriod as $dt) {
-            $key         = $dt->format($config['valueStringFormat']);
-            $dates[$key] = [
+            $key = $dt->format($config['valueStringFormat']);
+            $dateItem = [
                 'date' => $this->getFormattedLabel($config, $dt, $increment),
             ];
+            if ($config['viewType'] === 'date') {
+                $dateItem['dateStart'] = $this->getFormattedLabel($config, $dt, $increment);
+                $dateItemDateEnd = (clone $dt)->modify('Sunday this week');
+                $dateItem['dateEnd'] = $this->getFormattedLabel(
+                    $config,
+                    $dateItemDateEnd->diff($end)->invert === 0 ? $dateItemDateEnd : $end,
+                    0
+                );
+            }
+            $dates[$key] = $dateItem;
             $increment++;
         }
 
         $endDateKey = $end->format($config['valueStringFormat']);
         if (!in_array($endDateKey, array_keys($dates))) {
-            $dates[$endDateKey] = [
+            $dateItem = [
                 'date' => $this->getFormattedLabel($config, $end, $increment),
             ];
+            if ($config['viewType'] === 'date') {
+                $dateItem['dateStart'] = $this->getFormattedLabel(
+                    $config,
+                    (clone $end)->modify('Monday this week'),
+                    0
+                );
+                $dateItem['dateEnd'] = $this->getFormattedLabel($config, $end, 0);
+            }
+            $dates[$endDateKey] = $dateItem;
         }
 
         return $dates;
     }
 
     /**
-     * @param \DateTime    $start
-     * @param \DateTime    $end
+     * @param \DateTime $start
+     * @param \DateTime $end
      * @param QueryBuilder $qb
-     * @param string       $entityField
+     * @param string $entityField
+     * @param ?string $scaleType
      */
     public function addDatePartsSelect(
         \DateTime $start,
         \DateTime $end,
         QueryBuilder $qb,
-        $entityField
+        string $entityField,
+        string $scaleType = null
     ) {
         QueryBuilderUtil::checkField($entityField);
-        switch ($this->getFormatStrings($start, $end)['viewType']) {
+        $scaleType = $scaleType ?? $this->getFormatStrings($start, $end)['viewType'];
+        switch ($scaleType) {
             case 'year':
                 $qb->addSelect(sprintf(
                     '%s as yearCreated',
                     $this->getEnforcedTimezoneFunction('YEAR', $entityField)
                 ));
                 $qb->addGroupBy('yearCreated');
+                $qb->addOrderBy('yearCreated');
                 break;
             case 'month':
                 $qb->addSelect(sprintf(
@@ -197,11 +235,13 @@ class DateHelper
                 );
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('monthCreated');
+                $qb->addOrderBy('yearCreated');
+                $qb->addOrderBy('monthCreated');
                 break;
             case 'date':
                 $qb->addSelect(sprintf(
                     "%s as yearCreated",
-                    $this->getEnforcedTimezoneFunction('YEAR', $entityField)
+                    $this->getEnforcedTimezoneFunction('ISOYEAR', $entityField)
                 ));
                 $qb->addSelect(sprintf(
                     '%s as weekCreated',
@@ -209,6 +249,8 @@ class DateHelper
                 ));
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('weekCreated');
+                $qb->addOrderBy('yearCreated');
+                $qb->addOrderBy('weekCreated');
                 break;
             case 'day':
                 $qb->addSelect(sprintf(
@@ -228,6 +270,9 @@ class DateHelper
                 $qb->addGroupBy('yearCreated');
                 $qb->addGroupBy('monthCreated');
                 $qb->addGroupBy('dayCreated');
+                $qb->addOrderBy('yearCreated');
+                $qb->addOrderBy('monthCreated');
+                $qb->addOrderBy('dayCreated');
                 break;
             case 'time':
                 $qb->addSelect(sprintf(
@@ -240,6 +285,8 @@ class DateHelper
                 ));
                 $qb->addGroupBy('dateCreated');
                 $qb->addGroupBy('hourCreated');
+                $qb->addOrderBy('dateCreated');
+                $qb->addOrderBy('hourCreated');
                 break;
         }
     }
@@ -247,13 +294,16 @@ class DateHelper
     /**
      * @param \DateTime $start
      * @param \DateTime $end
-     * @param           $row
+     * @param array $row
+     * @param ?string $scaleType
      *
      * @return string
      */
-    public function getKey(\DateTime $start, \DateTime $end, $row)
+    public function getKey(\DateTime $start, \DateTime $end, array $row, string $scaleType = null)
     {
-        $config = $this->getFormatStrings($start, $end);
+        $config = $scaleType
+            ? $this->getDateIntervalConfigByScaleType($scaleType)
+            : $this->getFormatStrings($start, $end);
         switch ($config['viewType']) {
             case 'month':
                 $time = strtotime(sprintf('%s-%s', $row['yearCreated'], $row['monthCreated']));
@@ -269,6 +319,8 @@ class DateHelper
                 return $row['yearCreated'] . '-' . $week;
             case 'time':
                 return $row['dateCreated'] . '-' . str_pad($row['hourCreated'], 2, '0', STR_PAD_LEFT);
+            default:
+                throw new \InvalidArgumentException(sprintf('Unsupported scale "%s"', $config['viewType']));
         }
 
         return date($config['valueStringFormat'], $time);
@@ -294,7 +346,7 @@ class DateHelper
             $viewType          = 'month';
         } elseif ($diff->days > self::WEEK_TYPE_DAYS) {
             $intervalString    = 'P1W';
-            $valueStringFormat = 'Y-W';
+            $valueStringFormat = 'o-W'; // ISO 8601 week-numbering year, ISO 8601 week number of year
             $viewType          = 'date';
         } elseif ($diff->days > self::DAY_TYPE_DAYS) {
             $intervalString    = 'P1D';
@@ -314,29 +366,40 @@ class DateHelper
     }
 
     /**
-     * Returns correct date period dates for cases if user select 'less than' period type
+     * Returns correct date period dates for cases if user select 'less than' or 'all time' period type
      *
-     * @param array  $dateRange selected date range
+     * @param array  $dateRange Selected date range
      * @param string $entity    Entity name to search min date
      * @param string $field     Field name to search min date
      *
      * @return array
      */
-    public function getPeriod($dateRange, $entity, $field)
-    {
+    public function getPeriod(
+        array $dateRange,
+        string $entity,
+        string $field,
+        bool $isFullStartDate = false
+    ): array {
         $start = $dateRange['start'];
         $end   = $dateRange['end'];
 
-        if ($dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN) {
+        if ($dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN
+            || $dateRange['type'] === AbstractDateFilterType::TYPE_ALL_TIME
+        ) {
             QueryBuilderUtil::checkIdentifier($field);
             $qb = $this->doctrine
                 ->getRepository($entity)
                 ->createQueryBuilder('e')
-                ->select(sprintf('MIN(e.%s) as val', $field));
+                ->select(sprintf('COALESCE(MIN(e.%s), :defaultMinDate) as val', $field))
+                ->setParameter('defaultMinDate', static::MIN_DATE);
 
             $start = $this->aclHelper->apply($qb)->getSingleScalarResult();
-            $start = new \DateTime($start, new \DateTimeZone('UTC'));
+            $start = new Carbon($start, new \DateTimeZone('UTC'));
             $start = $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
+
+            if ($isFullStartDate) {
+                $start->setTime(0, 0);
+            }
         }
 
         return [$start, $end];
@@ -347,9 +410,7 @@ class DateHelper
      */
     public function getCurrentDateTime()
     {
-        $now = new \DateTime('now', new \DateTimeZone($this->localeSettings->getTimeZone()));
-
-        return $now;
+        return new \DateTime('now', new \DateTimeZone($this->localeSettings->getTimeZone()));
     }
 
     /**
@@ -398,7 +459,7 @@ class DateHelper
                 return $date->format('Y-m-d');
         }
 
-        return $date->format('c');
+        return (clone $date)->modify('+1 hour')->format('c');
     }
 
     /**
@@ -414,9 +475,8 @@ class DateHelper
         if ('UTC' !== $this->localeSettings->getTimeZone()) {
             $fieldName = sprintf("CONVERT_TZ(%s, '+00:00', '%s')", $fieldName, $this->getTimeZoneOffset());
         }
-        $result = sprintf('%s(%s)', $functionName, $fieldName);
 
-        return $result;
+        return sprintf('%s(%s)', $functionName, $fieldName);
     }
 
     /**
@@ -432,5 +492,83 @@ class DateHelper
         }
 
         return $this->offset;
+    }
+
+    /**
+     * @param \DateTimeInterface $start
+     * @param \DateTimeInterface $end
+     * @param int $dateRangeType
+     *
+     * @return string
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function getScaleType(\DateTimeInterface $start, \DateTimeInterface $end, int $dateRangeType): string
+    {
+        $diff = $end->diff($start);
+
+        if ($diff->days <= 1) {
+            return 'time';
+        }
+
+        switch ($dateRangeType) {
+            case AbstractDateFilterType::TYPE_TODAY:
+                return 'time';
+            case AbstractDateFilterType::TYPE_THIS_WEEK:
+            case AbstractDateFilterType::TYPE_THIS_MONTH:
+                return 'day';
+            case AbstractDateFilterType::TYPE_THIS_QUARTER:
+            case AbstractDateFilterType::TYPE_THIS_YEAR:
+                return 'date';
+            case AbstractDateFilterType::TYPE_MORE_THAN:
+            case AbstractDateFilterType::TYPE_LESS_THAN:
+            case AbstractDateFilterType::TYPE_BETWEEN:
+            case AbstractDateFilterType::TYPE_ALL_TIME:
+                if ($diff->days <= 31) {
+                    $scale = 'day';
+                } elseif ($diff->days <= self::DAYS_IN_53_WEEKS) {
+                    $scale = 'date';
+                } else {
+                    $scale = 'month';
+                }
+
+                return $scale;
+            default:
+                throw new \InvalidArgumentException(sprintf('Unsupported date range type "%s"', $dateRangeType));
+        }
+    }
+
+    public function getDateIntervalConfigByScaleType(string $scaleType): array
+    {
+        switch ($scaleType) {
+            case 'year':
+                $intervalString = 'P1Y';
+                $valueStringFormat = 'Y';
+                break;
+            case 'month':
+                $intervalString = 'P1M';
+                $valueStringFormat = 'Y-m';
+                break;
+            case 'date':
+                $intervalString = 'P1W';
+                $valueStringFormat = 'o-W'; // ISO 8601 week-numbering year, ISO 8601 week number of year
+                break;
+            case 'day':
+                $intervalString = 'P1D';
+                $valueStringFormat = 'Y-m-d';
+                break;
+            case 'time':
+                $intervalString = 'PT1H';
+                $valueStringFormat = 'Y-m-d-H';
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('Unsupported scale "%s"', $scaleType));
+        }
+
+        return [
+            'intervalString' => $intervalString,
+            'valueStringFormat' => $valueStringFormat,
+            'viewType' => $scaleType
+        ];
     }
 }

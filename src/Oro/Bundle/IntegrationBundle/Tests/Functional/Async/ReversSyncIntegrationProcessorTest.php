@@ -3,24 +3,24 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
+use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
 use Oro\Bundle\IntegrationBundle\Test\Provider\TestConnector;
 use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadChannelData;
-use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 /**
  * @dbIsolationPerTest
  */
 class ReversSyncIntegrationProcessorTest extends WebTestCase
 {
+    use MessageQueueExtension;
+
     private EntityManagerInterface $channelManager;
 
-    private ReversSyncIntegrationProcessor $processor;
+    private SyncScheduler $syncScheduler;
 
     protected function setUp(): void
     {
@@ -31,7 +31,7 @@ class ReversSyncIntegrationProcessorTest extends WebTestCase
         ]);
 
         $this->channelManager = self::getContainer()->get('doctrine')->getManagerForClass(Channel::class);
-        $this->processor = self::getContainer()->get('oro_integration.async.revers_sync_integration_processor');
+        $this->syncScheduler = self::getContainer()->get('oro_integration.sync_scheduler');
     }
 
     public function testProcess(): void
@@ -40,15 +40,12 @@ class ReversSyncIntegrationProcessorTest extends WebTestCase
         $integration = $this->getReference('oro_integration:foo_integration');
         self::assertEmpty($integration->getStatuses()->toArray());
 
-        $message = new Message();
-        $message->setMessageId(UUIDGenerator::v4());
-        $message->setBody([
-            'integration_id' => $integration->getId(),
-            'connector' => TestConnector::TYPE,
-            'connector_parameters' => [],
-        ]);
+        $this->syncScheduler->schedule($integration->getId(), TestConnector::TYPE);
 
-        $this->processor->process($message, $this->createMock(SessionInterface::class));
+        self::consume();
+
+        // get managed entity again after reset in consumer
+        $integration = $this->getReference('oro_integration:foo_integration');
 
         $this->channelManager->refresh($integration);
 

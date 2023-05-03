@@ -17,15 +17,9 @@ class KernelStub extends OroKernel
 
     /** @var array */
     protected $parameters = [
-        'database_driver' => 'pdo_mysql',
-        'database_host' => '127.0.0.1',
-        'database_port' => null,
-        'database_name' => 'oro_crm',
-        'database_user' => 'root',
-        'database_password' => null,
+        'database_dsn' => 'postgresql://root@127.0.0.1/oro_crm',
         'session_handler' => 'session.handler.native_file',
-        'message_queue_transport' => 'dbal',
-        'message_queue_transport_config' => null,
+        'message_queue_transport_dsn' => 'dbal:',
     ];
 
     /**

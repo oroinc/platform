@@ -58,17 +58,12 @@ class ChartSettingsCollectionTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $childType = new ChartSettingsType($this->createMock(ConfigProvider::class));
-
         return [
-            new PreloadedExtension(
-                [
-                    $childType->getName() => $childType
-                ],
-                []
-            )
+            new PreloadedExtension([
+                new ChartSettingsType($this->createMock(ConfigProvider::class))
+            ], [])
         ];
     }
 }

@@ -222,9 +222,9 @@ class DynamicTranslationProviderTest extends \PHPUnit\Framework\TestCase
             ->with([$locale], self::isFalse())
             ->willReturn([]);
 
-        $this->provider->warmUp($locale);
+        $this->provider->warmUp([$locale]);
 
         // test that memory cache is cleared
-        $this->provider->warmUp($locale);
+        $this->provider->warmUp([$locale]);
     }
 }

@@ -9,10 +9,10 @@ use Oro\Bundle\FilterBundle\Provider\DatagridFiltersProviderInterface;
 class DatagridFiltersProviderCompositeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridFiltersProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private DatagridFiltersProviderInterface $innerProvider1;
+    private $innerProvider1;
 
     /** @var DatagridFiltersProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private DatagridFiltersProviderInterface $innerProvider2;
+    private $innerProvider2;
 
     protected function setUp(): void
     {
@@ -26,14 +26,12 @@ class DatagridFiltersProviderCompositeTest extends \PHPUnit\Framework\TestCase
         $filters1 = ['filter1' => ['name' => 'filter1']];
         $filters2 = ['filter2' => ['name' => 'filter2']];
 
-        $this->innerProvider1
-            ->expects($this->once())
+        $this->innerProvider1->expects($this->once())
             ->method('getDatagridFilters')
             ->with($gridConfig)
             ->willReturn($filters1);
 
-        $this->innerProvider2
-            ->expects($this->once())
+        $this->innerProvider2->expects($this->once())
             ->method('getDatagridFilters')
             ->with($gridConfig)
             ->willReturn($filters2);

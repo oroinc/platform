@@ -31,17 +31,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeMetadata implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityMetadataFactory */
-    private $entityMetadataFactory;
-
-    /** @var MetadataProvider */
-    private $metadataProvider;
-
-    /** @var EntityOverrideProviderRegistry */
-    private $entityOverrideProviderRegistry;
+    private DoctrineHelper $doctrineHelper;
+    private EntityMetadataFactory $entityMetadataFactory;
+    private MetadataProvider $metadataProvider;
+    private EntityOverrideProviderRegistry $entityOverrideProviderRegistry;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -58,7 +51,7 @@ class NormalizeMetadata implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */
 
@@ -220,14 +213,20 @@ class NormalizeMetadata implements ProcessorInterface
         EntityMetadata $targetEntityMetadata
     ): bool {
         $isPropertyAdded = false;
+        $linkedProperty = $targetEntityMetadata->getPropertyByPropertyPath($linkedPropertyName);
+        if (null !== $linkedProperty) {
+            $linkedPropertyName = $linkedProperty->getName();
+        }
         if ($targetEntityMetadata->hasAssociation($linkedPropertyName)) {
             $association = clone $targetEntityMetadata->getAssociation($linkedPropertyName);
             $association->setName($fieldName);
+            $association->setPropertyPath(null);
             $entityMetadata->addAssociation($association);
             $isPropertyAdded = true;
         } elseif ($targetEntityMetadata->hasField($linkedPropertyName)) {
             $field = clone $targetEntityMetadata->getField($linkedPropertyName);
             $field->setName($fieldName);
+            $field->setPropertyPath(null);
             $entityMetadata->addField($field);
             $isPropertyAdded = true;
         }

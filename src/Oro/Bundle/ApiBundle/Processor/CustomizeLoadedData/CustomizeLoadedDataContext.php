@@ -16,10 +16,8 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     private const IDENTIFIER_ONLY = 'identifier_only';
 
     /** @var ConfigExtraInterface[] */
-    private $configExtras;
-
-    /** @var bool|null */
-    private $isHateoasEnabled;
+    private array $configExtras = [];
+    private ?bool $isHateoasEnabled = null;
 
     /**
      * Gets the response data.
@@ -64,10 +62,6 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
 
     /**
      * Gets the name under which the given field should be represented in response data.
-     *
-     * @param string $propertyPath The name of an entity field
-     *
-     * @return string|null
      */
     public function getResultFieldName(string $propertyPath): ?string
     {
@@ -89,13 +83,8 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
 
     /**
      * Gets the value of the given entity field from response data.
-     *
-     * @param string     $propertyName The name of an entity field
-     * @param array|null $data         Response data
-     *
-     * @return mixed
      */
-    public function getResultFieldValue(string $propertyName, array $data)
+    public function getResultFieldValue(string $propertyName, array $data): mixed
     {
         $fieldName = $this->getResultFieldName($propertyName);
         if (!$fieldName || !\array_key_exists($fieldName, $data)) {
@@ -107,13 +96,8 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
 
     /**
      * Gets the value of an entity field by the given property path from response data.
-     *
-     * @param string     $propertyPath The path to an entity field, each element is the property name in an entity
-     * @param array|null $data         Response data
-     *
-     * @return mixed
      */
-    public function getResultFieldValueByPropertyPath(string $propertyPath, array $data)
+    public function getResultFieldValueByPropertyPath(string $propertyPath, array $data): mixed
     {
         $config = $this->getConfig();
         $path = ConfigUtil::explodePropertyPath($propertyPath);
@@ -162,7 +146,7 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
      * @return bool TRUE if the given field is requested to be returned in response data,
      *              and it does not exist in the given response data, if it is specified
      */
-    public function isFieldRequested(?string $fieldName, array $data = null): bool
+    public function isFieldRequested(?string $fieldName, ?array $data = null): bool
     {
         if (!$fieldName) {
             return false;
@@ -188,13 +172,13 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
      *
      * @see isFieldRequested
      *
-     * @param array|null $data       Response data
      * @param string[]   $fieldNames The names under which fields should be represented in response data
+     * @param array|null $data       Response data
      *
      * @return bool TRUE if at least one of the given fields is requested to be returned in response data,
      *              and it does not exist in the given response data, if it is specified
      */
-    public function isAtLeastOneFieldRequested(array $fieldNames, array $data = null): bool
+    public function isAtLeastOneFieldRequested(array $fieldNames, ?array $data = null): bool
     {
         foreach ($fieldNames as $fieldName) {
             if ($this->isFieldRequested($fieldName, $data)) {
@@ -259,7 +243,7 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
      *
      * @return mixed
      */
-    public function getIdentifierValues(array $data, string $identifierFieldName)
+    public function getIdentifierValues(array $data, string $identifierFieldName): mixed
     {
         $ids = [];
         foreach ($data as $item) {

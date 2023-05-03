@@ -15,24 +15,18 @@ interface SharedDataAwareContextInterface extends ComponentContextInterface
     /**
      * Gets the current request type.
      * A request can belong to several types, e.g. "rest" and "json_api".
-     *
-     * @return RequestType
      */
-    public function getRequestType();
+    public function getRequestType(): RequestType;
 
     /**
-     * Gets API version
-     *
-     * @return string
+     * Gets API version.
      */
-    public function getVersion();
+    public function getVersion(): string;
 
     /**
-     * Sets API version
-     *
-     * @param string $version
+     * Sets API version.
      */
-    public function setVersion($version);
+    public function setVersion(string $version): void;
 
     /**
      * Gets an object that is used to share data between a primary action

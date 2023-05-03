@@ -6,6 +6,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroSimpleColorPickerField;
@@ -22,7 +23,10 @@ class FeatureContext extends OroFeatureContext implements
     FixtureLoaderAwareInterface,
     OroPageObjectAware
 {
-    use FixtureLoaderDictionary, PageObjectDictionary, AllowedColorsMapping;
+    use FixtureLoaderDictionary;
+    use PageObjectDictionary;
+    use AllowedColorsMapping;
+    use NormalizeConfigOptionTrait;
 
     /**
      * Follow link on sidebar in configuration menu
@@ -217,7 +221,7 @@ class FeatureContext extends OroFeatureContext implements
         }, $integrationElements);
 
         $isIntegrationVisibleExpectation = empty(trim($negotiation));
-        foreach ($table->getRows() as list($row)) {
+        foreach ($table->getRows() as [$row]) {
             if ($isIntegrationVisibleExpectation) {
                 self::assertContains($row, $actual, "Integration with name $row not found");
             } else {
@@ -255,8 +259,8 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
-     * Enables (set to true) certain config options
-     * Used instead of manual walking on configuration like "System/ Configuration"
+     * Enables (set to true) certain config options.
+     * Used instead of manual walking on configuration like "System/ Configuration".
      *
      * Example: I enable configuration options:
      *      | oro_config.setting1 |
@@ -275,8 +279,8 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
-     * Disables (set to false) certain config options
-     * Used instead of manual walking on configuration like "System/ Configuration"
+     * Disables (set to false) certain config options.
+     * Used instead of manual walking on configuration like "System/ Configuration".
      *
      * Example: I disable configuration options:
      *      | oro_config.setting1 |
@@ -295,11 +299,30 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
-     * @When /^(?:|I )set configuration property "(?P<key>[^"]+)" to "(?P<value>[^"]+)"$/
-     * @param string $key
-     * @param string $value
+     * Sets certain config options.
+     * Used instead of manual walking on configuration like "System/ Configuration" configuration.
+     *
+     * Example: I change configuration options:
+     *      | oro_config.oprion1 | true  |
+     *      | oro_config.oprion2 | false |
+     *
+     * @Given /^(?:|I )change configuration options:$/
      */
-    public function setConfigurationProperty($key, $value)
+    public function setConfigOptions(TableNode $table): void
+    {
+        /** @var ConfigManager $configManager */
+        $configManager = $this->getAppContainer()->get('oro_config.global');
+        foreach ($table->getRows() as $row) {
+            $configManager->set($row[0], $this->normalizeConfigOptionValue($row[1]));
+        }
+
+        $configManager->flush();
+    }
+
+    /**
+     * @When /^(?:|I )set configuration property "(?P<key>[^"]+)" to "(?P<value>[^"]+)"$/
+     */
+    public function setConfigurationProperty(string $key, string $value): void
     {
         $configManager = $this->getAppContainer()->get('oro_config.global');
         $configManager->set($key, $value);

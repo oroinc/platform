@@ -98,14 +98,14 @@ class ProcessorDecorator
                             $node
                         );
                         break;
-                    // groups need to be merged manually due to 'configurator' and 'handler' options
+                        // groups need to be merged manually due to 'configurator' and 'handler' options
                     case self::GROUPS_NODE:
                         $source[self::ROOT][$nodeName] = $this->mergeGroups(
                             $source[self::ROOT][$nodeName],
                             $node
                         );
                         break;
-                    // replace all overrides in other nodes
+                        // replace all overrides in other nodes
                     default:
                         $source[self::ROOT][$nodeName] = array_replace_recursive(
                             $source[self::ROOT][$nodeName],

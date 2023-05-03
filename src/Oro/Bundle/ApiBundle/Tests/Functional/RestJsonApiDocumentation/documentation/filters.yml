@@ -7,6 +7,10 @@ filters:
         requirement: '.+'
         type: 'string'
         operators: 'eq,neq,exists,neq_or_null'
+    'filter[organization]':
+        requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
+        type: 'integer or array or range'
+        operators: 'eq,neq,exists,neq_or_null'
     'filter[owner]':
         requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
         type: 'integer or array or range'
@@ -15,7 +19,17 @@ filters:
         requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
         type: 'integer or array or range'
         operators: 'eq,neq,exists,neq_or_null,contains,not_contains'
+    'fields[attachments]':
+        requirement: '.+'
     'fields[businessunits]':
+        requirement: '.+'
+    'fields[organizations]':
+        requirement: '.+'
+    'fields[testapibuyers]':
+        requirement: '.+'
+    'fields[testapidepartments]':
+        requirement: '.+'
+    'fields[testapiemployees]':
         requirement: '.+'
     'include':
         requirement: '.+'

@@ -6,14 +6,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\TextType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType as SymfonyTextType;
 
 class TextTypeTest extends AbstractConfigTypeTestCase
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getFormType()
+    protected function getFormType(): AbstractType
     {
         return new TextType(
             new ConfigTypeHelper($this->configManager),
@@ -24,7 +25,7 @@ class TextTypeTest extends AbstractConfigTypeTestCase
     /**
      * @dataProvider submitProvider
      */
-    public function testSubmit($newVal, $oldVal, $state, $isSetStateExpected)
+    public function testSubmit(string $newVal, ?string $oldVal, string $state, bool $isSetStateExpected)
     {
         $this->doTestSubmit(
             'testAttr',
@@ -40,7 +41,7 @@ class TextTypeTest extends AbstractConfigTypeTestCase
         );
     }
 
-    public function submitProvider()
+    public function submitProvider(): array
     {
         return [
             ['', null, ExtendScope::STATE_ACTIVE, false],
@@ -52,17 +53,16 @@ class TextTypeTest extends AbstractConfigTypeTestCase
         ];
     }
 
-    public function testGetName()
+    public function testGetBlockPrefix()
     {
         $this->assertEquals(
             'oro_entity_extend_text',
-            $this->getFormType()->getName()
+            $this->getFormType()->getBlockPrefix()
         );
     }
 
     public function testGetParent()
     {
-        $type = $this->getFormType();
         $this->assertEquals(
             SymfonyTextType::class,
             $this->getFormType()->getParent()

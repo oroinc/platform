@@ -7,23 +7,19 @@ namespace Oro\Bundle\ApiBundle\Request;
  */
 class ApiResource
 {
-    /** @var string */
-    private $entityClass;
-
+    private string $entityClass;
     /** @var string[] */
-    private $excludedActions = [];
+    private array $excludedActions = [];
 
-    public function __construct($entityClass)
+    public function __construct(string $entityClass)
     {
         $this->entityClass = $entityClass;
     }
 
     /**
      * Gets the class name of the entity.
-     *
-     * @return string
      */
-    public function getEntityClass()
+    public function getEntityClass(): string
     {
         return $this->entityClass;
     }
@@ -33,7 +29,7 @@ class ApiResource
      *
      * @return string[]
      */
-    public function getExcludedActions()
+    public function getExcludedActions(): array
     {
         return $this->excludedActions;
     }
@@ -43,29 +39,23 @@ class ApiResource
      *
      * @param string[] $excludedActions
      */
-    public function setExcludedActions(array $excludedActions)
+    public function setExcludedActions(array $excludedActions): void
     {
         $this->excludedActions = $excludedActions;
     }
 
     /**
      * Indicates whether an action must not be available for the entity.
-     *
-     * @param string $action
-     *
-     * @return bool
      */
-    public function isExcludedAction($action)
+    public function isExcludedAction(string $action): bool
     {
         return \in_array($action, $this->excludedActions, true);
     }
 
     /**
      * Adds an action to a list of actions that must not be available for the entity.
-     *
-     * @param string $action
      */
-    public function addExcludedAction($action)
+    public function addExcludedAction(string $action): void
     {
         if (!\in_array($action, $this->excludedActions, true)) {
             $this->excludedActions[] = $action;
@@ -74,15 +64,13 @@ class ApiResource
 
     /**
      * Removes an action from a list of actions that must not be available for the entity.
-     *
-     * @param string $action
      */
-    public function removeExcludedAction($action)
+    public function removeExcludedAction(string $action): void
     {
-        $key = \array_search($action, $this->excludedActions, true);
+        $key = array_search($action, $this->excludedActions, true);
         if (false !== $key) {
             unset($this->excludedActions[$key]);
-            $this->excludedActions = \array_values($this->excludedActions);
+            $this->excludedActions = array_values($this->excludedActions);
         }
     }
 }

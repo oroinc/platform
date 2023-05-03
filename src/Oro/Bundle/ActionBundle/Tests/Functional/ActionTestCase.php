@@ -22,10 +22,7 @@ abstract class ActionTestCase extends WebTestCase
     /** @var ActionGroupRegistry */
     private $actionGroupRegistry;
 
-    /**
-     * @return ActionGroupRegistry
-     */
-    protected function getActionGroupRegistry()
+    protected function getActionGroupRegistry(): ActionGroupRegistry
     {
         if (null === $this->actionGroupRegistry) {
             $this->actionGroupRegistry = $this->getContainer()->get(ActionGroupRegistry::class);
@@ -34,42 +31,27 @@ abstract class ActionTestCase extends WebTestCase
         return $this->actionGroupRegistry;
     }
 
-    /**
-     * @param string $name
-     * @param array $data
-     * @return ActionData
-     */
-    protected function executeActionGroup($name, array $data = [])
+    protected function executeActionGroup(string $name, array $data = []): ActionData
     {
-        $actionGroup = $this->getActionGroupRegistry()->get($name);
-
-        return $actionGroup->execute(new ActionData($data));
+        return $this->getActionGroupRegistry()->get($name)->execute(new ActionData($data));
     }
 
-    /**
-     * @return string
-     */
-    protected function getOperationExecutionRoute()
+    protected function getOperationExecutionRoute(): string
     {
         return 'oro_action_operation_execute';
     }
 
-    /**
-     * @return string
-     */
-    protected function getOperationDialogRoute()
+    protected function getOperationDialogRoute(): string
     {
         return 'oro_action_widget_form';
     }
 
-    /**
-     * @param string $buttonName
-     * @param mixed $entityId
-     * @param string $entityClass
-     * @param array $data
-     */
-    protected function assertActionButton($buttonName, $entityId, $entityClass, array $data = [])
-    {
+    protected function assertActionButton(
+        string $buttonName,
+        mixed $entityId,
+        string $entityClass,
+        array $data = []
+    ): void {
         $request = array_merge([
             ContextHelper::ENTITY_CLASS_PARAM => $entityClass,
             ContextHelper::ENTITY_ID_PARAM => $entityId,
@@ -93,24 +75,14 @@ abstract class ActionTestCase extends WebTestCase
         $this->assertContains($buttonName, $buttons);
     }
 
-    /**
-     * @param string $operationName
-     * @param mixed $entityId
-     * @param string $entityClass
-     * @param array $data
-     * @param array $server
-     * @param int $expectedCode
-     *
-     * @return Crawler
-     */
     protected function assertExecuteOperation(
-        $operationName,
-        $entityId,
-        $entityClass,
+        string $operationName,
+        mixed $entityId,
+        string $entityClass,
         array $data = [],
         array $server = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'],
-        $expectedCode = Response::HTTP_OK
-    ) {
+        int $expectedCode = Response::HTTP_OK
+    ): Crawler {
         $operationExecutionRoute = $this->getOperationExecutionRoute();
         $data  = array_merge(
             [
@@ -130,22 +102,14 @@ abstract class ActionTestCase extends WebTestCase
         return $crawler;
     }
 
-    /**
-     * @param mixed $entityId
-     * @param string $entityClass
-     * @param string $redirectUrl
-     * @param bool $isSuccess
-     * @param array $server
-     * @param int $expectedCode
-     */
     protected function assertDeleteOperation(
-        $entityId,
-        $entityClass,
-        $redirectUrl,
-        $isSuccess = true,
+        mixed $entityId,
+        string $entityClass,
+        string $redirectUrl,
+        bool $isSuccess = true,
         array $server = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'],
-        $expectedCode = Response::HTTP_OK
-    ) {
+        int $expectedCode = Response::HTTP_OK
+    ): void {
         $this->assertExecuteOperation('DELETE', $entityId, $entityClass, [], $server, $expectedCode);
 
         $this->assertEquals(
@@ -160,21 +124,13 @@ abstract class ActionTestCase extends WebTestCase
         );
     }
 
-    /**
-     * @param string $operationName
-     * @param mixed $entityId
-     * @param string $entityClass
-     * @param array $data
-     * @param array $server
-     * @return Crawler
-     */
     protected function assertOperationForm(
-        $operationName,
-        $entityId,
-        $entityClass,
+        string $operationName,
+        mixed $entityId,
+        string $entityClass,
         array $data = [],
         array $server = []
-    ) {
+    ): Crawler {
         $url = $this->getUrl($this->getOperationDialogRoute(), array_merge([
                 'operationName' => $operationName,
                 'entityId' => $entityId,
@@ -192,11 +148,7 @@ abstract class ActionTestCase extends WebTestCase
         return $crawler;
     }
 
-    /**
-     * @param Form $form
-     * @param string $message
-     */
-    protected function assertOperationFormSubmitted(Form $form, $message)
+    protected function assertOperationFormSubmitted(Form $form, string $message): void
     {
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);

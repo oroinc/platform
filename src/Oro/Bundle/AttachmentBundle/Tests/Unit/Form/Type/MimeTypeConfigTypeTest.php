@@ -15,15 +15,14 @@ class MimeTypeConfigTypeTest extends FormIntegrationTestCase
     ];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [new FileMimeTypeConfigType(self::ALLOWED_MIME_TYPES)],
-                []
-            )
+            new PreloadedExtension([
+                new FileMimeTypeConfigType(self::ALLOWED_MIME_TYPES)
+            ], [])
         ];
     }
 

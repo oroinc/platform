@@ -17,17 +17,10 @@ use Psr\Log\LoggerInterface;
  */
 class AsyncOperationManager
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var FileManager */
-    private $fileManager;
-
-    /** @var ErrorManager */
-    private $errorManager;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private ManagerRegistry $doctrine;
+    private FileManager $fileManager;
+    private ErrorManager $errorManager;
+    private LoggerInterface $logger;
 
     public function __construct(
         ManagerRegistry $doctrine,
@@ -144,7 +137,7 @@ class AsyncOperationManager
             new ChunkFile($dataFileName, -1, 0)
         );
 
-        $errorCountToAdd = count($errors);
+        $errorCountToAdd = \count($errors);
         if (null === $summary) {
             $summary = [
                 'aggregateTime' => 0,

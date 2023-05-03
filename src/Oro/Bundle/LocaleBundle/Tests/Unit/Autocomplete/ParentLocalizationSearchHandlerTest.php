@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\LocaleBundle\Autocomplete\ParentLocalizationSearchHandler;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
@@ -17,7 +18,6 @@ use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Component\Testing\ReflectionUtil;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -46,7 +46,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->searchHandler = new ParentLocalizationSearchHandler(self::TEST_ENTITY_CLASS, ['name']);
         $this->searchHandler->initSearchIndexer($this->indexer, $searchMappingProvider);
         $this->searchHandler->initDoctrinePropertiesByManagerRegistry($this->getManagerRegistry());
-        $this->searchHandler->setPropertyAccessor(new PropertyAccessor());
+        $this->searchHandler->setPropertyAccessor(PropertyAccess::createPropertyAccessor());
     }
 
     public function testSearchNoDelimiter()

@@ -6,6 +6,9 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\TimeType;
 
+/**
+ * Converts time to php format and database format
+ */
 class UTCTimeType extends TimeType
 {
     /** @var null| \DateTimeZone  */
@@ -47,7 +50,7 @@ class UTCTimeType extends TimeType
 
         $errors = $val->getLastErrors();
         // date was parsed to completely not valid value
-        if ($errors['warning_count'] > 0 && (int)$val->format('Y') < 0) {
+        if (false !== $errors && $errors['warning_count'] > 0 && (int)$val->format('Y') < 0) {
             return null;
         }
 

@@ -6,6 +6,9 @@ trusted_data:
                 fullNameQueryPart: true
             getSecondaryEmailsQb:
                 fullNameQueryPart: true
+        Oro\Bundle\UserBundle\Security\UserLoginAttemptLogger:
+            logItemToDb:
+                fields: true
     properties:
         Oro\Bundle\UserBundle\Autocomplete\WidgetRoleSearchHandler:
             getEntitiesByIds:

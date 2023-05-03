@@ -17,7 +17,7 @@ class FixConfigurationSectionResultDocument implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -28,13 +28,12 @@ class FixConfigurationSectionResultDocument implements ProcessorInterface
         }
 
         $data = $context->getResult();
-        if (array_key_exists('options', $data)) {
+        if (\array_key_exists('options', $data)) {
             $result = [];
             $options = $data['options'];
             foreach ($options as $option) {
                 $option['type'] = $option['dataType'];
-                unset($option['dataType']);
-                unset($option['scope']);
+                unset($option['dataType'], $option['scope']);
                 $result[] = $option;
             }
             $context->setResult($result);

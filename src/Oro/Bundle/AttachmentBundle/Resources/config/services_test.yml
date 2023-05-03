@@ -43,3 +43,10 @@ services:
         decorates: oro_attachment.tools.external_file_factory
         arguments:
             - '@.inner'
+
+    oro_attachment.tests.skipped_file_systems:
+        class: Oro\Bundle\GaufretteBundle\Tests\Functional\Environment\SkippedGaufretteFileSystemProvider
+        decorates: oro_gaufrette.tests.skipped_file_systems
+        arguments:
+            - '@.inner'
+            - ['attachments_cleanup_data']

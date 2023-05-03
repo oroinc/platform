@@ -4,6 +4,20 @@ parameters:
         required: true
         actualType: 'integer'
         readonly: true
+    title:
+        dataType: 'string'
+        required: true
+        actualType: 'string'
+    attachments:
+        dataType: 'integer'
+        required: false
+        actualType: 'collection'
+        subType: 'attachments'
+    organization:
+        dataType: 'integer'
+        required: false
+        actualType: 'model'
+        subType: 'organizations'
     owner:
         dataType: 'integer'
         required: false
@@ -20,6 +34,20 @@ response:
         required: true
         actualType: 'integer'
         readonly: true
+    title:
+        dataType: 'string'
+        required: true
+        actualType: 'string'
+    attachments:
+        dataType: 'integer'
+        required: false
+        actualType: 'collection'
+        subType: 'attachments'
+    organization:
+        dataType: 'integer'
+        required: false
+        actualType: 'model'
+        subType: 'organizations'
     owner:
         dataType: 'integer'
         required: false

@@ -16,11 +16,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class NestedObjectMetadataHelper
 {
-    /** @var MetadataHelper */
-    private $metadataHelper;
-
-    /** @var ObjectMetadataFactory */
-    private $objectMetadataFactory;
+    private MetadataHelper $metadataHelper;
+    private ObjectMetadataFactory $objectMetadataFactory;
 
     public function __construct(
         MetadataHelper $metadataHelper,
@@ -30,24 +27,14 @@ class NestedObjectMetadataHelper
         $this->objectMetadataFactory = $objectMetadataFactory;
     }
 
-    /**
-     * @param EntityMetadata              $entityMetadata
-     * @param string                      $entityClass
-     * @param EntityDefinitionConfig      $config
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $targetAction
-     *
-     * @return AssociationMetadata
-     */
     public function addNestedObjectAssociation(
         EntityMetadata $entityMetadata,
-        $entityClass,
+        string $entityClass,
         EntityDefinitionConfig $config,
-        $fieldName,
+        string $fieldName,
         EntityDefinitionFieldConfig $field,
-        $targetAction
-    ) {
+        ?string $targetAction
+    ): AssociationMetadata {
         $formOptions = $field->getFormOptions();
         $inheritData = $formOptions['inherit_data'] ?? false;
         $targetClass = null;
@@ -92,23 +79,15 @@ class NestedObjectMetadataHelper
     }
 
     /**
-     * @param EntityDefinitionConfig      $parentConfig
-     * @param string                      $parentClassName
-     * @param string                      $parentFieldName
-     * @param string                      $targetFieldName
-     * @param EntityDefinitionFieldConfig $targetField
-     *
-     * @return EntityDefinitionFieldConfig
-     *
      * @throws RuntimeException if the linked field cannot be found or it has invalid configuration
      */
     public function getLinkedField(
         EntityDefinitionConfig $parentConfig,
-        $parentClassName,
-        $parentFieldName,
-        $targetFieldName,
+        string $parentClassName,
+        string $parentFieldName,
+        string $targetFieldName,
         EntityDefinitionFieldConfig $targetField
-    ) {
+    ): EntityDefinitionFieldConfig {
         $propertyPath = $targetField->getPropertyPath($targetFieldName);
         $linkedField = ConfigUtil::IGNORE_PROPERTY_PATH !== $propertyPath
             ? $parentConfig->findField($propertyPath, true)
@@ -136,18 +115,12 @@ class NestedObjectMetadataHelper
         return $linkedField;
     }
 
-    /**
-     * @param PropertyMetadata            $propertyMetadata
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $targetAction
-     */
     public function setTargetPropertyPath(
         PropertyMetadata $propertyMetadata,
-        $fieldName,
+        string $fieldName,
         EntityDefinitionFieldConfig $field,
-        $targetAction
-    ) {
+        ?string $targetAction
+    ): void {
         $targetPropertyPath = $this->metadataHelper->getFormPropertyPath($field, $targetAction);
         if ($targetPropertyPath !== $fieldName) {
             $propertyMetadata->setPropertyPath($targetPropertyPath);

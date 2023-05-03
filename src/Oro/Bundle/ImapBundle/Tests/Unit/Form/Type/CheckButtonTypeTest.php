@@ -11,17 +11,10 @@ class CheckButtonTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $checkButtonType = new CheckButtonType();
-
         return [
-            new PreloadedExtension(
-                [
-                    $checkButtonType->getName() => $checkButtonType
-                ],
-                []
-            )
+            new PreloadedExtension([new CheckButtonType()], [])
         ];
     }
 

@@ -11,13 +11,13 @@ class DeploymentVariableProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetVariables()
     {
         $parameters = new ParameterBag([
-            'deployment_type' => 'local',
+            'kernel.environment' => 'local',
         ]);
         $provider = new DeploymentVariableProvider($parameters);
 
         $this->assertEquals(
             [
-                DeploymentVariable::create('oro.platform.deployment_type.label', 'local'),
+                DeploymentVariable::create('oro.platform.environment.label', 'local'),
             ],
             $provider->getVariables()
         );
@@ -29,7 +29,7 @@ class DeploymentVariableProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             [
-                DeploymentVariable::create('oro.platform.deployment_type.label'),
+                DeploymentVariable::create('oro.platform.environment.label'),
             ],
             $provider->getVariables()
         );

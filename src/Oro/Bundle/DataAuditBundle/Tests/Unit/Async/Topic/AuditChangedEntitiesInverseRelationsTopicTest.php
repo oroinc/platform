@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Async\Topic;
 
 use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseRelationsTopic;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Test\AbstractTopicTestCase;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
@@ -100,5 +101,10 @@ class AuditChangedEntitiesInverseRelationsTopicTest extends AbstractTopicTestCas
                 'exceptionMessage' => '/The required options "timestamp", "transaction_id" are missing./',
             ],
         ];
+    }
+
+    public function testDefaultPriority(): void
+    {
+        self::assertEquals(MessagePriority::VERY_LOW, $this->getTopic()->getDefaultPriority('queueName'));
     }
 }

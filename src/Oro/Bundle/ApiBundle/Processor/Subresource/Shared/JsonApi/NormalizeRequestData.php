@@ -25,14 +25,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeRequestData implements ProcessorInterface
 {
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var EntityIdTransformerRegistry */
-    private $entityIdTransformerRegistry;
-
-    /** @var ChangeRelationshipContext */
-    private $context;
+    private ValueNormalizer $valueNormalizer;
+    private EntityIdTransformerRegistry $entityIdTransformerRegistry;
+    private ?ChangeRelationshipContext $context = null;
 
     public function __construct(
         ValueNormalizer $valueNormalizer,
@@ -45,7 +40,7 @@ class NormalizeRequestData implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */
 
@@ -114,7 +109,7 @@ class NormalizeRequestData implements ProcessorInterface
         string $path,
         string $pointer,
         string $entityType,
-        $entityId,
+        mixed $entityId,
         EntityMetadata $metadata
     ): array {
         $entityClass = $this->normalizeEntityClass(
@@ -136,15 +131,7 @@ class NormalizeRequestData implements ProcessorInterface
         ];
     }
 
-    /**
-     * @param string         $path
-     * @param string         $pointer
-     * @param mixed          $entityId
-     * @param EntityMetadata $metadata
-     *
-     * @return mixed
-     */
-    private function normalizeEntityId(string $path, string $pointer, $entityId, EntityMetadata $metadata)
+    private function normalizeEntityId(string $path, string $pointer, mixed $entityId, EntityMetadata $metadata): mixed
     {
         try {
             $normalizedId = $this->getEntityIdTransformer($this->context->getRequestType())
@@ -208,7 +195,7 @@ class NormalizeRequestData implements ProcessorInterface
     {
         $associationMetadata = $this->context->getParentMetadata()->getAssociation($associationName);
         if (null === $associationMetadata) {
-            throw new RuntimeException(\sprintf(
+            throw new RuntimeException(sprintf(
                 'The metadata for association "%s::%s" does not exist.',
                 $this->context->getParentClassName(),
                 $associationName

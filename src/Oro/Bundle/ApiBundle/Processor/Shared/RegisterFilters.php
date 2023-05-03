@@ -24,8 +24,7 @@ abstract class RegisterFilters implements ProcessorInterface
         FilterOperator::NOT_CONTAINS
     ];
 
-    /** @var FilterFactoryInterface */
-    private $filterFactory;
+    private FilterFactoryInterface $filterFactory;
 
     public function __construct(FilterFactoryInterface $filterFactory)
     {
@@ -33,17 +32,14 @@ abstract class RegisterFilters implements ProcessorInterface
     }
 
     /**
-     * @param FilterFieldConfig $filterConfig
-     * @param string            $propertyPath
-     * @param Context           $context
-     *
-     * @return StandaloneFilter|null
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function createFilter(FilterFieldConfig $filterConfig, $propertyPath, Context $context)
-    {
+    protected function createFilter(
+        FilterFieldConfig $filterConfig,
+        string $propertyPath,
+        Context $context
+    ): ?StandaloneFilter {
         $filterOptions = $this->getFilterOptions($filterConfig);
         $filterType = $filterConfig->getType();
         $dataType = $filterConfig->getDataType();
@@ -60,7 +56,7 @@ abstract class RegisterFilters implements ProcessorInterface
             }
             if ($filterConfig->isCollection()) {
                 if (!$filter instanceof CollectionAwareFilterInterface) {
-                    throw new \LogicException(\sprintf(
+                    throw new \LogicException(sprintf(
                         'The filter by "%s" does not support the "collection" option.',
                         $propertyPath
                     ));
@@ -73,7 +69,7 @@ abstract class RegisterFilters implements ProcessorInterface
             if ($filter instanceof ConfigAwareFilterInterface) {
                 $config = $context->getConfig();
                 if (null === $config) {
-                    throw new \LogicException(\sprintf(
+                    throw new \LogicException(sprintf(
                         'The config for class "%s" does not exist, but it required for the filter by "%s".',
                         $context->getClassName(),
                         $propertyPath
@@ -84,7 +80,7 @@ abstract class RegisterFilters implements ProcessorInterface
             if ($filter instanceof MetadataAwareFilterInterface) {
                 $metadata = $context->getMetadata();
                 if (null === $metadata) {
-                    throw new \LogicException(\sprintf(
+                    throw new \LogicException(sprintf(
                         'The metadata for class "%s" does not exist, but it required for the filter by "%s".',
                         $context->getClassName(),
                         $propertyPath
@@ -127,7 +123,7 @@ abstract class RegisterFilters implements ProcessorInterface
             $filter->setSupportedOperators($operators);
         } elseif (!$filterConfig->hasType() && $filterConfig->isCollection()) {
             $filter->setSupportedOperators(
-                \array_merge($filter->getSupportedOperators(), self::COLLECTION_ASSOCIATION_ADDITIONAL_OPERATORS)
+                array_merge($filter->getSupportedOperators(), self::COLLECTION_ASSOCIATION_ADDITIONAL_OPERATORS)
             );
         }
     }

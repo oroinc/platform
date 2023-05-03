@@ -9,17 +9,14 @@ use Oro\Component\PhpUtils\QueryStringUtil;
  */
 class FilterValueAccessor implements FilterValueAccessorInterface
 {
-    /** @var FilterValue[] */
-    private $parameters;
-
-    /** @var array */
-    private $groups;
-
-    /** @var string|null */
-    private $defaultGroupName;
+    /** @var FilterValue[]|null */
+    private ?array $parameters = null;
+    /** @var array [group name => [filter key => FilterValue, ...], ...] */
+    private array $groups;
+    private ?string $defaultGroupName = null;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function has(string $key): bool
     {
@@ -44,7 +41,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function get(string $key): ?FilterValue
     {
@@ -69,21 +66,17 @@ class FilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getGroup(string $group): array
     {
         $this->ensureInitialized();
 
-        if (!isset($this->groups[$group])) {
-            return [];
-        }
-
-        return $this->groups[$group];
+        return $this->groups[$group] ?? [];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getDefaultGroupName(): ?string
     {
@@ -91,7 +84,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setDefaultGroupName(?string $group): void
     {
@@ -99,7 +92,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getAll(): array
     {
@@ -109,7 +102,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function set(string $key, ?FilterValue $value): void
     {
@@ -129,7 +122,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function remove(string $key): void
     {
@@ -141,7 +134,7 @@ class FilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getQueryString(): string
     {

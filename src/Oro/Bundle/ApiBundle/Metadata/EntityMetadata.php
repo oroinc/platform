@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ToArrayInterface;
 use Oro\Component\PhpUtils\ReflectionUtil;
@@ -596,7 +597,7 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
             ));
         }
 
-        $reflClass = new \ReflectionClass($entity);
+        $reflClass = new EntityReflectionClass($entity);
         if ($numberOfIdFields > 1) {
             $result = [];
             foreach ($this->identifiers as $fieldName) {

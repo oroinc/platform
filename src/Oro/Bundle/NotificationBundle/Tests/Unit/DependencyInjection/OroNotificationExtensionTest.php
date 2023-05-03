@@ -2,20 +2,35 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\NotificationBundle\Controller\Api\Rest\EmailNotificationController;
 use Oro\Bundle\NotificationBundle\DependencyInjection\OroNotificationExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroNotificationExtensionTest extends ExtensionTestCase
+class OroNotificationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroNotificationExtension());
+        $container = new ContainerBuilder();
 
-        $expectedDefinitions = [
-            EmailNotificationController::class,
-        ];
+        $extension = new OroNotificationExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
+        self::assertSame(
+            [
+                [
+                    'settings' => [
+                        'resolved' => true,
+                        'email_notification_sender_email' => [
+                            'value' => sprintf('no-reply@%s.example', gethostname()),
+                            'scope' => 'app'
+                        ],
+                        'email_notification_sender_name' => ['value' => 'Oro', 'scope' => 'app'],
+                        'mass_notification_template' => ['value' => 'system_maintenance', 'scope' => 'app'],
+                        'mass_notification_recipients' => ['value' => '', 'scope' => 'app'],
+                    ]
+                ]
+            ],
+            $container->getExtensionConfig('oro_notification')
+        );
     }
 }

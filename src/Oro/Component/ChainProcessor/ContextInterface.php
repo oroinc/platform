@@ -9,135 +9,99 @@ interface ContextInterface extends \ArrayAccess
 {
     /**
      * Checks whether an attribute exists in the context.
-     *
-     * @param string $key The name of an attribute
-     *
-     * @return bool
      */
-    public function has($key);
+    public function has(string $key): bool;
 
     /**
      * Gets a value of an attribute from the context.
-     *
-     * @param string $key The name of an attribute
-     *
-     * @return mixed|null A value of an attribute or null if an attribute does not exist
+     * When an attribute does not exist the returned value is NULL.
      */
-    public function get($key);
+    public function get(string $key): mixed;
 
     /**
      * Adds or updates a value of an attribute in the context.
-     *
-     * @param string $key   The name of an attribute
-     * @param mixed  $value The value of an attribute
      */
-    public function set($key, $value);
+    public function set(string $key, mixed $value): void;
 
     /**
      * Removes an attribute from the context.
-     *
-     * @param string $key The name of an attribute
      */
-    public function remove($key);
+    public function remove(string $key): void;
 
     /**
-     * Gets an identifier of processing action
-     *
-     * @return string
+     * Gets an identifier of processing action.
      */
-    public function getAction();
+    public function getAction(): string;
 
     /**
-     * Sets an identifier of processing action
-     *
-     * @param string $action
+     * Sets an identifier of processing action.
      */
-    public function setAction($action);
+    public function setAction(string $action): void;
 
     /**
-     * Gets a group starting from which processors should be executed
-     *
-     * @return string|null
+     * Gets a group starting from which processors should be executed.
      */
-    public function getFirstGroup();
+    public function getFirstGroup(): ?string;
 
     /**
-     * Sets a group starting from which processors should be executed
-     *
-     * @param string|null $group
+     * Sets a group starting from which processors should be executed.
      */
-    public function setFirstGroup($group);
+    public function setFirstGroup(?string $group): void;
 
     /**
-     * Gets a group after which processors should not be executed
-     *
-     * @return string|null
+     * Gets a group after which processors should not be executed.
      */
-    public function getLastGroup();
+    public function getLastGroup(): ?string;
 
     /**
-     * Sets a group after which processors should not be executed
-     *
-     * @param string|null $group
+     * Sets a group after which processors should not be executed.
      */
-    public function setLastGroup($group);
+    public function setLastGroup(?string $group): void;
 
     /**
-     * Checks whether there is at least one group to be skipped
-     *
-     * @return bool
+     * Checks whether there is at least one group to be skipped.
      */
-    public function hasSkippedGroups();
+    public function hasSkippedGroups(): bool;
 
     /**
-     * Gets all groups to be skipped
+     * Gets all groups to be skipped.
      *
      * @return string[]
      */
-    public function getSkippedGroups();
+    public function getSkippedGroups(): array;
 
     /**
-     * Clears a list of groups to be skipped
+     * Clears a list of groups to be skipped.
      */
-    public function resetSkippedGroups();
+    public function resetSkippedGroups(): void;
 
     /**
-     * Adds the given group to a list of groups to be skipped
-     *
-     * @param string $group
+     * Adds the given group to a list of groups to be skipped.
      */
-    public function skipGroup($group);
+    public function skipGroup(string $group): void;
 
     /**
-     * Removes the given group to a list of groups to be skipped
-     *
-     * @param string $group
+     * Removes the given group to a list of groups to be skipped.
      */
-    public function undoGroupSkipping($group);
+    public function undoGroupSkipping(string $group): void;
 
     /**
-     * Checks whether result data exists
-     *
-     * @return bool
+     * Checks whether result data exists.
      */
-    public function hasResult();
+    public function hasResult(): bool;
 
     /**
-     * Gets result data
-     *
-     * @return mixed
+     * Gets result data.
      */
-    public function getResult();
+    public function getResult(): mixed;
 
     /**
-     * Sets result data
-     *
-     * @param mixed $data
+     * Sets result data.
      */
-    public function setResult($data);
+    public function setResult(mixed $data): void;
 
     /**
-     * Removes result data
+     * Removes result data.
      */
-    public function removeResult();
+    public function removeResult(): void;
 }

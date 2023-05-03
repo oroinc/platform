@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 .grid-main-container {
     display: table;
     width: 100%;
@@ -171,7 +173,7 @@
         background-color: $cell-success-background;
 
         &:hover {
-            background-color: darken($cell-success-background, 5%);
+            background-color: color.adjust($cell-success-background, $lightness: -5%);
         }
     }
 
@@ -218,6 +220,15 @@
         &[type='radio'] {
             vertical-align: $oro-datagrid-body-cell-checkbox-vertical-align;
         }
+    }
+}
+
+.editing-cell {
+    padding: $oro-datagrid-body-editing-cell-inner-offset;
+
+    .input-editor {
+        width: 80px;
+        text-align: right;
     }
 }
 

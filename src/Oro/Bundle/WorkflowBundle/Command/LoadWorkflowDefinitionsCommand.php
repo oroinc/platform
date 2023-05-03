@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\WorkflowBundle\Command;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
@@ -99,8 +100,15 @@ HELP
             $workflowDefinitionRepository = $this->doctrine->getRepository(WorkflowDefinition::class);
             $workflowDefinitions = $this->configurationBuilder->buildFromConfiguration($workflowConfiguration);
 
+            $countProcessed = 0;
+            $countCreated = 0;
+            $countUpdated = 0;
             foreach ($workflowDefinitions as $workflowDefinition) {
-                $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $workflowDefinition->getName()));
+                $countProcessed++;
+                $output->writeln(
+                    \sprintf('  <comment>></comment> <info>%s</info>', $workflowDefinition->getName()),
+                    OutputInterface::VERBOSITY_VERY_VERBOSE
+                );
 
                 // all loaded workflows set as system by default
                 $workflowDefinition->setSystem(true);
@@ -113,16 +121,31 @@ HELP
                         $existingWorkflowDefinition,
                         $workflowDefinition
                     );
+                    $countUpdated++;
                 } else {
                     $this->definitionHandler->createWorkflowDefinition($workflowDefinition);
+                    $countCreated++;
                 }
 
-                if ($output->isVerbose()) {
+                if ($output->isDebug()) {
                     $output->writeln(Yaml::dump($workflowDefinition->getConfiguration(), 10));
                 }
             }
+            $output->writeln(
+                \sprintf(
+                    'Processed %d workflow definitions: updated %d existing workflows, created %d new workflows.',
+                    $countProcessed,
+                    $countUpdated,
+                    $countCreated
+                ),
+                OutputInterface::VERBOSITY_VERBOSE
+            );
+            $output->writeln('Done.');
             $output->writeln('');
-            $output->writeln('Please run command \'<info>oro:translation:load</info>\' to load translations.');
+            $output->writeln(\sprintf(
+                "Please run command '<info>%s</info>' to load translations.",
+                OroTranslationLoadCommand::getDefaultName()
+            ));
         } else {
             $output->writeln('No workflow definitions found.');
         }

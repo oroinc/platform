@@ -14,8 +14,8 @@
     }
 
     .page-title__path & {
-        @extend .badge;
-        @extend .badge-pill;
+        @extend %badge;
+        @extend %badge-pill;
 
         border: none;
     }

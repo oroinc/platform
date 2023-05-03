@@ -28,9 +28,6 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var DependentJobMessageProcessor */
     private $processor;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->producer = $this->createMock(MessageProducerInterface::class);
@@ -66,20 +63,18 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldLogCriticalAndRejectMessageIfJobEntityWasNotFound(): void
     {
-        $this->jobRepository
-            ->expects($this->once())
+        $this->jobRepository->expects($this->once())
             ->method('findJobById')
             ->with(12345);
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('critical')
             ->with('Job was not found. id: "12345"');
 
         $message = new TransportMessage();
         $message->setBody(['jobId' => 12345]);
 
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -89,21 +84,19 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $job = new Job();
         $job->setRootJob(new Job());
 
-        $this->jobRepository
-            ->expects($this->once())
+        $this->jobRepository->expects($this->once())
             ->method('findJobById')
             ->with(12345)
             ->willReturn($job);
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('critical')
             ->with('Expected root job but got child. id: "12345"');
 
         $message = new TransportMessage();
         $message->setBody(['jobId' => 12345]);
 
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -112,20 +105,18 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $job = new Job();
 
-        $this->jobRepository
-            ->expects($this->once())
+        $this->jobRepository->expects($this->once())
             ->method('findJobById')
             ->with(12345)
             ->willReturn($job);
 
-        $this->producer
-            ->expects($this->never())
+        $this->producer->expects($this->never())
             ->method('send');
 
         $message = new TransportMessage();
         $message->setBody(['jobId' => 12345]);
 
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -140,25 +131,22 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-        $this->jobRepository
-            ->expects($this->once())
+        $this->jobRepository->expects($this->once())
             ->method('findJobById')
             ->with(12345)
             ->willReturn($job);
 
-        $this->producer
-            ->expects($this->never())
+        $this->producer->expects($this->never())
             ->method('send');
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('critical')
             ->with('Got invalid dependent job data. job: "123", dependentJob: "[]"');
 
         $message = new TransportMessage();
         $message->setBody(['jobId' => 12345]);
 
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -175,18 +163,15 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-        $this->jobRepository
-            ->expects($this->once())
+        $this->jobRepository->expects($this->once())
             ->method('findJobById')
             ->with(12345)
             ->willReturn($job);
 
-        $this->producer
-            ->expects($this->never())
+        $this->producer->expects($this->never())
             ->method('send');
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('critical')
             ->with('Got invalid dependent job data. '.
              'job: "123", dependentJob: "{"topic":"topic-name"}"');
@@ -194,7 +179,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message = new TransportMessage();
         $message->setBody(['jobId' => 12345]);
 
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -212,16 +197,14 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-        $this->jobRepository
-            ->expects($this->once())
+        $this->jobRepository->expects($this->once())
             ->method('findJobById')
             ->with(12345)
             ->willReturn($job);
 
         /** @var Message $expectedMessage */
         $expectedMessage = null;
-        $this->producer
-            ->expects($this->once())
+        $this->producer->expects($this->once())
             ->method('send')
             ->with('topic-name', $this->isInstanceOf(Message::class))
             ->willReturnCallback(static function ($topic, Message $message) use (&$expectedMessage) {
@@ -231,7 +214,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message = new TransportMessage();
         $message->setBody(['jobId' => 12345]);
 
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
 
@@ -253,16 +236,14 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-        $this->jobRepository
-            ->expects($this->once())
+        $this->jobRepository->expects($this->once())
             ->method('findJobById')
             ->with(12345)
             ->willReturn($job);
 
         /** @var Message $expectedMessage */
         $expectedMessage = null;
-        $this->producer
-            ->expects($this->once())
+        $this->producer->expects($this->once())
             ->method('send')
             ->with('topic-name', $this->isInstanceOf(Message::class))
             ->willReturnCallback(static function ($topic, Message $message) use (&$expectedMessage) {
@@ -272,7 +253,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message = new TransportMessage();
         $message->setBody(['jobId' => 12345]);
 
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
 
@@ -308,19 +289,11 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message = new TransportMessage();
         $message->setBody(['jobId' => 12345]);
 
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
 
         $this->assertEquals('message', $expectedMessage->getBody());
         $this->assertEquals(['key' => 'value'], $expectedMessage->getProperties());
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
     }
 }

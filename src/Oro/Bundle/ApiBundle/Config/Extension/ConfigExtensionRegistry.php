@@ -10,17 +10,12 @@ use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSettingsInterface;
  */
 class ConfigExtensionRegistry
 {
-    /** @var int */
-    private $maxNestingLevel;
-
+    private int $maxNestingLevel;
     /** @var ConfigExtensionInterface[] */
-    private $extensions = [];
-
-    /** @var ConfigurationSettingsInterface|null */
-    private $configurationSettings;
-
+    private array $extensions = [];
+    private ?ConfigurationSettingsInterface $configurationSettings = null;
     /** @var string[]|null */
-    private $configSectionNames;
+    private ?array $configSectionNames = null;
 
     /**
      * @param int $maxNestingLevel The maximum number of nesting target entities

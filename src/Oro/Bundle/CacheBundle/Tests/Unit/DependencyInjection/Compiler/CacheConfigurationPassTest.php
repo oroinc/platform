@@ -143,12 +143,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $path
-     *
-     * @return Definition
-     */
-    private function getFilesystemCache()
+    private function getFilesystemCache(): Definition
     {
         $cacheDefinition = new Definition(
             FilesystemAdapter::class,

@@ -13,8 +13,7 @@ use Symfony\Component\Form\DataTransformerInterface;
  */
 class NullValueTransformer implements DataTransformerInterface
 {
-    /** @var DataTransformerInterface */
-    private $transformer;
+    private DataTransformerInterface $transformer;
 
     public function __construct(DataTransformerInterface $transformer)
     {
@@ -23,10 +22,8 @@ class NullValueTransformer implements DataTransformerInterface
 
     /**
      * Gets the wrapped data transformer.
-     *
-     * @return DataTransformerInterface
      */
-    public function getInnerTransformer()
+    public function getInnerTransformer(): DataTransformerInterface
     {
         return $this->transformer;
     }
@@ -34,25 +31,25 @@ class NullValueTransformer implements DataTransformerInterface
     /**
      * Sets the wrapped data transformer.
      */
-    public function setInnerTransformer(DataTransformerInterface $transformer)
+    public function setInnerTransformer(DataTransformerInterface $transformer): void
     {
         $this->transformer = $transformer;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function transform($value)
     {
         if (null === $value) {
-            return $value;
+            return null;
         }
 
         return $this->transformer->transform($value);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function reverseTransform($value)
     {

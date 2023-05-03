@@ -32,32 +32,16 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeIncludedData implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var EntityInstantiator */
-    protected $entityInstantiator;
-
-    /** @var EntityLoader */
-    protected $entityLoader;
-
-    /** @var ValueNormalizer */
-    protected $valueNormalizer;
-
-    /** @var EntityIdTransformerRegistry */
-    protected $entityIdTransformerRegistry;
-
-    /** @var ConfigProvider */
-    protected $configProvider;
-
-    /** @var MetadataProvider */
-    protected $metadataProvider;
-
-    /** @var FormContext */
-    protected $context;
-
-    /** @var EntityMetadata[] */
-    private $entityMetadata;
+    private DoctrineHelper $doctrineHelper;
+    private EntityInstantiator $entityInstantiator;
+    private EntityLoader $entityLoader;
+    private ValueNormalizer $valueNormalizer;
+    private EntityIdTransformerRegistry $entityIdTransformerRegistry;
+    private ConfigProvider $configProvider;
+    private MetadataProvider $metadataProvider;
+    private ?FormContext $context = null;
+    /** @var EntityMetadata[]|null */
+    private ?array $entityMetadata = null;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -80,7 +64,7 @@ class NormalizeIncludedData implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext|SingleItemContext $context */
 
@@ -112,12 +96,7 @@ class NormalizeIncludedData implements ProcessorInterface
         }
     }
 
-    /**
-     * @param array $requestData
-     *
-     * @return array
-     */
-    protected function normalizeIncludedData(array $requestData)
+    private function normalizeIncludedData(array $requestData): array
     {
         $includedData = !empty($requestData[JsonApiDoc::INCLUDED])
             ? $requestData[JsonApiDoc::INCLUDED]
@@ -131,12 +110,7 @@ class NormalizeIncludedData implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param array $includedData
-     *
-     * @return IncludedEntityCollection|null
-     */
-    protected function loadIncludedEntities(array $includedData)
+    private function loadIncludedEntities(array $includedData): ?IncludedEntityCollection
     {
         $includedEntities = new IncludedEntityCollection();
 
@@ -175,43 +149,33 @@ class NormalizeIncludedData implements ProcessorInterface
         return !$this->context->hasErrors() ? $includedEntities : null;
     }
 
-    /**
-     * @param mixed  $data
-     * @param string $pointer
-     *
-     * @return array
-     */
-    protected function getDataProperty($data, $pointer)
+    private function getDataProperty(mixed $data, string $pointer): array
     {
-        if (!is_array($data)) {
-            throw new RuntimeException(
-                sprintf('The "%s" element should be an array.', $pointer)
-            );
+        if (!\is_array($data)) {
+            throw new RuntimeException(sprintf('The "%s" element should be an array.', $pointer));
         }
-        if (!array_key_exists(JsonApiDoc::DATA, $data)) {
-            throw new RuntimeException(
-                sprintf('The "%s" element should have "%s" property.', $pointer, JsonApiDoc::DATA)
-            );
+        if (!\array_key_exists(JsonApiDoc::DATA, $data)) {
+            throw new RuntimeException(sprintf(
+                'The "%s" element should have "%s" property.',
+                $pointer,
+                JsonApiDoc::DATA
+            ));
         }
         $data = $data[JsonApiDoc::DATA];
-        if (!is_array($data)) {
-            throw new RuntimeException(
-                sprintf('The "%s" property of "%s" element should be an array.', JsonApiDoc::DATA, $pointer)
-            );
+        if (!\is_array($data)) {
+            throw new RuntimeException(sprintf(
+                'The "%s" property of "%s" element should be an array.',
+                JsonApiDoc::DATA,
+                $pointer
+            ));
         }
 
         return $data;
     }
 
-    /**
-     * @param string $pointer
-     * @param array  $data
-     *
-     * @return bool|null
-     */
-    protected function getUpdateFlag($pointer, $data)
+    private function getUpdateFlag(string $pointer, array $data): ?bool
     {
-        if (empty($data[JsonApiDoc::META]) || !array_key_exists(JsonApiDoc::META_UPDATE, $data[JsonApiDoc::META])) {
+        if (empty($data[JsonApiDoc::META]) || !\array_key_exists(JsonApiDoc::META_UPDATE, $data[JsonApiDoc::META])) {
             return false;
         }
 
@@ -228,7 +192,7 @@ class NormalizeIncludedData implements ProcessorInterface
         return $flag;
     }
 
-    protected function getEntityClass(string $pointer, string $entityType): ?string
+    private function getEntityClass(string $pointer, string $entityType): ?string
     {
         $entityClass = ValueNormalizerUtil::tryConvertToEntityClass(
             $this->valueNormalizer,
@@ -244,15 +208,7 @@ class NormalizeIncludedData implements ProcessorInterface
         return null;
     }
 
-    /**
-     * @param string $pointer
-     * @param string $entityClass
-     * @param mixed  $entityId
-     * @param bool   $updateFlag
-     *
-     * @return mixed
-     */
-    protected function getEntityId($pointer, $entityClass, $entityId, $updateFlag)
+    private function getEntityId(string $pointer, string $entityClass, mixed $entityId, bool $updateFlag): mixed
     {
         if (!$updateFlag) {
             return $entityId;
@@ -269,20 +225,12 @@ class NormalizeIncludedData implements ProcessorInterface
         return null;
     }
 
-    protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
-    /**
-     * @param string $pointer
-     * @param string $entityClass
-     * @param mixed  $entityId
-     * @param bool   $updateFlag
-     *
-     * @return object|null
-     */
-    protected function getEntity($pointer, $entityClass, $entityId, $updateFlag)
+    private function getEntity(string $pointer, string $entityClass, mixed $entityId, bool $updateFlag): ?object
     {
         $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
 
@@ -299,14 +247,7 @@ class NormalizeIncludedData implements ProcessorInterface
         return $this->entityInstantiator->instantiate($resolvedEntityClass ?? $entityClass);
     }
 
-    /**
-     * @param string $pointer
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return object|null
-     */
-    protected function getExistingEntity($pointer, $entityClass, $entityId)
+    private function getExistingEntity(string $pointer, string $entityClass, mixed $entityId): ?object
     {
         $entity = $this->entityLoader->findEntity($entityClass, $entityId, $this->getEntityMetadata($entityClass));
         if (null === $entity) {
@@ -316,12 +257,7 @@ class NormalizeIncludedData implements ProcessorInterface
         return $entity;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityMetadata
-     */
-    protected function getEntityMetadata($entityClass)
+    private function getEntityMetadata(string $entityClass): EntityMetadata
     {
         if (isset($this->entityMetadata[$entityClass])) {
             return $this->entityMetadata[$entityClass];
@@ -348,25 +284,12 @@ class NormalizeIncludedData implements ProcessorInterface
         return $metadata;
     }
 
-    /**
-     * @param string $parentPointer
-     * @param string $property
-     *
-     * @return string
-     */
-    protected function buildPointer($parentPointer, $property)
+    private function buildPointer(string $parentPointer, string $property): string
     {
         return $parentPointer . '/' . $property;
     }
 
-    /**
-     * @param string      $title
-     * @param string|null $pointer
-     * @param string|null $detail
-     *
-     * @return Error
-     */
-    protected function addValidationError($title, $pointer = null, $detail = null)
+    private function addValidationError(string $title, ?string $pointer = null, ?string $detail = null): Error
     {
         $error = Error::createValidationError($title);
         if (null !== $pointer) {

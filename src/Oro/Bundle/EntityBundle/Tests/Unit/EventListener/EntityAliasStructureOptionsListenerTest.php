@@ -25,15 +25,13 @@ class EntityAliasStructureOptionsListenerTest extends \PHPUnit\Framework\TestCas
     }
 
     /**
-     * @param bool $hasAlias
-     *
      * @dataProvider onOptionsRequestDataProvider
      */
-    public function testOnOptionsRequest($hasAlias)
+    public function testOnOptionsRequest(bool $hasAlias)
     {
         $alias = 'ALIAS';
         $pluralAlias = 'PLURAL_ALIAS';
-        $entityStructure = $this->getEntity(EntityStructure::class, ['className' => \stdClass::class,]);
+        $entityStructure = $this->getEntity(EntityStructure::class, ['className' => \stdClass::class]);
 
         $this->entityAliasResolver->expects($this->once())
             ->method('hasAlias')

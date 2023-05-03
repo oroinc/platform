@@ -15,7 +15,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * Suppressing for stubs and mock classes
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
@@ -74,48 +73,44 @@ class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
         return $context;
     }
 
-    public function errorsProvider(): \Generator
+    public function errorsProvider(): array
     {
-        yield 'http' => [
-            new BadRequestHttpException('http message', null, 418),
-            400, //has own status code regardless of argument
-            'http message'
-        ];
-
-        yield 'http threats as code aware' => [
-            new HttpException(418, 'I am a tea pot!! >:D'),
-            418, //has own status code regardless of argument
-            'I am a tea pot!! >:D'
-        ];
-
-        yield 'workflow 404' => [
-            new WorkflowNotFoundException('ghosty workflow', 429),
-            404,//as usual
-            'Workflow "ghosty workflow" not found'
-        ];
-
-        yield 'attribute unknown' => [
-            new UnknownAttributeException('attribute?', 42),
-            400,//bad request
-            'attribute?'
-        ];
-
-        yield 'transition invalid' => [
-            new InvalidTransitionException('message about that', 100500),
-            400,
-            'message about that'
-        ];
-
-        yield 'forbidden transition' => [
-            new ForbiddenTransitionException('not allowed', 2),
-            403, //http forbidden
-            'not allowed'
-        ];
-
-        yield 'any other problem that can be thrown' => [
-            new \Error('your strict isn\'t strict', 314),
-            500,
-            'your strict isn\'t strict'
+        return [
+            'http' => [
+                new BadRequestHttpException('http message', null, 418),
+                400, //has own status code regardless of argument
+                'http message'
+            ],
+            'http threats as code aware' => [
+                new HttpException(418, 'I am a tea pot!! >:D'),
+                418, //has own status code regardless of argument
+                'I am a tea pot!! >:D'
+            ],
+            'workflow 404' => [
+                new WorkflowNotFoundException('ghosty workflow'),
+                404,//as usual
+                'Workflow "ghosty workflow" not found'
+            ],
+            'attribute unknown' => [
+                new UnknownAttributeException('attribute?', 42),
+                400,//bad request
+                'attribute?'
+            ],
+            'transition invalid' => [
+                new InvalidTransitionException('message about that', 100500),
+                400,
+                'message about that'
+            ],
+            'forbidden transition' => [
+                new ForbiddenTransitionException('not allowed', 2),
+                403, //http forbidden
+                'not allowed'
+            ],
+            'any other problem that can be thrown' => [
+                new \Error('your strict isn\'t strict', 314),
+                500,
+                'your strict isn\'t strict'
+            ]
         ];
     }
 

@@ -7,13 +7,12 @@
     data-placement="bottom-end"
     class="dropdown-toggle dropdown-toggle--no-caret action-permissions__item-wrapper<% if (isAccessLevelChanged) {%> action-permissions__item-wrapper_changed<% } %>"
 >
-    <span class="action-permissions__label"
-          title="<%- label %>"><%- label %></span>
+    <span class="action-permissions__label" data-toggle="tooltip"><%- label %></span>
     -
     <a href="#"
        class="action-permissions__dropdown-toggle"
        data-emulate-btn-press=""
-       title="<%- access_level_label %>"><%- access_level_label %></a>
+       data-toggle="tooltip"><%- access_level_label %></a>
 </div>
 <div class="dropdown-menu dropdown-menu__permissions-item" aria-labelledby="<%- togglerId %>">
     <div data-role="dropdown-menu-content"></div>

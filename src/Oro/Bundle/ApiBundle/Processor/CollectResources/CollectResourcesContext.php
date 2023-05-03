@@ -13,15 +13,14 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
 class CollectResourcesContext extends ApiContext
 {
     /** @var string[] */
-    private $accessibleResources = [];
-
+    private array $accessibleResources = [];
     /** @var string[] */
-    private $accessibleAsAssociationResources = [];
+    private array $accessibleAsAssociationResources = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         parent::initialize();
         $this->setResult(new ApiResourceCollection());

@@ -12,11 +12,8 @@ use Oro\Component\EntitySerializer\DataTransformerInterface;
  */
 class ValueTransformer
 {
-    /** @var DataTransformerRegistry */
-    private $dataTransformerRegistry;
-
-    /** @var DataTransformerInterface */
-    private $dataTransformer;
+    private DataTransformerRegistry $dataTransformerRegistry;
+    private DataTransformerInterface $dataTransformer;
 
     public function __construct(
         DataTransformerRegistry $dataTransformerRegistry,
@@ -30,17 +27,11 @@ class ValueTransformer
      * Converts a value to the given data-type using data transformers registered in the data transformer registry.
      *
      * @see \Oro\Bundle\ApiBundle\Processor\ApiContext::getNormalizationContext for the transformation context.
-     *
-     * @param mixed  $value    A value to be transformed.
-     * @param string $dataType The data-type.
-     * @param array  $context  The transformation context.
-     *
-     * @return mixed
      */
-    public function transformValue($value, string $dataType, array $context)
+    public function transformValue(mixed $value, string $dataType, array $context): mixed
     {
         if (!isset($context[ApiContext::REQUEST_TYPE])) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'The transformation context must have "%s" attribute.',
                 ApiContext::REQUEST_TYPE
             ));
@@ -67,14 +58,8 @@ class ValueTransformer
      * @see \Oro\Bundle\ApiBundle\Processor\ApiContext::getNormalizationContext for the transformation context.
      * @see \Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig::toArray() for the field configuration. Usually
      * the $excludeTargetEntity parameter is TRUE.
-     *
-     * @param mixed $fieldValue  A value to be transformed.
-     * @param array $fieldConfig The field configuration.
-     * @param array $context     The transformation context.
-     *
-     * @return mixed
      */
-    public function transformFieldValue($fieldValue, array $fieldConfig, array $context)
+    public function transformFieldValue(mixed $fieldValue, array $fieldConfig, array $context): mixed
     {
         return $this->dataTransformer->transform($fieldValue, $fieldConfig, $context);
     }

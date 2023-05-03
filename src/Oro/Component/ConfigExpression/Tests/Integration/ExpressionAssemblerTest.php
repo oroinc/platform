@@ -8,7 +8,7 @@ use Oro\Component\ConfigExpression\ExpressionAssembler;
 class ExpressionAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpressionAssembler */
-    protected $expressionAssembler;
+    private $expressionAssembler;
 
     protected function setUp(): void
     {
@@ -25,7 +25,7 @@ class ExpressionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($configuration, $expr->toArray());
     }
 
-    public function assembleDataProvider()
+    public function assembleDataProvider(): array
     {
         return [
             [

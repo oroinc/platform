@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\EntityExtendBundle\Test\EntityExtendTestInitializer;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
@@ -15,6 +16,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResol
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\ResolverInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\Event\DisableListenersForDataFixturesEvent;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\TestEventsLoggerTrait;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
@@ -90,6 +92,9 @@ abstract class WebTestCase extends BaseWebTestCase
     /** @var Client */
     protected $client;
 
+    /** @var ReferenceRepository[] */
+    private array $referenceRepositories = [];
+
     /** @var ReferenceRepository */
     private static $referenceRepository;
 
@@ -104,6 +109,14 @@ abstract class WebTestCase extends BaseWebTestCase
 
     protected function setUp(): void
     {
+    }
+
+    /**
+     * @beforeClass
+     */
+    public static function setUpExtendEntityProcessor()
+    {
+        EntityExtendTestInitializer::initialize();
     }
 
     /**
@@ -266,18 +279,18 @@ abstract class WebTestCase extends BaseWebTestCase
     protected static function createKernel(array $options = [])
     {
         if (!array_key_exists('environment', $options)) {
-            if (isset($_ENV['SYMFONY_ENV'])) {
-                $options['environment'] = $_ENV['SYMFONY_ENV'];
-            } elseif (isset($_SERVER['SYMFONY_ENV'])) {
-                $options['environment'] = $_SERVER['SYMFONY_ENV'];
+            if (isset($_ENV['ORO_ENV'])) {
+                $options['environment'] = $_ENV['ORO_ENV'];
+            } elseif (isset($_SERVER['ORO_ENV'])) {
+                $options['environment'] = $_SERVER['ORO_ENV'];
             }
         }
 
         if (!array_key_exists('debug', $options)) {
-            if (isset($_ENV['SYMFONY_DEBUG'])) {
-                $options['debug'] = $_ENV['SYMFONY_DEBUG'];
-            } elseif (isset($_SERVER['SYMFONY_DEBUG'])) {
-                $options['debug'] = $_SERVER['SYMFONY_DEBUG'];
+            if (isset($_ENV['ORO_DEBUG'])) {
+                $options['debug'] = $_ENV['ORO_DEBUG'];
+            } elseif (isset($_SERVER['ORO_DEBUG'])) {
+                $options['debug'] = $_SERVER['ORO_DEBUG'];
             }
         }
 
@@ -421,8 +434,7 @@ abstract class WebTestCase extends BaseWebTestCase
             }
         }
 
-        $resolver = self::getContainer()->get('oro_test.value_resolver');
-        $resolver->setReferences(new Collection(self::$referenceRepository->getReferences()));
+        $resolver = self::getReferenceResolver();
 
         if (is_array($data)) {
             array_walk_recursive($data, function (&$item) use ($resolver) {
@@ -437,6 +449,14 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return $data;
+    }
+
+    protected static function getReferenceResolver(): ResolverInterface
+    {
+        $resolver = self::getContainer()->get('oro_test.value_resolver');
+        $resolver->setReferences(new Collection(self::$referenceRepository->getReferences()));
+
+        return $resolver;
     }
 
     /**
@@ -573,11 +593,16 @@ abstract class WebTestCase extends BaseWebTestCase
             $loader->addFixture($fixture);
         }
 
-        $executor = new DataFixturesExecutor($this->getDataFixturesExecutorEntityManager());
+        $executor = new DataFixturesExecutor(
+            $this->getDataFixturesExecutorEntityManager(),
+            $this->getContainer()->get('doctrine')
+        );
         self::$referenceRepository = $executor->getReferenceRepository();
         $this->preFixtureLoad();
         $this->doLoadFixtures($executor, $loader);
         $this->postFixtureLoad();
+
+        $this->referenceRepositories = $executor->getReferenceRepositories();
     }
 
     /**
@@ -699,15 +724,39 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * @return ReferenceRepository
+     * @throws \Exception
      */
-    protected function getReferenceRepository()
+    protected function getReferenceRepository(string $class = null): ReferenceRepository
     {
         if (null === self::$referenceRepository) {
             throw new \LogicException('The reference repository is not set. Have you loaded fixtures?');
         }
 
-        return self::$referenceRepository;
+        if (is_null($class)) {
+            return self::$referenceRepository;
+        }
+
+        if (!$objectManager = $this->getContainer()->get('doctrine')->getManagerForClass($class)) {
+            throw new \Exception(sprintf(
+                'Reference repository is not created for class "%s". Did you forget'
+                . ' to associate your object manager with class "%s"?',
+                $class,
+                $class
+            ));
+        }
+
+        foreach ($this->referenceRepositories as $referenceRepository) {
+            if ($objectManager === $referenceRepository->getManager()) {
+                return $referenceRepository;
+            }
+        }
+
+        throw new \Exception(sprintf(
+            'Reference repository is not created for class "%s". '
+                . 'Did you forget to extend Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture '
+                . 'in your fixture to use not default ObjectManager?',
+            $class
+        ));
     }
 
     /**

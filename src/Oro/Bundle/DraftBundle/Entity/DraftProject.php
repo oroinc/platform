@@ -3,10 +3,11 @@
 namespace Oro\Bundle\DraftBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\DraftBundle\Model\ExtendDraftProject;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
 
@@ -31,10 +32,11 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  *      }
  * )
  */
-class DraftProject extends ExtendDraftProject implements DatesAwareInterface, OrganizationAwareInterface
+class DraftProject implements DatesAwareInterface, OrganizationAwareInterface, ExtendEntityInterface
 {
     use DatesAwareTrait;
     use UserAwareTrait;
+    use ExtendEntityTrait;
 
     /**
      * @var integer

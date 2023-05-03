@@ -1,0 +1,28 @@
+services:
+    oro.cache.redis_provider:
+        class: 'Symfony\Component\Cache\Adapter\RedisAdapter'
+        factory: '@oro_redis_config.redis_connection_factory'
+        public: true
+        arguments:
+            - '%redis_dsn_cache%'
+
+    oro.cache.adapter.persistent:
+        public: false
+        parent: cache.adapter.redis
+        arguments:
+            $redis: '@oro.cache.redis_provider'
+
+    oro_wsse_authentication.nonce_cache:
+        abstract: true
+        class: Symfony\Component\Cache\Adapter\RedisAdapter
+        arguments:
+            - '@oro.cache.redis_provider'
+            - '<namespace>' # set in WsseNonceCachePass
+            - '<lifetime>' # set in WsseNonceCachePass
+
+    oro_embedded_form.csrf_token_cache:
+        class: Symfony\Component\Cache\Adapter\RedisAdapter
+        arguments:
+            - '@oro.cache.redis_provider'
+            - 'oro_embedded_form'
+            - '%oro_embedded_form.csrf_token_lifetime%'

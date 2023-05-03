@@ -6,31 +6,28 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\EntitySerializer\EntityFieldFilterInterface;
 
+/**
+ * The service that is used to check whether a specific entity field
+ * is applicable to process by the entity serializer component.
+ */
 class ExtendEntityFieldFilter implements EntityFieldFilterInterface
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    private ConfigManager $configManager;
+    private bool $allowExtendedFields;
 
-    /** @var bool */
-    protected $allowExtendedFields;
-
-    /**
-     * @param ConfigManager $configManager
-     * @param bool          $allowExtendedFields
-     */
-    public function __construct(ConfigManager $configManager, $allowExtendedFields = false)
+    public function __construct(ConfigManager $configManager, bool $allowExtendedFields = false)
     {
-        $this->configManager       = $configManager;
+        $this->configManager = $configManager;
         $this->allowExtendedFields = $allowExtendedFields;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isApplicableField($className, $fieldName)
+    public function isApplicableField(string $className, string $fieldName): bool
     {
         if (null === $this->configManager->getConfigModelId($className, $fieldName)) {
-            // this serializer works with non configurable entities as well
+            // non configurable entities are supported  as well
             return true;
         }
 
@@ -39,8 +36,7 @@ class ExtendEntityFieldFilter implements EntityFieldFilterInterface
             return false;
         }
 
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $extendConfig         = $extendConfigProvider->getConfig($className, $fieldName);
+        $extendConfig = $this->configManager->getFieldConfig('extend', $className, $fieldName);
 
         if (!$this->allowExtendedFields && $extendConfig->is('is_extend')) {
             // exclude extended fields if it is requested
@@ -52,7 +48,9 @@ class ExtendEntityFieldFilter implements EntityFieldFilterInterface
         }
 
         if ($extendConfig->has('target_entity')
-            && !ExtendHelper::isEntityAccessible($extendConfigProvider->getConfig($extendConfig->get('target_entity')))
+            && !ExtendHelper::isEntityAccessible(
+                $this->configManager->getEntityConfig('extend', $extendConfig->get('target_entity'))
+            )
         ) {
             return false;
         }

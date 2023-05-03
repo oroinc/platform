@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Command\Provider;
 
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,17 +16,10 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
     private const OPTION_NAME = 'option-name';
     private const MESSAGE = 'Question message';
 
-    /** @var QuestionHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $questionHelper;
-
-    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $input;
-
-    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $output;
-
-    /** @var InputOptionProvider */
-    private $inputOptionProvider;
+    private QuestionHelper|MockObject $questionHelper;
+    private InputInterface|MockObject $input;
+    private OutputInterface|MockObject $output;
+    private InputOptionProvider $inputOptionProvider;
 
     protected function setUp(): void
     {
@@ -158,6 +153,53 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             $userAnswer,
             $this->inputOptionProvider->get(self::OPTION_NAME, self::MESSAGE)
+        );
+    }
+
+    public function testGetCommandParametersFromOptions()
+    {
+        $options = [
+            'option-a' => [
+                'label' => 'Option A',
+                'options' => [
+                    'constructorArgs' => ['default-value-a'],
+                    'settings' => [
+                        'validator' => [
+                            function ($value) {
+                            }
+                        ]
+                    ]
+                ],
+                'defaultValue' => 'default-value-a',
+            ],
+            'option-b' => [
+                'label' => 'Option B',
+                'options' => [
+                    'constructorArgs' => ['default-value-b'],
+                    'settings' => [
+                        'validator' => [
+                            function ($value) {
+                            }
+                        ]
+                    ]
+                ],
+                'defaultValue' => 'default-value-b',
+            ]
+        ];
+
+        $this->input->expects($this->any())
+            ->method('getOption')
+            ->willReturnMap([
+                ['option-a', null],
+                ['option-b', 'some-test-value'],
+            ]);
+
+        static::assertEquals(
+            [
+                '--option-a' => 'default-value-a',
+                '--option-b' => 'some-test-value',
+            ],
+            $this->inputOptionProvider->getCommandParametersFromOptions($options)
         );
     }
 }

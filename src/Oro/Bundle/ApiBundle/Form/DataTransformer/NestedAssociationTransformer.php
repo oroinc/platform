@@ -19,7 +19,7 @@ class NestedAssociationTransformer extends AbstractEntityAssociationTransformer
         $entityId = $this->doctrineHelper
             ->getEntityMetadataForClass($resolvedEntityClass)
             ->getIdentifierValues($entity);
-        if (count($entityId) === 1) {
+        if (\count($entityId) === 1) {
             $entityId = reset($entityId);
         }
 

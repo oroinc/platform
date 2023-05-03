@@ -21,10 +21,7 @@ class AssertHasResult implements ProcessorInterface
         if (!$context->hasResult()) {
             $query = $context->getQuery();
             if (null !== $query) {
-                throw new NotFoundHttpException(sprintf(
-                    'Unsupported query type: %s.',
-                    \is_object($query) ? \get_class($query) : gettype($query)
-                ));
+                throw new NotFoundHttpException(sprintf('Unsupported query type: %s.', get_debug_type($query)));
             }
             throw new NotFoundHttpException('Unsupported request.');
         }

@@ -7,8 +7,7 @@ namespace Oro\Component\EntitySerializer;
  */
 class SerializationHelper
 {
-    /** @var DataTransformerInterface */
-    private $dataTransformer;
+    private DataTransformerInterface $dataTransformer;
 
     public function __construct(DataTransformerInterface $dataTransformer)
     {
@@ -17,14 +16,8 @@ class SerializationHelper
 
     /**
      * Prepares the given value for serialization.
-     *
-     * @param mixed            $fieldValue
-     * @param array            $context
-     * @param FieldConfig|null $fieldConfig
-     *
-     * @return mixed
      */
-    public function transformValue($fieldValue, array $context, FieldConfig $fieldConfig = null)
+    public function transformValue(mixed $fieldValue, array $context, ?FieldConfig $fieldConfig): mixed
     {
         return $this->dataTransformer->transform(
             $fieldValue,

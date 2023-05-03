@@ -10,9 +10,9 @@ use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
 class UpdateProcessor extends RequestActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): UpdateContext
     {
         return new UpdateContext($this->configProvider, $this->metadataProvider);
     }

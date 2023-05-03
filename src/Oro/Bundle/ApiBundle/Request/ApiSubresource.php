@@ -7,34 +7,25 @@ namespace Oro\Bundle\ApiBundle\Request;
  */
 class ApiSubresource
 {
-    /** @var string */
-    private $targetClassName;
-
+    private ?string $targetClassName = null;
+    /** @var string[]|null */
+    private ?array $acceptableTargetClassNames = null;
+    private bool $isCollection = false;
     /** @var string[] */
-    private $acceptableTargetClassNames;
-
-    /** @var bool */
-    private $isCollection;
-
-    /** @var string[] */
-    private $excludedActions = [];
+    private array $excludedActions = [];
 
     /**
      * Gets the target entity class name.
-     *
-     * @return string
      */
-    public function getTargetClassName()
+    public function getTargetClassName(): string
     {
-        return $this->targetClassName;
+        return $this->targetClassName ?? '';
     }
 
     /**
      * Sets the target entity class name.
-     *
-     * @param string $className
      */
-    public function setTargetClassName($className)
+    public function setTargetClassName(string $className): void
     {
         $this->targetClassName = $className;
     }
@@ -44,7 +35,7 @@ class ApiSubresource
      *
      * @return string[]
      */
-    public function getAcceptableTargetClassNames()
+    public function getAcceptableTargetClassNames(): array
     {
         return $this->acceptableTargetClassNames ?? [];
     }
@@ -54,19 +45,17 @@ class ApiSubresource
      *
      * @param string[] $classNames
      */
-    public function setAcceptableTargetClassNames(array $classNames)
+    public function setAcceptableTargetClassNames(array $classNames): void
     {
         $this->acceptableTargetClassNames = $classNames;
     }
 
     /**
      * Whether the sub-resource represents "to-many" or "to-one" association.
-     *
-     * @return bool
      */
-    public function isCollection()
+    public function isCollection(): bool
     {
-        return (bool)$this->isCollection;
+        return $this->isCollection;
     }
 
     /**
@@ -74,7 +63,7 @@ class ApiSubresource
      *
      * @param bool $isCollection TRUE for "to-many" relationship, FALSE for "to-one" relationship
      */
-    public function setIsCollection($isCollection)
+    public function setIsCollection(bool $isCollection): void
     {
         $this->isCollection = $isCollection;
     }
@@ -84,7 +73,7 @@ class ApiSubresource
      *
      * @return string[]
      */
-    public function getExcludedActions()
+    public function getExcludedActions(): array
     {
         return $this->excludedActions;
     }
@@ -94,29 +83,23 @@ class ApiSubresource
      *
      * @param string[] $excludedActions
      */
-    public function setExcludedActions(array $excludedActions)
+    public function setExcludedActions(array $excludedActions): void
     {
         $this->excludedActions = $excludedActions;
     }
 
     /**
      * Indicates whether an action must not be available for the sub-resource.
-     *
-     * @param string $action
-     *
-     * @return bool
      */
-    public function isExcludedAction($action)
+    public function isExcludedAction(string $action): bool
     {
         return \in_array($action, $this->excludedActions, true);
     }
 
     /**
      * Adds an action to a list of actions that must not be available for the sub-resource.
-     *
-     * @param string $action
      */
-    public function addExcludedAction($action)
+    public function addExcludedAction(string $action): void
     {
         if (!\in_array($action, $this->excludedActions, true)) {
             $this->excludedActions[] = $action;
@@ -125,15 +108,13 @@ class ApiSubresource
 
     /**
      * Removes an action from a list of actions that must not be available for the sub-resource.
-     *
-     * @param string $action
      */
-    public function removeExcludedAction($action)
+    public function removeExcludedAction(string $action): void
     {
-        $key = \array_search($action, $this->excludedActions, true);
+        $key = array_search($action, $this->excludedActions, true);
         if (false !== $key) {
             unset($this->excludedActions[$key]);
-            $this->excludedActions = \array_values($this->excludedActions);
+            $this->excludedActions = array_values($this->excludedActions);
         }
     }
 }

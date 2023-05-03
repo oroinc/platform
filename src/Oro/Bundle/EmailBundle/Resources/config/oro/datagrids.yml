@@ -225,6 +225,7 @@ datagrids:
                         field_options:
                             multiple: true
                             choices: "@oro_email.datagrid.origin_folder.provider->getListTypeChoices()"
+                            translatable_options: false
                 is_new:
                     label: oro.email.status.label
                     type: boolean
@@ -243,6 +244,7 @@ datagrids:
                         field_options:
                             required: false
                             choices: "@oro_email.mailbox_choice_list->getChoiceList"
+                            translatable_options: false
         views_list : "@oro_email.emailfolder.datagrid_view_list"
 
     activity-email-grid:
@@ -365,7 +367,7 @@ datagrids:
                             modal:         true
                             dblclick:      maximize
                             maximizedHeightDecreaseBy: minimize-bar
-                            width: 700
+                            width: 812
             view_thread:
                 type: dialog
                 label: oro.email.datagrid.emails.action.view
@@ -523,6 +525,7 @@ datagrids:
                 frontend_type:  select
                 label:          oro.email.emailtemplate.type.label
                 choices:        "@oro_email.emailtemplate.datagrid_helper->getTypeChoices"
+                translatable_options: false
             isSystem:
                 frontend_type:  boolean
                 label:          oro.email.emailtemplate.is_system.label
@@ -561,6 +564,7 @@ datagrids:
                     options:
                         field_options:
                             choices: "@oro_email.emailtemplate.datagrid_helper->getTypeChoices"
+                            translatable_options: false
 
                 isSystem:
                     type:           boolean

@@ -230,7 +230,7 @@ class testClassName implements Oro\Component\Layout\LayoutUpdateInterface
 {
     public function updateLayout(
         Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator,
-        Oro\Component\Layout\LayoutItemInterface $item
+        Oro\Component\Layout\LayoutItemInterface $item,
     ) {
         $layoutManipulator->add( 'root', NULL, 'root' );
         $layoutManipulator->add( 'header', 'root', 'header' );

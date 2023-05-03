@@ -10,7 +10,7 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeConfigProvider
      */
-    public function testNormalizeConfig($config, $expectedConfig, $configObject)
+    public function testNormalizeConfig(array $config, array $expectedConfig, array $configObject): void
     {
         $configConverter = new ConfigConverter();
         $normalizer = new ConfigNormalizer();
@@ -37,7 +37,7 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function normalizeConfigProvider()
+    public function normalizeConfigProvider(): array
     {
         return [
             'order_by'                                                => [
@@ -996,8 +996,8 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                             ]
                         ]
                     ]
-                ],
-            ],
+                ]
+            ]
         ];
     }
 }

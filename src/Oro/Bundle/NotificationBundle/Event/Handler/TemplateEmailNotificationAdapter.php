@@ -8,12 +8,13 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Event\NotificationProcessRecipientsEvent;
+use Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Adapts EmailNotification entity to TemplateEmailNotificationInterface getting recipients from the related recipient
@@ -37,7 +38,7 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
     private $entity;
 
     /**
-     * @var PropertyAccessor
+     * @var PropertyAccessorInterface
      */
     private $propertyAccessor;
 
@@ -49,11 +50,13 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
     /** @var ChainAdditionalEmailAssociationProvider */
     private $additionalEmailAssociationProvider;
 
+    private WebsiteAwareEntityHelper $websiteAwareEntityHelper;
+
     /**
      * @param object                                  $entity
      * @param EmailNotification                       $notification
      * @param EntityManager                           $entityManager
-     * @param PropertyAccessor                        $propertyAccessor
+     * @param PropertyAccessorInterface               $propertyAccessor
      * @param EventDispatcherInterface                $eventDispatcher
      * @param ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider
      */
@@ -61,9 +64,10 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
         $entity,
         EmailNotification $notification,
         EntityManager $entityManager,
-        PropertyAccessor $propertyAccessor,
+        PropertyAccessorInterface $propertyAccessor,
         EventDispatcherInterface $eventDispatcher,
-        ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider
+        ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider,
+        WebsiteAwareEntityHelper $websiteAwareEntityHelper,
     ) {
         $this->entity = $entity;
         $this->notification = $notification;
@@ -71,6 +75,7 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
         $this->propertyAccessor = $propertyAccessor;
         $this->eventDispatcher = $eventDispatcher;
         $this->additionalEmailAssociationProvider = $additionalEmailAssociationProvider;
+        $this->websiteAwareEntityHelper = $websiteAwareEntityHelper;
     }
 
     /**
@@ -115,7 +120,7 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
 
         $this->removeDisabledUsers($recipients);
 
-        $event = new NotificationProcessRecipientsEvent($this->entity, $recipients);
+        $event = new NotificationProcessRecipientsEvent($this->entity, $recipients, $this->websiteAwareEntityHelper);
         $this->eventDispatcher->dispatch($event, NotificationProcessRecipientsEvent::NAME);
 
         return $event->getRecipients();

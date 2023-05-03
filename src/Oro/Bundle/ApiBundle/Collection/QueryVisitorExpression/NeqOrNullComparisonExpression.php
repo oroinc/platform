@@ -22,11 +22,11 @@ class NeqOrNullComparisonExpression implements ComparisonExpressionInterface
         string $field,
         string $expression,
         string $parameterName,
-        $value
-    ) {
+        mixed $value
+    ): mixed {
         if (null === $value) {
             // the filter like IS NOT NULL OR IS NULL does not have a sense
-            throw new QueryException(\sprintf('The value for "%s" must not be NULL.', $field));
+            throw new QueryException(sprintf('The value for "%s" must not be NULL.', $field));
         }
 
         $builder = $visitor->getExpressionBuilder();

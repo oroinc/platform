@@ -5,10 +5,12 @@ namespace Oro\Bundle\SegmentBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
-use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
 
 /**
  * Main segment entity.
@@ -40,8 +42,10 @@ use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
  *      }
  * )
  */
-class Segment extends ExtendSegment implements GridQueryDesignerInterface
+class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterface, ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     const GRID_PREFIX = 'oro_segment_grid_';
 
     /**
@@ -154,6 +158,7 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
         $this->lastRun = null;
         $this->createdAt = null;
         $this->updatedAt = null;
+        $this->cloneExtendEntityStorage();
     }
 
     /**

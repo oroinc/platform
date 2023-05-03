@@ -35,14 +35,9 @@ class CompleteDefinition implements ProcessorInterface
 {
     public const OPERATION_NAME = 'complete_definition';
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var CompleteEntityDefinitionHelper */
-    protected $entityDefinitionHelper;
-
-    /** @var CompleteObjectDefinitionHelper */
-    protected $objectDefinitionHelper;
+    private DoctrineHelper $doctrineHelper;
+    private CompleteEntityDefinitionHelper $entityDefinitionHelper;
+    private CompleteObjectDefinitionHelper $objectDefinitionHelper;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -57,7 +52,7 @@ class CompleteDefinition implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 

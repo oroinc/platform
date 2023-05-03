@@ -78,7 +78,8 @@
                     'onRootSelectRoute' : routePrefix ~ 'view',
                     'onSelectRoute' : routePrefix ~ 'update',
                     'onMoveRoute' : routePrefix ~ 'ajax_move',
-                    'successMessage': movedMessage|default('oro.navigation.menuupdate.moved_success_message')
+                    'successMessage': movedMessage|default('oro.navigation.menuupdate.moved_success_message'),
+                    'maxDepth': entity.extras.max_nesting_level|default(3),
                 } %}
 
                 {% embed "@OroUI/content_sidebar.html.twig" with {options: {

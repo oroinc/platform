@@ -6,8 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
-use Oro\Bundle\EmailBundle\Model\ExtendEmailTemplate;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -44,8 +45,10 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterface
+class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     public const TYPE_HTML = 'html';
     public const TYPE_TEXT = 'txt';
 
@@ -178,8 +181,6 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
         $this->type = $type;
         $this->content = $parsedContent['content'];
         $this->translations = new ArrayCollection();
-
-        parent::__construct();
     }
 
     /**
@@ -513,6 +514,7 @@ class EmailTemplate extends ExtendEmailTemplate implements EmailTemplateInterfac
         foreach ($originalTranslations as $translation) {
             $this->addTranslation(clone $translation);
         }
+        $this->cloneExtendEntityStorage();
     }
 
     /**

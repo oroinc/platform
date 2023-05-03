@@ -11,15 +11,12 @@ class SettingsConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProviderForConverter
      */
-    public function testConvertToSettings($config, $expectedSettings)
+    public function testConvertToSettings(Config $config, array $expectedSettings)
     {
         $this->assertEquals($expectedSettings, SettingsConverter::convertToSettings($config));
     }
 
-    /**
-     * @return array
-     */
-    public function dataProviderForConverter()
+    public function dataProviderForConverter(): array
     {
         $configWithoutValues = new Config();
 

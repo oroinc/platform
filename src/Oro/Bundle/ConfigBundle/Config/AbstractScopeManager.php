@@ -25,7 +25,7 @@ abstract class AbstractScopeManager
         ManagerRegistry $doctrine,
         CacheInterface $cache,
         EventDispatcherInterface $eventDispatcher,
-        ConfigBag $configBag
+        ConfigBag $configBag,
     ) {
         $this->doctrine = $doctrine;
         $this->cache = $cache;

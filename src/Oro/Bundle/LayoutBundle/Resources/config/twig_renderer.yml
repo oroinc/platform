@@ -11,6 +11,7 @@ services:
         class: Oro\Bundle\LayoutBundle\Twig\TwigRenderer
         arguments:
             - '@oro_layout.twig.renderer.engine'
+            - '@oro_layout.layout_context_stack'
             - '@oro_layout.cache.render_cache'
             - '@oro_layout.cache.placeholder_renderer'
             - '@twig'
@@ -40,3 +41,10 @@ services:
         class: Oro\Bundle\LayoutBundle\Form\RendererEngine\TwigRendererEngine
         decorates: 'twig.form.engine'
         parent: 'twig.form.engine'
+
+    oro_layout.event_listener.layout_context_changed:
+        class: Oro\Bundle\LayoutBundle\EventListener\LayoutContextChangedListener
+        arguments:
+            - '@oro_layout.twig.layout_renderer'
+        tags:
+            - { name: kernel.event_listener, event: Oro\Bundle\LayoutBundle\Event\LayoutContextChangedEvent, method: onContextChanged }

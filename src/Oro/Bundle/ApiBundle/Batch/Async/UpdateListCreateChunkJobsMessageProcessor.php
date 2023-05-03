@@ -20,23 +20,12 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /** @var JobRunner */
-    private $jobRunner;
-
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var AsyncOperationManager */
-    private $operationManager;
-
-    /** @var UpdateListProcessingHelper */
-    private $processingHelper;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var int */
-    private $batchSize = 2000;
+    private JobRunner $jobRunner;
+    private ManagerRegistry $doctrine;
+    private AsyncOperationManager $operationManager;
+    private UpdateListProcessingHelper $processingHelper;
+    private LoggerInterface $logger;
+    private int $batchSize = 2000;
 
     public function __construct(
         JobRunner $jobRunner,
@@ -53,9 +42,9 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [UpdateListCreateChunkJobsTopic::getName()];
     }
@@ -69,9 +58,9 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
         $startTimestamp = microtime(true);
         $messageBody = $message->getBody();

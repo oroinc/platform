@@ -13,8 +13,7 @@ use Symfony\Component\Form\FormInterface;
 
 class FormContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormContext */
-    private $context;
+    private FormContext $context;
 
     protected function setUp(): void
     {
@@ -46,7 +45,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setIncludedEntities($includedEntities);
         self::assertSame($includedEntities, $this->context->getIncludedEntities());
 
-        $this->context->setIncludedEntities();
+        $this->context->setIncludedEntities(null);
         self::assertNull($this->context->getIncludedEntities());
     }
 
@@ -77,7 +76,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setEntityMapper($entityMapper);
         self::assertSame($entityMapper, $this->context->getEntityMapper());
 
-        $this->context->setEntityMapper();
+        $this->context->setEntityMapper(null);
         self::assertNull($this->context->getEntityMapper());
     }
 
@@ -92,7 +91,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->hasFormBuilder());
         self::assertSame($formBuilder, $this->context->getFormBuilder());
 
-        $this->context->setFormBuilder();
+        $this->context->setFormBuilder(null);
         self::assertFalse($this->context->hasFormBuilder());
         self::assertNull($this->context->getFormBuilder());
     }
@@ -108,7 +107,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->hasForm());
         self::assertSame($form, $this->context->getForm());
 
-        $this->context->setForm();
+        $this->context->setForm(null);
         self::assertFalse($this->context->hasForm());
         self::assertNull($this->context->getForm());
     }

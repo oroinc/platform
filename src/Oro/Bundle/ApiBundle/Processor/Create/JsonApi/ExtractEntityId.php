@@ -23,7 +23,7 @@ class ExtractEntityId implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext|SingleItemContext $context */
 
@@ -33,13 +33,13 @@ class ExtractEntityId implements ProcessorInterface
         }
 
         $requestData = $context->getRequestData();
-        if (!array_key_exists(JsonApiDoc::DATA, $requestData)) {
+        if (!\array_key_exists(JsonApiDoc::DATA, $requestData)) {
             // unsupported request data or the data are already normalized
             return;
         }
 
         $data = $requestData[JsonApiDoc::DATA];
-        if (array_key_exists(JsonApiDoc::ID, $data)) {
+        if (\array_key_exists(JsonApiDoc::ID, $data)) {
             $context->setId($data[JsonApiDoc::ID]);
         } else {
             $metadata = $context->getMetadata();
@@ -49,10 +49,7 @@ class ExtractEntityId implements ProcessorInterface
         }
     }
 
-    /**
-     * @return Error
-     */
-    private function createRequiredEntityIdError()
+    private function createRequiredEntityIdError(): Error
     {
         return Error::createValidationError(Constraint::ENTITY_ID, 'The identifier is mandatory')
             ->setSource(ErrorSource::createByPropertyPath('id'));

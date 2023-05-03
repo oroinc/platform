@@ -20,7 +20,7 @@ define(function(require) {
             useMainButtonsClone: false,
             truncateLength: null,
             moreLabel: '',
-            groupContainer: '<div class="btn-group"></div>',
+            groupContainer: '<div class="dropdown btn-group"></div>',
             minItemQuantity: 1,
             moreButtonAttrs: {},
             decoreClass: null
@@ -199,6 +199,10 @@ define(function(require) {
                 .removeClass(function(index, css) {
                     return (css.match(/\bbtn(-\S+)?/g) || []).join(' ');
                 }).wrap('<li role="menuitem"></li>').parent();
+        },
+
+        prepareDropdownButtons: function($buttons) {
+            return this._prepareButtons($buttons);
         }
     }));
 

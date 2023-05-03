@@ -13,17 +13,17 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class NormalizeValueProcessor extends ByStepActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): NormalizeValueContext
     {
         return new NormalizeValueContext();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function executeProcessors(ComponentContextInterface $context)
+    protected function executeProcessors(ComponentContextInterface $context): void
     {
         /** @var NormalizeValueContext $context */
 

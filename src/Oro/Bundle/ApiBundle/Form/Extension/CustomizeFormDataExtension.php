@@ -24,11 +24,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CustomizeFormDataExtension extends AbstractTypeExtension
 {
-    /** @var ActionProcessorInterface */
-    private $customizationProcessor;
-
-    /** @var CustomizeFormDataHandler */
-    private $customizationHandler;
+    private ActionProcessorInterface $customizationProcessor;
+    private CustomizeFormDataHandler $customizationHandler;
 
     public function __construct(
         ActionProcessorInterface $customizationProcessor,
@@ -39,9 +36,9 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (empty($options['data_class'])) {
             return;
@@ -58,9 +55,9 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefined([CustomizeFormDataHandler::API_CONTEXT])
@@ -68,7 +65,7 @@ class CustomizeFormDataExtension extends AbstractTypeExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static function getExtendedTypes(): iterable
     {

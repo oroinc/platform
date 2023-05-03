@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
@@ -24,8 +25,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsOrganization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -35,22 +35,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class AccessRuleWalkerTest extends OrmTestCase
 {
-    /** @var EntityManagerMock */
-    private $em;
-
-    /** @var DynamicAccessRule */
-    private $rule;
-
-    /** @var AccessRuleExecutor */
-    private $accessRuleExecutor;
+    private EntityManagerInterface $em;
+    private DynamicAccessRule $rule;
+    private AccessRuleExecutor $accessRuleExecutor;
 
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS'
-        ));
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->rule = new DynamicAccessRule();
         $container = $this->createMock(ContainerInterface::class);
@@ -87,8 +79,7 @@ class AccessRuleWalkerTest extends OrmTestCase
 
     public function testWalkerWithEmptyRules()
     {
-        $this->rule->setRule(function (Criteria $criteria) {
-            return;
+        $this->rule->setRule(function () {
         });
 
         $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')

@@ -21,10 +21,7 @@ trait MemoryCacheProviderAwareTestTrait
         return $this->memoryCacheProvider;
     }
 
-    /**
-     * @param mixed|null $cachedData
-     */
-    protected function mockMemoryCacheProvider($cachedData = null): void
+    protected function mockMemoryCacheProvider(mixed $cachedData = null): void
     {
         $this->getMemoryCacheProvider()
             ->expects($this->atLeastOnce())

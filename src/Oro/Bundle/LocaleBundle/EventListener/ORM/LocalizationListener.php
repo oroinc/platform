@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\LocaleBundle\EventListener\ORM;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
 
+/**
+ * Listens to Localization Entity events to clear cache
+ */
 class LocalizationListener
 {
     /**

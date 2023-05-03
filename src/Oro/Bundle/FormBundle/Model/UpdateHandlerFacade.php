@@ -98,7 +98,9 @@ class UpdateHandlerFacade
 
             return $result;
         } else {
-            $this->session->getFlashBag()->add('success', $saveMessage);
+            if (null !== $saveMessage) {
+                $this->session->getFlashBag()->add('success', $saveMessage);
+            }
 
             return $this->router->redirect($entity);
         }

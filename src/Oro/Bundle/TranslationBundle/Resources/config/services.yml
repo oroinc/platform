@@ -178,10 +178,8 @@ services:
         class: Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslationListener
         arguments:
             - '@oro_translation.provider.language'
-            - '@translator'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-translations-grid, method: onBuildBefore }
-            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.oro-translation-translations-grid, method: onResultAfter }
 
     oro_translation.listener.datagrid.translatable:
         class: Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslatableListener
@@ -329,6 +327,14 @@ services:
             - '@oro_distribution.handler.application_status'
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }
+            
+    oro_translation.update_translation.js_translation_dump:
+        class: Oro\Bundle\TranslationBundle\EventListener\InvalidateDynamicJsTranslationListener
+        arguments:
+            - '@oro_translation.js_dumper'
+            - '@oro_ui.dynamic_asset_version_manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_translation.invalidate_dynamic_translation_cache, method: onInvalidateDynamicTranslationCache }
 
     oro_translation.async.message_filter.dump_js_translations:
         class: Oro\Bundle\TranslationBundle\Async\DumpJsTranslationsMessageFilter

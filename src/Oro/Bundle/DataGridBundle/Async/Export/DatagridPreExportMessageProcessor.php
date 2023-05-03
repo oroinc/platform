@@ -3,10 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Async\Export;
 
 use Oro\Bundle\DataGridBundle\Async\Export\Executor\DatagridPreExportExecutorInterface;
-use Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic;
 use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager as DatagridManager;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
@@ -25,18 +23,14 @@ class DatagridPreExportMessageProcessor implements MessageProcessorInterface, To
 
     private DatagridManager $datagridManager;
 
-    private TokenAccessorInterface $tokenAccessor;
-
     public function __construct(
         JobRunner $jobRunner,
         DatagridPreExportExecutorInterface $datagridPreExportExecutor,
-        DatagridManager $datagridManager,
-        TokenAccessorInterface $tokenAccessor
+        DatagridManager $datagridManager
     ) {
         $this->jobRunner = $jobRunner;
         $this->datagridPreExportExecutor = $datagridPreExportExecutor;
         $this->datagridManager = $datagridManager;
-        $this->tokenAccessor = $tokenAccessor;
     }
 
     public static function getSubscribedTopics(): array
@@ -48,9 +42,8 @@ class DatagridPreExportMessageProcessor implements MessageProcessorInterface, To
     {
         $messageBody = $message->getBody();
 
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            $this->getJobUniqueName($messageBody['contextParameters']['gridName'], $messageBody['outputFormat']),
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
             function (JobRunner $jobRunner, Job $job) use ($messageBody) {
                 $datagrid = $this->datagridManager->getDatagrid(
                     $messageBody['contextParameters']['gridName'],
@@ -62,16 +55,5 @@ class DatagridPreExportMessageProcessor implements MessageProcessorInterface, To
         );
 
         return $result ? self::ACK : self::REJECT;
-    }
-
-    private function getJobUniqueName(string $gridName, string $outputFormat): string
-    {
-        return sprintf(
-            '%s.%s.user_%s.%s',
-            DatagridExportTopic::getName(),
-            $gridName,
-            $this->tokenAccessor->getUserId(),
-            $outputFormat
-        );
     }
 }

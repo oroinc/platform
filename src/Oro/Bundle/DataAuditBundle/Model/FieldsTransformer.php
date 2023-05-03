@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 
 /**
  * Transform AuditFields to a scalar data
@@ -56,7 +57,7 @@ class FieldsTransformer
                 'new' => $newValue,
             ];
 
-            if (method_exists($field, 'getCollectionDiffs')) {
+            if (EntityPropertyInfo::methodExists($field, 'getCollectionDiffs')) {
                 $collectionDiffs = $field->getCollectionDiffs();
                 if ($collectionDiffs['added'] || $collectionDiffs['changed'] || $collectionDiffs['removed']) {
                     $data[$field->getField()]['collectionDiffs'] = $field->getCollectionDiffs();

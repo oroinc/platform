@@ -2,11 +2,18 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiCustomization;
 
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier as TestEntity;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class CustomIdentifierTest extends RestJsonApiTestCase
@@ -134,26 +141,17 @@ class CustomIdentifierTest extends RestJsonApiTestCase
 
         $response = $this->cget(
             ['entity' => $entityType],
-            ['meta' => 'title', 'fields[' . $entityType . ']' => 'id,parent', 'include' => 'parent']
+            [
+                'meta'                        => 'title',
+                'fields[' . $entityType . ']' => 'id,parent',
+                'include'                     => 'parent',
+                'filter[id]'                  => $this->getEntityId('item 3')
+            ]
         );
 
         $this->assertResponseContains(
             [
                 'data'     => [
-                    [
-                        'type' => $entityType,
-                        'id'   => $this->getEntityId('item 1'),
-                        'meta' => [
-                            'title' => 'item 1 Item 1'
-                        ]
-                    ],
-                    [
-                        'type' => $entityType,
-                        'id'   => $this->getEntityId('item 2'),
-                        'meta' => [
-                            'title' => 'item 2 Item 2'
-                        ]
-                    ],
                     [
                         'type' => $entityType,
                         'id'   => $this->getEntityId('item 3'),
@@ -428,6 +426,59 @@ class CustomIdentifierTest extends RestJsonApiTestCase
         );
         $content = self::jsonToArray($response->getContent());
         self::assertFalse(isset($content['data']['attributes']['databaseId']));
+    }
+
+    public function testTryToExcludeIdentifierField()
+    {
+        $this->appendEntityConfig(
+            TestEntity::class,
+            [
+                'fields' => [
+                    'key' => [
+                        'exclude' => true
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->get(
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 3')],
+            [],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            ['title' => 'runtime exception'],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
+        $content = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('detail', $content['errors'][0]);
+
+        /** @var ConfigProvider $configProvider */
+        $configProvider = self::getContainer()->get('oro_api.config_provider');
+        try {
+            $configProvider->getConfig(
+                TestEntity::class,
+                Version::LATEST,
+                $this->getRequestType(),
+                [new EntityDefinitionConfigExtra(ApiAction::GET)]
+            );
+            self::fail('Expected ExecutionFailedException');
+        } catch (ExecutionFailedException $e) {
+            self::assertEquals(
+                sprintf(
+                    'Processor failed: "oro_api.get_config.complete_definition".'
+                    . ' Reason: Processor failed: "oro_api.get_config.complete_definition".'
+                    . ' Reason: The identifier field "key" for "%s" entity must not be excluded.',
+                    TestEntity::class
+                ),
+                $e->getMessage()
+            );
+        }
     }
 
     public function testGetWithTitles()

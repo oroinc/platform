@@ -40,13 +40,14 @@ class FormTypeTest extends TypeTestCase
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension(
-                [
-                    $this->form
-                ],
+                [$this->form],
                 [SymfonyFormType::class => [new DataBlockExtension()]]
             )
         ];

@@ -21,17 +21,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class AddPaginationLinksForAssociations implements ProcessorInterface
 {
-    /** @var RestRoutesRegistry */
-    private $routesRegistry;
-
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
-
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
-
-    /** @var SubresourcesProvider */
-    private $subresourcesProvider;
+    private RestRoutesRegistry $routesRegistry;
+    private FilterNamesRegistry $filterNamesRegistry;
+    private UrlGeneratorInterface $urlGenerator;
+    private SubresourcesProvider $subresourcesProvider;
 
     public function __construct(
         RestRoutesRegistry $routesRegistry,
@@ -46,9 +39,9 @@ class AddPaginationLinksForAssociations implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var MetadataContext $context */
 
@@ -90,29 +83,19 @@ class AddPaginationLinksForAssociations implements ProcessorInterface
             if (!$association->hasRelationshipLink(ApiDoc::LINK_NEXT)
                 && !$subresource->isExcludedAction(ApiAction::GET_RELATIONSHIP)
             ) {
-                $association->addRelationshipLink(
-                    ApiDoc::LINK_NEXT,
-                    new NextPageLinkMetadata(
-                        $this->getRelationshipLinkMetadata($relationshipRouteName, $associationName),
-                        $pageNumberFilterName
-                    )
-                );
+                $association->addRelationshipLink(ApiDoc::LINK_NEXT, new NextPageLinkMetadata(
+                    new RouteLinkMetadata(
+                        $this->urlGenerator,
+                        $relationshipRouteName,
+                        [
+                            'entity' => DataAccessorInterface::OWNER_ENTITY_TYPE,
+                            'id'     => DataAccessorInterface::OWNER_ENTITY_ID
+                        ],
+                        ['association' => $associationName]
+                    ),
+                    $pageNumberFilterName
+                ));
             }
         }
-    }
-
-    private function getRelationshipLinkMetadata(
-        string $relationshipRouteName,
-        string $associationName
-    ): RouteLinkMetadata {
-        return new RouteLinkMetadata(
-            $this->urlGenerator,
-            $relationshipRouteName,
-            [
-                'entity' => DataAccessorInterface::OWNER_ENTITY_TYPE,
-                'id'     => DataAccessorInterface::OWNER_ENTITY_ID
-            ],
-            ['association' => $associationName]
-        );
     }
 }

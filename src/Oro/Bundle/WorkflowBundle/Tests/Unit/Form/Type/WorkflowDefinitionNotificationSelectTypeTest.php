@@ -8,7 +8,7 @@ use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionNotificationSelectType
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType as EntityTypeStub;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -110,17 +110,15 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $entityType = new EntityTypeStub($this->getDefinitions(), 'oro_select2_entity');
-
         return [
             new PreloadedExtension(
                 [
                     $this->type,
-                    EntityType::class => $entityType
+                    EntityType::class => new EntityTypeStub($this->getDefinitions())
                 ],
                 []
             )

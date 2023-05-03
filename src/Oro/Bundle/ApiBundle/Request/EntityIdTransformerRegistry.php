@@ -12,19 +12,12 @@ use Psr\Container\ContainerInterface;
 class EntityIdTransformerRegistry
 {
     /** @var array [[transformer service id, request type expression], ...] */
-    private $transformers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
-
-    /** @var EntityIdResolverRegistry */
-    private $resolverRegistry;
-
+    private array $transformers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
+    private EntityIdResolverRegistry $resolverRegistry;
     /** @var array [request type => EntityIdTransformerInterface, ...] */
-    private $cache = [];
+    private array $cache = [];
 
     public function __construct(
         array $transformers,
@@ -49,7 +42,7 @@ class EntityIdTransformerRegistry
         }
 
         $entityIdTransformer = null;
-        foreach ($this->transformers as list($serviceId, $expression)) {
+        foreach ($this->transformers as [$serviceId, $expression]) {
             if ($this->matcher->matchValue($expression, $requestType)) {
                 $entityIdTransformer = $this->container->get($serviceId);
                 break;

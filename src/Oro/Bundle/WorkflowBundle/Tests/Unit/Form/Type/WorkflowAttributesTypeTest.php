@@ -85,15 +85,13 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         parent::setUp();
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    $this->type
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->type], [])
         ];
     }
 

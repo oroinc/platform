@@ -22,16 +22,12 @@ class UniversalCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider generateDataProvider
-     *
-     * @param array|string $arguments
-     * @param string $expectedCacheKey
      */
-    public function testGenerate($arguments, string $expectedCacheKey): void
+    public function testGenerate(mixed $arguments, string $expectedCacheKey): void
     {
-        $this->objectCacheKeyGenerator
-            ->expects($this->any())
+        $this->objectCacheKeyGenerator->expects($this->any())
             ->method('generate')
-            ->with($this->isInstanceOf(\stdClass::class), $scope = 'sample_scope')
+            ->with($this->isInstanceOf(\stdClass::class), 'sample_scope')
             ->willReturn('sample_key');
 
         $this->assertEquals($expectedCacheKey, $this->generator->generate($arguments));
@@ -77,9 +73,6 @@ class UniversalCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider normalizeDataProvider
-     * @param string $expectedCacheKey
-     * @param string $actualCacheKey
-     * @return void
      */
     public function testNormalizeCacheKey(string $expectedCacheKey, string $actualCacheKey): void
     {

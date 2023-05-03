@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Action;
 
 use Oro\Bundle\ActionBundle\Tests\Functional\OperationAwareTestTrait;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
 
@@ -10,16 +11,10 @@ class UpdateTest extends WebTestCase
 {
     use OperationAwareTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $this->loadFixtures([
-            'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems',
-        ]);
+        $this->loadFixtures([LoadItems::class]);
     }
 
     public function testExecute()
@@ -27,7 +22,7 @@ class UpdateTest extends WebTestCase
         $item = $this->getReference(LoadItems::ITEM1);
         $operationName = 'UPDATE';
         $entityId = $item->getId();
-        $entityClass = 'Oro\Bundle\TestFrameworkBundle\Entity\Item';
+        $entityClass = Item::class;
         $this->client->request(
             'POST',
             $this->getUrl(

@@ -12,13 +12,9 @@ use Psr\Container\ContainerInterface;
 class MandatoryFieldProviderRegistry
 {
     /** @var array [[provider service id, request type expression], ...] */
-    private $providers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $providers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $providers [[provider service id, request type expression], ...]
@@ -46,7 +42,7 @@ class MandatoryFieldProviderRegistry
     public function getMandatoryFields(string $entityClass, RequestType $requestType): array
     {
         $result = [];
-        foreach ($this->providers as list($serviceId, $expression)) {
+        foreach ($this->providers as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 /** @var MandatoryFieldProviderInterface $provider */
                 $provider = $this->container->get($serviceId);
@@ -57,8 +53,8 @@ class MandatoryFieldProviderRegistry
             }
         }
         if (!empty($result)) {
-            $result = \array_merge(...$result);
-            $result = \array_values(\array_unique($result));
+            $result = array_merge(...$result);
+            $result = array_values(array_unique($result));
         }
 
         return $result;

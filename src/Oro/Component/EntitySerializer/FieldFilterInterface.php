@@ -22,5 +22,5 @@ interface FieldFilterInterface
      *                   FALSE if the field value should not be shown and NULL should be returned instead of it
      *                   TRUE if the field should not be shown at all
      */
-    public function checkField($entity, string $entityClass, string $field): ?bool;
+    public function checkField(object $entity, string $entityClass, string $field): ?bool;
 }

@@ -2,15 +2,16 @@
 
 namespace Oro\Component\ConfigExpression;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Config context accessor.
+ */
 class ContextAccessor implements ContextAccessorInterface
 {
-    /**
-     * @var PropertyAccessor
-     */
-    protected $propertyAccessor;
+    protected ?PropertyAccessorInterface $propertyAccessor = null;
 
     /**
      * {@inheritdoc}
@@ -81,12 +82,12 @@ class ContextAccessor implements ContextAccessorInterface
     /**
      * Get PropertyAccessor
      *
-     * @return PropertyAccessor
+     * @return PropertyAccessorInterface
      */
     protected function getPropertyAccessor()
     {
         if ($this->propertyAccessor === null) {
-            $this->propertyAccessor = new PropertyAccessor();
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
         }
 
         return $this->propertyAccessor;

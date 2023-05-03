@@ -201,24 +201,24 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         $cacheItem1 = $this->createMock(CacheItemInterface::class);
         $cacheItem2 = $this->createMock(CacheItemInterface::class);
         $cacheItem3 = $this->createMock(CacheItemInterface::class);
-        $this->cache->expects($this->exactly(3))
+        $this->cache->expects(self::exactly(3))
             ->method('getItem')
             ->withConsecutive(['resources_1.2rest'], ['accessible_1.2rest'], ['excluded_actions_1.2rest'])
             ->willReturnOnConsecutiveCalls($cacheItem1, $cacheItem2, $cacheItem3);
-        $cacheItem1->expects($this->once())
+        $cacheItem1->expects(self::once())
             ->method('set')
             ->with([null, [
                 'Test\Entity1' => [[]],
                 'Test\Entity2' => [['get', 'get_list']],
                 'Test\Entity3' => [['create']]
             ]]);
-        $cacheItem2->expects($this->once())
+        $cacheItem2->expects(self::once())
             ->method('set')
             ->with([null, $accessibleResources]);
-        $cacheItem3->expects($this->once())
+        $cacheItem3->expects(self::once())
             ->method('set')
             ->with([null, $excludedActions]);
-        $this->cache->expects($this->exactly(3))
+        $this->cache->expects(self::exactly(3))
             ->method('save')
             ->withConsecutive([$cacheItem1], [$cacheItem2], [$cacheItem3]);
 
@@ -237,7 +237,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
             ->method('getItem')
             ->with('resources_wid_1.2rest')
             ->willReturn($this->cacheItem);
-        $this->cacheItem->expects($this->once())
+        $this->cacheItem->expects(self::once())
             ->method('set')
             ->with([null, ['Test\Entity1', 'Test\Entity2']]);
         $this->cache->expects(self::once())

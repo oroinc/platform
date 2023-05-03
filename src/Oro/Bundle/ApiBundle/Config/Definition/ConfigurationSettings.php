@@ -8,16 +8,13 @@ namespace Oro\Bundle\ApiBundle\Config\Definition;
 class ConfigurationSettings implements ConfigurationSettingsInterface
 {
     /** @var ConfigurationSectionInterface[] [section name => ConfigurationSectionInterface, ...] */
-    private $extraSections = [];
-
+    private array $extraSections = [];
     /** @var array [section path => callback[], ...] */
-    private $configureCallbacks = [];
-
+    private array $configureCallbacks = [];
     /** @var array [section path => callback[], ...] */
-    private $preProcessCallbacks = [];
-
+    private array $preProcessCallbacks = [];
     /** @var array [section path => callback[], ...] */
-    private $postProcessCallbacks = [];
+    private array $postProcessCallbacks = [];
 
     /**
      * {@inheritdoc}
@@ -56,29 +53,17 @@ class ConfigurationSettings implements ConfigurationSettingsInterface
         $this->extraSections[$sectionName] = $section;
     }
 
-    /**
-     * @param string   $section
-     * @param callable $callback
-     */
-    public function addConfigureCallback(string $section, $callback): void
+    public function addConfigureCallback(string $section, callable $callback): void
     {
         $this->configureCallbacks[$section][] = $callback;
     }
 
-    /**
-     * @param string   $section
-     * @param callable $callback
-     */
-    public function addPreProcessCallback(string $section, $callback): void
+    public function addPreProcessCallback(string $section, callable $callback): void
     {
         $this->preProcessCallbacks[$section][] = $callback;
     }
 
-    /**
-     * @param string   $section
-     * @param callable $callback
-     */
-    public function addPostProcessCallback(string $section, $callback): void
+    public function addPostProcessCallback(string $section, callable $callback): void
     {
         $this->postProcessCallbacks[$section][] = $callback;
     }

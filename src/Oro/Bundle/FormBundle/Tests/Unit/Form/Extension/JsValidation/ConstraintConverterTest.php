@@ -9,9 +9,11 @@ use Symfony\Component\Validator\Constraints\Type;
 
 class ConstraintConverterTest extends \PHPUnit\Framework\TestCase
 {
-    private ConstraintFactory|\PHPUnit\Framework\MockObject\MockObject $constraintFactory;
+    /** @var ConstraintFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $constraintFactory;
 
-    private ConstraintConverter $converter;
+    /** @var ConstraintConverter */
+    private $converter;
 
     protected function setUp(): void
     {
@@ -23,8 +25,7 @@ class ConstraintConverterTest extends \PHPUnit\Framework\TestCase
     {
         $constraint = new Type(['type' => 'string']);
 
-        $this->constraintFactory
-            ->expects(self::never())
+        $this->constraintFactory->expects(self::never())
             ->method('create');
 
         self::assertSame($constraint, $this->converter->convertConstraint($constraint));
@@ -42,8 +43,7 @@ class ConstraintConverterTest extends \PHPUnit\Framework\TestCase
         );
 
         $newConstraint = $this->createMock(Constraint::class);
-        $this->constraintFactory
-            ->expects(self::once())
+        $this->constraintFactory->expects(self::once())
             ->method('create')
             ->with($constraintName, $options)
             ->willReturn($newConstraint);

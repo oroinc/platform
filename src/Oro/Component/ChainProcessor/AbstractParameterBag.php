@@ -8,7 +8,7 @@ namespace Oro\Component\ChainProcessor;
 abstract class AbstractParameterBag implements ParameterBagInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getIterator(): \Traversable
     {
@@ -16,7 +16,7 @@ abstract class AbstractParameterBag implements ParameterBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetExists($offset): bool
     {
@@ -24,7 +24,7 @@ abstract class AbstractParameterBag implements ParameterBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetGet($offset): mixed
     {
@@ -32,7 +32,7 @@ abstract class AbstractParameterBag implements ParameterBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetSet($offset, $value): void
     {
@@ -40,7 +40,7 @@ abstract class AbstractParameterBag implements ParameterBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetUnset($offset): void
     {

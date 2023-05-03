@@ -20,8 +20,7 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
     /** Simple test message */
     private const MESSAGE = ['message' => 'test', 'extra' => []];
 
-    private ConsumerState|\PHPUnit\Framework\MockObject\MockObject $consumerState;
-
+    private ConsumerState $consumerState;
     private AddConsumerStateProcessor $processor;
 
     protected function setUp(): void
@@ -29,7 +28,6 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->consumerState = new ConsumerState();
 
         $messageToArrayConverter = $this->createMock(MessageToArrayConverterInterface::class);
-
         $messageToArrayConverter
             ->expects(self::any())
             ->method('convert')
@@ -247,6 +245,6 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
 
         self::assertArrayHasKey('elapsed_time', $record['extra']);
         self::assertIsString($record['extra']['elapsed_time']);
-        static::assertStringContainsString(' ms', $record['extra']['elapsed_time']);
+        self::assertStringContainsString(' ms', $record['extra']['elapsed_time']);
     }
 }

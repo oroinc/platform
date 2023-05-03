@@ -7,20 +7,14 @@ namespace Oro\Bundle\ApiBundle\Util;
  */
 class RequireJoinsFieldVisitorFactory
 {
-    /** @var RequireJoinsDecisionMakerInterface */
-    private $decisionMaker;
+    private RequireJoinsDecisionMakerInterface $decisionMaker;
 
     public function __construct(RequireJoinsDecisionMakerInterface $decisionMaker)
     {
         $this->decisionMaker = $decisionMaker;
     }
 
-    /**
-     * Creates a new instance of RequireJoinsFieldVisitor.
-     *
-     * @return RequireJoinsFieldVisitor
-     */
-    public function createExpressionVisitor()
+    public function createExpressionVisitor(): RequireJoinsFieldVisitor
     {
         return new RequireJoinsFieldVisitor($this->decisionMaker);
     }

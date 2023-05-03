@@ -7,10 +7,5 @@ namespace Oro\Component\ChainProcessor;
  */
 interface ProcessorBagAwareApplicableCheckerInterface
 {
-    /**
-     * Sets the ProcessorBag.
-     *
-     * @param ProcessorBagInterface|null $processorBag The ProcessorBagInterface instance or null
-     */
-    public function setProcessorBag(ProcessorBagInterface $processorBag = null);
+    public function setProcessorBag(ProcessorBagInterface $processorBag): void;
 }

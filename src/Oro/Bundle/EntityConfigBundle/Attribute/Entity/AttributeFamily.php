@@ -5,11 +5,14 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\EntityConfigBundle\Model\ExtendAttributeFamily;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\Layout\ContextItemInterface;
@@ -42,12 +45,18 @@ use Oro\Component\Layout\ContextItemInterface;
  *          }
  *      }
  * )
+ * @method File getImage()
+ * @method AttributeFamily setImage(File $image)
+ * @method LocalizedFallbackValue getLabel(Localization $localization = null)
+ * @method LocalizedFallbackValue getDefaultLabel()
  */
-class AttributeFamily extends ExtendAttributeFamily implements
+class AttributeFamily implements
     DatesAwareInterface,
-    ContextItemInterface
+    ContextItemInterface,
+    ExtendEntityInterface
 {
     use DatesAwareTrait;
+    use ExtendEntityTrait;
 
     /**
      * @var integer
@@ -140,8 +149,6 @@ class AttributeFamily extends ExtendAttributeFamily implements
      */
     public function __construct()
     {
-        parent::__construct();
-
         $this->labels = new ArrayCollection();
         $this->attributeGroups = new ArrayCollection();
     }

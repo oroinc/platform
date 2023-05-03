@@ -7,11 +7,11 @@ namespace Oro\Bundle\ApiBundle\Filter;
  */
 class ChainFilterFactory implements FilterFactoryInterface
 {
-    /** @var iterable|FilterFactoryInterface[] */
-    private $factories;
+    /** @var iterable<FilterFactoryInterface> */
+    private iterable $factories;
 
     /**
-     * @param iterable|FilterFactoryInterface[] $factories
+     * @param iterable<FilterFactoryInterface> $factories
      */
     public function __construct(iterable $factories)
     {
@@ -19,7 +19,7 @@ class ChainFilterFactory implements FilterFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function createFilter(string $filterType, array $options = []): ?StandaloneFilter
     {

@@ -8,17 +8,14 @@ class RestGroupsTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateWsseAuthHeader());
     }
 
-    /**
-     * @return array
-     */
-    public function testCreateGroup()
+    public function testCreateGroup(): array
     {
         $request = [
             'group' => [
-                'name' => 'Group_'.mt_rand(100, 500),
+                'name' => 'Group_' . random_int(100, 500),
                 'owner' => '1'
             ]
         ];
@@ -29,24 +26,22 @@ class RestGroupsTest extends WebTestCase
             $request
         );
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 201);
+        self::assertJsonResponseStatusCodeEquals($result, 201);
 
         return $request;
     }
 
     /**
      * @depends testCreateGroup
-     * @param  array $request
-     * @return array $group
      */
-    public function testGetGroups($request)
+    public function testGetGroups(array $request): array
     {
         $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_groups')
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         $group = array_filter(
             $result,
@@ -62,11 +57,8 @@ class RestGroupsTest extends WebTestCase
     /**
      * @depends testCreateGroup
      * @depends testGetGroups
-     * @param  array $request
-     * @param  array $group
-     * @return array $group
      */
-    public function testUpdateGroup($request, $group)
+    public function testUpdateGroup(array $request, array $group): array
     {
         $request['group']['name'] .= '_updated';
         $this->client->jsonRequest(
@@ -75,14 +67,14 @@ class RestGroupsTest extends WebTestCase
             $request
         );
         $result = $this->client->getResponse();
-        $this->assertEmptyResponseStatusCodeEquals($result, 204);
+        self::assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_group', ['id' => $group['id']])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertArrayHasKey('name', $result);
         $this->assertEquals($result['name'], $request['group']['name'], 'Group does not updated');
@@ -93,20 +85,20 @@ class RestGroupsTest extends WebTestCase
     /**
      * @depends testUpdateGroup
      */
-    public function testDeleteGroup($group)
+    public function testDeleteGroup(array $group)
     {
         $this->client->jsonRequest(
             'DELETE',
             $this->getUrl('oro_api_delete_group', ['id' => $group['id']])
         );
         $result = $this->client->getResponse();
-        $this->assertEmptyResponseStatusCodeEquals($result, 204);
+        self::assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_group', ['id' => $group['id']])
         );
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 404);
+        self::assertJsonResponseStatusCodeEquals($result, 404);
     }
 }

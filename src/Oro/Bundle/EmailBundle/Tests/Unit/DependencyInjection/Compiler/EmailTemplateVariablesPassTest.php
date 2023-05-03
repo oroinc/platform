@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -60,7 +61,7 @@ class EmailTemplateVariablesPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessForProviderWithoutScope()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'The attribute "scope" is required for "oro_email.emailtemplate.variable_provider" tag.'
             . ' Service: "system_provider1".'
@@ -78,7 +79,7 @@ class EmailTemplateVariablesPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessForProviderWithInvalidScope()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'The value "another" is invalid for the tag attribute "scope" for service "system_provider1",'
             . ' expected "system" or "entity".'

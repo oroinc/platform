@@ -20,14 +20,9 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class NestedTreeComparisonExpression implements ComparisonExpressionInterface
 {
-    /** @var TreeListener */
-    private $treeListener;
-
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var bool */
-    private $includeRoot;
+    private TreeListener $treeListener;
+    private ManagerRegistry $doctrine;
+    private bool $includeRoot;
 
     public function __construct(
         TreeListener $treeListener,
@@ -47,14 +42,14 @@ class NestedTreeComparisonExpression implements ComparisonExpressionInterface
         string $field,
         string $expression,
         string $parameterName,
-        $value
-    ) {
+        mixed $value
+    ): mixed {
         if (null === $value) {
             // the filter like NESTED_TREE for NULL does not have a sense
-            throw new QueryException(\sprintf('The value for "%s" must not be NULL.', $field));
+            throw new QueryException(sprintf('The value for "%s" must not be NULL.', $field));
         }
         if ($value instanceof Range) {
-            throw new QueryException(\sprintf('The value for "%s" must not be a range.', $field));
+            throw new QueryException(sprintf('The value for "%s" must not be a range.', $field));
         }
 
         $visitor->addParameter($parameterName, $value);

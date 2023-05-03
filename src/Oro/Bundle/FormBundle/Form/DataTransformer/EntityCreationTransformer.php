@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
+/**
+ * Entity creation data transformer.
+ */
 class EntityCreationTransformer extends EntityToIdTransformer
 {
     /**
@@ -62,7 +65,10 @@ class EntityCreationTransformer extends EntityToIdTransformer
             return null;
         } else {
             $data = $this->getData($value);
-            $id = $this->propertyAccessor->getValue($data, $this->propertyPath);
+            $id = null;
+            if ($this->propertyAccessor->isReadable($data, $this->propertyPath)) {
+                $id = $this->propertyAccessor->getValue($data, $this->propertyPath);
+            }
 
             return $id ? parent::reverseTransform($id) : $this->createNewEntity($data);
         }
@@ -73,7 +79,7 @@ class EntityCreationTransformer extends EntityToIdTransformer
      */
     protected function createPropertyAccessor()
     {
-        $this->propertyAccessor = new PropertyAccessor(false, true);
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
     }
 
     /**

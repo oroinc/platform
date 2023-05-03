@@ -8,26 +8,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CompilerPassProviderTraitTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CompilerPassProviderStub
-     */
-    private $stub;
+    private CompilerPassProviderStub $stub;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->stub = new CompilerPassProviderStub();
     }
 
     /**
-     * @param array $expectedBeforeOptimizationPasses
-     * @param array|null $expectedResult
-     *
      * @dataProvider getDataProvider
      */
-    public function testFindCompilerPassByClassName(array $expectedBeforeOptimizationPasses, $expectedResult)
+    public function testFindCompilerPassByClassName(array $expectedBeforeOptimizationPasses, ?object $expectedResult)
     {
         $compilerPassConfig = $this->createMock(PassConfig::class);
         $compilerPassConfig->expects($this->once())
@@ -42,10 +33,7 @@ class CompilerPassProviderTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->stub->getStdClassCompilerPass($container));
     }
 
-    /**
-     * @return array
-     */
-    public function getDataProvider()
+    public function getDataProvider(): array
     {
         $object = new \stdClass();
 

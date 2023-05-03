@@ -9,7 +9,7 @@ class ApiContext extends OroFeatureContext
     /**
      * @Given /^(?:|I )enable API$/
      */
-    public function setConfigurationProperty()
+    public function setConfigurationProperty(): void
     {
         $configManager = $this->getAppContainer()->get('oro_config.global');
         $configManager->set('oro_api.web_api', true);

@@ -8,13 +8,17 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType as BaseMultipleAssociationChoiceType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type\AssociationTypeTestCase;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormView;
 
 class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 {
-    protected function getFormType()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getFormType(): AbstractType
     {
         return new MultipleAssociationChoiceType(
             new AssociationTypeHelper($this->configManager, $this->createMock(EntityClassResolver::class)),
@@ -72,9 +76,9 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         );
     }
 
-    public function testGetName()
+    public function testGetBlockPrefix()
     {
-        $this->assertEquals('oro_activity_multiple_association_choice', $this->getFormType()->getName());
+        $this->assertEquals('oro_activity_multiple_association_choice', $this->getFormType()->getBlockPrefix());
     }
 
     public function testGetParent()
