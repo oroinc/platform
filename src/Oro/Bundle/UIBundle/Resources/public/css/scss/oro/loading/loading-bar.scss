@@ -28,6 +28,10 @@
         position: $loading-bar-block-process-position;
         animation: none;
     }
+
+    &.show {
+        display: block;
+    }
 }
 
 @keyframes line-point {

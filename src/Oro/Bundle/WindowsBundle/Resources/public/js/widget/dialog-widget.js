@@ -229,7 +229,7 @@ define(function(require, exports, module) {
         _initLoadingBar: function() {
             if ((this.options.mobileLoadingBar && tools.isMobile()) ||
                 (this.options.desktopLoadingBar && !tools.isMobile())) {
-                this.subview('LoadingBarView', new LoadingBarView({
+                this.subview('loadingBarView', new LoadingBarView({
                     container: this.widget.dialog('instance').uiDialogTitlebar,
                     ajaxLoading: true
                 }));
@@ -237,11 +237,11 @@ define(function(require, exports, module) {
                 this.widget.on({
                     [`ajaxStart${this.eventNamespace()}`]: e => {
                         e.stopPropagation();
-                        this.subview('LoadingBarView').showLoader();
+                        this.subview('loadingBarView').showLoader();
                     },
                     [`ajaxComplete${this.eventNamespace()}`]: e => {
                         e.stopPropagation();
-                        this.subview('LoadingBarView').hideLoader();
+                        this.subview('loadingBarView').hideLoader();
                     }
                 });
             }

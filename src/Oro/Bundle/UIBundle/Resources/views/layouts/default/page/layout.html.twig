@@ -26,7 +26,8 @@
             module: 'oroui/js/app/components/app-loading-mask-component'
         }) }}></div>
         <div {{ UI.renderPageComponentAttributes({
-            module: 'oroui/js/app/components/app-loading-bar-component'
+            module: 'oroui/js/app/components/app-loading-bar-component',
+            options: {viewOptions: {className: 'loading-bar app-loading-bar'}}
         }) }}></div>
         <div id="container" data-layout="separate"
              {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/content-view'}) }}>
