@@ -224,11 +224,9 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler
         arguments:
             - '@form.factory'
-            - '@session'
+            - '@request_stack'
             - '@oro_ui.router'
             - '@oro_entity_config.config.config_helper'
-            - '@translator'
-            - '@router'
 
     Oro\Bundle\EntityConfigBundle\Manager\AttributeManager:
         alias: oro_entity_config.manager.attribute_manager
@@ -295,7 +293,7 @@ services:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_extend.extend.field_name_validation_helper'
             - '@oro_entity_config.config.config_helper'
-            - '@session'
+            - '@request_stack'
             - '@doctrine'
 
     Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler:

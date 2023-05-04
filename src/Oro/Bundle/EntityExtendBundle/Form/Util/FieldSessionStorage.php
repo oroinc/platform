@@ -3,24 +3,21 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Util;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Storage of fields session.
+ */
 class FieldSessionStorage
 {
     const SESSION_ID_FIELD_NAME = '_extendbundle_create_entity_%s_field_name';
     const SESSION_ID_FIELD_TYPE = '_extendbundle_create_entity_%s_field_type';
 
     /**
-     * @var Session
-     */
-    private $session;
-
-    /**
      * FieldSessionStorage constructor.
      */
-    public function __construct(Session $session)
+    public function __construct(private RequestStack $requestStack)
     {
-        $this->session = $session;
     }
 
     /**
@@ -29,11 +26,12 @@ class FieldSessionStorage
      */
     public function getFieldInfo(EntityConfigModel $entityConfigModel)
     {
-        $fieldName = $this->session->get(
+        $session = $this->requestStack->getSession();
+        $fieldName = $session->get(
             sprintf(self::SESSION_ID_FIELD_NAME, $entityConfigModel->getId())
         );
 
-        $fieldType = $this->session->get(
+        $fieldType = $session->get(
             sprintf(self::SESSION_ID_FIELD_TYPE, $entityConfigModel->getId())
         );
 
@@ -53,12 +51,13 @@ class FieldSessionStorage
 
     public function saveFieldInfo(EntityConfigModel $entityConfigModel, $fieldName, $fieldType)
     {
-        $this->session->set(
+        $session = $this->requestStack->getSession();
+        $session->set(
             sprintf(self::SESSION_ID_FIELD_NAME, $entityConfigModel->getId()),
             $fieldName
         );
 
-        $this->session->set(
+        $session->set(
             sprintf(self::SESSION_ID_FIELD_TYPE, $entityConfigModel->getId()),
             $fieldType
         );

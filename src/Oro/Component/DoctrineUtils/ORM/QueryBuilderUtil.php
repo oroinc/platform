@@ -333,13 +333,7 @@ class QueryBuilderUtil
             ->getAssociationTargetClass($field);
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string $alias
-     *
-     * @return Expr\Join|null
-     */
-    public static function findJoinByAlias(QueryBuilder $qb, $alias)
+    public static function findJoinByAlias(QueryBuilder $qb, string $alias): ?Expr\Join
     {
         $joinParts = $qb->getDQLPart('join');
         foreach ($joinParts as $joins) {
@@ -351,6 +345,27 @@ class QueryBuilderUtil
         }
 
         return null;
+    }
+
+    public static function addJoin(QueryBuilder $qb, Expr\Join $join): void
+    {
+        if ($join->getJoinType() === Expr\Join::LEFT_JOIN) {
+            $qb->leftJoin(
+                $join->getJoin(),
+                $join->getAlias(),
+                $join->getConditionType(),
+                $join->getCondition(),
+                $join->getIndexBy()
+            );
+        } else {
+            $qb->innerJoin(
+                $join->getJoin(),
+                $join->getAlias(),
+                $join->getConditionType(),
+                $join->getCondition(),
+                $join->getIndexBy()
+            );
+        }
     }
 
     /**

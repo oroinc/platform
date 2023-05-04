@@ -48,13 +48,14 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         $this->router = $this->createMock(Router::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->updateFactory = $this->createMock(UpdateFactory::class);
-
+        $this->requestStack->expects($this->any())
+            ->method('getSession')
+            ->willReturn($this->session);
         $this->form = $this->createMock(FormInterface::class);
         $this->data = (object)[];
 
         $this->facade = new UpdateHandlerFacade(
             $this->requestStack,
-            $this->session,
             $this->router,
             $this->doctrineHelper,
             $this->updateFactory

@@ -12,6 +12,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -31,6 +32,9 @@ class NotificationAlertsListenerTest extends \PHPUnit\Framework\TestCase
 
     /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
     private $session;
+
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
@@ -58,7 +62,10 @@ class NotificationAlertsListenerTest extends \PHPUnit\Framework\TestCase
         $this->notificationAlertManager = $this->createMock(NotificationAlertManager::class);
         $this->mailboxManager = $this->createMock(MailboxManager::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack->expects($this->any())
+            ->method('getSession')
+            ->willReturn($this->session);
         $this->flashbag = new FlashBag();
 
         $this->session->expects(self::any())
@@ -73,7 +80,7 @@ class NotificationAlertsListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->listener = new NotificationAlertsListener(
             $this->router,
-            $this->session,
+            $this->requestStack,
             $this->translator,
             $this->notificationAlertManager,
             $this->mailboxManager,

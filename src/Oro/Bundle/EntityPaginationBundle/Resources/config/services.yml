@@ -31,7 +31,7 @@ services:
         class: Oro\Bundle\EntityPaginationBundle\Manager\MessageManager
         public: true
         arguments:
-            - '@session'
+            - '@request_stack'
             - '@translator'
             - '@oro_entity_pagination.navigation'
             - '@oro_entity_pagination.storage'
