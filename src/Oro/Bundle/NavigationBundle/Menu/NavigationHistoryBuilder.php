@@ -3,7 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Knp\Menu\ItemInterface;
-use Knp\Menu\Matcher\Matcher;
+use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProviderInterface;
@@ -14,7 +14,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
  */
 class NavigationHistoryBuilder extends NavigationItemBuilder
 {
-    /** @var Matcher */
+    /** @var MatcherInterface */
     private $matcher;
 
     /** @var MenuManipulator */
@@ -26,7 +26,7 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
         NavigationItemsProviderInterface $navigationItemsProvider,
-        Matcher $matcher,
+        MatcherInterface $matcher,
         MenuManipulator $menuManipulator,
         ConfigManager $configManager
     ) {
