@@ -6,6 +6,7 @@ use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -14,6 +15,9 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Session */
     private $session;
+
+    /** @var RequestStack */
+    private $requestStack;
 
     /** @var EntityPaginationNavigation|\PHPUnit\Framework\MockObject\MockObject */
     private $navigation;
@@ -29,7 +33,10 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
         $this->session = new Session(new MockArraySessionStorage());
         $this->navigation = $this->createMock(EntityPaginationNavigation::class);
         $this->storage = $this->createMock(EntityPaginationStorage::class);
-
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack->expects($this->any())
+            ->method('getSession')
+            ->willReturn($this->session);
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
@@ -37,7 +44,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
                 return str_replace(array_keys($parameters), array_values($parameters), $id . '.trans');
             });
 
-        $this->manager = new MessageManager($this->session, $translator, $this->navigation, $this->storage);
+        $this->manager = new MessageManager($this->requestStack, $translator, $this->navigation, $this->storage);
     }
 
     public function testAddFlashMessage()

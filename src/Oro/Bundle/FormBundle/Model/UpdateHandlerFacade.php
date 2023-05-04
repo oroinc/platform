@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Handles update action of controller used to create or update entity on separate page or widget dialog.
@@ -19,19 +19,16 @@ class UpdateHandlerFacade
 {
     private UpdateFactory $updateFactory;
     private RequestStack $requestStack;
-    protected Session $session;
     private Router $router;
     protected DoctrineHelper $doctrineHelper;
 
     public function __construct(
         RequestStack $requestStack,
-        Session $session,
         Router $router,
         DoctrineHelper $doctrineHelper,
         UpdateFactory $updateFactory
     ) {
         $this->requestStack = $requestStack;
-        $this->session = $session;
         $this->router = $router;
         $this->doctrineHelper = $doctrineHelper;
         $this->updateFactory = $updateFactory;
@@ -99,7 +96,7 @@ class UpdateHandlerFacade
             return $result;
         } else {
             if (null !== $saveMessage) {
-                $this->session->getFlashBag()->add('success', $saveMessage);
+                $this->requestStack->getSession()->getFlashBag()->add('success', $saveMessage);
             }
 
             return $this->router->redirect($entity);
@@ -121,5 +118,10 @@ class UpdateHandlerFacade
     protected function getCurrentRequest(): Request
     {
         return $this->requestStack->getCurrentRequest();
+    }
+
+    protected function getSession(): ?SessionInterface
+    {
+        return $this->requestStack->getSession();
     }
 }

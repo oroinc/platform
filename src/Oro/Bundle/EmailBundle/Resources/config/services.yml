@@ -1438,7 +1438,7 @@ services:
         class: Oro\Bundle\EmailBundle\EventListener\NotificationAlertsListener
         arguments:
             - '@router'
-            - '@session'
+            - '@request_stack'
             - '@translator'
             - '@oro_email.email_notification_alert_manager'
             - '@oro_email.mailbox.manager'

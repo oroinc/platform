@@ -270,7 +270,7 @@ services:
     oro_ui.flash_message_helper:
         class: Oro\Bundle\UIBundle\Tools\FlashMessageHelper
         arguments:
-            - '@session'
+            - '@request_stack'
             - '@translator'
             - '@oro_ui.html_tag_helper'
 

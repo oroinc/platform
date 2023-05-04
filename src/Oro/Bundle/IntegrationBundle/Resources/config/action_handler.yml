@@ -20,7 +20,7 @@ services:
     oro_integration.action_handler.channel_error:
         class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Error\FlashBagChannelActionErrorHandler'
         arguments:
-            - '@session'
+            - '@request_stack'
 
     oro_integration.action_handler.decorator.channel_delete_dispatcher:
         class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerDispatcherDecorator'
