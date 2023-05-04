@@ -23,9 +23,15 @@ abstract class WhereExpressionModifier
 
         $this->qb = $qb;
         try {
-            $qb->where($this->dispatch($whereExpression));
+            $whereExpression = $this->processWhereExpression($whereExpression);
         } finally {
             $this->qb = null;
+        }
+
+        if (null === $whereExpression) {
+            $qb->resetDQLPart('where');
+        } else {
+            $qb->where($whereExpression);
         }
     }
 
@@ -35,9 +41,13 @@ abstract class WhereExpressionModifier
     {
         switch (true) {
             case $expr instanceof Andx:
-                return new Andx($this->walkCompositeParts($expr->getParts()));
+                $parts = $this->walkCompositeParts($expr->getParts());
+
+                return $parts ? new Andx($parts) : null;
             case $expr instanceof Orx:
-                return new Orx($this->walkCompositeParts($expr->getParts()));
+                $parts = $this->walkCompositeParts($expr->getParts());
+
+                return $parts ? new Orx($parts) : null;
             case $expr instanceof Comparison:
                 return $this->walkComparison($expr);
             default:
@@ -45,11 +55,19 @@ abstract class WhereExpressionModifier
         }
     }
 
+    protected function processWhereExpression(mixed $expr): mixed
+    {
+        return $this->dispatch($expr);
+    }
+
     private function walkCompositeParts(array $parts): array
     {
         $result = [];
         foreach ($parts as $part) {
-            $result[] = $this->dispatch($part);
+            $expr = $this->dispatch($part);
+            if (null !== $expr) {
+                $result[] = $expr;
+            }
         }
 
         return $result;

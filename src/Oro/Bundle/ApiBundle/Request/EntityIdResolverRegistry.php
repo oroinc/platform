@@ -7,7 +7,7 @@ use Psr\Container\ContainerInterface;
 
 /**
  * Contains resolvers for all predefined identifiers of API resources
- * and allows to get a transformer suitable for a specific predefined identifier, entity and request type.
+ * and allows to get a resolver suitable for a specific predefined identifier, entity and request type.
  */
 class EntityIdResolverRegistry
 {

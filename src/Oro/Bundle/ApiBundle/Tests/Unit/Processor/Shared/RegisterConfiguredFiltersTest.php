@@ -67,6 +67,30 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
+    public function testProcessWhenFilterCreationFailed(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The filter "someField" for "%s" cannot be created.',
+            Entity\Category::class
+        ));
+
+        $exception = new \TypeError('some error');
+        $this->filterFactory->expects(self::once())
+            ->method('createFilter')
+            ->with('string', [])
+            ->willThrowException($exception);
+
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setConfigOfFilters(
+            $this->createFiltersConfig($this->createFilterConfig(DataType::STRING), 'someField')
+        );
+        $this->context->setConfig(new EntityDefinitionConfig());
+        $this->processor->process($this->context);
+
+        $this->context->getFilters();
+    }
+
     public function testProcessForComparisonFilterForNotManageableEntity(): void
     {
         $className = 'Test\Class';
