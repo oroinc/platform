@@ -2,12 +2,23 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional\EntityExtend;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Oro\Bundle\EntityExtendBundle\Tests\Functional\Stub\TestEnum;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityPropertyInfoTest extends WebTestCase
 {
+    public function setUp(): void
+    {
+        $this->bootKernel();
+    }
+
     /**
      * @dataProvider methodExistsDataProvider
      */
@@ -22,13 +33,28 @@ class EntityPropertyInfoTest extends WebTestCase
     {
         return [
             'method does not exists' => [
-                'name' => 'getDefault',
-                'class' => TestEnum::class,
+                'name' => 'getUndefinedMethodName',
+                'class' => User::class,
                 'expectedResult' => false
             ],
-            'method exists' => [
-                'name' => 'isDefault',
-                'class' => TestEnum::class,
+            'real method exists' => [
+                'name' => 'getUserName',
+                'class' => User::class,
+                'expectedResult' => true
+            ],
+            'extend method exists for object' => [
+                'name' => 'getPhone',
+                'class' => new User(),
+                'expectedResult' => true
+            ],
+            'attribute method exists' => [
+                'name' => 'getImage',
+                'class' => AttributeFamily::class,
+                'expectedResult' => true
+            ],
+            'serialized_data method exists' => [
+                'name' => 'getSerializedData',
+                'class' => AttributeFamily::class,
                 'expectedResult' => true
             ],
             'method exists with broken register' => [
@@ -59,18 +85,28 @@ class EntityPropertyInfoTest extends WebTestCase
         return [
             'property does not exists' => [
                 'name' => 'undefinedProperty',
-                'class' => TestEnum::class,
+                'class' => User::class,
                 'expectedResult' => false
             ],
-            'protected property exists' => [
+            'real protected property exists' => [
                 'name' => 'locale',
                 'class' => TestEnum::class,
                 'expectedResult' => true
             ],
-            'private property exists' => [
-                'name' => 'priority',
-                'class' => TestEnum::class,
-                'expectedResult' => false
+            'extend property exists for object' => [
+                'name' => 'phone',
+                'class' => new User(),
+                'expectedResult' => true
+            ],
+            'extend file type property exists' => [
+                'name' => 'image',
+                'class' => AttributeFamily::class,
+                'expectedResult' => true
+            ],
+            'serialized_data property exists' => [
+                'name' => 'serialized_data',
+                'class' => AttributeFamily::class,
+                'expectedResult' => true
             ],
             'protected property exists with object' => [
                 'name' => 'locale',
@@ -82,9 +118,109 @@ class EntityPropertyInfoTest extends WebTestCase
 
     public function testGetExtendedPropertiesEmpty(): void
     {
-        $extendedProperties = EntityPropertyInfo::getExtendedProperties(TestEnum::class);
+        $extendedProperties = EntityPropertyInfo::getExtendedProperties(AbstractEnumValue::class);
 
         self::assertSame($extendedProperties, []);
+    }
+
+    /**
+     * @dataProvider extendedPropertiesDataProvider
+     */
+    public function testGetExtendedProperties(string|object $class, array $expectedResult): void
+    {
+        $extendedProperties = EntityPropertyInfo::getExtendedProperties($class);
+        foreach ($expectedResult as $extendedProperty) {
+            self::assertContains($extendedProperty, $extendedProperties);
+        }
+    }
+
+    public function extendedPropertiesDataProvider(): array
+    {
+        return [
+            'extended properties' => [
+                'class' => User::class,
+                'extendedProperties' => [
+                    'phone',
+                    'title'
+                ]
+            ],
+            'attribute properties' => [
+                'class' => AttributeFamily::class,
+                'extendedProperties' => [
+                    'image',
+                ]
+            ],
+            'serialized_data properties' => [
+                'class' => AttributeFamily::class,
+                'extendedProperties' => [
+                    'serialized_data',
+                ]
+            ],
+        ];
+    }
+
+    public function testGetExtendedPropertiesWithoutReal(): void
+    {
+        $extendedProperties = EntityPropertyInfo::getExtendedProperties(User::class);
+        // real properties
+        self::assertNotContains('username', $extendedProperties);
+        self::assertNotContains('email', $extendedProperties);
+        self::assertNotContains('firstName', $extendedProperties);
+    }
+
+    public function testGetExtendedMethodsEmpty(): void
+    {
+        $extendedProperties = EntityPropertyInfo::getExtendedMethods(AbstractEnumValue::class);
+
+        self::assertSame($extendedProperties, []);
+    }
+
+    /**
+     * @dataProvider extendedMethodsDataProvider
+     */
+    public function testGetExtendedMethods(string|object $class, array $expectedResult): void
+    {
+        $extendedMethods = EntityPropertyInfo::getExtendedMethods($class);
+        foreach ($expectedResult as $method) {
+            self::assertTrue(isset($extendedMethods[$method]));
+        }
+    }
+
+    public function extendedMethodsDataProvider(): array
+    {
+        return [
+            'extended methods' => [
+                'class' => User::class,
+                'extendedMethods' => [
+                    'getPhone',
+                    'setPhone',
+                    'getTitle',
+                    'setTitle'
+                ]
+            ],
+            'attribute properties' => [
+                'class' => AttributeFamily::class,
+                'extendedMethods' => [
+                    'getImage',
+                    'setImage',
+                ]
+            ],
+            'serialized_data properties' => [
+                'class' => AttributeFamily::class,
+                'extendedMethods' => [
+                    'getSerializedData',
+                ]
+            ],
+        ];
+    }
+
+    public function testGetExtendedMethodsWithoutReal(): void
+    {
+        $extendedMethods = EntityPropertyInfo::getExtendedMethods(User::class);
+        // real properties
+        self::assertNotContains('getUsername', $extendedMethods);
+        self::assertNotContains('setEmail', $extendedMethods);
+        self::assertNotContains('getFirstName', $extendedMethods);
     }
 
     /**
@@ -133,6 +269,37 @@ class EntityPropertyInfoTest extends WebTestCase
                     'defaultValue'
                 ],
                 'expectedResult' => true
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getMatchedMethodDataProvider
+     */
+    public function testGetMatchedExtendMethod(string $class, string $realMethod, mixed $expectedResult): void
+    {
+        $matchedMethod = EntityPropertyInfo::getMatchedMethod($class, $realMethod);
+
+        self::assertSame($expectedResult, $matchedMethod);
+    }
+
+    public function getMatchedMethodDataProvider(): array
+    {
+        return [
+            'matched method for real property return the same' => [
+                'class' => User::class,
+                'realMethod' => 'GETEMAIL',
+                'expectedResult' => 'GETEMAIL',
+            ],
+            'matched method for extended property return correct method name' => [
+                'class' => User::class,
+                'realMethod' => 'getphone',
+                'expectedResult' => 'getPhone',
+            ],
+            'matched serialized_data method' => [
+                'class' => User::class,
+                'realMethod' => 'getSERializEdData',
+                'expectedResult' => 'getSerializedData',
             ],
         ];
     }
