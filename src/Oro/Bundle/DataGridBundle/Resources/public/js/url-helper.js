@@ -53,6 +53,27 @@ define(function() {
             }
             newQueryString += parameterName + '=' + encodeURIComponent(parameterValue || '');
             return urlParts[0] + newQueryString + urlHash;
+        },
+
+        /**
+         * Encodes URI with special characters by replacing certain character by escape sequences
+         *
+         * @param {String} uri
+         * @returns {string}
+         */
+        encodeURI(uri) {
+            const map = {
+                '-': '%2D',
+                '_': '%5F',
+                '.': '%2E',
+                '!': '%21',
+                '~': '%7E',
+                '*': '%2A',
+                '\'': '%27',
+                '(': '%28',
+                ')': '%29'
+            };
+            return encodeURIComponent(uri).replaceAll(/[-_.!~*'()]/g, match => map[match]);
         }
     };
 });

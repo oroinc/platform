@@ -17,7 +17,7 @@ class CompleteSorters extends CompleteSection
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -31,7 +31,7 @@ class CompleteSorters extends CompleteSection
         EntityConfigInterface $section,
         string $entityClass,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
         $this->completeSortersForIdentifierFields($section, $definition);
@@ -39,10 +39,10 @@ class CompleteSorters extends CompleteSection
         $this->completeSortersForAssociations($section, $metadata, $definition);
     }
 
-    protected function completeSortersForIdentifierFields(
+    private function completeSortersForIdentifierFields(
         EntityConfigInterface $sorters,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         $idFieldNames = $definition->getIdentifierFieldNames();
         foreach ($idFieldNames as $fieldName) {
             if ($definition->hasField($fieldName)) {
@@ -51,11 +51,11 @@ class CompleteSorters extends CompleteSection
         }
     }
 
-    protected function completeSortersForFields(
+    private function completeSortersForFields(
         EntityConfigInterface $sorters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         $indexedFields = $this->doctrineHelper->getIndexedFields($metadata);
         foreach ($indexedFields as $propertyPath => $dataType) {
             $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
@@ -65,11 +65,11 @@ class CompleteSorters extends CompleteSection
         }
     }
 
-    protected function completeSortersForAssociations(
+    private function completeSortersForAssociations(
         EntityConfigInterface $sorters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         $indexedAssociations = $this->doctrineHelper->getIndexedAssociations($metadata);
         foreach ($indexedAssociations as $propertyPath => $dataType) {
             $sorter = $sorters->findField($propertyPath, true);

@@ -2,21 +2,27 @@
 
 namespace Oro\Component\Layout;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\EntityExtend\PropertyAccessorWithDotArraySyntax;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * Block options manipulator layout.
+ */
 class BlockOptionsManipulator implements BlockOptionsManipulatorInterface
 {
     /** @var RawLayout */
     protected $rawLayout;
 
-    /** @var PropertyAccessor */
-    protected $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
 
     public function __construct()
     {
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
+            throw: PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
+        );
     }
 
     /**

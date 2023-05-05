@@ -8,10 +8,9 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 class ApiDocDataTypeConverter
 {
     /** @var array [data type => data type in documentation, ...] */
-    private $defaultMapping;
-
+    private array $defaultMapping;
     /** @var array [view name => [data type => data type in documentation, ...], ...] */
-    private $viewMappings;
+    private array $viewMappings;
 
     /**
      * @param array $defaultMapping [data type => data type in documentation, ...]

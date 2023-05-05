@@ -12,7 +12,6 @@ use Psr\Cache\CacheItemPoolInterface;
 
 class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-
     /** @var AdditionalMetadataProvider */
     private $additionalMetadataProvider;
 

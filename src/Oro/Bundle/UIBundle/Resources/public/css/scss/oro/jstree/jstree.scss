@@ -58,10 +58,31 @@
         background: $jstree-wholerow-hovered-background;
     }
 
+    .jstree-disabled {
+        background: transparent;
+
+        &.jstree-clicked {
+            background: transparent;
+        }
+    }
+
+    .jstree-wholerow-disabled {
+        background: $jstree-wholerow-disabled-background;
+
+        &.jstree-wholerow-clicked {
+            background: $jstree-wholerow-disabled-clicked-background;
+        }
+    }
+
     .jstree-anchor,
     .jstree-animated,
     .jstree-wholerow {
         transition: $jstree-wholerow-transition;
+    }
+
+    .jstree-wholerow {
+        height: $jstree-anchor-height;
+        padding: $jstree-anchor-inner-offset;
     }
 
     .jstree-anchor {

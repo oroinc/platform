@@ -1,0 +1,19 @@
+/* @theme: admin.oro; */
+
+.buttons-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0 $content-padding-small;
+
+    &--pull-end {
+        float: right;
+    }
+
+    &--start-offset {
+        margin-left: 32px;
+    }
+
+    &--bottom-offset {
+        margin-bottom: 10px;
+    }
+}

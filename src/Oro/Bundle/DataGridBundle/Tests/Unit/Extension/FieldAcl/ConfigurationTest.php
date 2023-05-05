@@ -8,17 +8,9 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Configuration */
-    private $configuration;
-
-    protected function setUp(): void
+    private function processConfiguration(array $config): array
     {
-        $this->configuration = new Configuration();
-    }
-
-    private function validateConfiguration(Configuration $configuration, array $config): array
-    {
-        return (new Processor())->processConfiguration($configuration, $config);
+        return (new Processor())->processConfiguration(new Configuration(), $config);
     }
 
     public function testValidateWrongArrayData()
@@ -27,7 +19,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Unrecognized option "a" under "fields_acl"');
 
         $config = ['fields_acl' => ['a' => 'b']];
-        $this->validateConfiguration($this->configuration, $config);
+        $this->processConfiguration($config);
     }
 
     public function testValidateWrongNonArrayData()
@@ -36,7 +28,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Invalid type for path "fields_acl');
 
         $config = ['fields_acl' => 's'];
-        $this->validateConfiguration($this->configuration, $config);
+        $this->processConfiguration($config);
     }
 
     public function testValidateWithFullData()
@@ -54,7 +46,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
            ]
         ];
 
-        $resultConfig = $this->validateConfiguration($this->configuration, $config);
+        $resultConfig = $this->processConfiguration($config);
         $this->assertEquals(
             [
                 'columns' => [

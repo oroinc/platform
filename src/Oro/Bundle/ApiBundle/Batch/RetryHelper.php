@@ -30,7 +30,7 @@ class RetryHelper
     public function hasItemsToRetry(array $rawItems, array $processedItemStatuses): bool
     {
         $result = false;
-        if (count($rawItems) > 1) {
+        if (\count($rawItems) > 1) {
             foreach ($processedItemStatuses as $status) {
                 if (BatchUpdateItemStatus::NOT_PROCESSED === $status
                     || BatchUpdateItemStatus::HAS_ERRORS === $status
@@ -57,9 +57,9 @@ class RetryHelper
         foreach ($processedItemStatuses as $index => $status) {
             if (BatchUpdateItemStatus::NOT_PROCESSED === $status) {
                 if (-1 === $lastNoErrorsItemIndex
-                    || count($result[$lastNoErrorsItemIndex][1]) !== ($index - $result[$lastNoErrorsItemIndex][0])
+                    || \count($result[$lastNoErrorsItemIndex][1]) !== ($index - $result[$lastNoErrorsItemIndex][0])
                 ) {
-                    $lastNoErrorsItemIndex = count($result);
+                    $lastNoErrorsItemIndex = \count($result);
                     $result[$lastNoErrorsItemIndex] = [$index, []];
                 }
                 $result[$lastNoErrorsItemIndex][1][] = $rawItems[$index];

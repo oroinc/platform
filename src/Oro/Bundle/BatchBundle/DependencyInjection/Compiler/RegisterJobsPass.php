@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Parser as YamlParser;
 
 /**
@@ -35,6 +36,18 @@ class RegisterJobsPass implements CompilerPassInterface
             if (is_file($configFile = $bundleDir . '/Resources/config/batch_jobs.yml')) {
                 $container->addResource(new FileResource($configFile));
                 $this->registerJobs($registry, $configFile);
+            }
+        }
+
+        // Temporary solution, should be refactored loaded in BAP-21714
+        $path = $container->getParameter('kernel.project_dir') . '/config/batch_jobs';
+        if (is_dir($path)) {
+            $finder = new Finder();
+            $finder->in($path)->files()->name('*.yml')->name('*.yaml');
+            foreach ($finder as $item) {
+                $filePath = $item->getRealPath();
+                $container->addResource(new FileResource($filePath));
+                $this->registerJobs($registry, $filePath);
             }
         }
     }

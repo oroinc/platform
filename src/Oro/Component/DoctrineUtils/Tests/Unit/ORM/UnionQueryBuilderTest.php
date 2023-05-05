@@ -3,12 +3,13 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\DBAL\Query\QueryException;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -16,8 +17,7 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
  */
 class UnionQueryBuilderTest extends OrmTestCase
 {
-    /** @var EntityManager */
-    private $em;
+    private EntityManagerInterface $em;
 
     protected function setUp(): void
     {
@@ -143,7 +143,7 @@ class UnionQueryBuilderTest extends OrmTestCase
 
     public function testGetQueryBuilderWhenNoSubQueries()
     {
-        $this->expectException(\Doctrine\DBAL\Query\QueryException::class);
+        $this->expectException(QueryException::class);
         $this->expectExceptionMessage('At least one sub-query should be added.');
 
         $qb = new UnionQueryBuilder($this->em);
@@ -153,7 +153,7 @@ class UnionQueryBuilderTest extends OrmTestCase
 
     public function testGetQueryBuilderWhenNoSelectExpr()
     {
-        $this->expectException(\Doctrine\DBAL\Query\QueryException::class);
+        $this->expectException(QueryException::class);
         $this->expectExceptionMessage('At least one select expression should be added.');
 
         $qb = new UnionQueryBuilder($this->em);

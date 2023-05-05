@@ -40,9 +40,9 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const TWIG = 'twig';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$this->isApplicable($container)) {
             return;
@@ -65,12 +65,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         return $config['api_doc_views'];
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return bool
-     */
-    private function isApplicable(ContainerBuilder $container)
+    private function isApplicable(ContainerBuilder $container): bool
     {
         // extractor
         if (!$container->hasDefinition(self::API_DOC_EXTRACTOR_SERVICE)) {
@@ -99,7 +94,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         return true;
     }
 
-    private function configureUnderlyingViews(ContainerBuilder $container)
+    private function configureUnderlyingViews(ContainerBuilder $container): void
     {
         $underlyingViews = $this->getUnderlyingViews($container);
         foreach ($underlyingViews as $view => $underlyingView) {
@@ -110,12 +105,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
             ->replaceArgument(2, $underlyingViews);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array [view name => underlying view name, ...]
-     */
-    private function getUnderlyingViews(ContainerBuilder $container)
+    private function getUnderlyingViews(ContainerBuilder $container): array
     {
         $underlyingViews = [];
         $views = $this->getApiDocViews($container);
@@ -128,8 +118,11 @@ class ApiDocCompilerPass implements CompilerPassInterface
         return $underlyingViews;
     }
 
-    private function registerUnderlyingViewHandler(ContainerBuilder $container, string $view, string $underlyingView)
-    {
+    private function registerUnderlyingViewHandler(
+        ContainerBuilder $container,
+        string $view,
+        string $underlyingView
+    ): void {
         $container
             ->register(
                 self::API_DOC_ANNOTATION_HANDLER_SERVICE . '.' . $view,
@@ -140,7 +133,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
             ->addTag(self::API_DOC_ANNOTATION_HANDLER_TAG_NAME);
     }
 
-    private function configureApiDocExtractor(ContainerBuilder $container)
+    private function configureApiDocExtractor(ContainerBuilder $container): void
     {
         $apiDocExtractorDef = $container->getDefinition(self::API_DOC_EXTRACTOR_SERVICE);
         $apiDocExtractorDef->setClass(
@@ -160,7 +153,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         );
     }
 
-    private function configureRequestTypeProvider(ContainerBuilder $container)
+    private function configureRequestTypeProvider(ContainerBuilder $container): void
     {
         $requestTypeProviderDef = $container->getDefinition(self::API_DOC_REQUEST_TYPE_PROVIDER_SERVICE);
         $views = $this->getApiDocViews($container);
@@ -171,14 +164,14 @@ class ApiDocCompilerPass implements CompilerPassInterface
         }
     }
 
-    private function configureApiSourceListener(ContainerBuilder $container)
+    private function configureApiSourceListener(ContainerBuilder $container): void
     {
         $config = DependencyInjectionUtil::getConfig($container);
         $container->getDefinition(self::API_SOURCE_LISTENER_SERVICE)
             ->setArgument('$excludedFeatures', $config['api_doc_cache']['excluded_features']);
     }
 
-    private function configureCacheManager(ContainerBuilder $container)
+    private function configureCacheManager(ContainerBuilder $container): void
     {
         $config = DependencyInjectionUtil::getConfig($container);
         $resettableServiceIds = $config['api_doc_cache']['resettable_services'];
@@ -190,7 +183,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         }
     }
 
-    private function configureApiDocFormatters(ContainerBuilder $container)
+    private function configureApiDocFormatters(ContainerBuilder $container): void
     {
         // rename default HTML formatter service
         $defaultHtmlFormatterDef = $container->getDefinition(self::API_DOC_HTML_FORMATTER_SERVICE);
@@ -230,7 +223,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
             $htmlFormatter = $view['html_formatter'];
             unset($views[$name]['html_formatter']);
             $compositeHtmlFormatterDef->addMethodCall('addFormatter', [$name, new Reference($htmlFormatter)]);
-            if (!in_array($htmlFormatter, $htmlFormatters, true)) {
+            if (!\in_array($htmlFormatter, $htmlFormatters, true)) {
                 $htmlFormatters[] = $htmlFormatter;
             }
         }
@@ -239,7 +232,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         }
     }
 
-    private function configureApiDocDataTypeConverter(ContainerBuilder $container)
+    private function configureApiDocDataTypeConverter(ContainerBuilder $container): void
     {
         $config = DependencyInjectionUtil::getConfig($container);
         $defaultMapping = $config['api_doc_data_types'];
@@ -257,7 +250,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
             ->setArgument('$viewMappings', $viewMappings);
     }
 
-    private function registerRoutingOptionsResolvers(ContainerBuilder $container)
+    private function registerRoutingOptionsResolvers(ContainerBuilder $container): void
     {
         $services = [];
         $views = $container->getParameter(OroApiExtension::API_DOC_VIEWS_PARAMETER_NAME);
@@ -270,7 +263,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
                     $id,
                     self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME
                 );
-                if (!in_array($view, $views, true)) {
+                if (!\in_array($view, $views, true)) {
                     throw new LogicException(sprintf(
                         'The "%s" is invalid value for attribute "view" of tag "%s". Service: "%s".'
                         . ' Possible values: %s.',
@@ -293,12 +286,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
             ->replaceArgument(0, $services);
     }
 
-    /**
-     * @param string $currentClass
-     *
-     * @return string|null
-     */
-    private function getNewApiDocExtractorClass($currentClass)
+    private function getNewApiDocExtractorClass(string $currentClass): ?string
     {
         switch ($currentClass) {
             case NelmioExtractor\CachingApiDocExtractor::class:

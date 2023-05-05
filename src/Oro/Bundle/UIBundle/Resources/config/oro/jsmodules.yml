@@ -1,6 +1,6 @@
 aliases:
     asap$: asap/asap
-    autolinker$: autolinker/dist/Autolinker
+    autolinker$: autolinker/dist/autolinker
     backbone$: backbone/backbone
     base64$: oroui/js/extend/base64
     bootstrap$: oroui/js/bootstrap
@@ -46,16 +46,16 @@ aliases:
     oro/page-widget$: oroui/js/widget/page-widget
     oroui/js/widget-manager$: oroui/js/widget/widget-manager
     overlayScrollbars$: overlayscrollbars/js/OverlayScrollbars
-    popper$: popper.js/dist/umd/popper
+    popper$: popper.js/dist/popper
+    popper-utils$: popper.js/dist/popper-utils
     scriptjs$: scriptjs/dist/script
-    slick$: slick-carousel/slick/slick
+    slick$: '@oroinc/slick-carousel/slick/slick'
     styled-scroll-bar$: oroui/js/app/plugins/styled-scroll-bar
-    underscore$: underscore/underscore
+    underscore$: underscore/underscore.js
 app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/color-util
     - oroui/js/app/modules/component-shortcuts-module
-    - oroui/js/app/modules/css-variable-module
     - oroui/js/app/modules/focus-visible
     - oroui/js/app/modules/ignore-tabbable
     - oroui/js/app/modules/init-image-preview
@@ -95,7 +95,6 @@ configs:
     oroui/js/tools/highlighter/highlighter-favicon: {}
     oroui/js/tools/highlighter/highlighter-title: {}
     oroui/js/tools/scroll-helper: {}
-    oroui/js/viewport-manager: {}
 dynamic-imports:
     commons:
         - controllers/page-controller
@@ -115,6 +114,7 @@ dynamic-imports:
         - oroui/js/app/views/content-sidebar-view
         - oroui/js/app/views/datepicker/datepicker-view
         - oroui/js/app/views/datepicker/datetimepicker-view
+        - oroui/js/app/views/dynamic-accessible-button-view
         - oroui/js/app/views/element-value-copy-to-clipboard-view
         - oroui/js/app/views/hidden-initialization-view
         - oroui/js/app/views/highlight-text-view

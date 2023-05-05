@@ -11,7 +11,9 @@ use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateWithScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
+use Oro\Bundle\NavigationBundle\Manager\MenuUpdateDisplayManager;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
+use Oro\Bundle\NavigationBundle\Manager\MenuUpdateMoveManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
@@ -49,7 +51,17 @@ abstract class AbstractMenuController extends AbstractController
 
     protected function getMenuUpdateManager(): MenuUpdateManager
     {
-        return $this->get(MenuUpdateManager::class);
+        return $this->container->get(MenuUpdateManager::class);
+    }
+
+    protected function getMenuUpdateMoveManager(): MenuUpdateMoveManager
+    {
+        return $this->container->get(MenuUpdateMoveManager::class);
+    }
+
+    protected function getMenuUpdateDisplayManager(): MenuUpdateDisplayManager
+    {
+        return $this->container->get(MenuUpdateDisplayManager::class);
     }
 
     protected function getScopeType(): string
@@ -99,24 +111,27 @@ abstract class AbstractMenuController extends AbstractController
         $menu = $this->getMenu($menuName, $context);
         $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate(
             $menu,
+            $scope,
             [
-                'menu' => $menuName,
                 'parentKey' => $parentKey,
-                'custom' => true,
-                'scope' => $scope
             ]
         );
 
         return $this->handleUpdate($menuUpdate, $context, $menu);
     }
 
-    protected function update(string $menuName, string $key, array $context = []): array|RedirectResponse
+    protected function update(string $menuName, ?string $key, array $context = []): array|RedirectResponse
     {
         $this->checkAcl($context);
         $context = $this->denormalizeContext($context);
         $scope = $this->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context, false);
         $menu = $this->getMenu($menuName, $context);
-        $menuUpdate = $this->getMenuUpdateManager()->findOrCreateMenuUpdate($menu, $key, $scope);
+
+        if ($key === null) {
+            $key = $menuName;
+        }
+
+        $menuUpdate = $this->getMenuUpdateManager()->findOrCreateMenuUpdate($menu, $scope, ['key' => $key]);
 
         if (!$menuUpdate->getKey()) {
             throw $this->createNotFoundException(
@@ -160,7 +175,7 @@ abstract class AbstractMenuController extends AbstractController
             /** @var EntityManager $entityManager */
             $entityManager = $this->getDoctrine()->getManagerForClass($this->getEntityClass());
             $scope = $this->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context);
-            $updates = $this->getMenuUpdateManager()->moveMenuItems(
+            $updates = $this->getMenuUpdateMoveManager()->moveMenuItems(
                 $menu,
                 $collection->source,
                 $scope,
@@ -169,7 +184,7 @@ abstract class AbstractMenuController extends AbstractController
             );
 
             foreach ($updates as $update) {
-                $errors = $this->get(ValidatorInterface::class)->validate($update);
+                $errors = $this->get(ValidatorInterface::class)->validate($update, null, ['Move']);
                 if (count($errors)) {
                     $form->addError(new FormError(
                         $this->get(TranslatorInterface::class)
@@ -206,12 +221,9 @@ abstract class AbstractMenuController extends AbstractController
         array $context,
         ItemInterface $menu
     ): array|RedirectResponse {
-        $menuItem = null;
-        if (!$menuUpdate->isCustom()) {
-            $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
-        }
+        $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
 
-        $form = $this->createForm(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem]);
+        $form = $this->createForm(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem, 'menu' => $menu]);
 
         $response = $this->get(UpdateHandlerFacade::class)->update(
             $menuUpdate,
@@ -224,6 +236,7 @@ abstract class AbstractMenuController extends AbstractController
             $response['menuName'] = $menu->getName();
             $response['tree'] = $this->createMenuTree($menu);
             $response['menuItem'] = $menuItem;
+            $response['menu'] = $menu;
             $response = array_merge($response, $context);
         } else {
             $this->dispatchMenuUpdateChangeEvent($menu->getName(), $context);
@@ -334,6 +347,8 @@ abstract class AbstractMenuController extends AbstractController
                 EventDispatcherInterface::class,
                 ContextRequestHelper::class,
                 MenuUpdateManager::class,
+                MenuUpdateMoveManager::class,
+                MenuUpdateDisplayManager::class,
                 UpdateHandlerFacade::class
             ]
         );

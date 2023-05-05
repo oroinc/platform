@@ -6,6 +6,8 @@ use Oro\Bundle\MessageQueueBundle\Job\JobManager;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\Testing\Assert\UniqueJobsProcessedConstraint;
 
 /**
  * Provides useful assertion methods for the jobs management related functional tests.
@@ -61,6 +63,15 @@ trait JobsAwareTestTrait
         return $rootJob->getData()['dependentJobs'] ?? [];
     }
 
+    protected function createRootJobMyMessage(MessageInterface $message)
+    {
+        $this->getJobProcessor()->findOrCreateRootJob(
+            $message->getMessageId(),
+            $this->getJobRunner()->getJobNameByMessage($message),
+            true
+        );
+    }
+
     protected function getUniqid(): string
     {
         return uniqid(microtime(true), true);
@@ -69,5 +80,15 @@ trait JobsAwareTestTrait
     protected function assertJobStatus(string $status, int $jobId): void
     {
         self::assertEquals($status, $this->getJobProcessor()->findJobById($jobId)->getStatus());
+    }
+
+    protected function assertUniqueJobsProcessed(): void
+    {
+        self::assertThat($this->getJobManager(), new UniqueJobsProcessedConstraint);
+    }
+
+    protected function assertUniqueJobsNotProcessed(): void
+    {
+        self::assertThat($this->getJobManager(), new UniqueJobsProcessedConstraint(false));
     }
 }

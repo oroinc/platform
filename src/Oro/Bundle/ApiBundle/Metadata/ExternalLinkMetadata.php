@@ -71,12 +71,10 @@ class ExternalLinkMetadata extends LinkMetadata
         }
         $missingParams = array_diff(array_keys($this->urlParams), array_keys($params));
         if (!empty($missingParams)) {
-            throw new LinkHrefResolvingFailedException(
-                sprintf(
-                    'Cannot build URL for a link. Missing Parameters: %s.',
-                    implode(',', $missingParams)
-                )
-            );
+            throw new LinkHrefResolvingFailedException(sprintf(
+                'Cannot build URL for a link. Missing Parameters: %s.',
+                implode(',', $missingParams)
+            ));
         }
 
         $url = $this->urlTemplate;

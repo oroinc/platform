@@ -20,14 +20,9 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class BuildFormBuilder implements ProcessorInterface
 {
-    /** @var FormHelper */
-    private $formHelper;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var bool */
-    private $enableFullValidation;
+    private FormHelper $formHelper;
+    private DoctrineHelper $doctrineHelper;
+    private bool $enableFullValidation;
 
     public function __construct(
         FormHelper $formHelper,
@@ -42,7 +37,7 @@ class BuildFormBuilder implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */
 
@@ -68,12 +63,7 @@ class BuildFormBuilder implements ProcessorInterface
         }
     }
 
-    /**
-     * @param FormContext $context
-     *
-     * @return FormBuilderInterface|null
-     */
-    protected function getFormBuilder(FormContext $context)
+    protected function getFormBuilder(FormContext $context): ?FormBuilderInterface
     {
         $config = $context->getConfig();
         if (null === $config) {
@@ -99,13 +89,7 @@ class BuildFormBuilder implements ProcessorInterface
         return $formBuilder;
     }
 
-    /**
-     * @param FormContext            $context
-     * @param EntityDefinitionConfig $config
-     *
-     * @return array
-     */
-    protected function getFormOptions(FormContext $context, EntityDefinitionConfig $config)
+    protected function getFormOptions(FormContext $context, EntityDefinitionConfig $config): array
     {
         $options = $config->getFormOptions();
         if (null === $options) {
@@ -120,13 +104,7 @@ class BuildFormBuilder implements ProcessorInterface
         return $options;
     }
 
-    /**
-     * @param FormContext            $context
-     * @param EntityDefinitionConfig $config
-     *
-     * @return string
-     */
-    protected function getFormDataClass(FormContext $context, EntityDefinitionConfig $config)
+    protected function getFormDataClass(FormContext $context, EntityDefinitionConfig $config): string
     {
         $dataClass = $context->getClassName();
         $entity = $context->getResult();

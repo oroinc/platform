@@ -19,8 +19,7 @@ class AddIncludeFilter implements ProcessorInterface
     public const FILTER_DESCRIPTION =
         'A list of related entities to be included. Comma-separated paths, e.g. \'comments,comments.author\'.';
 
-    /** @var FilterNamesRegistry */
-    private $filterNamesRegistry;
+    private FilterNamesRegistry $filterNamesRegistry;
 
     public function __construct(FilterNamesRegistry $filterNamesRegistry)
     {
@@ -30,7 +29,7 @@ class AddIncludeFilter implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

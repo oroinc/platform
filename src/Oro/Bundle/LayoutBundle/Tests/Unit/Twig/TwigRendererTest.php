@@ -6,22 +6,32 @@ use Oro\Bundle\LayoutBundle\Cache\PlaceholderRenderer;
 use Oro\Bundle\LayoutBundle\Cache\RenderCache;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface;
 use Oro\Bundle\LayoutBundle\Twig\TwigRenderer;
+use Oro\Component\Layout\LayoutContextStack;
 use Psr\Log\LoggerInterface;
 use Twig\Environment;
 
 class TwigRendererTest extends \PHPUnit\Framework\TestCase
 {
-    private TwigRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject $twigRendererEngine;
+    /** @var TwigRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $twigRendererEngine;
+
+    private LayoutContextStack $layoutContextStack;
 
     private RenderCache|\PHPUnit\Framework\MockObject\MockObject $rendererCache;
 
-    private PlaceholderRenderer|\PHPUnit\Framework\MockObject\MockObject $placeholderRenderer;
+    /** @var PlaceholderRenderer|\PHPUnit\Framework\MockObject\MockObject */
+    private $placeholderRenderer;
 
-    private Environment|\PHPUnit\Framework\MockObject\MockObject $environment;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $environment;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     protected function setUp(): void
     {
         $this->twigRendererEngine = $this->createMock(TwigRendererEngineInterface::class);
+        $this->layoutContextStack = new LayoutContextStack();
         $this->rendererCache = $this->createMock(RenderCache::class);
         $this->placeholderRenderer = $this->createMock(PlaceholderRenderer::class);
         $this->environment = $this->createMock(Environment::class);
@@ -30,13 +40,13 @@ class TwigRendererTest extends \PHPUnit\Framework\TestCase
 
     public function testConstructor(): void
     {
-        $this->twigRendererEngine
-            ->expects(self::once())
+        $this->twigRendererEngine->expects(self::once())
             ->method('setEnvironment')
             ->with(self::identicalTo($this->environment));
 
         $renderer = new TwigRenderer(
             $this->twigRendererEngine,
+            $this->layoutContextStack,
             $this->rendererCache,
             $this->placeholderRenderer,
             $this->environment
@@ -47,8 +57,7 @@ class TwigRendererTest extends \PHPUnit\Framework\TestCase
     public function testSetEnvironment(): void
     {
         $newEnvironment = clone $this->environment;
-        $this->twigRendererEngine
-            ->expects(self::exactly(3))
+        $this->twigRendererEngine->expects(self::exactly(3))
             ->method('setEnvironment')
             ->withConsecutive(
                 [self::identicalTo($this->environment)],
@@ -58,6 +67,7 @@ class TwigRendererTest extends \PHPUnit\Framework\TestCase
 
         $renderer = new TwigRenderer(
             $this->twigRendererEngine,
+            $this->layoutContextStack,
             $this->rendererCache,
             $this->placeholderRenderer,
             $this->environment

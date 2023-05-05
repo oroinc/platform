@@ -42,12 +42,9 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createMockTranslator()
+    protected function createMockTranslator(): TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
     {
-        $translator = $this->getMockForAbstractClass(TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->with($this->anything(), [])
@@ -56,10 +53,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
         return $translator;
     }
 
-    /**
-     * @return OptionsResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createMockOptionsResolver()
+    protected function createMockOptionsResolver(): OptionsResolver|\PHPUnit\Framework\MockObject\MockObject
     {
         return $this->createMock(OptionsResolver::class);
     }
@@ -90,10 +84,8 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 
     /**
      * Data provider for testBindData
-     *
-     * @return array
      */
-    abstract public function configureOptionsDataProvider();
+    abstract public function configureOptionsDataProvider(): array;
 
     /**
      * @dataProvider bindDataProvider
@@ -121,20 +113,15 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 
     /**
      * Data provider for testBindData
-     *
-     * @return array
      */
-    abstract public function bindDataProvider();
+    abstract public function bindDataProvider(): array;
+
+    abstract protected function getTestFormType(): AbstractType;
 
     /**
-     * @return AbstractType
+     * {@inheritDoc}
      */
-    abstract protected function getTestFormType();
-
-    /**
-     * @return array|FormExtensionInterface[]
-     */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return array_merge(
             $this->formExtensions,
@@ -142,19 +129,11 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @param string  $class
-     * @param array $events
-     *
-     * @return mixed
-     */
-    public function getMockSubscriber($class, array $events = [])
+    protected function getSubscriber(string $class, array $events = []): MutableFormEventSubscriber
     {
-        $mock = $this->createMock($class);
+        $subscriber = new MutableFormEventSubscriber($this->createMock($class));
+        $subscriber->setSubscribedEvents($events);
 
-        $eventListener = new MutableFormEventSubscriber($mock);
-        $eventListener->setSubscribedEvents($events);
-
-        return $eventListener;
+        return $subscriber;
     }
 }

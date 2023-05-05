@@ -3,19 +3,21 @@
 namespace Oro\Bundle\AssetBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\AssetBundle\DependencyInjection\Configuration;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
+    private function processConfiguration(array $config): array
+    {
+        return (new Processor())->processConfiguration(new Configuration(), $config);
+    }
+
     public function testConfigTreeWithoutAnyOptions(): void
     {
-        $processor = new Processor();
+        $result = $this->processConfiguration([]);
 
-        $result = $processor->processConfiguration(new Configuration(), []);
-
-        $this->assertArrayHasKey('disable_babel', $result);
-        $this->assertTrue($result['disable_babel']);
+        $this->assertArrayHasKey('with_babel', $result);
+        $this->assertFalse($result['with_babel']);
 
         $this->assertArrayHasKey('build_timeout', $result);
         $this->assertNull($result['build_timeout']);
@@ -33,13 +35,9 @@ class ConfigurationTest extends TestCase
     /**
      * @dataProvider dataProviderConfigTree
      */
-    public function testConfigTree(array $options, array $expects): void
+    public function testConfigTree(array $config, array $expected): void
     {
-        $processor = new Processor();
-        $configuration = new Configuration();
-        $result = $processor->processConfiguration($configuration, [$options]);
-
-        $this->assertEquals($expects, $result);
+        $this->assertEquals($expected, $this->processConfiguration([$config]));
     }
 
     public function dataProviderConfigTree(): array
@@ -51,7 +49,7 @@ class ConfigurationTest extends TestCase
                     'npm_path' => 'npm',
                 ],
                 'expects' => [
-                    'disable_babel' => true,
+                    'with_babel' => false,
                     'nodejs_path' => 'nodejs',
                     'npm_path' => 'npm',
                     'build_timeout' => null,
@@ -66,7 +64,7 @@ class ConfigurationTest extends TestCase
             ],
             [
                 'options' => [
-                    'disable_babel' => true,
+                    'with_babel' => false,
                     'nodejs_path' => 'node',
                     'npm_path' => '/usr/local/bin/npm',
                     'build_timeout' => 300,
@@ -79,7 +77,7 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
                 'expects' => [
-                    'disable_babel' => true,
+                    'with_babel' => false,
                     'nodejs_path' => 'node',
                     'npm_path' => '/usr/local/bin/npm',
                     'build_timeout' => 300,

@@ -12,20 +12,20 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 class RestPlainDocContainsConstraint extends ArrayContainsConstraint
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function matches($other): bool
     {
         if (parent::matches($other)
-            && is_array($this->expected)
-            && is_array($other)
+            && \is_array($this->expected)
+            && \is_array($other)
             && !empty($this->expected)
             && !ArrayUtil::isAssoc($this->expected)
-            && count($this->expected) !== count($other)
+            && \count($this->expected) !== \count($other)
         ) {
             try {
                 \PHPUnit\Framework\Assert::assertCount(
-                    count($this->expected),
+                    \count($this->expected),
                     $other,
                     'Failed asserting the primary data collection items count.'
                 );
@@ -40,13 +40,13 @@ class RestPlainDocContainsConstraint extends ArrayContainsConstraint
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function matchAssocArray(array $expected, array $actual, array $path)
+    protected function matchAssocArray(array $expected, array $actual, array $path): void
     {
         parent::matchAssocArray($expected, $actual, $path);
         // test links count
-        if (count($path) > 0 && RestApiDoc::LINKS === $path[count($path) - 1]) {
+        if (\count($path) > 0 && RestApiDoc::LINKS === $path[\count($path) - 1]) {
             $expectedLinks = array_keys($expected);
             $actualLinks = array_keys($actual);
             sort($expectedLinks);

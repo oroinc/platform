@@ -1,6 +1,6 @@
 /* @theme: default; */
 
-.input {
+@mixin base-input() {
     margin: 0;
 
     @include base-ui-element(
@@ -23,6 +23,12 @@
         display: none;
     }
 
+    &[type='date'],
+    &[type='time'] {
+        display: flex;
+        align-items: center;
+    }
+
     &[type='date'] {
         min-height: $input-date-height;
 
@@ -31,21 +37,23 @@
         }
 
         &::-webkit-calendar-picker-indicator {
-            display: none;
+            opacity: 0;
         }
 
-        // Fix height Shadow DOM elements
+        // Fix height and text-align Shadow DOM elements
         &::-webkit-date-and-time-value,
         &::-webkit-datetime-edit {
             line-height: 1;
+            text-align: left;
         }
     }
 
     &[type='time'] {
-        // Fix height Shadow DOM elements
+        // Fix height and text-align Shadow DOM elements
         &::-webkit-date-and-time-value,
         &::-webkit-datetime-edit {
             line-height: 1;
+            text-align: left;
         }
     }
 
@@ -78,16 +86,19 @@
         box-shadow: $input-box-shadow-focus-state;
     }
 
-    &.focus-visible {
+    &.focus-visible:focus {
         border-color: $input-border-color-focus-state;
     }
 
     @include element-state('error') {
         border-color: $input-border-color-error-state;
+        box-shadow: $input-box-shadow-error-state;
     }
 
     @include element-state('disabled') {
         background: $input-border-color-disabled-background;
+        box-shadow: none;
+        border: $input-border;
 
         @include base-disabled-style();
 
@@ -95,16 +106,10 @@
             border-color: $input-border-color-disabled-hover-border-color;
         }
     }
+}
 
-    @include element-state('error') {
-        box-shadow: $input-box-shadow-error-state;
-    }
-
-    @include element-state('disabled') {
-        background: $input-background-color-disabled-state;
-        box-shadow: none;
-        border: $input-border;
-    }
+.input {
+    @include base-input;
 
     &--empty {
         &[type='date'],
@@ -117,6 +122,7 @@
             &::before {
                 content: attr(placeholder);
                 color: $input-time-placeholder-color;
+                text-align: left;
                 flex: 1 1 0%;
             }
         }

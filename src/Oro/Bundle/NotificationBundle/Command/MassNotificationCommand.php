@@ -41,8 +41,8 @@ class MassNotificationCommand extends Command
             ->addOption('sender_email', null, InputOption::VALUE_OPTIONAL, 'Notification sender email')
             ->setDescription('Sends an email notification to the application users.')
             ->setHelp(
-            // @codingStandardsIgnoreStart
-            <<<'HELP'
+                // @codingStandardsIgnoreStart
+                <<<'HELP'
 The <info>%command.name%</info> command sends an email notification to the recipients listed in 
 <comment>System Configuration > General Setup > Email Configuration > Maintenance Notifications > Recipients</comment>.
 If the recipient list in the system configuration is left empty, the notification will be sent

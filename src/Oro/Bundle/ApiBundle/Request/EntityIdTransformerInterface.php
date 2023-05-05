@@ -21,7 +21,7 @@ interface EntityIdTransformerInterface
      *
      * @return mixed A request specific representation of entity identifier
      */
-    public function transform($id, EntityMetadata $metadata);
+    public function transform(mixed $id, EntityMetadata $metadata): mixed;
 
     /**
      * Transforms a request specific representation of an entity identifier to its original representation.
@@ -34,5 +34,5 @@ interface EntityIdTransformerInterface
      *
      * @return mixed The identifier of an entity
      */
-    public function reverseTransform($value, EntityMetadata $metadata);
+    public function reverseTransform(mixed $value, EntityMetadata $metadata): mixed;
 }

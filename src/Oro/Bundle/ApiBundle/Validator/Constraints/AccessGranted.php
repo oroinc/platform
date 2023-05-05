@@ -13,10 +13,9 @@ use Symfony\Component\Validator\Constraint;
  */
 class AccessGranted extends Constraint implements ConstraintWithStatusCodeInterface
 {
-    public $message = 'oro.api.form.no_access';
+    public string $message = 'oro.api.form.no_access';
 
-    /** @var string */
-    public $permission = 'VIEW';
+    public string $permission = 'VIEW';
 
     /**
      * {@inheritdoc}

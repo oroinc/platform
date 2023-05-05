@@ -16,15 +16,15 @@ class QueryExpressionCompilerPass implements CompilerPassInterface
 
     private const QUERY_EXPRESSION_VISITOR_FACTORY_SERVICE_ID = 'oro_api.query.expression_visitor_factory';
 
-    private const COMPOSITE_EXPRESSION_TAG       = 'oro.api.query.composite_expression';
-    private const COMPOSITE_EXPRESSION_TYPE      = 'type';
-    private const COMPARISON_EXPRESSION_TAG      = 'oro.api.query.comparison_expression';
+    private const COMPOSITE_EXPRESSION_TAG = 'oro.api.query.composite_expression';
+    private const COMPOSITE_EXPRESSION_TYPE = 'type';
+    private const COMPARISON_EXPRESSION_TAG = 'oro.api.query.comparison_expression';
     private const COMPARISON_EXPRESSION_OPERATOR = 'operator';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $compositeExpressions = $this->getExpressions(
             $container,
@@ -41,13 +41,6 @@ class QueryExpressionCompilerPass implements CompilerPassInterface
             ->replaceArgument(1, $comparisonExpressions);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $tagName
-     * @param string           $operatorPlaceholder
-     *
-     * @return array [operator name => provider definition, ...]
-     */
     private function getExpressions(ContainerBuilder $container, string $tagName, string $operatorPlaceholder): array
     {
         $services = [];

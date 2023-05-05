@@ -109,6 +109,14 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
      */
     protected $links;
 
+    /**
+     * @var TestCustomIdentifier|null
+     *
+     * @ORM\ManyToOne(targetEntity="TestCustomIdentifier")
+     * @ORM\JoinColumn(name="linked_id", referencedColumnName="id")
+     */
+    protected $linked;
+
     public function __construct()
     {
         $this->children = new ArrayCollection();
@@ -331,11 +339,11 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     }
 
     /**
-     * @param TestEntityForNestedObjects $item
+     * @param TestEntityForNestedObjects|null $parent
      */
-    public function setParent($item)
+    public function setParent($parent)
     {
-        $this->parent = $item;
+        $this->parent = $parent;
     }
 
     /**
@@ -376,5 +384,21 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     public function removeLink(TestCustomIdentifier $link)
     {
         $this->links->removeElement($link);
+    }
+
+    /**
+     * @return TestCustomIdentifier|null
+     */
+    public function getLinked()
+    {
+        return $this->linked;
+    }
+
+    /**
+     * @param TestCustomIdentifier|null $linked
+     */
+    public function setLinked($linked)
+    {
+        $this->linked = $linked;
     }
 }

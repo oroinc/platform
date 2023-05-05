@@ -14,8 +14,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class ValidateFileViewAccess implements ProcessorInterface
 {
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    private AuthorizationCheckerInterface $authorizationChecker;
 
     public function __construct(AuthorizationCheckerInterface $authorizationChecker)
     {
@@ -25,7 +24,7 @@ class ValidateFileViewAccess implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */
 

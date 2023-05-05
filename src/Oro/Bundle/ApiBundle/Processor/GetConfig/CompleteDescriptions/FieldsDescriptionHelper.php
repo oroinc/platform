@@ -134,7 +134,7 @@ class FieldsDescriptionHelper
         );
         $this->setDescriptionForCreatedAtField($definition, $targetAction);
         $this->setDescriptionForUpdatedAtField($definition, $targetAction);
-        if (\is_a($entityClass, AbstractEnumValue::class, true)) {
+        if (is_a($entityClass, AbstractEnumValue::class, true)) {
             $this->setDescriptionsForEnumFields($definition);
         }
     }
@@ -142,7 +142,7 @@ class FieldsDescriptionHelper
     private function getIdentifierFieldName(EntityDefinitionConfig $definition): ?string
     {
         $identifierFieldNames = $definition->getIdentifierFieldNames();
-        if (count($identifierFieldNames) !== 1) {
+        if (\count($identifierFieldNames) !== 1) {
             return null;
         }
 

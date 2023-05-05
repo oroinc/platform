@@ -12,11 +12,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailNotificationGridHelper
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var array */
-    private $events;
+    private ManagerRegistry $doctrine;
+    /** @var string[] */
+    private array $events;
 
     public function __construct(ManagerRegistry $doctrine, array $events)
     {
@@ -24,38 +22,22 @@ class EmailNotificationGridHelper
         $this->events = $events;
     }
 
-    /**
-     * @return array
-     */
-    public function getRecipientUsersChoices()
+    public function getRecipientUsersChoices(): array
     {
         return $this->getEntityChoices(User::class, 'e.id, e.firstName, e.lastName');
     }
 
-    /**
-     * @return array
-     */
-    public function getRecipientGroupsChoices()
+    public function getRecipientGroupsChoices(): array
     {
         return $this->getEntityChoices(Group::class, 'e.id, e.name', 'name');
     }
 
-    /**
-     * @return array
-     */
-    public function getEventNameChoices()
+    public function getEventNameChoices(): array
     {
-        return $this->events;
+        return array_combine($this->events, $this->events);
     }
 
-    /**
-     * @param string $entity
-     * @param string $select
-     * @param string $mainField
-     *
-     * @return array
-     */
-    private function getEntityChoices($entity, $select, $mainField = null)
+    private function getEntityChoices(string $entity, string $select, ?string $mainField = null): array
     {
         $options = [];
         $entities = $this->getEntityManager($entity)
@@ -77,12 +59,7 @@ class EmailNotificationGridHelper
         return $options;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityManagerInterface
-     */
-    private function getEntityManager($entityClass)
+    private function getEntityManager(string $entityClass): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass($entityClass);
     }

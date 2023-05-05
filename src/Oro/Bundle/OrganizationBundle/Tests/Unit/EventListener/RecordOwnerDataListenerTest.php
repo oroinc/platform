@@ -3,7 +3,7 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\OrganizationBundle\EventListener\RecordOwnerDataListener;
 use Oro\Bundle\OrganizationBundle\Ownership\EntityOwnershipAssociationsSetter;
 

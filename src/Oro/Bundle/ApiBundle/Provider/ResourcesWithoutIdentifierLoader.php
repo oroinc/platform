@@ -13,8 +13,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class ResourcesWithoutIdentifierLoader
 {
-    /** @var ConfigProvider */
-    private $configProvider;
+    private ConfigProvider $configProvider;
 
     public function __construct(ConfigProvider $configProvider)
     {

@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Provider;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 
 /**
  * The provider for datagrids configuration
@@ -50,6 +51,10 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             $this->processedConfiguration[$gridName] = $this->resolver->resolve($gridName, $rawConfig);
         }
 
-        return DatagridConfiguration::createNamed($gridName, $this->processedConfiguration[$gridName]);
+        return DatagridConfiguration::createNamed(
+            $gridName,
+            $this->processedConfiguration[$gridName],
+            PropertyAccess::createPropertyAccessorWithDotSyntax()
+        );
     }
 }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\Acl;
 
 use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\AbstractRole;
 
 abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
 {
@@ -26,12 +26,8 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
 
     /**
      * @dataProvider configurablePermissionCapabilitiesProvider
-     *
-     * @param array $config
-     * @param string $action
-     * @param bool $expected
      */
-    public function testConfigurableCapabilities(array $config, $action, $expected)
+    public function testConfigurableCapabilities(array $config, string $action, bool $expected)
     {
         self::getConfigurationModifier()->updateCache($config);
 
@@ -59,12 +55,7 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
         $assertGridData($gridData);
     }
 
-    /**
-     * @param array $gridData
-     * @param string $entityClass
-     * @param string $permissionName
-     */
-    protected function assertHasEntityPermission(array $gridData, $entityClass, $permissionName)
+    protected function assertHasEntityPermission(array $gridData, string $entityClass, string $permissionName): void
     {
         try {
             $permissions = array_filter(
@@ -97,12 +88,7 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
         }
     }
 
-    /**
-     * @param array $gridData
-     * @param string $entityClass
-     * @param string $permissionName
-     */
-    protected function assertNotHasEntityPermission(array $gridData, $entityClass, $permissionName)
+    protected function assertNotHasEntityPermission(array $gridData, string $entityClass, string $permissionName): void
     {
         try {
             $this->assertHasEntityPermission($gridData, $entityClass, $permissionName);
@@ -119,40 +105,20 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
         );
     }
 
-    /**
-     * @param string $gridName
-     * @param array $parameters
-     *
-     * @return array
-     */
-    protected function requestGrid($gridName, array $parameters = [])
+    protected function requestGrid(string $gridName, array $parameters = []): array
     {
         $manager = $this->getContainer()->get('oro_datagrid.datagrid.manager');
+
         return $manager->getDatagrid($gridName, $parameters)->getData()->toArray();
     }
 
-    /**
-     * @return array|\Generator
-     */
-    abstract public function configurablePermissionEntitiesProvider();
+    abstract public function configurablePermissionEntitiesProvider(): array;
 
-    /**
-     * @return array|\Generator
-     */
-    abstract public function configurablePermissionCapabilitiesProvider();
+    abstract public function configurablePermissionCapabilitiesProvider(): array;
 
-    /**
-     * @return Role
-     */
-    abstract protected function getRole();
+    abstract protected function getRole(): AbstractRole;
 
-    /**
-     * @return string
-     */
-    abstract protected function getGridName();
+    abstract protected function getGridName(): string;
 
-    /**
-     * @return string
-     */
-    abstract protected function getRouteName();
+    abstract protected function getRouteName(): string;
 }

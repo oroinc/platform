@@ -13,17 +13,10 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
 {
     public const NAME = ConfigUtil::DEFINITION;
 
-    /** @var string|null */
-    private $action;
-
-    /** @var bool */
-    private $collection;
-
-    /** @var string|null */
-    private $parentClassName;
-
-    /** @var string|null */
-    private $associationName;
+    private ?string $action;
+    private bool $collection;
+    private ?string $parentClassName;
+    private ?string $associationName;
 
     /**
      * @param string|null $action          The name of the action for which the configuration is requested
@@ -35,10 +28,10 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
      *                                     for which the configuration of a sub-resource is requested
      */
     public function __construct(
-        $action = null,
-        $collection = false,
-        $parentClassName = null,
-        $associationName = null
+        ?string $action = null,
+        bool $collection = false,
+        ?string $parentClassName = null,
+        ?string $associationName = null
     ) {
         $this->action = $action;
         $this->collection = $collection;
@@ -82,7 +75,7 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -90,7 +83,7 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(ConfigContext $context)
+    public function configureContext(ConfigContext $context): void
     {
         $context->setTargetAction($this->action ?? '');
         $context->setIsCollection($this->collection);
@@ -101,7 +94,7 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function isPropagable()
+    public function isPropagable(): bool
     {
         return true;
     }
@@ -109,7 +102,7 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         $result = self::NAME;
         if ($this->action) {

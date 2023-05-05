@@ -8,25 +8,20 @@ namespace Oro\Bundle\ApiBundle\Processor;
  */
 class SingleItemContext extends Context
 {
-    /** @var mixed */
-    private $id;
+    private mixed $id = null;
 
     /**
-     * Gets an identifier of an entity
-     *
-     * @return mixed|null
+     * Gets an identifier of an entity.
      */
-    public function getId()
+    public function getId(): mixed
     {
         return $this->id;
     }
 
     /**
-     * Sets an identifier of an entity
-     *
-     * @param mixed $id
+     * Sets an identifier of an entity.
      */
-    public function setId($id)
+    public function setId(mixed $id): void
     {
         $this->id = $id;
     }

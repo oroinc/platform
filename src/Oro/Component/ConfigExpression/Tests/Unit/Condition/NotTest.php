@@ -4,11 +4,12 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use Oro\Component\ConfigExpression\Exception\UnexpectedTypeException;
 
 class NotTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Condition\Not */
-    protected $condition;
+    private Condition\Not $condition;
 
     protected function setUp(): void
     {
@@ -58,7 +59,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWhenOptionNotExpressionInterface()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Invalid option type. Expected "Oro\Component\ConfigExpression\ExpressionInterface", "string" given.'
         );
@@ -68,7 +69,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWhenEmptyOptions()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
 
         $this->condition->initialize([]);
@@ -77,7 +78,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected)
+    public function testToArray(array $options, ?string $message, array $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -87,7 +88,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -119,7 +120,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected)
+    public function testCompile(array $options, ?string $message, string $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -129,7 +130,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [

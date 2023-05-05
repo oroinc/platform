@@ -115,7 +115,10 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
         $choiceType = $this->createMock(OroChoiceType::class);
         $choiceType->expects($this->any())

@@ -11,8 +11,7 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
  */
 class ContextMetadataAccessor implements MetadataAccessorInterface
 {
-    /** @var Context */
-    protected $context;
+    private Context $context;
 
     public function __construct(Context $context)
     {
@@ -24,7 +23,7 @@ class ContextMetadataAccessor implements MetadataAccessorInterface
      */
     public function getMetadata(string $className): ?EntityMetadata
     {
-        return \is_a($this->context->getClassName(), $className, true)
+        return is_a($this->context->getClassName(), $className, true)
             ? $this->context->getMetadata()
             : null;
     }

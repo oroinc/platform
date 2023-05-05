@@ -9,3 +9,5 @@ services:
         arguments:
             - '@doctrine.dbal.session_connection.wrapped'
             - { db_table: oro_session, db_id_col: id }
+        tags:
+            - { name: "oro_session_handler", alias: "pdo" }

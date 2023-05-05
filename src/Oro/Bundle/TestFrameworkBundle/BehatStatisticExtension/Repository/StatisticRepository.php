@@ -16,25 +16,21 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
 {
     const MAX_LIMIT = 10000;
 
-    /**
-     * @var Connection
-     */
-    protected $connection;
+    protected Connection $connection;
 
     /**
      * @var StatisticModelInterface[]
      */
-    protected $collection = [];
+    protected array $collection = [];
 
     /**
-     * @var StatisticModelInterface
+     * @var string|StatisticModelInterface
      */
     protected $className;
 
-    /**
-     * @var AvgStrategyInterface
-     */
-    protected $avgStrategy;
+    protected AvgStrategyInterface $avgStrategy;
+
+    private array $paths;
 
     /**
      * StatisticRepository constructor.

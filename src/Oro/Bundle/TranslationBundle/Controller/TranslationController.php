@@ -21,7 +21,7 @@ class TranslationController extends BaseController
 {
     /**
      * @Route("/", name="oro_translation_translation_index")
-     * @Template
+     * @Template("@OroTranslation/Translation/index.html.twig")
      * @AclAncestor("oro_translation_language_view")
      *
      * @return array

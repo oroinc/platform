@@ -47,7 +47,7 @@ class PlatformResultSetMappingTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function databasePlatformProvider()
+    public function databasePlatformProvider(): array
     {
         return [
             [

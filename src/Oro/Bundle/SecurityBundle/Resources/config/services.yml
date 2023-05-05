@@ -854,3 +854,23 @@ services:
 
     Oro\Bundle\SecurityBundle\Util\SameSiteUrlHelper:
         alias: oro_security.util.same_site_url_helper
+
+    oro.session_handler:
+        class: '\SessionHandlerInterface'
+        public: true
+        arguments:
+            - !tagged_locator { tag: 'oro_session_handler', index_by: 'alias' }
+            - '%session_handler_dsn%'
+        factory: [ 'Oro\Bundle\SecurityBundle\Session\SessionHandlerFactory', 'create' ]
+
+    # The fallback for the backward compatibility
+    snc_redis.session.handler:
+        alias: oro.session_handler
+
+    oro_security.authentication.failure_handler:
+        parent: security.authentication.failure_handler
+        class: Oro\Bundle\SecurityBundle\Authentication\Handler\DefaultAuthenticationFailureHandler
+
+    oro_security.authentication.success_handler:
+        parent: security.authentication.success_handler
+        class: Oro\Bundle\SecurityBundle\Authentication\Handler\DefaultAuthenticationSuccessHandler

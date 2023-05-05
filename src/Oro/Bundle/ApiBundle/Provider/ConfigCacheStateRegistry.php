@@ -13,13 +13,10 @@ use Oro\Component\Config\Cache\ConfigCacheStateInterface;
 class ConfigCacheStateRegistry
 {
     /** @var array [[config cache state service, request type expression], ...] */
-    private $states;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
-
+    private array $states;
+    private RequestExpressionMatcher $matcher;
     /** @var ConfigCacheStateInterface[] [request type => ConfigCacheStateInterface, ...] */
-    private $cache = [];
+    private array $cache = [];
 
     /**
      * @param array                    $states [[config cache state service, request type expression], ...]
@@ -44,16 +41,17 @@ class ConfigCacheStateRegistry
         }
 
         $state = null;
-        foreach ($this->states as list($currentState, $expression)) {
+        foreach ($this->states as [$currentState, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $state = $currentState;
                 break;
             }
         }
         if (null === $state) {
-            throw new \LogicException(
-                sprintf('Cannot find a config cache state service for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find a config cache state service for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         $this->cache[$cacheKey] = $state;

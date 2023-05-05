@@ -13,12 +13,12 @@ use Oro\DBAL\Types\MoneyType;
 class MoneyToStringTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function transform($value, array $config, array $context)
+    public function transform(mixed $value, array $config, array $context): mixed
     {
         if (null === $value) {
-            return $value;
+            return null;
         }
 
         return (string)BigDecimal::of($value)->toScale(MoneyType::TYPE_SCALE, RoundingMode::DOWN);

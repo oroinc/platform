@@ -29,7 +29,7 @@ class LayoutManagerPass implements CompilerPassInterface
         $embeddedFormLayoutFactoryBuilderDef
             ->setClass($layoutFactoryBuilderDef->getClass())
             ->setArguments($layoutFactoryBuilderDef->getArguments())
-            ->replaceArgument(3, null)
+            ->replaceArgument(5, null)
             ->setMethodCalls($layoutFactoryBuilderDef->getMethodCalls())
         ;
 

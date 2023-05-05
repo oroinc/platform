@@ -111,9 +111,7 @@ class TranslationController extends AbstractFOSRestController
             'status' => $translated,
             'id'     => $translated ? $translation->getId() : null,
             'value'  => $translated ? $translation->getValue() : null,
-            // this is required to auto-update "Current Value" column of the translation datagrid
             'fields' => [
-                'current' => $translator->trans($key, [], $domain, $locale)
             ]
         ];
         // this is required to auto-update "English Translation" column of the translation datagrid

@@ -9,6 +9,7 @@ use Doctrine\Persistence\Proxy;
 use Oro\Bundle\ApiBundle\Provider\ChainEntityOverrideProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
@@ -17,26 +18,13 @@ use Oro\Component\PhpUtils\ReflectionUtil;
  */
 class EntityMapper
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityInstantiator */
-    private $entityInstantiator;
-
-    /** @var EntityOverrideProviderInterface */
-    private $entityOverrideProvider;
-
-    /** @var MutableEntityOverrideProvider|null */
-    private $additionalEntityOverrideProvider;
-
-    /** @var \SplObjectStorage */
-    private $entityMap;
-
-    /** @var \SplObjectStorage */
-    private $modelMap;
-
-    /** @var \SplObjectStorage */
-    private $processing;
+    private DoctrineHelper $doctrineHelper;
+    private EntityInstantiator $entityInstantiator;
+    private EntityOverrideProviderInterface $entityOverrideProvider;
+    private \SplObjectStorage $entityMap;
+    private \SplObjectStorage $modelMap;
+    private \SplObjectStorage $processing;
+    private ?MutableEntityOverrideProvider $additionalEntityOverrideProvider = null;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -54,14 +42,9 @@ class EntityMapper
     /**
      * Returns a model for the given entity.
      *
-     * @param object      $entity
-     * @param string|null $modelClass
-     *
-     * @return object
-     *
      * @throws \InvalidArgumentException if the entity or the model class is not valid
      */
-    public function getModel($entity, string $modelClass = null)
+    public function getModel(object $entity, string $modelClass = null): object
     {
         $updateReferences =
             $this->entityMap->offsetExists($entity)
@@ -82,14 +65,9 @@ class EntityMapper
     /**
      * Returns an entity for the given model.
      *
-     * @param object      $model
-     * @param string|null $entityClass
-     *
-     * @return object
-     *
      * @throws \InvalidArgumentException if the model or the entity class is not valid
      */
-    public function getEntity($model, string $entityClass = null)
+    public function getEntity(object $model, string $entityClass = null): object
     {
         if (!$this->hasModels()) {
             $modelClass = $this->doctrineHelper->getClass($model);
@@ -115,11 +93,9 @@ class EntityMapper
     /**
      * Makes sure that the given entity exists in the map.
      *
-     * @param object $entity
-     *
      * @throws \InvalidArgumentException if the entity is not a manageable entity
      */
-    public function registerEntity($entity): void
+    public function registerEntity(object $entity): void
     {
         $this->assertEntity($this->doctrineHelper->getClass($entity));
         if (!$this->entityMap->offsetExists($entity)) {
@@ -152,14 +128,9 @@ class EntityMapper
     }
 
     /**
-     * @param object      $entity
-     * @param string|null $modelClass
-     *
-     * @return object
-     *
      * @throws \InvalidArgumentException
      */
-    private function innerGetModel($entity, string $modelClass = null)
+    private function innerGetModel(object $entity, string $modelClass = null): object
     {
         $model = null;
         if ($this->entityMap->offsetExists($entity)) {
@@ -186,14 +157,10 @@ class EntityMapper
         return $model;
     }
 
-    /**
-     * @param object $model
-     * @param object $entity
-     */
-    private function updateModelAssociations($model, $entity): void
+    private function updateModelAssociations(object $model, object $entity): void
     {
-        $modelReflClass = new \ReflectionClass($this->doctrineHelper->getClass($model));
-        $entityReflClass = new \ReflectionClass($this->doctrineHelper->getClass($entity));
+        $modelReflClass = new EntityReflectionClass($this->doctrineHelper->getClass($model));
+        $entityReflClass = new EntityReflectionClass($this->doctrineHelper->getClass($entity));
         $metadata = $this->getEntityMetadata($entityReflClass->getName());
         foreach ($metadata->getAssociationNames() as $name) {
             $value = self::getObjectPropertyValue($entityReflClass, $entity, $name);
@@ -217,11 +184,7 @@ class EntityMapper
         }
     }
 
-    /**
-     * @param object $model
-     * @param object $entity
-     */
-    private function updateReferencesToModel($model, $entity): void
+    private function updateReferencesToModel(object $model, object $entity): void
     {
         foreach ($this->modelMap as $currentModel) {
             if ($currentModel === $model) {
@@ -247,14 +210,9 @@ class EntityMapper
     }
 
     /**
-     * @param object      $model
-     * @param string|null $entityClass
-     *
-     * @return object
-     *
      * @throws \InvalidArgumentException
      */
-    private function innerGetEntity($model, string $entityClass = null)
+    private function innerGetEntity(object $model, string $entityClass = null): object
     {
         $modelClass = null;
         $isNewEntity = false;
@@ -291,27 +249,21 @@ class EntityMapper
     }
 
     /**
-     * @param object $entity
-     * @param object $model
-     * @param string $entityClass
-     * @param string $modelClass
-     * @param bool   $isNewEntity
-     *
      * @throws \ReflectionException
      */
     private function updateEntity(
-        $entity,
-        $model,
+        object $entity,
+        object $model,
         string $entityClass,
         string $modelClass,
         bool $isNewEntity
     ): void {
-        $entityReflClass = new \ReflectionClass($entityClass);
+        $entityReflClass = new EntityReflectionClass($entityClass);
         $metadata = $this->getEntityMetadata($entityClass, $modelClass);
         if ($entity === $model) {
             $this->refreshEntityAssociations($entityReflClass, $metadata, $entity);
         } else {
-            $modelReflClass = new \ReflectionClass($modelClass);
+            $modelReflClass = new EntityReflectionClass($modelClass);
             if (!$isNewEntity) {
                 $this->updateEntityFields($entityReflClass, $modelReflClass, $metadata, $entity, $model);
             }
@@ -319,19 +271,12 @@ class EntityMapper
         }
     }
 
-    /**
-     * @param \ReflectionClass $entityReflClass
-     * @param \ReflectionClass $modelReflClass
-     * @param ClassMetadata    $metadata
-     * @param object           $entity
-     * @param object           $model
-     */
     private function updateEntityFields(
         \ReflectionClass $entityReflClass,
         \ReflectionClass $modelReflClass,
         ClassMetadata $metadata,
-        $entity,
-        $model
+        object $entity,
+        object $model
     ): void {
         $names = $metadata->getFieldNames();
         foreach ($names as $name) {
@@ -344,19 +289,12 @@ class EntityMapper
         }
     }
 
-    /**
-     * @param \ReflectionClass $entityReflClass
-     * @param \ReflectionClass $modelReflClass
-     * @param ClassMetadata    $metadata
-     * @param object           $entity
-     * @param object           $model
-     */
     private function updateEntityAssociations(
         \ReflectionClass $entityReflClass,
         \ReflectionClass $modelReflClass,
         ClassMetadata $metadata,
-        $entity,
-        $model
+        object $entity,
+        object $model
     ): void {
         $names = $metadata->getAssociationNames();
         foreach ($names as $name) {
@@ -376,15 +314,10 @@ class EntityMapper
         }
     }
 
-    /**
-     * @param \ReflectionClass $entityReflClass
-     * @param ClassMetadata    $metadata
-     * @param object           $entity
-     */
     private function refreshEntityAssociations(
         \ReflectionClass $entityReflClass,
         ClassMetadata $metadata,
-        $entity
+        object $entity
     ): void {
         $names = $metadata->getAssociationNames();
         foreach ($names as $name) {
@@ -436,8 +369,8 @@ class EntityMapper
      */
     private function assertEntityAndModelClasses(string $entityClass, string $modelClass): void
     {
-        if (!\is_subclass_of($modelClass, $entityClass)) {
-            throw new \InvalidArgumentException(\sprintf(
+        if (!is_subclass_of($modelClass, $entityClass)) {
+            throw new \InvalidArgumentException(sprintf(
                 'The model class "%s" must be equal to or a subclass of the entity class "%s".',
                 $modelClass,
                 $entityClass
@@ -446,7 +379,7 @@ class EntityMapper
         if ($this->doctrineHelper->isManageableEntityClass($modelClass)
             && !self::isParentEntityClass($this->getEntityMetadata($entityClass))
         ) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'The model class "%s" must not represent a manageable entity.',
                 $modelClass
             ));
@@ -462,7 +395,7 @@ class EntityMapper
     private function assertEntity(string $entityClass): void
     {
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'The entity class "%s" must represent a manageable entity.',
                 $entityClass
             ));
@@ -472,16 +405,11 @@ class EntityMapper
     /**
      * Creates an instance of $objectClass
      * and copies values of all properties from $source to the created object.
-     *
-     * @param string $objectClass
-     * @param object $source
-     *
-     * @return object
      */
-    private function createObject(string $objectClass, $source)
+    private function createObject(string $objectClass, object $source): object
     {
         $object = $this->entityInstantiator->instantiate($objectClass);
-        $objectReflClass = new \ReflectionClass($objectClass);
+        $objectReflClass = new EntityReflectionClass($objectClass);
         $sourceProperties = self::getProperties($this->doctrineHelper->getClass($source));
         foreach ($sourceProperties as $sourceProperty) {
             $objectProperty = ReflectionUtil::getProperty($objectReflClass, $sourceProperty->getName());
@@ -520,22 +448,12 @@ class EntityMapper
             || !$metadata->isInheritanceTypeNone();
     }
 
-    /**
-     * @param mixed $entity
-     *
-     * @return bool
-     */
-    private static function isNotInitializedEntityProxy($entity): bool
+    private static function isNotInitializedEntityProxy(mixed $entity): bool
     {
         return $entity instanceof Proxy && !$entity->__isInitialized();
     }
 
-    /**
-     * @param mixed $collection
-     *
-     * @return bool
-     */
-    private static function isNotInitializedLazyCollection($collection): bool
+    private static function isNotInitializedLazyCollection(mixed $collection): bool
     {
         return $collection instanceof AbstractLazyCollection && !$collection->isInitialized();
     }
@@ -547,8 +465,9 @@ class EntityMapper
      */
     private static function getProperties(string $objectClass): array
     {
-        $reflClass = new \ReflectionClass($objectClass);
+        $reflClass = new EntityReflectionClass($objectClass);
         $properties = $reflClass->getProperties();
+
         $parentClass = $reflClass->getParentClass();
         if ($parentClass) {
             $names = [];
@@ -570,13 +489,7 @@ class EntityMapper
         return $properties;
     }
 
-    /**
-     * @param object              $object
-     * @param \ReflectionProperty $property
-     *
-     * @return mixed
-     */
-    private static function getPropertyValue($object, \ReflectionProperty $property)
+    private static function getPropertyValue(mixed $object, \ReflectionProperty $property): mixed
     {
         if (!$property->isPublic()) {
             $property->setAccessible(true);
@@ -585,12 +498,7 @@ class EntityMapper
         return $property->getValue($object);
     }
 
-    /**
-     * @param object              $object
-     * @param \ReflectionProperty $property
-     * @param mixed               $value
-     */
-    private static function setPropertyValue($object, \ReflectionProperty $property, $value): void
+    private static function setPropertyValue(object $object, \ReflectionProperty $property, mixed $value): void
     {
         if (!$property->isPublic()) {
             $property->setAccessible(true);
@@ -598,35 +506,22 @@ class EntityMapper
         $property->setValue($object, $value);
     }
 
-    /**
-     * @param \ReflectionClass $objectReflClass
-     * @param object           $object
-     * @param string           $propertyName
-     *
-     * @return mixed
-     */
     private static function getObjectPropertyValue(
         \ReflectionClass $objectReflClass,
-        $object,
+        object $object,
         string $propertyName
-    ) {
+    ): mixed {
         return self::getPropertyValue(
             $object,
             ReflectionUtil::getProperty($objectReflClass, $propertyName)
         );
     }
 
-    /**
-     * @param \ReflectionClass $objectReflClass
-     * @param object           $object
-     * @param string           $propertyName
-     * @param mixed            $value
-     */
     private static function setObjectPropertyValue(
         \ReflectionClass $objectReflClass,
-        $object,
+        object $object,
         string $propertyName,
-        $value
+        mixed $value
     ): void {
         self::setPropertyValue(
             $object,

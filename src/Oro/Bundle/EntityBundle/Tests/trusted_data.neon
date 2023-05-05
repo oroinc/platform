@@ -17,6 +17,11 @@ trusted_data:
         Oro\Bundle\EntityBundle\Form\Handler\EntitySelectHandler:
             searchEntities:
                 currentField: true
+        Oro\Bundle\EntityBundle\ORM\TriggerDriver\AbstractDriver:
+            disable:
+                tableName: true
+            enable:
+                tableName: true
     safe_methods:
         Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager:
             getEntityIdentifierFieldName: true
@@ -31,6 +36,9 @@ trusted_data:
             getSingleEntityIdentifierFieldType: true
         Oro\Bundle\EntityBundle\Provider\EntityNameResolver:
             getNameDQL: true
+        Oro\Bundle\EntityBundle\ORM\TriggerDriver\AbstractDriver:
+            getSqlDisable: true
+            getSqlEnable: true
     check_methods_safety:
         Oro\Bundle\EntityBundle\Provider\EntityNameResolver:
             prepareNameDQL: [0]

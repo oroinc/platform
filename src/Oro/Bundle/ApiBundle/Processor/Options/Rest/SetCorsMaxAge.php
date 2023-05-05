@@ -14,8 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetCorsMaxAge implements ProcessorInterface
 {
-    /** @var CorsSettings */
-    private $corsSettings;
+    private CorsSettings $corsSettings;
 
     public function __construct(CorsSettings $corsSettings)
     {
@@ -25,7 +24,7 @@ class SetCorsMaxAge implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var OptionsContext $context */
 

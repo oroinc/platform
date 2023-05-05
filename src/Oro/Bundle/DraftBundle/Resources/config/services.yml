@@ -2,8 +2,6 @@ services:
     oro_draft.event_listener_orm.draft_source_listener:
         class: Oro\Bundle\DraftBundle\EventListener\ORM\DraftSourceListener
         public: false
-        arguments:
-            - '%database_driver%'
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata }
 
@@ -86,6 +84,7 @@ services:
         public: false
         arguments:
             - '@doctrine'
+            - '@oro_draft.manager.draftable_filter_state'
         tags:
             - { name: 'oro_message_queue.consumption.extension', priority: 249, persistent: false }
 
@@ -137,3 +136,6 @@ services:
     Oro\Bundle\DraftBundle\EntityConfig\DraftFieldConfiguration:
         tags:
             - oro_entity_config.validation.entity_config
+
+    oro_draft.manager.draftable_filter_state:
+        class: Oro\Bundle\DraftBundle\Manager\DraftableFilterState

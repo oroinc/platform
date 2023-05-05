@@ -21,6 +21,7 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ReflectionProperty;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -32,7 +33,6 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -94,7 +94,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
             $this->registry,
             $this->addressHelper,
             $this->indexer,
-            new PropertyAccessor()
+            PropertyAccess::createPropertyAccessor()
         );
     }
 

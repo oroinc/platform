@@ -14,13 +14,11 @@ namespace Oro\Component\ChainProcessor;
 class ChainApplicableChecker implements ApplicableCheckerInterface, \IteratorAggregate
 {
     /** @var ApplicableCheckerInterface[] */
-    protected $checkers = [];
-
-    /** @var int */
-    protected $numberOfCheckers = 0;
+    private array $checkers = [];
+    private int $numberOfCheckers = 0;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getIterator(): \Traversable
     {
@@ -28,28 +26,26 @@ class ChainApplicableChecker implements ApplicableCheckerInterface, \IteratorAgg
     }
 
     /**
-     * Adds a checker to the chain
+     * Adds a checker to the chain.
      */
-    public function addChecker(ApplicableCheckerInterface $checker)
+    public function addChecker(ApplicableCheckerInterface $checker): void
     {
         $this->checkers[] = $checker;
         $this->numberOfCheckers++;
     }
 
     /**
-     * Indicates whether the chain has checkers
-     *
-     * @return bool
+     * Indicates whether the chain has checkers.
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return empty($this->checkers);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isApplicable(ContextInterface $context, array $processorAttributes)
+    public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         // by performance reasons we do not need a loop if only one checker is registered
         if (1 === $this->numberOfCheckers) {
@@ -71,18 +67,11 @@ class ChainApplicableChecker implements ApplicableCheckerInterface, \IteratorAgg
         return $result;
     }
 
-    /**
-     * @param ApplicableCheckerInterface $checker
-     * @param ContextInterface           $context
-     * @param array                      $processorAttributes
-     *
-     * @return int
-     */
     protected function executeChecker(
         ApplicableCheckerInterface $checker,
         ContextInterface $context,
         array $processorAttributes
-    ) {
+    ): int {
         return $checker->isApplicable($context, $processorAttributes);
     }
 }

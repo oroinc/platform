@@ -15,7 +15,7 @@ class InitializeSubresources extends LoadSubresources
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CollectSubresourcesContext $context */
 
@@ -27,7 +27,7 @@ class InitializeSubresources extends LoadSubresources
 
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
-        $accessibleResources = \array_fill_keys($context->getAccessibleResources(), true);
+        $accessibleResources = array_fill_keys($context->getAccessibleResources(), true);
         $resources = $context->getResources();
         foreach ($resources as $resource) {
             $entitySubresources = $this->createEntitySubresources(

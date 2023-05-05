@@ -305,7 +305,8 @@
         white-space: $select2-search-white-space;
 
         .select2-input {
-            padding-left: $select2-search-field-input-inner-offset-start;
+            // stylelint-disable-next-line declaration-no-important
+            padding-left: $select2-search-field-input-inner-offset-start !important;
         }
     }
 
@@ -364,7 +365,8 @@
         }
 
         .select2-input {
-            width: $select2-search-input-width;
+            // stylelint-disable-next-line declaration-no-important
+            width: $select2-search-input-width !important;
         }
     }
 

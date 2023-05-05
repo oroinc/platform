@@ -4,12 +4,12 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class NotHasValueTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Condition\NotHasValue */
-    protected $condition;
+    private Condition\NotHasValue $condition;
 
     protected function setUp(): void
     {
@@ -20,13 +20,13 @@ class NotHasValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, array $context, bool $expectedResult)
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
             'has_value'        => [
@@ -49,7 +49,7 @@ class NotHasValueTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWhenEmptyOptions()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
 
         $this->condition->initialize([]);
@@ -58,7 +58,7 @@ class NotHasValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected)
+    public function testToArray(array $options, ?string $message, array $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -68,7 +68,7 @@ class NotHasValueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -100,7 +100,7 @@ class NotHasValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected)
+    public function testCompile(array $options, ?string $message, string $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -110,7 +110,7 @@ class NotHasValueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [

@@ -10,6 +10,7 @@ use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
+use Oro\Bundle\UserBundle\Form\Provider\RolesChoicesForUserProvider;
 use Oro\Bundle\UserBundle\Form\Type\ChangePasswordType;
 use Oro\Bundle\UserBundle\Form\Type\UserType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -42,11 +43,15 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
     /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $optionsProvider;
 
+    /** @var RolesChoicesForUserProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $rolesChoicesForUserProvider;
+
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->optionsProvider = $this->createMock(PasswordFieldOptionsProvider::class);
+        $this->rolesChoicesForUserProvider = $this->createMock(RolesChoicesForUserProvider::class);
     }
 
     /**
@@ -131,7 +136,13 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $type = new UserType($this->authorizationChecker, $this->tokenAccessor, $requestStack, $this->optionsProvider);
+        $type = new UserType(
+            $this->authorizationChecker,
+            $this->tokenAccessor,
+            $requestStack,
+            $this->optionsProvider,
+            $this->rolesChoicesForUserProvider
+        );
         $type->buildForm($builder, []);
     }
 
@@ -206,7 +217,8 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
             $this->authorizationChecker,
             $this->tokenAccessor,
             $requestStack,
-            $this->optionsProvider
+            $this->optionsProvider,
+            $this->rolesChoicesForUserProvider
         );
         $type->configureOptions($resolver);
     }

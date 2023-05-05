@@ -11,14 +11,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class ActivityListManagerTest extends WebTestCase
 {
-    /**
-     * @var ActivityListManager
-     */
-    private $manager;
+    private ActivityListManager $manager;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([]);
@@ -28,11 +22,8 @@ class ActivityListManagerTest extends WebTestCase
 
     /**
      * @dataProvider emailActivityProvider
-     *
-     * @param int $expectedCommentCount
-     * @param string $activityReference
      */
-    public function testGetEntityViewModelEmailWithNoThread($expectedCommentCount, $activityReference)
+    public function testGetEntityViewModelEmailWithNoThread(int $expectedCommentCount, string $activityReference)
     {
         $organization = $this->getReference('organization');
         $user = self::getContainer()->get('doctrine')
@@ -54,10 +45,7 @@ class ActivityListManagerTest extends WebTestCase
         self::assertEquals($expectedCommentCount, $result['commentCount']);
     }
 
-    /**
-     * @return array
-     */
-    public function emailActivityProvider()
+    public function emailActivityProvider(): array
     {
         return [
             'email_without_thread' => [

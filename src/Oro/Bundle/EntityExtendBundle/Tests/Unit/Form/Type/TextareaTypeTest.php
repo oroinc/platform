@@ -6,14 +6,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\TextareaType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType as SymfonyTextareaType;
 
 class TextareaTypeTest extends AbstractConfigTypeTestCase
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getFormType()
+    protected function getFormType(): AbstractType
     {
         return new TextareaType(
             new ConfigTypeHelper($this->configManager),
@@ -24,7 +25,7 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
     /**
      * @dataProvider submitProvider
      */
-    public function testSubmit($newVal, $oldVal, $state, $isSetStateExpected)
+    public function testSubmit(string $newVal, ?string $oldVal, string $state, bool $isSetStateExpected)
     {
         $this->doTestSubmit(
             'testAttr',
@@ -40,7 +41,7 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
         );
     }
 
-    public function submitProvider()
+    public function submitProvider(): array
     {
         return [
             ['', null, ExtendScope::STATE_ACTIVE, false],
@@ -52,11 +53,11 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
         ];
     }
 
-    public function testGetName()
+    public function testGetBlockPrefix()
     {
         $this->assertEquals(
             'oro_entity_extend_textarea',
-            $this->getFormType()->getName()
+            $this->getFormType()->getBlockPrefix()
         );
     }
 

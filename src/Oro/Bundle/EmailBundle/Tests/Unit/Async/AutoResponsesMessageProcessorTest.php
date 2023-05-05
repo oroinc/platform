@@ -36,9 +36,9 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects($this->once())
-            ->method('runUnique')
-            ->with('message-id', 'oro.email.send_auto_responses' . ':' . md5('1'))
-            ->willReturnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+            ->method('runUniqueByMessage')
+            ->with($message)
+            ->willReturnCallback(function ($message, $callback) use ($jobRunner) {
                 $callback($jobRunner);
 
                 return true;

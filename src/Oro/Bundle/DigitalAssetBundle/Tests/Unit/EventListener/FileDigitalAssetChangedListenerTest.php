@@ -3,10 +3,10 @@
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\EventListener\FileDigitalAssetChangedListener;
@@ -92,7 +92,7 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->eventArgs
             ->expects($this->once())
-            ->method('getEntityManager')
+            ->method('getObjectManager')
             ->willReturn($entityManager = $this->createMock(EntityManager::class));
 
         $entityManager
@@ -129,7 +129,7 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->eventArgs
             ->expects($this->once())
-            ->method('getEntityManager')
+            ->method('getObjectManager')
             ->willReturn($entityManager = $this->createMock(EntityManager::class));
 
         $entityManager

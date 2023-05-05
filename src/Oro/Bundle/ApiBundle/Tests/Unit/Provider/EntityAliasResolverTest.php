@@ -51,7 +51,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
 
     protected function setLoadExpectations()
     {
-        $this->cacheItem->expects($this->once())
+        $this->cacheItem->expects(self::once())
             ->method('isHit')
             ->willReturn(false);
         $this->cache->expects(self::atLeastOnce())
@@ -202,14 +202,14 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         $storage = new EntityAliasStorage();
         $storage->addEntityAlias('Test\Entity1', new EntityAlias('entity1_alias', 'entity1_plural_alias'));
 
-        $this->cacheItem->expects($this->once())
+        $this->cacheItem->expects(self::once())
             ->method('isHit')
             ->willReturn(true);
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('getItem')
             ->with('entity_aliases')
             ->willReturn($this->cacheItem);
-        $this->cacheItem->expects($this->once())
+        $this->cacheItem->expects(self::once())
             ->method('get')
             ->willReturn([null, $storage]);
 
@@ -263,7 +263,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
             . 'with "oro_entity.alias_provider" tag in DI container.'
         );
 
-        $this->cacheItem->expects($this->once())
+        $this->cacheItem->expects(self::once())
             ->method('isHit')
             ->willReturn(false);
         $this->cache->expects(self::atLeastOnce())

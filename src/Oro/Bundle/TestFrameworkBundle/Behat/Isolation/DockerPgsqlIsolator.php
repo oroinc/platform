@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -13,9 +12,7 @@ class DockerPgsqlIsolator extends UnixPgsqlIsolator
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
     {
-        return self::isApplicableOS()
-            && DatabaseDriverInterface::DRIVER_POSTGRESQL === $container->getParameter('database_driver')
-            && getenv('BEHAT_DATABASE_LOCATION') === 'docker';
+        return self::isApplicableOS() && getenv('BEHAT_DATABASE_LOCATION') === 'docker';
     }
 
     protected function getDropDbCommand(): string

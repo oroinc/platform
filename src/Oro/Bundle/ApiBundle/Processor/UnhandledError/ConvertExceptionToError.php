@@ -17,7 +17,7 @@ class ConvertExceptionToError implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -29,7 +29,7 @@ class ConvertExceptionToError implements ProcessorInterface
         if (!$exception instanceof \Throwable) {
             throw new RuntimeException(sprintf(
                 'The result should be an instance of Throwable, "%s" given.',
-                \is_object($exception) ? \get_class($exception) : gettype($exception)
+                get_debug_type($exception)
             ));
         }
 

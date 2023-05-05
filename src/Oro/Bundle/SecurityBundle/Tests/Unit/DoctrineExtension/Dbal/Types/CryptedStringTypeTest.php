@@ -8,27 +8,25 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 class CryptedStringTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CryptedStringType */
-    private $fieldType;
+    private CryptedStringType $type;
 
     protected function setUp(): void
     {
         $crypter = $this->createMock(SymmetricCrypterInterface::class);
-        $crypter->expects($this->any())
+        $crypter->expects(self::any())
             ->method('encryptData')
             ->willReturnCallback(function ($value) {
                 return 'crypted_' . $value;
             });
-        $crypter->expects($this->any())
+        $crypter->expects(self::any())
             ->method('decryptData')
             ->willReturnCallback(function ($value) {
                 return str_replace('crypted_', '', $value);
             });
+
         CryptedStringType::setCrypter($crypter);
-        if (!CryptedStringType::hasType('crypted_string')) {
-            CryptedStringType::addType('crypted_string', CryptedStringType::class);
-        }
-        $this->fieldType = CryptedStringType::getType('crypted_string');
+
+        $this->type = new CryptedStringType();
     }
 
     public function testConvertToDatabaseValue()
@@ -36,7 +34,7 @@ class CryptedStringTypeTest extends \PHPUnit\Framework\TestCase
         $testString = 'test';
         $this->assertEquals(
             'crypted_' . $testString,
-            $this->fieldType->convertToDatabaseValue($testString, $this->createMock(AbstractPlatform::class))
+            $this->type->convertToDatabaseValue($testString, $this->createMock(AbstractPlatform::class))
         );
     }
 
@@ -45,7 +43,7 @@ class CryptedStringTypeTest extends \PHPUnit\Framework\TestCase
         $testString = 'test';
         $this->assertEquals(
             $testString,
-            $this->fieldType->convertToPHPValue('crypted_' . $testString, $this->createMock(AbstractPlatform::class))
+            $this->type->convertToPHPValue('crypted_' . $testString, $this->createMock(AbstractPlatform::class))
         );
     }
 }

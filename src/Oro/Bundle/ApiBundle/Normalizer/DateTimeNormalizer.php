@@ -12,8 +12,7 @@ use Symfony\Component\Form\DataTransformerInterface;
  */
 class DateTimeNormalizer implements ObjectNormalizerInterface
 {
-    /** @var DataTransformerRegistry */
-    private $dataTransformerRegistry;
+    private DataTransformerRegistry $dataTransformerRegistry;
 
     public function __construct(DataTransformerRegistry $dataTransformerRegistry)
     {
@@ -23,7 +22,7 @@ class DateTimeNormalizer implements ObjectNormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, RequestType $requestType)
+    public function normalize(object $object, RequestType $requestType): mixed
     {
         $dataTransformer = $this->dataTransformerRegistry->getDataTransformer(DataType::DATETIME, $requestType);
 

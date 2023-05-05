@@ -25,16 +25,20 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
     private const PROPERTY_TYPE = 'bigint';
     private const SOME_LABEL = 'someLabel';
 
-    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $formConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $formConfigProvider;
 
-    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $extendConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendConfigProvider;
 
-    private ExtendFieldFormTypeProvider $extendFieldFormTypeProvider;
+    /** @var ExtendFieldFormTypeProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendFieldFormTypeProvider;
 
-    private ExtendFieldFormOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-        $extendFieldFormOptionsProvider;
+    /** @var ExtendFieldFormOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendFieldFormOptionsProvider;
 
-    private ExtendFieldTypeGuesser $guesser;
+    /** @var ExtendFieldTypeGuesser|\PHPUnit\Framework\MockObject\MockObject */
+    private $guesser;
 
     protected function setUp(): void
     {
@@ -70,12 +74,6 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider
-     * @param string $fieldType
-     * @param string $scopeName
-     * @param array $scopeOptions
-     */
     private function createConfigProviderExpectation(
         ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider,
         string $fieldType,
@@ -161,8 +159,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
             'required' => false,
             'block' => 'general',
         ];
-        $this->extendFieldFormOptionsProvider
-            ->expects(self::once())
+        $this->extendFieldFormOptionsProvider->expects(self::once())
             ->method('getOptions')
             ->with(self::CLASS_NAME, self::CLASS_PROPERTY)
             ->willReturn($options);
@@ -179,8 +176,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
 
         $this->expectsGetExtendConfig(['owner' => ExtendScope::OWNER_CUSTOM]);
 
-        $this->extendFieldFormOptionsProvider
-            ->expects(self::never())
+        $this->extendFieldFormOptionsProvider->expects(self::never())
             ->method('getOptions');
 
         $typeGuess = $this->guesser->guessType(self::CLASS_NAME, self::CLASS_PROPERTY);
@@ -200,8 +196,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
 
         $this->expectsGetExtendConfig($extendConfig, $fieldType);
 
-        $this->extendFieldFormOptionsProvider
-            ->expects(self::never())
+        $this->extendFieldFormOptionsProvider->expects(self::never())
             ->method('getOptions');
 
         $this->extendFieldFormTypeProvider->addExtendTypeMapping($fieldType, 'text');
@@ -272,14 +267,12 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $extendFieldConfig = $this->createFieldConfig('extend', $extendScopeOptions, $fieldType);
         $fileExtendConfig = $this->createFieldConfig('extend', $fileExtendScopeOptions, $fieldType);
 
-        $this->extendConfigProvider
-            ->expects(self::exactly(2))
+        $this->extendConfigProvider->expects(self::exactly(2))
             ->method('getConfig')
             ->withConsecutive([self::CLASS_NAME, self::CLASS_PROPERTY], [File::class])
             ->willReturn($extendFieldConfig, $fileExtendConfig);
 
-        $this->extendFieldFormOptionsProvider
-            ->expects(self::never())
+        $this->extendFieldFormOptionsProvider->expects(self::never())
             ->method('getOptions');
 
         $this->extendFieldFormTypeProvider->addExtendTypeMapping($fieldType, 'text');
@@ -351,8 +344,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
             'required' => false,
             'block' => 'general',
         ];
-        $this->extendFieldFormOptionsProvider
-            ->expects(self::once())
+        $this->extendFieldFormOptionsProvider->expects(self::once())
             ->method('getOptions')
             ->with(self::CLASS_NAME, self::CLASS_PROPERTY)
             ->willReturn($options);

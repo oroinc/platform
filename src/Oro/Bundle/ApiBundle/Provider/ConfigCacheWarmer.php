@@ -20,36 +20,26 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class ConfigCacheWarmer
 {
-    public const CONFIG_KEY        = 'configKey';
-    public const CONFIG            = 'config';
-    public const ALIASES           = 'aliases';
-    public const SUBSTITUTIONS     = 'substitutions';
+    public const CONFIG_KEY = 'configKey';
+    public const CONFIG = 'config';
+    public const ALIASES = 'aliases';
+    public const SUBSTITUTIONS = 'substitutions';
     public const EXCLUDED_ENTITIES = 'excluded_entities';
-    public const EXCLUSIONS        = 'exclusions';
-    public const INCLUSIONS        = 'inclusions';
+    public const EXCLUSIONS = 'exclusions';
+    public const INCLUSIONS = 'inclusions';
 
     private const OVERRIDE_CLASS = 'override_class';
     private const APP_API_CONFIG_PATH = '../config/oro/';
     private const YAML_EXTENSION = '.yml';
 
-
-    /** @var ConfigExtensionRegistry */
-    private $configExtensionRegistry;
-
+    private ConfigExtensionRegistry $configExtensionRegistry;
     /** @var array [config key => [config file name, ...], ...] */
-    private $configFiles;
-
-    /** @var ConfigCacheFactory */
-    private $configCacheFactory;
-
-    /** @var bool */
-    private $debug;
-
-    /** @var string */
-    private $environment;
-
-    /** @var ResourceInterface[] [config file name => ResourceInterface, ...] */
-    private $resources;
+    private array $configFiles;
+    private ConfigCacheFactory $configCacheFactory;
+    private bool $debug;
+    private string $environment;
+    /** @var ResourceInterface[]|null [config file name => ResourceInterface, ...] */
+    private ?array $resources = null;
 
     public function __construct(
         array $configFiles,
@@ -93,7 +83,7 @@ class ConfigCacheWarmer
      */
     private function dumpConfigCache(string $configKey, array $fileNames, array $fileConfigs): void
     {
-        if (count($fileNames) === 1) {
+        if (\count($fileNames) === 1) {
             $this->dumpConfigCacheForSingleFileApi($configKey, $fileNames[0], $fileConfigs[$fileNames[0]]);
         } else {
             $this->dumpConfigCacheForMultiFileApi($configKey, $fileNames, $fileConfigs);
@@ -240,7 +230,7 @@ class ConfigCacheWarmer
         $fileConfigMap = [];
         foreach ($configFiles as $configKey => $fileNames) {
             foreach ($fileNames as $fileName) {
-                if (!array_key_exists($fileName, $fileConfigs)) {
+                if (!\array_key_exists($fileName, $fileConfigs)) {
                     $requestConfig = $this->loadConfigFile($fileName);
 
                     $aliases = $requestConfig[Config::ENTITY_ALIASES_SECTION];
@@ -267,7 +257,7 @@ class ConfigCacheWarmer
                     ];
                 }
             }
-            if (count($fileNames) === 1) {
+            if (\count($fileNames) === 1) {
                 $fileConfigMap[reset($fileNames)] = $configKey;
             }
         }
@@ -278,11 +268,6 @@ class ConfigCacheWarmer
         return $fileConfigs;
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return array []
-     */
     private function loadConfigFile(string $fileName): array
     {
         $configFileLoaders = [new YamlCumulativeFileLoader('Resources/config/oro/' . $fileName)];
@@ -301,7 +286,7 @@ class ConfigCacheWarmer
         $configLoader = new CumulativeConfigLoader('oro_api', $configFileLoaders);
         $resources = $configLoader->load();
         foreach ($resources as $resource) {
-            if (array_key_exists(Config::ROOT_NODE, $resource->data)) {
+            if (\array_key_exists(Config::ROOT_NODE, $resource->data)) {
                 $config[] = $resource->data[Config::ROOT_NODE];
             }
         }
@@ -315,9 +300,7 @@ class ConfigCacheWarmer
 
     private function processConfiguration(ConfigurationInterface $configuration, array $configs): array
     {
-        $processor = new Processor();
-
-        return $processor->processConfiguration($configuration, $configs);
+        return (new Processor())->processConfiguration($configuration, $configs);
     }
 
     /**
@@ -330,7 +313,7 @@ class ConfigCacheWarmer
     private function hasEntityConfig(string $entityClass, array $fileNames, array $fileConfigs): bool
     {
         $hasConfig = false;
-        foreach ($fileNames as $key => $fileName) {
+        foreach ($fileNames as $fileName) {
             if (isset($fileConfigs[$fileName][self::CONFIG][Config::ENTITIES_SECTION][$entityClass])) {
                 $hasConfig = true;
                 break;
@@ -361,12 +344,12 @@ class ConfigCacheWarmer
     {
         $exist = false;
         foreach ($items as $existingItem) {
-            if (count($existingItem) !== count($item)) {
+            if (\count($existingItem) !== \count($item)) {
                 continue;
             }
             $equal = true;
             foreach ($item as $key => $value) {
-                if (!array_key_exists($key, $existingItem) || $existingItem[$key] !== $value) {
+                if (!\array_key_exists($key, $existingItem) || $existingItem[$key] !== $value) {
                     $equal = false;
                     break;
                 }

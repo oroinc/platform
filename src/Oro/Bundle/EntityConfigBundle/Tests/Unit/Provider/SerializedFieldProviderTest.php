@@ -22,10 +22,7 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->serializedFieldProvider = new SerializedFieldProvider($this->extendConfigProvider);
     }
 
-    /**
-     * @return FieldConfigModel
-     */
-    private function checkIsSerializedWrongType()
+    private function checkIsSerializedWrongType(): FieldConfigModel
     {
         $fieldConfigModel = new FieldConfigModel('name', 'wrong_type');
         $this->extendConfigProvider->expects($this->never())
@@ -46,10 +43,7 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->serializedFieldProvider->isSerializedByData($fieldConfigModel, []));
     }
 
-    /**
-     * @return FieldConfigModel
-     */
-    private function expectsEmptyPropertiesValues()
+    private function expectsEmptyPropertiesValues(): FieldConfigModel
     {
         $fieldConfigModel = new FieldConfigModel('name', 'string');
         $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
@@ -138,7 +132,7 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function assertExtendConfigProvider()
+    protected function assertExtendConfigProvider(): void
     {
         $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $propertyConfigContainer->expects($this->once())

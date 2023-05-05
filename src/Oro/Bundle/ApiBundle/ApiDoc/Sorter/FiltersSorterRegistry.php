@@ -13,16 +13,11 @@ use Symfony\Contracts\Service\ResetInterface;
 class FiltersSorterRegistry implements ResetInterface
 {
     /** @var array [[sorter service id, request type expression], ...] */
-    private $sorters;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
-
+    private array $sorters;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
     /** @var FiltersSorterInterface[] [request type => FiltersSorterInterface, ...] */
-    private $cache = [];
+    private array $cache = [];
 
     /**
      * @param array                    $sorters [[sorter service id, request type expression], ...]
@@ -66,7 +61,7 @@ class FiltersSorterRegistry implements ResetInterface
     /**
      * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->cache = [];
     }

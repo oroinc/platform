@@ -15,8 +15,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class AllMemberOfComparisonExpression implements ComparisonExpressionInterface
 {
-    /** @var bool */
-    private $notExpression;
+    private bool $notExpression;
 
     public function __construct(bool $notExpression = false)
     {
@@ -31,10 +30,10 @@ class AllMemberOfComparisonExpression implements ComparisonExpressionInterface
         string $field,
         string $expression,
         string $parameterName,
-        $value
-    ) {
+        mixed $value
+    ): mixed {
         if ($value instanceof Range) {
-            throw new QueryException(\sprintf('The value for "%s" must not be a range.', $field));
+            throw new QueryException(sprintf('The value for "%s" must not be a range.', $field));
         }
 
         $expectedNumberOfRecordsParameterName = $parameterName . '_expected';
@@ -53,16 +52,11 @@ class AllMemberOfComparisonExpression implements ComparisonExpressionInterface
 
         return $visitor->getExpressionBuilder()->eq(
             $visitor->buildPlaceholder($expectedNumberOfRecordsParameterName),
-            \sprintf('(%s)', $subquery->getDQL())
+            sprintf('(%s)', $subquery->getDQL())
         );
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return int
-     */
-    private function getExpectedNumberOfRecords($value): int
+    private function getExpectedNumberOfRecords(mixed $value): int
     {
         if ($this->notExpression) {
             return 0;

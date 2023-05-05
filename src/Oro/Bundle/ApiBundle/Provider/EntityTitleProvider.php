@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -15,11 +15,8 @@ use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
  */
 class EntityTitleProvider
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityNameResolver */
-    private $entityNameResolver;
+    private DoctrineHelper $doctrineHelper;
+    private EntityNameResolver $entityNameResolver;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -39,7 +36,7 @@ class EntityTitleProvider
      *
      * @return array [['id' => entity id, 'entity' => entity class, 'title' => entity title], ...]
      */
-    public function getTitles(array $targets)
+    public function getTitles(array $targets): array
     {
         $result = [];
         $em = $this->getEntityManager($targets);
@@ -51,39 +48,33 @@ class EntityTitleProvider
     }
 
     /**
-     * @param EntityManager $em
-     * @param array         $targets [entity class => [entity id field name, [entity id, ...]], ...]
+     * @param EntityManagerInterface $em
+     * @param array                  $targets [entity class => [entity id field name, [entity id, ...]], ...]
      *
      * @return AbstractQuery[]
      */
-    private function loadTitles(EntityManager $em, $targets)
+    private function loadTitles(EntityManagerInterface $em, array $targets): array
     {
         $result = [];
         $groups = $this->groupByIdentifierType($em, $targets);
         foreach ($groups as $idFieldType => $group) {
             if ('array' === $idFieldType) {
-                foreach ($group as $entityClass => list($idFieldName, $ids)) {
-                    $result = array_merge(
-                        $result,
-                        $this->executeQueryWithCompositeId(
-                            $this->getNameQuery($em, $entityClass, $idFieldName, $ids),
-                            $idFieldName
-                        )
+                foreach ($group as $entityClass => [$idFieldName, $ids]) {
+                    $result[] = $this->executeQueryWithCompositeId(
+                        $this->getNameQuery($em, $entityClass, $idFieldName, $ids),
+                        $idFieldName
                     );
                 }
-            } elseif (count($group) === 1) {
-                list($idFieldName, $ids) = reset($group);
+            } elseif (\count($group) === 1) {
+                [$idFieldName, $ids] = reset($group);
                 $entityClass = key($group);
-                $result = array_merge(
-                    $result,
-                    $this->getNameQuery($em, $entityClass, $idFieldName, $ids)->getArrayResult()
-                );
+                $result[] = $this->getNameQuery($em, $entityClass, $idFieldName, $ids)->getArrayResult();
             } else {
-                $result = array_merge(
-                    $result,
-                    $this->getNameUnionQuery($em, $group, $idFieldType)->getArrayResult()
-                );
+                $result[] = $this->getNameUnionQuery($em, $group, $idFieldType)->getArrayResult();
             }
+        }
+        if ($result) {
+            $result = array_merge(...$result);
         }
 
         return $result;
@@ -95,7 +86,7 @@ class EntityTitleProvider
      *
      * @return array [['id' => entity id, 'entity' => entity class, 'title' => entity title], ...]
      */
-    private function executeQueryWithCompositeId(AbstractQuery $query, array $idFieldNames)
+    private function executeQueryWithCompositeId(AbstractQuery $query, array $idFieldNames): array
     {
         $result = [];
 
@@ -115,20 +106,16 @@ class EntityTitleProvider
         return $result;
     }
 
-    /**
-     * @param EntityManager $em
-     * @param string        $entityClass
-     * @param string|array  $idFieldName
-     * @param array         $ids
-     *
-     * @return Query
-     */
-    private function getNameQuery(EntityManager $em, $entityClass, $idFieldName, array $ids)
-    {
+    private function getNameQuery(
+        EntityManagerInterface $em,
+        string $entityClass,
+        string|array $idFieldName,
+        array $ids
+    ): Query {
         $qb = $em->getRepository($entityClass)->createQueryBuilder('e');
         $qb
             ->select(
-                (string)$qb->expr()->literal($entityClass) . ' AS entity',
+                $qb->expr()->literal($entityClass) . ' AS entity',
                 $this->entityNameResolver->prepareNameDQL(
                     $this->entityNameResolver->getNameDQL($entityClass, 'e'),
                     true
@@ -163,20 +150,20 @@ class EntityTitleProvider
     }
 
     /**
-     * @param EntityManager $em
-     * @param array         $targets [entity class => [entity id field name, id, ...], ...]
-     * @param string        $idFieldType
+     * @param EntityManagerInterface $em
+     * @param array                  $targets [entity class => [entity id field name, id, ...], ...]
+     * @param string                 $idFieldType
      *
      * @return AbstractQuery
      */
-    private function getNameUnionQuery(EntityManager $em, array $targets, $idFieldType)
+    private function getNameUnionQuery(EntityManagerInterface $em, array $targets, string $idFieldType): AbstractQuery
     {
         $qb = new UnionQueryBuilder($em);
         $qb
             ->addSelect('id', 'id', $idFieldType)
             ->addSelect('entity', 'entity')
             ->addSelect('title', 'title');
-        foreach ($targets as $entityClass => list($idFieldName, $ids)) {
+        foreach ($targets as $entityClass => [$idFieldName, $ids]) {
             $qb->addSubQuery(
                 $this->getNameQuery($em, $entityClass, $idFieldName, $ids)
             );
@@ -186,8 +173,8 @@ class EntityTitleProvider
     }
 
     /**
-     * @param EntityManager $em
-     * @param array         $targets [entity class => [entity id field name, [entity id, ...]], ...]
+     * @param EntityManagerInterface $em
+     * @param array                  $targets [entity class => [entity id field name, [entity id, ...]], ...]
      *
      * @return array
      *  [
@@ -198,14 +185,14 @@ class EntityTitleProvider
      *      ...
      *  ]
      */
-    private function groupByIdentifierType(EntityManager $em, array $targets)
+    private function groupByIdentifierType(EntityManagerInterface $em, array $targets): array
     {
         $groups = [];
-        foreach ($targets as $entityClass => list($idFieldName, $ids)) {
+        foreach ($targets as $entityClass => [$idFieldName, $ids]) {
             if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
                 continue;
             }
-            if (is_array($idFieldName)) {
+            if (\is_array($idFieldName)) {
                 $idFieldType = 'array';
             } else {
                 $idFieldType = $this->doctrineHelper->getFieldDataType(
@@ -224,9 +211,9 @@ class EntityTitleProvider
     /**
      * @param array $targets [entity class => [entity id field name, [entity id, ...]], ...]
      *
-     * @return EntityManager|null
+     * @return EntityManagerInterface|null
      */
-    private function getEntityManager(array $targets)
+    private function getEntityManager(array $targets): ?EntityManagerInterface
     {
         $em = null;
         foreach ($targets as $entityClass => $value) {

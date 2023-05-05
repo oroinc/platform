@@ -99,32 +99,28 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
 
     /**
      * {@inheritdoc}
-     *
-     * @return UserScopeManager
      */
     protected function createManager(
         ManagerRegistry $doctrine,
         CacheInterface $cache,
         EventDispatcher $eventDispatcher,
-        ConfigBag $configBag
-    ) {
+        ConfigBag $configBag,
+    ): UserScopeManager {
         return new UserScopeManager($doctrine, $cache, $eventDispatcher, $configBag);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getScopedEntityName()
+    protected function getScopedEntityName(): string
     {
         return 'user';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return User
      */
-    protected function getScopedEntity()
+    protected function getScopedEntity(): User
     {
         return $this->getEntity(User::class, ['id' => 123]);
     }

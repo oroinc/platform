@@ -48,8 +48,8 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit\Framework\TestCa
 
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects($this->once())
-            ->method('runUnique')
-            ->with('12345', 'oro.imap.clear_inactive_mailbox');
+            ->method('runUniqueByMessage')
+            ->with($message);
 
         $processor = new ClearInactiveMailboxMessageProcessor($clearManager, $jobRunner, $logger);
         $result = $processor->process($message, $this->createMock(SessionInterface::class));

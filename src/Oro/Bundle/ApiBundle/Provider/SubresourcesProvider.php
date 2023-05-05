@@ -13,14 +13,9 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
  */
 class SubresourcesProvider
 {
-    /** @var ActionProcessorInterface */
-    private $processor;
-
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var ResourcesCache */
-    private $resourcesCache;
+    private ActionProcessorInterface $processor;
+    private ResourcesProvider $resourcesProvider;
+    private ResourcesCache $resourcesCache;
 
     public function __construct(
         ActionProcessorInterface $processor,

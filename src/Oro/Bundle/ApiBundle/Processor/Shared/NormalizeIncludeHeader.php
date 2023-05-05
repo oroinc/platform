@@ -14,12 +14,12 @@ class NormalizeIncludeHeader implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
         $xInclude = $context->getRequestHeaders()->get(Context::INCLUDE_HEADER);
-        if (empty($xInclude) || is_array($xInclude)) {
+        if (empty($xInclude) || \is_array($xInclude)) {
             // no X-Include header or it is already normalized
             return;
         }

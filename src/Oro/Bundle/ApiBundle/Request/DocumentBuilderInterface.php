@@ -28,14 +28,8 @@ interface DocumentBuilderInterface
 
     /**
      * Gets a string representation of the given entity identifier.
-     *
-     * @param mixed          $entity
-     * @param RequestType    $requestType
-     * @param EntityMetadata $metadata
-     *
-     * @return string
      */
-    public function getEntityId($entity, RequestType $requestType, EntityMetadata $metadata): string;
+    public function getEntityId(mixed $entity, RequestType $requestType, EntityMetadata $metadata): string;
 
     /**
      * Sets metadata that are linked to data.
@@ -46,32 +40,20 @@ interface DocumentBuilderInterface
 
     /**
      * Sets a single object as the primary data.
-     *
-     * @param mixed               $object
-     * @param RequestType         $requestType
-     * @param EntityMetadata|null $metadata
      */
-    public function setDataObject($object, RequestType $requestType, EntityMetadata $metadata = null): void;
+    public function setDataObject(mixed $object, RequestType $requestType, ?EntityMetadata $metadata): void;
 
     /**
      * Sets a collection as the primary data.
-     *
-     * @param mixed               $collection
-     * @param RequestType         $requestType
-     * @param EntityMetadata|null $metadata
      */
-    public function setDataCollection($collection, RequestType $requestType, EntityMetadata $metadata = null): void;
+    public function setDataCollection(mixed $collection, RequestType $requestType, ?EntityMetadata $metadata): void;
 
     /**
      * Adds an object related to the primary data.
      * E.g. in JSON:API this object is added to the "included" section.
      * @link http://jsonapi.org/format/#fetching-includes
-     *
-     * @param mixed               $object
-     * @param RequestType         $requestType
-     * @param EntityMetadata|null $metadata
      */
-    public function addIncludedObject($object, RequestType $requestType, EntityMetadata $metadata = null): void;
+    public function addIncludedObject(mixed $object, RequestType $requestType, ?EntityMetadata $metadata): void;
 
     /**
      * Adds a link for a whole document data.

@@ -19,11 +19,10 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class SecurityFirewallCompilerPass implements CompilerPassInterface
 {
-    /** @var array */
-    private $contextListeners = [];
+    private array $contextListeners = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContainerBuilder $container): void
     {
@@ -53,8 +52,8 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
     private function isStatelessFirewallWithContext(array $firewallConfig): bool
     {
         return
-            array_key_exists('stateless', $firewallConfig)
-            && array_key_exists('context', $firewallConfig)
+            \array_key_exists('stateless', $firewallConfig)
+            && \array_key_exists('context', $firewallConfig)
             && $firewallConfig['stateless']
             && $firewallConfig['context'];
     }
@@ -112,13 +111,7 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
         $exceptionListenerDef->setClass(ExceptionListener::class);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $contextKey
-     *
-     * @return string
-     */
-    private function createContextListener(ContainerBuilder $container, $contextKey): string
+    private function createContextListener(ContainerBuilder $container, string $contextKey): string
     {
         if (isset($this->contextListeners[$contextKey])) {
             return $this->contextListeners[$contextKey];

@@ -6,6 +6,9 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaReg
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\DestinationNameTopicSubscriber;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\InvalidTopicSubscriber;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\OnlyTopicNameTopicSubscriber;
+use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\SampleTopic;
+use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\SubscribedTopic;
+use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\UnknownTopicSubscriber;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,6 +30,12 @@ class BuildTopicMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new BuildTopicMetaRegistryPass();
 
         $this->container = new ContainerBuilder();
+        $this->container->register('oro_message_queue.topic.registry')
+            ->addArgument(0);
+        $this->container->register('sample_topic', SampleTopic::class)
+            ->addTag('oro_message_queue.topic');
+        $this->container->register('subscribed_topic_name', SubscribedTopic::class)
+            ->addTag('oro_message_queue.topic');
         $this->registryDefinition = $this->container->register('oro_message_queue.client.meta.topic_meta_registry');
     }
 
@@ -36,6 +45,15 @@ class BuildTopicMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
 
         $container->register('processor_id', $this->getMockClass(MessageProcessorInterface::class))
             ->addTag('oro_message_queue.client.message_processor', []);
+        $container->register('oro_message_queue.topic.registry');
+
+        $this->compiler->process($container);
+    }
+
+    public function testWhenTopicRegistryIsNotDefined(): void
+    {
+        $container = new ContainerBuilder();
+        $container->register('oro_message_queue.client.meta.topic_meta_registry');
 
         $this->compiler->process($container);
     }
@@ -57,20 +75,20 @@ class BuildTopicMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
     public function testProcessWhenTopicIsSet(): void
     {
         $this->container->register('processor_id', $this->getMockClass(MessageProcessorInterface::class))
-            ->addTag('oro_message_queue.client.message_processor', ['topicName' => 'sample_topic']);
+            ->addTag('oro_message_queue.client.message_processor', ['topicName' => SampleTopic::getName()]);
 
         $this->compiler->process($this->container);
 
         self::assertEquals(
             [
-                'sample_topic' => [Config::DEFAULT_QUEUE_NAME => 'processor_id'],
+                SampleTopic::getName() => [Config::DEFAULT_QUEUE_NAME => 'processor_id'],
             ],
             $this->registryDefinition->getArgument('$messageProcessorsByTopicAndQueue')
         );
 
         self::assertEquals(
             [
-                'sample_topic' => [Config::DEFAULT_QUEUE_NAME],
+                SampleTopic::getName() => [Config::DEFAULT_QUEUE_NAME],
             ],
             $this->registryDefinition->getArgument('$queuesByTopic')
         );
@@ -81,21 +99,21 @@ class BuildTopicMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
         $this->container->register('processor_id', $this->getMockClass(MessageProcessorInterface::class))
             ->addTag(
                 'oro_message_queue.client.message_processor',
-                ['topicName' => 'sample_topic', 'destinationName' => 'sample_destination']
+                ['topicName' => SampleTopic::getName(), 'destinationName' => 'sample_destination']
             );
 
         $this->compiler->process($this->container);
 
         self::assertEquals(
             [
-                'sample_topic' => ['sample_destination' => 'processor_id'],
+                SampleTopic::getName() => ['sample_destination' => 'processor_id'],
             ],
             $this->registryDefinition->getArgument('$messageProcessorsByTopicAndQueue')
         );
 
         self::assertEquals(
             [
-                'sample_topic' => ['sample_destination'],
+                SampleTopic::getName() => ['sample_destination'],
             ],
             $this->registryDefinition->getArgument('$queuesByTopic')
         );
@@ -104,20 +122,20 @@ class BuildTopicMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
     public function testProcessWhenTopicSubscriberWithTopicName(): void
     {
         $this->container->register('processor_id', OnlyTopicNameTopicSubscriber::class)
-            ->addTag('oro_message_queue.client.message_processor', ['topicName' => 'sample_topic']);
+            ->addTag('oro_message_queue.client.message_processor', ['topicName' => SubscribedTopic::getName()]);
 
         $this->compiler->process($this->container);
 
         self::assertEquals(
             [
-                'subscribed_topic_name' => [Config::DEFAULT_QUEUE_NAME => 'processor_id'],
+                SubscribedTopic::getName() => [Config::DEFAULT_QUEUE_NAME => 'processor_id'],
             ],
             $this->registryDefinition->getArgument('$messageProcessorsByTopicAndQueue')
         );
 
         self::assertEquals(
             [
-                'subscribed_topic_name' => [Config::DEFAULT_QUEUE_NAME],
+                SubscribedTopic::getName() => [Config::DEFAULT_QUEUE_NAME],
             ],
             $this->registryDefinition->getArgument('$queuesByTopic')
         );
@@ -132,14 +150,14 @@ class BuildTopicMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                'subscribed_topic_name' => ['subscriber_destination_name' => 'processor_id'],
+                SubscribedTopic::getName() => ['subscriber_destination_name' => 'processor_id'],
             ],
             $this->registryDefinition->getArgument('$messageProcessorsByTopicAndQueue')
         );
 
         self::assertEquals(
             [
-                'subscribed_topic_name' => ['subscriber_destination_name'],
+                SubscribedTopic::getName() => ['subscriber_destination_name'],
             ],
             $this->registryDefinition->getArgument('$queuesByTopic')
         );
@@ -153,10 +171,23 @@ class BuildTopicMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
         $container = new ContainerBuilder();
         $container->register('oro_message_queue.client.meta.topic_meta_registry')
             ->addArgument([]);
+        $container->register('oro_message_queue.topic.registry')
+            ->addArgument(0);
 
         $container->register('processor_id', InvalidTopicSubscriber::class)
             ->addTag('oro_message_queue.client.message_processor');
 
         $this->compiler->process($container);
+    }
+
+    public function testProcessWhenTopicNotInTopicRegistry(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Topic "unknown_topic" should be declared as MQ topic.');
+
+        $this->container->register('processor_id', UnknownTopicSubscriber::class)
+            ->addTag('oro_message_queue.client.message_processor');
+
+        $this->compiler->process($this->container);
     }
 }

@@ -15,8 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class StoreRequestData implements ProcessorInterface
 {
-    /** @var FileManager */
-    private $fileManager;
+    private FileManager $fileManager;
 
     public function __construct(FileManager $fileManager)
     {
@@ -26,7 +25,7 @@ class StoreRequestData implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */
 
@@ -36,7 +35,7 @@ class StoreRequestData implements ProcessorInterface
             return;
         }
 
-        if (!is_resource($requestData)) {
+        if (!\is_resource($requestData)) {
             // request data should be a resource
             return;
         }

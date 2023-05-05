@@ -14,57 +14,37 @@ class Category
      * @ORM\Column(name="name", type="string", length=50)
      * @ORM\Id
      */
-    protected $name;
+    private ?string $name;
 
     /**
      * @ORM\Column(name="label", type="string", length=255, unique=true)
      */
-    protected $label;
+    private ?string $label;
 
-    /**
-     * @param string|null $name
-     * @param string|null $label
-     */
-    public function __construct($name = null, $label = null)
+    public function __construct(string $name = null, string $label = null)
     {
-        $this->name  = $name;
+        $this->name = $name;
         $this->label = $label;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return self
-     */
-    public function setName($name)
+    public function setName(?string $name): static
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): ?string
     {
         return $this->label;
     }
 
-    /**
-     * @param string $label
-     *
-     * @return self
-     */
-    public function setLabel($label)
+    public function setLabel(?string $label): static
     {
         $this->label = $label;
 

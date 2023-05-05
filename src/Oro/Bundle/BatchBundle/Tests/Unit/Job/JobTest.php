@@ -93,15 +93,14 @@ class JobTest extends \PHPUnit\Framework\TestCase
 
         $jobExecution = new JobExecution();
 
-        $mockStep = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step']);
-
-        $mockStep->setEventDispatcher($this->eventDispatcher);
-        $mockStep->setJobRepository($this->jobRepository);
-        $mockStep->expects(self::any())
+        $step = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step']);
+        $step->setEventDispatcher($this->eventDispatcher);
+        $step->setJobRepository($this->jobRepository);
+        $step->expects(self::any())
             ->method('doExecute')
             ->willThrowException($exception);
 
-        $this->job->addStep($mockStep);
+        $this->job->addStep($step);
 
         $this->job->execute($jobExecution);
 
@@ -225,31 +224,31 @@ class JobTest extends \PHPUnit\Framework\TestCase
 
     public function testAddStep(): void
     {
-        $mockStep1 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step1']);
-        $mockStep2 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step2']);
+        $step1 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step1']);
+        $step2 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step2']);
 
-        $this->job->addStep($mockStep1);
-        $this->job->addStep($mockStep2);
+        $this->job->addStep($step1);
+        $this->job->addStep($step2);
 
-        self::assertEquals([$mockStep1, $mockStep2], $this->job->getSteps());
+        self::assertEquals([$step1, $step2], $this->job->getSteps());
     }
 
     public function testSetSteps(): void
     {
-        $mockStep1 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step1']);
-        $mockStep2 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step2']);
+        $step1 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step1']);
+        $step2 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step2']);
 
-        $this->job->setSteps([$mockStep1, $mockStep2]);
+        $this->job->setSteps([$step1, $step2]);
 
-        self::assertEquals([$mockStep1, $mockStep2], $this->job->getSteps());
+        self::assertEquals([$step1, $step2], $this->job->getSteps());
     }
 
     public function testGetStepNames(): void
     {
-        $mockStep1 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step1']);
-        $mockStep2 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step2']);
+        $step1 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step1']);
+        $step2 = $this->getMockForAbstractClass(AbstractStep::class, ['my_mock_step2']);
 
-        $this->job->setSteps([$mockStep1, $mockStep2]);
+        $this->job->setSteps([$step1, $step2]);
 
         self::assertEquals(['my_mock_step1', 'my_mock_step2'], $this->job->getStepNames());
     }
@@ -257,7 +256,6 @@ class JobTest extends \PHPUnit\Framework\TestCase
     public function getItemStep($name, $reader, $processor, $writer): ItemStep
     {
         $itemStep = new ItemStep($name);
-
         $itemStep->setReader($reader);
         $itemStep->setProcessor($processor);
         $itemStep->setWriter($writer);
@@ -270,11 +268,9 @@ class JobTest extends \PHPUnit\Framework\TestCase
         array $fields = []
     ): \PHPUnit\Framework\MockObject\MockObject|ItemReaderTestHelper {
         $reader = $this->createMock(ItemReaderTestHelper::class);
-
         $reader->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($configuration);
-
         $reader->expects(self::any())
             ->method('getConfigurationFields')
             ->willReturn($fields);
@@ -287,11 +283,9 @@ class JobTest extends \PHPUnit\Framework\TestCase
         array $fields = []
     ): ItemProcessorTestHelper|\PHPUnit\Framework\MockObject\MockObject {
         $processor = $this->createMock(ItemProcessorTestHelper::class);
-
         $processor->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($configuration);
-
         $processor->expects(self::any())
             ->method('getConfigurationFields')
             ->willReturn($fields);
@@ -304,11 +298,9 @@ class JobTest extends \PHPUnit\Framework\TestCase
         array $fields = []
     ): ItemWriterTestHelper|\PHPUnit\Framework\MockObject\MockObject {
         $writer = $this->createMock(ItemWriterTestHelper::class);
-
         $writer->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($configuration);
-
         $writer->expects(self::any())
             ->method('getConfigurationFields')
             ->willReturn($fields);

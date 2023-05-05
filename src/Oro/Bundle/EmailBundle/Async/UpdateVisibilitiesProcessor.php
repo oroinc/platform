@@ -47,12 +47,11 @@ class UpdateVisibilitiesProcessor implements MessageProcessorInterface, TopicSub
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $jobName = 'oro:email:update-visibilities:email-addresses';
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            $jobName,
-            function (JobRunner $jobRunner) use ($jobName) {
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
+            function (JobRunner $jobRunner, Job $job) {
                 $organizationIds = $this->getOrganizationIds();
+                $jobName = $job->getName();
                 foreach ($organizationIds as $organizationId) {
                     $this->scheduleUpdatingVisibilities($jobRunner, $jobName, $organizationId);
                 }

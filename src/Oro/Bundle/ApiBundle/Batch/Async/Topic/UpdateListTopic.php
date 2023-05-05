@@ -3,12 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Batch\Async\Topic;
 
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * A topic to split data of API batch update request to chunks
  */
-class UpdateListTopic extends AbstractTopic
+class UpdateListTopic extends AbstractTopic implements JobAwareTopicInterface
 {
     public static function getName(): string
     {
@@ -58,5 +59,10 @@ class UpdateListTopic extends AbstractTopic
             ->setDefined('aggregateTime')
             ->setDefault('aggregateTime', 0)
             ->setAllowedTypes('aggregateTime', 'int');
+    }
+
+    public function createJobName($messageBody): string
+    {
+        return sprintf('oro:batch_api:%d', $messageBody['operationId']);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Functional\Filter;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
@@ -18,21 +18,13 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class DateTimeRangeFilterTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadUserWithBUAndOrganization::class]);
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return QueryBuilder
-     */
-    private function createQueryBuilder($alias)
+    private function createQueryBuilder(string $alias): QueryBuilder
     {
         return $this->getUserRepository()->createQueryBuilder($alias);
     }
@@ -103,7 +95,7 @@ class DateTimeRangeFilterTest extends WebTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function filterProvider()
+    public function filterProvider(): array
     {
         return [
             'equals'            => [
@@ -229,20 +221,12 @@ class DateTimeRangeFilterTest extends WebTestCase
         ];
     }
 
-    /**
-     * @return DateTimeRangeFilter
-     */
-    private function getFilter()
+    private function getFilter(): DateTimeRangeFilter
     {
         return self::getContainer()->get('oro_filter.datetime_range_filter');
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    private function fixTimeZone($value)
+    private function fixTimeZone(mixed $value): mixed
     {
         if ($value instanceof \DateTime) {
             $value = new \DateTime($value->format('Y-m-d H:i'), new \DateTimeZone('UTC'));
@@ -261,26 +245,17 @@ class DateTimeRangeFilterTest extends WebTestCase
         $em->flush($user);
     }
 
-    /**
-     * @return UserRepository
-     */
-    private function getUserRepository()
+    private function getUserRepository(): UserRepository
     {
         return $this->getUserEntityManager()->getRepository(User::class);
     }
 
-    /**
-     * @return EntityManager
-     */
-    private function getUserEntityManager()
+    private function getUserEntityManager(): EntityManagerInterface
     {
         return self::getContainer()->get('doctrine')->getManagerForClass(User::class);
     }
 
-    /**
-     * @return User
-     */
-    private function getUser()
+    private function getUser(): User
     {
         return $this->getUserRepository()->findOneBy(['username' => 'admin']);
     }

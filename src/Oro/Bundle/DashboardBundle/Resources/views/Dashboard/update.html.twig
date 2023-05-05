@@ -1,4 +1,5 @@
 {% extends '@OroUI/actions/update.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% oro_title_set({params : {'%entityName%': 'oro.dashboard.entity_label'|trans, "%label%": entity.label} }) %}
 
@@ -59,8 +60,25 @@
         {% if form.owner is defined %}
             {{ form_row(form.owner) }}
         {% endif %}
+        {% set startDashboardGroupId = 'start-dashboard-'|uniqid %}
+        {% if form.dashboardType is defined %}
+            {% set dashboardTypeViewOptions = {
+                startDashboardrField: '#' ~ startDashboardGroupId,
+            } %}
+            {{ form_row(form.dashboardType, {
+                'attr': {
+                    'data-page-component-view': 'orodashboard/js/views/dashboard-type-view',
+                    'data-page-component-options': dashboardTypeViewOptions|json_encode
+                }
+            }) }}
+        {% endif %}
         {% if form.startDashboard is defined %}
-            {{ form_row(form.startDashboard) }}
+            {{ form_row(form.startDashboard, {
+                'group_attr': {
+                    'id': startDashboardGroupId,
+                    'class': form.dashboardType is defined ? 'hide' : ''
+                }
+            }) }}
         {% endif %}
         {% for child in form.children %}
             {% if child.vars.extra_field is defined and child.vars.extra_field %}
@@ -87,5 +105,3 @@
     } %}
     {{ parent() }}
 {% endblock %}
-
-

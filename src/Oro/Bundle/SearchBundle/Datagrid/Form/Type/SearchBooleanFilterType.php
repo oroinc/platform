@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\SearchBundle\Datagrid\Form\Type;
 
-use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Form type which can be used as a boolean filter for datagrids with search datasource.
+ * The form type which can be used as a boolean filter for datagrids with search datasource.
  */
-class SearchBooleanFilterType extends AbstractChoiceType
+class SearchBooleanFilterType extends AbstractType
 {
-    const NAME = 'oro_search_type_boolean_filter';
-
     /**
      * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setNormalizer('field_options', function (Options $options, $value) {
             if (!$value) {
@@ -32,7 +30,7 @@ class SearchBooleanFilterType extends AbstractChoiceType
     /**
      * {@inheritDoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return BooleanFilterType::class;
     }
@@ -40,16 +38,8 @@ class SearchBooleanFilterType extends AbstractChoiceType
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getBlockPrefix(): string
     {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getBlockPrefix()
-    {
-        return self::NAME;
+        return 'oro_search_type_boolean_filter';
     }
 }

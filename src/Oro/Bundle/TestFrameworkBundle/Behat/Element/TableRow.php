@@ -129,6 +129,9 @@ class TableRow extends Element
         // if it's a checkbox, use 'checked' attribute rather than text value
         if ($input->hasAttribute('type') && 'checkbox' === $input->getAttribute('type')) {
             $cellElementValue = (int) $input->isChecked();
+        } elseif (empty($cellElementValue)) {
+            // no text in cell element, but there's an input element — take its value
+            $cellElementValue = $input->getValue();
         }
 
         return $cellElementValue;

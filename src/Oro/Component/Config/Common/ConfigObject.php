@@ -2,10 +2,10 @@
 
 namespace Oro\Component\Config\Common;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -24,10 +24,10 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
     /** @var array */
     protected $params;
 
-    protected function __construct(array $params)
+    protected function __construct(array $params, PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->accessor = new PropertyAccessor();
-        $this->params   = $params;
+        $this->accessor = $propertyAccessor ?? new PropertyAccessor();
+        $this->params = $params;
     }
 
     /**
@@ -37,9 +37,9 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
      *
      * @return $this
      */
-    public static function create(array $params)
+    public static function create(array $params, PropertyAccessorInterface $propertyAccessor = null)
     {
-        return new static($params);
+        return new static($params, $propertyAccessor);
     }
 
     /**
@@ -50,11 +50,11 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
      *
      * @return $this
      */
-    public static function createNamed($name, array $params)
+    public static function createNamed($name, array $params, PropertyAccessorInterface $propertyAccessor = null)
     {
         $params[self::NAME_KEY] = $name;
 
-        return new static($params);
+        return new static($params, $propertyAccessor);
     }
 
     /**

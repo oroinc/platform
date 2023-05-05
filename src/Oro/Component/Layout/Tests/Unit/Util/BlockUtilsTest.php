@@ -5,6 +5,7 @@ namespace Oro\Component\Layout\Tests\Unit\Util;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -34,7 +35,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function normalizeTransValueDataProvider()
+    public function normalizeTransValueDataProvider(): array
     {
         return [
             [null, null, null],
@@ -69,7 +70,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessUrlShouldThrowExceptionIfRequiredAndEmptyOptions()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
+        $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage('Either "path" or "route_name" must be set.');
 
         BlockUtils::processUrl(

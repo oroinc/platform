@@ -14,10 +14,12 @@ use Symfony\Component\Form\FormFactoryInterface;
  */
 class EnumFilter extends BaseMultiChoiceFilter
 {
-    const FILTER_TYPE_NAME = 'enum';
+    public const FILTER_TYPE_NAME = 'enum';
 
-    /** @var DictionaryApiEntityManager */
-    protected $dictionaryApiEntityManager;
+    private const CLASS_KEY = 'class';
+    private const ENUM_CODE_KEY = 'enum_code';
+
+    protected DictionaryApiEntityManager $dictionaryApiEntityManager;
 
     public function __construct(
         FormFactoryInterface $factory,
@@ -29,22 +31,22 @@ class EnumFilter extends BaseMultiChoiceFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'dictionary';
-        if (isset($params['class'])) {
-            $params[FilterUtility::FORM_OPTIONS_KEY]['class'] = $params['class'];
-            unset($params['class']);
+        if (isset($params[self::CLASS_KEY])) {
+            $params[FilterUtility::FORM_OPTIONS_KEY][self::CLASS_KEY] = $params[self::CLASS_KEY];
+            unset($params[self::CLASS_KEY]);
         }
-        if (isset($params['enum_code'])) {
+        if (isset($params[self::ENUM_CODE_KEY])) {
             $params[FilterUtility::FORM_OPTIONS_KEY] = [
-                'enum_code' => $params['enum_code'],
-                'class' => ExtendHelper::buildEnumValueClassName($params['enum_code'])
+                self::ENUM_CODE_KEY => $params[self::ENUM_CODE_KEY],
+                self::CLASS_KEY => ExtendHelper::buildEnumValueClassName($params[self::ENUM_CODE_KEY])
             ];
-            $params['class'] = ExtendHelper::buildEnumValueClassName($params['enum_code']);
-            unset($params['enum_code']);
+            $params[self::CLASS_KEY] = ExtendHelper::buildEnumValueClassName($params[self::ENUM_CODE_KEY]);
+            unset($params[self::ENUM_CODE_KEY]);
         }
 
         parent::init($name, $params);
@@ -56,9 +58,8 @@ class EnumFilter extends BaseMultiChoiceFilter
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
-        if ($metadata['class']) {
-            $resolvedEntityClass = $this->resolveMetadataClass($metadata);
-            $this->dictionaryApiEntityManager->setClass($resolvedEntityClass);
+        if ($metadata[self::CLASS_KEY]) {
+            $this->dictionaryApiEntityManager->setClass($this->resolveMetadataClass($metadata));
             $metadata['initialData'] = $this->dictionaryApiEntityManager->findValueByPrimaryKey(
                 $this->getForm()->get('value')->getData()
             );
@@ -75,20 +76,15 @@ class EnumFilter extends BaseMultiChoiceFilter
         return $data;
     }
 
-    /**
-     * @param array $metadata
-     *
-     * @return string
-     */
-    private function resolveMetadataClass(array $metadata)
+    private function resolveMetadataClass(array $metadata): string
     {
-        if (\array_key_exists('class', $metadata)
-            && str_starts_with($metadata['class'], ExtendHelper::ENTITY_NAMESPACE)
+        if (\array_key_exists(self::CLASS_KEY, $metadata)
+            && str_starts_with($metadata[self::CLASS_KEY], ExtendHelper::ENTITY_NAMESPACE)
         ) {
-            return $metadata['class'];
+            return $metadata[self::CLASS_KEY];
         }
 
-        return $this->dictionaryApiEntityManager->resolveEntityClass($metadata['class'], true);
+        return $this->dictionaryApiEntityManager->resolveEntityClass($metadata[self::CLASS_KEY], true);
     }
 
     /**
@@ -101,24 +97,19 @@ class EnumFilter extends BaseMultiChoiceFilter
             $ds->setParameter($parameterName, $data['value']);
         }
 
-        return $this->buildComparisonExpr(
-            $ds,
-            $comparisonType,
-            $fieldName,
-            $parameterName
-        );
+        return $this->buildComparisonExpr($ds, $comparisonType, $fieldName, $parameterName);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getFormType()
+    protected function getFormType(): string
     {
         return EnumFilterType::class;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,

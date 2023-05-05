@@ -251,8 +251,7 @@
     }
 
     .filter-item {
-        // stylelint-disable-next-line declaration-no-important
-        display: $mobile-filter-item-display !important;
+        display: $mobile-filter-item-display;
         margin: $mobile-filter-item-offset;
 
         > .btn {
@@ -331,8 +330,11 @@
                 .dropdown-menu {
                     width: $mobile-filter-box-ui-dialog-content-filter-criteria-width;
                     height: $mobile-filter-box-ui-dialog-content-filter-criteria-height;
-                    top: $mobile-filter-box-ui-dialog-content-filter-criteria-top;
-                    transform: $mobile-filter-box-ui-dialog-content-filter-criteria-transform;
+                    // Need to override inline styles
+                    // stylelint-disable-next-line declaration-no-important
+                    top: $mobile-filter-box-ui-dialog-content-filter-criteria-top !important;
+                    // stylelint-disable-next-line declaration-no-important
+                    transform: $mobile-filter-box-ui-dialog-content-filter-criteria-transform !important;
                 }
             }
         }

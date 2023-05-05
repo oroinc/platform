@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 class DeleteContext extends SingleItemContext implements ChangeContextInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getAllEntities(bool $mainOnly = false): array
     {

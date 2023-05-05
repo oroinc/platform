@@ -8,8 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\TagBundle\Model\ExtendTag;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -64,8 +65,10 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class Tag extends ExtendTag
+class Tag implements ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var integer
      *
@@ -147,8 +150,6 @@ class Tag extends ExtendTag
      */
     public function __construct($name = null)
     {
-        parent::__construct();
-
         $this->setName($name);
         $this->tagging = new ArrayCollection();
     }

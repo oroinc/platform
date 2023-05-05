@@ -125,11 +125,7 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($emptyConfiguration[ProcessConfigurationProvider::NODE_TRIGGERS]);
     }
 
-    /**
-     * @param string $bundleName
-     * @return array
-     */
-    private function getExpectedProcessConfiguration($bundleName)
+    private function getExpectedProcessConfiguration(string $bundleName): array
     {
         $fileName = __DIR__ . '/Stub/' . $bundleName . '/Resources/config/oro/processes.php';
         $this->assertFileExists($fileName);

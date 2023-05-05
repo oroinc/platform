@@ -10,11 +10,9 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processConfigurationDataProvider
      */
-    public function testProcessConfiguration($configs, $expected)
+    public function testProcessConfiguration(array $configs, array $expected)
     {
-        $configuration = new Configuration();
-        $processor = new Processor();
-        $this->assertEquals($expected, $processor->processConfiguration($configuration, $configs));
+        $this->assertEquals($expected, (new Processor())->processConfiguration(new Configuration(), $configs));
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Carbon\Carbon;
 use Oro\Bundle\TestFrameworkBundle\Behat\Environment\BehatSecretsReader;
 use Oro\Bundle\TestFrameworkBundle\Exception\BehatSecretsReaderException;
 use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
@@ -57,7 +58,7 @@ class Form extends Element
      * @param string $value
      * @throws ElementNotFoundException
      */
-    public function typeInField($label, $value)
+    public function typeInField($label, $value, $clearField = true)
     {
         $field = null;
         if (isset($this->options['mapping'][$label])) {
@@ -88,7 +89,7 @@ class Form extends Element
 
         self::assertTrue($field->isVisible(), "Field with '$label' was found, but it not visible");
 
-        $this->getDriver()->typeIntoInput($field->getXpath(), $value);
+        $this->getDriver()->typeIntoInput($field->getXpath(), $value, $clearField);
     }
 
     public function assertFields(TableNode $table)
@@ -146,6 +147,11 @@ class Form extends Element
     public function saveAndCreateNew()
     {
         $this->pressActionButton('Save and New');
+    }
+
+    public function saveAndReturn()
+    {
+        $this->pressActionButton('Save and Return');
     }
 
     /**
@@ -331,6 +337,8 @@ class Form extends Element
         }
 
         $value = trim($value);
+        # Replace non-breaking space with regular space
+        $value = str_replace("\xE2\x80\xAF", ' ', $value);
 
         if (0 === strpos($value, '[')) {
             $value = trim($value, '[]');
@@ -369,8 +377,26 @@ class Form extends Element
                 $value = (new \DateTime($matches['value']))->format(\DateTimeInterface::ATOM);
             }
             if ('Date' === $matches['function']) {
-                $parsed =  new \DateTime($matches['value']);
-                $value = str_replace($matches[0], $parsed->format('M j, Y'), $value);
+                switch ($matches['value']) {
+                    case 'this month':
+                        $dateValue = Carbon::today(new \DateTimeZone('UTC'));
+                        $parsed = $dateValue->firstOfMonth();
+
+                        return str_replace($matches[0], $parsed->format('M j, Y'), $value);
+                    case 'this quarter':
+                        $dateValue = Carbon::today(new \DateTimeZone('UTC'));
+                        $parsed = $dateValue->firstOfQuarter();
+
+                        return str_replace($matches[0], $parsed->format('M j, Y'), $value);
+                    case 'this year':
+                        $dateValue = Carbon::today(new \DateTimeZone('UTC'));
+                        $parsed = $dateValue->firstOfYear();
+
+                        return str_replace($matches[0], $parsed->format('M j, Y'), $value);
+                    default:
+                        $parsed = new \DateTime($matches['value']);
+                        $value = str_replace($matches[0], $parsed->format('M j, Y'), $value);
+                }
             }
             if ('Secret' === $matches['function']) {
                 $value = BehatSecretsReader::getInstance()->getValue($matches['value']);

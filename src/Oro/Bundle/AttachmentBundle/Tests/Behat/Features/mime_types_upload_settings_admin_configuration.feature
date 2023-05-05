@@ -1,6 +1,6 @@
 @regression
 @ticket-BB-15166
-
+@behat-test-env
 Feature: Mime types upload settings admin configuration
   In order to manage upload settings
   As an administrator

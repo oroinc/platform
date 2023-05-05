@@ -54,4 +54,12 @@ class AddEmailAssociationsTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro.email.add_association_to_emails:class:15:' . md5(implode(',', ['42', '142'])),
+            $this->getTopic()->createJobName(['targetClass' => 'class', 'targetId' => 15, 'emailIds' => ['42', '142']])
+        );
+    }
 }

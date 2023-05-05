@@ -15,11 +15,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class InitializeCriteria implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityClassResolver */
-    private $entityClassResolver;
+    private DoctrineHelper $doctrineHelper;
+    private EntityClassResolver $entityClassResolver;
 
     public function __construct(DoctrineHelper $doctrineHelper, EntityClassResolver $entityClassResolver)
     {
@@ -30,7 +27,7 @@ class InitializeCriteria implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

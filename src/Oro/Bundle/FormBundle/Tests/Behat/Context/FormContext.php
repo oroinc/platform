@@ -81,6 +81,19 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $field->openSelectEntityPopup();
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * @When /^(?:|I )open create entity popup for field "(?P<fieldName>[\w\s]*)" in form "(?P<formName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )open create entity popup for field "(?P<fieldName>[\w\s]*)"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iOpenCreateEntityPopup($fieldName, $formName = "OroForm")
+    {
+        /** @var Select2Entity $field */
+        $field = $this->getFieldInForm($fieldName, $formName);
+        $field->openCreateEntityPopup();
+    }
+
     /**
      * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" field in form "(?P<formName>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" field$/
@@ -133,6 +146,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function iSaveAndCreateNewForm()
     {
         $this->createOroForm()->saveAndCreateNew();
+    }
+
+    /**
+     * @When /^(?:|I )save form and return/
+     */
+    public function iSaveFormAndReturn()
+    {
+        $this->createOroForm()->saveAndReturn();
     }
 
     /**
@@ -367,13 +388,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Assert form fields values
-     * Example: And "User Form" must contains values:
+     * Example: And "User Form" must contain values:
      *            | Username          | charlie           |
      *            | First Name        | Charlie           |
      *            | Last Name         | Sheen             |
      *            | Primary Email     | charlie@sheen.com |
      *
      * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contains values:$/
+     * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contain values:$/
      */
     public function formMustContainsValues($formName, TableNode $table)
     {
@@ -426,6 +448,29 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $form = $this->createElement($formName);
 
         $form->typeInField($locator, $value);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Type value in field chapter by chapter. Imitate real user input from keyboard
+     * Example: And continue typing "Common" in "search"
+     * Example: When I continue typing "Create" in "Enter shortcut action"
+     *
+     * @When /^(?:|I )continue typing "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )continue typing "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)" from "(?P<formName>(?:[^"]|\\")*)"$/
+     * @throws ElementNotFoundException
+     */
+    //@codingStandardsIgnoreEnd
+    public function iContinueTypingInFieldWith($locator, $value, $formName = 'OroForm')
+    {
+        $locator = $this->fixStepArgument($locator);
+        $value = $this->fixStepArgument($value);
+        $formName = $this->fixStepArgument($formName);
+
+        /** @var OroForm $form */
+        $form = $this->createElement($formName);
+
+        $form->typeInField($locator, $value, false);
     }
 
     /**
@@ -504,6 +549,30 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var SystemConfigForm $form */
         $form = $this->createElement('SystemConfigForm');
         self::assertTrue($form->isUseDefaultCheckboxExists($label, $checkbox));
+    }
+
+    /**
+     * @Then I should see :label action button
+     */
+    public function iShouldSeeActionButton(string $label): void
+    {
+        $button = $this->createOroForm()->findButton($label);
+        self::assertNotNull(
+            $button,
+            sprintf('Expected action button "%s" is not present on page', $label)
+        );
+    }
+
+    /**
+     * @Then I should not see :label action button
+     */
+    public function iShouldNotSeeActionButton(string $label): void
+    {
+        $button = $this->createOroForm()->findButton($label);
+        self::assertNull(
+            $button,
+            sprintf('Expected action button "%s" is present on page', $label)
+        );
     }
 
     /**

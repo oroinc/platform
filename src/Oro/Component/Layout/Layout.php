@@ -10,34 +10,35 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  */
 class Layout
 {
-    /** @var BlockView */
-    protected $view;
+    protected BlockView $view;
 
-    /** @var LayoutRendererRegistryInterface */
-    protected $rendererRegistry;
+    protected LayoutRendererRegistryInterface $rendererRegistry;
 
-    /** @var string */
-    protected $rendererName;
+    protected ContextInterface $context;
 
-    /** @var array */
-    protected $themes = [];
+    protected LayoutContextStack $layoutContextStack;
 
-    /** @var array */
-    protected $formThemes = [];
+    protected ?string $rendererName = null;
 
-    /** @var TemplateNameParser */
-    private static $templateNameParser;
+    protected array $themes = [];
 
-    public function __construct(BlockView $view, LayoutRendererRegistryInterface $rendererRegistry)
-    {
-        $this->view             = $view;
+    protected array $formThemes = [];
+
+    private static ?TemplateNameParser $templateNameParser = null;
+
+    public function __construct(
+        BlockView $view,
+        LayoutRendererRegistryInterface $rendererRegistry,
+        ContextInterface $context,
+        LayoutContextStack $layoutContextStack
+    ) {
+        $this->view = $view;
+        $this->context = $context;
         $this->rendererRegistry = $rendererRegistry;
+        $this->layoutContextStack = $layoutContextStack;
     }
 
-    /**
-     * @return BlockView
-     */
-    public function getView()
+    public function getView(): BlockView
     {
         return $this->view;
     }
@@ -47,20 +48,28 @@ class Layout
      */
     public function render(): string
     {
-        $renderer = $this->rendererRegistry->getRenderer($this->rendererName);
-        foreach ($this->themes as $theme) {
-            $renderer->setBlockTheme($theme[0], $this->prepareThemes($theme[1]));
-        }
-        $renderer->setFormTheme($this->prepareThemes($this->formThemes));
+        try {
+            $this->layoutContextStack->push($this->context);
 
-        return $renderer->renderBlock($this->view);
+            $twigLayoutRenderer = $this->rendererRegistry->getRenderer($this->rendererName);
+
+            foreach ($this->themes as $theme) {
+                $twigLayoutRenderer->setBlockTheme($theme[0], $this->prepareThemes($theme[1]));
+            }
+            $twigLayoutRenderer->setFormTheme($this->prepareThemes($this->formThemes));
+
+            return $twigLayoutRenderer->renderBlock($this->view);
+        } finally {
+            $this->layoutContextStack->pop();
+        }
     }
 
     /**
      * @param string|string[] $themes
-     * @return string|string[]|TemplateReferenceInterface|TemplateReferenceInterface[]
+     *
+     * @return TemplateReferenceInterface[]|TemplateReferenceInterface|string[]|string
      */
-    private function prepareThemes($themes)
+    private function prepareThemes(array|string $themes): TemplateReferenceInterface|array|string
     {
         if (\is_array($themes)) {
             foreach ($themes as &$theme) {
@@ -94,11 +103,11 @@ class Layout
     /**
      * Sets a renderer to be used to render this layout
      *
-     * @param string $name The name of a layout renderer
+     * @param string|null $name The name of a layout renderer
      *
      * @return self
      */
-    public function setRenderer($name)
+    public function setRenderer(?string $name): self
     {
         $this->rendererName = $name;
 
@@ -113,7 +122,7 @@ class Layout
      *
      * @return self
      */
-    public function setBlockTheme($themes, $blockId = null)
+    public function setBlockTheme(array|string $themes, ?string $blockId = null): self
     {
         $view = $blockId
             ? $this->view[$blockId]
@@ -131,11 +140,16 @@ class Layout
      *
      * @return self
      */
-    public function setFormTheme($themes)
+    public function setFormTheme(array|string $themes): self
     {
         $themes = is_array($themes) ? $themes : [$themes];
         $this->formThemes = array_merge($this->formThemes, $themes);
 
         return $this;
+    }
+
+    public function getContext(): ContextInterface
+    {
+        return $this->context;
     }
 }

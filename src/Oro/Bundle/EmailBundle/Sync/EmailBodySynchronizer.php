@@ -130,7 +130,9 @@ class EmailBodySynchronizer implements LoggerAwareInterface
             foreach ($emailIds as $emailId) {
                 $em = $this->getManager();
                 $email = $em->find(Email::class, $emailId);
-                $this->syncOneEmailBody($email);
+                if ($email) {
+                    $this->syncOneEmailBody($email);
+                }
             }
             $this->getManager()->clear();
 
@@ -171,7 +173,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
     /**
      * @return array [$bodyLoaded, $emailBodyChanged, $notifications]
      */
-    protected function loadBody(Email $email, bool$forceSync, EmailOrigin $origin, EmailFolder $folder): array
+    protected function loadBody(Email $email, bool $forceSync, EmailOrigin $origin, EmailFolder $folder): array
     {
         $notifications = [];
         $bodyLoaded = false;

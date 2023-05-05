@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout;
 
-use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
-use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutBuilderInterface;
@@ -13,75 +11,54 @@ use Oro\Component\Layout\LayoutFactoryInterface;
 
 class LayoutManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $builder;
+    private LayoutBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder;
 
-    /** @var LayoutContextHolder|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextHolder;
-
-    /** @var LayoutDataCollector|\PHPUnit\Framework\MockObject\MockObject */
-    private $layoutDataCollector;
-
-    /** @var LayoutManager */
-    private $manager;
+    private LayoutManager $manager;
 
     protected function setUp(): void
     {
         $this->builder = $this->createMock(LayoutBuilderInterface::class);
-        $this->contextHolder = $this->createMock(LayoutContextHolder::class);
-        $this->layoutDataCollector = $this->createMock(LayoutDataCollector::class);
 
         $factory = $this->createMock(LayoutFactoryInterface::class);
-        $factory->expects($this->any())
+        $factory->expects(self::any())
             ->method('createLayoutBuilder')
             ->willReturn($this->builder);
 
         $factoryBuilder = $this->createMock(LayoutFactoryBuilderInterface::class);
-        $factoryBuilder->expects($this->any())
+        $factoryBuilder->expects(self::any())
             ->method('getLayoutFactory')
             ->willReturn($factory);
 
-        $this->manager = new LayoutManager($factoryBuilder, $this->contextHolder, $this->layoutDataCollector);
+        $this->manager = new LayoutManager($factoryBuilder);
     }
 
-    public function testGetLayout()
+    public function testGetLayout(): void
     {
         $context = new LayoutContext();
         $layout = $this->createMock(Layout::class);
 
-        $this->builder->expects($this->once())
+        $this->builder->expects(self::once())
             ->method('getLayout')
             ->with($context, 'root_id')
             ->willReturn($layout);
 
-        $this->builder->expects($this->once())
+        $this->builder->expects(self::once())
             ->method('add')
             ->with('root', null, 'root');
-
-        $this->builder->expects($this->once())
-            ->method('getNotAppliedActions')
-            ->willReturn([]);
-
-        $this->layoutDataCollector->expects($this->once())
-            ->method('setNotAppliedActions');
-
-        $this->contextHolder->expects($this->once())
-            ->method('setContext')
-            ->with($context);
 
         $this->manager->getLayout($context, 'root_id');
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $layout = $this->createMock(Layout::class);
-        $layout->expects($this->once())
+        $layout->expects(self::once())
             ->method('render')
             ->willReturn('rendered text');
-        $this->builder->expects($this->once())
+        $this->builder->expects(self::once())
             ->method('getLayout')
             ->with(
-                $this->callback(function (LayoutContext $context) {
+                self::callback(function (LayoutContext $context) {
                     $this->assertInstanceOf(LayoutContext::class, $context);
 
                     return true;
@@ -90,27 +67,10 @@ class LayoutManagerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($layout);
 
-        $this->builder->expects($this->once())
+        $this->builder->expects(self::once())
             ->method('add')
             ->with('root', null, 'root');
 
-        $this->builder->expects($this->once())
-            ->method('getNotAppliedActions')
-            ->willReturn([]);
-
-        $this->layoutDataCollector->expects($this->once())
-            ->method('setNotAppliedActions');
-
-        $this->contextHolder->expects($this->once())
-            ->method('setContext')
-            ->with(
-                $this->callback(function ($context) {
-                    $this->assertInstanceOf(LayoutContext::class, $context);
-
-                    return true;
-                })
-            );
-
-        $this->assertEquals('rendered text', $this->manager->render(['foo' => 'bar'], ['foo']));
+        self::assertEquals('rendered text', $this->manager->render(['foo' => 'bar'], ['foo']));
     }
 }

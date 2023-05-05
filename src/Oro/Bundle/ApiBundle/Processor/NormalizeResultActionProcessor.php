@@ -27,21 +27,20 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAwareInterface
 {
-    /** @var LoggerInterface */
-    protected $logger;
+    protected ?LoggerInterface $logger = null;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function executeProcessors(ComponentContextInterface $context)
+    protected function executeProcessors(ComponentContextInterface $context): void
     {
         /** @var NormalizeResultContext $context */
 
@@ -74,13 +73,9 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     }
 
     /**
-     * @param NormalizeResultContext $context
-     * @param string                 $processorId
-     * @param string|null            $group
-     *
      * @throws \Exception if the soft handling of errors was not requested
      */
-    protected function handleErrors(NormalizeResultContext $context, $processorId, $group)
+    protected function handleErrors(NormalizeResultContext $context, string $processorId, ?string $group): void
     {
         if (null !== $this->logger) {
             $this->logger->info(
@@ -101,15 +96,14 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     }
 
     /**
-     * @param \Error                 $e
-     * @param NormalizeResultContext $context
-     * @param string                 $processorId
-     * @param string|null            $group
-     *
      * @throws \Exception if the soft handling of errors was not requested
      */
-    protected function handlePhpError(\Error $e, NormalizeResultContext $context, $processorId, $group)
-    {
+    protected function handlePhpError(
+        \Error $e,
+        NormalizeResultContext $context,
+        string $processorId,
+        ?string $group
+    ): void {
         $this->handleException(
             new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine()),
             $context,
@@ -119,15 +113,14 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     }
 
     /**
-     * @param \Exception             $e
-     * @param NormalizeResultContext $context
-     * @param string                 $processorId
-     * @param string|null            $group
-     *
      * @throws \Exception if the soft handling of errors was not requested
      */
-    protected function handleException(\Exception $e, NormalizeResultContext $context, $processorId, $group)
-    {
+    protected function handleException(
+        \Exception $e,
+        NormalizeResultContext $context,
+        string $processorId,
+        ?string $group
+    ): void {
         if (null !== $this->logger) {
             $this->logException($e, $processorId, $context);
         }
@@ -149,7 +142,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         }
     }
 
-    protected function logException(\Exception $e, string $processorId, NormalizeResultContext $context)
+    protected function logException(\Exception $e, string $processorId, NormalizeResultContext $context): void
     {
         $underlyingException = ExceptionUtil::getProcessorUnderlyingException($e);
         if ($this->isSafeException($underlyingException)) {
@@ -186,12 +179,8 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      * * invalid request data
      * * requesting not existing resource
      * * access to the requested resource is denied
-     *
-     * @param \Exception $e
-     *
-     * @return bool
      */
-    protected function isSafeException(\Exception $e)
+    protected function isSafeException(\Exception $e): bool
     {
         if ($e instanceof HttpExceptionInterface) {
             return $e->getStatusCode() < Response::HTTP_INTERNAL_SERVER_ERROR;
@@ -203,12 +192,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
             || $e instanceof ValidationExceptionInterface;
     }
 
-    /**
-     * @param NormalizeResultContext $context
-     *
-     * @return bool
-     */
-    protected function isNormalizeResultEnabled(NormalizeResultContext $context)
+    protected function isNormalizeResultEnabled(NormalizeResultContext $context): bool
     {
         return !$context->getLastGroup();
     }
@@ -219,7 +203,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      *
      * @throws \Exception if some processor throws an exception
      */
-    protected function executeNormalizeResultProcessors(NormalizeResultContext $context)
+    protected function executeNormalizeResultProcessors(NormalizeResultContext $context): void
     {
         $context->setFirstGroup(ApiActionGroup::NORMALIZE_RESULT);
         $processors = $this->processorBag->getProcessors($context);
@@ -293,7 +277,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         }
         $exception = $error->getInnerException();
         if (null !== $exception) {
-            $result['exception'] = sprintf('%s: %s', get_class($exception), $exception->getMessage());
+            $result['exception'] = sprintf('%s: %s', \get_class($exception), $exception->getMessage());
         }
         $source = $error->getSource();
         if (null !== $source) {
@@ -303,12 +287,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         return $result;
     }
 
-    /**
-     * @param string|Label|null $value
-     *
-     * @return string|null
-     */
-    private function getErrorTextPropertyForLog($value): ?string
+    private function getErrorTextPropertyForLog(string|Label|null $value): ?string
     {
         if ($value instanceof Label) {
             $value = $value->getName();

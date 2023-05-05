@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:map';
+
 $badge-theme-success: (
     'background': $success-ultra-light,
     'color': $success-darken,
@@ -31,7 +33,7 @@ $badge-theme-primary: (
 ) !default;
 
 $badge-theme-keys: () !default;
-$badge-theme-keys: map-merge(
+$badge-theme-keys: map.merge(
     (
         'enabled': $badge-theme-success,
         'disabled': $badge-theme-primary,

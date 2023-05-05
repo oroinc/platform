@@ -18,7 +18,7 @@ class SortByPredefinedIds implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         $sortedIds = $context->get(self::SORTED_IDS);
         if (empty($sortedIds)) {
@@ -26,7 +26,7 @@ class SortByPredefinedIds implements ProcessorInterface
         }
 
         $data = $context->getResult();
-        if (is_array($data)) {
+        if (\is_array($data)) {
             $context->setResult($this->sortData($data, $sortedIds));
         }
     }

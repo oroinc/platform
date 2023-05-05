@@ -4,6 +4,7 @@ navigation:
             localization:
                 label: 'oro.locale.menu.localization.label'
                 uri: '#'
+                position: 130
 
             localizations:
                 label: 'oro.locale.menu.localizations.label'

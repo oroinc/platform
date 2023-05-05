@@ -113,8 +113,6 @@ class UniqueJobHandlerTest extends WebTestCase
 
     public function testShouldThrowIfDuplicateJobOwnerIdUsingUpsert(): void
     {
-        $this->uniqueJobHandler->setUpsertSupport(true);
-
         $existingJob = $this->getReference(LoadJobData::JOB_1);
 
         $job = new Job();
@@ -130,8 +128,6 @@ class UniqueJobHandlerTest extends WebTestCase
 
     public function testShouldThrowIfDuplicateJobNameUsingUpsert(): void
     {
-        $this->uniqueJobHandler->setUpsertSupport(true);
-
         $existingJob = $this->getReference(LoadJobData::JOB_1);
 
         $job = new Job();
@@ -147,7 +143,6 @@ class UniqueJobHandlerTest extends WebTestCase
 
     public function testShouldThrowIfDuplicateJobOwnerIdUsingUpsertAndPreSelect(): void
     {
-        $this->uniqueJobHandler->setUpsertSupport(true);
         $this->uniqueJobHandler->setPreSelectSupport(true);
 
         $existingJob = $this->getReference(LoadJobData::JOB_1);
@@ -165,7 +160,6 @@ class UniqueJobHandlerTest extends WebTestCase
 
     public function testShouldThrowIfDuplicateJobNameUsingUpsertAndPreSelect(): void
     {
-        $this->uniqueJobHandler->setUpsertSupport(true);
         $this->uniqueJobHandler->setPreSelectSupport(true);
 
         $existingJob = $this->getReference(LoadJobData::JOB_1);

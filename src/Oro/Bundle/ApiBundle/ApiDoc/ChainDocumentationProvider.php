@@ -12,13 +12,9 @@ use Psr\Container\ContainerInterface;
 class ChainDocumentationProvider implements DocumentationProviderInterface
 {
     /** @var array [[provider service id, request type expression], ...] */
-    private $providers;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $providers;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     public function __construct(
         array $providers,
@@ -36,7 +32,7 @@ class ChainDocumentationProvider implements DocumentationProviderInterface
     public function getDocumentation(RequestType $requestType): ?string
     {
         $paragraphs = [];
-        foreach ($this->providers as list($serviceId, $expression)) {
+        foreach ($this->providers as [$serviceId, $expression]) {
             if ($this->isMatched($expression, $requestType)) {
                 $provider = $this->instantiateProvider($serviceId);
                 $documentation = $provider->getDocumentation($requestType);
@@ -50,16 +46,10 @@ class ChainDocumentationProvider implements DocumentationProviderInterface
             return null;
         }
 
-        return \implode("\n\n", $paragraphs);
+        return implode("\n\n", $paragraphs);
     }
 
-    /**
-     * @param mixed       $expression
-     * @param RequestType $requestType
-     *
-     * @return bool
-     */
-    private function isMatched($expression, RequestType $requestType): bool
+    private function isMatched(mixed $expression, RequestType $requestType): bool
     {
         return !$expression || $this->matcher->matchValue($expression, $requestType);
     }

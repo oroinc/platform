@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\NoteBundle\Controller\Api\Rest\NoteController;
 use Oro\Bundle\NoteBundle\DependencyInjection\OroNoteExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroNoteExtensionTest extends ExtensionTestCase
+class OroNoteExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoad(): void
     {
-        $this->loadExtension(new OroNoteExtension());
+        $container = new ContainerBuilder();
 
-        $expectedDefinitions = [
-            NoteController::class,
-        ];
+        $extension = new OroNoteExtension();
+        $extension->load([], $container);
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        self::assertNotEmpty($container->getDefinitions());
     }
 }

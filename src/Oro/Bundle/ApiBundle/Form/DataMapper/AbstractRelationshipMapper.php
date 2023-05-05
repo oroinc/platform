@@ -18,11 +18,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 abstract class AbstractRelationshipMapper implements DataMapperInterface
 {
-    /** @var PropertyAccessorInterface */
-    protected $propertyAccessor;
-
-    /** @var EntityMapper|null */
-    protected $entityMapper;
+    protected PropertyAccessorInterface $propertyAccessor;
+    protected ?EntityMapper $entityMapper;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor, EntityMapper $entityMapper = null)
     {
@@ -31,14 +28,14 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function mapDataToForms($data, $forms)
+    public function mapDataToForms($viewData, $forms): void
     {
-        $empty = null === $data;
+        $empty = null === $viewData;
 
-        if (!$empty && !is_object($data)) {
-            throw new UnexpectedTypeException($data, 'object or empty');
+        if (!$empty && !\is_object($viewData)) {
+            throw new UnexpectedTypeException($viewData, 'object or empty');
         }
 
         foreach ($forms as $form) {
@@ -46,7 +43,7 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
             $config = $form->getConfig();
 
             if (!$empty && null !== $propertyPath && $config->getMapped()) {
-                $this->mapDataToFormField($data, $form, $propertyPath);
+                $this->mapDataToFormField($viewData, $form, $propertyPath);
             } else {
                 $form->setData($form->getConfig()->getData());
             }
@@ -54,15 +51,15 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function mapFormsToData($forms, &$data)
+    public function mapFormsToData($forms, &$viewData): void
     {
-        if (null === $data) {
+        if (null === $viewData) {
             return;
         }
-        if (!is_object($data)) {
-            throw new UnexpectedTypeException($data, 'object or empty');
+        if (!\is_object($viewData)) {
+            throw new UnexpectedTypeException($viewData, 'object or empty');
         }
 
         foreach ($forms as $form) {
@@ -77,23 +74,19 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
                 && $form->isSynchronized()
                 && !$form->isDisabled()
             ) {
-                $this->mapFormFieldToData($data, $form, $config, $propertyPath);
+                $this->mapFormFieldToData($viewData, $form, $config, $propertyPath);
             }
         }
     }
 
     /**
      * Maps a property of some data to a child form.
-     *
-     * @param object                $data
-     * @param FormInterface         $formField
-     * @param PropertyPathInterface $propertyPath
      */
     protected function mapDataToFormField(
-        $data,
+        object $data,
         FormInterface $formField,
         PropertyPathInterface $propertyPath
-    ) {
+    ): void {
         $dataValue = $this->propertyAccessor->getValue($data, $propertyPath);
         if ($this->useAdderAndRemover($dataValue, $formField, $propertyPath)) {
             // a collection valued property
@@ -105,15 +98,12 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
 
     /**
      * Checks whether adder and remover should be used instead of setter.
-     *
-     * @param                       $dataValue
-     * @param FormInterface         $formField
-     * @param PropertyPathInterface $propertyPath
-     *
-     * @return bool
      */
-    protected function useAdderAndRemover($dataValue, FormInterface $formField, PropertyPathInterface $propertyPath)
-    {
+    protected function useAdderAndRemover(
+        mixed $dataValue,
+        FormInterface $formField,
+        PropertyPathInterface $propertyPath
+    ): bool {
         if (1 !== $propertyPath->getLength()) {
             return false;
         }
@@ -135,18 +125,13 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
 
     /**
      * Maps the data of a child form into the property of some data.
-     *
-     * @param object                $data
-     * @param FormInterface         $formField
-     * @param FormConfigInterface   $formFieldConfig
-     * @param PropertyPathInterface $propertyPath
      */
     protected function mapFormFieldToData(
-        $data,
+        object $data,
         FormInterface $formField,
         FormConfigInterface $formFieldConfig,
         PropertyPathInterface $propertyPath
-    ) {
+    ): void {
         $formData = $formField->getData();
         $dataValue = $this->propertyAccessor->getValue($data, $propertyPath);
 
@@ -168,29 +153,21 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
 
     /**
      * Maps a property of some data to a collection valued child form.
-     *
-     * @param object                $data
-     * @param FormInterface         $formField
-     * @param PropertyPathInterface $propertyPath
      */
     abstract protected function mapDataToCollectionFormField(
-        $data,
+        object $data,
         FormInterface $formField,
         PropertyPathInterface $propertyPath
-    );
+    ): void;
 
     /**
      * Maps the data of a collection valued child form into the property of some data.
-     *
-     * @param object                $data
-     * @param FormInterface         $formField
-     * @param PropertyPathInterface $propertyPath
      */
     abstract protected function mapCollectionFormFieldToData(
-        $data,
+        object $data,
         FormInterface $formField,
         PropertyPathInterface $propertyPath
-    );
+    ): void;
 
     /**
      * Searches for add and remove methods.
@@ -200,19 +177,14 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
      *
      * @return array|null [adder, remover] when found, null otherwise
      */
-    protected function findAdderAndRemover($object, $property)
+    protected function findAdderAndRemover(object $object, string $property): ?array
     {
         return ReflectionUtil::findAdderAndRemover($object, $property);
     }
 
-    /**
-     * @param mixed $object
-     *
-     * @return mixed
-     */
-    protected function resolveEntity($object)
+    protected function resolveEntity(mixed $object): mixed
     {
-        if (null === $this->entityMapper || !is_object($object)) {
+        if (null === $this->entityMapper || !\is_object($object)) {
             return $object;
         }
 

@@ -50,4 +50,12 @@ class ClearInactiveMailboxTopicTest extends AbstractTopicTestCase
             ],
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro.imap.clear_inactive_mailbox',
+            $this->getTopic()->createJobName([])
+        );
+    }
 }

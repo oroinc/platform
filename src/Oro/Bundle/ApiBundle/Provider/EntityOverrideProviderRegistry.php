@@ -12,16 +12,11 @@ use Psr\Container\ContainerInterface;
 class EntityOverrideProviderRegistry
 {
     /** @var array [[provider service id, request type expression], ...] */
-    private $entityOverrideProviders;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
-
+    private array $entityOverrideProviders;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
     /** @var EntityOverrideProviderInterface[] [request type => EntityOverrideProviderInterface, ...] */
-    private $cache = [];
+    private array $cache = [];
 
     /**
      * @param array                    $entityOverrideProviders [[provider service id, request type expression], ...]
@@ -51,16 +46,17 @@ class EntityOverrideProviderRegistry
         }
 
         $entityOverrideProviderServiceId = null;
-        foreach ($this->entityOverrideProviders as list($serviceId, $expression)) {
+        foreach ($this->entityOverrideProviders as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $entityOverrideProviderServiceId = $serviceId;
                 break;
             }
         }
         if (null === $entityOverrideProviderServiceId) {
-            throw new \LogicException(
-                sprintf('Cannot find an entity override provider for the request "%s".', (string)$requestType)
-            );
+            throw new \LogicException(sprintf(
+                'Cannot find an entity override provider for the request "%s".',
+                (string)$requestType
+            ));
         }
 
         /** @var EntityOverrideProviderInterface $entityOverrideProvider */

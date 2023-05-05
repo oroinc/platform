@@ -273,3 +273,12 @@ services:
     Oro\Bundle\OrganizationBundle\EntityConfig\OrganizationEntityConfiguration:
         tags:
             - oro_entity_config.validation.entity_config
+
+    Oro\Bundle\OrganizationBundle\EntityConfig\GlobalOrganizationAwareConfiguration:
+        tags:
+            - oro_entity_config.validation.entity_config
+
+    oro_organization.entity_global_organization_aware_helper:
+        class: Oro\Bundle\OrganizationBundle\Model\GlobalOrganizationAwareEntityHelper
+        arguments:
+            - "@oro_entity_config.config_manager"

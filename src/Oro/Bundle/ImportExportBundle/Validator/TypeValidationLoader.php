@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Validator\AbstractFieldConfigBasedValidationLoader;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
@@ -52,12 +53,13 @@ class TypeValidationLoader extends AbstractFieldConfigBasedValidationLoader
         $fieldName = $fieldConfig->getId()
             ->getFieldName();
 
-        if (!property_exists($className, $fieldName) || $fieldConfig->is('excluded')) {
+        if (!EntityPropertyInfo::propertyExists($className, $fieldName) || $fieldConfig->is('excluded')) {
             return false;
         }
 
         $extendConfig = $this->extendConfigProvider->getConfig($className, $fieldName);
 
-        return !$extendConfig->is('is_deleted') && $extendConfig->is('state', ExtendScope::STATE_ACTIVE);
+        return !$extendConfig->is('is_deleted')
+            && $extendConfig->is('state', ExtendScope::STATE_ACTIVE);
     }
 }

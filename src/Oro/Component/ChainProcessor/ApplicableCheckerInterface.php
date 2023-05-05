@@ -8,8 +8,8 @@ namespace Oro\Component\ChainProcessor;
  */
 interface ApplicableCheckerInterface
 {
-    public const APPLICABLE     = 1;
-    public const ABSTAIN        = 0;
+    public const APPLICABLE = 1;
+    public const ABSTAIN = 0;
     public const NOT_APPLICABLE = -1;
 
     /**
@@ -23,5 +23,5 @@ interface ApplicableCheckerInterface
      *
      * @return int Either APPLICABLE, ABSTAIN, or NOT_APPLICABLE
      */
-    public function isApplicable(ContextInterface $context, array $processorAttributes);
+    public function isApplicable(ContextInterface $context, array $processorAttributes): int;
 }

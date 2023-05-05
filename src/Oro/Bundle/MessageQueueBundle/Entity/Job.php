@@ -76,6 +76,7 @@ class Job extends BaseJob
      * @var Job[]
      *
      * @ORM\OneToMany(targetEntity="Job", mappedBy="rootJob", cascade={"persist"})
+     * @ORM\OrderBy({"id" = "ASC"})
      */
     protected $childJobs;
 

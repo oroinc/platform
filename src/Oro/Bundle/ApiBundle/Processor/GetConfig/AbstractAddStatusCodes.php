@@ -11,24 +11,14 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 abstract class AbstractAddStatusCodes implements ProcessorInterface
 {
-    /**
-     * @param StatusCodesConfig $statusCodes
-     * @param int               $statusCode
-     * @param string            $description
-     */
-    protected function addStatusCode(StatusCodesConfig $statusCodes, $statusCode, $description)
+    protected function addStatusCode(StatusCodesConfig $statusCodes, int $statusCode, string $description): void
     {
         if (!$statusCodes->hasCode($statusCode)) {
             $statusCodes->addCode($statusCode, $this->createStatusCode($description));
         }
     }
 
-    /**
-     * @param string $description
-     *
-     * @return StatusCodeConfig
-     */
-    protected function createStatusCode($description)
+    protected function createStatusCode(string $description): StatusCodeConfig
     {
         $code = new StatusCodeConfig();
         $code->setDescription($description);

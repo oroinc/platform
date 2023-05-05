@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Consumption\Extension;
 
 use Oro\Bundle\MessageQueueBundle\Test\Async\ChangeConfigProcessor;
+use Oro\Bundle\MessageQueueBundle\Test\Async\Topic\ChangeConfigTestTopic;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
@@ -26,8 +27,14 @@ class InterruptConsumptionExtensionTest extends WebTestCase
 
     public function testMessageConsumptionIsInterruptedByMessageLimit(): void
     {
-        self::sendMessage(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_NOOP);
-        self::sendMessage(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_NOOP);
+        self::sendMessage(
+            ChangeConfigTestTopic::getName(),
+            ['message' => ChangeConfigProcessor::COMMAND_NOOP]
+        );
+        self::sendMessage(
+            ChangeConfigTestTopic::getName(),
+            ['message' => ChangeConfigProcessor::COMMAND_NOOP]
+        );
 
         self::getConsumer()
             ->bind('oro.default')
@@ -40,8 +47,14 @@ class InterruptConsumptionExtensionTest extends WebTestCase
 
     public function testMessageConsumptionIsInterruptedByConfigCacheChanged(): void
     {
-        self::sendMessage(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_CHANGE_CACHE);
-        self::sendMessage(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_CHANGE_CACHE);
+        self::sendMessage(
+            ChangeConfigTestTopic::getName(),
+            ['message' => ChangeConfigProcessor::COMMAND_CHANGE_CACHE]
+        );
+        self::sendMessage(
+            ChangeConfigTestTopic::getName(),
+            ['message' => ChangeConfigProcessor::COMMAND_CHANGE_CACHE]
+        );
 
         self::getConsumer()
             ->bind('oro.default')

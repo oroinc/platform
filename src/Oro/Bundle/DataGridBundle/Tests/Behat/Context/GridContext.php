@@ -815,15 +815,17 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * Assert record position in grid
      * It is find record by text and assert its position
      * Example: Then Zyta Zywiec must be first record
      * Example: And John Doe must be first record
      *
-     * @Then /^(?P<content>[\w\d\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record$/
-     * @Then /^(?P<content>[\w\d\s]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record in "(?P<gridName>[^"]+)"$/
+     * @Then /^(?P<content>[\w\d\s\-\.,%]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record$/
+     * @Then /^(?P<content>[\w\d\s\-\.,%]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record in "(?P<gridName>[^"]+)"$/
      */
+    //@codingStandardsIgnoreEnd
     public function assertRowContent($content, $rowNumber, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
@@ -1814,6 +1816,26 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function clickViewList($gridName = null)
     {
+        $list = $this->getViewList($gridName);
+        $list->press();
+    }
+
+    /**
+     * Click on item in grid view list.
+     * Example: Given I click on "Some view" in grid view list
+     *
+     * @Given I click on :title in grid view list
+     * @Given I click on :title in grid view list in "(?P<gridName>[^"]+)"
+     */
+    public function clickLinkInViewList(string $title, string $gridName = null)
+    {
+        $list = $this->getViewList($gridName);
+        $list->press();
+        $list->clickLink($title);
+    }
+
+    private function getViewList(string $gridName = null): Element
+    {
         if ($gridName === null) {
             $list = $this->elementFactory->createElement('GridViewList');
         } else {
@@ -1821,7 +1843,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $list = $grid->getElement($grid->getMappedChildElementName('GridViewList'));
         }
         self::assertTrue($list->isValid(), 'Grid view list not found on the page');
-        $list->press();
+
+        return $list;
     }
 
     /**
@@ -1928,12 +1951,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iShouldSeeSuccessMessageWithNumberOfRecordsWereDeleted()
     {
-        $flashMessage = $this->getSession()->getPage()->find('css', '.flash-messages-holder');
+        $found = $this->spin(function (GridContext $context) {
+            $flashMessage = $context->getSession()->getPage()->find('css', '.flash-messages-holder');
+            $regex = '/\d+ entities have been deleted successfully/';
 
-        self::assertNotNull($flashMessage, 'Can\'t find flash message');
+            return preg_match($regex, $flashMessage->getText()) > 0;
+        });
 
-        $regex = '/\d+ entities have been deleted successfully/';
-        self::assertMatchesRegularExpression($regex, $flashMessage->getText());
+        self::assertTrue($found, 'Can\'t find flash message');
     }
 
     /**
@@ -2636,6 +2661,7 @@ TEXT;
      *   | Amount      | -$2.00   |
      *
      * @Then /^(?:|I )should see next rows in "(?P<elementName>[\w\s]+)" table$/
+     * @Then /^(?:|I )should see following rows in "(?P<elementName>[\w\s]+)" table$/
      * @param TableNode $expectedTableNode
      * @param string $elementName
      */

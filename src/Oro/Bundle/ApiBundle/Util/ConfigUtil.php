@@ -41,19 +41,6 @@ class ConfigUtil extends BaseConfigUtil
     /** a flag indicates whether an entity configuration should be merged with a configuration of a parent entity */
     public const INHERIT = 'inherit';
 
-    /**
-     * You can use this constant as a property path for computed field
-     * to avoid collisions with existing getters.
-     * Example of usage:
-     *  'fields' => [
-     *      'primaryPhone' => ['property_path' => '_']
-     *  ]
-     * In this example a value of primaryPhone will not be loaded
-     * even if an entity has getPrimaryPhone method.
-     * Also such field will be marked as not mapped for Symfony forms.
-     */
-    public const IGNORE_PROPERTY_PATH = '_';
-
     /** a short, human-readable description of API resource, sub-resource, field, etc. */
     public const DESCRIPTION = 'description';
 
@@ -177,7 +164,7 @@ class ConfigUtil extends BaseConfigUtil
      *
      * @return array
      */
-    public static function convertObjectsToArray(array $objects, $treatEmptyAsNull = false)
+    public static function convertObjectsToArray(array $objects, bool $treatEmptyAsNull = false): array
     {
         $result = [];
         foreach ($objects as $key => $value) {
@@ -199,7 +186,7 @@ class ConfigUtil extends BaseConfigUtil
      *
      * @return array
      */
-    public static function convertPropertiesToArray(array $properties)
+    public static function convertPropertiesToArray(array $properties): array
     {
         $result = [];
         foreach ($properties as $name => $property) {
@@ -213,16 +200,12 @@ class ConfigUtil extends BaseConfigUtil
 
     /**
      * Gets a native PHP array representation of the given configuration options.
-     *
-     * @param array $items
-     *
-     * @return array
      */
-    public static function convertItemsToArray(array $items)
+    public static function convertItemsToArray(array $items): array
     {
         $result = $items;
         foreach ($items as $key => $value) {
-            if (\is_object($value) && \method_exists($value, 'toArray')) {
+            if (\is_object($value) && method_exists($value, 'toArray')) {
                 $result[$key] = $value->toArray();
             }
         }
@@ -238,9 +221,9 @@ class ConfigUtil extends BaseConfigUtil
      *
      * @return string
      */
-    public static function buildMetaPropertyName($resultName)
+    public static function buildMetaPropertyName(string $resultName): string
     {
-        return \sprintf('__%s__', $resultName);
+        return sprintf('__%s__', $resultName);
     }
 
     /**
@@ -252,7 +235,7 @@ class ConfigUtil extends BaseConfigUtil
      * @return string|null The property path if the requested meta property exists in the entity configuration
      *                     and it is not excluded; otherwise, NULL.
      */
-    public static function getPropertyPathOfMetaProperty($resultName, EntityDefinitionConfig $config)
+    public static function getPropertyPathOfMetaProperty(string $resultName, EntityDefinitionConfig $config): ?string
     {
         $fieldName = $config->findFieldNameByPropertyPath(
             self::buildMetaPropertyName($resultName)
@@ -268,12 +251,7 @@ class ConfigUtil extends BaseConfigUtil
         return $field->getPropertyPath($fieldName);
     }
 
-    /**
-     * @param bool $isCollection
-     *
-     * @return string
-     */
-    public static function getAssociationTargetType($isCollection)
+    public static function getAssociationTargetType(bool $isCollection): string
     {
         return $isCollection ? self::TO_MANY : self::TO_ONE;
     }

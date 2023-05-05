@@ -10,13 +10,13 @@ class MenuTreeBuilderTest extends \PHPUnit\Framework\TestCase
     public function testConstructorSetsMenuMapping()
     {
         $builder = new MenuTreeBuilder();
-        static::assertInstanceOf(MenuNodeDefinition::class, $builder->node('menu', 'menu'));
+        self::assertInstanceOf(MenuNodeDefinition::class, $builder->node('menu', 'menu'));
     }
 
     public function testMenuNode()
     {
         $nodeDefinition = (new MenuTreeBuilder())->menuNode('test');
-        static::assertInstanceOf(MenuNodeDefinition::class, $nodeDefinition);
-        static::assertEquals('test', $nodeDefinition->getNode()->getName());
+        self::assertInstanceOf(MenuNodeDefinition::class, $nodeDefinition);
+        self::assertEquals('test', $nodeDefinition->getNode()->getName());
     }
 }

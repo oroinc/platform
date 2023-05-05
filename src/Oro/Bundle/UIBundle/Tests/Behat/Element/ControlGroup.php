@@ -5,6 +5,7 @@ namespace Oro\Bundle\UIBundle\Tests\Behat\Element;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 
 class ControlGroup extends Element
 {
@@ -39,7 +40,8 @@ class ControlGroup extends Element
      */
     public function compareValues($expectedValue)
     {
-        if (null === $actualValue = $this->getValue()) {
+        $actualValue = Form::normalizeValue($this->getValue());
+        if (null === $actualValue) {
             throw new ElementNotFoundException(
                 $this->getDriver(),
                 'ControlGroup OroElement',

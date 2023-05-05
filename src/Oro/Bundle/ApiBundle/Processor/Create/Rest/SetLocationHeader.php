@@ -20,17 +20,10 @@ class SetLocationHeader implements ProcessorInterface
 {
     public const RESPONSE_HEADER_NAME = 'Location';
 
-    /** @var RestRoutesRegistry */
-    private $routesRegistry;
-
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
-
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var EntityIdTransformerRegistry */
-    private $entityIdTransformerRegistry;
+    private RestRoutesRegistry $routesRegistry;
+    private UrlGeneratorInterface $urlGenerator;
+    private ValueNormalizer $valueNormalizer;
+    private EntityIdTransformerRegistry $entityIdTransformerRegistry;
 
     public function __construct(
         RestRoutesRegistry $routesRegistry,
@@ -47,7 +40,7 @@ class SetLocationHeader implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */
 

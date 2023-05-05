@@ -69,6 +69,7 @@ class MultipleEntityType extends AbstractType
                 'selector_window_title'      => null,
                 'extra_config'               => null,
                 'selection_url'              => null,
+                'selection_url_method'       => null,
                 'selection_route'            => null,
                 'selection_route_parameters' => [],
             ]
@@ -82,6 +83,7 @@ class MultipleEntityType extends AbstractType
     {
         $this->setOptionToView($view, $options, 'extra_config');
         $this->setOptionToView($view, $options, 'selection_url');
+        $this->setOptionToView($view, $options, 'selection_url_method');
         $this->setOptionToView($view, $options, 'selection_route');
         $this->setOptionToView($view, $options, 'selection_route_parameters');
         $this->setOptionToView($view, $options, 'initial_elements');

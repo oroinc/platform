@@ -101,6 +101,7 @@ define(function(require) {
             }
 
             this.$button.off();
+            this.$button.data('disposed', true);
 
             ButtonComponent.__super__.dispose.call(this);
         }

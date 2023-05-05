@@ -209,11 +209,11 @@
             {% import _self as UIMacro %}
 
             {{ UIMacro.renderAttribute(title,
-                '<div class="control-label collapse-overflow collapse no-transition" data-toggle="false" data-check-overflow="true"' ~
+                '<div class="control-label collapse-overflow collapse no-transition" data-toggle="false" data-check-overflow="true" ' ~
                       'id="'~ collapseId ~'" data-state-id="'~ collapseKey ~'" data-collapsed-text="'~ moreText|trans ~ '" data-expanded-text="'~ lessText|trans ~'">' ~
                     data|default('oro.ui.empty'|trans) ~
                 '</div>' ~
-                '<a href="#" role=button class="control-label collapse-toggle" data-toggle="collapse"' ~
+                '<a href="#" role="button" class="control-label collapse-toggle" data-toggle="collapse" ' ~
                    'data-target="#'~ collapseId ~'" aria-expanded="false" aria-controls="'~ collapseId ~'"><span data-text>' ~ moreText|trans ~ '</span></a>'
             ) }}
         </div>
@@ -236,9 +236,9 @@
                  data-expanded-text="{{ lessText|trans }}"
                  data-check-overflow="true"
                  data-toggle="false"
-            {%- if entity is not empty and fieldName is not empty -%}
+            {% if entity is not empty and fieldName is not empty %}
                  data-state-id="{{ 'collapseBlock[' ~ oro_class_name(entity) ~ '][' ~ fieldName ~ '][' ~ entity.id|default(0) ~ ']'}}"
-            {%- endif -%}
+            {% endif %}
             >{{ data|raw }}</div>
             <a href="#"
                role="button"
@@ -297,6 +297,7 @@
             'iCss'  - css class for 'i' tag (icon)
             'label' - button label
             'role'  - link role HTML attribute
+            'target' - target attribute
         ]
 #}
 {% macro link(parameters) %}
@@ -333,6 +334,7 @@
             class="{{ classes|split(' ')|array_unique|join(' ') }}"
         {% endif %}
         {% if parameters.role is defined %}role="{{ parameters.role }}"{% endif %}
+        {% if parameters.target is defined%}target="{{ parameters.target }}"{% endif %}
         {% if parameters.title is defined and parameters.title is not empty %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
         {{- parameters.label|trim }}
     </a>
@@ -551,12 +553,9 @@
             : 'oro.ui.create'|trans
         %}
     {% endif %}
-    <a href="{{ parameters.path }}"
-        class="btn main-group btn-primary pull-right {{ parameters.aCss is defined? parameters.aCss : '' }}"
-        title="{{ title }}"
-    >
-        {{- label -}}
-    </a>
+
+    {% import _self as UIMacro %}
+    {{ UIMacro.link({'class': parameters.class|default('btn main-group btn-primary pull-right'), 'role': 'button', 'label': label, 'title': title}|merge(parameters)) }}
 {% endmacro %}
 
 {#
@@ -1021,6 +1020,24 @@
 
     {% set defaultParameters = {
         'label': 'Save and New'|trans
+    } %}
+
+    {% set parameters = defaultParameters|merge(parameters) %}
+
+    {{ UIMacro.saveActionButton(parameters) }}
+{% endmacro %}
+
+{#
+    Outputs a button with "Save and Return" label. After save application will show a page configured by parameter with name "action".
+    For parameters description see documentation of saveActionButton macros.
+#}
+{% macro saveAndReturnButton(parameters = {}) %}
+    {% import _self as UIMacro %}
+
+    {% set defaultParameters = {
+        'class': 'btn-success',
+        'label': 'Save and Return'|trans,
+        'action': 'save_and_return'
     } %}
 
     {% set parameters = defaultParameters|merge(parameters) %}
@@ -1577,9 +1594,9 @@
                     </tbody>
                 </table>
             </div>
-            <a class="btn add-list-item" data-container=".oro-item-collection tbody" href="#">
+            <button type="button" class="btn add-list-item" data-container=".oro-item-collection tbody">
                 {{ options.add_btn_label|default('') }}
-            </a>
+            </button>
         </div>
     </div>
 {% endmacro %}
@@ -1645,4 +1662,121 @@
             <div class="no-data">{{ noDataMessage|trans }}</div>
         {%- endif %}
     {%- endif -%}
+{% endmacro %}
+
+{% macro renderButtonsRow(content) %}
+<div class="buttons-row {% if isDesktopVersion() %}buttons-row--start-offset buttons-row--pull-end{% else %}buttons-row--bottom-offset{% endif %}">
+    {{ content }}
+</div>
+{% endmacro %}
+
+{#
+Renders a link with javascript handler or regular 'add' link
+regarding of 'oro_ui.quick_create_actions_window_target' configuration value
+
+Parameters - array:
+    [
+        'dataUrl' - used as a dataUrl parameter for widget or path for page
+        'title' - button title
+        'label' - button label
+        'widget' - array [
+            'reload-grid-name' - grid name that should be reloaded
+            'options' - array [
+                'alias' - widget alias
+                'dialogOptions' - array [
+                    'title' - dialog window title
+                ]
+            ]
+        ]
+    ]
+#}
+{% macro quickAccessLink(parameters) %}
+    {% import _self as UIMacro %}
+
+    {% set quickCreateAction = oro_config_value('oro_ui.quick_create_actions') %}
+
+    {% set defaultParameters = {
+        'iCss': 'fa-plus',
+        'class': 'dropdown-item',
+    } %}
+
+    {% if quickCreateAction == 'popup' %}
+        {% set clientLinkParameters = defaultParameters|merge({
+            'widget': {
+                'type': 'dialog',
+                'multiple': false,
+                'options': {
+                    'dialogOptions': {
+                        'allowMaximize': true,
+                        'allowMinimize': true,
+                        'dblclick': 'maximize',
+                        'maximizedHeightDecreaseBy': 'minimize-bar',
+                        'autoResize': true,
+                        'width': 812,
+                        'minWidth': 'expanded',
+                        'modal': false
+                    }
+                }
+            }
+        }) %}
+        {{ UIMacro.clientLink(clientLinkParameters|merge_recursive(parameters)) }}
+    {% else %}
+        {% set linkParameters = defaultParameters
+            |merge(parameters)
+            |merge({
+                'path': parameters.dataUrl,
+                'target': quickCreateAction == 'current_page' ? '_self' : '_blank'
+            })
+            |filter((v, k) => k != 'widget' and k != 'dataUrl')
+        %}
+        {{ UIMacro.link(linkParameters) }}
+    {% endif %}
+{% endmacro %}
+
+{#
+Renders a button with javascript handler or regular 'add' button
+regarding of 'oro_ui.quick_create_actions' configuration value
+
+Parameters - array:
+    [
+        'title' - button title
+        'label' - button label
+        'dataUrl' - used as a dataUrl parameter for widget or as a path for regular 'add' button
+        'widget' - options to define a widget on the control
+    ]
+#}
+{% macro quickAccessAddButton(parameters) %}
+    {% import _self as UIMacro %}
+
+    {% set defaultParameters = {
+        'class': 'btn main-group btn-primary pull-right',
+        'role': 'button'
+    } %}
+
+    {{ UIMacro.quickAccessLink(defaultParameters|merge(parameters)) }}
+{% endmacro %}
+
+{#
+Renders a button with javascript handler or regular button
+regarding of 'oro_ui.quick_create_actions' configuration value
+
+Parameters - array:
+    [
+        'title' - button title
+        'label' - button label
+        'dataUrl' - used as a dataUrl parameter for widget or as a path for regular button
+        'widget' - options to define a widget on the control
+    ]
+#}
+{% macro quickAccessButton(parameters) %}
+    {% import _self as UIMacro %}
+
+    {% set defaultParameters = {
+        'class': 'btn back icons-holder-text',
+        'role': 'button'
+    } %}
+
+    <div class="pull-left btn-group icons-holder">
+        {{ UIMacro.quickAccessLink(defaultParameters|merge(parameters)) }}
+    </div>
 {% endmacro %}

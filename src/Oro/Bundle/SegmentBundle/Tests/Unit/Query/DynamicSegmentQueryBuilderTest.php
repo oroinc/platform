@@ -38,7 +38,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 {
-
     /** @var FormFactoryInterface */
     private $formFactory;
 

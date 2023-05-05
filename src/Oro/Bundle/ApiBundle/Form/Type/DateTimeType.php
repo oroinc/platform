@@ -13,9 +13,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class DateTimeType extends AbstractType
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addViewTransformer(new DateTimeToStringTransformer(
             $options['with_time'],
@@ -24,22 +24,22 @@ class DateTimeType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'with_date'    => true,
-            'with_time'    => true,
-            'by_reference' => false,
-            'compound'     => false
-        ]);
+        $resolver
+            ->setDefault('with_date', true)
+            ->setDefault('with_date', true)
+            ->setDefault('with_time', true)
+            ->setDefault('by_reference', false)
+            ->setDefault('compound', false);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_api_datetime';
     }

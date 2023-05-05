@@ -11,7 +11,7 @@ use Nelmio\ApiDocBundle\DataTypes as ApiDocDataTypes;
 class NewHtmlFormatter extends HtmlFormatter
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function renderOne(array $data)
     {
@@ -26,7 +26,7 @@ class NewHtmlFormatter extends HtmlFormatter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function render(array $collection)
     {
@@ -41,7 +41,7 @@ class NewHtmlFormatter extends HtmlFormatter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getNewName($name, $data, $parentName = null)
     {
@@ -53,7 +53,7 @@ class NewHtmlFormatter extends HtmlFormatter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function compressNestedParameters(array $data, $parentName = null, $ignoreNestedReadOnly = false)
     {
@@ -70,12 +70,8 @@ class NewHtmlFormatter extends HtmlFormatter
 
     /**
      * Re-formats input and output data for a set of resource sections.
-     *
-     * @param array $collection
-     *
-     * @return array
      */
-    protected function reformatDocData(array $collection)
+    protected function reformatDocData(array $collection): array
     {
         foreach ($collection as $resourceBlockName => $resourceGroupBlock) {
             foreach ($resourceGroupBlock as $resourceUrl => $resourceBlock) {
@@ -90,15 +86,11 @@ class NewHtmlFormatter extends HtmlFormatter
 
     /**
      * Re-formats input and output data for collected resource.
-     *
-     * @param array $data
-     *
-     * @return array
      */
-    protected function reformatData(array $data)
+    protected function reformatData(array $data): array
     {
         // reformat parameters (input data)
-        if (array_key_exists('parameters', $data)) {
+        if (\array_key_exists('parameters', $data)) {
             $data['documentation'] .= $this->twig->render(
                 '@OroApi/ApiDoc/input.html.twig',
                 ['data' => $data['parameters']]
@@ -107,7 +99,7 @@ class NewHtmlFormatter extends HtmlFormatter
         }
 
         // reformat output
-        if (array_key_exists('response', $data)) {
+        if (\array_key_exists('response', $data)) {
             $data['documentation'] .= $this->twig->render(
                 '@OroApi/ApiDoc/response.html.twig',
                 ['data' => $data['response']]
@@ -119,7 +111,7 @@ class NewHtmlFormatter extends HtmlFormatter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function processCollection(array $collection)
     {
@@ -156,11 +148,11 @@ class NewHtmlFormatter extends HtmlFormatter
      *
      * @return array [resource id => API action, ...]
      */
-    protected function getActions(array $collection)
+    protected function getActions(array $collection): array
     {
         $actions = [];
-        foreach ($collection as $resourceBlockName => $resourceGroupBlock) {
-            foreach ($resourceGroupBlock as $resourceUrl => $resourceBlock) {
+        foreach ($collection as $resourceGroupBlock) {
+            foreach ($resourceGroupBlock as $resourceBlock) {
                 foreach ($resourceBlock as $resource) {
                     if (!empty($resource['action'])) {
                         $actions[$resource['id']] = $resource['action'];

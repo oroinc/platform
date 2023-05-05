@@ -6,9 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamilyAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\TestFrameworkBundle\Model\ExtendTestActivityTarget;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 
 /**
+ * Store test activity target.
+ *
  * @ORM\Table(name="test_activity_target")
  * @ORM\Entity
  * @Config(
@@ -19,10 +22,13 @@ use Oro\Bundle\TestFrameworkBundle\Model\ExtendTestActivityTarget;
  *      }
  * )
  */
-class TestActivityTarget extends ExtendTestActivityTarget implements
+class TestActivityTarget implements
     TestFrameworkEntityInterface,
-    AttributeFamilyAwareInterface
+    AttributeFamilyAwareInterface,
+    ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var integer
      *
@@ -100,30 +106,6 @@ class TestActivityTarget extends ExtendTestActivityTarget implements
     public function setString($string)
     {
         $this->string = $string;
-
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @param array $arguments
-     * @return $this|null
-     */
-    public function __call($name, $arguments)
-    {
-        preg_match('/^(set|get).*/', $name, $matches);
-        if (count($matches) !== 2) {
-            return;
-        }
-
-        $fieldName = strtolower(str_replace($matches[1], '', $matches[0]));
-        if (strtolower($matches[1]) === 'get') {
-            return isset($this->serialized_data[$fieldName])
-                ? $this->serialized_data[$fieldName]
-                : null;
-        }
-
-        $this->serialized_data[$fieldName] = $arguments[0];
 
         return $this;
     }

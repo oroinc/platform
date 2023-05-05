@@ -18,8 +18,7 @@ class AclProtectedQueryResolver extends QueryResolver
 {
     public const SKIP_ACL_FOR_ROOT_ENTITY = 'skip_acl_for_root_entity';
 
-    /** @var AclHelper */
-    private $aclHelper;
+    private AclHelper $aclHelper;
 
     public function __construct(QueryHintResolverInterface $queryHintResolver, AclHelper $aclHelper)
     {
@@ -28,9 +27,9 @@ class AclProtectedQueryResolver extends QueryResolver
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function resolveQuery(Query $query, EntityConfig $config)
+    public function resolveQuery(Query $query, EntityConfig $config): void
     {
         $options = [AclAccessRule::CHECK_OWNER => true];
         $skipRootEntity = (bool)$config->get(self::SKIP_ACL_FOR_ROOT_ENTITY);

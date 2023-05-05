@@ -12,7 +12,6 @@ class DuplicatorFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {
-        $factory = new DuplicatorFactory();
         $filter = new SetNullFilter();
         $matcher = new PropertyNameMatcher('firstField');
         $filterFactory = $this->createMock(FilterFactory::class);
@@ -27,9 +26,7 @@ class DuplicatorFactoryTest extends \PHPUnit\Framework\TestCase
             ->with('propertyName', ['firstField'])
             ->willReturn($matcher);
 
-        $factory->setFilterFactory($filterFactory);
-        $factory->setMatcherFactory($matcherFactory);
-
+        $factory = new DuplicatorFactory($matcherFactory, $filterFactory);
         $duplicator = $factory->create();
 
         $firstField = new \stdClass();

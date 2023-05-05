@@ -15,7 +15,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FiltersMetadataProvider
 {
     private RawConfigurationProvider $configurationProvider;
-
     private TranslatorInterface $translator;
 
     public function __construct(RawConfigurationProvider $configurationProvider, TranslatorInterface $translator)
@@ -27,8 +26,9 @@ class FiltersMetadataProvider
     /**
      * Provides filters metadata for the specified filters and datagrid config.
      *
-     * @param FilterInterface[] $filters
+     * @param FilterInterface[]     $filters
      * @param DatagridConfiguration $gridConfig
+     *
      * @return array
      */
     public function getMetadataForFilters(array $filters, DatagridConfiguration $gridConfig): array

@@ -12,7 +12,7 @@ class AndCompositeExpression implements CompositeExpressionInterface
     /**
      * {@inheritdoc}
      */
-    public function walkCompositeExpression(array $expressions)
+    public function walkCompositeExpression(array $expressions): mixed
     {
         return new Expr\Andx($expressions);
     }

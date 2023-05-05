@@ -108,7 +108,7 @@
 }
 
 #{map_get($oro-form-selectors, 'inputs')} {
-    @extend .input;
+    @extend %base-input;
 
     &.full {
         width: 100%;
@@ -220,6 +220,7 @@ select[multiple] {
         border-color: $input-focus-border-color;
     }
 
+    &.readonly,
     &.disabled {
         span {
             cursor: $input-disabled-cursor;
@@ -281,6 +282,8 @@ select[multiple] {
             border-color: $add-on-disabled-border-color;
             background-color: $add-on-disabled-background-color;
             color: $add-on-disabled-color;
+            // color, background and border are already matching to a disabled control, no need for extra opacity
+            opacity: 1;
         }
     }
 

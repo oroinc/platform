@@ -10,33 +10,33 @@ use Oro\Component\ChainProcessor\ParameterBag;
 class CaseInsensitiveParameterBag extends ParameterBag
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return parent::has(strtolower($key));
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function get($key)
+    public function get(string $key): mixed
     {
         return parent::get(strtolower($key));
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         parent::set(strtolower($key), $value);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         parent::remove(strtolower($key));
     }

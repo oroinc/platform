@@ -39,8 +39,6 @@ Microsecond: Microsecond
 "Error! Incorrect server response.": "Error! Incorrect server response."
 "Sorry, an unexpected error has occurred.": "Sorry, an unexpected error has occurred."
 "Please select a file...": "Please select a file..."
-"Attach file:": "Attach file:"
-"Upload": "Upload"
 "Choose File": "Choose File"
 "Clear": "Clear"
 "Searching...": "Searching..."
@@ -55,8 +53,6 @@ close: close
 Save: Save
 Discard: Discard
 "Copy to Clipboard": "Copy to Clipboard"
-"Remove row": "Remove row"
-"Add row": "Add row"
 oro:
     ui:
         delete_confirm_cascade: Are you sure you want to delete this {{ entity_label }} with other entities related to it?

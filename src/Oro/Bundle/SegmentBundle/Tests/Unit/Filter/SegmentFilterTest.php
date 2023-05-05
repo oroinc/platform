@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -34,9 +35,10 @@ use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
 use Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity\CmsUser;
+use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -116,6 +118,7 @@ class SegmentFilterTest extends OrmTestCase
                     )
                 ]
             )
+            ->addTypeExtension(new TranslatableChoiceTypeExtension())
             ->getFormFactory();
 
         $this->em->expects(self::any())
@@ -167,10 +170,7 @@ class SegmentFilterTest extends OrmTestCase
         $this->filter->init('segment', ['entity' => '']);
     }
 
-    /**
-     * @return ClassMetadata|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getClassMetadata()
+    private function getClassMetadata(): ClassMetadata
     {
         $classMetaData = $this->createMock(ClassMetadata::class);
         $classMetaData->expects(self::any())
@@ -277,7 +277,7 @@ class SegmentFilterTest extends OrmTestCase
 
         $this->em->expects(self::any())
             ->method('getRepository')
-            ->with(self::equalTo('OroSegmentBundle:Segment'))
+            ->with(Segment::class)
             ->willReturn($repo);
     }
 
@@ -340,19 +340,10 @@ class SegmentFilterTest extends OrmTestCase
         self::assertEquals(self::TEST_PARAM_VALUE, $params[0]->getValue());
     }
 
-    /**
-     * @return \Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock
-     */
-    private function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         $em = $this->getTestEntityManager();
-        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity'
-        ));
-        $em->getConfiguration()->setEntityNamespaces([
-            'OroSegmentBundle' => 'Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity'
-        ]);
+        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         return $em;
     }

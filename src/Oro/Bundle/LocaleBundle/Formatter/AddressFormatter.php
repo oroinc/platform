@@ -7,7 +7,7 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfigura
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Encapsulates methods for address formatting.
@@ -25,7 +25,7 @@ class AddressFormatter
     protected $nameFormatter;
 
     /**
-     * @var PropertyAccessor
+     * @var PropertyAccessorInterface
      */
     protected $propertyAccessor;
 
@@ -37,7 +37,7 @@ class AddressFormatter
     public function __construct(
         LocaleSettings $localeSettings,
         NameFormatter $nameFormatter,
-        PropertyAccessor $propertyAccessor
+        PropertyAccessorInterface $propertyAccessor
     ) {
         $this->localeSettings = $localeSettings;
         $this->nameFormatter = $nameFormatter;

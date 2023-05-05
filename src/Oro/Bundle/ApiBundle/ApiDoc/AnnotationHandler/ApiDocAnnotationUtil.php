@@ -12,6 +12,12 @@ use Oro\Component\PhpUtils\ReflectionUtil;
  */
 final class ApiDocAnnotationUtil
 {
+    private static ?\ReflectionClass $reflClass = null;
+    private static ?\ReflectionProperty $statusCodesReflProperty = null;
+    private static ?\ReflectionProperty $filtersReflProperty = null;
+    private static ?\ReflectionProperty $inputReflProperty = null;
+    private static ?\ReflectionProperty $outputReflProperty = null;
+
     /**
      * @param ApiDoc $annotation
      *
@@ -19,29 +25,50 @@ final class ApiDocAnnotationUtil
      */
     public static function getStatusCodes(ApiDoc $annotation): array
     {
-        return self::getReflectionProperty($annotation, 'statusCodes')->getValue($annotation);
+        if (null === self::$statusCodesReflProperty) {
+            self::$statusCodesReflProperty = ReflectionUtil::getProperty(self::getReflectionClass(), 'statusCodes');
+            self::$statusCodesReflProperty->setAccessible(true);
+        }
+
+        return self::$statusCodesReflProperty->getValue($annotation);
     }
 
     public static function setFilters(ApiDoc $annotation, array $filters): void
     {
-        self::getReflectionProperty($annotation, 'filters')->setValue($annotation, $filters);
+        if (null === self::$filtersReflProperty) {
+            self::$filtersReflProperty = ReflectionUtil::getProperty(self::getReflectionClass(), 'filters');
+            self::$filtersReflProperty->setAccessible(true);
+        }
+
+        self::$filtersReflProperty->setValue($annotation, $filters);
     }
 
     public static function setInput(ApiDoc $annotation, array $input): void
     {
-        self::getReflectionProperty($annotation, 'input')->setValue($annotation, $input);
+        if (null === self::$inputReflProperty) {
+            self::$inputReflProperty = ReflectionUtil::getProperty(self::getReflectionClass(), 'input');
+            self::$inputReflProperty->setAccessible(true);
+        }
+
+        self::$inputReflProperty->setValue($annotation, $input);
     }
 
     public static function setOutput(ApiDoc $annotation, array $input): void
     {
-        self::getReflectionProperty($annotation, 'output')->setValue($annotation, $input);
+        if (null === self::$outputReflProperty) {
+            self::$outputReflProperty = ReflectionUtil::getProperty(self::getReflectionClass(), 'output');
+            self::$outputReflProperty->setAccessible(true);
+        }
+
+        self::$outputReflProperty->setValue($annotation, $input);
     }
 
-    private static function getReflectionProperty(ApiDoc $annotation, string $propertyName): \ReflectionProperty
+    private static function getReflectionClass(): \ReflectionClass
     {
-        $property = ReflectionUtil::getProperty(new \ReflectionClass($annotation), $propertyName);
-        $property->setAccessible(true);
+        if (null === self::$reflClass) {
+            self::$reflClass = new \ReflectionClass(ApiDoc::class);
+        }
 
-        return $property;
+        return self::$reflClass;
     }
 }

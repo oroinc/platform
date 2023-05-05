@@ -30,33 +30,26 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        initialize: function(options) {
+        initialize(options) {
             if (this.expanded && !this.multiple) {
                 this.editor = SelectCellRadioEditor;
             }
 
             const choices = options.column.get('metadata').choices;
             if (choices) {
-                this.optionValues = [];
-                _.each(choices, function(value, label) {
-                    this.optionValues.push([_.escape(textUtil.prepareText(label)), value]);
-                }, this);
+                this.optionValues = Object.entries(choices)
+                    .map(([label, value]) => [_.escape(textUtil.prepareText(label)), value]);
             } else {
                 throw new Error('Column metadata must have choices specified');
             }
             SelectCell.__super__.initialize.call(this, options);
-
-            this.listenTo(this.model, 'change:' + this.column.get('name'), function() {
-                this.enterEditMode();
-
-                this.$el.find('select').inputWidget('create');
-            });
+            this.listenTo(this.model, 'change:' + this.column.get('name'), this.enterEditMode);
         },
 
         /**
          * @inheritdoc
          */
-        render: function() {
+        render() {
             if (_.isEmpty(this.optionValues)) {
                 return;
             }
@@ -71,16 +64,21 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        enterEditMode: function() {
-            if (this.isEditableColumn()) {
+        enterEditMode() {
+            if (!this.isEditableColumn()) {
+                return;
+            }
+            const modelValue = this.model.get(this.column.get('name'));
+            if (!this.currentEditor || !_.isEqual(this.currentEditor.$el.val(), modelValue)) {
                 SelectCell.__super__.enterEditMode.call(this);
+                this.$el.find('select').inputWidget('create');
             }
         },
 
         /**
          * @inheritdoc
          */
-        exitEditMode: function() {
+        exitEditMode() {
             this.$el.removeClass('error');
             this.stopListening(this.currentEditor);
             delete this.currentEditor;

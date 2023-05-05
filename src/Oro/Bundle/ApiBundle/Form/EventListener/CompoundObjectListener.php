@@ -20,13 +20,12 @@ use Symfony\Component\Form\FormInterface;
  */
 class CompoundObjectListener implements EventSubscriberInterface
 {
-    /** @var bool */
-    private $setDataToNull = false;
+    private bool $setDataToNull = false;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SUBMIT  => 'preSubmit',
@@ -96,10 +95,7 @@ class CompoundObjectListener implements EventSubscriberInterface
             return;
         }
 
-        $context = FormUtil::getApiContext($form);
-        if (null !== $context) {
-            $context->addAdditionalEntity($entity);
-        }
+        FormUtil::getApiContext($form)?->addAdditionalEntity($entity);
     }
 
     private function getEmptySubmittedData(FormInterface $form): array
@@ -122,18 +118,12 @@ class CompoundObjectListener implements EventSubscriberInterface
 
     private function isEmptyValue(array $submittedData, string $name, EntityMetadata $metadata): bool
     {
-        $dataType = null;
-        $property = $metadata->getProperty($name);
-        if (null !== $property) {
-            $dataType = $property->getDataType();
-        }
-        $value = $submittedData[$name];
-
+        $dataType = $metadata->getProperty($name)?->getDataType();
         if (null === $dataType || DataType::STRING === $dataType) {
-            return '' === $value;
+            return '' === $submittedData[$name];
         }
         if (DataType::OBJECT === $dataType || DataType::isArray($dataType)) {
-            return [] === $value;
+            return [] === $submittedData[$name];
         }
 
         return false;

@@ -9,81 +9,82 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class OroEmbeddedFormExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testDefaultConfiguration()
+    public function testLoad(): void
     {
         $container = new ContainerBuilder();
+
         $extension = new OroEmbeddedFormExtension();
         $extension->load([], $container);
 
+        self::assertNotEmpty($container->getDefinitions());
+
         $this->assertEquals(
             '_embedded_form_sid',
-            $container->getParameter(OroEmbeddedFormExtension::SESSION_ID_FIELD_NAME_PARAM)
+            $container->getParameter('oro_embedded_form.session_id_field_name')
         );
         $this->assertEquals(
             3600,
-            $container->getParameter(OroEmbeddedFormExtension::CSRF_TOKEN_LIFETIME_PARAM)
+            $container->getParameter('oro_embedded_form.csrf_token_lifetime')
         );
 
         $this->assertEquals(
-            new Reference(OroEmbeddedFormExtension::DEFAULT_CSRF_TOKEN_CACHE_SERVICE_ID),
-            $container->getDefinition(OroEmbeddedFormExtension::CSRF_TOKEN_STORAGE_SERVICE_ID)
-                ->getArgument(0)
+            new Reference('oro_embedded_form.csrf_token_cache'),
+            $container->getDefinition('oro_embedded_form.csrf_token_storage')->getArgument(0)
         );
     }
 
-    public function testShouldOverrideSessionIdFieldName()
+    public function testLoadShouldOverrideSessionIdFieldName(): void
     {
         $container = new ContainerBuilder();
+
+        $configs = [
+            ['session_id_field_name' => 'test']
+        ];
+
         $extension = new OroEmbeddedFormExtension();
-        $extension->load(
-            [
-                ['session_id_field_name' => 'test']
-            ],
-            $container
-        );
+        $extension->load($configs, $container);
 
         $this->assertEquals(
             'test',
-            $container->getParameter(OroEmbeddedFormExtension::SESSION_ID_FIELD_NAME_PARAM)
+            $container->getParameter('oro_embedded_form.session_id_field_name')
         );
     }
 
-    public function testShouldOverrideCsrfTokenLifetime()
+    public function testLoadShouldOverrideCsrfTokenLifetime(): void
     {
         $container = new ContainerBuilder();
+
+        $configs = [
+            ['csrf_token_lifetime' => 123]
+        ];
+
         $extension = new OroEmbeddedFormExtension();
-        $extension->load(
-            [
-                ['csrf_token_lifetime' => 123]
-            ],
-            $container
-        );
+        $extension->load($configs, $container);
 
         $this->assertEquals(
             123,
-            $container->getParameter(OroEmbeddedFormExtension::CSRF_TOKEN_LIFETIME_PARAM)
+            $container->getParameter('oro_embedded_form.csrf_token_lifetime')
         );
     }
 
-    public function testShouldOverrideCsrfTokenCacheService()
+    public function testLoadShouldOverrideCsrfTokenCacheService(): void
     {
         $container = new ContainerBuilder();
+
+        $configs = [
+            ['csrf_token_cache_service_id' => 'test_service']
+        ];
+
         $extension = new OroEmbeddedFormExtension();
-        $extension->load(
-            [
-                ['csrf_token_cache_service_id' => 'test_service']
-            ],
-            $container
-        );
+        $extension->load($configs, $container);
 
         $this->assertEquals(
             new Reference('test_service'),
-            $container->getDefinition(OroEmbeddedFormExtension::CSRF_TOKEN_STORAGE_SERVICE_ID)
-                ->getArgument(0)
+            $container->getDefinition('oro_embedded_form.csrf_token_storage')->getArgument(0)
         );
     }
 
-    public function testPrepend()
+    public function testPrepend(): void
     {
         $securityConfig = [
             'clickjacking' => [

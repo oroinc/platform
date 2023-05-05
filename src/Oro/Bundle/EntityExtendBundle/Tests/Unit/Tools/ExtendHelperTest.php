@@ -14,7 +14,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getReverseRelationTypeProvider
      */
-    public function testGetReverseRelationType($type, $expectedType)
+    public function testGetReverseRelationType(string $type, string $expectedType)
     {
         $this->assertEquals(
             $expectedType,
@@ -22,7 +22,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function getReverseRelationTypeProvider()
+    public static function getReverseRelationTypeProvider(): array
     {
         return [
             ['oneToMany', 'manyToOne'],
@@ -35,15 +35,18 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildToManyRelationTargetFieldNameProvider
      */
-    public function testBuildToManyRelationTargetFieldName($entityClassName, $fieldName, $expected)
-    {
+    public function testBuildToManyRelationTargetFieldName(
+        string $entityClassName,
+        string $fieldName,
+        string $expected
+    ) {
         $this->assertEquals(
             $expected,
             ExtendHelper::buildToManyRelationTargetFieldName($entityClassName, $fieldName)
         );
     }
 
-    public static function buildToManyRelationTargetFieldNameProvider()
+    public static function buildToManyRelationTargetFieldNameProvider(): array
     {
         return [
             ['Oro\Bundle\TestBundle\Entity\Test', 'testField', 'test_testField'],
@@ -53,15 +56,18 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildAssociationNameProvider
      */
-    public function testBuildAssociationName($targetEntityClassName, $associationKind, $expected)
-    {
+    public function testBuildAssociationName(
+        string $targetEntityClassName,
+        ?string $associationKind,
+        string $expected
+    ) {
         $this->assertEquals(
             $expected,
             ExtendHelper::buildAssociationName($targetEntityClassName, $associationKind)
         );
     }
 
-    public static function buildAssociationNameProvider()
+    public static function buildAssociationNameProvider(): array
     {
         return [
             ['Oro\Bundle\TestBundle\Entity\Test', null, 'test_d2f667e'],
@@ -154,7 +160,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidRelationKeysForGetRelationType
      */
-    public function testGetRelationTypeForInvalidRelationKey($relationKey)
+    public function testGetRelationTypeForInvalidRelationKey(?string $relationKey)
     {
         $this->assertNull(ExtendHelper::getRelationType($relationKey));
     }
@@ -172,7 +178,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumCodeProvider
      */
-    public function testBuildEnumCode($enumName, $expectedEnumCode)
+    public function testBuildEnumCode(string $enumName, string $expectedEnumCode)
     {
         $this->assertEquals(
             $expectedEnumCode,
@@ -180,7 +186,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function buildEnumCodeProvider()
+    public static function buildEnumCodeProvider(): array
     {
         return [
             ['test', 'test'],
@@ -201,7 +207,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumCodeForInvalidEnumNameProvider
      */
-    public function testBuildEnumCodeForInvalidEnumName($enumName)
+    public function testBuildEnumCodeForInvalidEnumName(string $enumName)
     {
         $this->expectException(\InvalidArgumentException::class);
         ExtendHelper::buildEnumCode($enumName);
@@ -210,7 +216,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumCodeForInvalidEnumNameProvider
      */
-    public function testBuildEnumCodeForInvalidEnumNameIgnoreException($enumValueName)
+    public function testBuildEnumCodeForInvalidEnumNameIgnoreException(string $enumValueName)
     {
         $this->assertSame(
             '',
@@ -218,7 +224,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function buildEnumCodeForInvalidEnumNameProvider()
+    public static function buildEnumCodeForInvalidEnumNameProvider(): array
     {
         return [
             [''],
@@ -233,15 +239,19 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider generateEnumCodeProvider
      */
-    public function testGenerateEnumCode($entityClassName, $fieldName, $maxEnumCodeSize, $expectedEnumCode)
-    {
+    public function testGenerateEnumCode(
+        string $entityClassName,
+        string $fieldName,
+        ?int $maxEnumCodeSize,
+        string $expectedEnumCode
+    ) {
         $this->assertEquals(
             $expectedEnumCode,
             ExtendHelper::generateEnumCode($entityClassName, $fieldName, $maxEnumCodeSize)
         );
     }
 
-    public static function generateEnumCodeProvider()
+    public static function generateEnumCodeProvider(): array
     {
         return [
             ['Test\Entity', 'field1', null, 'entity_field1_489d47b1'],
@@ -271,7 +281,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumValueIdProvider
      */
-    public function testBuildEnumValueId($enumValueName, $expectedEnumValueId)
+    public function testBuildEnumValueId(string $enumValueName, string $expectedEnumValueId)
     {
         $enumValueId = ExtendHelper::buildEnumValueId($enumValueName);
         $this->assertEquals(
@@ -287,7 +297,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function buildEnumValueIdProvider()
+    public static function buildEnumValueIdProvider(): array
     {
         return [
             ['0', '0'],
@@ -331,7 +341,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumValueIdForInvalidEnumValueNameProvider
      */
-    public function testBuildEnumValueIdForInvalidEnumValueName($enumValueName)
+    public function testBuildEnumValueIdForInvalidEnumValueName(string $enumValueName)
     {
         $this->expectException(\InvalidArgumentException::class);
         ExtendHelper::buildEnumValueId($enumValueName);
@@ -340,7 +350,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumValueIdForInvalidEnumValueNameProvider
      */
-    public function testBuildEnumValueIdForInvalidEnumValueNameIgnoreException($enumValueName)
+    public function testBuildEnumValueIdForInvalidEnumValueNameIgnoreException(string $enumValueName)
     {
         $this->assertSame(
             '',
@@ -348,7 +358,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function buildEnumValueIdForInvalidEnumValueNameProvider()
+    public static function buildEnumValueIdForInvalidEnumValueNameProvider(): array
     {
         return [
             [''],
@@ -363,7 +373,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumValueClassNameProvider
      */
-    public function testBuildEnumValueClassName($enumCode, $expectedClassName)
+    public function testBuildEnumValueClassName(string $enumCode, string $expectedClassName)
     {
         $this->assertEquals(
             $expectedClassName,
@@ -371,7 +381,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function buildEnumValueClassNameProvider()
+    public static function buildEnumValueClassNameProvider(): array
     {
         return [
             ['test', ExtendHelper::ENTITY_NAMESPACE . 'EV_Test'],
@@ -392,15 +402,19 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getEnumTranslationKeyProvider
      */
-    public function testGetEnumTranslationKey($propertyName, $enumCode, $fieldName, $expected)
-    {
+    public function testGetEnumTranslationKey(
+        string $propertyName,
+        string $enumCode,
+        ?string $fieldName,
+        string $expected
+    ) {
         $this->assertEquals(
             $expected,
             ExtendHelper::getEnumTranslationKey($propertyName, $enumCode, $fieldName)
         );
     }
 
-    public static function getEnumTranslationKeyProvider()
+    public static function getEnumTranslationKeyProvider(): array
     {
         return [
             ['label', 'test_enum', null, 'oro.entityextend.enums.test_enum.entity_label'],
@@ -411,7 +425,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isCustomEntityProvider
      */
-    public function testIsCustomEntity($className, $expected)
+    public function testIsCustomEntity(string $className, bool $expected)
     {
         $this->assertEquals(
             $expected,
@@ -419,7 +433,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function isCustomEntityProvider()
+    public static function isCustomEntityProvider(): array
     {
         return [
             ['Extend\Entity\Test', true],
@@ -430,7 +444,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getShortClassNameProvider
      */
-    public function testGetShortClassName($className, $expected)
+    public function testGetShortClassName(string $className, string $expected)
     {
         $this->assertEquals(
             $expected,
@@ -438,7 +452,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function getShortClassNameProvider()
+    public static function getShortClassNameProvider(): array
     {
         return [
             ['Oro\Bundle\TestBundle\Entity\Test', 'Test'],
@@ -450,7 +464,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getExtendEntityProxyClassNameProvider
      */
-    public function testGetExtendEntityProxyClassName($className, $expected)
+    public function testGetExtendEntityProxyClassName(string $className, string $expected)
     {
         $this->assertEquals(
             $expected,
@@ -458,7 +472,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public static function getExtendEntityProxyClassNameProvider()
+    public static function getExtendEntityProxyClassNameProvider(): array
     {
         return [
             [
@@ -475,12 +489,12 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider updatedPendingValueDataProvider
      */
-    public function testUpdatedPendingValue($currentVal, array $changeSet, $expectedResult)
+    public function testUpdatedPendingValue(int|array $currentVal, array $changeSet, int|array $expectedResult)
     {
         $this->assertEquals($expectedResult, ExtendHelper::updatedPendingValue($currentVal, $changeSet));
     }
 
-    public function updatedPendingValueDataProvider()
+    public function updatedPendingValueDataProvider(): array
     {
         return [
             'scalar value' => [

@@ -13,8 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ApplyCriteria implements ProcessorInterface
 {
-    /** @var CriteriaConnector */
-    private $criteriaConnector;
+    private CriteriaConnector $criteriaConnector;
 
     public function __construct(CriteriaConnector $criteriaConnector)
     {
@@ -22,9 +21,9 @@ class ApplyCriteria implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -33,7 +32,7 @@ class ApplyCriteria implements ProcessorInterface
             $query = $context->getQuery();
             if ($query instanceof QueryBuilder) {
                 $this->criteriaConnector->applyCriteria($query, $criteria);
-                $context->setCriteria();
+                $context->setCriteria(null);
             }
         }
     }

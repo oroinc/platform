@@ -18,7 +18,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $visibleExtension = new ConfigurableTypeExtension();
         $visibleExtension->setOptionsConfig([
@@ -26,6 +26,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
                 'default' => true,
             ]
         ]);
+
         return [
             new PreloadedExtension(
                 [],

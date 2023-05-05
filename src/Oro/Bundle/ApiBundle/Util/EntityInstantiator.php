@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
@@ -12,8 +13,7 @@ use Oro\Component\PhpUtils\ReflectionUtil;
  */
 class EntityInstantiator
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -22,14 +22,10 @@ class EntityInstantiator
 
     /**
      * Creates an instance of a given class.
-     *
-     * @param string $className
-     *
-     * @return object
      */
-    public function instantiate(string $className)
+    public function instantiate(string $className): object
     {
-        $reflClass = new \ReflectionClass($className);
+        $reflClass = new EntityReflectionClass($className);
 
         return $this->isInstantiableViaConstructor($reflClass)
             ? $this->instantiateViaConstructor($reflClass)
@@ -48,22 +44,12 @@ class EntityInstantiator
             );
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     *
-     * @return object
-     */
-    private function instantiateViaConstructor(\ReflectionClass $reflClass)
+    private function instantiateViaConstructor(\ReflectionClass $reflClass): object
     {
         return $reflClass->newInstance();
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     *
-     * @return object
-     */
-    private function instantiateViaReflection(\ReflectionClass $reflClass)
+    private function instantiateViaReflection(\ReflectionClass $reflClass): object
     {
         $entity = $reflClass->newInstanceWithoutConstructor();
 

@@ -15,6 +15,9 @@ define(function(require) {
         container: '',
         temporaryContainer: '[data-role="messenger-temporary-container"]',
         delay: false,
+        dismissible: true,
+        showIcon: true,
+        animation: true,
         template: template,
         insertMethod: 'appendTo',
         style: 'default',
@@ -27,8 +30,9 @@ define(function(require) {
 
     const resolveContainer = function(options) {
         if ($(options.container).is(defaults.container) && $(defaults.temporaryContainer).length) {
-            options.container = defaults.temporaryContainer;
+            return defaults.temporaryContainer;
         }
+        return options.container;
     };
 
     /**
@@ -36,15 +40,18 @@ define(function(require) {
      */
     function showMessage(type, message, options = {}) {
         const opt = Object.assign({}, defaults, options);
-        resolveContainer(opt);
+        const container = resolveContainer(opt);
 
         messenger.clear(opt.namespace, opt);
 
         const $el = $(opt.template({
-            type: type,
-            message: message,
-            style: opt.style
-        }))[opt.insertMethod](opt.container);
+            type,
+            message,
+            style: opt.style,
+            dismissible: opt.dismissible,
+            showIcon: opt.showIcon,
+            animation: opt.animation
+        }))[opt.insertMethod](container);
 
         $el.data('_message', {type, message, options});
 
@@ -95,6 +102,9 @@ define(function(require) {
          *      or false - means to not close automatically
          * @param {Function=} options.template template function
          * @param {boolean=} options.flash flag to turn on default delay close call, it's 5s
+         * @param {boolean=} options.dismissible alert can be closed, by default true
+         * @param {boolean=} options.showIcon alert has icon related to its type, by default true
+         * @param {boolean=} options.animation alert should be shown and hidden with animation, by default true
          * @param {boolean?} options.afterReload whether the message should be shown after a page is reloaded
          * @param {string=} options.namespace slot for a massage,
          *     other existing message with the same namespace will be removed
@@ -140,6 +150,9 @@ define(function(require) {
          *      or false - means to not close automatically
          * @param {Function=} options.template template function
          * @param {boolean=} options.flash flag to turn on default delay close call, it's 5s
+         * @param {boolean=} options.dismissible alert can be closed, by default true
+         * @param {boolean=} options.showIcon alert has icon related to its type, by default true
+         * @param {boolean=} options.animation alert should be shown and hidden with animation, by default true
          * @param {boolean?} options.afterReload whether the message should be shown after a page is reloaded
          * @param {string=} options.namespace slot for a massage,
          *     other existing message with the same namespace will be removed
@@ -240,9 +253,8 @@ define(function(require) {
         removeTemporaryContainer: function() {
             $(this).children().each((i, el) => {
                 const {type, message, options} = $(el).data('_message');
-                const {container, insertMethod, ...restOptions} = options;
                 // re-publish messages with original options into default messages container
-                _.delay(() => messenger.notificationMessage(type, message, restOptions));
+                _.delay(() => messenger.notificationMessage(type, message, options));
             });
         },
 

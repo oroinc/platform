@@ -3,33 +3,21 @@
 namespace Oro\Component\EntitySerializer;
 
 /**
- * Prepares a configuration to be used by EntitySerializer.
+ * Prepares a configuration to be used by the entity serializer.
  */
 class ConfigNormalizer
 {
-    /**
-     * Prepares a configuration to be used by EntitySerializer
-     *
-     * @param array $config
-     *
-     * @return array
-     */
-    public function normalizeConfig(array $config)
+    public function normalizeConfig(array $config): array
     {
-        $config = $this->preNormalizeConfig($config);
-
-        return $this->doNormalizeConfig($config);
+        return $this->doNormalizeConfig($this->preNormalizeConfig($config));
     }
 
     /**
-     * Remembers the current config state before it will be normalized
+     * Remembers the current config state before it will be normalized.
      *
-     * @param array $config
-     *
-     * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function preNormalizeConfig(array $config)
+    protected function preNormalizeConfig(array $config): array
     {
         if (\array_key_exists(ConfigUtil::FIELDS, $config)) {
             if (\is_string($config[ConfigUtil::FIELDS])) {
@@ -70,14 +58,11 @@ class ConfigNormalizer
     }
 
     /**
-     * Performs the normalization of a configuration
+     * Performs the normalization of a configuration.
      *
-     * @param array $config
-     *
-     * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function doNormalizeConfig(array $config)
+    protected function doNormalizeConfig(array $config): array
     {
         if (\array_key_exists(ConfigUtil::FIELDS, $config) && !empty($config[ConfigUtil::FIELDS])) {
             $renamedFields = [];
@@ -111,15 +96,9 @@ class ConfigNormalizer
     }
 
     /**
-     * Checks that all fields from the given property path exist in the config
-     * and add them if needed
-     *
-     * @param array    $config
-     * @param string[] $propertyPath
-     *
-     * @return array
+     * Checks that all fields from the given property path exist in the config and add them if needed.
      */
-    protected function applyPropertyPathConfig(array $config, array $propertyPath)
+    protected function applyPropertyPathConfig(array $config, array $propertyPath): array
     {
         // set a reference to the root config
         $currentConfig = &$config;
@@ -157,9 +136,9 @@ class ConfigNormalizer
     }
 
     /**
-     * Expands simplified definition of collapsed association to its full definition
+     * Expands simplified definition of collapsed association to its full definition.
      */
-    protected function applySingleFieldConfig(array &$config)
+    protected function applySingleFieldConfig(array &$config): void
     {
         $field = $config[ConfigUtil::FIELDS];
 
@@ -170,14 +149,9 @@ class ConfigNormalizer
     }
 
     /**
-     * Finds a field by its property path or name
-     *
-     * @param array  $fields
-     * @param string $property
-     *
-     * @return string|null The name of the found field; otherwise, NULL
+     * Finds a field by its property path or name.
      */
-    protected function findField(array $fields, $property)
+    protected function findField(array $fields, string $property): ?string
     {
         // at the first try to find a field by the property path,
         // it is a case when a field was renamed
@@ -191,14 +165,9 @@ class ConfigNormalizer
     }
 
     /**
-     * Finds a field by its property path
-     *
-     * @param array  $fields
-     * @param string $property
-     *
-     * @return string|null The name of the found field; otherwise, NULL
+     * Finds a field by its property path.
      */
-    protected function findFieldByPropertyPath(array $fields, $property)
+    protected function findFieldByPropertyPath(array $fields, string $property): ?string
     {
         foreach ($fields as $fieldName => $fieldConfig) {
             if (\is_array($fieldConfig) && isset($fieldConfig[ConfigUtil::PROPERTY_PATH])) {
@@ -213,12 +182,7 @@ class ConfigNormalizer
         return null;
     }
 
-    /**
-     * @param array $config
-     *
-     * @return string|null
-     */
-    protected function getCollapseField(array $config)
+    protected function getCollapseField(array $config): ?string
     {
         $result = null;
         foreach ($config[ConfigUtil::FIELDS] as $field => $fieldConfig) {

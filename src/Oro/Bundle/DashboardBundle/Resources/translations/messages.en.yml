@@ -19,6 +19,7 @@ oro:
         widgets.label:       Widgets
         organization.label:  Organization
         options.label:       Options
+        dashboard_type.label: Dashboard type
 
         feature:
             label: Dashboards
@@ -72,7 +73,10 @@ oro:
         chart:
             year.label: Year
             month.label: Month
-            date.label: Week
+            date:
+                label: Week
+                start.label: Week Start Date
+                end.label: Week End Date
             day.label: Day
             time.label: Hour
         date_range.label: Date range
@@ -112,6 +116,19 @@ oro:
                     this_quarter: 'This quarter'
                     this_year: 'This year'
                     all_time: 'All time'
+                    none: 'None'
+                current_date_range:
+                    choices:
+                        today: 'Today'
+                        month_to_date: 'Month-To-Date'
+                        quarter_to_date: 'Quarter-To-Date'
+                        year_to_date: 'Year-To-Date'
+                        all_time: 'All Time'
+                        custom: 'Custom'
+                dependent_date_range:
+                    choices:
+                        none: 'None'
+                        starting_at: 'Starting At'
             sort_by:
                 label: Sort By
                 property.placeholder: Choose a property...

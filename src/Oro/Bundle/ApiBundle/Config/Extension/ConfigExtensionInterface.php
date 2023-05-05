@@ -15,7 +15,7 @@ interface ConfigExtensionInterface
      *
      * @return ConfigurationSectionInterface[] [section name => configuration, ...]
      */
-    public function getEntityConfigurationSections();
+    public function getEntityConfigurationSections(): array;
 
     /**
      * Returns a list callbacks that should be used to build a configuration of a section.
@@ -24,7 +24,7 @@ interface ConfigExtensionInterface
      *               Where the section is the name/path to a configuration section,
      *               e.g. "entities.entity", "entities.entity.field", "sorters", "filters.field", etc.
      */
-    public function getConfigureCallbacks();
+    public function getConfigureCallbacks(): array;
 
     /**
      * Returns a list callbacks that should be used to pre processing of a configuration.
@@ -33,7 +33,7 @@ interface ConfigExtensionInterface
      *               Where the section is the name/path to a configuration section,
      *               e.g. "entities.entity", "entities.entity.field", "sorters", "filters.field", etc.
      */
-    public function getPreProcessCallbacks();
+    public function getPreProcessCallbacks(): array;
 
     /**
      * Returns a list callbacks that should be used to post processing of a configuration.
@@ -42,12 +42,12 @@ interface ConfigExtensionInterface
      *               Where the section is the name/path to a configuration section,
      *               e.g. "entities.entity", "entities.entity.field", "sorters", "filters.field", etc.
      */
-    public function getPostProcessCallbacks();
+    public function getPostProcessCallbacks(): array;
 
     /**
      * Returns a list of loaders for an entity configuration sections.
      *
      * @return ConfigLoaderInterface[] [config type => loader, ...]
      */
-    public function getEntityConfigurationLoaders();
+    public function getEntityConfigurationLoaders(): array;
 }

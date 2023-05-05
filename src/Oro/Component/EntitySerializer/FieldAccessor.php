@@ -21,14 +21,9 @@ class FieldAccessor
     /** Uses for caching the built lists of fields to be serialized */
     private const FIELDS_SERIALIZE = '_serialize';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var DataAccessorInterface */
-    private $dataAccessor;
-
-    /** @var EntityFieldFilterInterface */
-    private $entityFieldFilter;
+    private DoctrineHelper $doctrineHelper;
+    private DataAccessorInterface $dataAccessor;
+    private ?EntityFieldFilterInterface $entityFieldFilter;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -199,14 +194,8 @@ class FieldAccessor
 
     /**
      * Gets a value of a metadata property.
-     *
-     * @param object         $entity
-     * @param string         $property
-     * @param EntityMetadata $entityMetadata
-     *
-     * @return mixed
      */
-    public function getMetadataProperty(object $entity, string $property, EntityMetadata $entityMetadata)
+    public function getMetadataProperty(object $entity, string $property, EntityMetadata $entityMetadata): mixed
     {
         switch ($property) {
             case ConfigUtil::CLASS_NAME:
@@ -224,9 +213,9 @@ class FieldAccessor
             return false;
         }
 
-        return null !== $this->entityFieldFilter
-            ? $this->entityFieldFilter->isApplicableField($entityClass, $field)
-            : true;
+        return
+            null === $this->entityFieldFilter
+            || $this->entityFieldFilter->isApplicableField($entityClass, $field);
     }
 
     /**

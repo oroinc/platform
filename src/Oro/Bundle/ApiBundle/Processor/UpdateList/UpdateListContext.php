@@ -9,14 +9,10 @@ use Oro\Bundle\ApiBundle\Processor\Context;
  */
 class UpdateListContext extends Context
 {
-    /** @var string|null */
-    private $targetFileName;
-
-    /** @var int|null */
-    private $operationId;
-
+    private ?string $targetFileName = null;
+    private ?int $operationId = null;
     /** @var resource|null */
-    private $requestData;
+    private $requestData = null;
 
     /**
      * Gets a resource contains request data.
@@ -49,7 +45,7 @@ class UpdateListContext extends Context
     /**
      * Sets the name of a file that is used to store request data.
      */
-    public function setTargetFileName(string $targetFileName = null): void
+    public function setTargetFileName(?string $targetFileName): void
     {
         $this->targetFileName = $targetFileName;
     }
@@ -65,7 +61,7 @@ class UpdateListContext extends Context
     /**
      * Sets an identifier of an asynchronous operation.
      */
-    public function setOperationId(int $operationId = null): void
+    public function setOperationId(?int $operationId): void
     {
         $this->operationId = $operationId;
     }

@@ -17,35 +17,21 @@ use Symfony\Component\Routing\Route;
  */
 trait ApiDocExtractorTrait
 {
-    /** @var RouteOptionsResolverInterface */
-    protected $routeOptionsResolver;
+    private RouteOptionsResolverInterface $routeOptionsResolver;
+    private RestDocViewDetector $docViewDetector;
+    private ApiDocAnnotationHandlerInterface $apiDocAnnotationHandler;
 
-    /** @var RestDocViewDetector */
-    protected $docViewDetector;
-
-    /** @var ApiDocAnnotationHandlerInterface */
-    protected $apiDocAnnotationHandler;
-
-    /**
-     * Sets the RouteOptionsResolver.
-     */
-    public function setRouteOptionsResolver(RouteOptionsResolverInterface $routeOptionsResolver)
+    public function setRouteOptionsResolver(RouteOptionsResolverInterface $routeOptionsResolver): void
     {
         $this->routeOptionsResolver = $routeOptionsResolver;
     }
 
-    /**
-     * Sets the RestDocViewDetector.
-     */
-    public function setRestDocViewDetector(RestDocViewDetector $docViewDetector)
+    public function setRestDocViewDetector(RestDocViewDetector $docViewDetector): void
     {
         $this->docViewDetector = $docViewDetector;
     }
 
-    /**
-     * Sets the ApiDocAnnotationHandler.
-     */
-    public function setApiDocAnnotationHandler(ApiDocAnnotationHandlerInterface $apiDocAnnotationHandler)
+    public function setApiDocAnnotationHandler(ApiDocAnnotationHandlerInterface $apiDocAnnotationHandler): void
     {
         $this->apiDocAnnotationHandler = $apiDocAnnotationHandler;
     }
@@ -55,7 +41,7 @@ trait ApiDocExtractorTrait
      *
      * @return Route[]
      */
-    protected function processRoutes(array $routes)
+    private function processRoutes(array $routes): array
     {
         $routeCollection = new EnhancedRouteCollection($routes);
         $routeCollectionAccessor = new RouteCollectionAccessor($routeCollection);
@@ -68,12 +54,7 @@ trait ApiDocExtractorTrait
         return RouteCollectionUtil::filterHidden($routes);
     }
 
-    /**
-     * @param string $view
-     *
-     * @return string
-     */
-    protected function resolveView($view)
+    private function resolveView(string $view): string
     {
         $detectedView = $this->docViewDetector->getView();
         if ($detectedView) {
@@ -94,16 +75,17 @@ trait ApiDocExtractorTrait
      * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function doExtractAnnotations(array $routes, $view, array $excludeSections)
+    private function doExtractAnnotations(array $routes, string $view, array $excludeSections): array
     {
         $array = [];
         $resources = [];
 
         foreach ($routes as $route) {
             if (!$route instanceof Route) {
-                throw new \InvalidArgumentException(
-                    \sprintf('All elements of $routes must be instances of Route. "%s" given', gettype($route))
-                );
+                throw new \InvalidArgumentException(sprintf(
+                    'All elements of $routes must be instances of Route. "%s" given',
+                    get_debug_type($route)
+                ));
             }
 
             $method = $this->getReflectionMethod($route->getDefault('_controller'));
@@ -132,7 +114,6 @@ trait ApiDocExtractorTrait
         }
 
         foreach ($this->annotationsProviders as $annotationProvider) {
-            /** @var ApiDoc[] $annotations */
             $annotations = $annotationProvider->getAnnotations();
             foreach ($annotations as $annotation) {
                 $route = $annotation->getRoute();
@@ -158,9 +139,9 @@ trait ApiDocExtractorTrait
         return $array;
     }
 
-    protected function doAddResources(array &$array, array $resources)
+    private function doAddResources(array &$array, array $resources): void
     {
-        \rsort($resources);
+        rsort($resources);
         foreach ($array as $index => $element) {
             if (\array_key_exists('resource', $element)) {
                 continue;
@@ -184,7 +165,7 @@ trait ApiDocExtractorTrait
         }
     }
 
-    protected function doSortAnnotations(array &$array)
+    private function doSortAnnotations(array &$array): void
     {
         $methodOrder = [
             Request::METHOD_HEAD    => 1,
@@ -195,7 +176,7 @@ trait ApiDocExtractorTrait
             Request::METHOD_PATCH   => 6,
             Request::METHOD_DELETE  => 7
         ];
-        \usort(
+        usort(
             $array,
             function ($a, $b) use ($methodOrder) {
                 $resourceA = $a['resource'];
@@ -215,21 +196,15 @@ trait ApiDocExtractorTrait
                         return $methodA > $methodB ? 1 : -1;
                     }
 
-                    return \strcmp($routeA->getPath(), $routeB->getPath());
+                    return strcmp($routeA->getPath(), $routeB->getPath());
                 }
 
-                return \strcmp($resourceA, $resourceB);
+                return strcmp($resourceA, $resourceB);
             }
         );
     }
 
-    /**
-     * @param ApiDoc $annotation
-     * @param Route  $route
-     *
-     * @return string|null
-     */
-    protected function getRouteResource(ApiDoc $annotation, Route $route)
+    private function getRouteResource(ApiDoc $annotation, Route $route): ?string
     {
         if (!$annotation->isResource()) {
             return null;
@@ -238,19 +213,13 @@ trait ApiDocExtractorTrait
         $resource = $annotation->getResource();
         if (!$resource) {
             // remove format from routes used for resource grouping
-            $resource = \str_replace('.{_format}', '', $route->getPath());
+            $resource = str_replace('.{_format}', '', $route->getPath());
         }
 
         return $resource;
     }
 
-    /**
-     * @param Route $route
-     * @param array $methodOrder
-     *
-     * @return int
-     */
-    protected function getRouteMethodOrder(Route $route, $methodOrder)
+    private function getRouteMethodOrder(Route $route, array $methodOrder): int
     {
         $order = PHP_INT_MAX;
         $methods = $route->getMethods();
@@ -263,12 +232,7 @@ trait ApiDocExtractorTrait
         return $order;
     }
 
-    /**
-     * @param Route $route
-     *
-     * @return string|null
-     */
-    protected function getRouteAction(Route $route)
+    private function getRouteAction(Route $route): ?string
     {
         return $route->getDefault('_action');
     }
@@ -279,7 +243,7 @@ trait ApiDocExtractorTrait
         if (!$views) {
             return ApiDoc::DEFAULT_VIEW === $view;
         }
-        if (count($views) === 1 && reset($views) === 'all') {
+        if (\count($views) === 1 && reset($views) === 'all') {
             return true;
         }
 

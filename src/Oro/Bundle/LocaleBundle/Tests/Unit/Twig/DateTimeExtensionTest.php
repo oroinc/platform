@@ -71,15 +71,15 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \DateTime $value
-     * @param string $dateType
-     * @param string $locale
-     * @param string $timeZone
-     * @param string $expected
      * @dataProvider formatDateDataProvider
      */
-    public function testFormatDate($value, $expected, $dateType = null, $locale = null, $timeZone = null)
-    {
+    public function testFormatDate(
+        \DateTime $value,
+        string $expected,
+        ?string $dateType = null,
+        ?string $locale = null,
+        ?string $timeZone = null
+    ) {
         $options = [
             'dateType' => $dateType,
             'locale' => $locale,
@@ -97,10 +97,7 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function formatDayDataProvider()
+    public function formatDayDataProvider(): array
     {
         return [
             'default options' => [
@@ -116,12 +113,9 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \DateTime $value
-     * @param string $expected
-     * @param string $locale
      * @dataProvider formatDayDataProvider
      */
-    public function testFormatDay($value, $expected, $locale = null)
+    public function testFormatDay(\DateTime $value, string $expected, ?string $locale = null)
     {
         $timeZone = null;
         $dateType = null;
@@ -138,10 +132,7 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function formatTimeDataProvider()
+    public function formatTimeDataProvider(): array
     {
         return [
             'default options' => [
@@ -159,15 +150,15 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \DateTime $value
-     * @param string $timeType
-     * @param string $locale
-     * @param string $timeZone
-     * @param string $expected
      * @dataProvider formatTimeDataProvider
      */
-    public function testFormatTime($value, $expected, $timeType = null, $locale = null, $timeZone = null)
-    {
+    public function testFormatTime(
+        \DateTime $value,
+        string $expected,
+        ?string $timeType = null,
+        ?string $locale = null,
+        ?string $timeZone = null
+    ) {
         $options = [
             'timeType' => $timeType,
             'locale' => $locale,

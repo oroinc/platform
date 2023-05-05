@@ -11,8 +11,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
  */
 class JsonApiIncludeAccessor implements IncludeAccessorInterface
 {
-    /** @var ItemKeyBuilder */
-    private $itemKeyBuilder;
+    private ItemKeyBuilder $itemKeyBuilder;
 
     public function __construct(ItemKeyBuilder $itemKeyBuilder)
     {
@@ -41,10 +40,10 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
      */
     public function getItemIdentifier(array $item): array
     {
-        if (!array_key_exists(JsonApiDoc::TYPE, $item)) {
+        if (!\array_key_exists(JsonApiDoc::TYPE, $item)) {
             throw new \InvalidArgumentException(sprintf('The \'%s\' property is required', JsonApiDoc::TYPE));
         }
-        if (!array_key_exists(JsonApiDoc::ID, $item)) {
+        if (!\array_key_exists(JsonApiDoc::ID, $item)) {
             throw new \InvalidArgumentException(sprintf('The \'%s\' property is required', JsonApiDoc::ID));
         }
 
@@ -52,7 +51,7 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
         if (null === $type) {
             throw new \InvalidArgumentException(sprintf('The \'%s\' property should not be null', JsonApiDoc::TYPE));
         }
-        if (!is_string($type)) {
+        if (!\is_string($type)) {
             throw new \InvalidArgumentException(sprintf('The \'%s\' property should be a string', JsonApiDoc::TYPE));
         }
         if ('' === $type) {
@@ -63,7 +62,7 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
         if (null === $id) {
             throw new \InvalidArgumentException(sprintf('The \'%s\' property should not be null', JsonApiDoc::ID));
         }
-        if (!is_string($id)) {
+        if (!\is_string($id)) {
             throw new \InvalidArgumentException(sprintf('The \'%s\' property should be a string', JsonApiDoc::ID));
         }
         if ('' === $id) {
@@ -84,7 +83,7 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
             return $result;
         }
         $relationships = $item[JsonApiDoc::RELATIONSHIPS];
-        if (!is_array($relationships)) {
+        if (!\is_array($relationships)) {
             return $result;
         }
 
@@ -93,7 +92,7 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
                 continue;
             }
             $relationshipData = $relationship[JsonApiDoc::DATA];
-            if (!is_array($relationships)) {
+            if (!\is_array($relationships)) {
                 continue;
             }
             if (ArrayUtil::isAssoc($relationshipData)) {
@@ -107,7 +106,7 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
                 }
             } else {
                 foreach ($relationshipData as $relationshipItemData) {
-                    if (!is_array($relationshipItemData)) {
+                    if (!\is_array($relationshipItemData)) {
                         continue;
                     }
                     $itemIdentifier = $this->tryGetItemIdentifier($relationshipItemData);
@@ -135,7 +134,7 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
             return;
         }
         $relationships = $item[JsonApiDoc::RELATIONSHIPS];
-        if (!is_array($relationships)) {
+        if (!\is_array($relationships)) {
             return;
         }
 
@@ -144,7 +143,7 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
                 continue;
             }
             $relationshipData = $relationship[JsonApiDoc::DATA];
-            if (!is_array($relationships)) {
+            if (!\is_array($relationships)) {
                 continue;
             }
             if (ArrayUtil::isAssoc($relationshipData)) {
@@ -158,7 +157,7 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
                 }
             } else {
                 foreach ($relationshipData as $index => $relationshipItemData) {
-                    if (!is_array($relationshipItemData)) {
+                    if (!\is_array($relationshipItemData)) {
                         continue;
                     }
                     $itemIdentifier = $this->tryGetItemIdentifier($relationshipItemData);
@@ -190,11 +189,11 @@ class JsonApiIncludeAccessor implements IncludeAccessorInterface
         }
 
         $type = $item[JsonApiDoc::TYPE];
-        if (!is_string($type) || '' === $type) {
+        if (!\is_string($type) || '' === $type) {
             return null;
         }
         $id = $item[JsonApiDoc::ID];
-        if (!is_string($id) || '' === $id) {
+        if (!\is_string($id) || '' === $id) {
             return null;
         }
 

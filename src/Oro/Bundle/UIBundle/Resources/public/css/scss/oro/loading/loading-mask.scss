@@ -1,10 +1,18 @@
-/* @theme admin.oro; */
+/* @theme: admin.oro; */
+
+@use 'sass:meta';
+
+$loading-mask: 'loader-mask';
+
+@if (meta.variable-exists('loading-mask-prefix')) {
+    $loading-mask: $loading-mask-prefix + $loading-mask;
+}
 
 .view-loading {
     height: $loading-view-height;
 }
 
-.loader-mask {
+.#{$loading-mask} {
     position: absolute;
     top: 0;
     left: 0;
@@ -16,7 +24,7 @@
 
     overflow: hidden;
 
-    background-color: rgba($loading-mask-background-color, .5);
+    background-color: var(--loading-mask-background-color, rgba($loading-mask-background-color, .5));
 
     .loader-frame {
         @include loader();
@@ -37,7 +45,7 @@
         overflow: hidden;
     }
 
-    > .loader-mask.shown {
+    > .#{$loading-mask}.shown {
         // show only first level loaders
         display: flex;
         flex-direction: column;
@@ -49,8 +57,8 @@
         1. hide all nested loaders
         2. hide rest of first level loaders, except first one
      */
-    .loading .loader-mask.shown,
-    > .loader-mask.shown ~ .loader-mask.shown {
+    .loading .#{$loading-mask}.shown,
+    > .#{$loading-mask}.shown ~ .#{$loading-mask}.shown {
         display: none;
     }
 }

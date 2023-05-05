@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    const $ = require('jquery');
     const _ = require('underscore');
     const BaseView = require('oroui/js/app/views/base/view');
     const DropdownMenuCollectionView = require('oroui/js/app/views/dropdown-menu-collection-view');
@@ -50,6 +51,20 @@ define(function(require) {
             if (dropdown) {
                 this.$('[data-role="dropdown-menu-content"]').replaceWith(dropdown.$el);
             }
+        },
+
+        initControls() {
+            this.$('[data-toggle="tooltip"]:not([title])').data('title', function() {
+                const el = this;
+                const $el = $(el);
+                const $clone = $el.clone()
+                    .css({'max-width': 'initial', 'visibility': 'hidden', 'position': 'fixed'})
+                    .appendTo('body');
+                const isTruncated = $el.width() < $clone.width();
+                $clone.remove();
+                return isTruncated ? el.textContent : void 0;
+            });
+            PermissionView.__super__.initControls.call(this);
         },
 
         onDropdownOpen: function(e) {

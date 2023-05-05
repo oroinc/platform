@@ -1,11 +1,13 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 $jstree-actions-display: none !default;
 
 $jstree-actions-handle-offset: 0 3px !default;
 $jstree-actions-handle-color: $primary-400 !default;
 
-$jstree-actions-handle-hover-color: darken($jstree-actions-handle-color, 10%) !default;
+$jstree-actions-handle-hover-color: color.adjust($jstree-actions-handle-color, $lightness: -10%) !default;
 
 $jstree-actions-menu-position: absolute !default;
 

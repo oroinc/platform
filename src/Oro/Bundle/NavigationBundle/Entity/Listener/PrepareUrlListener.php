@@ -3,19 +3,22 @@
 namespace Oro\Bundle\NavigationBundle\Entity\Listener;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\NavigationBundle\Model\UrlAwareInterface;
 
+/**
+ * Listens to Entity that implements UrlAwareInterface to generate url
+ */
 class PrepareUrlListener
 {
     public function prePersist(UrlAwareInterface $entity, LifecycleEventArgs $args)
     {
-        $entity->setUrl($this->prepareUrl($args->getEntityManager(), get_class($entity), $entity->getUrl()));
+        $entity->setUrl($this->prepareUrl($args->getObjectManager(), get_class($entity), $entity->getUrl()));
     }
 
     public function preUpdate(UrlAwareInterface $entity, LifecycleEventArgs $args)
     {
-        $entity->setUrl($this->prepareUrl($args->getEntityManager(), get_class($entity), $entity->getUrl()));
+        $entity->setUrl($this->prepareUrl($args->getObjectManager(), get_class($entity), $entity->getUrl()));
     }
 
     /**

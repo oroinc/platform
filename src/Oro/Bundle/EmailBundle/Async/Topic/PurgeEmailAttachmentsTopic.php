@@ -3,12 +3,13 @@
 namespace Oro\Bundle\EmailBundle\Async\Topic;
 
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Purge email attachments.
  */
-class PurgeEmailAttachmentsTopic extends AbstractTopic
+class PurgeEmailAttachmentsTopic extends AbstractTopic implements JobAwareTopicInterface
 {
     public static function getName(): string
     {
@@ -29,5 +30,10 @@ class PurgeEmailAttachmentsTopic extends AbstractTopic
             ])
             ->addAllowedTypes('all', ['int', 'bool'])
             ->addAllowedTypes('size', ['int', 'null']);
+    }
+
+    public function createJobName($messageBody): string
+    {
+        return 'oro.email.purge_email_attachments';
     }
 }

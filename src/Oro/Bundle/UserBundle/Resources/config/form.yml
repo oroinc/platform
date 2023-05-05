@@ -55,6 +55,7 @@ services:
             - '@oro_security.token_accessor'
             - '@request_stack'
             - '@oro_user.form.provider.password_field_options_provider'
+            - '@oro_user.form.provider.roles_choices_for_user'
         tags:
             - { name: form.type, alias: oro_user_user }
 
@@ -65,6 +66,7 @@ services:
             - '@oro_security.token_accessor'
             - '@request_stack'
             - '@oro_user.form.provider.password_field_options_provider'
+            - '@oro_user.form.provider.roles_choices_for_user'
         calls:
             - [setUserConfigManager, ["@oro_config.user"]]
         tags:
@@ -227,6 +229,7 @@ services:
             - '@oro_user.form.reset'
             - '@request_stack'
             - '@oro_user.manager'
+            - '@logger'
 
     oro_user.form.handler.abstract.acl_role:
         class: Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler
@@ -276,6 +279,12 @@ services:
         arguments:
             - '@oro_user.provider.password_complexity_config_provider'
             - '@oro_user.form.provider.password_tooltip'
+
+    oro_user.form.provider.roles_choices_for_user:
+        class: Oro\Bundle\UserBundle\Form\Provider\RolesChoicesForUserProvider
+        arguments:
+            - '@doctrine'
+            - '@oro_security.acl_helper'
 
     oro_user.form.extension.js_validation.password_complexity_extension:
         class: Oro\Bundle\UserBundle\Form\Extension\JsValidation\PasswordComplexityExtension

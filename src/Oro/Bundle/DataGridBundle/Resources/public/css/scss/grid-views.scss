@@ -2,7 +2,6 @@
 
 .grid-views {
     display: flex;
-    align-items: center;
 
     .inner-grid & {
         margin: $oro-datagrid-inner-grid-views-offset;
@@ -10,7 +9,6 @@
 
     .grid-views-toogler {
         display: flex;
-        align-items: center;
     }
 
     .grid-view-title {
@@ -46,7 +44,11 @@
     }
 
     .grid-view-icon {
+        align-self: flex-start;
         margin: $oro-datagrid-grid-views-icon-offset;
+
+        font-size: $oro-datagrid-grid-views-title-font-size;
+        font-weight: $oro-datagrid-grid-views-title-font-weight;
 
         @include fa-icon($oro-datagrid-grid-views-icon-close);
     }

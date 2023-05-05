@@ -10,7 +10,7 @@ class TestConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationSections()
+    public function getEntityConfigurationSections(): array
     {
         return ['test_section' => new TestConfiguration()];
     }
@@ -18,7 +18,7 @@ class TestConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getConfigureCallbacks()
+    public function getConfigureCallbacks(): array
     {
         return [
             'entities.entity'       => function (NodeBuilder $node) {
@@ -45,7 +45,7 @@ class TestConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getPostProcessCallbacks()
+    public function getPostProcessCallbacks(): array
     {
         return [
             'entities.entity'       => function (array $config) {
@@ -96,7 +96,7 @@ class TestConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationLoaders()
+    public function getEntityConfigurationLoaders(): array
     {
         return ['test_section' => new TestConfigLoader()];
     }

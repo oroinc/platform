@@ -13,8 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class PersistIncludedEntities implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -24,7 +23,7 @@ class PersistIncludedEntities implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */
 
@@ -43,11 +42,7 @@ class PersistIncludedEntities implements ProcessorInterface
         }
     }
 
-    /**
-     * @param object $entity
-     * @param bool   $checkIsNew
-     */
-    private function persistEntity($entity, bool $checkIsNew = false): void
+    private function persistEntity(object $entity, bool $checkIsNew = false): void
     {
         $em = $this->doctrineHelper->getEntityManager($entity, false);
         if (null === $em) {

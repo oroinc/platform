@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -36,6 +37,7 @@ class FormProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->context = $this->createContext();
+        $this->context->setAction(ApiAction::UPDATE);
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
         $this->context->setConfigExtras([

@@ -2,14 +2,16 @@
 
 namespace Oro\Component\ExpressionLanguage\Node;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\ExpressionLanguage\Compiler;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\Node;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Represents property a call.
- * Differs from {@see \Symfony\Component\ExpressionLanguage\Node\GetAttrNode} by using {@see PropertyAccessor}
+ * Differs from {@see \Symfony\Component\ExpressionLanguage\Node\GetAttrNode}
+ * by using {@see PropertyAccessorWithDotArraySyntax}
  * that gives the ability to access both array elements and objects properties.
  *
  * Version of the "symfony/expression-language" component used at the moment of customization: 5.3.7
@@ -17,7 +19,7 @@ use Symfony\Component\ExpressionLanguage\Node\Node;
  */
 class GetPropertyNode extends Node
 {
-    private static ?PropertyAccessor $propertyAccessor = null;
+    private static ?PropertyAccessorInterface $propertyAccessor = null;
 
     public function __construct(Node $node, Node $attribute, ArrayNode $arguments)
     {
@@ -50,10 +52,10 @@ class GetPropertyNode extends Node
         return self::getPropertyAccessor()->getValue($evaluatedNode, $property);
     }
 
-    private static function getPropertyAccessor(): PropertyAccessor
+    private static function getPropertyAccessor(): PropertyAccessorInterface
     {
         if (self::$propertyAccessor === null) {
-            self::$propertyAccessor = new PropertyAccessor();
+            self::$propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
         }
 
         return self::$propertyAccessor;

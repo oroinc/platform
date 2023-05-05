@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\Splitter;
 
-use JsonStreamingParser\Listener\ListenerInterface;
 use JsonStreamingParser\Parser;
 use Oro\Bundle\ApiBundle\Exception\TimeoutExceededFileSplitterException;
 use Oro\Bundle\GaufretteBundle\FileManager;
@@ -12,26 +11,15 @@ use Oro\Bundle\GaufretteBundle\FileManager;
  */
 class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSplitterInterface
 {
-    /** @var bool */
-    private $completed = false;
-
-    /** @var int */
-    private $timeout = -1;
-
-    /** @var array */
-    private $state = [];
-
-    /** @var float */
-    private $chunkStartTime;
-
-    /** @var int */
-    private $chunkTime = 0;
-
-    /** @var int */
-    private $chunkCount = 0;
+    private bool $completed = false;
+    private int $timeout = -1;
+    private array $state = [];
+    private ?float $chunkStartTime = null;
+    private int $chunkTime = 0;
+    private int $chunkCount = 0;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isCompleted(): bool
     {
@@ -39,7 +27,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getTimeout(): int
     {
@@ -47,7 +35,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setTimeout(int $milliseconds): void
     {
@@ -55,7 +43,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getState(): array
     {
@@ -63,7 +51,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setState(array $data): void
     {
@@ -74,7 +62,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function splitFile(string $fileName, FileManager $srcFileManager, FileManager $destFileManager): array
     {
@@ -88,7 +76,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function parse(Parser $parser): void
     {
@@ -96,7 +84,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
 
         $this->completed = true;
         $parser->setState($this->state);
-        if (array_key_exists('sectionName', $this->state)) {
+        if (\array_key_exists('sectionName', $this->state)) {
             $this->sectionName = $this->state['sectionName'];
         }
         try {
@@ -118,7 +106,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getParser($stream): Parser
     {
@@ -126,9 +114,9 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getParserListener(): ListenerInterface
+    protected function getParserListener(): JsonPartialFileSplitterListener
     {
         return new JsonPartialFileSplitterListener(
             function ($item) {
@@ -146,9 +134,9 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function processItem($item): void
+    protected function processItem(mixed $item): void
     {
         if (-1 !== $this->timeout && null === $this->chunkStartTime) {
             $this->chunkStartTime = microtime(true);
@@ -158,7 +146,7 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function saveChunk(): void
     {

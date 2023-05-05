@@ -13,11 +13,8 @@ use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
  */
 class BatchUpdateHandler
 {
-    /** @var StepExecutor */
-    private $stepExecutor;
-
-    /** @var BatchUpdateItemProcessor */
-    private $itemProcessor;
+    private StepExecutor $stepExecutor;
+    private BatchUpdateItemProcessor $itemProcessor;
 
     public function __construct(BatchUpdateProcessor $processor, BatchUpdateItemProcessor $itemProcessor)
     {
@@ -58,7 +55,7 @@ class BatchUpdateHandler
 
         $records = $context->getResult();
         if ($records) {
-            $context->getSummary()->incrementReadCount(count($records));
+            $context->getSummary()->incrementReadCount(\count($records));
             $context->setBatchItems($this->processRecords($records, $context));
             $this->stepExecutor->executeStep(ApiActionGroup::SAVE_DATA, $context);
             if ($context->hasErrors() || $context->isRetryAgain()) {

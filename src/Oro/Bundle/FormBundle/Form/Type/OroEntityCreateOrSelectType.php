@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
@@ -14,9 +15,11 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * Type of entity create or select.
+ */
 class OroEntityCreateOrSelectType extends AbstractType
 {
     const NAME = 'oro_entity_create_or_select';

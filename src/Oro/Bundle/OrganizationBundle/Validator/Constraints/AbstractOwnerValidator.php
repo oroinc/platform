@@ -19,7 +19,6 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -94,9 +93,7 @@ abstract class AbstractOwnerValidator extends ConstraintValidator
 
         if (!$this->validateOwner($ownershipMetadata, $em, $entityClass, $value)) {
             $ownerFieldName = $ownershipMetadata->getOwnerFieldName();
-            /** @var ExecutionContextInterface $context */
-            $context = $this->context;
-            $context->buildViolation($constraint->message)
+            $this->context->buildViolation($constraint->message)
                 ->atPath($ownerFieldName)
                 ->setParameter('{{ owner }}', $ownerFieldName)
                 ->addViolation();

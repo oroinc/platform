@@ -9,7 +9,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 class MutableEntityOverrideProvider implements EntityOverrideProviderInterface
 {
     /** @var string[] [class name => substitute class name, ...] */
-    private $substitutions;
+    private array $substitutions;
 
     /**
      * @param string[] $substitutions [class name => substitute class name, ...]
@@ -25,23 +25,19 @@ class MutableEntityOverrideProvider implements EntityOverrideProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getSubstituteEntityClass(string $entityClass): ?string
     {
-        if (!isset($this->substitutions[$entityClass])) {
-            return null;
-        }
-
-        return $this->substitutions[$entityClass];
+        return $this->substitutions[$entityClass] ?? null;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getEntityClass(string $substituteClass): ?string
     {
-        $entityClass = \array_search($substituteClass, $this->substitutions, true);
+        $entityClass = array_search($substituteClass, $this->substitutions, true);
         if (false === $entityClass) {
             return null;
         }

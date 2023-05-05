@@ -14,8 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AddressTypeType extends AbstractType
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -23,20 +22,18 @@ class AddressTypeType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addViewTransformer(
-            new AddressTypeToIdTransformer($this->doctrineHelper)
-        );
+        $builder->addViewTransformer(new AddressTypeToIdTransformer($this->doctrineHelper));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['compound' => false]);
+        $resolver->setDefault('compound', false);
     }
 }

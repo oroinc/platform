@@ -14,14 +14,9 @@ use Psr\Log\LoggerInterface;
  */
 class AsyncOperationDeleteHandler extends AbstractEntityDeleteHandler
 {
-    /** @var FileNameProvider */
-    private $fileNameProvider;
-
-    /** @var FileManager */
-    private $fileManager;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private FileNameProvider $fileNameProvider;
+    private FileManager $fileManager;
+    private LoggerInterface $logger;
 
     public function __construct(FileNameProvider $fileNameProvider, FileManager $fileManager, LoggerInterface $logger)
     {
@@ -39,7 +34,7 @@ class AsyncOperationDeleteHandler extends AbstractEntityDeleteHandler
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function deleteWithoutFlush($entity, array $options): void
     {

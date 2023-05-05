@@ -116,6 +116,30 @@
         }
     }
 
+    .dropdown-close {
+        display: none;
+    }
+
+    &[x-fullscreen] {
+        border-radius: 0;
+        box-shadow: none;
+        overflow: auto;
+        right: 0;
+        bottom: 0;
+
+        .dropdown-close {
+            display: initial;
+            // to ignore scroll action within position fixed parent element
+            position: sticky;
+            top: 0;
+            left: calc(100vw - $btn-icon-mobile-width - $dropdown-padding-y);
+
+            > *:first-child {
+                position: absolute;
+            }
+        }
+    }
+
     &[x-placement] {
         /* rtl:ignore */
         right: auto;
@@ -127,7 +151,7 @@
     &,
     .dropdown-menu-items {
         > li > a {
-            @extend .dropdown-item;
+            @extend %dropdown-item;
         }
     }
 

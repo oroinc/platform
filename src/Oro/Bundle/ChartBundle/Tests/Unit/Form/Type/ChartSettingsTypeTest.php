@@ -28,17 +28,12 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    ChartSettingsType::class => $this->type
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->type], [])
         ];
     }
 

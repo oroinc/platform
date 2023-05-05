@@ -57,7 +57,7 @@ Feature: Multi grid context with custom entity
       | To      | test@local.com |
       | Subject | Test email     |
     And click "Send"
-    Then I should see "The email was sent"
+    Then I should see "The email was sent" flash message
     And I click "view" on first row in grid
     And I click "Add Context"
     Then I should see "Test Record"

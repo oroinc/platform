@@ -80,10 +80,9 @@ class DumpTranslationToFilesCommandTest extends WebTestCase
         self::runCommand(self::COMMAND_NAME, ['--locale' => 'en', '--source' => 'crowdin'], true, true);
         $dumpedCatalogue = $this->loadTranslationsFromFiles('en');
         $domains = $dumpedCatalogue->getDomains();
-        self::assertCount(6, $domains);
+        self::assertCount(4, $domains);
         self::assertContains('config', $domains);
         self::assertContains('validators', $domains);
-        self::assertContains('security', $domains);
         self::assertContains('messages', $domains);
         self::assertContains('jsmessages', $domains);
         self::assertEquals('Invalid credentials.', $dumpedCatalogue->get('Invalid credentials.', 'security'));

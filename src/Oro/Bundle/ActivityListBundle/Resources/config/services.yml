@@ -70,6 +70,10 @@ services:
             - "@translator"
             - "@oro_entity.routing_helper"
             - "@oro_security.token_accessor"
+            - "@oro_activity_list.factory"
+
+    oro_activity_list.factory:
+        class: Oro\Bundle\ActivityListBundle\Entity\Factory\ActivityListFactory
 
     oro_activity_list.provider.email_recipients:
         class: Oro\Bundle\ActivityListBundle\Provider\EmailRecipientsProvider
@@ -95,12 +99,10 @@ services:
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
-    oro_activity_list.entity_generator.extension:
-        class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityGeneratorExtension
-        arguments:
-            - "@oro_activity_list.provider.chain"
+    oro_activity_list.entity_field.activity_list_extension:
+        class: Oro\Bundle\ActivityListBundle\EntityExtend\ActivityListEntityFieldExtension
         tags:
-            - { name: oro_entity_extend.entity_generator_extension }
+            - { name: 'oro_entity_extend.entity_field_extension', priority: 50 }
 
     oro_activity_list.migration.extension.activity_list:
         class: Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension

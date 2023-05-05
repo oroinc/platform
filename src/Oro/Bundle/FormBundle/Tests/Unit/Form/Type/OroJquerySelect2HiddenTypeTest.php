@@ -59,15 +59,13 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
         return array_merge(parent::getExtensions(), [
-            new PreloadedExtension(
-                [
-                    OroJquerySelect2HiddenType::class => $this->type
-                ],
-                []
-            ),
+            new PreloadedExtension([OroJquerySelect2HiddenType::class => $this->type], []),
             new TestFormExtension()
         ]);
     }

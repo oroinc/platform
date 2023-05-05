@@ -14,7 +14,7 @@ class SortersConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationSections()
+    public function getEntityConfigurationSections(): array
     {
         return [ConfigUtil::SORTERS => new SortersConfiguration()];
     }
@@ -22,7 +22,7 @@ class SortersConfigExtension extends AbstractConfigExtension
     /**
      * {@inheritdoc}
      */
-    public function getEntityConfigurationLoaders()
+    public function getEntityConfigurationLoaders(): array
     {
         return [ConfigUtil::SORTERS => new SortersConfigLoader()];
     }

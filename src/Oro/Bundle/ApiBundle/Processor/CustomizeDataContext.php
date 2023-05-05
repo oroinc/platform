@@ -19,81 +19,62 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
     /** FQCN of a customizing entity */
     private const CLASS_NAME = 'class';
 
-    /** @var EntityDefinitionConfig|null */
-    private $rootConfig;
-
-    /** @var EntityDefinitionConfig|null */
-    private $config;
-
-    /** @var ParameterBagInterface|null */
-    private $sharedData;
+    private ?EntityDefinitionConfig $rootConfig = null;
+    private ?EntityDefinitionConfig $config = null;
+    private ?ParameterBagInterface $sharedData = null;
 
     /**
      * Gets FQCN of a root entity.
-     *
-     * @return string|null
      */
-    public function getRootClassName()
+    public function getRootClassName(): ?string
     {
         return $this->get(self::ROOT_CLASS_NAME);
     }
 
     /**
      * Sets FQCN of a root entity.
-     *
-     * @param string $className
      */
-    public function setRootClassName($className)
+    public function setRootClassName(string $className): void
     {
         $this->set(self::ROOT_CLASS_NAME, $className);
     }
 
     /**
      * Gets a path from a root entity to a customizing entity.
-     *
-     * @return string|null
      */
-    public function getPropertyPath()
+    public function getPropertyPath(): ?string
     {
         return $this->get(self::PROPERTY_PATH);
     }
 
     /**
      * Sets a path from a root entity to a customizing entity.
-     *
-     * @param string $propertyPath
      */
-    public function setPropertyPath($propertyPath)
+    public function setPropertyPath(string $propertyPath): void
     {
         $this->set(self::PROPERTY_PATH, $propertyPath);
     }
 
     /**
      * Gets FQCN of a customizing entity.
-     *
-     * @return string
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->get(self::CLASS_NAME);
     }
 
     /**
      * Sets FQCN of a customizing entity.
-     *
-     * @param string $className
      */
-    public function setClassName($className)
+    public function setClassName(string $className): void
     {
         $this->set(self::CLASS_NAME, $className);
     }
 
     /**
      * Gets a configuration of a root entity.
-     *
-     * @return EntityDefinitionConfig|null
      */
-    public function getRootConfig()
+    public function getRootConfig(): ?EntityDefinitionConfig
     {
         return $this->rootConfig;
     }
@@ -101,17 +82,15 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
     /**
      * Sets a configuration of a root entity.
      */
-    public function setRootConfig(EntityDefinitionConfig $config = null)
+    public function setRootConfig(?EntityDefinitionConfig $config): void
     {
         $this->rootConfig = $config;
     }
 
     /**
      * Gets a configuration of a customizing entity.
-     *
-     * @return EntityDefinitionConfig|null
      */
-    public function getConfig()
+    public function getConfig(): ?EntityDefinitionConfig
     {
         return $this->config;
     }
@@ -119,7 +98,7 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
     /**
      * Sets a configuration of a customizing entity.
      */
-    public function setConfig(EntityDefinitionConfig $config = null)
+    public function setConfig(?EntityDefinitionConfig $config): void
     {
         $this->config = $config;
     }

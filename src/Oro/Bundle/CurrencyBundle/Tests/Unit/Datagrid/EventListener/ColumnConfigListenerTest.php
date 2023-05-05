@@ -14,7 +14,7 @@ class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
     private const ENTITY = 'Test:Entity';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $entityClassResolver;
 
     /** @var ColumnConfigListener */
@@ -281,11 +281,7 @@ class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $configuration
-     * @return BuildBefore
-     */
-    private function createBuildBeforeEvent(array $configuration)
+    private function createBuildBeforeEvent(array $configuration): BuildBefore
     {
         $event = $this->createMock(BuildBefore::class);
         $event->expects($this->any())

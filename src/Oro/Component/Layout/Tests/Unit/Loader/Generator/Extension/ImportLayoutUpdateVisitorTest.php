@@ -66,7 +66,7 @@ class ImportedLayoutUpdate implements Oro\Component\Layout\LayoutUpdateImportInt
 }
 
 CODE
-        ,
+            ,
             $visitContext->getClass()->print()
         );
     }

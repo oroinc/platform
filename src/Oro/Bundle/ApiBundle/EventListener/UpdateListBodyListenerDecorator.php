@@ -13,11 +13,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 class UpdateListBodyListenerDecorator implements BodyListenerInterface
 {
-    /** @var BodyListenerInterface */
-    private $listener;
-
-    /** @var RestRoutes */
-    private $routes;
+    private BodyListenerInterface $listener;
+    private RestRoutes $routes;
 
     public function __construct(BodyListenerInterface $listener, RestRoutes $routes)
     {

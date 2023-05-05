@@ -11,9 +11,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     private function processConfiguration(array $configs): array
     {
-        $processor = new Processor();
-
-        return $processor->processConfiguration(new Configuration(), $configs);
+        return (new Processor())->processConfiguration(new Configuration(), $configs);
     }
 
     /**

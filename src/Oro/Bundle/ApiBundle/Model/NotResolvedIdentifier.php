@@ -7,26 +7,16 @@ namespace Oro\Bundle\ApiBundle\Model;
  */
 class NotResolvedIdentifier
 {
-    /** @var mixed */
-    private $value;
+    private mixed $value;
+    private string $entityClass;
 
-    /** @var string */
-    private $entityClass;
-
-    /**
-     * @param mixed  $value
-     * @param string $entityClass
-     */
-    public function __construct($value, string $entityClass)
+    public function __construct(mixed $value, string $entityClass)
     {
         $this->value = $value;
         $this->entityClass = $entityClass;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }

@@ -10,5 +10,5 @@ interface FormExtensionCheckerInterface
     /**
      * Checks whether API form extension is activated.
      */
-    public function isApiFormExtensionActivated();
+    public function isApiFormExtensionActivated(): bool;
 }

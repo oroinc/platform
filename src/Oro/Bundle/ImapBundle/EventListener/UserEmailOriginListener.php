@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ImapBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -32,7 +32,7 @@ class UserEmailOriginListener
         if (!$origin->getFolders()->isEmpty()) {
             $folders = $origin->getRootFolders();
 
-            $this->createImapEmailFolders($folders, $event->getEntityManager());
+            $this->createImapEmailFolders($folders, $event->getObjectManager());
         }
     }
 

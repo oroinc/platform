@@ -17,9 +17,9 @@ use Oro\Component\Testing\Unit\PreloadedExtension;
 class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @return array
+     * {#@inheritDoc}
      */
-    public function getExtensions()
+    protected function getExtensions(): array
     {
         $attributeManagerMock = $this->createMock(AttributeManager::class);
 
@@ -41,12 +41,7 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @param string|null $string
-     * @param string|null $text
-     * @return LocalizedFallbackValue
-     */
-    protected function createLocalizedValue($string = null, $text = null)
+    private function createLocalizedValue(?string $string = null, ?string $text = null): LocalizedFallbackValue
     {
         $value = new LocalizedFallbackValue();
         $value->setString($string)->setText($text);

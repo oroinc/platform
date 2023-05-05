@@ -8,11 +8,8 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider isFieldUnidirectionalDataProvider
-     *
-     * @param string $fieldName
-     * @param bool $expected
      */
-    public function testIsFieldUnidirectional($fieldName, $expected)
+    public function testIsFieldUnidirectional(string $fieldName, bool $expected)
     {
         $this->assertEquals($expected, UnidirectionalFieldHelper::isFieldUnidirectional($fieldName));
     }
@@ -41,11 +38,8 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getRealFieldNameDataProvider
-     *
-     * @param string $fieldName
-     * @param string $expected
      */
-    public function testGetRealFieldName($fieldName, $expected)
+    public function testGetRealFieldName(string $fieldName, string $expected)
     {
         $this->assertEquals($expected, UnidirectionalFieldHelper::getRealFieldName($fieldName));
     }
@@ -74,11 +68,8 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getRealFieldClassDataProvider
-     *
-     * @param string $fieldName
-     * @param string $expected
      */
-    public function testGetRealFieldClass($fieldName, $expected)
+    public function testGetRealFieldClass(string $fieldName, string $expected)
     {
         $this->assertEquals($expected, UnidirectionalFieldHelper::getRealFieldClass($fieldName));
     }

@@ -18,6 +18,13 @@ services:
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
+    oro_test.listener.job_status_subcriber:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\JobStatusSubscriber
+        arguments:
+            - '@fob_symfony.kernel'
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
+
     oro_test.listener.suite_aware_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SuiteAwareSubscriber
         arguments:
@@ -155,37 +162,6 @@ services:
         tags:
             - { name: 'environment.handler', priority: 256 }
 
-    oro_test.processor.message_queue.base:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessor
-        arguments:
-            - '@fob_symfony.kernel'
-
-    oro_test.processor.message_queue.dbal:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\DbalMessageQueueProcessor
-        arguments:
-            - '@fob_symfony.kernel'
-            - '@oro_test.processor.message_queue.base'
-
-    oro_test.processor.message_queue.amqp:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\AmqpMessageQueueProcessor
-        arguments:
-            - '@fob_symfony.kernel'
-            - '@oro_test.processor.message_queue.base'
-
-    oro_test.processor.message_queue:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorFacade
-        arguments:
-            - '@fob_symfony.kernel'
-            - '@oro_test.processor.message_queue.dbal'
-            - '@oro_test.processor.message_queue.amqp'
-
-    oro_test.processor.message_queue_initializer:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorInitializer'
-        calls:
-            - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
-        tags:
-            - { name: 'context.initializer' }
-
     Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\AppKernelInitializer:
         arguments:
             - '@fob_symfony.kernel'
@@ -198,3 +174,6 @@ services:
 
     oro_test.storage.failed_features:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Storage\FailedFeatures
+
+    nelmio_alice.generator.resolver.value.chainable.fixture_reference_resolver:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceFixtureReferenceResolver

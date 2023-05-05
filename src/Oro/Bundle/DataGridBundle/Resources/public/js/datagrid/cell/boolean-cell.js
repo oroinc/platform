@@ -30,7 +30,7 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        render: function() {
+        render() {
             if (this.isEditableColumn()) {
                 // render a checkbox for editable cell
                 this.enterEditMode();
@@ -52,10 +52,12 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        enterEditMode: function() {
-            BooleanCell.__super__.enterEditMode.call(this);
-            if (this.currentEditor) {
-                this.currentEditor.$el.inputWidget('create');
+        enterEditMode() {
+            if (!this.currentEditor) {
+                BooleanCell.__super__.enterEditMode.call(this);
+                if (this.currentEditor) {
+                    this.currentEditor.$el.inputWidget('create');
+                }
             }
         },
 
@@ -63,9 +65,9 @@ define(function(require) {
          * @param {Backgrid.Row} row
          * @param {Event} e
          */
-        onRowClicked: function(row, e) {
+        onRowClicked(row, e) {
             if (this.currentEditor && !this.currentEditor.$el.is(e.target)) {
-                // click on the row, but outside of currentEditor
+                // click on the row, but outside currentEditor
                 const columnName = this.column.get('name');
                 const currentValue = this.model.get(columnName);
                 this.model.set(columnName, !currentValue);
@@ -76,7 +78,7 @@ define(function(require) {
          * Handles model change and updates editor
          * @param {Backbone.Model} model
          */
-        onModelChange: function(model) {
+        onModelChange(model) {
             if (this.currentEditor) {
                 const val = this.currentEditor.formatter.fromRaw(model.get(this.column.get('name')), model);
                 this.currentEditor.$el.prop('checked', val);

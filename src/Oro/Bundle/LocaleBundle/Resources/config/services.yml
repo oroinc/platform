@@ -361,13 +361,13 @@ services:
         arguments:
             - [] # a map of default fallback fields
 
-    oro_locale.entity_generator.extension:
-        class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
+    oro_locale.entity_field.extension:
+        class: Oro\Bundle\LocaleBundle\EntityExtend\LocaleEntityFieldExtension
         arguments:
             - '@oro_locale.storage.entity_fallback_fields_storage'
             - '@oro_locale.provider.default_fallback_methods_names'
         tags:
-            - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
+            - { name: 'oro_entity_extend.entity_field_extension', priority: 90 }
 
     oro_locale.twig.date_time_organization:
         class: Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension

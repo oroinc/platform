@@ -3,6 +3,13 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
+use Oro\Bundle\LocaleBundle\Command\LocalizationOptionsCommandTrait;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\MigrationBundle\Locator\FixturePathLocatorInterface;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
@@ -20,6 +27,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class LoadDataFixturesCommand extends Command
 {
+    use LocalizationOptionsCommandTrait;
+
     public const MAIN_FIXTURES_TYPE = DataFixturesExecutorInterface::MAIN_FIXTURES;
     public const DEMO_FIXTURES_TYPE = DataFixturesExecutorInterface::DEMO_FIXTURES;
 
@@ -30,12 +39,18 @@ class LoadDataFixturesCommand extends Command
     protected DataFixturesLoader $dataFixturesLoader;
     protected DataFixturesExecutorInterface $dataFixturesExecutor;
     protected FixturePathLocatorInterface $fixturePathLocator;
+    protected ConfigManager $configManager;
+    protected ManagerRegistry $doctrine;
+
+    private InputOptionProvider $inputOptionProvider;
 
     public function __construct(
         KernelInterface $kernel,
         DataFixturesLoader $dataFixturesLoader,
         DataFixturesExecutorInterface $dataFixturesExecutor,
-        FixturePathLocatorInterface $fixturePathLocator
+        FixturePathLocatorInterface $fixturePathLocator,
+        ConfigManager $configManager,
+        ManagerRegistry $doctrine
     ) {
         parent::__construct();
 
@@ -43,6 +58,8 @@ class LoadDataFixturesCommand extends Command
         $this->dataFixturesLoader = $dataFixturesLoader;
         $this->dataFixturesExecutor = $dataFixturesExecutor;
         $this->fixturePathLocator = $fixturePathLocator;
+        $this->configManager = $configManager;
+        $this->doctrine = $doctrine;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -74,6 +91,7 @@ class LoadDataFixturesCommand extends Command
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'Bundles with the fixtures that should be skipped'
             )
+            ->addLocalizationOptions()
             ->setDescription('Loads data fixtures.')
             ->setHelp(
                 <<<'HELP'
@@ -95,6 +113,7 @@ The <info>--exclude</info> option will skip loading fixtures from the specified 
   <info>php %command.full_name% --exclude=<BundleOne> --exclude=<BundleTwo> --exclude=<BundleThree></info>
 
 HELP
+                . $this->getLocalizationOptionsHelp()
             )
             ->addUsage('--fixtures-type=main')
             ->addUsage('--fixtures-type=demo')
@@ -105,12 +124,15 @@ HELP
             ->addUsage('--exclude=<BundleOne> --exclude=<BundleTwo>')
             ->addUsage('--fixtures-type=demo --exclude=<BundleOne> --exclude=<BundleTwo>')
             ->addUsage('--dry-run --fixtures-type=demo --exclude=<BundleOne> --exclude=<BundleTwo>')
+            ->addLocalizationOptionsUsage()
         ;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->inputOptionProvider = new InputOptionProvider($output, $input, $this->getHelperSet()->get('question'));
+
         $fixtures = null;
         try {
             $fixtures = $this->getFixtures($input, $output);
@@ -195,16 +217,22 @@ HELP
     {
         $output->writeln(
             sprintf(
-                'Loading "%s" data fixtures ...',
-                $this->getTypeOfFixtures($input)
+                'Loading "%s" data fixtures (language: %s, formatting code: %s)...',
+                $this->getTypeOfFixtures($input),
+                $this->getLanguage($input),
+                $this->getFormattingCode($input)
             )
         );
 
-        $this->executeFixtures($output, $fixtures, $this->getTypeOfFixtures($input));
+        $this->executeFixtures($input, $output, $fixtures, $this->getTypeOfFixtures($input));
     }
 
-    protected function executeFixtures(OutputInterface $output, array $fixtures, string $fixturesType): void
-    {
+    protected function executeFixtures(
+        InputInterface $input,
+        OutputInterface $output,
+        array $fixtures,
+        string $fixturesType
+    ): void {
         $cursor = new Cursor($output);
         $this->dataFixturesExecutor->setLogger(
             function ($message) use ($output, $cursor) {
@@ -228,7 +256,54 @@ HELP
             ));
         };
 
+        $this->dataFixturesExecutor->setFormattingCode($this->getFormattingCode($input));
+        $this->dataFixturesExecutor->setLanguage($this->getLanguage($input));
+
         $this->dataFixturesExecutor->execute($fixtures, $fixturesType, $progressCallback);
+    }
+
+    protected function getFormattingCode(InputInterface $input): string
+    {
+        $defaultFormattingCode = $this->getDefaultLocalization()?->getFormattingCode()
+            ?? $this->kernel->getContainer()->getParameter(OroLocaleExtension::PARAMETER_FORMATTING_CODE);
+
+        $interactive = $input->isInteractive();
+        $input->setInteractive(false);
+
+        $formattingCode = $this->getFormattingCodeFromOptions($defaultFormattingCode);
+
+        $input->setInteractive($interactive);
+
+        return $formattingCode;
+    }
+
+    protected function getLanguage(InputInterface $input): string
+    {
+        $defaultLanguage = $this->getDefaultLocalization()?->getLanguageCode()
+            ?? $this->kernel->getContainer()->getParameter(OroLocaleExtension::PARAMETER_LANGUAGE);
+
+        $interactive = $input->isInteractive();
+        $input->setInteractive(false);
+
+        $language = $this->getLanguageFromOptions($defaultLanguage);
+
+        $input->setInteractive($interactive);
+
+        return $language;
+    }
+
+    protected function getDefaultLocalization(): ?Localization
+    {
+        $defaultLocalization = null;
+
+        $defaultLocalizationId = $this->configManager->get(
+            Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION),
+        );
+        if ($defaultLocalizationId) {
+            $defaultLocalization = $this->doctrine->getRepository(Localization::class)->find($defaultLocalizationId);
+        }
+
+        return $defaultLocalization;
     }
 
     protected function getTypeOfFixtures(InputInterface $input): string
@@ -238,9 +313,9 @@ HELP
 
     protected function getFixtureRelativePath(InputInterface $input): string
     {
-        $fixtureType         = (string)$this->getTypeOfFixtures($input);
+        $fixtureType = $this->getTypeOfFixtures($input);
         $fixtureRelativePath = $this->fixturePathLocator->getPath($fixtureType);
 
-        return str_replace('/', DIRECTORY_SEPARATOR, sprintf('/%s', $fixtureRelativePath));
+        return \str_replace('/', DIRECTORY_SEPARATOR, \sprintf('/%s', $fixtureRelativePath));
     }
 }

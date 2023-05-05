@@ -4,6 +4,7 @@
 @import 'core';
 @import '~@oroinc/font-awesome/scss/bordered-pulled';
 @import '~@oroinc/font-awesome/scss/icons';
-@import '_icons-rtl';
+@import 'icons-rtl';
 @import '~@oroinc/font-awesome/scss/animated';
-@import '_animated-rtl';
+@import 'animated-rtl';
+@import 'placeholders';

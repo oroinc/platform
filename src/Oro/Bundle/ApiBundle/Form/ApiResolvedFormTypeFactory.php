@@ -11,11 +11,8 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
  */
 class ApiResolvedFormTypeFactory implements ResolvedFormTypeFactoryInterface
 {
-    /** @var ResolvedFormTypeFactoryInterface */
-    private $defaultFactory;
-
-    /** @var FormExtensionCheckerInterface */
-    private $formExtensionChecker;
+    private ResolvedFormTypeFactoryInterface $defaultFactory;
+    private FormExtensionCheckerInterface $formExtensionChecker;
 
     public function __construct(
         ResolvedFormTypeFactoryInterface $defaultFactory,
@@ -26,13 +23,13 @@ class ApiResolvedFormTypeFactory implements ResolvedFormTypeFactoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function createResolvedType(
         FormTypeInterface $type,
         array $typeExtensions,
         ResolvedFormTypeInterface $parent = null
-    ) {
+    ): ResolvedFormTypeInterface {
         $resolvedType = $this->defaultFactory->createResolvedType($type, $typeExtensions, $parent);
         if ($this->formExtensionChecker->isApiFormExtensionActivated()) {
             $resolvedType = new ApiResolvedFormType($resolvedType);

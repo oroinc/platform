@@ -8,7 +8,7 @@ use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Tools\CommandRunner;
 use Oro\Bundle\CronBundle\Tools\CronHelper;
-use Oro\Bundle\MaintenanceBundle\Maintenance\Mode;
+use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,7 +23,7 @@ class CronCommand extends Command
     protected static $defaultName = 'oro:cron';
 
     private ManagerRegistry $doctrine;
-    private Mode $maintenanceMode;
+    private MaintenanceModeState $maintenanceMode;
     private CronHelper $cronHelper;
     private CommandRunnerInterface $commandRunner;
     private CronCommandFeatureCheckerInterface $commandFeatureChecker;
@@ -32,7 +32,7 @@ class CronCommand extends Command
 
     public function __construct(
         ManagerRegistry $doctrine,
-        Mode $maintenanceMode,
+        MaintenanceModeState $maintenanceMode,
         CronHelper $cronHelper,
         CommandRunnerInterface $commandRunner,
         CronCommandFeatureCheckerInterface $commandFeatureChecker,

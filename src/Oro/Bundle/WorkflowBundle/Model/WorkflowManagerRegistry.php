@@ -4,10 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 
+/**
+ * Registry of workflow managers registered for different "applications" (e.g. back-office, storefront).
+ */
 class WorkflowManagerRegistry
 {
-    /** @var CurrentApplicationProviderInterface */
-    protected $applicationProvider;
+    protected CurrentApplicationProviderInterface $currentApplicationProvider;
 
     /** @var WorkflowManager[] */
     protected $managers = [];

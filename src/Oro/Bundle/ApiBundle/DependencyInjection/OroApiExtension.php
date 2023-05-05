@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigBag;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Component\ChainProcessor\Debug\TraceableActionProcessor;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -37,11 +37,12 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     private const CACHE_MANAGER_SERVICE_ID = 'oro_api.cache_manager';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        $container->prependExtensionConfig($this->getAlias(), SettingsBuilder::getSettings($config));
         // remember the configuration to be able to use it in compiler passes
         DependencyInjectionUtil::setConfig($container, $config);
 
@@ -113,12 +114,10 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             $loader->load('services_test.yml');
             $this->configureTestEnvironment($container);
         }
-
-        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function prepend(ContainerBuilder $container): void
@@ -150,6 +149,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             foreach ($configs as $key => $config) {
                 if (isset($config['format_listener']['rules']) && \is_array($config['format_listener']['rules'])) {
                     // add REST API format listener rule
+                    /** @noinspection PhpArrayAccessCanBeReplacedWithForeachValueInspection */
                     array_unshift(
                         $configs[$key]['format_listener']['rules'],
                         [
@@ -187,32 +187,9 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         if (!$isBatchApiLockConfigured) {
             $container->prependExtensionConfig(
                 'framework',
-                ['lock' => ['batch_api' => $this->getBatchApiLockDsn($container)]]
+                ['lock' => ['batch_api' => '%env(pgsql_advisory_schema:ORO_DB_DSN)%']]
             );
         }
-    }
-
-    private function getBatchApiLockDsn(ContainerBuilder $container): string
-    {
-        /**
-         * The host is added via "host" query parameter to avoid 'Malformed parameter "url".' exception
-         * in {@see \Doctrine\DBAL\DriverManager::parseDatabaseUrl}
-         * when the host is a path to a unix socket like '/path/to/socket'.
-         */
-
-        $scheme = $container->getParameter('database_driver') === DatabaseDriverInterface::DRIVER_POSTGRESQL
-            ? 'pgsql+advisory'
-            : 'mysql';
-
-        return sprintf(
-            '%s://%s:%s@127.0.0.1:%s/%s?host=%s',
-            $scheme,
-            $container->getParameter('database_user'),
-            $container->getParameter('database_password'),
-            $container->getParameter('database_port'),
-            $container->getParameter('database_name'),
-            $container->getParameter('database_host')
-        );
     }
 
     private function configureTestEnvironment(ContainerBuilder $container): void
@@ -351,20 +328,10 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
     private function registerFilterOperators(ContainerBuilder $container, array $config): void
     {
-        $filterOperatorRegistryDef = DependencyInjectionUtil::findDefinition(
-            $container,
-            self::FILTER_OPERATOR_REGISTRY_SERVICE_ID
-        );
-        if (null !== $filterOperatorRegistryDef) {
-            $filterOperatorRegistryDef->replaceArgument(0, $config['filter_operators']);
-        }
-        $restFilterValueAccessorFactoryDef = DependencyInjectionUtil::findDefinition(
-            $container,
-            self::REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID
-        );
-        if (null !== $restFilterValueAccessorFactoryDef) {
-            $restFilterValueAccessorFactoryDef->replaceArgument(1, $config['filter_operators']);
-        }
+        DependencyInjectionUtil::findDefinition($container, self::FILTER_OPERATOR_REGISTRY_SERVICE_ID)
+            ?->replaceArgument(0, $config['filter_operators']);
+        DependencyInjectionUtil::findDefinition($container, self::REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID)
+            ?->replaceArgument(1, $config['filter_operators']);
     }
 
     private function registerConfigExtensions(ContainerBuilder $container, array $config): void

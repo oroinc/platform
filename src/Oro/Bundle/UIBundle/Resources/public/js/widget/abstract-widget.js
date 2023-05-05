@@ -203,9 +203,15 @@ define(function(require) {
          */
 
         _showLoading: function() {
-            this.subview('loadingMask', new LoadingMask({
+            let options = {
                 container: this._getLoadingElement()
-            }));
+            };
+
+            if (this.options.loadingProperties) {
+                options = Object.assign({}, options, this.options.loadingProperties);
+            }
+
+            this.subview('loadingMask', new LoadingMask(options));
             this.subview('loadingMask').show();
         },
 
@@ -332,8 +338,8 @@ define(function(require) {
             if (this.options.actionsEl !== undefined) {
                 if (typeof this.options.actionsEl === 'string') {
                     return this.$el.find(this.options.actionsEl);
-                } else if (_.isElement(this.options.actionsEl)) {
-                    return this.options.actionsEl;
+                } else if (_.isElement(this.options.actionsEl) || this.options.actionsEl instanceof $) {
+                    return $(this.options.actionsEl);
                 }
             }
             return false;

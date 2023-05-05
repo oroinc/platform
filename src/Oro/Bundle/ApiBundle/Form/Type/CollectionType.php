@@ -14,9 +14,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CollectionType extends AbstractType
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(
             new CollectionListener(
@@ -30,17 +30,13 @@ class CollectionType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'by_reference'  => false,
-            'entry_options' => [],
-        ]);
-        $resolver->setRequired([
-            'entry_type',
-            'entry_data_class'
-        ]);
+        $resolver
+            ->setDefault('by_reference', false)
+            ->setDefault('entry_options', [])
+            ->setRequired(['entry_type', 'entry_data_class']);
     }
 }

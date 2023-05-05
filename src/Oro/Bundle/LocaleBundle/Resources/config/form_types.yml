@@ -128,3 +128,6 @@ services:
         public: true
         arguments:
             - '@oro_config.form.handler.config'
+
+    oro_locale.form.event_subscriber.localized_fallback_value_collection_clearing:
+        class: Oro\Bundle\LocaleBundle\Form\EventSubscriber\LocalizedFallbackValueCollectionClearingSubscriber

@@ -29,7 +29,7 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        initialize: function(options) {
+        initialize(options) {
             _.extend(this, options);
             NumberCell.__super__.initialize.call(this, options);
             this.formatter = this.createFormatter();
@@ -40,14 +40,14 @@ define(function(require) {
          *
          * @return {orodatagrid.datagrid.formatter.NumberFormatter}
          */
-        createFormatter: function() {
+        createFormatter() {
             return new this.formatterPrototype({style: this.style});
         },
 
         /**
          * @inheritdoc
          */
-        render: function() {
+        render() {
             const render = NumberCell.__super__.render.call(this);
 
             this.enterEditMode();
@@ -58,8 +58,8 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        enterEditMode: function() {
-            if (this.isEditableColumn()) {
+        enterEditMode() {
+            if (this.isEditableColumn() && !this.currentEditor) {
                 NumberCell.__super__.enterEditMode.call(this);
             }
         },
@@ -67,7 +67,7 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        exitEditMode: function() {
+        exitEditMode() {
             if (!this.isEditableColumn()) {
                 NumberCell.__super__.exitEditMode.call(this);
             }

@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
  */
 class CompositeIdentifierFilterFactory
 {
-    /** @var EntityIdTransformerRegistry */
-    private $entityIdTransformerRegistry;
+    private EntityIdTransformerRegistry $entityIdTransformerRegistry;
 
     public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {

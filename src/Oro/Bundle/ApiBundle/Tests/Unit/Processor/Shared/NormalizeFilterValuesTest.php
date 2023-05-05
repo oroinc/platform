@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -125,6 +126,31 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
+    public function testProcessForEmptyValueFieldFilter()
+    {
+        $filters = $this->context->getFilters();
+        $stringFilter = new ComparisonFilter('string');
+        $filters->add('label', $stringFilter);
+
+        $filterValues = $this->context->getFilterValues();
+        $filterValues->set('label', new FilterValue('label', 'no', FilterOperator::EMPTY_VALUE));
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('no', 'boolean', $this->context->getRequestType(), false, false)
+            ->willReturn(false);
+        $this->entityIdTransformerRegistry->expects(self::never())
+            ->method('getEntityIdTransformer');
+
+        $this->context->setFilterValues($filterValues);
+        $this->processor->process($this->context);
+
+        self::assertFalse($filterValues->get('label')->getValue());
+
+        self::assertFalse($this->context->hasErrors());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
+    }
+
     public function testProcessForSingleIdFilter()
     {
         $filters = $this->context->getFilters();
@@ -200,6 +226,39 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertSame(1, $filterValues->get('association')->getValue());
+
+        self::assertFalse($this->context->hasErrors());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
+    }
+
+    public function testProcessForExistsAssociationFilter()
+    {
+        $filters = $this->context->getFilters();
+        $associationFilter = new ComparisonFilter('integer');
+        $associationFilter->setField('associationField');
+        $filters->add('association', $associationFilter);
+
+        $filterValues = $this->context->getFilterValues();
+        $filterValues->set('association', new FilterValue('association', 'no', FilterOperator::EXISTS));
+
+        $metadata = new EntityMetadata('Test\Entity');
+        $associationMetadata = new AssociationMetadata('associationField');
+        $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
+        $associationMetadata->setTargetMetadata($associationTargetMetadata);
+        $metadata->addAssociation($associationMetadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('no', 'boolean', $this->context->getRequestType(), false, false)
+            ->willReturn(false);
+        $this->entityIdTransformerRegistry->expects(self::never())
+            ->method('getEntityIdTransformer');
+
+        $this->context->setFilterValues($filterValues);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        self::assertFalse($filterValues->get('association')->getValue());
 
         self::assertFalse($this->context->hasErrors());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());

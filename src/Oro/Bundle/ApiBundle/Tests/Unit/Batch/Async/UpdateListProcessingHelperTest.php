@@ -73,7 +73,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         usleep(10000);
         $calculatedAggregateTime = $this->helper->calculateAggregateTime($startTimestamp, 5);
         // expected value is 15, but do test with some delta
-        // due to the calculated time may depends on the server performance
+        // due to the calculated time may depend on the server performance
         self::assertGreaterThanOrEqual(15, $calculatedAggregateTime);
         self::assertLessThan(30, $calculatedAggregateTime);
     }

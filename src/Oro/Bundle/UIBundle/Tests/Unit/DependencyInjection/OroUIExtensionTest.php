@@ -5,27 +5,27 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\UIBundle\DependencyInjection\OroUIExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class OroUIExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoadDefaultConfiguration()
+    public function testLoad(): void
     {
-        $container = new ContainerBuilder(new ParameterBag([
-            'kernel.environment' => 'prod'
-        ]));
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroUIExtension();
         $extension->load([], $container);
 
+        self::assertNotEmpty($container->getDefinitions());
         self::assertEquals(
             [
                 [
                     'settings' => [
-                        'resolved'          => true,
+                        'resolved' => true,
                         'organization_name' => ['value' => 'ORO', 'scope' => 'app'],
-                        'application_url'   => ['value' => 'http://localhost', 'scope' => 'app'],
-                        'navbar_position'   => ['value' => 'left', 'scope' => 'app']
+                        'application_url' => ['value' => 'http://localhost', 'scope' => 'app'],
+                        'navbar_position' => ['value' => 'left', 'scope' => 'app'],
+                        'quick_create_actions' => ['value' => 'current_page', 'scope' => 'app'],
                     ]
                 ]
             ],

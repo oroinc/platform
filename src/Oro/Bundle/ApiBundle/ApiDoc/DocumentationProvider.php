@@ -22,11 +22,8 @@ use Symfony\Component\Config\FileLocatorInterface;
  */
 class DocumentationProvider implements DocumentationProviderInterface
 {
-    /** @var string */
-    private $resource;
-
-    /** @var FileLocatorInterface */
-    private $fileLocator;
+    private string $resource;
+    private FileLocatorInterface $fileLocator;
 
     public function __construct(string $resource, FileLocatorInterface $fileLocator)
     {
@@ -46,6 +43,6 @@ class DocumentationProvider implements DocumentationProviderInterface
             ));
         }
 
-        return \file_get_contents($this->fileLocator->locate($this->resource));
+        return file_get_contents($this->fileLocator->locate($this->resource));
     }
 }

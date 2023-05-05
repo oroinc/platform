@@ -26,45 +26,27 @@ use Psr\Log\LoggerInterface;
  */
 abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 {
-    public const DATA   = 'data';
+    public const DATA = 'data';
     public const ERRORS = 'errors';
 
-    public const LINK_SELF    = 'self';
+    public const LINK_SELF = 'self';
     public const LINK_RELATED = 'related';
-    public const LINK_FIRST   = 'first';
-    public const LINK_LAST    = 'last';
-    public const LINK_PREV    = 'prev';
-    public const LINK_NEXT    = 'next';
+    public const LINK_FIRST = 'first';
+    public const LINK_LAST = 'last';
+    public const LINK_PREV = 'prev';
+    public const LINK_NEXT = 'next';
 
-    /** @var ValueNormalizer */
-    protected $valueNormalizer;
-
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /** @var ObjectAccessorInterface */
-    protected $objectAccessor;
-
-    /** @var DocumentBuilderDataAccessor */
-    protected $resultDataAccessor;
-
-    /** @var array */
-    protected $result = [];
-
+    protected ValueNormalizer $valueNormalizer;
+    protected LoggerInterface $logger;
+    protected ObjectAccessorInterface $objectAccessor;
+    protected DocumentBuilderDataAccessor $resultDataAccessor;
+    protected array $result = [];
     /** @var array [name => [href, meta properties] or LinkMetadataInterface, ...] */
-    protected $links = [];
-
-    /** @var EntityIdTransformerRegistry */
-    private $entityIdTransformerRegistry;
-
-    /** @var EntityIdAccessor */
-    private $entityIdAccessor;
-
-    /** @var AssociationToArrayAttributeConverter */
-    private $arrayAttributeConverter;
-
-    /** @var TargetMetadataProvider */
-    private $targetMetadataProvider;
+    protected array $links = [];
+    private EntityIdTransformerRegistry $entityIdTransformerRegistry;
+    private EntityIdAccessor $entityIdAccessor;
+    private ?AssociationToArrayAttributeConverter $arrayAttributeConverter = null;
+    private ?TargetMetadataProvider $targetMetadataProvider = null;
 
     public function __construct(
         ValueNormalizer $valueNormalizer,
@@ -112,7 +94,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntityId($entity, RequestType $requestType, EntityMetadata $metadata): string
+    public function getEntityId(mixed $entity, RequestType $requestType, EntityMetadata $metadata): string
     {
         return $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
@@ -128,7 +110,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setDataObject($object, RequestType $requestType, EntityMetadata $metadata = null): void
+    public function setDataObject(mixed $object, RequestType $requestType, ?EntityMetadata $metadata): void
     {
         $this->assertNoData();
 
@@ -148,12 +130,12 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setDataCollection($collection, RequestType $requestType, EntityMetadata $metadata = null): void
+    public function setDataCollection($collection, RequestType $requestType, ?EntityMetadata $metadata): void
     {
         $this->assertNoData();
 
         $this->result[self::DATA] = [];
-        if (\is_array($collection) || $collection instanceof \Traversable) {
+        if (\is_iterable($collection)) {
             $this->resultDataAccessor->setCollection(true);
             $this->resultDataAccessor->addEntity();
             try {
@@ -171,7 +153,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addIncludedObject($object, RequestType $requestType, EntityMetadata $metadata = null): void
+    public function addIncludedObject(mixed $object, RequestType $requestType, ?EntityMetadata $metadata): void
     {
         $this->assertData();
 
@@ -227,17 +209,10 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         $this->result[self::ERRORS] = $errorsData;
     }
 
-    /**
-     * @param array|\Traversable  $collection
-     * @param RequestType         $requestType
-     * @param EntityMetadata|null $metadata
-     *
-     * @return array
-     */
     protected function convertCollectionToArray(
-        $collection,
+        iterable $collection,
         RequestType $requestType,
-        EntityMetadata $metadata = null
+        ?EntityMetadata $metadata
     ): array {
         $result = [];
         foreach ($collection as $object) {
@@ -247,17 +222,10 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return $result;
     }
 
-    /**
-     * @param mixed               $object
-     * @param RequestType         $requestType
-     * @param EntityMetadata|null $metadata
-     *
-     * @return array
-     */
     abstract protected function convertObjectToArray(
-        $object,
+        mixed $object,
         RequestType $requestType,
-        EntityMetadata $metadata = null
+        ?EntityMetadata $metadata
     ): array;
 
     abstract protected function convertErrorToArray(Error $error): array;
@@ -266,15 +234,11 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
     abstract protected function tryConvertToEntityType(string $entityClass, RequestType $requestType): ?string;
 
-    /**
-     * @param mixed          $object
-     * @param RequestType    $requestType
-     * @param EntityMetadata $metadata
-     *
-     * @return string
-     */
-    protected function getEntityTypeForObject($object, RequestType $requestType, EntityMetadata $metadata): string
-    {
+    protected function getEntityTypeForObject(
+        mixed $object,
+        RequestType $requestType,
+        EntityMetadata $metadata
+    ): string {
         $className = $this->objectAccessor->getClassName($object);
 
         return $className
@@ -363,7 +327,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
             ConfigUtil::CLASS_NAME === $propertyPath
             && (
                 $metadata->isInheritedType()
-                || \is_a($metadata->getClassName(), EntityIdentifier::class, true)
+                || is_a($metadata->getClassName(), EntityIdentifier::class, true)
             );
     }
 
@@ -424,33 +388,19 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return new TargetMetadataProvider($this->objectAccessor);
     }
 
-    /**
-     * @param mixed $value
-     * @param bool  $isCollection
-     *
-     * @return bool
-     */
-    protected function isEmptyRelationship($value, bool $isCollection): bool
+    protected function isEmptyRelationship(mixed $value, bool $isCollection): bool
     {
         return $isCollection
             ? empty($value)
             : null === $value;
     }
 
-    /**
-     * @param array               $data
-     * @param RequestType         $requestType
-     * @param string              $associationName
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return mixed
-     */
     protected function getRelationshipValue(
         array $data,
         RequestType $requestType,
         string $associationName,
         AssociationMetadata $associationMetadata
-    ) {
+    ): mixed {
         $result = null;
         $isCollection = $associationMetadata->isCollection();
         if (\array_key_exists($associationName, $data)) {
@@ -487,15 +437,8 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return $data;
     }
 
-    /**
-     * @param array|\Traversable  $collection
-     * @param RequestType         $requestType
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return array
-     */
     protected function processRelatedCollection(
-        $collection,
+        iterable $collection,
         RequestType $requestType,
         AssociationMetadata $associationMetadata
     ): array {
@@ -510,29 +453,17 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         return $result;
     }
 
-    /**
-     * @param mixed               $object
-     * @param RequestType         $requestType
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return mixed
-     */
     abstract protected function processRelatedObject(
-        $object,
+        mixed $object,
         RequestType $requestType,
         AssociationMetadata $associationMetadata
-    );
+    ): mixed;
 
     abstract protected function addRelatedObject(array $object): void;
 
     abstract protected function addLinkToResult(array &$result, string $name, LinkMetadataInterface $link): void;
 
-    /**
-     * @param array  $result
-     * @param string $name
-     * @param mixed  $value
-     */
-    abstract protected function addMetaToCollectionResult(array &$result, string $name, $value): void;
+    abstract protected function addMetaToCollectionResult(array &$result, string $name, mixed $value): void;
 
     /**
      * Checks that the primary data exists.
@@ -554,18 +485,12 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
         }
     }
 
-    /**
-     * @param string $expectedType
-     * @param mixed  $value
-     *
-     * @return \UnexpectedValueException
-     */
-    protected function createUnexpectedValueException(string $expectedType, $value): \UnexpectedValueException
+    protected function createUnexpectedValueException(string $expectedType, mixed $value): \UnexpectedValueException
     {
-        return new \UnexpectedValueException(\sprintf(
+        return new \UnexpectedValueException(sprintf(
             'Expected argument of type "%s", "%s" given.',
             $expectedType,
-            \is_object($value) ? \get_class($value) : \gettype($value)
+            get_debug_type($value)
         ));
     }
 

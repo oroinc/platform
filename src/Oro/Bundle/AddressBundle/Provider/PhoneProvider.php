@@ -6,8 +6,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -20,7 +20,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class PhoneProvider implements PhoneProviderInterface, ResetInterface
 {
-    private const GET_PHONE_METHOD = 'getPhone';
+    private const PHONE_PROPERTY = 'getPhone';
 
     /** @var array [class name => [provider id, ...], ...] */
     private $phoneProviderMap;
@@ -99,8 +99,9 @@ class PhoneProvider implements PhoneProviderInterface, ResetInterface
             return $phone;
         }
 
-        if (method_exists($object, self::GET_PHONE_METHOD)) {
-            $phone = $object->getPhone();
+        $accessor = PropertyAccess::createPropertyAccessor();
+        if ($accessor->isReadable($object, self::PHONE_PROPERTY)) {
+            $phone = $accessor->getValue($object, self::PHONE_PROPERTY);
             if (!is_object($phone)) {
                 return $phone;
             }
@@ -135,8 +136,9 @@ class PhoneProvider implements PhoneProviderInterface, ResetInterface
             return $phones;
         }
 
-        if (method_exists($object, self::GET_PHONE_METHOD)) {
-            $phone = $object->{self::GET_PHONE_METHOD}();
+        $accessor = PropertyAccess::createPropertyAccessor();
+        if ($accessor->isReadable($object, self::PHONE_PROPERTY)) {
+            $phone = $accessor->getValue($object, self::PHONE_PROPERTY);
             if ($phone && !is_object($phone)) {
                 return [[$phone, $object]];
             }

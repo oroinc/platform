@@ -13,8 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class SetResultDocumentBuilder implements ProcessorInterface
 {
-    /** @var DocumentBuilderFactory */
-    private $documentBuilderFactory;
+    private DocumentBuilderFactory $documentBuilderFactory;
 
     public function __construct(DocumentBuilderFactory $documentBuilderFactory)
     {
@@ -24,7 +23,7 @@ class SetResultDocumentBuilder implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 

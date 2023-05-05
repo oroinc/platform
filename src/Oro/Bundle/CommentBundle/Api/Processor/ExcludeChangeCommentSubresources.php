@@ -29,7 +29,7 @@ class ExcludeChangeCommentSubresources implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CollectSubresourcesContext $context */
 

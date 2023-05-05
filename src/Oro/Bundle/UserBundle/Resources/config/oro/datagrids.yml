@@ -21,7 +21,7 @@ datagrids:
                     - u.createdAt
                     - u.updatedAt
                     - u.enabled
-                    - au.id as auth_status
+                    - au.name as authStatus
                 from:
                     - { table: 'Oro\Bundle\UserBundle\Entity\User', alias: u }
                 join:
@@ -49,8 +49,8 @@ datagrids:
                 choices:
                     oro.user.datagrid.user.columns.disabled: 0
                     oro.user.datagrid.user.columns.enabled: 1
-            auth_status:
-                label:         oro.user.auth_status.label
+            authStatus:
+                label:         oro.user.datagrid.auth_status.label
                 editable:      false
                 inline_editing:
                     enable: false
@@ -99,7 +99,7 @@ datagrids:
                     data_name: u.updatedAt
                 enabled:
                     data_name: u.enabled
-                auth_status:
+                authStatus:
                     data_name: au.priority
             default:
                 username: ASC
@@ -126,7 +126,7 @@ datagrids:
                             choices:
                                 oro.user.datagrid.user.filters.disabled: 2
                                 oro.user.datagrid.user.filters.enabled: 1
-                auth_status:
+                authStatus:
                     type:      enum
                     data_name: au.id
                     enum_code: auth_status
@@ -804,10 +804,11 @@ datagrids:
         acl_resource: oro_view_user_login_attempt
         source:
             type: orm
+#            id in user loing attempt is in type of uuid.
             query:
                 select:
                     - partial ul.{ id }
-                    - ul.id
+                    - CAST(ul.id as string) as ulId
                     - ul.attemptAt
                     - ul.success
                     - ul.source
@@ -835,6 +836,7 @@ datagrids:
                 label: oro.user.userloginattempt.source.label
                 frontend_type: select
                 choices: '@oro_user.logger.user_login_attempt->getSourceChoices()'
+                translatable_options: false
             username:
                 label: oro.user.userloginattempt.username.label
             user:
@@ -871,7 +873,7 @@ datagrids:
             columns:
                 id:
                     type: string
-                    data_name: ul.id
+                    data_name: ulId
                 success:
                     data_name: ul.success
                     type: boolean
@@ -887,6 +889,7 @@ datagrids:
                     options:
                         field_options:
                             choices: '@oro_user.logger.user_login_attempt->getSourceChoices()'
+                            translatable_options: false
                             multiple: true
                 user:
                     type: choice-tree

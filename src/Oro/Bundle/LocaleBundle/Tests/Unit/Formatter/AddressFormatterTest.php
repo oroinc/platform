@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
 use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Stubs\AddressStub;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class AddressFormatterTest extends \PHPUnit\Framework\TestCase
 {

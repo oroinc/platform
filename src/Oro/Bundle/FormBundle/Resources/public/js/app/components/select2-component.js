@@ -123,7 +123,8 @@ define(function(require) {
             } else {
                 // configure non AJAX based Select2
                 if (config.minimumResultsForSearch === undefined) {
-                    config.minimumResultsForSearch = 7;
+                    // Disable search field for Select2 on the iOS to avoid autoscrolling
+                    config.minimumResultsForSearch = tools.isIOS() ? -1 : 7;
                 }
                 config.sortResults = function(results, container, query) {
                     if (!query.term || query.term.length < 1) {

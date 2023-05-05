@@ -9,9 +9,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 
 class PermissionMapTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PermissionMap
-     */
+    /** @var PermissionMap */
     private $map;
 
     protected function setUp(): void
@@ -29,7 +27,7 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getMasksProvider
      */
-    public function testGetMasks($object, $name, $mask)
+    public function testGetMasks(object|string $object, string $name, array $mask)
     {
         $this->assertEquals($mask, $this->map->getMasks($name, $object));
     }
@@ -37,7 +35,7 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider containsProvider
      */
-    public function testContains($name, $expectedResult)
+    public function testContains(string $name, bool $expectedResult)
     {
         $this->assertEquals($expectedResult, $this->map->contains($name));
     }
@@ -45,7 +43,7 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public static function getMasksProvider()
+    public static function getMasksProvider(): array
     {
         return [
             'VIEW' => [
@@ -124,10 +122,7 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function containsProvider()
+    public static function containsProvider(): array
     {
         return [
             ['VIEW', true],

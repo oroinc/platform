@@ -3,9 +3,7 @@ Oro\Bundle\TranslationBundle\Entity\Language:
     code: 'ja_JP'
     enabled: true
     organization: '@organization'
-    owner: '@admin'
   dutch:
     code: 'nl_NL'
     enabled: true
     organization: '@organization'
-    owner: '@admin'

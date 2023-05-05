@@ -50,4 +50,12 @@ class RecalculateEmailVisibilityTopicTest extends AbstractTopicTestCase
             ]
         ];
     }
+
+    public function testCreateJobName(): void
+    {
+        self::assertSame(
+            'oro.email.recalculate_email_visibility:' . md5('test@test.com'),
+            $this->getTopic()->createJobName(['email' => 'test@test.com'])
+        );
+    }
 }

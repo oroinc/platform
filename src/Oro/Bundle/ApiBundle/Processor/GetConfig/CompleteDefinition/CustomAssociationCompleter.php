@@ -126,7 +126,7 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
             return;
         }
         $idFieldNames = $targetEntity->getIdentifierFieldNames();
-        if (1 !== count($idFieldNames)) {
+        if (1 !== \count($idFieldNames)) {
             return;
         }
         $idField = $targetEntity->getField(reset($idFieldNames));
@@ -148,7 +148,7 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
         foreach ($targetEntityClasses as $targetEntityClass) {
             $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetEntityClass);
             $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
-            if (1 !== count($targetIdFieldNames)) {
+            if (1 !== \count($targetIdFieldNames)) {
                 $idDataType = null;
                 break;
             }

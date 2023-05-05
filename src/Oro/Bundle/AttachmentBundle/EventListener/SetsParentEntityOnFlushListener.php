@@ -4,16 +4,17 @@ namespace Oro\Bundle\AttachmentBundle\EventListener;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
@@ -44,7 +45,7 @@ class SetsParentEntityOnFlushListener
      */
     public function onFlush(OnFlushEventArgs $event): void
     {
-        $entityManager = $event->getEntityManager();
+        $entityManager = $event->getObjectManager();
         $metadataFactory = $entityManager->getMetadataFactory();
 
         $unitOfWork = $entityManager->getUnitOfWork();
@@ -91,7 +92,7 @@ class SetsParentEntityOnFlushListener
 
     private function onFlushCollections(OnFlushEventArgs $event)
     {
-        $entityManager = $event->getEntityManager();
+        $entityManager = $event->getObjectManager();
         $unitOfWork = $entityManager->getUnitOfWork();
         $fileClassMetadata = $entityManager->getClassMetadata(File::class);
 
@@ -143,7 +144,9 @@ class SetsParentEntityOnFlushListener
      */
     private function processEntity($entity, EntityManager $entityManager, callable $callback): void
     {
-        $classMetadata = $entityManager->getClassMetadata(ClassUtils::getRealClass($entity));
+        $realClass = ClassUtils::getRealClass($entity);
+        $classMetadata = $entityManager->getClassMetadata($realClass);
+
         if (count($classMetadata->getIdentifier()) !== 1) {
             // Entity does not have id field or it is composite.
             return;
@@ -152,6 +155,18 @@ class SetsParentEntityOnFlushListener
         foreach ($classMetadata->getAssociationMappings() as $mapping) {
             if ($entity instanceof FileItem || !$this->isMetadataAcceptable($mapping)) {
                 continue;
+            }
+
+            if ($this->configManager->hasConfig($realClass, $mapping['fieldName'])) {
+                $fieldConfig = $this->configManager->getFieldConfig(
+                    'extend',
+                    $realClass,
+                    $mapping['fieldName']
+                );
+
+                if ($fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
+                    continue;
+                }
             }
 
             $fileEntities = $this->getFileFieldValue($entity, $mapping['fieldName'], $mapping['type']);
@@ -185,8 +200,8 @@ class SetsParentEntityOnFlushListener
     public function prePersist(LifecycleEventArgs $event): void
     {
         $this->processEntity(
-            $event->getEntity(),
-            $event->getEntityManager(),
+            $event->getObject(),
+            $event->getObjectManager(),
             function ($entity, string $fieldName, array $filesEntities) {
                 if (!isset($this->scheduledForUpdate[$entity])) {
                     $this->scheduledForUpdate[$entity] = [];
@@ -204,12 +219,12 @@ class SetsParentEntityOnFlushListener
      */
     public function postPersist(LifecycleEventArgs $event): void
     {
-        $entity = $event->getEntity();
+        $entity = $event->getObject();
         if (!$this->scheduledForUpdate->contains($entity)) {
             return;
         }
 
-        $entityManager = $event->getEntityManager();
+        $entityManager = $event->getObjectManager();
         $entityId = $this->getEntityId($entityManager, $entity);
         if (!$entityId) {
             throw new \LogicException('The persisted entity does not have an id');

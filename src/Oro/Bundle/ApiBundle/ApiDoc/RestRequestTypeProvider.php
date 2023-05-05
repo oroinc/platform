@@ -14,10 +14,8 @@ class RestRequestTypeProvider implements
     ResetInterface
 {
     /** @var array [view name => [request type, ...], ...] */
-    private $requestTypeMap = [];
-
-    /** @var RestDocViewDetector|null */
-    private $docViewDetector;
+    private array $requestTypeMap = [];
+    private ?RestDocViewDetector $docViewDetector = null;
 
     /**
      * Adds a mapping between API view and related to it request type.
@@ -25,13 +23,13 @@ class RestRequestTypeProvider implements
      * @param string   $view
      * @param string[] $requestTypes
      */
-    public function mapViewToRequestType(string $view, array $requestTypes)
+    public function mapViewToRequestType(string $view, array $requestTypes): void
     {
         $this->requestTypeMap[$view] = $requestTypes;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setRestDocViewDetector(RestDocViewDetector $docViewDetector): void
     {
@@ -41,18 +39,18 @@ class RestRequestTypeProvider implements
     /**
      * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->docViewDetector = null;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getRequestType(): ?RequestType
     {
         $view = $this->docViewDetector->getView();
-        if (array_key_exists($view, $this->requestTypeMap)) {
+        if (\array_key_exists($view, $this->requestTypeMap)) {
             return new RequestType($this->requestTypeMap[$view]);
         }
 

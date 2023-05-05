@@ -6,6 +6,7 @@ Extend\Entity\TestApiE2:
 Extend\Entity\TestApiE1:
     entity1_1:
         name: 'Entity 1 (1)'
+        serializedField: 'serialized 1'
         enumField: '@enum1_1'
         multiEnumField: ['@enum2_1', '@enum2_2']
         uniM2O: '@entity2_1'

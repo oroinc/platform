@@ -2,35 +2,23 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc\Parser;
 
+/**
+ * Represents a state of {@see MarkdownApiDocParser}.
+ */
 class MarkdownApiDocParserState
 {
-    /** @var string|null */
-    private $className;
+    private ?string $className = null;
+    private ?string $section = null;
+    private ?string $element = null;
+    private ?string $subElement = null;
+    private bool $hasSubElements = false;
 
-    /** @var string|null */
-    private $section;
-
-    /** @var string|null */
-    private $element;
-
-    /** @var string|null */
-    private $subElement;
-
-    /** @var bool */
-    private $hasSubElements = false;
-
-    /**
-     * @return string|null
-     */
-    public function getClassName()
+    public function getClassName(): ?string
     {
         return $this->className;
     }
 
-    /**
-     * @param string|null $className
-     */
-    public function setClassName($className)
+    public function setClassName(?string $className): void
     {
         $this->className = $className;
         $this->section = null;
@@ -39,18 +27,12 @@ class MarkdownApiDocParserState
         $this->hasSubElements = false;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getSection()
+    public function getSection(): ?string
     {
         return $this->section;
     }
 
-    /**
-     * @param string|null $section
-     */
-    public function setSection($section)
+    public function setSection(?string $section): void
     {
         $this->section = $section;
         $this->element = null;
@@ -58,76 +40,49 @@ class MarkdownApiDocParserState
         $this->hasSubElements = false;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getElement()
+    public function getElement(): ?string
     {
         return $this->element;
     }
 
-    /**
-     * @param string|null $element
-     */
-    public function setElement($element)
+    public function setElement(?string $element): void
     {
         $this->element = $element;
         $this->subElement = null;
         $this->hasSubElements = false;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getSubElement()
+    public function getSubElement(): ?string
     {
         return $this->subElement;
     }
 
-    /**
-     * @param string|null $subElement
-     */
-    public function setSubElement($subElement)
+    public function setSubElement(?string $subElement): void
     {
         $this->subElement = $subElement;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasSubElements()
+    public function hasSubElements(): bool
     {
         return $this->hasSubElements;
     }
 
-    /**
-     * @param bool $hasSubElements
-     */
-    public function setHasSubElements($hasSubElements)
+    public function setHasSubElements(bool $hasSubElements): void
     {
         $this->hasSubElements = $hasSubElements;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasClass()
+    public function hasClass(): bool
     {
         return (bool)$this->className;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasSection()
+    public function hasSection(): bool
     {
         return $this->section && $this->className;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasElement()
+    public function hasElement(): bool
     {
         return $this->element && $this->section && $this->className;
     }

@@ -12,7 +12,6 @@ use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -28,14 +27,14 @@ class ValidLoadedItemsValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof ValidLoadedItems) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\ValidLoadedItems');
+            throw new UnexpectedTypeException($constraint, ValidLoadedItems::class);
         }
 
         if (null === $value) {
             return;
         }
 
-        if (!is_array($value) && !$value instanceof \Traversable) {
+        if (!\is_array($value) && !$value instanceof \Traversable) {
             throw new UnexpectedTypeException($value, 'array or Traversable');
         }
 
@@ -43,12 +42,11 @@ class ValidLoadedItemsValidator extends ConstraintValidator
             return;
         }
 
-        /** @var ExecutionContextInterface $context */
-        $context = $this->context;
-        $validator = $context->getValidator()->inContext($context);
         if ($value instanceof PersistentCollection) {
             $value = $value->unwrap();
         }
+
+        $validator = $this->context->getValidator()->inContext($this->context);
         foreach ($value as $key => $element) {
             $validator->atPath('[' . $key . ']')->validate($element, $constraint->constraints);
         }

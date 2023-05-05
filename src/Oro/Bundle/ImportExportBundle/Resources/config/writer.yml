@@ -3,8 +3,7 @@ services:
         class: Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter
         arguments:
             - '@oro_importexport.context_registry'
-        calls:
-            - [setClearWriter, ['@oro_importexport.writer.doctrine_clear']]
+            - '@oro_importexport.writer.doctrine_clear'
         tags:
             - { name: oro_importexport.writer, alias: csv }
 
@@ -12,8 +11,7 @@ services:
         class: Oro\Bundle\ImportExportBundle\Writer\XlsxFileWriter
         arguments:
             - '@oro_importexport.context_registry'
-        calls:
-            - [setClearWriter, ['@oro_importexport.writer.doctrine_clear']]
+            - '@oro_importexport.writer.doctrine_clear'
         tags:
             - { name: oro_importexport.writer, alias: xlsx }
 
@@ -52,6 +50,7 @@ services:
         class: Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter
         arguments:
             - '@doctrine'
+            - '@oro_importexport.context_registry'
         tags:
             - { name: oro_importexport.writer, alias: doctrine_clear }
 

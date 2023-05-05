@@ -24,14 +24,7 @@ class SchedulesByArgumentsFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $command
-     * @param array  $arguments
-     * @param string $definition
-     *
-     * @return Schedule
-     */
-    private function createSchedule($command, array $arguments, $definition)
+    private function createSchedule(string $command, array $arguments, string $definition): Schedule
     {
         $schedule = new Schedule();
         $schedule

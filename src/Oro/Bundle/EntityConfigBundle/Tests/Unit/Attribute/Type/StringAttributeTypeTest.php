@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\StringAttributeType;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
@@ -10,7 +11,7 @@ class StringAttributeTypeTest extends AttributeTypeTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeType()
+    protected function getAttributeType(): AttributeTypeInterface
     {
         return new StringAttributeType();
     }
@@ -18,12 +19,10 @@ class StringAttributeTypeTest extends AttributeTypeTestCase
     /**
      * {@inheritdoc}
      */
-    public function configurationMethodsDataProvider()
+    public function configurationMethodsDataProvider(): array
     {
-        yield [
-            'isSearchable' => true,
-            'isFilterable' => true,
-            'isSortable' => true
+        return [
+            ['isSearchable' => true, 'isFilterable' => true, 'isSortable' => true]
         ];
     }
 

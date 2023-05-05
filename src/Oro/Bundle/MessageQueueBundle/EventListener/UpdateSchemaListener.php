@@ -1,27 +1,26 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\EventListener;
 
-use Oro\Bundle\MessageQueueBundle\Consumption\InterruptConsumptionExtensionTrait;
+use Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension;
+use Psr\Cache\CacheItemPoolInterface;
 
+/**
+ * Interrupts consumption on schema update event
+ */
 class UpdateSchemaListener
 {
-    use InterruptConsumptionExtensionTrait;
+    private CacheItemPoolInterface $interruptConsumptionCache;
 
-    /**
-     * @param string $filePath
-     */
-    public function __construct($filePath)
+    public function __construct(CacheItemPoolInterface $interruptConsumptionCache)
     {
-        $this->filePath = $filePath;
+        $this->interruptConsumptionCache = $interruptConsumptionCache;
     }
 
     /**
-     * Interrupt consumption on schema update event
+     * Clears "Interrupt Consumption" cache
      */
-    public function interruptConsumption()
+    public function onSchemaUpdate(): void
     {
-        $this->touch($this->filePath);
-
-        touch($this->filePath); // update file metadata
+        $this->interruptConsumptionCache->deleteItem(InterruptConsumptionExtension::CACHE_KEY);
     }
 }

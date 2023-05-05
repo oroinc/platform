@@ -1,5 +1,14 @@
 services:
     oro_navigation.form.type.menu_update:
         class: 'Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType'
+        calls:
+            - ['setLocalizedFallbackValueCollectionSubscriber', ['@oro_locale.form.event_subscriber.localized_fallback_value_collection_clearing']]
+        tags:
+            - { name: form.type}
+
+    oro_navigation.form.type.menu_choice:
+        class: 'Oro\Bundle\NavigationBundle\Form\Type\MenuChoiceType'
+        arguments:
+            - '@oro_navigation.provider.menu_names'
         tags:
             - { name: form.type}

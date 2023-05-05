@@ -12,19 +12,16 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class DateTimeToStringTransformer implements DataTransformerInterface
 {
-    private const DATE_VALUE       = '(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?';
-    private const TIME_VALUE       = '(\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d+)?';
-    private const TIMEZONE_VALUE   = '(Z|(?:(?:\+|-)\d{2}:\d{2}))';
+    private const DATE_VALUE = '(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?';
+    private const TIME_VALUE = '(\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d+)?';
+    private const TIMEZONE_VALUE = '(Z|(?:(?:\+|-)\d{2}:\d{2}))';
     private const DATETIME_PATTERN =
         '/^' . self::DATE_VALUE . '(T' . self::TIME_VALUE . self::TIMEZONE_VALUE . ')?$/';
-    private const DATE_PATTERN     = '/^' . self::DATE_VALUE . '$/';
-    private const TIME_PATTERN     = '/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/';
+    private const DATE_PATTERN = '/^' . self::DATE_VALUE . '$/';
+    private const TIME_PATTERN = '/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/';
 
-    /** @var bool */
-    private $withTime;
-
-    /** @var bool */
-    private $withDate;
+    private bool $withTime;
+    private bool $withDate;
 
     public function __construct(bool $withTime = true, bool $withDate = true)
     {
@@ -36,7 +33,7 @@ class DateTimeToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function transform($value)
     {
@@ -52,7 +49,7 @@ class DateTimeToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function reverseTransform($value)
     {
@@ -104,20 +101,20 @@ class DateTimeToStringTransformer implements DataTransformerInterface
                 ['{{ value }}' => $value]
             );
         }
-        if (array_key_exists(3, $matches) && '' !== $matches[3]) {
+        if (\array_key_exists(3, $matches) && '' !== $matches[3]) {
             $this->assertValidDate($matches[1], $matches[2], $matches[3]);
             $dateValue = $matches[1] . '-' . $matches[2] . '-' . $matches[3];
-        } elseif (array_key_exists(2, $matches) && '' !== $matches[2]) {
+        } elseif (\array_key_exists(2, $matches) && '' !== $matches[2]) {
             $this->assertValidDate($matches[1], $matches[2], '01');
             $dateValue = $matches[1] . '-' . $matches[2] . '-01';
         } else {
             $this->assertValidDate($matches[1], '01', '01');
             $dateValue = $matches[1] . '-01-01';
         }
-        if (array_key_exists(7, $matches) && '' !== $matches[7]) {
+        if (\array_key_exists(7, $matches) && '' !== $matches[7]) {
             $this->assertValidTime($matches[5], $matches[6], $matches[7]);
             $value = $dateValue . $matches[4];
-        } elseif (array_key_exists(5, $matches)) {
+        } elseif (\array_key_exists(5, $matches)) {
             $this->assertValidTime($matches[5], $matches[6], '00');
             $value = $dateValue . 'T' . $matches[5] . ':' . $matches[6] . ':00' . $matches[8];
         } else {
@@ -136,9 +133,9 @@ class DateTimeToStringTransformer implements DataTransformerInterface
                 ['{{ value }}' => $value]
             );
         }
-        if (array_key_exists(3, $matches)) {
+        if (\array_key_exists(3, $matches)) {
             $this->assertValidDate($matches[1], $matches[2], $matches[3]);
-        } elseif (array_key_exists(2, $matches)) {
+        } elseif (\array_key_exists(2, $matches)) {
             $this->assertValidDate($matches[1], $matches[2], '01');
             $value .= '-01';
         } else {
@@ -158,7 +155,7 @@ class DateTimeToStringTransformer implements DataTransformerInterface
                 ['{{ value }}' => $value]
             );
         }
-        if (array_key_exists(3, $matches)) {
+        if (\array_key_exists(3, $matches)) {
             $this->assertValidTime($matches[1], $matches[2], $matches[3]);
         } else {
             $this->assertValidTime($matches[1], $matches[2], '00');
@@ -193,14 +190,9 @@ class DateTimeToStringTransformer implements DataTransformerInterface
         return $result;
     }
 
-    /**
-     * @param int|string $year
-     * @param int|string $month
-     * @param int|string $day
-     */
-    private function assertValidDate($year, $month, $day): void
+    private function assertValidDate(string $year, string $month, string $day): void
     {
-        if (!checkdate($month, $day, $year)) {
+        if (!checkdate((int)$month, (int)$day, (int)$year)) {
             throw FormUtil::createTransformationFailedException(
                 sprintf('The date "%s-%s-%s" is not a valid date.', $year, $month, $day),
                 'oro.api.form.invalid_date',
@@ -209,14 +201,9 @@ class DateTimeToStringTransformer implements DataTransformerInterface
         }
     }
 
-    /**
-     * @param int|string $hours
-     * @param int|string $minutes
-     * @param int|string $seconds
-     */
-    private function assertValidTime($hours, $minutes, $seconds): void
+    private function assertValidTime(string $hours, string $minutes, string $seconds): void
     {
-        if ($hours > 23 || $minutes > 59 || $seconds > 59) {
+        if ((int)$hours > 23 || (int)$minutes > 59 || (int)$seconds > 59) {
             throw FormUtil::createTransformationFailedException(
                 sprintf('The time "%s:%s:%s" is not a valid time.', $hours, $minutes, $seconds),
                 'oro.api.form.invalid_time',

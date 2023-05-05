@@ -156,21 +156,33 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldRunRunUniqueAndACKMessage(): void
     {
+        $options = [
+            Context::OPTION_BATCH_SIZE => 100,
+            Context::OPTION_ENCLOSURE => '|',
+            Context::OPTION_DELIMITER => ';',
+        ];
+
+        $message = new Message();
+        $message->setMessageId(1);
+        $message->setBody([
+            'fileName' => '123435.csv',
+            'originFileName' => 'test.csv',
+            'userId' => '1',
+            'jobName' => 'test',
+            'processorAlias' => 'test',
+            'process' => 'import',
+            'options' => $options,
+        ]);
+
         $this->jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->with(1)
+            ->method('runUniqueByMessage')
+            ->with($message)
             ->willReturn(true);
 
         $this->fileManager->expects(self::once())
             ->method('writeToTmpLocalStorage')
             ->with('123435.csv')
             ->willReturn('12345.csv');
-
-        $options = [
-            Context::OPTION_BATCH_SIZE => 100,
-            Context::OPTION_ENCLOSURE => '|',
-            Context::OPTION_DELIMITER => ';',
-        ];
 
         $this->importHandler->expects(self::once())
             ->method('setImportingFileName')
@@ -186,6 +198,20 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects(self::never())
             ->method('dispatch');
 
+        $result = $this->preImportMessageProcessor->process($message, $this->createMock(SessionInterface::class));
+
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
+    }
+
+    public function testUniqueJobWithCustomName(): void
+    {
+        $options = [
+            Context::OPTION_BATCH_SIZE => 100,
+            Context::OPTION_ENCLOSURE => '|',
+            Context::OPTION_DELIMITER => ';',
+            'unique_job_slug' => 0,
+        ];
+
         $message = new Message();
         $message->setMessageId(1);
         $message->setBody([
@@ -198,18 +224,10 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'options' => $options,
         ]);
 
-        $result = $this->preImportMessageProcessor->process($message, $this->createMock(SessionInterface::class));
-
-        self::assertEquals(MessageProcessorInterface::ACK, $result);
-    }
-
-    public function testUniqueJobWithCustomName(): void
-    {
         $this->jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->willReturnCallback(function ($jobId, $name) {
-                self::assertEquals(1, $jobId);
-                self::assertMatchesRegularExpression('/^oro:import:test:test:1:\d*/', $name);
+            ->method('runUniqueByMessage')
+            ->willReturnCallback(function ($actualMessage) use ($message) {
+                $this->assertSame($actualMessage, $message);
 
                 return true;
             });
@@ -219,13 +237,6 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('123435.csv')
             ->willReturn('12345.csv');
 
-        $options = [
-            Context::OPTION_BATCH_SIZE => 100,
-            Context::OPTION_ENCLOSURE => '|',
-            Context::OPTION_DELIMITER => ';',
-            'unique_job_slug' => 0,
-        ];
-
         $this->importHandler->expects(self::once())
             ->method('setImportingFileName')
             ->with('12345.csv');
@@ -239,18 +250,6 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects(self::never())
             ->method('dispatch');
-
-        $message = new Message();
-        $message->setMessageId(1);
-        $message->setBody([
-            'fileName' => '123435.csv',
-            'originFileName' => 'test.csv',
-            'userId' => '1',
-            'jobName' => 'test',
-            'processorAlias' => 'test',
-            'process' => 'import',
-            'options' => $options,
-        ]);
 
         $result = $this->preImportMessageProcessor->process($message, $this->createMock(SessionInterface::class));
 
@@ -343,12 +342,15 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $childJob2 = $this->getJob(3, $job);
         $childJob = $this->getJob(10, $job);
 
+        $message = new Message();
+        $message->setMessageId(1);
+        $message->setBody($messageData);
+
         $jobRunner = $this->jobRunner;
         $jobRunner->expects(self::once())
-            ->method('runUnique')
-            ->willReturnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
-                self::assertEquals(1, $jobId);
-                self::assertMatchesRegularExpression('/^oro:import:processor_test:test_import:1:\d*/', $name);
+            ->method('runUniqueByMessage')
+            ->willReturnCallback(function ($actualMessage, $callback) use ($message, $jobRunner, $childJob) {
+                $this->assertSame($actualMessage, $message);
 
                 return $callback($jobRunner, $childJob);
             });
@@ -357,18 +359,12 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('createDelayed')
             ->willReturnOnConsecutiveCalls(
                 new ReturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
-                    self::assertMatchesRegularExpression(
-                        '/^oro:import:processor_test:test_import:1:\d*:chunk.1/',
-                        $jobId
-                    );
+                    self::assertEquals('job_name:chunk.1', $jobId);
 
                     return $callback($jobRunner, $childJob1);
                 }),
                 new ReturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
-                    self::assertMatchesRegularExpression(
-                        '/^oro:import:processor_test:test_import:1:\d*:chunk.2/',
-                        $jobId
-                    );
+                    self::assertEquals('job_name:chunk.2', $jobId);
 
                     return $callback($jobRunner, $childJob2);
                 })
@@ -476,10 +472,6 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS
             );
 
-        $message = new Message();
-        $message->setMessageId(1);
-        $message->setBody($messageData);
-
         $result = $this->preImportMessageProcessor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
@@ -489,6 +481,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $job = new Job();
         $job->setId($id);
+        $job->setName('job_name');
         if (null !== $rootJob) {
             $job->setRootJob($rootJob);
         }

@@ -14,11 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class AbstractErrorCompleter implements ErrorCompleterInterface
 {
-    /** @var ErrorTitleOverrideProvider */
-    private $errorTitleOverrideProvider;
-
-    /** @var ExceptionTextExtractorInterface */
-    private $exceptionTextExtractor;
+    private ErrorTitleOverrideProvider $errorTitleOverrideProvider;
+    private ExceptionTextExtractorInterface $exceptionTextExtractor;
 
     public function __construct(
         ErrorTitleOverrideProvider $errorTitleOverrideProvider,

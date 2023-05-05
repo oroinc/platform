@@ -111,10 +111,7 @@ class OwnershipMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($levels, $metadata->getAccessLevelNames());
     }
 
-    /**
-     * @return array
-     */
-    public function getAccessLevelNamesDataProvider()
+    public function getAccessLevelNamesDataProvider(): array
     {
         return [
             'no owner' => [

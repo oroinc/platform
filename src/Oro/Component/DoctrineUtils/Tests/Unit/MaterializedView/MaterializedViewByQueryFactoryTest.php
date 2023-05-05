@@ -4,32 +4,29 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\MaterializedView;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Component\DoctrineUtils\MaterializedView\MaterializedViewByQueryFactory;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class MaterializedViewByQueryFactoryTest extends OrmTestCase
 {
-    private EntityManagerMock $entityManager;
-
+    private EntityManagerInterface $em;
     private MaterializedViewByQueryFactory $factory;
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->getTestEntityManager();
-        $this->entityManager
-            ->getConfiguration()
-            ->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+        $this->em = $this->getTestEntityManager();
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->factory = new MaterializedViewByQueryFactory();
     }
 
     public function testCreateByQuery(): void
     {
-        $query = $this->entityManager->createQuery('SELECT e.id, e.name FROM ' . Item::class . ' e WHERE e.id = :id');
+        $query = $this->em->createQuery('SELECT e.id, e.name FROM ' . Item::class . ' e WHERE e.id = :id');
         $query
             ->setFirstResult(42)
             ->setMaxResults(142)

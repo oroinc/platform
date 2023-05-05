@@ -11,9 +11,9 @@ use Oro\Bundle\ApiBundle\Processor\ByStepNormalizeResultActionProcessor;
 class BatchUpdateProcessor extends ByStepNormalizeResultActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): BatchUpdateContext
     {
         return new BatchUpdateContext();
     }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;

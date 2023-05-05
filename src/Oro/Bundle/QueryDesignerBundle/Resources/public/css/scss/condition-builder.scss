@@ -147,7 +147,7 @@
                 float: none;
                 position: absolute;
                 top: 50%;
-                left: ceil($condition-builder-conditions-group-start-border-width * .5);
+                left: math.ceil($condition-builder-conditions-group-start-border-width * .5);
                 margin: math.div($condition-builder-close-item-size, -2);
                 width: $condition-builder-close-item-size;
                 height: $condition-builder-close-item-size;

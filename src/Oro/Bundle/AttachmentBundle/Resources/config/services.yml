@@ -32,6 +32,11 @@ services:
             - '@oro_attachment.mapper.client_mime_type_mapper'
             - '@oro_attachment.tools.external_file_factory'
 
+    oro_attachment.file_manager.cleanup_data:
+        parent: oro_gaufrette.file_manager
+        arguments:
+            - 'attachments_cleanup_data'
+
     oro_attachment.mapper.client_mime_type_mapper:
         class: Oro\Bundle\AttachmentBundle\Mapper\ClientMimeTypeMapper
 
@@ -183,10 +188,10 @@ services:
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
-    oro_attachment.entity_generator.extension:
-        class: Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension
+    oro_attachment.entity_field.attachment_extension:
+        class: Oro\Bundle\AttachmentBundle\EntityExtend\AttachmentEntityFieldExtension
         tags:
-            - { name: oro_entity_extend.entity_generator_extension }
+            - { name: 'oro_entity_extend.entity_field_extension', priority: 40 }
 
     oro_attachment.migration.extension.attachment:
         class: Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
@@ -310,6 +315,7 @@ services:
 
     oro_attachment.media_cache_manager_registry:
         class: 'Oro\Bundle\AttachmentBundle\Manager\MediaCacheManagerRegistry'
+        public: true
         arguments:
             - '@oro_attachment.acl.file_access_control_checker'
             - '@oro_attachment.manager.public_mediacache'
@@ -559,6 +565,7 @@ services:
 
     oro_attachment.provider.image_file_names:
         class: Oro\Bundle\AttachmentBundle\Provider\ImageFileNamesProvider
+        public: true
         arguments:
             - '@liip_imagine.filter.configuration'
             - '@oro_attachment.provider.resized_image_path'
@@ -572,14 +579,6 @@ services:
             - '@oro_attachment.manager.image_file_removal_config'
             - '@oro_attachment.provider.image_file_names'
             - '@oro_attachment.media_cache_manager_registry'
-
-    oro_attachment.async.image_file_removal_processor:
-        class: Oro\Bundle\AttachmentBundle\Async\ImageFileRemovalProcessor
-        arguments:
-            - '@oro_attachment.manager.image_file_removal'
-            - '@logger'
-        tags:
-            - { name: oro_message_queue.client.message_processor }
 
     oro_attachment.layout.data_provider.file_applications:
         class: 'Oro\Bundle\AttachmentBundle\Layout\DataProvider\FileApplicationsDataProvider'
@@ -620,11 +619,22 @@ services:
         tags:
             - { name: oro_featuretogle.voter, priority: 10 }
 
-    oro_attachment.checker.voter.post_processors_voter:
-        class: 'Oro\Bundle\AttachmentBundle\Checker\Voter\PostProcessorsVoter'
+    oro_attachment.cache.processor_helper:
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_attachment_processor_helper' }
+
+    oro_attachment.processor_helper:
+        class: Oro\Bundle\AttachmentBundle\ProcessorHelper
         arguments:
             - '%liip_imagine.jpegoptim.binary%'
             - '%liip_imagine.pngquant.binary%'
+            - '@oro_attachment.cache.processor_helper'
+
+    oro_attachment.checker.voter.post_processors_voter:
+        class: 'Oro\Bundle\AttachmentBundle\Checker\Voter\PostProcessorsVoter'
+        arguments:
+            - '@oro_attachment.processor_helper'
         tags:
             - { name: oro_featuretogle.voter, priority: 10 }
 
@@ -690,6 +700,7 @@ services:
 
     oro_attachment.tools.webp_configuration:
         class: Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration
+        public: true
         arguments:
             - '@oro_config.manager'
             - '%oro_attachment.webp_strategy%'

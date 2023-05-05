@@ -109,9 +109,17 @@ define(function(require) {
 
             viewInstance.$el.addClass('inline-editor-wrapper');
 
+            const $boundary = cell.$el.closest('.grid-container').find('.grid-editor-boundary');
+            const className = viewInstance.className()
+                .split(' ')
+                .filter(className => className)
+                .map(className => `${className}-offset`)
+                .join(' ');
+            $boundary.addClass(className);
+
             const position = {
                 of: cell.$el,
-                within: cell.$el.closest('tbody')
+                within: $boundary
             };
 
             const isAlignedRight = cell.el && getComputedStyle(cell.el).textAlign === 'right';
@@ -273,6 +281,8 @@ define(function(require) {
             if (!this.view) {
                 this.options.cell.$el.removeClass('view-mode save-fail');
                 this.options.cell.$el.addClass('edit-mode');
+                this.options.grid.$('.grid-container')
+                    .append('<div class="grid-editor-boundary"></div>');
                 this.createView(this.options);
                 // rethrow view events on component
                 this.listenTo(this.view, 'all', function(eventName, ...args) {
@@ -294,6 +304,7 @@ define(function(require) {
                 if (!this.options.cell.disposed) {
                     this.options.cell.$el.removeClass('edit-mode').addClass('view-mode');
                 }
+                this.options.grid.$('div.grid-editor-boundary').remove();
                 this.view.dispose();
                 this.stopListening(this.view);
                 delete this.view;

@@ -265,7 +265,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider preUpdateForRelationsProvider
      */
-    public function testPreUpdateForRelations($fieldType)
+    public function testPreUpdateForRelations(string $fieldType)
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $config->set('is_extend', true);
@@ -296,7 +296,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->preUpdate();
     }
 
-    public function preUpdateForRelationsProvider()
+    public function preUpdateForRelationsProvider(): array
     {
         return [
             ['manyToOne'],

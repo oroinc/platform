@@ -2,13 +2,11 @@
 
 namespace Oro\Component\EntitySerializer;
 
+/**
+ * Represents a service that is used to check whether a specific entity field
+ * is applicable to process by the entity serializer component.
+ */
 interface EntityFieldFilterInterface
 {
-    /**
-     * @param string $className The FQCN of an entity
-     * @param string $fieldName The name of an entity field
-     *
-     * @return bool
-     */
-    public function isApplicableField($className, $fieldName);
+    public function isApplicableField(string $className, string $fieldName): bool;
 }

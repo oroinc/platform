@@ -1,4 +1,4 @@
-@container-incompatible
+@behat-test-env
 @ticket-BB-17850
 @feature-BAP-19790
 Feature:  Digital asset management

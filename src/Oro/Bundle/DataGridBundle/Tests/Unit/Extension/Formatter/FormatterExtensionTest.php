@@ -22,9 +22,6 @@ class FormatterExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var FormatterExtension */
     private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->propertyContainer = $this->createMock(ContainerInterface::class);

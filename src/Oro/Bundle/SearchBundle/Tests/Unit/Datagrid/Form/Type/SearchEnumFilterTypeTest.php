@@ -8,8 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SearchEnumFilterTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SearchEnumFilterType */
-    private $type;
+    private SearchEnumFilterType $type;
 
     protected function setUp(): void
     {
@@ -54,7 +53,7 @@ class SearchEnumFilterTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGetBlockPrefix()
     {
-        $this->assertEquals(SearchEnumFilterType::NAME, $this->type->getBlockPrefix());
+        $this->assertEquals('oro_search_type_enum_filter', $this->type->getBlockPrefix());
     }
 
     public function testGetParent()

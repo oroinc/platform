@@ -9,9 +9,6 @@ class SmtpConnectionCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param string $dsn
-     * @param bool $expected
      */
     public function testSupports(string $dsn, bool $expected): void
     {

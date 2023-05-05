@@ -5,7 +5,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\ServiceContainer;
 use Behat\Behat\Context\Initializer\ContextInitializer;
 use Behat\Behat\Context\ServiceContainer\ContextExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\AppKernelInitializer;
 use Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\ContextServiceEnvironmentHandler;
@@ -49,6 +48,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     ): void {
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
         $containerBuilder->setParameter('suite.configurations', $suiteConfig);
+        $containerBuilder->setParameter('paths.base', __DIR__);
 
         $config = [
             'oro_test' => [
@@ -77,6 +77,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $containerBuilder = $this->getContainerBuilder([]);
         $sharedContexts = [OroMainContext::class];
+        $containerBuilder->setParameter('paths.base', __DIR__);
 
         $config = [
             'oro_test' => [
@@ -225,6 +226,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
         $containerBuilder->setParameter('suite.configurations', []);
+        $containerBuilder->setParameter('paths.base', __DIR__);
         $extension = new OroTestFrameworkExtension();
         $extension->load($containerBuilder, $this->processConfig($configExtension));
         $extension->process($containerBuilder);
@@ -265,6 +267,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 
         $containerBuilder = $this->getContainerBuilder($bundlesConfig);
         $containerBuilder->setParameter('suite.configurations', []);
+        $containerBuilder->setParameter('paths.base', __DIR__);
         $extension = new OroTestFrameworkExtension();
         $extension->load($containerBuilder, $this->processConfig($configExtension));
 
@@ -298,12 +301,6 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
                 ->getMock()
         );
         $kernel->getContainer()->set('logger', new NullLogger());
-        $kernel->getContainer()->set(
-            'oro_message_queue.consumption.cache_state',
-            $this->getMockBuilder(CacheState::class)
-                ->disableOriginalConstructor()
-                ->getMock()
-        );
         $kernel->getContainer()->setParameter('kernel.secret', 'secret');
 
         $containerBuilder->set('fob_symfony.kernel', $kernel);
@@ -349,6 +346,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $containerBuilder = $this->getContainerBuilder([]);
         $containerBuilder->setParameter('suite.configurations', []);
+        $containerBuilder->setParameter('paths.base', __DIR__);
 
         $className = $this->getMockClass(ContextInitializer::class);
         $contextInitializerDef = new Definition($this->getMockClass(ContextInitializer::class));
@@ -375,7 +373,6 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
                 ['registerContextInitializer', [new Reference('oro_behat_session_alias_initializer')]],
                 ['registerContextInitializer', [new Reference('oro_behat_browser_tab_manager_initializer')]],
                 ['registerContextInitializer', [new Reference('oro_behat_fixture_loader_initializer')]],
-                ['registerContextInitializer', [new Reference('oro_test.processor.message_queue_initializer')]],
                 ['registerContextInitializer', [new Reference(AppKernelInitializer::class)]],
             ],
             $containerBuilder->getDefinition($envHandlerId)
@@ -387,6 +384,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $containerBuilder = $this->getContainerBuilder([]);
         $containerBuilder->setParameter('suite.configurations', []);
+        $containerBuilder->setParameter('paths.base', __DIR__);
 
         $sampleServiceDef = new Definition(\stdClass::class);
         $containerBuilder->setDefinition(\stdClass::class, $sampleServiceDef);

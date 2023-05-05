@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\PostProcessor;
 
 use Oro\Bundle\ApiBundle\PostProcessor\TwigPostProcessor;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Twig\Environment;
 
 class TwigPostProcessorTest extends \PHPUnit\Framework\TestCase
@@ -17,7 +18,11 @@ class TwigPostProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $this->twig = $this->createMock(Environment::class);
 
-        $this->postProcessor = new TwigPostProcessor($this->twig);
+        $container = TestContainerBuilder::create()
+            ->add(Environment::class, $this->twig)
+            ->getContainer($this);
+
+        $this->postProcessor = new TwigPostProcessor($container);
     }
 
     public function testProcessForNullValue()

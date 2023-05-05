@@ -23,7 +23,7 @@ class SkippedEntityProvider implements SkippedEntityProviderInterface
         if (isset($this->skippedEntities[$entityClass])) {
             return
                 !$this->skippedEntities[$entityClass]
-                || in_array($action, $this->skippedEntities[$entityClass], true);
+                || \in_array($action, $this->skippedEntities[$entityClass], true);
         }
 
         return $this->innerProvider->isSkippedEntity($entityClass, $action);

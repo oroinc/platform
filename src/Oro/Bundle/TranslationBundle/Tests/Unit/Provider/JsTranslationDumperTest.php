@@ -48,7 +48,7 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
 
     public static function assertFileExists(string $filename, string $message = ''): void
     {
-        static::assertTrue(self::$fileManager->hasFile($filename), $message);
+        self::assertTrue(self::$fileManager->hasFile($filename), $message);
     }
 
     public static function assertStringEqualsFile(
@@ -56,11 +56,11 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
         string $actualString,
         string $message = ''
     ): void {
-        static::assertFileExists($expectedFile, $message);
+        self::assertFileExists($expectedFile, $message);
 
         $constraint = new IsEqual(self::$fileManager->getFile($expectedFile)->getContent());
 
-        static::assertThat($actualString, $constraint, $message);
+        self::assertThat($actualString, $constraint, $message);
     }
 
     public function testGetAllLocales(): void

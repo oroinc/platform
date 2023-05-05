@@ -10,8 +10,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
 class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigExclusionProvider */
-    private $provider;
+    private ConfigExclusionProvider $provider;
 
     protected function setUp(): void
     {
@@ -19,10 +18,10 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
         $hierarchyProvider->expects(self::any())
             ->method('getHierarchyForClassName')
             ->willReturnMap([
-                ['Test\Entity\Entity1', ['Test\Entity\BaseEntity1']],
-                ['Test\Entity\Entity2', []],
-                ['Test\Entity\Entity3', []],
-                ['Test\Entity\Entity4', []]
+                ['Test\Entity1', ['Test\BaseEntity1']],
+                ['Test\Entity2', []],
+                ['Test\Entity3', []],
+                ['Test\Entity4', []]
             ]);
 
         $configProvider = $this->createMock(EntityConfigurationProvider::class);
@@ -30,10 +29,10 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->with(EntityConfiguration::EXCLUSIONS)
             ->willReturn([
-                ['entity' => 'Test\Entity\Entity1', 'field' => 'field1'],
-                ['entity' => 'Test\Entity\BaseEntity1', 'field' => 'field2'],
+                ['entity' => 'Test\Entity1', 'field' => 'field1'],
+                ['entity' => 'Test\BaseEntity1', 'field' => 'field2'],
                 ['type' => 'date'],
-                ['entity' => 'Test\Entity\Entity3']
+                ['entity' => 'Test\Entity3']
             ]);
 
         $this->provider = new ConfigExclusionProvider(
@@ -67,7 +66,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     public function testIsIgnoredFieldByDataType()
     {
         $metadata = $this->getEntityMetadata(
-            'Test\Entity\Entity2',
+            'Test\Entity2',
             [
                 'field1' => 'date'
             ]
@@ -92,9 +91,9 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     public function entityProvider(): array
     {
         return [
-            'excluded'                                    => ['Test\Entity\Entity3', true],
-            'not excluded, has excluded fields'           => ['Test\Entity\Entity1', false],
-            'not excluded, does not have excluded fields' => ['Test\Entity\Entity4', false]
+            'excluded'                                    => ['Test\Entity3', true],
+            'not excluded, has excluded fields'           => ['Test\Entity1', false],
+            'not excluded, does not have excluded fields' => ['Test\Entity4', false]
         ];
     }
 
@@ -103,7 +102,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
         return [
             'excluded'                                               => [
                 $this->getEntityMetadata(
-                    'Test\Entity\Entity1',
+                    'Test\Entity1',
                     [
                         'field1' => 'integer',
                         'field2' => 'string',
@@ -115,7 +114,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'excluded in parent class'                               => [
                 $this->getEntityMetadata(
-                    'Test\Entity\Entity1',
+                    'Test\Entity1',
                     [
                         'field1' => 'integer',
                         'field2' => 'string',
@@ -127,7 +126,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'not excluded, but entity has other excluded fields'     => [
                 $this->getEntityMetadata(
-                    'Test\Entity\Entity1',
+                    'Test\Entity1',
                     [
                         'field1' => 'integer',
                         'field2' => 'string',
@@ -140,7 +139,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'not excluded, entity does not have any excluded fields' => [
                 $this->getEntityMetadata(
-                    'Test\Entity\Entity2',
+                    'Test\Entity2',
                     [
                         'field1' => 'integer',
                         'field2' => 'date'
@@ -151,7 +150,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'excluded, because whole entity is excluded'             => [
                 $this->getEntityMetadata(
-                    'Test\Entity\Entity3',
+                    'Test\Entity3',
                     [
                         'field1' => 'integer'
                     ]
@@ -165,7 +164,6 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     private function getEntityMetadata(string $className, array $fields = []): ClassMetadata
     {
         $metadata = new ClassMetadata($className);
-
         foreach ($fields as $fieldName => $fieldType) {
             $metadata->mapField(['fieldName' => $fieldName, 'type' => $fieldType]);
         }

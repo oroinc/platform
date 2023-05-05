@@ -20,11 +20,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 abstract class LoadSubresources implements ProcessorInterface
 {
-    /** @var ConfigProvider */
-    private $configProvider;
-
-    /** @var MetadataProvider */
-    private $metadataProvider;
+    private ConfigProvider $configProvider;
+    private MetadataProvider $metadataProvider;
 
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
@@ -76,15 +73,15 @@ abstract class LoadSubresources implements ProcessorInterface
         }
 
         // keep only sub-resource related actions
-        $result = \array_intersect($resourceExcludedActions, SubresourceUtil::SUBRESOURCE_ACTIONS);
+        $result = array_intersect($resourceExcludedActions, SubresourceUtil::SUBRESOURCE_ACTIONS);
         // make sure that default excluded actions for sub-resource exist
-        $result = \array_merge($result, SubresourceUtil::SUBRESOURCE_DEFAULT_EXCLUDED_ACTIONS);
+        $result = array_merge($result, SubresourceUtil::SUBRESOURCE_DEFAULT_EXCLUDED_ACTIONS);
         // disable changes of relationships if the parent entity modification is disabled
         if (\in_array(ApiAction::UPDATE, $resourceExcludedActions, true)) {
-            $result = \array_merge($result, SubresourceUtil::RELATIONSHIP_CHANGE_ACTIONS);
+            $result = array_merge($result, SubresourceUtil::RELATIONSHIP_CHANGE_ACTIONS);
         }
 
-        return \array_values(\array_unique($result));
+        return array_values(array_unique($result));
     }
 
     protected function isExcludedAssociation(string $fieldName, EntityDefinitionConfig $config): bool

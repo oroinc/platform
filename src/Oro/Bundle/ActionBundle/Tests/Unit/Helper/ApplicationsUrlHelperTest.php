@@ -12,7 +12,7 @@ class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
     private $routerProvider;
 
     /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $mockRouter;
+    private $router;
 
     /** @var ApplicationsUrlHelper */
     private $instance;
@@ -20,9 +20,9 @@ class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->routerProvider = $this->createMock(RouteProviderInterface::class);
-        $this->mockRouter = $this->createMock(RouterInterface::class);
+        $this->router = $this->createMock(RouterInterface::class);
 
-        $this->instance = new ApplicationsUrlHelper($this->routerProvider, $this->mockRouter);
+        $this->instance = new ApplicationsUrlHelper($this->routerProvider, $this->router);
     }
 
     public function testGetExecutionUrl()
@@ -33,7 +33,7 @@ class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getExecutionRoute')
             ->willReturn('extension_route');
 
-        $this->mockRouter->expects($this->once())
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('extension_route', $parameters)
             ->willReturn('ok_extension');
@@ -49,7 +49,7 @@ class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getFormDialogRoute')
             ->willReturn('dialog_route');
 
-        $this->mockRouter->expects($this->once())
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('dialog_route', $parameters)
             ->willReturn('ok_dialog');
@@ -65,7 +65,7 @@ class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getFormPAgeRoute')
             ->willReturn('page_route');
 
-        $this->mockRouter->expects($this->once())
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('page_route', $parameters)
             ->willReturn('ok_dialog');

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\DecimalValidator;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class DecimalValidatorTest extends ConstraintValidatorTestCase

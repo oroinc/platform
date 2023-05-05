@@ -12,8 +12,7 @@ class RootPathConfigExtra implements ConfigExtraInterface
 {
     public const NAME = 'path';
 
-    /** @var string */
-    private $path;
+    private string $path;
 
     public function __construct(string $path)
     {
@@ -31,7 +30,7 @@ class RootPathConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
@@ -39,7 +38,7 @@ class RootPathConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContext(ConfigContext $context)
+    public function configureContext(ConfigContext $context): void
     {
         // no any modifications of the ConfigContext is required
     }
@@ -47,7 +46,7 @@ class RootPathConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function isPropagable()
+    public function isPropagable(): bool
     {
         return false;
     }
@@ -55,7 +54,7 @@ class RootPathConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheKeyPart()
+    public function getCacheKeyPart(): ?string
     {
         return 'path:' . $this->path;
     }

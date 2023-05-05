@@ -17,6 +17,12 @@ services:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\NullSkippedEntityProvider
         public: true
 
+    oro_api.tests.config_entity_exclusion_provider:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigExclusionProvider
+        decorates: oro_entity.exclusion_provider.config
+        arguments:
+            - '@.inner'
+
     oro_api.tests.config_registry:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry
         public: true
@@ -30,6 +36,17 @@ services:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestRouteOptionsResolver
         tags:
             - { name: routing.options_resolver }
+
+    oro_api.tests.twig_state:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestTwigState
+        public: true
+
+    oro_api.tests.twig.test_extension:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestTwigExtension
+        arguments:
+            - '@oro_api.tests.twig_state'
+        tags:
+            - { name: twig.extension }
 
     oro_api.tests.test_session_listener:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestSessionListener

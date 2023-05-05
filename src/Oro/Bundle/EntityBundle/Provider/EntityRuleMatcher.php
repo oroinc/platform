@@ -3,28 +3,22 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 /**
- * Compares an entity or an entity field with a set of rules this matcher contains.
+ * Compares an entity or an entity field with a set of exclusion rules this matcher contains.
  */
 class EntityRuleMatcher
 {
     private const ENTITY = 'entity';
-    private const FIELD  = 'field';
-    private const TYPE   = 'type';
+    private const FIELD = 'field';
+    private const TYPE = 'type';
 
-    /** @var EntityHierarchyProviderInterface */
-    private $entityHierarchyProvider;
-
-    /** @var array */
-    private $rules;
-
-    /** @var array [entity class => true, ...] */
-    private $entityRules;
-
-    /** @var array [entity class => [field name => true], ...] */
-    private $fieldRules;
-
-    /** @var array [data type => true, ...] */
-    private $typeRules;
+    private EntityHierarchyProviderInterface $entityHierarchyProvider;
+    private ?array $rules;
+    /** @var array|null [entity class => true, ...] */
+    private ?array $entityRules = null;
+    /** @var array|null [entity class => [field name => true], ...] */
+    private ?array $fieldRules = null;
+    /** @var array|null [data type => true, ...] */
+    private ?array $typeRules = null;
 
     public function __construct(
         EntityHierarchyProviderInterface $entityHierarchyProvider,
@@ -55,7 +49,7 @@ class EntityRuleMatcher
     }
 
     /**
-     * Checks if an entity field matches at least one rule this matcher contains.
+     * Checks if an entity field matches at least one field or entity rule this matcher contains.
      */
     public function isFieldMatched(string $entityClass, string $fieldName, string $fieldType = null): bool
     {

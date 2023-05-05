@@ -9,7 +9,7 @@ use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Finds detached properties in entity and reloads them from UnitOfWork.
@@ -30,14 +30,14 @@ class EntityDetachFixer
     private $fieldHelper;
 
     /**
-     * @var PropertyAccessor
+     * @var PropertyAccessorInterface
      */
     protected $propertyAccessor;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
         FieldHelper $fieldHelper,
-        PropertyAccessor $propertyAccessor
+        PropertyAccessorInterface $propertyAccessor
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->fieldHelper = $fieldHelper;

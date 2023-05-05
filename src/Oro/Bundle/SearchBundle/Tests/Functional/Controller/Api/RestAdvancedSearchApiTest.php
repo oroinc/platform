@@ -71,20 +71,14 @@ class RestAdvancedSearchApiTest extends SearchBundleWebTestCase
         $this->assertEquals($response['message'], $result['message']);
     }
 
-    /**
-     * @return array
-     */
-    public function advancedSearchDataProvider()
+    public function advancedSearchDataProvider(): array
     {
         return $this->getApiRequestsData(
             __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'advanced_requests'
         );
     }
 
-    /**
-     * @return array
-     */
-    public function advancedSearchBadRequestDataProvider()
+    public function advancedSearchBadRequestDataProvider(): array
     {
         return $this->getApiRequestsData(
             __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'advanced_search_bad_requests'

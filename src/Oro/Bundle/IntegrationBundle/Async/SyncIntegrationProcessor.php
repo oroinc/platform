@@ -92,9 +92,8 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
         $this->setTemporaryIntegrationToken($integration);
         $integration->getTransport()->getSettingsBag()->set('page_size', $messageBody['transport_batch_size']);
 
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            'oro_integration:sync_integration:' . $messageBody['integration_id'],
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
             function () use ($integration, $messageBody) {
                 $processor = $this->syncProcessorRegistry->getProcessorForIntegration($integration);
                 if ($processor instanceof LoggerStrategyAwareInterface) {

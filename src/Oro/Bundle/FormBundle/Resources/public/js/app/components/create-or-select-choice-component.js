@@ -175,7 +175,7 @@ define(function(require) {
                     const editor = tinyMCE.get($input.attr('id'));
 
                     if (editor && !$input.data('saved-disabled')) {
-                        editor.setMode('design');
+                        editor.mode.set('design');
                         $(editor.editorContainer).removeClass('disabled');
                         $(editor.editorContainer).children('.disabled-overlay').remove();
                     }
@@ -245,7 +245,7 @@ define(function(require) {
                     $input.prop('disabled', true);
 
                     if (editor && !$input.data('saved-disabled')) {
-                        editor.setMode('readonly');
+                        editor.mode.set('readonly');
                         $(editor.editorContainer).addClass('disabled');
                         $(editor.editorContainer).children('.disabled-overlay').remove();
                         $(editor.editorContainer).append('<div class="disabled-overlay"></div>');

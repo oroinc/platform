@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Entity\EntityListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator;
 
+/**
+ * Listens to AttributeGroup Entity and generates code slug for AttributeGroup
+ */
 class AttributeGroupListener
 {
     const DEFAULT_SLUG = 'default_group';
@@ -27,7 +30,7 @@ class AttributeGroupListener
         $codeSlug = $this->slugGenerator->slugify((string)$group->getDefaultLabel()) ?: self::DEFAULT_SLUG;
         $codeSlug = str_replace('-', '_', $codeSlug);
 
-        $repository = $args->getEntityManager()->getRepository(AttributeGroup::class);
+        $repository = $args->getObjectManager()->getRepository(AttributeGroup::class);
         $i = 0;
         $baseSlug = $codeSlug;
         do {

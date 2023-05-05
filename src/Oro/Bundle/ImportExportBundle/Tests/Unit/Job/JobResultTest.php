@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class JobResultTest extends \PHPUnit\Framework\TestCase
 {

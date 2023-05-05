@@ -65,9 +65,8 @@ class PurgeEmailAttachmentsMessageProcessor implements MessageProcessorInterface
         $size = $this->getSize($message->getBody());
         $emailAttachments = $this->getEmailAttachments($size);
 
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            'oro.email.purge_email_attachments',
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
             function (JobRunner $jobRunner) use ($emailAttachments, $size) {
                 $ids = [];
                 $count = 0;

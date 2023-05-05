@@ -10,12 +10,9 @@ use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 class SearchListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param object $entity
-     * @param array $data
-     * @param array $expectedData
      * @dataProvider getPrepareEntityMapEvent
      */
-    public function testPrepareEntityMapEvent($entity, array $data, array $expectedData): void
+    public function testPrepareEntityMapEvent(object $entity, array $data, array $expectedData): void
     {
         $searchListener = new SearchListener();
         $event = new PrepareEntityMapEvent($entity, get_class($entity), $data, []);

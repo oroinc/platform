@@ -11,28 +11,22 @@ use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
  */
 class CompositeFormatter implements FormatterInterface
 {
-    /** @var RestDocViewDetector */
-    private $docViewDetector;
-
+    private RestDocViewDetector $docViewDetector;
     /** @var FormatterInterface[] [view => formatter, ...] */
-    private $formatters = [];
+    private array $formatters = [];
 
     public function __construct(RestDocViewDetector $docViewDetector)
     {
         $this->docViewDetector = $docViewDetector;
     }
 
-    /**
-     * @param string             $view
-     * @param FormatterInterface $formatter
-     */
-    public function addFormatter($view, FormatterInterface $formatter)
+    public function addFormatter(string $view, FormatterInterface $formatter): void
     {
         $this->formatters[$view] = $formatter;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function format(array $collection)
     {
@@ -40,17 +34,14 @@ class CompositeFormatter implements FormatterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function formatOne(ApiDoc $annotation)
     {
         return $this->getFormatter()->formatOne($annotation);
     }
 
-    /**
-     * @return FormatterInterface
-     */
-    private function getFormatter()
+    private function getFormatter(): FormatterInterface
     {
         $view = $this->docViewDetector->getView();
         if (isset($this->formatters[$view])) {

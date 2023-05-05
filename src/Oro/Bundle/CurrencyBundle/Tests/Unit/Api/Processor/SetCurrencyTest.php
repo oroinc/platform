@@ -5,11 +5,11 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Api\Processor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData\CustomizeFormDataProcessorTestCase;
 use Oro\Bundle\CurrencyBundle\Api\Processor\SetCurrency;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Api\Stub\CurrencyAwareStub;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
 {

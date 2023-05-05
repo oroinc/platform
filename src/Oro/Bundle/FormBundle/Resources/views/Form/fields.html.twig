@@ -190,6 +190,7 @@
             {% elseif form.vars.selection_url is defined and form.vars.selection_url %}
                 {% set selectionUrl = form.vars.selection_url %}
             {% endif %}
+            {% set selectionUrlMethod = form.vars.selection_url_method|default(null) %}
             {% set selectionRouteName = form.vars.selection_route|default(null) %}
             {% set selectionRouteParameters = form.vars.selection_route_parameters|default({}) %}
 
@@ -200,6 +201,7 @@
                 name: {{ id|json_encode|raw }},
                 defaultElement: {{ form.vars.default_element|json_encode|raw }},
                 selectionUrl: {{ selectionUrl|json_encode|raw }},
+                selectionUrlMethod: {{ selectionUrlMethod|json_encode|raw }},
                 selectionRouteName: {{ selectionRouteName|json_encode|raw }},
                 selectionRouteParams: {{ selectionRouteParameters|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
                 allowAction: {{ form.vars.allow_action|json_encode|raw }},
@@ -392,19 +394,21 @@
         {% set disabled = widget.vars.disabled %}
         {% set allow_delete = widget.vars.allow_delete %}
         {% set allow_add_after = widget.vars.allow_add_after %}
+        {% set skip_optional_validation_group = widget.vars.skip_optional_validation_group|default(false) %}
     {% else %}
         {% set form = widget %}
         {% set name = widget.vars.full_name %}
         {% set disabled = widget.parent.vars.disabled %}
         {% set allow_delete = widget.parent.vars.allow_delete %}
         {% set allow_add_after = widget.parent.vars.allow_add_after %}
+        {% set skip_optional_validation_group = widget.parent.vars.skip_optional_validation_group|default(false) %}
         {% if widget.vars.allow_delete is defined %}
             {% set allow_delete = allow_delete and widget.vars.allow_delete %}
         {% endif %}
     {% endif %}
     <div class="oro-collection-item"
         data-content="{{ name }}"
-        {% if widget.parent.vars.skip_optional_validation_group is not defined %}
+        {% if not skip_optional_validation_group %}
             data-validation-optional-group
             {% if form.vars.attr['data-validation-optional-group-handler'] is defined %}
                 data-validation-optional-group-handler="{{ form.vars.attr['data-validation-optional-group-handler'] }}"

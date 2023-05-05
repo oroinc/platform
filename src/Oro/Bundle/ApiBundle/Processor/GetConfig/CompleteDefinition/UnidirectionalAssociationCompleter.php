@@ -25,11 +25,8 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
 
     private const UNIDIRECTIONAL_ASSOCIATION_PREFIX = 'unidirectionalAssociation:';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityOverrideProviderRegistry */
-    private $entityOverrideProviderRegistry;
+    private DoctrineHelper $doctrineHelper;
+    private EntityOverrideProviderRegistry $entityOverrideProviderRegistry;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -78,13 +75,6 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
     }
 
     /**
-     * @param ClassMetadata                   $metadata
-     * @param EntityDefinitionFieldConfig     $field
-     * @param string                          $fieldName
-     * @param string                          $dataType
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     *
-     * @return string the name of the target association
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function completeUnidirectionalAssociation(
@@ -97,7 +87,7 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
         if (!$field->hasPropertyPath()) {
             $field->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
         } elseif (ConfigUtil::IGNORE_PROPERTY_PATH !== $field->getPropertyPath()) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The property path for the unidirectional association "%s::%s" must not be specified or must be "%s".',
                 $metadata->name,
                 $fieldName,
@@ -117,14 +107,14 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
                 }
             }
         } else {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The target class for the unidirectional association "%s::%s" must be specified.',
                 $metadata->name,
                 $fieldName
             ));
         }
         if (!$this->doctrineHelper->isManageableEntityClass($targetClass)) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The target class "%s" for the unidirectional association "%s::%s" must be a manageable entity.',
                 $targetClass,
                 $metadata->name,
@@ -135,7 +125,7 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
         if (!$field->hasTargetType()) {
             $field->setTargetType(ConfigUtil::TO_MANY);
         } elseif (ConfigUtil::TO_MANY !== $field->getTargetType()) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The target type for the unidirectional association "%s::%s" must not be specified or must be "%s".',
                 $metadata->name,
                 $fieldName,
@@ -144,9 +134,9 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
         }
 
         $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
-        $targetAssociationName = \substr($dataType, \strlen(self::UNIDIRECTIONAL_ASSOCIATION_PREFIX));
+        $targetAssociationName = substr($dataType, \strlen(self::UNIDIRECTIONAL_ASSOCIATION_PREFIX));
         if (!$targetMetadata->hasAssociation($targetAssociationName)) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The target entity "%s" for the unidirectional association "%s::%s" must have the association "%s".',
                 $targetClass,
                 $metadata->name,
@@ -174,7 +164,7 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
     ): void {
         $targetAssociationMapping = $targetMetadata->getAssociationMapping($targetAssociationName);
         if (!$targetAssociationMapping['isOwningSide']) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The association "%s::%s" that is referred by the unidirectional association "%s::%s"'
                 . ' must be a owning side of the relation.',
                 $targetMetadata->name,
@@ -184,7 +174,7 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
             ));
         }
         if ($targetAssociationMapping['sourceEntity'] !== $targetMetadata->name) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The source entity of the association "%s::%s" that is referred by'
                 . ' the unidirectional association "%s::%s" must be equal tp "%s".',
                 $targetMetadata->name,
@@ -195,7 +185,7 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
             ));
         }
         if ($targetAssociationMapping['targetEntity'] !== $metadata->name) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The source entity of the association "%s::%s" that is referred by'
                 . ' the unidirectional association "%s::%s" must be equal tp "%s".',
                 $targetMetadata->name,
@@ -206,7 +196,7 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
             ));
         }
         if (!($targetAssociationMapping['type'] & (ClassMetadata::MANY_TO_ONE | ClassMetadata::MANY_TO_MANY))) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The association "%s::%s" that is referred by the unidirectional association "%s::%s"'
                 . ' must be many-to-one or many-to-many ORM association.',
                 $targetMetadata->name,

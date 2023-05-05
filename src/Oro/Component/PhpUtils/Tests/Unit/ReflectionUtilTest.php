@@ -3,17 +3,16 @@
 namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\ReflectionUtil;
+use Oro\Component\PhpUtils\Tests\Unit\Stubs\AbstractTestObject;
 use Oro\Component\PhpUtils\Tests\Unit\Stubs\TestObject1;
 use Oro\Component\PhpUtils\Tests\Unit\Stubs\TestObject2;
 
 class ReflectionUtilTest extends \PHPUnit\Framework\TestCase
 {
-    private const TEST_NAMESPACE = 'Oro\Component\PhpUtils\Tests\Unit\Stubs\\';
-
     /**
      * @dataProvider getPropertyDataProvider
      */
-    public function testGetProperty($object, $propertyName, $expectedDeclaringClass)
+    public function testGetProperty(object $object, string $propertyName, ?string $expectedDeclaringClass)
     {
         $property = ReflectionUtil::getProperty(new \ReflectionClass($object), $propertyName);
         if (null === $expectedDeclaringClass) {
@@ -30,15 +29,15 @@ class ReflectionUtilTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [new TestObject1(), 'undefinedProperty', null],
-            [new TestObject1(), 'publicProperty', self::TEST_NAMESPACE . 'TestObject1'],
-            [new TestObject1(), 'protectedProperty', self::TEST_NAMESPACE . 'TestObject1'],
-            [new TestObject1(), 'privateProperty', self::TEST_NAMESPACE . 'TestObject1'],
-            [new TestObject1(), 'publicBaseProperty', self::TEST_NAMESPACE . 'AbstractTestObject'],
-            [new TestObject1(), 'protectedBaseProperty', self::TEST_NAMESPACE . 'AbstractTestObject'],
-            [new TestObject1(), 'privateBaseProperty', self::TEST_NAMESPACE . 'AbstractTestObject'],
-            [new TestObject2(), 'publicBaseProperty', self::TEST_NAMESPACE . 'TestObject2'],
-            [new TestObject2(), 'protectedBaseProperty', self::TEST_NAMESPACE . 'TestObject2'],
-            [new TestObject2(), 'privateBaseProperty', self::TEST_NAMESPACE . 'TestObject2'],
+            [new TestObject1(), 'publicProperty', TestObject1::class],
+            [new TestObject1(), 'protectedProperty', TestObject1::class],
+            [new TestObject1(), 'privateProperty', TestObject1::class],
+            [new TestObject1(), 'publicBaseProperty', AbstractTestObject::class],
+            [new TestObject1(), 'protectedBaseProperty', AbstractTestObject::class],
+            [new TestObject1(), 'privateBaseProperty', AbstractTestObject::class],
+            [new TestObject2(), 'publicBaseProperty', TestObject2::class],
+            [new TestObject2(), 'protectedBaseProperty', TestObject2::class],
+            [new TestObject2(), 'privateBaseProperty', TestObject2::class],
         ];
     }
 }

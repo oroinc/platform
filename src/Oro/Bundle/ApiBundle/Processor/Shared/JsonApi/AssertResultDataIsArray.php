@@ -15,7 +15,7 @@ class AssertResultDataIsArray implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         if (!$context->hasResult()) {
             // exit because a result was not set in the context
@@ -23,10 +23,8 @@ class AssertResultDataIsArray implements ProcessorInterface
         }
 
         $result = $context->getResult();
-        if (array_key_exists(JsonApiDoc::DATA, $result) && !is_array($result[JsonApiDoc::DATA])) {
-            throw new RuntimeException(
-                sprintf('The "%s" section must be an array.', JsonApiDoc::DATA)
-            );
+        if (\array_key_exists(JsonApiDoc::DATA, $result) && !\is_array($result[JsonApiDoc::DATA])) {
+            throw new RuntimeException(sprintf('The "%s" section must be an array.', JsonApiDoc::DATA));
         }
     }
 }

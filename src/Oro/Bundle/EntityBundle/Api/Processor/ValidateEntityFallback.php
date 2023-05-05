@@ -19,11 +19,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class ValidateEntityFallback implements ProcessorInterface
 {
-    /** @var EntityFallbackResolver */
-    private $fallbackResolver;
-
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
+    private EntityFallbackResolver $fallbackResolver;
+    private PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(
         EntityFallbackResolver $fallbackResolver,
@@ -36,7 +33,7 @@ class ValidateEntityFallback implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
 
@@ -62,19 +59,14 @@ class ValidateEntityFallback implements ProcessorInterface
                 )
             );
         } elseif (null !== $includedEntities) {
-            list($ownerEntity, $associationName) = $this->findAssociation($fallbackValue, $includedEntities);
+            [$ownerEntity, $associationName] = $this->findAssociation($fallbackValue, $includedEntities);
             if (null !== $ownerEntity && $associationName) {
                 $this->validateValidFallback($form, $fallbackValue, $ownerEntity, $associationName);
             }
         }
     }
 
-    /**
-     * @param EntityFieldFallbackValue $fallbackValue
-     *
-     * @return bool
-     */
-    private function hasExactlyOneAttribute(EntityFieldFallbackValue $fallbackValue)
+    private function hasExactlyOneAttribute(EntityFieldFallbackValue $fallbackValue): bool
     {
         $filledAttributes = 0;
         if (null !== $fallbackValue->getScalarValue()) {
@@ -90,16 +82,10 @@ class ValidateEntityFallback implements ProcessorInterface
         return 1 === $filledAttributes;
     }
 
-    /**
-     * @param FormInterface            $form
-     * @param EntityFieldFallbackValue $fallbackValue
-     * @param object                   $entity
-     * @param string                   $associationName
-     */
     private function validateValidFallback(
         FormInterface $form,
         EntityFieldFallbackValue $fallbackValue,
-        $entity,
+        object $entity,
         string $associationName
     ): void {
         $fallbackConfig = $this->fallbackResolver->getFallbackConfig(
@@ -109,7 +95,7 @@ class ValidateEntityFallback implements ProcessorInterface
         );
 
         if ($fallbackValue->getFallback()) {
-            if (!array_key_exists($fallbackValue->getFallback(), $fallbackConfig)) {
+            if (!\array_key_exists($fallbackValue->getFallback(), $fallbackConfig)) {
                 FormUtil::addNamedFormError(
                     $form,
                     Assert\Choice::class,
@@ -186,16 +172,9 @@ class ValidateEntityFallback implements ProcessorInterface
         return [$ownerEntity, $associationName];
     }
 
-    /**
-     * @param EntityFieldFallbackValue $fallbackValue
-     * @param object                   $entity
-     * @param EntityMetadata|null      $metadata
-     *
-     * @return string|null
-     */
     private function findAssociationName(
         EntityFieldFallbackValue $fallbackValue,
-        $entity,
+        object $entity,
         ?EntityMetadata $metadata
     ): ?string {
         if (null === $metadata) {

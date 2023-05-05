@@ -68,6 +68,7 @@ use PHPUnit\Framework\SyntheticSkippedError;
  * This trait allows to use PHPUnit assertions in Behat tests.
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 trait AssertTrait
 {

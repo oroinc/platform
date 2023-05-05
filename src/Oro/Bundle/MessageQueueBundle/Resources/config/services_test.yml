@@ -69,3 +69,10 @@ services:
         tags:
             # Must be definitely the last extension to collect the latest data.
             - { name: 'oro_message_queue.consumption.extension', priority: -500, persistent: true }
+
+    Oro\Bundle\MessageQueueBundle\EventListener\InstalledApplicationListener:
+        arguments:
+            - '%kernel.environment%'
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: installer.finish, method: onFinishApplicationEvent }

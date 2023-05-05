@@ -15,8 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ValidateEntityTypeSupported implements ProcessorInterface
 {
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct(ValueNormalizer $valueNormalizer)
     {
@@ -26,7 +25,7 @@ class ValidateEntityTypeSupported implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateItemContext $context */
 

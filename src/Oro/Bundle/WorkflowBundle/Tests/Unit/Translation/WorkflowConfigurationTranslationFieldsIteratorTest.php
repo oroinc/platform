@@ -7,12 +7,9 @@ use Oro\Bundle\WorkflowBundle\Translation\WorkflowConfigurationTranslationFields
 class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param string $workflowName
-     * @param array $config
-     * @param array $readResultExpected
      * @dataProvider iterateReadCases
      */
-    public function testIterateRead($workflowName, array $config, array $readResultExpected)
+    public function testIterateRead(string $workflowName, array $config, array $readResultExpected)
     {
         $iterator = new WorkflowConfigurationTranslationFieldsIterator($workflowName, $config);
 
@@ -22,10 +19,7 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit\Framew
         );
     }
 
-    /**
-     * @return array
-     */
-    public function iterateReadCases()
+    public function iterateReadCases(): array
     {
         return [
             'empty' => [
@@ -114,12 +108,9 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit\Framew
     }
 
     /**
-     * @param string $workflowName
-     * @param array $config
-     * @param array $expected
      * @dataProvider iterateWriteCases
      */
-    public function testIterateWrite($workflowName, array $config, array $expected)
+    public function testIterateWrite(string $workflowName, array $config, array $expected)
     {
         $iterator = new WorkflowConfigurationTranslationFieldsIterator($workflowName, $config);
 
@@ -132,9 +123,8 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit\Framew
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function iterateWriteCases()
+    public function iterateWriteCases(): array
     {
         return [
             'empty' => [

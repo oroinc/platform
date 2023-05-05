@@ -5,12 +5,12 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class NotBlankTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Condition\NotBlank */
-    protected $condition;
+    private Condition\NotBlank $condition;
 
     protected function setUp(): void
     {
@@ -21,13 +21,13 @@ class NotBlankTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, array $context, bool $expectedResult)
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
             'not_empty_string' => [
@@ -80,7 +80,7 @@ class NotBlankTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeFailsWhenEmptyOptions()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
 
         $this->condition->initialize([]);
@@ -89,7 +89,7 @@ class NotBlankTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected)
+    public function testToArray(array $options, ?string $message, array $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -99,7 +99,7 @@ class NotBlankTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -131,7 +131,7 @@ class NotBlankTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected)
+    public function testCompile(array $options, ?string $message, string $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -141,7 +141,7 @@ class NotBlankTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [

@@ -18,14 +18,9 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class NestedAssociationType extends AbstractType
 {
-    /** @var PropertyAccessorInterface */
-    protected $propertyAccessor;
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var EntityLoader */
-    protected $entityLoader;
+    private PropertyAccessorInterface $propertyAccessor;
+    private DoctrineHelper $doctrineHelper;
+    private EntityLoader $entityLoader;
 
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
@@ -38,9 +33,9 @@ class NestedAssociationType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->addEventSubscriber(new NestedAssociationListener($this->propertyAccessor, $options['config']))
@@ -50,9 +45,9 @@ class NestedAssociationType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefault('compound', false)

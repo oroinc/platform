@@ -7,7 +7,7 @@ use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User;
 
 class HasMoreTest extends EntitySerializerTestCase
 {
-    public function testQueryHasMaxResultsButThereIsNoHasMoreOptionInConfig()
+    public function testQueryHasMaxResultsButThereIsNoHasMoreOptionInConfig(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->setMaxResults(2);
@@ -41,7 +41,7 @@ class HasMoreTest extends EntitySerializerTestCase
         );
     }
 
-    public function testHasMoreWhenQueryHasMaxResultsAndThereAreMoreRecords()
+    public function testHasMoreWhenQueryHasMaxResultsAndThereAreMoreRecords(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->setMaxResults(2);
@@ -78,7 +78,7 @@ class HasMoreTest extends EntitySerializerTestCase
         );
     }
 
-    public function testHasMoreWhenQueryHasMaxResultsAndThereAreNoMoreRecords()
+    public function testHasMoreWhenQueryHasMaxResultsAndThereAreNoMoreRecords(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->setMaxResults(2);
@@ -113,7 +113,7 @@ class HasMoreTest extends EntitySerializerTestCase
         );
     }
 
-    public function testHasMoreWhenQueryDoesNotHaveMaxResults()
+    public function testHasMoreWhenQueryDoesNotHaveMaxResults(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e');
 
@@ -150,7 +150,7 @@ class HasMoreTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testHasMoreWhenToManyAssociationQueryHasMaxResultsAndThereAreMoreRecords()
+    public function testHasMoreWhenToManyAssociationQueryHasMaxResultsAndThereAreMoreRecords(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -279,7 +279,7 @@ class HasMoreTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testHasMoreWhenToManyCollapsedAssociationQueryHasMaxResultsAndThereAreMoreRecords()
+    public function testHasMoreWhenToManyCollapsedAssociationQueryHasMaxResultsAndThereAreMoreRecords(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -386,7 +386,7 @@ class HasMoreTest extends EntitySerializerTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testHasMoreWhenToManyAssociationQueryHasMaxResultsAndThereAreNoMoreRecords()
+    public function testHasMoreWhenToManyAssociationQueryHasMaxResultsAndThereAreNoMoreRecords(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -490,7 +490,7 @@ class HasMoreTest extends EntitySerializerTestCase
     /**
      * @dataProvider subQueryLimitAndEntityCountMoreThanUnionQueryLimitDataProvider
      */
-    public function testSubQueryLimitAndEntityCountMoreThanUnionQueryLimit(int $entityCount)
+    public function testSubQueryLimitAndEntityCountMoreThanUnionQueryLimit(int $entityCount): void
     {
         $unionQueryLimit = 100;
         $entityRows = [];
@@ -588,7 +588,7 @@ class HasMoreTest extends EntitySerializerTestCase
         ];
     }
 
-    public function testHasMoreWhenToManyAssociationQueryDoesNotHaveMaxResults()
+    public function testHasMoreWhenToManyAssociationQueryDoesNotHaveMaxResults(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')

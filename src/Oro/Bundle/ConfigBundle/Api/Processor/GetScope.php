@@ -28,7 +28,7 @@ class GetScope implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -38,7 +38,7 @@ class GetScope implements ProcessorInterface
         if ($scopeFilterValue) {
             $scope = $scopeFilterValue->getValue();
             $scopes = $this->configRepository->getScopes();
-            if (!in_array($scope, $scopes, true)) {
+            if (!\in_array($scope, $scopes, true)) {
                 $context->addError(
                     Error::createValidationError(
                         Constraint::FILTER,

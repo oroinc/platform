@@ -3,24 +3,31 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Layout;
+use Oro\Component\Layout\LayoutContext;
+use Oro\Component\Layout\LayoutContextStack;
 use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
 use Symfony\Component\Templating\TemplateReference;
 
 class LayoutTest extends LayoutTestCase
 {
-    /** @var LayoutRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $renderer;
+    private LayoutRendererInterface|\PHPUnit\Framework\MockObject\MockObject $renderer;
 
-    /** @var LayoutRendererRegistry */
-    private $rendererRegistry;
+    private LayoutRendererRegistry $rendererRegistry;
+
+    private ContextInterface $context;
+
+    private LayoutContextStack|\PHPUnit\Framework\MockObject\MockObject $layoutContextStack;
 
     protected function setUp(): void
     {
         $this->renderer = $this->createMock(LayoutRendererInterface::class);
-
+        $this->context = new LayoutContext();
+        $this->context->resolve();
+        $this->layoutContextStack = $this->createMock(LayoutContextStack::class);
         $this->rendererRegistry = new LayoutRendererRegistry();
         $this->rendererRegistry->addRenderer('test', $this->renderer);
         $this->rendererRegistry->setDefaultRenderer('test');
@@ -30,7 +37,7 @@ class LayoutTest extends LayoutTestCase
     {
         $view = new BlockView();
 
-        $layout = new Layout($view, $this->rendererRegistry);
+        $layout = new Layout($view, $this->rendererRegistry, $this->context, $this->layoutContextStack);
 
         self::assertSame($view, $layout->getView());
     }
@@ -43,10 +50,20 @@ class LayoutTest extends LayoutTestCase
 
         $this->renderer->expects(self::once())
             ->method('renderBlock')
-            ->with($this->identicalTo($view))
+            ->with(self::identicalTo($view))
             ->willReturn($expected);
 
-        $layout = new Layout($view, $this->rendererRegistry);
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('push')
+            ->with($this->context);
+
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('pop')
+            ->with();
+
+        $layout = new Layout($view, $this->rendererRegistry, $this->context, $this->layoutContextStack);
         $result = $layout->render();
         self::assertEquals($expected, $result);
     }
@@ -57,7 +74,7 @@ class LayoutTest extends LayoutTestCase
         $this->expectExceptionMessage('The layout renderer named "unknown" was not found.');
 
         $view = new BlockView();
-        $layout = new Layout($view, $this->rendererRegistry);
+        $layout = new Layout($view, $this->rendererRegistry, $this->context, $this->layoutContextStack);
         $layout->setRenderer('unknown')->render();
     }
 
@@ -72,10 +89,20 @@ class LayoutTest extends LayoutTestCase
 
         $otherRenderer->expects(self::once())
             ->method('renderBlock')
-            ->with($this->identicalTo($view))
+            ->with(self::identicalTo($view))
             ->willReturn($expected);
 
-        $layout = new Layout($view, $this->rendererRegistry);
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('push')
+            ->with($this->context);
+
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('pop')
+            ->with();
+
+        $layout = new Layout($view, $this->rendererRegistry, $this->context, $this->layoutContextStack);
         $result = $layout->setRenderer('other')->render();
         self::assertEquals($expected, $result);
     }
@@ -89,14 +116,24 @@ class LayoutTest extends LayoutTestCase
 
         $this->renderer->expects(self::once())
             ->method('setBlockTheme')
-            ->with($this->identicalTo($view), $theme);
+            ->with(self::identicalTo($view), $theme);
 
         $this->renderer->expects(self::once())
             ->method('renderBlock')
-            ->with($this->identicalTo($view))
+            ->with(self::identicalTo($view))
             ->willReturn($expected);
 
-        $layout = new Layout($view, $this->rendererRegistry);
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('push')
+            ->with($this->context);
+
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('pop')
+            ->with();
+
+        $layout = new Layout($view, $this->rendererRegistry, $this->context, $this->layoutContextStack);
         $layout->setBlockTheme($theme);
         $result = $layout->render();
         self::assertEquals($expected, $result);
@@ -115,14 +152,24 @@ class LayoutTest extends LayoutTestCase
 
         $this->renderer->expects(self::once())
             ->method('setBlockTheme')
-            ->with($this->identicalTo($childView), $theme);
+            ->with(self::identicalTo($childView), $theme);
 
         $this->renderer->expects(self::once())
             ->method('renderBlock')
-            ->with($this->identicalTo($view))
+            ->with(self::identicalTo($view))
             ->willReturn($expected);
 
-        $layout = new Layout($view, $this->rendererRegistry);
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('push')
+            ->with($this->context);
+
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('pop')
+            ->with();
+
+        $layout = new Layout($view, $this->rendererRegistry, $this->context, $this->layoutContextStack);
         $layout->setBlockTheme($theme, 'child_id');
         $result = $layout->render();
         self::assertEquals($expected, $result);
@@ -135,11 +182,22 @@ class LayoutTest extends LayoutTestCase
         $this->renderer->expects(self::once())
             ->method('setFormTheme')
             ->with([$theme]);
-        $layout = new Layout($view, $this->rendererRegistry);
+
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('push')
+            ->with($this->context);
+
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('pop')
+            ->with();
+
+        $layout = new Layout($view, $this->rendererRegistry, $this->context, $this->layoutContextStack);
         $layout->setFormTheme($theme);
         $this->renderer->expects(self::once())
             ->method('renderBlock')
-            ->with($this->identicalTo($view))
+            ->with(self::identicalTo($view))
             ->willReturn('some_value');
         self::assertSame('some_value', $layout->render());
     }
@@ -153,9 +211,9 @@ class LayoutTest extends LayoutTestCase
 
         $this->renderer->expects(self::once())
             ->method('setBlockTheme')
-            ->with($this->identicalTo($view))
+            ->with(self::identicalTo($view))
             ->willReturnCallback(function ($view, $themes) use ($expected) {
-                // Because assertEqual casted TemplateReference to string on compare - compare type manually
+                // Because assertEqual cast TemplateReference to string on compare - compare type manually
                 if (\is_array($expected)) {
                     foreach ($expected as $key => $value) {
                         self::assertSame(\gettype($value), \gettype($themes[$key]));
@@ -172,7 +230,17 @@ class LayoutTest extends LayoutTestCase
             ->with($view)
             ->willReturn('render result');
 
-        $layout = new Layout($view, $this->rendererRegistry);
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('push')
+            ->with($this->context);
+
+        $this->layoutContextStack
+            ->expects(self::once())
+            ->method('pop')
+            ->with();
+
+        $layout = new Layout($view, $this->rendererRegistry, $this->context, $this->layoutContextStack);
         $layout->setBlockTheme($themes);
         $result = $layout->render();
         self::assertEquals('render result', $result);
@@ -202,5 +270,12 @@ class LayoutTest extends LayoutTestCase
                 ],
             ],
         ];
+    }
+
+    public function testGetContext(): void
+    {
+        $layout = new Layout(new BlockView(), $this->rendererRegistry, $this->context, $this->layoutContextStack);
+
+        self::assertSame($this->context, $layout->getContext());
     }
 }

@@ -104,7 +104,7 @@ class JsonFileSplitterListener implements ListenerInterface
 
         $sectionName = $this->objectKeys[$this->objectLevel + 1] ?? null;
         if (null !== $this->headerSectionName && $sectionName === $this->headerSectionName) {
-            if (count($this->objectKeys) !== 2
+            if (\count($this->objectKeys) !== 2
                 || null !== $this->objectKeys[1]
                 || $this->headerSectionName !== $this->objectKeys[2]
             ) {
@@ -119,10 +119,10 @@ class JsonFileSplitterListener implements ListenerInterface
             }
             $header = $this->stack[0];
             $this->stack[0] = [];
-            if (is_callable($this->headerCallback)) {
-                call_user_func($this->headerCallback, $header);
+            if (\is_callable($this->headerCallback)) {
+                \call_user_func($this->headerCallback, $header);
             }
-        } elseif (!$this->sectionNamesToSplit || in_array($sectionName, $this->sectionNamesToSplit, true)) {
+        } elseif (!$this->sectionNamesToSplit || \in_array($sectionName, $this->sectionNamesToSplit, true)) {
             if (!$this->stack[1]) {
                 throw new ParsingException(
                     0,
@@ -132,8 +132,8 @@ class JsonFileSplitterListener implements ListenerInterface
             }
             while ($this->stack[1]) {
                 $obj = array_shift($this->stack[1]);
-                if (is_callable($this->objectCallback)) {
-                    call_user_func($this->objectCallback, $obj);
+                if (\is_callable($this->objectCallback)) {
+                    \call_user_func($this->objectCallback, $obj);
                 }
             }
         }
@@ -161,8 +161,8 @@ class JsonFileSplitterListener implements ListenerInterface
     public function key(string $key): void
     {
         $this->key = $key;
-        if ($this->objectLevel === 1 && is_callable($this->sectionCallback)) {
-            call_user_func($this->sectionCallback, $key);
+        if ($this->objectLevel === 1 && \is_callable($this->sectionCallback)) {
+            \call_user_func($this->sectionCallback, $key);
         }
     }
 

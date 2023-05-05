@@ -150,13 +150,7 @@ class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->registry->getAttributeType($this->getAttribute($fieldName, 'some_type')));
     }
 
-    /**
-     * @param string $fieldName
-     * @param string $type
-     *
-     * @return FieldConfigModel
-     */
-    private function getAttribute($fieldName, $type)
+    private function getAttribute(?string $fieldName, string $type): FieldConfigModel
     {
         $attribute = new FieldConfigModel($fieldName, $type);
         $attribute->setEntity(new EntityConfigModel(self::CLASS_NAME));

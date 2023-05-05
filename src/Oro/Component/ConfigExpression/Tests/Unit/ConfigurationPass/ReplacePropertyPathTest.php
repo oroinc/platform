@@ -9,23 +9,16 @@ class ReplacePropertyPathTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider passDataProvider
-     *
-     * @param array $sourceData
-     * @param array $expectedData
-     * @param string $prefix
      */
-    public function testPassConfiguration(array $sourceData, array $expectedData, $prefix = null)
+    public function testPassConfiguration(array $sourceData, array $expectedData, ?string $prefix = null)
     {
         $parameterPass = new ReplacePropertyPath($prefix);
-        $actualData    = $parameterPass->passConfiguration($sourceData);
+        $actualData = $parameterPass->passConfiguration($sourceData);
 
         $this->assertEquals($expectedData, $actualData);
     }
 
-    /**
-     * @return array
-     */
-    public function passDataProvider()
+    public function passDataProvider(): array
     {
         return [
             'empty data' => [
@@ -76,7 +69,7 @@ class ReplacePropertyPathTest extends \PHPUnit\Framework\TestCase
     public function testLocalCache()
     {
         $parameterPass = new ReplacePropertyPath();
-        $actualData    = $parameterPass->passConfiguration(['a' => '$path']);
+        $actualData = $parameterPass->passConfiguration(['a' => '$path']);
 
         $this->assertEquals(
             ['a' => new PropertyPath('path')],

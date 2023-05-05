@@ -7,7 +7,7 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Test\Async\BasicMessageProcessor;
+use Oro\Component\MessageQueue\Test\Async\Topic\BasicMessageTestTopic;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 
 class BufferedMessageProducerTest extends WebTestCase
@@ -36,22 +36,19 @@ class BufferedMessageProducerTest extends WebTestCase
     {
         self::getMessageCollector()->clear();
 
-        // make sure that there are not messages in the database
+        // make sure that there are no messages in the database
         // it can happen because the database transaction was closed in setUp() method
         $container = self::getContainer();
-        $dbalConnectionServiceId = 'oro_message_queue.transport.dbal.connection';
-        if ($container->has($dbalConnectionServiceId)) {
-            $connection = $container->get($dbalConnectionServiceId);
-            if ($connection instanceof DbalConnection) {
-                $connection->getDBALConnection()->executeQuery('DELETE FROM ' . $connection->getTableName());
-            }
+        $connection = $container->get('oro_message_queue.transport.connection');
+        if ($connection instanceof DbalConnection) {
+            $connection->getDBALConnection()->executeQuery('DELETE FROM ' . $connection->getTableName());
         }
     }
 
-    public function testBufferModeDisabled()
+    public function testBufferModeDisabled(): void
     {
-        $topic = BasicMessageProcessor::TEST_TOPIC;
-        $message = 'foo';
+        $topic = BasicMessageTestTopic::getName();
+        $message = ['message' => 'foo'];
 
         // buffered producer should send messages directly omitting buffering
         $this->producer->send($topic, $message);
@@ -59,10 +56,10 @@ class BufferedMessageProducerTest extends WebTestCase
         self::assertMessagesSent($topic, [$message]);
     }
 
-    public function testForceDisableBufferModeWhenEnableBufferingNestingLevelIsOne()
+    public function testForceDisableBufferModeWhenEnableBufferingNestingLevelIsOne(): void
     {
-        $topic = BasicMessageProcessor::TEST_TOPIC;
-        $message = 'foo';
+        $topic = BasicMessageTestTopic::getName();
+        $message = ['message' => 'foo'];
 
         $this->bufferedProducer->enableBuffering();
         $this->bufferedProducer->disable();
@@ -78,10 +75,10 @@ class BufferedMessageProducerTest extends WebTestCase
         self::assertFalse($this->bufferedProducer->isBufferingEnabled());
     }
 
-    public function testForceDisableBufferModeWhenEnableBufferingNestingLevelIsMoreThanOne()
+    public function testForceDisableBufferModeWhenEnableBufferingNestingLevelIsMoreThanOne(): void
     {
-        $topic = BasicMessageProcessor::TEST_TOPIC;
-        $message = 'foo';
+        $topic = BasicMessageTestTopic::getName();
+        $message = ['message' => 'foo'];
 
         $this->bufferedProducer->enableBuffering();
         $this->bufferedProducer->enableBuffering();
@@ -101,10 +98,13 @@ class BufferedMessageProducerTest extends WebTestCase
         self::assertFalse($this->bufferedProducer->isBufferingEnabled());
     }
 
-    public function testFlushBufferOnCommit()
+    public function testFlushBufferOnCommit(): void
     {
-        $topic = BasicMessageProcessor::TEST_TOPIC;
-        $messages = ['foo', 'bar'];
+        $topic = BasicMessageTestTopic::getName();
+        $messages = [
+            ['message' => 'foo'],
+            ['message' => 'bar'],
+        ];
 
         $this->connection->beginTransaction();
         try {
@@ -119,10 +119,13 @@ class BufferedMessageProducerTest extends WebTestCase
         self::assertMessagesSent($topic, $messages);
     }
 
-    public function testNestedTransactions()
+    public function testNestedTransactions(): void
     {
-        $topic = BasicMessageProcessor::TEST_TOPIC;
-        $messages = ['foo', 'bar'];
+        $topic = BasicMessageTestTopic::getName();
+        $messages = [
+            ['message' => 'foo'],
+            ['message' => 'bar'],
+        ];
 
         // begin root transaction and send a message
         $this->connection->beginTransaction();
@@ -147,10 +150,13 @@ class BufferedMessageProducerTest extends WebTestCase
         self::assertMessagesSent($topic, $messages);
     }
 
-    public function testClearBufferOnRollback()
+    public function testClearBufferOnRollback(): void
     {
-        $topic = BasicMessageProcessor::TEST_TOPIC;
-        $messages = ['foo', 'bar'];
+        $topic = BasicMessageTestTopic::getName();
+        $messages = [
+            ['message' => 'foo'],
+            ['message' => 'bar'],
+        ];
 
         $this->connection->beginTransaction();
         try {

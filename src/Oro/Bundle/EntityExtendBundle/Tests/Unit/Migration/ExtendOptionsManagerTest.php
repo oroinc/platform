@@ -101,10 +101,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$objectKey => $expectedOptions], $this->manager->getExtendOptions());
     }
 
-    /**
-     * @return array
-     */
-    public function dataProviderForMergeColumnOptions()
+    public function dataProviderForMergeColumnOptions(): array
     {
         return [
             [
@@ -120,23 +117,20 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function setTableOptionsProvider()
+    public function setTableOptionsProvider(): array
     {
         return $this->getSetOptionsData('test_table');
     }
 
-    public function setColumnOptionsProvider()
+    public function setColumnOptionsProvider(): array
     {
         return $this->getSetOptionsData('test_table', 'test_clmn');
     }
 
     /**
-     * @param string      $tableName
-     * @param string|null $columnName
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getSetOptionsData($tableName, $columnName = null)
+    public function getSetOptionsData(string $tableName, ?string $columnName = null): array
     {
         $result = [];
 
@@ -322,15 +316,13 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['_append' => []], $this->manager->getExtendOptions());
     }
 
-    /**
-     * @param string      $testName
-     * @param array       $data
-     * @param array       $result
-     * @param string      $tableName
-     * @param string|null $columnName
-     */
-    protected function addSetOptionsDataItem($testName, array $data, array &$result, $tableName, $columnName = null)
-    {
+    private function addSetOptionsDataItem(
+        string $testName,
+        array $data,
+        array &$result,
+        string $tableName,
+        ?string $columnName = null
+    ): void {
         $key = $tableName;
         if (null !== $columnName) {
             $key .= '!' . $columnName;
@@ -347,12 +339,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @param string $key
-     * @param array  $data
-     * @return array
-     */
-    protected function processSetOptionsData($key, $data)
+    private function processSetOptionsData(string $key, array $data): array
     {
         $result = [$key => $data];
 
@@ -365,13 +352,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    /**
-     * @param string $scope
-     * @param string $code
-     * @param string $val
-     * @return array
-     */
-    protected function getAppendedOption($scope, $code, $val)
+    private function getAppendedOption(string $scope, string $code, mixed $val): array
     {
         $options = new OroOptions();
         $options->append($scope, $code, $val);

@@ -16,9 +16,9 @@ use Oro\Bundle\EntityBundle\Fallback\Provider\EntityFallbackProviderInterface;
 use Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
@@ -57,7 +57,7 @@ class FileDigitalAssetChangedListener
 
     public function preUpdate(File $entity, LifecycleEventArgs $args): void
     {
-        $changeSet = $args->getEntityManager()->getUnitOfWork()->getEntityChangeSet($entity);
+        $changeSet = $args->getObjectManager()->getUnitOfWork()->getEntityChangeSet($entity);
         if (!empty($changeSet['digitalAsset'][1])) {
             $this->prePersist($entity, $args);
         }

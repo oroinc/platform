@@ -128,19 +128,12 @@ class DefaultPreloadingListenerTest extends WebTestCase
         $this->assertNotProxyOrInitialized($user->getOwner(), BusinessUnit::class);
     }
 
-    /**
-     * @param object $value
-     */
-    private function assertProxyAndNotInitialized($value): void
+    private function assertProxyAndNotInitialized(object $value): void
     {
         $this->assertTrue($value instanceof Proxy && !$value->__isInitialized());
     }
 
-    /**
-     * @param object $value
-     * @param string $expectedClass
-     */
-    private function assertNotProxyOrInitialized($value, string $expectedClass): void
+    private function assertNotProxyOrInitialized(object $value, string $expectedClass): void
     {
         if ($value instanceof Proxy) {
             $this->assertTrue($value->__isInitialized());

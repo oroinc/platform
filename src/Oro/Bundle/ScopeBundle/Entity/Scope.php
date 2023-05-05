@@ -4,7 +4,8 @@ namespace Oro\Bundle\ScopeBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\ScopeBundle\Model\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 
 /**
  * Represents a set of application parameters that can be used to find application data suitable for these parameters.
@@ -17,8 +18,10 @@ use Oro\Bundle\ScopeBundle\Model\ExtendScope;
  * @ORM\Entity()
  * @Config()
  */
-class Scope extends ExtendScope
+class Scope implements ExtendEntityInterface
 {
+    use ExtendEntityTrait;
+
     /**
      * @var integer
      *

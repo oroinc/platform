@@ -54,9 +54,6 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /**
-     * Set mapping config parameters
-     */
     public function testSetMappingConfig()
     {
         $query = new Query();
@@ -98,19 +95,13 @@ class QueryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProviderForClearString
-     *
-     * @param string $textToClear
-     * @param string $expected
      */
-    public function testClearString($textToClear, $expected)
+    public function testClearString(string $textToClear, string $expected)
     {
         $this->assertEquals($expected, Query::clearString($textToClear));
     }
 
-    /**
-     * @return array
-     */
-    public function dataProviderForClearString()
+    public function dataProviderForClearString(): array
     {
         return [
             ['Re: FW: Test - One äöü ßü abc 3 – again', 'Re FW Test One äöü ßü abc 3 again'],
@@ -251,10 +242,12 @@ class QueryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals([], $query->getAggregations());
 
-        $query->addAggregate('test_name', 'test_field', 'test_function');
+        $query->addAggregate('test_name', 'test_field', 'test_function', ['test' => 'parameter']);
 
         $this->assertEquals(
-            ['test_name' => ['field' => 'test_field', 'function' => 'test_function']],
+            ['test_name' =>
+                ['field' => 'test_field', 'function' => 'test_function', 'parameters' => ['test' => 'parameter']]
+            ],
             $query->getAggregations()
         );
     }
@@ -264,9 +257,27 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $criteria = new Criteria();
         $query = new Query();
         $query->setCriteria($criteria);
+        $query->setHint('test', 'value');
 
         $cloneQuery = clone $query;
 
         self::assertNotSame($criteria, $cloneQuery->getCriteria());
+        self::assertEmpty($cloneQuery->getHints());
+    }
+
+    public function testHints()
+    {
+        $query = new Query();
+
+        $this->assertFalse($query->hasHint('test'));
+        $this->assertFalse($query->getHint('test'));
+
+        $query->setHint('test', 'value');
+        $query->setHint('test2', 'value2');
+        $this->assertTrue($query->hasHint('test'));
+        $this->assertTrue($query->hasHint('test2'));
+        $this->assertEquals('value', $query->getHint('test'));
+        $this->assertEquals('value2', $query->getHint('test2'));
+        $this->assertEquals(['test' => 'value', 'test2' => 'value2'], $query->getHints());
     }
 }

@@ -16,6 +16,7 @@ class CustomizeLoadedDataProcessorTestCase extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->context = $this->createContext();
+        $this->context->setAction('customize_loader_data');
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
         $this->context->setSharedData(new ParameterBag());

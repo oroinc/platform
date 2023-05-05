@@ -10,10 +10,10 @@ services:
         tags:
             - { name: oro_migration.extension, extension_name: comment }
 
-    oro_comment.entity_generator.extension:
-        class: Oro\Bundle\CommentBundle\Tools\CommentEntityGeneratorExtension
+    oro_comment.entity_field.comment_extension:
+        class: Oro\Bundle\CommentBundle\EntityExtend\CommentEntityFieldExtension
         tags:
-            - { name: oro_entity_extend.entity_generator_extension }
+            - { name: 'oro_entity_extend.entity_field_extension', priority: 30 }
 
     oro_comment.entity_config_dumper.extension:
         class: Oro\Bundle\CommentBundle\Tools\CommentEntityConfigDumperExtension
@@ -49,7 +49,7 @@ services:
             - '@oro_security.token_accessor'
         tags:
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\CommentBundle\Entity\Comment, event: preUpdate }
-    
+
     oro_comment.placeholder.filter:
         class: Oro\Bundle\CommentBundle\Placeholder\CommentPlaceholderFilter
         public: true

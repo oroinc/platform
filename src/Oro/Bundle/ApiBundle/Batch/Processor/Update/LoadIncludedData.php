@@ -15,11 +15,8 @@ class LoadIncludedData implements ProcessorInterface
 {
     public const OPERATION_NAME = 'load_included_data';
 
-    /** @var IncludeAccessorRegistry */
-    private $includeAccessorRegistry;
-
-    /** @var IncludeMapManager */
-    private $includeMapManager;
+    private IncludeAccessorRegistry $includeAccessorRegistry;
+    private IncludeMapManager $includeMapManager;
 
     public function __construct(
         IncludeAccessorRegistry $includeAccessorRegistry,
@@ -32,7 +29,7 @@ class LoadIncludedData implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */
 

@@ -1,5 +1,8 @@
-define(['underscore', 'asap'], function(_, asap) {
+define(function(require) {
     'use strict';
+
+    const _ = require('underscore');
+    const asap = require('asap');
 
     _.mixin({
         nl2br: function(str) {

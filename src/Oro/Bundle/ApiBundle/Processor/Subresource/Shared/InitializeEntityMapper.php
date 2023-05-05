@@ -15,14 +15,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class InitializeEntityMapper implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityInstantiator */
-    private $entityInstantiator;
-
-    /** @var EntityOverrideProviderRegistry */
-    private $entityOverrideProviderRegistry;
+    private DoctrineHelper $doctrineHelper;
+    private EntityInstantiator $entityInstantiator;
+    private EntityOverrideProviderRegistry $entityOverrideProviderRegistry;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -37,7 +32,7 @@ class InitializeEntityMapper implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */
 

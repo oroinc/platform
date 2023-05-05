@@ -15,17 +15,12 @@ use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
  */
 class SearchAggregationFilter extends StandaloneFilter implements FieldFilterInterface
 {
-    /** @var SearchFieldResolverFactory */
-    private $searchFieldResolverFactory;
-
-    /** @var string */
-    private $entityClass;
-
+    private SearchFieldResolverFactory $searchFieldResolverFactory;
+    private string $entityClass;
     /** @var array [field name => field name in search index, ...] */
-    private $fieldMappings = [];
-
+    private array $fieldMappings = [];
     /** @var string[] */
-    private $aggregations;
+    private array $aggregations;
 
     public function setSearchFieldResolverFactory(SearchFieldResolverFactory $searchFieldResolverFactory): void
     {

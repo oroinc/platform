@@ -30,12 +30,9 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $propertyName
-     * @param mixed $testValue
-     * @param mixed $defaultValue
      * @dataProvider setGetDataProvider
      */
-    public function testSetGetEntity($propertyName, $testValue, $defaultValue = null)
+    public function testSetGetEntity(string $propertyName, mixed $testValue, mixed $defaultValue = null)
     {
         $setter = 'set' . ucfirst($propertyName);
         $getter = (is_bool($testValue) ? 'is' : 'get') . ucfirst($propertyName);
@@ -62,7 +59,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dateIntervalAndSecondsDataProvider
      */
-    public function testConvertDateIntervalToSeconds(\DateInterval $interval, $seconds)
+    public function testConvertDateIntervalToSeconds(\DateInterval $interval, int $seconds)
     {
         $this->assertEquals($seconds, ProcessTrigger::convertDateIntervalToSeconds($interval));
     }
@@ -70,7 +67,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dateIntervalAndSecondsDataProvider
      */
-    public function testConvertSecondsToDateInterval(\DateInterval $interval, $seconds)
+    public function testConvertSecondsToDateInterval(\DateInterval $interval, int $seconds)
     {
         $actualInterval = ProcessTrigger::convertSecondsToDateInterval($seconds);
 
@@ -115,8 +112,8 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
 
         $this->entity->prePersist();
 
-        $this->assertInstanceOf('\DateTime', $this->entity->getCreatedAt());
-        $this->assertInstanceOf('\DateTime', $this->entity->getUpdatedAt());
+        $this->assertInstanceOf(\DateTime::class, $this->entity->getCreatedAt());
+        $this->assertInstanceOf(\DateTime::class, $this->entity->getUpdatedAt());
         $this->assertEquals('UTC', $this->entity->getCreatedAt()->getTimezone()->getName());
         $this->assertEquals('UTC', $this->entity->getUpdatedAt()->getTimezone()->getName());
     }
@@ -127,7 +124,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
 
         $this->entity->preUpdate();
 
-        $this->assertInstanceOf('\DateTime', $this->entity->getUpdatedAt());
+        $this->assertInstanceOf(\DateTime::class, $this->entity->getUpdatedAt());
         $this->assertEquals('UTC', $this->entity->getUpdatedAt()->getTimezone()->getName());
     }
 
@@ -150,13 +147,11 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         $this->assertProcessTriggerEntitiesEquals($importedEntity, $this->entity);
     }
 
-    /**
-     * @param ProcessTrigger $expectedEntity
-     * @param ProcessTrigger $actualEntity
-     * @param bool $isEquals
-     */
-    private function assertProcessTriggerEntitiesEquals($expectedEntity, $actualEntity, $isEquals = true)
-    {
+    private function assertProcessTriggerEntitiesEquals(
+        ProcessTrigger $expectedEntity,
+        ProcessTrigger $actualEntity,
+        bool $isEquals = true
+    ): void {
         $method = $isEquals ? 'assertEquals' : 'assertNotEquals';
         $this->$method($expectedEntity->getEvent(), $actualEntity->getEvent());
         $this->$method($expectedEntity->getField(), $actualEntity->getField());
@@ -167,13 +162,9 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $trigger1Attributes
-     * @param array $trigger2Attributes
-     * @param bool $expected
-     *
      * @dataProvider testIsDefinitiveEqualData
      */
-    public function testIsDefinitiveEqual(array $trigger1Attributes, array $trigger2Attributes, $expected)
+    public function testIsDefinitiveEqual(array $trigger1Attributes, array $trigger2Attributes, bool $expected)
     {
         $trigger1 = $this->createProcessTriggerByAttributes($trigger1Attributes);
         $trigger2 = $this->createProcessTriggerByAttributes($trigger2Attributes);
@@ -183,10 +174,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function testIsDefinitiveEqualData()
+    public function testIsDefinitiveEqualData(): array
     {
         return [
             'equal full' => [
@@ -247,26 +235,18 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $attributes
-     * @return ProcessTrigger
-     */
-    public function createProcessTriggerByAttributes(array $attributes)
+    public function createProcessTriggerByAttributes(array $attributes): ProcessTrigger
     {
         $trigger = new ProcessTrigger();
-
         if (isset($attributes['event'])) {
             $trigger->setEvent($attributes['event']);
         }
-
         if (isset($attributes['field'])) {
             $trigger->setField($attributes['field']);
         }
-
         if (isset($attributes['cron'])) {
             $trigger->setCron($attributes['cron']);
         }
-
         if (isset($attributes['definition'])) {
             $definition = new ProcessDefinition();
             $definition->setName($attributes['definition']);

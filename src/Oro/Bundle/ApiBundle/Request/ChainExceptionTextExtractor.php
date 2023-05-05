@@ -7,11 +7,11 @@ namespace Oro\Bundle\ApiBundle\Request;
  */
 class ChainExceptionTextExtractor implements ExceptionTextExtractorInterface
 {
-    /** @var iterable|ExceptionTextExtractorInterface[] */
-    private $extractors;
+    /** @var iterable<ExceptionTextExtractorInterface> */
+    private iterable $extractors;
 
     /**
-     * @param iterable|ExceptionTextExtractorInterface[] $extractors
+     * @param iterable<ExceptionTextExtractorInterface> $extractors
      */
     public function __construct(iterable $extractors)
     {
@@ -19,9 +19,9 @@ class ChainExceptionTextExtractor implements ExceptionTextExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getExceptionStatusCode(\Exception $exception)
+    public function getExceptionStatusCode(\Exception $exception): ?int
     {
         $result = null;
         foreach ($this->extractors as $extractor) {
@@ -35,9 +35,9 @@ class ChainExceptionTextExtractor implements ExceptionTextExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getExceptionCode(\Exception $exception)
+    public function getExceptionCode(\Exception $exception): ?string
     {
         $result = null;
         foreach ($this->extractors as $extractor) {
@@ -51,9 +51,9 @@ class ChainExceptionTextExtractor implements ExceptionTextExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getExceptionType(\Exception $exception)
+    public function getExceptionType(\Exception $exception): ?string
     {
         $result = null;
         foreach ($this->extractors as $extractor) {
@@ -67,9 +67,9 @@ class ChainExceptionTextExtractor implements ExceptionTextExtractorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getExceptionText(\Exception $exception)
+    public function getExceptionText(\Exception $exception): ?string
     {
         $result = null;
         foreach ($this->extractors as $extractor) {

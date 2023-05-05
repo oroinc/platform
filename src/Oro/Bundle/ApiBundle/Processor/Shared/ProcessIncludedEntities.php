@@ -23,14 +23,9 @@ class ProcessIncludedEntities implements ProcessorInterface
 {
     use ErrorStatusCodesWithoutContentTrait;
 
-    /** @var ActionProcessorBagInterface */
-    private $processorBag;
-
-    /** @var ErrorCompleterRegistry */
-    private $errorCompleterRegistry;
-
-    /** @var ExceptionTextExtractorInterface */
-    private $exceptionTextExtractor;
+    private ActionProcessorBagInterface $processorBag;
+    private ErrorCompleterRegistry $errorCompleterRegistry;
+    private ExceptionTextExtractorInterface $exceptionTextExtractor;
 
     public function __construct(
         ActionProcessorBagInterface $processorBag,
@@ -45,7 +40,7 @@ class ProcessIncludedEntities implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */
 
@@ -80,22 +75,14 @@ class ProcessIncludedEntities implements ProcessorInterface
         }
     }
 
-    /**
-     * @param FormContext        $context
-     * @param array              $entityRequestData
-     * @param object             $entity
-     * @param string             $entityClass
-     * @param string             $entityIncludeId
-     * @param IncludedEntityData $entityData
-     */
     private function processIncludedEntity(
         FormContext $context,
         array $entityRequestData,
-        $entity,
-        $entityClass,
-        $entityIncludeId,
+        object $entity,
+        string $entityClass,
+        string $entityIncludeId,
         IncludedEntityData $entityData
-    ) {
+    ): void {
         $actionProcessor = $this->processorBag->getProcessor(
             $entityData->isExisting() ? ApiAction::UPDATE : ApiAction::CREATE
         );

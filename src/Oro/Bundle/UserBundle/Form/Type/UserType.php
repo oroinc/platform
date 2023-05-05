@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\FormBundle\Form\Type\OroBirthdayType;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType;
@@ -12,6 +11,7 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
+use Oro\Bundle\UserBundle\Form\Provider\RolesChoicesForUserProviderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -32,42 +32,36 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class UserType extends AbstractType
 {
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private TokenAccessorInterface $tokenAccessor;
+    private PasswordFieldOptionsProvider $optionsProvider;
+    private RolesChoicesForUserProviderInterface $choicesForUserProvider;
 
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var bool */
-    protected $isMyProfilePage;
-
-    /** @var PasswordFieldOptionsProvider */
-    protected $optionsProvider;
+    private bool $isMyProfilePage;
 
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
         RequestStack $requestStack,
-        PasswordFieldOptionsProvider $optionsProvider
+        PasswordFieldOptionsProvider $optionsProvider,
+        RolesChoicesForUserProviderInterface $choicesForUserProvider
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
         $this->isMyProfilePage = $requestStack->getCurrentRequest()->get('_route') === 'oro_user_profile_update';
         $this->optionsProvider = $optionsProvider;
+        $this->choicesForUserProvider = $choicesForUserProvider;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->addEntityFields($builder);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addEntityFields(FormBuilderInterface $builder)
+    public function addEntityFields(FormBuilderInterface $builder): void
     {
         $builder->addEventSubscriber(new UserSubscriber($builder->getFormFactory(), $this->tokenAccessor));
 
@@ -85,10 +79,10 @@ class UserType extends AbstractType
                 [
                     'label'         => 'oro.user.roles.label',
                     'class'         => Role::class,
-                    'choice_label'  => 'label',
-                    'query_builder' => function (EntityRepository $repo) {
-                        return $repo->createQueryBuilder('r')->orderBy('r.label');
+                    'choice_label'  => function (Role $role) {
+                        return $this->choicesForUserProvider->getChoiceLabel($role);
                     },
+                    'choices'       => $this->choicesForUserProvider->getRoles(),
                     'multiple'      => true,
                     'expanded'      => true,
                     'required'      => !$this->isMyProfilePage,
@@ -139,7 +133,7 @@ class UserType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData'], 10);
     }
 
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $form = $event->getForm();
 
@@ -189,9 +183,9 @@ class UserType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'         => User::class,
@@ -202,17 +196,17 @@ class UserType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->getBlockPrefix();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_user_user';
     }
@@ -220,7 +214,7 @@ class UserType extends AbstractType
     /**
      * Set user fields
      */
-    protected function setDefaultUserFields(FormBuilderInterface $builder)
+    protected function setDefaultUserFields(FormBuilderInterface $builder): void
     {
         $builder
             ->add('username', TextType::class, ['label' => 'oro.user.username.label', 'required' => true])
@@ -237,7 +231,7 @@ class UserType extends AbstractType
     /**
      * Add Invite user fields
      */
-    protected function addInviteUserField(FormBuilderInterface $builder)
+    protected function addInviteUserField(FormBuilderInterface $builder): void
     {
         $builder->add(
             'inviteUser',
@@ -252,7 +246,7 @@ class UserType extends AbstractType
         );
     }
 
-    protected function addOrganizationField(FormBuilderInterface $builder)
+    protected function addOrganizationField(FormBuilderInterface $builder): void
     {
         if ($this->authorizationChecker->isGranted('oro_organization_view')
             && $this->authorizationChecker->isGranted('oro_business_unit_view')

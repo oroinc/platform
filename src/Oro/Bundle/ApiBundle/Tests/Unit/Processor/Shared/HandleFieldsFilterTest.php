@@ -11,9 +11,11 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\HandleFieldsFilter;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class HandleFieldsFilterTest extends GetProcessorTestCase
@@ -65,8 +67,10 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
     {
         $filterValue = FilterValue::createFromSource('fields[entity]', 'entity', '');
 
-        $this->valueNormalizer->expects(self::never())
-            ->method('normalizeValue');
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn('Test\Entity');
 
         $this->context->getFilterValues()->set('fields[entity]', $filterValue);
         $this->processor->process($this->context);
@@ -83,10 +87,12 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
     {
         $filterValue = FilterValue::createFromSource('fields[entity]', 'entity', 'field1');
 
-        $this->valueNormalizer->expects(self::once())
+        $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
-            ->with('field1', DataType::STRING, self::identicalTo($this->context->getRequestType()), self::isTrue())
-            ->willReturn('field1');
+            ->willReturnMap([
+                ['entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Entity'],
+                ['field1', DataType::STRING, $this->context->getRequestType(), true, false, 'field1']
+            ]);
 
         $this->context->getFilterValues()->set('fields[entity]', $filterValue);
         $this->processor->process($this->context);
@@ -99,15 +105,66 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
         );
     }
 
+    public function testProcessForUnknownEntityType()
+    {
+        $filterValue = FilterValue::createFromSource('fields[entity]', 'entity', 'field1');
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willThrowException(new EntityAliasNotFoundException('unknown entity type'));
+
+        $this->context->getFilterValues()->set('fields[entity]', $filterValue);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasConfigExtra(FilterFieldsConfigExtra::NAME));
+        self::assertEquals(
+            [
+                Error::createValidationError(Constraint::FILTER)
+                    ->setDetail('An entity type is not known.')
+                    ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function testProcessForWrongFieldsFilterValue()
     {
         $filterValue = FilterValue::createFromSource('fields[entity]', 'entity', 'field1');
 
         $exception = new \Exception('some error');
-        $this->valueNormalizer->expects(self::once())
+        $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
-            ->with('field1', DataType::STRING, self::identicalTo($this->context->getRequestType()), self::isTrue())
-            ->willThrowException($exception);
+            ->willReturnCallback(
+                function (
+                    mixed $value,
+                    string $dataType,
+                    RequestType $requestType,
+                    bool $isArrayAllowed,
+                    bool $isRangeAllowed
+                ) use ($exception) {
+                    if ('entity' === $value
+                        && DataType::ENTITY_CLASS === $dataType
+                        && $this->context->getRequestType() === $requestType
+                        && !$isArrayAllowed
+                        && !$isRangeAllowed
+                    ) {
+                        return 'Test\Entity';
+                    }
+                    if ('field1' === $value
+                        && DataType::STRING === $dataType
+                        && $this->context->getRequestType() === $requestType
+                        && $isArrayAllowed
+                        && !$isRangeAllowed
+                    ) {
+                        throw $exception;
+                    }
+                    throw new \LogicException('Unexpected arguments.');
+                }
+            );
 
         $this->context->getFilterValues()->set('fields[entity]', $filterValue);
         $this->processor->process($this->context);

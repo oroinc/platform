@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
+use Doctrine\Persistence\Mapping\MappingException;
+use Doctrine\Persistence\Mapping\ReflectionService;
 use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendReflectionErrorHandler;
 
@@ -136,6 +139,15 @@ class OroClassMetadataFactory extends ClassMetadataFactory
         }
 
         return $result;
+    }
+
+    protected function initializeReflection(ClassMetadataInterface $class, ReflectionService $reflService)
+    {
+        $className = $class->getName();
+        if (!class_exists($className)) {
+            throw MappingException::nonExistingClass($className);
+        }
+        parent::initializeReflection($class, $reflService);
     }
 
     /**

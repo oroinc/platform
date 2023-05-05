@@ -9,20 +9,12 @@ namespace Oro\Bundle\ApiBundle\Model;
  */
 class EntityIdentifier implements \ArrayAccess
 {
-    /** @var mixed */
-    private $id;
-
-    /** @var string */
-    private $class;
-
+    private mixed $id;
+    private ?string $class;
     /** @var array [name => value, ...] */
-    private $attributes = [];
+    private array $attributes = [];
 
-    /**
-     * @param mixed|null  $id
-     * @param string|null $class
-     */
-    public function __construct($id = null, $class = null)
+    public function __construct(mixed $id = null, ?string $class = null)
     {
         $this->id = $id;
         $this->class = $class;
@@ -30,40 +22,32 @@ class EntityIdentifier implements \ArrayAccess
 
     /**
      * Gets an identifier of the entity.
-     *
-     * @return mixed
      */
-    public function getId()
+    public function getId(): mixed
     {
         return $this->id;
     }
 
     /**
      * Sets an identifier of the entity.
-     *
-     * @param mixed $id
      */
-    public function setId($id)
+    public function setId(mixed $id): void
     {
         $this->id = $id;
     }
 
     /**
      * Gets the FQCN of the entity.
-     *
-     * @return mixed
      */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->class;
     }
 
     /**
      * Sets the FQCN of the entity.
-     *
-     * @param string $class
      */
-    public function setClass($class)
+    public function setClass(?string $class): void
     {
         $this->class = $class;
     }
@@ -73,35 +57,27 @@ class EntityIdentifier implements \ArrayAccess
      *
      * @return array [name => value, ...]
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
 
     /**
      * Checks whether an additional attribute exists.
-     *
-     * @param string $name
-     *
-     * @return mixed
      */
-    public function hasAttribute($name)
+    public function hasAttribute(string $name): bool
     {
-        return array_key_exists($name, $this->attributes);
+        return \array_key_exists($name, $this->attributes);
     }
 
     /**
      * Gets a value of an additional attribute.
      *
-     * @param string $name
-     *
-     * @return mixed
-     *
      * @throws \InvalidArgumentException if an attribute does not exist
      */
-    public function getAttribute($name)
+    public function getAttribute(string $name): mixed
     {
-        if (!array_key_exists($name, $this->attributes)) {
+        if (!\array_key_exists($name, $this->attributes)) {
             throw new \InvalidArgumentException(sprintf('The "%s" attribute does not exist.', $name));
         }
 
@@ -110,27 +86,22 @@ class EntityIdentifier implements \ArrayAccess
 
     /**
      * Sets an additional attribute.
-     *
-     * @param string $name
-     * @param mixed  $value
      */
-    public function setAttribute($name, $value)
+    public function setAttribute(string $name, mixed $value): void
     {
         $this->attributes[$name] = $value;
     }
 
     /**
      * Removes an additional attribute.
-     *
-     * @param string $name
      */
-    public function removeAttribute($name)
+    public function removeAttribute(string $name): void
     {
         unset($this->attributes[$name]);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetExists($offset): bool
     {
@@ -138,7 +109,7 @@ class EntityIdentifier implements \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetGet($offset): mixed
     {
@@ -146,7 +117,7 @@ class EntityIdentifier implements \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetSet($offset, $value): void
     {
@@ -154,7 +125,7 @@ class EntityIdentifier implements \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetUnset($offset): void
     {

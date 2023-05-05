@@ -2,7 +2,7 @@
 
 namespace Oro\Component\EntitySerializer;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,11 +16,8 @@ class DoctrineHelper
     private const KEY_METADATA = 'metadata';
     private const KEY_ID_FIELD = 'id';
 
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var array */
-    private $cache = [];
+    private ManagerRegistry $doctrine;
+    private array $cache = [];
 
     public function __construct(ManagerRegistry $doctrine)
     {
@@ -29,29 +26,20 @@ class DoctrineHelper
 
     /**
      * Checks whether the given class represents a manageable entity.
-     *
-     * @param string $entityClass
-     *
-     * @return bool
      */
-    public function isManageableEntity($entityClass)
+    public function isManageableEntity(string $entityClass): bool
     {
         return null !== $this->doctrine->getManagerForClass($entityClass);
     }
 
     /**
      * Gets the entity manager associated with the given entity class.
-     *
-     * @param string $entityClass
-     *
-     * @return EntityManager
-     *
-     * @throws \RuntimeException
      */
-    public function getEntityManager($entityClass)
+    public function getEntityManager(string $entityClass): EntityManagerInterface
     {
+        /** @var EntityManagerInterface|null $em */
         $em = $this->doctrine->getManagerForClass($entityClass);
-        if (!$em) {
+        if (null === $em) {
             throw new \RuntimeException(sprintf('Entity class "%s" is not manageable.', $entityClass));
         }
 
@@ -60,13 +48,8 @@ class DoctrineHelper
 
     /**
      * Creates a new query builder object for the given entity class.
-     *
-     * @param string $entityClass
-     * @param string $alias
-     *
-     * @return QueryBuilder
      */
-    public function createQueryBuilder($entityClass, $alias)
+    public function createQueryBuilder(string $entityClass, string $alias): QueryBuilder
     {
         return $this->getEntityManager($entityClass)
             ->getRepository($entityClass)
@@ -75,12 +58,8 @@ class DoctrineHelper
 
     /**
      * Gets the ORM metadata for the given entity class.
-     *
-     * @param string $entityClass
-     *
-     * @return EntityMetadata
      */
-    public function getEntityMetadata($entityClass)
+    public function getEntityMetadata(string $entityClass): EntityMetadata
     {
         if (isset($this->cache[$entityClass][self::KEY_METADATA])) {
             return $this->cache[$entityClass][self::KEY_METADATA];
@@ -100,12 +79,13 @@ class DoctrineHelper
      * @param string $entityName The name of the entity. Can be bundle:entity or full class name
      *
      * @return string The full class name
-     * @throws \InvalidArgumentException
+     *
+     * @throws \InvalidArgumentException if the given entity name cannot be resolved
      */
-    public function resolveEntityClass($entityName)
+    public function resolveEntityClass(string $entityName): string
     {
         $parts = explode(':', $entityName);
-        $numberOfParts = count($parts);
+        $numberOfParts = \count($parts);
         if ($numberOfParts <= 1) {
             // the given entity name is not in bundle:entity format; it is supposed that it is the full class name
             return $entityName;
@@ -123,13 +103,9 @@ class DoctrineHelper
     /**
      * Gets the root alias of the given query.
      *
-     * @param QueryBuilder $qb
-     *
-     * @return string
-     *
      * @throws QueryException if the given query builder does not have a root alias or has more than one root aliases
      */
-    public function getRootAlias(QueryBuilder $qb)
+    public function getRootAlias(QueryBuilder $qb): string
     {
         return QueryBuilderUtil::getSingleRootAlias($qb);
     }
@@ -137,25 +113,17 @@ class DoctrineHelper
     /**
      * Gets the root entity class of the given query.
      *
-     * @param QueryBuilder $qb
-     *
-     * @return string
-     *
      * @throws QueryException if the given query builder does not have a root entity or has more than one root entities
      */
-    public function getRootEntityClass(QueryBuilder $qb)
+    public function getRootEntityClass(QueryBuilder $qb): string
     {
         return $this->resolveEntityClass(QueryBuilderUtil::getSingleRootEntity($qb));
     }
 
     /**
      * Gets the name of entity identifier field if an entity has a single-field identifier.
-     *
-     * @param string $entityClass
-     *
-     * @return string
      */
-    public function getEntityIdFieldName($entityClass)
+    public function getEntityIdFieldName(string $entityClass): string
     {
         if (isset($this->cache[$entityClass][self::KEY_ID_FIELD])) {
             return $this->cache[$entityClass][self::KEY_ID_FIELD];
@@ -169,12 +137,8 @@ class DoctrineHelper
 
     /**
      * Gets the data-type of entity identifier field if an entity has a single-field identifier.
-     *
-     * @param string $entityClass
-     *
-     * @return string|null
      */
-    public function getEntityIdType($entityClass)
+    public function getEntityIdType(string $entityClass): ?string
     {
         return $this->getEntityMetadata($entityClass)
             ->getFieldType($this->getEntityIdFieldName($entityClass));

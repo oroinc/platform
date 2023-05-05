@@ -5,16 +5,15 @@ namespace Oro\Bundle\WorkflowBundle\Processor\Transition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
-use Oro\Bundle\WorkflowBundle\Processor\Context\ValidateTransitionContextTrait;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Initializes base context attributes.
+ */
 class BaseContextInitProcessor implements ProcessorInterface
 {
-    use ValidateTransitionContextTrait;
-
-    /** @var WorkflowManager */
-    private $workflowManager;
+    private WorkflowManager $workflowManager;
 
     public function __construct(WorkflowManager $workflowManager)
     {
@@ -22,11 +21,11 @@ class BaseContextInitProcessor implements ProcessorInterface
     }
 
     /**
-     * @param ContextInterface|TransitionContext $context
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
-        $this->validateContextType($context);
+        /** @var TransitionContext $context */
 
         $transitionName = $context->getTransitionName();
 

@@ -13,11 +13,14 @@ class MaterializedViewRemoverTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private MaterializedViewManager|\PHPUnit\Framework\MockObject\MockObject $materializedViewManager;
+    /** @var MaterializedViewManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $materializedViewManager;
 
-    private MaterializedViewRemover $remover;
+    /** @var MaterializedViewEntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
 
-    private MaterializedViewEntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository;
+    /** @var MaterializedViewRemover */
+    private $remover;
 
     protected function setUp(): void
     {
@@ -29,8 +32,7 @@ class MaterializedViewRemoverTest extends \PHPUnit\Framework\TestCase
         $this->setUpLoggerMock($this->remover);
 
         $this->repository = $this->createMock(MaterializedViewEntityRepository::class);
-        $managerRegistry
-            ->expects(self::any())
+        $managerRegistry->expects(self::any())
             ->method('getRepository')
             ->with(MaterializedViewEntity::class)
             ->willReturn($this->repository);
@@ -40,18 +42,15 @@ class MaterializedViewRemoverTest extends \PHPUnit\Framework\TestCase
     {
         $daysOld = 5;
         $dateTime = new \DateTime(sprintf('today -%d days', $daysOld));
-        $this->repository
-            ->expects(self::once())
+        $this->repository->expects(self::once())
             ->method('findOlderThan')
             ->with($dateTime)
             ->willReturn([]);
 
-        $this->materializedViewManager
-            ->expects(self::never())
+        $this->materializedViewManager->expects(self::never())
             ->method(self::anything());
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('info')
             ->with(
                 'Found {count} materialized view older than {daysOld} days for removal.',
@@ -70,19 +69,16 @@ class MaterializedViewRemoverTest extends \PHPUnit\Framework\TestCase
         $daysOld = 5;
         $dateTime = new \DateTime(sprintf('today -%d days', $daysOld));
         $materializedViewNames = ['sample_name1', 'sample_name2'];
-        $this->repository
-            ->expects(self::once())
+        $this->repository->expects(self::once())
             ->method('findOlderThan')
             ->with($dateTime)
             ->willReturn($materializedViewNames);
 
-        $this->materializedViewManager
-            ->expects(self::exactly(2))
+        $this->materializedViewManager->expects(self::exactly(2))
             ->method('delete')
             ->withConsecutive([$materializedViewNames[0]], [$materializedViewNames[1]]);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('info')
             ->with(
                 'Found {count} materialized view older than {daysOld} days for removal.',

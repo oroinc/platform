@@ -8,20 +8,17 @@ class RestApiTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateWsseAuthHeader());
     }
 
-    /**
-     * @return array
-     */
-    public function testGetCountries()
+    public function testGetCountries(): array
     {
         $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_countries')
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         return array_slice($result, 0, 5);
     }
@@ -37,7 +34,7 @@ class RestApiTest extends WebTestCase
                 $this->getUrl('oro_api_get_country', ['id' => $country['iso2code']])
             );
 
-            $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+            $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
             $this->assertEquals($country, $result);
         }
@@ -47,7 +44,7 @@ class RestApiTest extends WebTestCase
             $this->getUrl('oro_api_get_country', ['id' => 'US'])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertEquals(
             [
@@ -66,7 +63,7 @@ class RestApiTest extends WebTestCase
             $this->getUrl('oro_api_get_region', ['id' => 'US-LA'])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertEquals(
             [
@@ -86,7 +83,7 @@ class RestApiTest extends WebTestCase
             $this->getUrl('oro_api_country_get_regions', ['country' => 'US'])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
         $result = array_slice($result, 0, 5);
 
         foreach ($result as $region) {
@@ -94,10 +91,10 @@ class RestApiTest extends WebTestCase
                 'GET',
                 $this->getUrl('oro_api_get_region', ['id' => $region['combinedCode']]),
                 [],
-                $this->generateWsseAuthHeader()
+                self::generateWsseAuthHeader()
             );
 
-            $expectedResult = $this->getJsonResponseContent($this->client->getResponse(), 200);
+            $expectedResult = self::getJsonResponseContent($this->client->getResponse(), 200);
 
             $this->assertEquals($expectedResult, $region);
         }

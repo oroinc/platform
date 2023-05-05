@@ -1,6 +1,6 @@
 {% import '@OroUI/macros.html.twig' as UI %}
 {% import '@OroTag/macros.html.twig' as Tag %}
-{% if is_granted('oro_tag_view') %}
+{% if is_granted('oro_tag_view') and feature_enabled('manage_tags') %}
     <div class="row-fluid">
         <div class="responsive-block">
     {{ UI.renderHtmlProperty('oro.tag.entity_plural_label'|trans, Tag.renderView(entity)) }}

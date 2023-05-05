@@ -3,20 +3,17 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationLoader;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 class DynamicTranslationLoaderTest extends OrmTestCase
 {
-    /** @var EntityManagerMock */
-    private $em;
-
-    /** @var DynamicTranslationLoader */
-    private $loader;
+    private EntityManagerInterface $em;
+    private DynamicTranslationLoader $loader;
 
     protected function setUp(): void
     {

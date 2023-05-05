@@ -293,6 +293,20 @@ define(function(require, exports, module) {
             return SelectFilter.__super__.hide.call(this);
         },
 
+        /**
+         * @inheritdoc
+         */
+        setValue: function(value) {
+            // When the system applies pre-defined view, it won't change type of filter value.
+            // Select filters can have numeric values,
+            // but internally all logic expects that all values will have string type.
+            if (_.isNumber(value.value) && !_.isNaN(value.value)) {
+                value.value = value.value.toString();
+            }
+
+            return SelectFilter.__super__.setValue.call(this, value);
+        },
+
         _disposeSelectWidget() {
             if (this.selectWidget) {
                 this.$(this.inputSelector).off(`remove${this.eventNamespace()}`);

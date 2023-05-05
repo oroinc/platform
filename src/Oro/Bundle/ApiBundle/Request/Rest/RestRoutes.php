@@ -7,17 +7,10 @@ namespace Oro\Bundle\ApiBundle\Request\Rest;
  */
 class RestRoutes
 {
-    /** @var string */
-    private $itemRouteName;
-
-    /** @var string */
-    private $listRouteName;
-
-    /** @var string */
-    private $subresourceRouteName;
-
-    /** @var string */
-    private $relationshipRouteName;
+    private string $itemRouteName;
+    private string $listRouteName;
+    private string $subresourceRouteName;
+    private string $relationshipRouteName;
 
     public function __construct(
         string $itemRouteName,

@@ -58,8 +58,8 @@ class InsertAuthStatusesQuery extends ParametrizedMigrationQuery
                 ':is_default' => true,
             ],
             [
-                ':id' => UserManager::STATUS_EXPIRED,
-                ':name' => 'Password reset',
+                ':id' => UserManager::STATUS_RESET,
+                ':name' => 'Reset',
                 ':priority' => 2,
                 ':is_default' => false,
             ],

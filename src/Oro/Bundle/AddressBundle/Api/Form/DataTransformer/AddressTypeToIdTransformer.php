@@ -13,8 +13,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class AddressTypeToIdTransformer implements DataTransformerInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -22,7 +21,7 @@ class AddressTypeToIdTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function transform($value)
     {
@@ -30,7 +29,7 @@ class AddressTypeToIdTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function reverseTransform($value)
     {
@@ -52,12 +51,13 @@ class AddressTypeToIdTransformer implements DataTransformerInterface
      */
     private function getEntity(string $id): AddressType
     {
-        $em = $this->doctrineHelper->getEntityManagerForClass(AddressType::class);
-        $entity = $em->find(AddressType::class, $id);
+        $entity = $this->doctrineHelper->getEntityManagerForClass(AddressType::class)
+            ->find(AddressType::class, $id);
         if (null === $entity) {
-            throw new TransformationFailedException(
-                \sprintf('The address type with "%s" identifier does not exist.', $id)
-            );
+            throw new TransformationFailedException(sprintf(
+                'The address type with "%s" identifier does not exist.',
+                $id
+            ));
         }
 
         return $entity;

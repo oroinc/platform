@@ -30,7 +30,7 @@ class UrlUtilTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($result, UrlUtil::join($path1, $path2));
     }
 
-    public function getAbsolutePathDataProvider()
+    public function getAbsolutePathDataProvider(): array
     {
         return [
             ['', '', ''],
@@ -74,7 +74,7 @@ class UrlUtilTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getPathInfoDataProvider()
+    public function getPathInfoDataProvider(): array
     {
         return [
             ['', '', ''],
@@ -120,7 +120,7 @@ class UrlUtilTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function joinDataProvider()
+    public function joinDataProvider(): array
     {
         return [
             ['', '', ''],

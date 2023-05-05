@@ -20,7 +20,7 @@ class LoadDataFromFile extends BaseLoadDataFromFile
         $sourceData = JsonUtil::decode($fileManager->getFileContent($fileName));
 
         $headerSectionData = null;
-        if (array_key_exists(JsonApiDoc::JSONAPI, $sourceData)) {
+        if (\array_key_exists(JsonApiDoc::JSONAPI, $sourceData)) {
             $headerSectionData = [JsonApiDoc::JSONAPI => $sourceData[JsonApiDoc::JSONAPI]];
             unset($sourceData[JsonApiDoc::JSONAPI]);
         }

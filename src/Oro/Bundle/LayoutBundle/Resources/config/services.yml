@@ -40,7 +40,7 @@ services:
     oro_layout.cache.extension.theme:
         class: Oro\Bundle\LayoutBundle\Cache\Extension\ThemeRenderCacheExtension
         arguments:
-            - '@oro_layout.layout_context_holder'
+            - '@oro_layout.layout_context_stack'
         tags: [layout.cache.extension]
 
     oro_layout.cache.metadata_provider.default:
@@ -51,7 +51,6 @@ services:
         arguments:
             - '@oro_layout.cache.metadata_provider.default'
             - !tagged_iterator layout.cache.metadata_provider
-            - '@oro_layout.layout_context_holder'
             - '@logger'
             - '%kernel.debug%'
         tags:
@@ -62,19 +61,20 @@ services:
         class: Oro\Bundle\LayoutBundle\Cache\PlaceholderRenderer
         arguments:
             - '@oro_layout.layout_manager'
-            - '@oro_layout.layout_context_holder'
+            - '@oro_layout.layout_context_stack'
             - '@logger'
         tags:
             - { name: monolog.logger, channel: oro_layout.cache }
             - { name: kernel.reset, method: reset }
 
     oro_layout.layout_factory_builder:
-        public: false
         class: Oro\Bundle\LayoutBundle\Layout\CacheLayoutFactoryBuilder
         arguments:
+            - '@oro_layout.layout_context_stack'
             - '@oro_layout.processor.expression'
             - '@oro_layout.cache.render_cache'
             - '@oro_layout.cache.metadata_provider'
+            - '@event_dispatcher'
             - '@oro_layout.cache.block_view_cache'
         calls:
             - [addExtension, ['@oro_layout.extension']]
@@ -86,8 +86,6 @@ services:
         class: 'Oro\Bundle\LayoutBundle\Layout\LayoutManager'
         arguments:
             - '@oro_layout.layout_factory_builder'
-            - '@oro_layout.layout_context_holder'
-            - '@oro_layout.profiler.layout_data_collector'
 
     Oro\Bundle\LayoutBundle\Layout\LayoutManager:
         alias: oro_layout.layout_manager
@@ -133,6 +131,13 @@ services:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator
         arguments:
             - '@oro_layout.theme_extension.resource_provider.last_modification_date'
+        tags:
+            - { name: layout.context_configurator }
+
+    oro_layout.layout_context_configurator.is_xml_http_request:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\XmlHttpRequestConfigurator
+        arguments:
+            - '@request_stack'
         tags:
             - { name: layout.context_configurator }
 
@@ -190,8 +195,10 @@ services:
         class: Doctrine\Common\Collections\ArrayCollection
         public: false
 
-    oro_layout.layout_context_holder:
-        class: Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder
+    oro_layout.layout_context_stack:
+        class: Oro\Bundle\LayoutBundle\Layout\Context\LayoutContextStack
+        arguments:
+            - '@event_dispatcher'
 
     oro_layout.cache_warmer.layout_updates:
         class: Oro\Bundle\LayoutBundle\Cache\LayoutUpdatesCacheWarmer

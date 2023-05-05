@@ -205,6 +205,29 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Change group of permissions on create/edit customer user pages
+     *
+     * Example: And select customer user role permissions:
+     *       | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
+     *       | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User    |
+     *
+     * @Then /^(?:|I )select customer user role permissions:$/
+     */
+    public function iSelectCustomerUserRolePermissions(TableNode $table)
+    {
+        $userRoleForm = $this->elementFactory->createElement('CustomerUserRoleForm');
+
+        foreach ($table->getRows() as $row) {
+            $entityName = array_shift($row);
+
+            foreach ($row as $cell) {
+                [$permission, $value] = explode(':', $cell);
+                $userRoleForm->setPermission($entityName, $permission, $value);
+            }
+        }
+    }
+
+    /**
      * Set capability permission on create/edit pages by selecting checkbox
      *
      * Example: And I check "Access dotmailer statistics" entity permission

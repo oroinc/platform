@@ -28,7 +28,7 @@ class CacheClearCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache')
@@ -52,7 +52,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 

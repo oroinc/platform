@@ -243,9 +243,9 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     /**
      * {@inheritdoc}
      */
-    public function addAggregate($name, $field, $function)
+    public function addAggregate($name, $field, $function, array $parameters = [])
     {
-        $this->query->addAggregate($name, $field, $function);
+        $this->query->addAggregate($name, $field, $function, $parameters);
 
         return $this;
     }
@@ -256,6 +256,28 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     public function getAggregations()
     {
         return $this->query->getAggregations();
+    }
+
+    public function setHint(string $name, $value): self
+    {
+        $this->query->setHint($name, $value);
+
+        return $this;
+    }
+
+    public function getHint(string $name)
+    {
+        return $this->query->getHint($name);
+    }
+
+    public function hasHint(string $name): bool
+    {
+        return $this->query->hasHint($name);
+    }
+
+    public function getHints(): array
+    {
+        return $this->query->getHints();
     }
 
     public function __clone()

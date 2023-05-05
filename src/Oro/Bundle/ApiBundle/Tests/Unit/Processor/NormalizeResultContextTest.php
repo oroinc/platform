@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
 
 class NormalizeResultContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var NormalizeResultContext */
-    private $context;
+    private NormalizeResultContext $context;
 
     protected function setUp(): void
     {

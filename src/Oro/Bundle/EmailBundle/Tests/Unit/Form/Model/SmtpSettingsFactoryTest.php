@@ -40,10 +40,6 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider partialParametersDataProvider
-     *
-     * @param string $uri
-     * @param string $method
-     * @param array  $parameters
      */
     public function testWithPartialValidRequestValues(string $uri, string $method, array $parameters): void
     {
@@ -62,10 +58,6 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidParametersDataProvider
-     *
-     * @param string $uri
-     * @param string $method
-     * @param array  $parameters
      */
     public function testWithInvalidRequestValues(string $uri, string $method, array $parameters): void
     {

@@ -11,8 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RestActionMapper
 {
-    /** @var RestRoutes */
-    private $routes;
+    private RestRoutes $routes;
 
     public function __construct(RestRoutes $routes)
     {
@@ -108,6 +107,6 @@ class RestActionMapper
                 return Request::METHOD_OPTIONS;
         }
 
-        throw new \LogicException(\sprintf('Unsupported API action "%s".', $action));
+        throw new \LogicException(sprintf('Unsupported API action "%s".', $action));
     }
 }

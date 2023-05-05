@@ -12,17 +12,14 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RestRequestHeaders extends AbstractParameterBag
 {
-    /** @var Request */
-    private $request;
-
+    private Request $request;
     /**
-     * @var array|null [normalized_key => [] | false | ['v' => value], ...]
-     * where the value can be:
+     * each value of the array can be:
      *  []             - a parameter exists, but a value should be retrieved using $this->getHeaderValue()
      *  false          - a parameter was removed
      *  ['v' => value] - a parameter exists and its value is stored in this array
      */
-    private $parameters;
+    private ?array $parameters = null;
 
     public function __construct(Request $request)
     {
@@ -30,9 +27,9 @@ class RestRequestHeaders extends AbstractParameterBag
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         if (null === $this->parameters) {
             return $this->hasHeader($key);
@@ -44,9 +41,9 @@ class RestRequestHeaders extends AbstractParameterBag
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function get($key)
+    public function get(string $key): mixed
     {
         if (null === $this->parameters) {
             return $this->getHeaderValue($key);
@@ -67,9 +64,9 @@ class RestRequestHeaders extends AbstractParameterBag
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         $this->ensureInternalStorageInitialized();
 
@@ -77,9 +74,9 @@ class RestRequestHeaders extends AbstractParameterBag
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         $this->ensureInternalStorageInitialized();
 
@@ -87,9 +84,9 @@ class RestRequestHeaders extends AbstractParameterBag
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = [];
         if (null === $this->parameters) {
@@ -109,9 +106,9 @@ class RestRequestHeaders extends AbstractParameterBag
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function clear()
+    public function clear(): void
     {
         $this->ensureInternalStorageInitialized();
 
@@ -122,12 +119,12 @@ class RestRequestHeaders extends AbstractParameterBag
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function count(): int
     {
         if (null === $this->parameters) {
-            return count($this->getHeaderNames());
+            return \count($this->getHeaderNames());
         }
 
         $result = 0;
@@ -173,12 +170,7 @@ class RestRequestHeaders extends AbstractParameterBag
         return $this->request->headers->has($name);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return array|string|null
-     */
-    private function getHeaderValue(string $name)
+    private function getHeaderValue(string $name): array|string|null
     {
         $lowerName = strtolower($name);
         if ('accept' === $lowerName) {

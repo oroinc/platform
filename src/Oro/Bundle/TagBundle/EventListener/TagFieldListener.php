@@ -35,8 +35,10 @@ class TagFieldListener
             );
 
             if (!empty($data['dataBlocks'])) {
-                if (isset($data['dataBlocks'][0]['subblocks'])) {
-                    array_push($data['dataBlocks'][0]['subblocks'][0]['data'], $tagField);
+                $firstBlockIndex = array_key_first($data['dataBlocks']);
+
+                if (isset($data['dataBlocks'][$firstBlockIndex]['subblocks'])) {
+                    array_push($data['dataBlocks'][$firstBlockIndex]['subblocks'][0]['data'], $tagField);
                 }
             }
             $event->setData($data);

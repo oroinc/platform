@@ -5,6 +5,7 @@ namespace Oro\Component\PhpUtils;
 
 use Nette\InvalidStateException;
 use Nette\PhpGenerator\Attribute;
+use Nette\PhpGenerator\ClassLike;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Constant;
 use Nette\PhpGenerator\Method;
@@ -64,7 +65,7 @@ final class ClassGenerator
         $this->classType = clone $this->classType;
         if (null !== $this->namespace) {
             $this->namespace = clone $this->namespace;
-            $this->namespace->add($this->classType);
+            $this->add($this->classType);
         }
 
         // It is not cloned intentionally. Uncomment if run into side-effects.
@@ -211,7 +212,7 @@ final class ClassGenerator
     /** @return static */
     public function addExtend(string $name): self
     {
-        $this->classType->addExtend($name);
+        $this->classType->setExtends($name);
         return $this;
     }
 
@@ -386,6 +387,10 @@ final class ClassGenerator
 
     public function addMethod(string $name): Method
     {
+        if ($this->classType->hasMethod($name)) {
+            $this->classType->removeMethod($name);
+        }
+
         return $this->classType->addMethod($name);
     }
 
@@ -425,5 +430,15 @@ final class ClassGenerator
         $this->classType->addComment($val);
         return $this;
     }
+
     //endregion
+
+    public function add(ClassLike $class): PhpNamespace
+    {
+        if (in_array($class, $this->namespace->getClasses())) {
+            $this->namespace->removeClass($class->getName());
+        }
+
+        return $this->namespace->add($class);
+    }
 }

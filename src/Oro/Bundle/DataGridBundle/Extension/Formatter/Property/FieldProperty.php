@@ -27,18 +27,15 @@ class FieldProperty extends AbstractProperty
     {
         $type = $this->getOr(self::FRONTEND_TYPE_KEY);
         if ($type === self::TYPE_SELECT || $type === self::TYPE_MULTI_SELECT) {
-            $translator = $this->translator;
-
             $choices = $this->getOr('choices', []);
-            $translated = [];
-            array_walk(
-                $choices,
-                function ($item, $key) use ($translator, &$translated) {
-                    $translated[$translator->trans((string) $key)] = $item;
+            if ($this->getOr('translatable_options', true)) {
+                $translated = [];
+                foreach ($choices as $key => $val) {
+                    $translated[$key ? $this->translator->trans((string)$key) : ''] = $val;
                 }
-            );
-
-            $this->params['choices'] = $translated;
+                $choices = $translated;
+            }
+            $this->params['choices'] = $choices;
         }
     }
 

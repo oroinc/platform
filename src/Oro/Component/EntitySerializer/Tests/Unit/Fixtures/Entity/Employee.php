@@ -12,20 +12,14 @@ class Employee extends Person
     /**
      * @ORM\Column(name="position", type="string", length=255)
      */
-    protected $position;
+    private ?string $position = null;
 
-    /**
-     * @return string
-     */
-    public function getPosition()
+    public function getPosition(): ?string
     {
         return $this->position;
     }
 
-    /**
-     * @param string $position
-     */
-    public function setPosition($position)
+    public function setPosition(?string $position): void
     {
         $this->position = $position;
     }

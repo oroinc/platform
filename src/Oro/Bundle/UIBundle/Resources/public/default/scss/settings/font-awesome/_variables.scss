@@ -1,5 +1,7 @@
 /* @theme: default; */
 
+@use 'sass:color';
+
 @import '~@oroinc/font-awesome/scss/variables';
 
 :root {
@@ -826,7 +828,7 @@
 
 $fa-font-family: 'FontAwesome';
 
-$fa-color-gray: lighten(get-color('additional', 'dark'), 21%);
+$fa-color-gray: color.adjust(get-color('additional', 'dark'), $lightness: 21%);
 $fa-color-dark-gray: get-color('additional', 'dark');
 
 $font-icon-offset-end: 3px !default;

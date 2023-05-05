@@ -6,6 +6,7 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -17,8 +18,18 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * Represents form for MenuUpdate.
+ */
 class MenuUpdateType extends AbstractType
 {
+    private ?EventSubscriberInterface $localizedFallbackValueCollectionSubscriber = null;
+
+    public function setLocalizedFallbackValueCollectionSubscriber(?EventSubscriberInterface $eventSubscriber): void
+    {
+        $this->localizedFallbackValueCollectionSubscriber = $eventSubscriber;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -33,6 +44,10 @@ class MenuUpdateType extends AbstractType
                 'entry_options' => ['constraints' => [new NotBlank()]]
             ]
         );
+
+        if ($this->localizedFallbackValueCollectionSubscriber) {
+            $builder->get('titles')->addEventSubscriber($this->localizedFallbackValueCollectionSubscriber);
+        }
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
@@ -114,5 +129,9 @@ class MenuUpdateType extends AbstractType
                 }
             ]
         );
+        $resolver->setAllowedTypes('menu_item', [ItemInterface::class, 'null']);
+
+        $resolver->setRequired('menu');
+        $resolver->setAllowedTypes('menu', ItemInterface::class);
     }
 }

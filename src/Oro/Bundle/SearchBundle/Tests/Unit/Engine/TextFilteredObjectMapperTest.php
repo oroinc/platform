@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\TextFilteredObjectMapper;
 use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\SearchBundle\Test\Unit\SearchMappingTypeCastingHandlersTestTrait;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class TextFilteredObjectMapperTest extends ObjectMapperTest
 {

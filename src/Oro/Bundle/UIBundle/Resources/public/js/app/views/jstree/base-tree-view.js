@@ -18,6 +18,7 @@ define(function(require) {
      * Options:
      * - data - tree structure in jstree json format
      * - nodeId - identifier of selected node
+     * - disabled - disable the whole tree
      *
      * @export oroui/js/app/views/jstree/base-tree-view
      * @extends oroui.app.views.base.View
@@ -153,6 +154,11 @@ define(function(require) {
         autohideNeighbors: false,
 
         /**
+         * @property {Boolean}
+         */
+        disabled: false,
+
+        /**
          * @inheritdoc
          */
         constructor: function BaseTreeView(options) {
@@ -192,6 +198,7 @@ define(function(require) {
             };
 
             this.nodeId = options.nodeId;
+            this.disabled = options.disabled || false;
 
             this.jsTreeConfig = this.customizeTreeConfig(options, config);
 
@@ -236,12 +243,34 @@ define(function(require) {
                 this.$searchField.val(state.search).change();
             }
 
-            this.openSelectedNode();
+            this.openSelectedNode(!this.disabled);
+
+            if (this.disabled) {
+                this.toggleDisable(true);
+            }
 
             this._resolveDeferredRender();
         },
 
-        openSelectedNode: function() {
+        /**
+         * @param {jQuery.Event} event
+         * @param {Object} data
+         *  {
+         *      instance: jQuery.jsTree,
+         *      node: Object
+         *  }
+         */
+        onOpen: function(event, data) {
+            const $nodeElement = $(this.jsTreeInstance.get_node(data.node, true));
+            if (this.disabled) {
+                $nodeElement.find('.jstree-wholerow').addClass('jstree-wholerow-disabled');
+            }
+        },
+
+        /**
+         * @param {Boolean} includeSelf
+         */
+        openSelectedNode: function(includeSelf) {
             const nodes = this.jsTreeInstance.get_selected();
             const parents = [];
             _.each(nodes, function(node) {
@@ -250,7 +279,33 @@ define(function(require) {
                     parents.push(parent);
                 }
             }, this);
-            this.jsTreeInstance.open_node(parents.concat(nodes));
+
+            this.jsTreeInstance.open_node(includeSelf ? parents.concat(nodes) : parents);
+        },
+
+        /**
+         * @param {Boolean} state
+         */
+        toggleDisable: function(state) {
+            this.disabled = state;
+            this.disableSearchField(state);
+
+            const nodes = this.jsTreeInstance.get_json('#', {flat: true, no_data: true, no_state: true});
+            if (state === true) {
+                _.each(nodes, node => {
+                    this.jsTreeInstance.disable_node(node);
+                    $(this.jsTreeInstance.get_node(node, true))
+                        .find('.jstree-wholerow')
+                        .addClass('jstree-wholerow-disabled');
+                });
+            } else {
+                _.each(nodes, node => {
+                    this.jsTreeInstance.enable_node(node);
+                    $(this.jsTreeInstance.get_node(node, true))
+                        .find('.jstree-wholerow')
+                        .removeClass('jstree-wholerow-disabled');
+                });
+            }
         },
 
         /**

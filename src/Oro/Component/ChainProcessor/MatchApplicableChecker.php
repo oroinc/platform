@@ -32,10 +32,10 @@ class MatchApplicableChecker extends AbstractMatcher implements ApplicableChecke
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function isApplicable(ContextInterface $context, array $processorAttributes)
+    public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         $result = self::APPLICABLE;
         foreach ($processorAttributes as $name => $value) {

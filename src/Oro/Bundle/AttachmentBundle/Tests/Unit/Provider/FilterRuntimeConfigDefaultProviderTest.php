@@ -8,9 +8,6 @@ class FilterRuntimeConfigDefaultProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getRuntimeConfigForFilterDataProvider
-     *
-     * @param string $format
-     * @param array $expectedConfig
      */
     public function testGetRuntimeConfigForFilter(string $format, array $expectedConfig): void
     {

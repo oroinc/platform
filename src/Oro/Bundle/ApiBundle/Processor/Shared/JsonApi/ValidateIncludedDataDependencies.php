@@ -20,7 +20,7 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */
 
@@ -29,15 +29,13 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
             // there are no included data in the request
             return;
         }
-        if (!array_key_exists(JsonApiDoc::DATA, $requestData)) {
-            throw new \LogicException(
-                sprintf('The "%s" section must exist in the request data.', JsonApiDoc::DATA)
-            );
+        if (!\array_key_exists(JsonApiDoc::DATA, $requestData)) {
+            throw new \LogicException(sprintf('The "%s" section must exist in the request data.', JsonApiDoc::DATA));
         }
 
         $primaryObject = $requestData[JsonApiDoc::DATA];
         $includedData = $requestData[JsonApiDoc::INCLUDED];
-        if (!is_array($primaryObject) || !is_array($includedData)) {
+        if (!\is_array($primaryObject) || !\is_array($includedData)) {
             // invalid primary data or included data in the request
             return;
         }
@@ -64,12 +62,12 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
         }
     }
 
-    protected function processDirectRelationships(
+    private function processDirectRelationships(
         array &$checked,
         array &$toCheck,
         array $includedData,
         array $primaryObject
-    ) {
+    ): void {
         foreach ($includedData as $index => $object) {
             $objectKey = $this->getObjectKey($object);
             if ($this->isDependentObject($primaryObject, $objectKey)) {
@@ -80,18 +78,12 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
         }
     }
 
-    /**
-     * @param array  $checked
-     * @param array  $toCheck
-     * @param array  $includedData
-     * @param string $primaryObjectKey
-     */
-    protected function processDirectInverseRelationships(
+    private function processDirectInverseRelationships(
         array &$checked,
         array &$toCheck,
         array $includedData,
-        $primaryObjectKey
-    ) {
+        string $primaryObjectKey
+    ): void {
         $keys = array_keys($toCheck);
         foreach ($keys as $objectKey) {
             $index = $toCheck[$objectKey];
@@ -102,7 +94,7 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
         }
     }
 
-    protected function processIndirectRelationships(array &$checked, array &$toCheck, array $includedData)
+    private function processIndirectRelationships(array &$checked, array &$toCheck, array $includedData): void
     {
         $hasChanges = true;
         while ($hasChanges && !empty($toCheck)) {
@@ -125,24 +117,20 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
     }
 
     /**
-     * @param array  $object
-     * @param string $targetObjectKey
-     *
-     * @return bool
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function isDependentObject(array $object, $targetObjectKey)
+    private function isDependentObject(array $object, ?string $targetObjectKey): bool
     {
         if (empty($object[JsonApiDoc::RELATIONSHIPS])) {
             return false;
         }
 
         foreach ($object[JsonApiDoc::RELATIONSHIPS] as $relationship) {
-            if (!array_key_exists(JsonApiDoc::DATA, $relationship)) {
+            if (!\array_key_exists(JsonApiDoc::DATA, $relationship)) {
                 continue;
             }
             $data = $relationship[JsonApiDoc::DATA];
-            if (!is_array($data) || empty($data)) {
+            if (!\is_array($data) || empty($data)) {
                 continue;
             }
             if (!ArrayUtil::isAssoc($data)) {
@@ -159,16 +147,11 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
         return false;
     }
 
-    /**
-     * @param array|null $object
-     *
-     * @return string|null
-     */
-    protected function getObjectKey($object)
+    private function getObjectKey(mixed $object): ?string
     {
-        if (is_array($object)
-            && array_key_exists(JsonApiDoc::TYPE, $object)
-            && array_key_exists(JsonApiDoc::ID, $object)
+        if (\is_array($object)
+            && \array_key_exists(JsonApiDoc::TYPE, $object)
+            && \array_key_exists(JsonApiDoc::ID, $object)
         ) {
             return sprintf('%s::%s', $object[JsonApiDoc::TYPE], $object[JsonApiDoc::ID]);
         }
@@ -176,12 +159,7 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
         return null;
     }
 
-    /**
-     * @param int $includedObjectIndex
-     *
-     * @return Error
-     */
-    protected function createValidationError($includedObjectIndex)
+    private function createValidationError(int $includedObjectIndex): Error
     {
         $error = Error::createValidationError(
             Constraint::REQUEST_DATA,

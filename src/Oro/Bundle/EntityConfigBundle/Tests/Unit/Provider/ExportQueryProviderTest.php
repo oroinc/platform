@@ -14,11 +14,11 @@ class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const DEFAULT_FIELD = 'fieldName';
 
-    /** @var ExportQueryProvider */
-    private $exportQueryProvider;
-
     /** @var EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityConfigManager;
+
+    /** @var ExportQueryProvider */
+    private $exportQueryProvider;
 
     protected function setUp(): void
     {
@@ -29,12 +29,10 @@ class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
     public function testEnumField(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
-        $metadata
-            ->expects($this->once())
+        $metadata->expects($this->once())
             ->method('getName')
             ->willReturn(TestEnumValue::class);
-        $metadata
-            ->expects($this->never())
+        $metadata->expects($this->never())
             ->method('isAssociationWithSingleJoinColumn');
 
         $this->assertFalse($this->exportQueryProvider->isAssociationExportable($metadata, self::DEFAULT_FIELD));
@@ -43,12 +41,10 @@ class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
     public function testFallbackField(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
-        $metadata
-            ->expects($this->once())
+        $metadata->expects($this->once())
             ->method('getName')
             ->willReturn(EntityFieldFallbackValue::class);
-        $metadata
-            ->expects($this->never())
+        $metadata->expects($this->never())
             ->method('isAssociationWithSingleJoinColumn');
 
         $this->assertFalse($this->exportQueryProvider->isAssociationExportable($metadata, self::DEFAULT_FIELD));
@@ -56,20 +52,15 @@ class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider configurableFieldDataProvider
-     *
-     * @param bool $isExcluded
-     * @param bool $isExportable
      */
     public function testConfigurableField(bool $isExcluded, bool $isExportable): void
     {
         $this->assertEntityConfigManger($isExcluded);
         $metadata = $this->createMock(ClassMetadata::class);
-        $metadata
-            ->expects($this->once())
+        $metadata->expects($this->once())
             ->method('getName')
             ->willReturn(TestActivity::class);
-        $metadata
-            ->expects($this->any())
+        $metadata->expects($this->any())
             ->method('isAssociationWithSingleJoinColumn')
             ->willReturn(true);
 
@@ -88,25 +79,21 @@ class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
     private function assertEntityConfigManger(bool $isExcluded): void
     {
         $config = $this->createMock(ConfigInterface::class);
-        $config
-            ->expects($this->any())
+        $config->expects($this->any())
             ->method('has')
             ->willReturn(true);
-        $config
-            ->expects($this->any())
+        $config->expects($this->any())
             ->method('get')
             ->willReturnMap([
                 ['excluded', false, null, $isExcluded]
             ]);
 
-        $this->entityConfigManager
-            ->expects($this->any())
+        $this->entityConfigManager->expects($this->any())
             ->method('hasConfig')
             ->with(TestActivity::class, self::DEFAULT_FIELD)
             ->willReturn(true);
 
-        $this->entityConfigManager
-            ->expects($this->any())
+        $this->entityConfigManager->expects($this->any())
             ->method('getFieldConfig')
             ->with('importexport', TestActivity::class, self::DEFAULT_FIELD)
             ->willReturn($config);

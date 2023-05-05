@@ -6,11 +6,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\DigitalAssetBundle\Model\ExtendDigitalAsset;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
@@ -65,11 +67,15 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  *          }
  *      }
  * )
+ * @method LocalizedFallbackValue getTitle(Localization $localization = null)
+ * @method LocalizedFallbackValue getDefaultTitle()
+ * @method Collection getChildFiles()
  */
-class DigitalAsset extends ExtendDigitalAsset implements DatesAwareInterface, OrganizationAwareInterface
+class DigitalAsset implements DatesAwareInterface, OrganizationAwareInterface, ExtendEntityInterface
 {
     use UserAwareTrait;
     use DatesAwareTrait;
+    use ExtendEntityTrait;
 
     /**
      * @var int|null
@@ -123,8 +129,6 @@ class DigitalAsset extends ExtendDigitalAsset implements DatesAwareInterface, Or
 
     public function __construct()
     {
-        parent::__construct();
-
         $this->titles = new ArrayCollection();
     }
 

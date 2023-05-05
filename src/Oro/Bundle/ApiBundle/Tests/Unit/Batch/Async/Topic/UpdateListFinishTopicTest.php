@@ -18,6 +18,9 @@ class UpdateListFinishTopicTest extends AbstractTopicTestCase
     public function validBodyDataProvider(): array
     {
         $fullOptionsSet = [
+            'entityClass' => '',
+            'requestType' => [],
+            'version' => '1',
             'operationId' => 1,
             'fileName' => 'foo.bar',
         ];
@@ -37,20 +40,27 @@ class UpdateListFinishTopicTest extends AbstractTopicTestCase
                 'body' => [],
                 'exceptionClass' => MissingOptionsException::class,
                 'exceptionMessage' =>
-                    '/The required options "fileName", "operationId" are missing./',
+                    '/The required options "entityClass", "fileName", "operationId", "requestType", ' .
+                    '"version" are missing./',
             ],
             'wrong operationId type' => [
                 'body' => [
+                    'entityClass' => '',
+                    'requestType' => [],
                     'operationId' => '1',
                     'fileName' => 'foo.bar',
+                    'version' => '1'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
                 'exceptionMessage' => '/The option "operationId" with value "1" is expected to be of type "int"/',
             ],
             'wrong fileName type' => [
                 'body' => [
+                    'entityClass' => '',
+                    'requestType' => [],
                     'operationId' => 1,
                     'fileName' => 1,
+                    'version' => '1'
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
                 'exceptionMessage' => '/The option "fileName" with value 1 is expected to be of type "string"/',

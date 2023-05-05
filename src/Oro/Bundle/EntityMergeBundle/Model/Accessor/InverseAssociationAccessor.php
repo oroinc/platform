@@ -3,12 +3,12 @@
 namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
 use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * The inverse associations entity data accessor.
@@ -16,7 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 class InverseAssociationAccessor implements AccessorInterface
 {
     private DoctrineHelper $doctrineHelper;
-    private ?PropertyAccessor $propertyAccessor = null;
+    private ?PropertyAccessorInterface $propertyAccessor = null;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -101,7 +101,7 @@ class InverseAssociationAccessor implements AccessorInterface
         }
     }
 
-    private function getPropertyAccessor(): PropertyAccessor
+    private function getPropertyAccessor(): PropertyAccessorInterface
     {
         if (!$this->propertyAccessor) {
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();

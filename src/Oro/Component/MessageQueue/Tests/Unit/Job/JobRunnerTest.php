@@ -2,6 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Exception\JobNotFoundException;
 use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Exception\JobRuntimeException;
@@ -10,6 +11,11 @@ use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Tests\Unit\Stub\JobAwareTopicInterfaceStub;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
+use Oro\Component\MessageQueue\Topic\TopicInterface;
+use Oro\Component\MessageQueue\Topic\TopicRegistry;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
@@ -27,6 +33,9 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
     /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $jobExtension;
 
+    /** @var TopicRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $topicRegistry;
+
     /** @var JobRunner */
     private $jobRunner;
 
@@ -37,8 +46,9 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
     {
         $this->jobProcessor = $this->createMock(JobProcessor::class);
         $this->jobExtension = $this->createMock(ExtensionInterface::class);
+        $this->topicRegistry = $this->createMock(TopicRegistry::class);
 
-        $this->jobRunner = new JobRunner($this->jobProcessor, $this->jobExtension);
+        $this->jobRunner = new JobRunner($this->jobProcessor, $this->jobExtension, $this->topicRegistry);
     }
 
     public function testRunUniqueRootJobNotFound()
@@ -384,7 +394,7 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
             'rootJob' => $rootJob,
             'startedAt' => new \DateTime(),
             'stoppedAt' => new \DateTime(),
-            'status' => 'oro.message_queue_job.status.failed_redelivered'
+            'status' => 'oro.message_queue_job.status.failed_redelivered',
         ]);
 
         $this->jobProcessor
@@ -448,7 +458,7 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
             'rootJob' => $rootJob,
             'startedAt' => new \DateTime(),
             'stoppedAt' => new \DateTime(),
-            'status' => 'oro.message_queue_job.status.failed_redelivered'
+            'status' => 'oro.message_queue_job.status.failed_redelivered',
         ]);
 
         $this->jobProcessor
@@ -646,7 +656,7 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
             ->method('onPostCreateDelayed')
             ->with($childJob);
 
-        $jobRunner = new JobRunner($this->jobProcessor, $this->jobExtension, $rootJob);
+        $jobRunner = new JobRunner($this->jobProcessor, $this->jobExtension, $this->topicRegistry, $rootJob);
         $result = $jobRunner->createDelayed($jobName, function () use ($expectedResult) {
             return $expectedResult;
         });
@@ -681,7 +691,7 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(JobRuntimeException::class);
         $this->expectExceptionMessage('An error occurred while created job, id: 2');
 
-        $jobRunner = new JobRunner($this->jobProcessor, $this->jobExtension, $rootJob);
+        $jobRunner = new JobRunner($this->jobProcessor, $this->jobExtension, $this->topicRegistry, $rootJob);
         $jobRunner->createDelayed($jobName, function () {
             throw new \Exception('Exception Message');
         });
@@ -714,7 +724,7 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(JobRuntimeException::class);
         $this->expectExceptionMessage('An error occurred while created job, id: 2');
 
-        $jobRunner = new JobRunner($this->jobProcessor, $this->jobExtension, $rootJob);
+        $jobRunner = new JobRunner($this->jobProcessor, $this->jobExtension, $this->topicRegistry, $rootJob);
         $jobRunner->createDelayed($jobName, function () {
             $func = function (array $a) {
             };
@@ -1031,7 +1041,7 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
             'rootJob' => $rootJob,
             'startedAt' => new \DateTime(),
             'stoppedAt' => new \DateTime(),
-            'status' => 'oro.message_queue_job.status.failed_redelivered'
+            'status' => 'oro.message_queue_job.status.failed_redelivered',
         ]);
 
         $this->jobProcessor
@@ -1089,7 +1099,7 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
             'rootJob' => $rootJob,
             'startedAt' => new \DateTime(),
             'stoppedAt' => new \DateTime(),
-            'status' => 'oro.message_queue_job.status.failed_redelivered'
+            'status' => 'oro.message_queue_job.status.failed_redelivered',
         ]);
 
         $this->jobProcessor
@@ -1302,24 +1312,125 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
+     * @dataProvider resultFailedDataProvider
+     *
+     * @param mixed $expectedResult
      */
-    public function resultSuccessDataProvider()
+    public function testRunUniqueByMessageWithJobNameInProperty($expectedResult)
+    {
+        $jobName = 'job_name';
+        $messageId = 'id1';
+
+        $message = new Message();
+        $message->setProperties([
+            JobAwareTopicInterface::UNIQUE_JOB_NAME => $jobName
+        ]);
+        $message->setMessageId($messageId);
+
+        $this->jobProcessor->expects($this->once())
+            ->method('findJobByName')
+            ->with($messageId, $jobName)
+            ->willReturn(null);
+
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
+            function () use ($expectedResult) {
+                return $expectedResult;
+            }
+        );
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    /**
+     * @dataProvider resultFailedDataProvider
+     *
+     * @param mixed $expectedResult
+     */
+    public function testRunUniqueByMessageWithoutJobNameInProperty($expectedResult)
+    {
+        $jobName = 'job_name';
+        $topicName = 'topic_name';
+        $messageId = 'id1';
+        $body = [];
+
+        $topic = $this->createMock(JobAwareTopicInterfaceStub::class);
+        $message = new Message();
+        $message->setProperties([
+            Config::PARAMETER_TOPIC_NAME => $topicName
+        ]);
+        $message->setBody($body);
+        $message->setMessageId($messageId);
+
+        $this->topicRegistry->expects(self::once())
+            ->method('get')
+            ->with($topicName)
+            ->willReturn($topic);
+
+        $topic->expects(self::once())
+            ->method('createJobName')
+            ->with($body)
+            ->willReturn($jobName);
+
+        $this->jobProcessor->expects($this->once())
+            ->method('findJobByName')
+            ->with($messageId, $jobName)
+            ->willReturn(null);
+
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
+            function () use ($expectedResult) {
+                return $expectedResult;
+            }
+        );
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function testRunUniqueByMessageThrowException()
+    {
+        $topicName = 'topic_name';
+
+        $topic = $this->createMock(TopicInterface::class);
+        $message = new Message();
+        $message->setProperties([
+            Config::PARAMETER_TOPIC_NAME => $topicName,
+        ]);
+
+        $this->topicRegistry->expects(self::once())
+            ->method('get')
+            ->with($topicName)
+            ->willReturn($topic);
+
+        $this->jobProcessor->expects($this->never())
+            ->method('findOrCreateRootJob');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            sprintf('Topic %s must implement JobAwareTopicInterface', get_class($topic))
+        );
+
+        $this->jobRunner->runUniqueByMessage(
+            $message,
+            function () {
+                throw new \Exception('Exception Message');
+            }
+        );
+    }
+
+    public function resultSuccessDataProvider(): array
     {
         return [
             'bool' => [true],
             'int' => [1],
             'string' => ['test'],
             'object' => [new \stdClass()],
-            'callback' => [function () {
-            }],
+            'callback' => [
+                function () {
+                },
+            ],
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function resultFailedDataProvider()
+    public function resultFailedDataProvider(): array
     {
         return [
             'bool' => [false],

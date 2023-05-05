@@ -15,27 +15,24 @@ abstract class AssociationFilter extends ComparisonFilter implements
     SelfIdentifiableFilterInterface,
     RequestAwareFilterInterface
 {
-    /** @var RequestType */
-    private $requestType;
-
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
+    private RequestType $requestType;
+    private ValueNormalizer $valueNormalizer;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setRequestType(RequestType $requestType): void
     {
         $this->requestType = $requestType;
     }
 
-    public function setValueNormalizer(ValueNormalizer $valueNormalizer)
+    public function setValueNormalizer(ValueNormalizer $valueNormalizer): void
     {
         $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getFilterValueName(): string
     {
@@ -48,7 +45,7 @@ abstract class AssociationFilter extends ComparisonFilter implements
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function searchFilterKeys(array $filterValues): array
     {

@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
@@ -39,65 +40,54 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    private EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject $fieldProvider;
+    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldProvider;
 
-    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider;
-
-    private FieldHelper $helper;
+    /** @var FieldHelper */
+    private $helper;
 
     protected function setUp(): void
     {
         $this->fieldProvider = $this->createMock(EntityFieldProvider::class);
-        $this->configProvider = $this->prepareConfigProvider();
+
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $configProvider->expects(self::any())->method('hasConfig')
+            ->with(self::isType('string'), self::isType('string'))
+            ->willReturnCallback(function ($entityName, $fieldName) {
+                return isset($this->config[$entityName][$fieldName]);
+            });
+        $configProvider->expects(self::any())->method('getConfig')
+            ->with(self::isType('string'), self::isType('string'))
+            ->willReturnCallback(function ($entityName, $fieldName) {
+                $entityConfig = $this->createMock(ConfigInterface::class);
+                $entityConfig->expects($this->any())->method('has')->with($this->isType('string'))
+                    ->willReturnCallback(
+                        function ($parameter) use ($entityName, $fieldName) {
+                            return isset($this->config[$entityName][$fieldName][$parameter]);
+                        }
+                    );
+                $entityConfig->expects($this->any())->method('get')->with($this->isType('string'))
+                    ->willReturnCallback(
+                        function ($parameter, $isStrict, $default) use ($entityName, $fieldName) {
+                            return $this->config[$entityName][$fieldName][$parameter] ?? $default;
+                        }
+                    );
+
+                return $entityConfig;
+            });
 
         $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
         $entityExtendConfigurationProvider->expects(self::any())
             ->method('getUnderlyingTypes')
             ->willReturn([]);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         $this->helper = new FieldHelper(
             $this->fieldProvider,
-            $this->configProvider,
-            new FieldTypeHelper($entityExtendConfigurationProvider)
+            $configProvider,
+            new FieldTypeHelper($entityExtendConfigurationProvider),
+            $propertyAccessor
         );
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigProvider
-     */
-    private function prepareConfigProvider()
-    {
-        $configProvider = $this->createMock(ConfigProvider::class);
-        $configProvider->expects(self::any())->method('hasConfig')
-            ->with(self::isType('string'), self::isType('string'))
-            ->willReturnCallback(
-                function ($entityName, $fieldName) {
-                    return isset($this->config[$entityName][$fieldName]);
-                }
-            );
-        $configProvider->expects(self::any())->method('getConfig')
-            ->with(self::isType('string'), self::isType('string'))
-            ->willReturnCallback(
-                function ($entityName, $fieldName) {
-                    $entityConfig = $this->createMock(ConfigInterface::class);
-                    $entityConfig->expects($this->any())->method('has')->with($this->isType('string'))
-                        ->willReturnCallback(
-                            function ($parameter) use ($entityName, $fieldName) {
-                                return isset($this->config[$entityName][$fieldName][$parameter]);
-                            }
-                        );
-                    $entityConfig->expects($this->any())->method('get')->with($this->isType('string'))
-                        ->willReturnCallback(
-                            function ($parameter, $isStrict, $default) use ($entityName, $fieldName) {
-                                return $this->config[$entityName][$fieldName][$parameter] ?? $default;
-                            }
-                        );
-
-                    return $entityConfig;
-                }
-            );
-
-        return $configProvider;
     }
 
     public function testGetEntityFields(): void
@@ -145,24 +135,17 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $expected
-     * @param string $entityName
-     * @param string $fieldName
-     * @param string $parameter
-     * @param mixed|null $default
-     * @param bool $hasConfig
-     *
      * @dataProvider getConfigValueDataProvider
      */
     public function testGetConfigValue(
-        $expected,
+        mixed $expected,
         string $entityName,
         string $fieldName,
         string $parameter,
-        $default,
+        mixed $default,
         bool $hasConfig = true
     ): void {
-        if (!is_null($expected)) {
+        if (null !== $expected) {
             self::assertTrue($this->helper->hasConfig($entityName, $fieldName));
         }
 
@@ -203,9 +186,6 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param boolean $expected
-     * @param array $field
-     *
      * @dataProvider relationDataProvider
      */
     public function testIsRelation(bool $expected, array $field): void
@@ -239,9 +219,6 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param boolean $expected
-     * @param array $field
-     *
      * @dataProvider singleRelationDataProvider
      */
     public function testIsSingleRelation(bool $expected, array $field): void
@@ -277,9 +254,6 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param boolean $expected
-     * @param array $field
-     *
      * @dataProvider multipleRelationDataProvider
      */
     public function testIsMultipleRelation(bool $expected, array $field): void
@@ -322,9 +296,6 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $expected
-     * @param array $field
-     *
      * @dataProvider dateTimeDataProvider
      */
     public function testIsDateTimeField(bool $expected, array $field): void
@@ -355,14 +326,9 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object $object
-     * @param string $fieldName
-     * @param mixed $value
-     * @param string $exception
-     *
      * @dataProvider objectValueProvider
      */
-    public function testSetObjectValue(object $object, string $fieldName, $value, string $exception): void
+    public function testSetObjectValue(object $object, string $fieldName, mixed $value, string $exception): void
     {
         if ($exception) {
             $this->expectException($exception);
@@ -374,14 +340,9 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object $object
-     * @param string $fieldName
-     * @param mixed $value
-     * @param string $exception
-     *
      * @dataProvider objectValueProvider
      */
-    public function testGetObjectValue(object $object, string $fieldName, $value, string $exception): void
+    public function testGetObjectValue(object $object, string $fieldName, mixed $value, string $exception): void
     {
         if ($exception) {
             $this->expectException($exception);
@@ -425,13 +386,9 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $data
-     * @param string|null $fieldName
-     * @param array $expected
-     *
      * @dataProvider getItemDataDataProvider
      */
-    public function testGetItemData($data, ?string $fieldName, array $expected): void
+    public function testGetItemData(mixed $data, ?string $fieldName, array $expected): void
     {
         self::assertSame($expected, $this->helper->getItemData($data, $fieldName));
     }
@@ -506,7 +463,7 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isRequiredIdentityFieldProvider
      */
-    public function testIsRequiredIdentityField($identityValue, $expectedResult): void
+    public function testIsRequiredIdentityField(mixed $identityValue, bool $expectedResult): void
     {
         $this->config['stdClass'] = [
             'testField' => ['identity' => $identityValue],
@@ -558,11 +515,6 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $entityName
-     * @param string $fieldName
-     * @param array $data
-     * @param bool $expected
-     *
      * @dataProvider isFieldExcludedProvider
      */
     public function testIsFieldExcluded(string $entityName, string $fieldName, array $data, bool $expected): void

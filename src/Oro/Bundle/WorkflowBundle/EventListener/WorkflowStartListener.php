@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
+/**
+ * Listens to postPersist event to add WorkflowStartArguments when activeWorkflow has start step
+ */
 class WorkflowStartListener
 {
     /** @var array */

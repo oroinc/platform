@@ -19,7 +19,7 @@ define(function(require) {
             const template = this[templateKey];
             let templateFunc = null;
 
-            // If templateSelector is set in a extended view
+            // If templateSelector is set in an extended view
             if (this[templateKey + 'Selector'] && $(this[templateKey + 'Selector']).length) {
                 templateFunc = _.template($(this[templateKey + 'Selector']).html());
             } else if (typeof template === 'string') {

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Validator\Constraints;
 
-use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
+use Oro\Bundle\CustomerBundle\Entity\AbstractDefaultTypedAddress;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -13,24 +13,32 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class ValidOrganizationValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
-     * @param AbstractAddress $entity
-     * @param ValidOrganization $constraint
+     * {@inheritDoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
+        if (!$constraint instanceof ValidOrganization) {
+            throw new UnexpectedTypeException($constraint, ValidOrganization::class);
+        }
+
         if (null === $value) {
-            return ;
+            return;
         }
 
-        if (!$value instanceof AbstractAddress) {
-            throw new UnexpectedTypeException($value, AbstractAddress::class);
+        if (!$value instanceof AbstractDefaultTypedAddress) {
+            throw new UnexpectedTypeException($value, AbstractDefaultTypedAddress::class);
         }
 
-        $ownerOrganizationId = $value->getFrontendOwner()?->getOrganization()?->getId();
         $systemOrganizationId = $value->getSystemOrganization()?->getId();
+        if (null === $systemOrganizationId) {
+            return;
+        }
+        $ownerOrganizationId = $value->getFrontendOwner()?->getOrganization()?->getId();
+        if (null === $ownerOrganizationId) {
+            return;
+        }
 
-        if ($ownerOrganizationId && $systemOrganizationId && $ownerOrganizationId != $systemOrganizationId) {
+        if ($ownerOrganizationId !== $systemOrganizationId) {
             $this->context->addViolation($constraint->message);
         }
     }

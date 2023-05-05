@@ -10,14 +10,11 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
  */
 class IncludedEntityCollection implements \Countable, \IteratorAggregate
 {
-    /** @var KeyObjectCollection */
-    private $collection;
-
+    private KeyObjectCollection $collection;
     /** @var array [key => [entity class, entity id], ...] */
-    private $keys = [];
-
+    private array $keys = [];
     /** @var array|null [entity class, entity id, entity, metadata] */
-    private $primaryEntity;
+    private ?array $primaryEntity = null;
 
     public function __construct()
     {
@@ -26,24 +23,16 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Sets the primary entity identifier.
-     *
-     * @param string $entityClass
-     * @param mixed  $entityId
      */
-    public function setPrimaryEntityId($entityClass, $entityId)
+    public function setPrimaryEntityId(string $entityClass, mixed $entityId): void
     {
         $this->primaryEntity = [$entityClass, $entityId, null, null];
     }
 
     /**
      * Checks whether the given class and id represents the primary entity.
-     *
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return bool
      */
-    public function isPrimaryEntity($entityClass, $entityId)
+    public function isPrimaryEntity(string $entityClass, mixed $entityId): bool
     {
         return
             null !== $this->primaryEntity
@@ -54,11 +43,8 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Sets the primary entity.
-     *
-     * @param object|null         $entity
-     * @param EntityMetadata|null $metadata
      */
-    public function setPrimaryEntity($entity, ?EntityMetadata $metadata)
+    public function setPrimaryEntity(?object $entity, ?EntityMetadata $metadata): void
     {
         if (null === $this->primaryEntity) {
             throw new \LogicException('The primary entity identifier must be set before.');
@@ -70,10 +56,8 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Gets the primary entity.
-     *
-     * @return object|null
      */
-    public function getPrimaryEntity()
+    public function getPrimaryEntity(): ?object
     {
         return null !== $this->primaryEntity
             ? $this->primaryEntity[2]
@@ -92,13 +76,8 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Adds an entity to the collection.
-     *
-     * @param object             $entity
-     * @param string             $entityClass
-     * @param mixed              $entityId
-     * @param IncludedEntityData $data
      */
-    public function add($entity, $entityClass, $entityId, IncludedEntityData $data)
+    public function add(object $entity, string $entityClass, mixed $entityId, IncludedEntityData $data): void
     {
         $key = $this->buildKey($entityClass, $entityId);
         $this->collection->add($entity, $key, $data);
@@ -107,11 +86,8 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Removes an entity from the collection.
-     *
-     * @param string $entityClass
-     * @param mixed  $entityId
      */
-    public function remove($entityClass, $entityId)
+    public function remove(string $entityClass, mixed $entityId): void
     {
         $key = $this->buildKey($entityClass, $entityId);
         $this->collection->removeKey($key);
@@ -121,7 +97,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     /**
      * Removes all entities from the collection.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->collection->clear();
         $this->keys = [];
@@ -129,18 +105,14 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Checks whether the collection does contain any entity.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return $this->collection->isEmpty();
     }
 
     /**
      * Gets the number of entities in the collection
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -149,50 +121,32 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Checks whether an entity exists in the collection.
-     *
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return bool
      */
-    public function contains($entityClass, $entityId)
+    public function contains(string $entityClass, mixed $entityId): bool
     {
         return $this->collection->containsKey($this->buildKey($entityClass, $entityId));
     }
 
     /**
      * Gets an entity.
-     *
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return object|null
      */
-    public function get($entityClass, $entityId)
+    public function get(string $entityClass, mixed $entityId): ?object
     {
         return $this->collection->get($this->buildKey($entityClass, $entityId));
     }
 
     /**
      * Gets data are associated with an object.
-     *
-     * @param object $object
-     *
-     * @return IncludedEntityData|null
      */
-    public function getData($object)
+    public function getData(object $object): ?IncludedEntityData
     {
         return $this->collection->getData($object);
     }
 
     /**
      * Gets a class is associated with an object.
-     *
-     * @param object $object
-     *
-     * @return string|null
      */
-    public function getClass($object)
+    public function getClass(object $object): ?string
     {
         $key = $this->collection->getKey($object);
 
@@ -203,12 +157,8 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
 
     /**
      * Gets an identifier is associated with an object.
-     *
-     * @param object $object
-     *
-     * @return mixed|null
      */
-    public function getId($object)
+    public function getId(object $object): mixed
     {
         $key = $this->collection->getKey($object);
 
@@ -222,28 +172,20 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      *
      * @return object[]
      */
-    public function getAll()
+    public function getAll(): array
     {
         return array_values($this->collection->getAll());
     }
 
     /**
      * Gets an iterator to get all objects from the collection.
-     *
-     * @return \Traversable
      */
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator(array_values($this->collection->getAll()));
     }
 
-    /**
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return string
-     */
-    private function buildKey($entityClass, $entityId)
+    private function buildKey(string $entityClass, mixed $entityId): string
     {
         return $entityClass . ':' . (string)$entityId;
     }

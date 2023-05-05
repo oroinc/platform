@@ -16,8 +16,7 @@ abstract class ApiContext extends BaseContext
     /** API version */
     public const VERSION = 'version';
 
-    /** @var array[]|null */
-    private $processed;
+    private ?array $processed = null;
 
     public function __construct()
     {
@@ -27,7 +26,7 @@ abstract class ApiContext extends BaseContext
     /**
      * Sets default values into the context.
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         $this->set(self::REQUEST_TYPE, new RequestType([]));
     }
@@ -35,30 +34,24 @@ abstract class ApiContext extends BaseContext
     /**
      * Gets the current request type.
      * A request can belong to several types, e.g. "rest" and "json_api".
-     *
-     * @return RequestType
      */
-    public function getRequestType()
+    public function getRequestType(): RequestType
     {
         return $this->get(self::REQUEST_TYPE);
     }
 
     /**
-     * Gets API version
-     *
-     * @return string
+     * Gets API version.
      */
-    public function getVersion()
+    public function getVersion(): string
     {
-        return $this->get(self::VERSION);
+        return $this->get(self::VERSION) ?? '';
     }
 
     /**
-     * Sets API version
-     *
-     * @param string $version
+     * Sets API version.
      */
-    public function setVersion($version)
+    public function setVersion(string $version): void
     {
         $this->set(self::VERSION, $version);
     }
@@ -69,20 +62,16 @@ abstract class ApiContext extends BaseContext
      * when a work is already done by checking a state of a context.
      * However, a processor performs a complex work, it might be required
      * to mark a work as already done directly.
-     *
-     * @param string $operationName The name of an operation that represents some work
      */
-    public function setProcessed($operationName)
+    public function setProcessed(string $operationName): void
     {
         $this->processed[$operationName] = true;
     }
 
     /**
      * Marks a work as not yet done.
-     *
-     * @param string $operationName The name of an operation that represents some work
      */
-    public function clearProcessed($operationName)
+    public function clearProcessed(string $operationName): void
     {
         if ($this->isProcessed($operationName)) {
             unset($this->processed[$operationName]);
@@ -91,12 +80,8 @@ abstract class ApiContext extends BaseContext
 
     /**
      * Checks whether a work is already done.
-     *
-     * @param string $operationName The name of an operation that represents some work
-     *
-     * @return bool
      */
-    public function isProcessed($operationName)
+    public function isProcessed(string $operationName): bool
     {
         return
             null !== $this->processed

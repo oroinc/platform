@@ -31,17 +31,12 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    FallbackPropertyType::class => $this->formType
-                ],
-                []
-            ),
+            new PreloadedExtension([$this->formType], [])
         ];
     }
 

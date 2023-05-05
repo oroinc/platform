@@ -11,8 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class RemoveExcludedEntities implements ProcessorInterface
 {
-    /** @var ExclusionProviderRegistry */
-    private $exclusionProviderRegistry;
+    private ExclusionProviderRegistry $exclusionProviderRegistry;
 
     public function __construct(ExclusionProviderRegistry $exclusionProviderRegistry)
     {
@@ -22,7 +21,7 @@ class RemoveExcludedEntities implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */
 

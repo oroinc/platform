@@ -1,4 +1,5 @@
 {% if check_ws() %}
+    {% set ws = get_ws_config() %}
 <script>
     loadModules(['jquery', 'orosync/js/sync', 'orosync/js/sync/wamp', 'routing'],
     function($, sync, Wamp, routing){

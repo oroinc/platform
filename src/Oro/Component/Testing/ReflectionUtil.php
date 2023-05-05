@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Testing;
 
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Component\PhpUtils\ReflectionUtil as PhpReflectionUtil;
 
 /**
@@ -11,40 +12,28 @@ class ReflectionUtil
 {
     /**
      * Sets the ID value to the given entity.
-     *
-     * @param object $entity
-     * @param mixed  $id
      */
-    public static function setId(object $entity, $id): void
+    public static function setId(object $entity, mixed $id): void
     {
         self::setPropertyValue($entity, 'id', $id);
     }
 
     /**
      * Sets the given value to the given protected/private property.
-     *
-     * @param object $object
-     * @param string $propertyName
-     * @param mixed  $propertyValue
      */
-    public static function setPropertyValue(object $object, string $propertyName, $propertyValue): void
+    public static function setPropertyValue(object $object, string $propertyName, mixed $propertyValue): void
     {
-        $property = self::getProperty(new \ReflectionClass($object), $propertyName);
+        $property = self::getProperty(new EntityReflectionClass($object), $propertyName);
         $property->setAccessible(true);
         $property->setValue($object, $propertyValue);
     }
 
     /**
      * Gets a value of the given protected/private property.
-     *
-     * @param object $object
-     * @param string $propertyName
-     *
-     * @return mixed
      */
-    public static function getPropertyValue(object $object, string $propertyName)
+    public static function getPropertyValue(object $object, string $propertyName): mixed
     {
-        $property = self::getProperty(new \ReflectionClass($object), $propertyName);
+        $property = self::getProperty(new EntityReflectionClass($object), $propertyName);
         $property->setAccessible(true);
 
         return $property->getValue($object);
@@ -52,14 +41,8 @@ class ReflectionUtil
 
     /**
      * Calls a protected/private method of the given object.
-     *
-     * @param object $object
-     * @param string $methodName
-     * @param array  $args
-     *
-     * @return mixed
      */
-    public static function callMethod(object $object, string $methodName, array $args)
+    public static function callMethod(object $object, string $methodName, array $args): mixed
     {
         $reflClass = new \ReflectionClass($object);
         try {

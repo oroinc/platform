@@ -29,11 +29,6 @@ class ControllersTest extends WebTestCase
         $this->getDatagridQueryCollector()->disable();
     }
 
-    /**
-     * Data provider for SOAP API tests
-     *
-     * @return array
-     */
     public function reportDataProvider(): array
     {
         return self::getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'reports');

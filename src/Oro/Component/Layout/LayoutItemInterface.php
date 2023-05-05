@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Interface for layout item model.
+ */
 interface LayoutItemInterface
 {
     /**
@@ -38,6 +41,11 @@ interface LayoutItemInterface
      * @return string|null
      */
     public function getParentId();
+
+    /**
+     * Returns the id of the root layout item
+     */
+    public function getRootId(): ?string;
 
     /**
      * Returns the layout building context

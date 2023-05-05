@@ -8,6 +8,8 @@ dynamic-imports:
         - orodashboard/js/app/views/dashboard-container-view
         - orodashboard/js/app/views/widget-date-compare-view
         - orodashboard/js/app/views/widget-date-range-view
+        - orodashboard/js/app/views/current-date-widget-date-range-view
         - orodashboard/js/app/views/widget-datetime-range-view
         - orodashboard/js/app/views/widget-tabs-view
         - orodashboard/js/items/view
+        - orodashboard/js/views/dashboard-type-view

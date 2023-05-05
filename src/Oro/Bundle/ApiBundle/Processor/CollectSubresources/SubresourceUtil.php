@@ -55,7 +55,7 @@ class SubresourceUtil
         $targetClassNames = $subresource->getAcceptableTargetClassNames();
         if (empty($targetClassNames)) {
             $targetClassName = $subresource->getTargetClassName();
-            if (\is_a($targetClassName, EntityIdentifier::class, true)) {
+            if (is_a($targetClassName, EntityIdentifier::class, true)) {
                 return true;
             }
 
@@ -81,17 +81,17 @@ class SubresourceUtil
         string $targetClassName,
         array $acceptableTargetClassNames = []
     ): void {
-        if (\is_a($targetClassName, EntityIdentifier::class, true)) {
+        if (is_a($targetClassName, EntityIdentifier::class, true)) {
             $subresource->setAcceptableTargetClassNames($acceptableTargetClassNames);
         } elseif (!empty($acceptableTargetClassNames)
             && (
                 \count($acceptableTargetClassNames) > 1
-                || \reset($acceptableTargetClassNames) !== $targetClassName
+                || reset($acceptableTargetClassNames) !== $targetClassName
             )
         ) {
             foreach ($acceptableTargetClassNames as $className) {
-                if (!\is_a($className, $targetClassName, true)) {
-                    throw new \RuntimeException(\sprintf(
+                if (!is_a($className, $targetClassName, true)) {
+                    throw new \RuntimeException(sprintf(
                         'The acceptable target class "%s" should be "%s" or its subclass.',
                         $className,
                         $targetClassName

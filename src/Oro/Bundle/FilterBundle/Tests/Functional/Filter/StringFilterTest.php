@@ -16,8 +16,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class StringFilterTest extends WebTestCase
 {
-    /** @var StringFilter */
-    private $filter;
+    private StringFilter $filter;
 
     protected function setUp(): void
     {
@@ -79,7 +78,7 @@ class StringFilterTest extends WebTestCase
         self::assertSame($expectedResult, $result);
     }
 
-    public function filterProvider()
+    public function filterProvider(): array
     {
         return [
             'Filter "not empty"'        => [

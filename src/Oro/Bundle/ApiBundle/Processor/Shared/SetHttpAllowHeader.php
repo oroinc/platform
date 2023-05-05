@@ -19,8 +19,7 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
 {
     public const RESPONSE_HEADER_NAME = 'Allow';
 
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
+    private ResourcesProvider $resourcesProvider;
 
     public function __construct(ResourcesProvider $resourcesProvider)
     {
@@ -30,7 +29,7 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -62,12 +61,12 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     /**
      * @return array [action => HTTP method, ...]
      */
-    abstract protected function getHttpMethodToActionsMap();
+    abstract protected function getHttpMethodToActionsMap(): array;
 
     /**
      * @return array [action => HTTP method, ...]
      */
-    protected function getHttpMethodToActionsMapForResourceWithoutIdentifier()
+    protected function getHttpMethodToActionsMapForResourceWithoutIdentifier(): array
     {
         return [
             Request::METHOD_OPTIONS => ApiAction::OPTIONS,
@@ -83,7 +82,7 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
      *
      * @return string[]
      */
-    protected function getExcludeActions(Context $context)
+    protected function getExcludeActions(Context $context): array
     {
         return $this->getExcludeActionsForClass(
             $context->getClassName(),
@@ -99,7 +98,7 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
      *
      * @return string[]
      */
-    protected function getExcludeActionsForClass($entityClass, $version, RequestType $requestType)
+    protected function getExcludeActionsForClass(string $entityClass, string $version, RequestType $requestType): array
     {
         return $this->resourcesProvider->getResourceExcludeActions($entityClass, $version, $requestType);
     }
@@ -110,18 +109,18 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
      *
      * @return string
      */
-    private function getAllowedHttpMethods(array $httpMethodToActionsMap, array $excludeActions)
+    private function getAllowedHttpMethods(array $httpMethodToActionsMap, array $excludeActions): string
     {
-        $allowedActions = \array_diff(\array_values($httpMethodToActionsMap), $excludeActions);
-        $httpMethodToActionsMap = \array_flip($httpMethodToActionsMap);
+        $allowedActions = array_diff(array_values($httpMethodToActionsMap), $excludeActions);
+        $httpMethodToActionsMap = array_flip($httpMethodToActionsMap);
         $allowedMethods = [];
         foreach ($allowedActions as $action) {
             $allowedMethods[] = $httpMethodToActionsMap[$action];
         }
-        if (count($allowedMethods) === 1 && Request::METHOD_OPTIONS === $allowedMethods[0]) {
+        if (\count($allowedMethods) === 1 && Request::METHOD_OPTIONS === $allowedMethods[0]) {
             $allowedMethods = [];
         }
 
-        return \implode(', ', $allowedMethods);
+        return implode(', ', $allowedMethods);
     }
 }

@@ -16,8 +16,7 @@ use Oro\Component\ChainProcessor\ParameterBagInterface;
  */
 class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CustomizeLoadedDataContext */
-    private $context;
+    private CustomizeLoadedDataContext $context;
 
     protected function setUp(): void
     {
@@ -35,8 +34,6 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
 
     public function testClassName()
     {
-        self::assertNull($this->context->getClassName());
-
         $className = 'Test\Class';
         $this->context->setClassName($className);
         self::assertEquals($className, $this->context->getClassName());

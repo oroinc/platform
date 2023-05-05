@@ -12,13 +12,9 @@ use Psr\Container\ContainerInterface;
 class IncludeAccessorRegistry
 {
     /** @var array [[accessor service id, request type expression], ...] */
-    private $accessors;
-
-    /** @var ContainerInterface */
-    private $container;
-
-    /** @var RequestExpressionMatcher */
-    private $matcher;
+    private array $accessors;
+    private ContainerInterface $container;
+    private RequestExpressionMatcher $matcher;
 
     /**
      * @param array                    $accessors [[accessor service id, request type expression], ...]

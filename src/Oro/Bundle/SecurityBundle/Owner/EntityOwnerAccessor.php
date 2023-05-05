@@ -4,10 +4,11 @@ namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
@@ -20,10 +21,8 @@ class EntityOwnerAccessor
      */
     protected $metadataProvider;
 
-    /**
-     * @var PropertyAccessor
-     */
-    protected $propertyAccessor;
+    protected ?PropertyAccessorInterface $propertyAccessor = null;
+
     private Inflector $inflector;
 
     public function __construct(OwnershipMetadataProviderInterface $metadataProvider, Inflector $inflector)
@@ -92,7 +91,7 @@ class EntityOwnerAccessor
             return $this->propertyAccessor->getValue($object, $property);
         } catch (NoSuchPropertyException $e) {
             try {
-                $reflectionClass = new \ReflectionClass($object);
+                $reflectionClass = new EntityReflectionClass($object);
                 $reflectionProperty = $reflectionClass->getProperty($property);
                 $reflectionProperty->setAccessible(true);
 

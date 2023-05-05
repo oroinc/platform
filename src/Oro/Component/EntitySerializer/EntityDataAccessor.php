@@ -3,6 +3,7 @@
 namespace Oro\Component\EntitySerializer;
 
 use Doctrine\Common\Util\ClassUtils;
+use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
  * Reads property values from entity objects or arrays.
@@ -10,56 +11,74 @@ use Doctrine\Common\Util\ClassUtils;
 class EntityDataAccessor implements DataAccessorInterface
 {
     private const NO_GETTER = '';
+    private const NO_PROPERTY = false;
 
     /** @var \ReflectionClass[] */
-    private $reflCache = [];
-
+    private array $reflCache = [];
     /** @var array [class name => [property name => getter name, ...], ...] */
-    private $getterCache = [];
+    private array $getterCache = [];
+    /** @var array [class name => [property name => property, ...], ...] */
+    private array $propertyCache = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function hasGetter($className, $property)
+    public function hasGetter(string $className, string $property): bool
     {
         $reflClass = $this->getReflectionClass($className);
-        $getter = $this->findGetterName($reflClass, $property);
 
-        return $getter || $reflClass->hasProperty($property);
+        return
+            null !== $this->findGetterName($reflClass, $property)
+            || null !== $this->findProperty($reflClass, $property);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function tryGetValue($object, $property, &$value)
+    public function tryGetValue(object|array $object, string $property, mixed &$value): bool
     {
-        $hasValue = false;
         if (\is_array($object)) {
-            if (\array_key_exists($property, $object)) {
-                $hasValue = true;
-                $value = $object[$property];
+            if (!\array_key_exists($property, $object)) {
+                return false;
             }
-        } else {
-            $reflClass = $this->getReflectionClass(\get_class($object));
-            $getter = $this->findGetterName($reflClass, $property);
-            if ($getter) {
-                $hasValue = true;
-                $value = $object->{$getter}();
-            } elseif ($reflClass->hasProperty($property)) {
-                $hasValue = true;
-                $prop = $reflClass->getProperty($property);
-                $prop->setAccessible(true);
-                $value = $prop->getValue($object);
-            }
+
+            $value = $object[$property];
+
+            return true;
         }
 
-        return $hasValue;
+        $reflClass = $this->getReflectionClass(\get_class($object));
+        $getter = $this->findGetterName($reflClass, $property);
+        if (null !== $getter) {
+            $value = $object->{$getter}();
+
+            return true;
+        }
+
+        $propertyObject = $this->findProperty($reflClass, $property);
+        if (null !== $propertyObject) {
+            $value = $propertyObject->getValue($object);
+
+            return true;
+        }
+
+        if ($object instanceof \ArrayAccess) {
+            if (!$object->offsetExists($property)) {
+                return false;
+            }
+
+            $value = $object->offsetGet($property);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getValue($object, $property)
+    public function getValue(object|array $object, string $property): mixed
     {
         $value = null;
         if (!$this->tryGetValue($object, $property, $value)) {
@@ -71,49 +90,46 @@ class EntityDataAccessor implements DataAccessorInterface
                     ClassUtils::getClass($object)
                 );
             throw new \RuntimeException($message);
-        };
+        }
 
         return $value;
     }
 
-    /**
-     * Camelizes a given string.
-     *
-     * @param string $string Some string
-     *
-     * @return string The camelized version of the string
-     */
-    protected function camelize($string)
-    {
-        return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
-    }
-
-    /**
-     * Gets an instance of \ReflectionClass for the given class name
-     *
-     * @param string $className
-     *
-     * @return \ReflectionClass
-     */
-    protected function getReflectionClass($className)
+    protected function getReflectionClass(string $className): \ReflectionClass
     {
         if (isset($this->reflCache[$className])) {
             return $this->reflCache[$className];
         }
 
-        $reflClass = new \ReflectionClass($className);
+        $reflClass = $this->createReflectionClass(ClassUtils::getRealClass($className));
         $this->reflCache[$className] = $reflClass;
 
         return $reflClass;
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     * @param string           $property
-     *
-     * @return string|null
-     */
-    protected function findGetterName(\ReflectionClass $reflClass, $property)
+    protected function createReflectionClass(string $className): \ReflectionClass
+    {
+        return new \ReflectionClass($className);
+    }
+
+    protected function findProperty(\ReflectionClass $reflClass, string $property): ?\ReflectionProperty
+    {
+        if (isset($this->propertyCache[$reflClass->name][$property])) {
+            $propertyObject = $this->propertyCache[$reflClass->name][$property];
+        } else {
+            $propertyObject = ReflectionUtil::getProperty($reflClass, $property);
+            if (null === $propertyObject) {
+                $propertyObject = self::NO_PROPERTY;
+            } elseif (!$propertyObject->isPublic()) {
+                $propertyObject->setAccessible(true);
+            }
+            $this->propertyCache[$reflClass->name][$property] = $propertyObject;
+        }
+
+        return self::NO_PROPERTY === $propertyObject ? null : $propertyObject;
+    }
+
+    protected function findGetterName(\ReflectionClass $reflClass, string $property): ?string
     {
         if (isset($this->getterCache[$reflClass->name][$property])) {
             $getterName = $this->getterCache[$reflClass->name][$property];
@@ -125,16 +141,9 @@ class EntityDataAccessor implements DataAccessorInterface
         return self::NO_GETTER === $getterName ? null : $getterName;
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     * @param string           $property
-     *
-     * @return string
-     */
-    protected function getGetterName(\ReflectionClass $reflClass, $property)
+    protected function getGetterName(\ReflectionClass $reflClass, string $property): string
     {
         $camelized = $this->camelize($property);
-
         $getter = 'get' . $camelized;
         if ($this->isGetter($reflClass, $getter)) {
             return $getter;
@@ -147,6 +156,10 @@ class EntityDataAccessor implements DataAccessorInterface
         if ($this->isGetter($reflClass, $getter)) {
             return $getter;
         }
+        $getter = 'can' . $camelized;
+        if ($this->isGetter($reflClass, $getter)) {
+            return $getter;
+        }
         $getter = lcfirst($camelized);
         if ($this->isGetter($reflClass, $getter)) {
             return $getter;
@@ -155,13 +168,12 @@ class EntityDataAccessor implements DataAccessorInterface
         return self::NO_GETTER;
     }
 
-    /**
-     * @param \ReflectionClass $reflClass
-     * @param string           $methodName
-     *
-     * @return bool
-     */
-    protected function isGetter(\ReflectionClass $reflClass, $methodName)
+    protected function camelize(string $string): string
+    {
+        return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
+    }
+
+    protected function isGetter(\ReflectionClass $reflClass, string $methodName): bool
     {
         if (!$reflClass->hasMethod($methodName)) {
             return false;
@@ -169,8 +181,6 @@ class EntityDataAccessor implements DataAccessorInterface
 
         $method = $reflClass->getMethod($methodName);
 
-        return
-            $method->isPublic()
-            && 0 === $method->getNumberOfRequiredParameters();
+        return $method->isPublic() && 0 === $method->getNumberOfRequiredParameters();
     }
 }

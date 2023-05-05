@@ -320,7 +320,7 @@ class EmailType extends AbstractType
 
         return [
             'valid_elements' => null, //all elements are valid
-            'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullpage']),
+            'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullscreen']),
         ];
     }
 }

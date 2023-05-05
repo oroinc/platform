@@ -87,7 +87,7 @@
     .tab-content {
         overflow-x: hidden;
 
-        .tox-tinymce {
+        .tox-tinymce:not(.tox-fullscreen) {
             max-width: 516px;
         }
 

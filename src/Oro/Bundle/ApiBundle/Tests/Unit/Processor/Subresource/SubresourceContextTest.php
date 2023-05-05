@@ -57,6 +57,10 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setParentClassName('test');
         self::assertEquals('test', $this->context->getParentClassName());
         self::assertEquals('test', $this->context->get('parentClass'));
+
+        $this->context->setParentClassName(null);
+        self::assertNull($this->context->getParentClassName());
+        self::assertFalse($this->context->has('parentClass'));
     }
 
     public function testParentId()
@@ -78,6 +82,10 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setAssociationName('test');
         self::assertEquals('test', $this->context->getAssociationName());
         self::assertEquals('test', $this->context->get('association'));
+
+        $this->context->setAssociationName(null);
+        self::assertNull($this->context->getAssociationName());
+        self::assertFalse($this->context->has('association'));
     }
 
     public function testIsCollection()
@@ -339,7 +347,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($config, $this->context->get('parentConfig'));
 
         // test remove config
-        $this->context->setParentConfig();
+        $this->context->setParentConfig(null);
         self::assertFalse($this->context->hasParentConfig());
     }
 

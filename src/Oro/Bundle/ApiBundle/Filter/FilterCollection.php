@@ -10,13 +10,10 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     private const GROUPED_FILTER_KEY_TEMPLATE = '%s[%s]';
 
     /** @var FilterInterface[] */
-    private $filters = [];
-
+    private array $filters = [];
     /** @var array [filter key => true, ...] */
-    private $excludeFromDefaultGroup = [];
-
-    /** @var string|null */
-    private $defaultGroupName;
+    private array $excludeFromDefaultGroup = [];
+    private ?string $defaultGroupName = null;
 
     /**
      * Builds the filter key for in the given group.
@@ -28,7 +25,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      */
     public function getGroupedFilterKey(string $group, string $key): string
     {
-        return \sprintf(self::GROUPED_FILTER_KEY_TEMPLATE, $group, $key);
+        return sprintf(self::GROUPED_FILTER_KEY_TEMPLATE, $group, $key);
     }
 
     /**
@@ -91,10 +88,6 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * Gets a filter by its key.
      * In additional finds the filter in the default filter's group if it is set.
-     *
-     * @param string $key
-     *
-     * @return FilterInterface|null A FilterInterface instance or null when not found
      */
     public function get(string $key): ?FilterInterface
     {
@@ -142,8 +135,6 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
 
     /**
      * Checks whether the collection is empty (contains no elements).
-     *
-     * @return bool TRUE if the collection is empty, FALSE otherwise.
      */
     public function isEmpty(): bool
     {
@@ -161,7 +152,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetExists($offset): bool
     {
@@ -169,7 +160,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetGet($offset): ?FilterInterface
     {
@@ -177,7 +168,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetSet($offset, $value): void
     {
@@ -185,7 +176,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function offsetUnset($offset): void
     {
@@ -193,7 +184,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function count(): int
     {
@@ -201,7 +192,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getIterator(): \Traversable
     {

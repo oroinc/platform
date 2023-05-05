@@ -3,7 +3,7 @@ define(function(require) {
 
     const $ = require('jquery');
     const _ = require('underscore');
-    const Popper = require('popper');
+    const Popper = require('popper').default;
     const BaseView = require('oroui/js/app/views/base/view');
     const VALIDATOR_ERROR_CLASS = 'validation-failed';
 
@@ -39,6 +39,8 @@ define(function(require) {
         popper: null,
 
         active: false,
+
+        useMessageLabelWidth: true,
 
         template: require('tpl-loader!oroform/templates/floating-error-message.html'),
 
@@ -84,7 +86,9 @@ define(function(require) {
 
                 this.labelContainer.append(messageEl);
 
-                messageEl.css({'max-width': Math.ceil(this.label.width())});
+                if (this.useMessageLabelWidth) {
+                    messageEl.css({'max-width': Math.ceil(this.label.width())});
+                }
 
                 const popperReference = this.getPopperReferenceElement();
 

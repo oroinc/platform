@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\UIBundle\Route;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -19,7 +20,7 @@ class Router
     protected RequestStack $requestStack;
     protected UrlGeneratorInterface $urlGenerator;
     protected AuthorizationCheckerInterface $authorizationChecker;
-    protected PropertyAccessor $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(
         RequestStack $requestStack,
@@ -30,7 +31,7 @@ class Router
         $this->urlGenerator = $urlGenerator;
         $this->authorizationChecker = $authorizationChecker;
 
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
     }
 
     /**
@@ -40,7 +41,7 @@ class Router
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        $rawRouteData = json_decode($this->getRawRouteData($request), true);
+        $rawRouteData = $this->getInputActionData($request);
 
         /**
          * Default route should be used in case if no input_action in request
@@ -58,6 +59,15 @@ class Router
             $redirectUrl = $this->urlGenerator->generate($routeName, $routeParams);
         }
         return new RedirectResponse($redirectUrl);
+    }
+
+    public function getInputActionData(Request $request = null): ?array
+    {
+        if ($request === null) {
+            $request = $this->requestStack->getCurrentRequest();
+        }
+
+        return json_decode($this->getRawRouteData($request), true);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\ManyToOneAttributeType;
 
 class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
@@ -20,7 +21,7 @@ class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeType()
+    protected function getAttributeType(): AttributeTypeInterface
     {
         return new ManyToOneAttributeType($this->entityNameResolver, $this->doctrineHelper);
     }
@@ -28,12 +29,10 @@ class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
     /**
      * {@inheritdoc}
      */
-    public function configurationMethodsDataProvider()
+    public function configurationMethodsDataProvider(): array
     {
-        yield [
-            'isSearchable' => true,
-            'isFilterable' => true,
-            'isSortable' => true
+        return [
+            ['isSearchable' => true, 'isFilterable' => true, 'isSortable' => true]
         ];
     }
 

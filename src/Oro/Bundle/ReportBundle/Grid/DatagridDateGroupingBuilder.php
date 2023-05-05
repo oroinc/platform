@@ -29,7 +29,7 @@ class DatagridDateGroupingBuilder
     const FIELDS_ACL_KEY_NAME = 'fields_acl';
     const COLUMNS_KEY_NAME = 'columns';
     const CALENDAR_DATE_COLUMN_ALIAS = 'cDate';
-    const CALENDAR_TABLE_JOIN_CONDITION_TEMPLATE = 'CAST(%s as DATE) = CAST(%s as DATE)';
+    const CALENDAR_TABLE_JOIN_CONDITION_TEMPLATE = '%s = CAST(%s as DATE)';
     const CALENDAR_DATE_GRID_COLUMN_NAME = 'timePeriod';
     const DATE_PERIOD_FILTER = 'datePeriodFilter';
     const DEFAULT_GROUP_BY_FIELD = 'id';

@@ -9,14 +9,13 @@ class CountryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider provider
-     * @param string $property
      */
-    public function testSettersAndGetters($property)
+    public function testSettersAndGetters(string $property)
     {
         $obj = new Country('iso2code');
         $value = 'testValue';
 
-        call_user_func_array([$obj, 'set' . ucfirst($property)], [$value]);
+        $obj->{'set' . ucfirst($property)}($value);
         $this->assertEquals($value, call_user_func_array([$obj, 'get' . ucfirst($property)], []));
     }
 

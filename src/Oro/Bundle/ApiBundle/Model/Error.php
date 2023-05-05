@@ -11,34 +11,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class Error
 {
-    /** @var int|null */
-    private $statusCode;
-
-    /** @var string|null */
-    private $code;
-
-    /** @var string|Label|null */
-    private $title;
-
-    /** @var string|Label|null */
-    private $detail;
-
-    /** @var ErrorSource|null */
-    private $source;
-
-    /** @var \Exception|null */
-    private $innerException;
+    private ?int $statusCode = null;
+    private ?string $code = null;
+    private string|Label|null $title = null;
+    private string|Label|null $detail = null;
+    private ?ErrorSource $source = null;
+    private ?\Exception $innerException = null;
 
     /**
      * Creates an error object.
      *
-     * @param string|Label      $title  A short, human-readable summary of the problem that should not change
+     * @param string|Label|null $title  A short, human-readable summary of the problem that should not change
      *                                  from occurrence to occurrence of the problem.
      * @param string|Label|null $detail A human-readable explanation specific to this occurrence of the problem
      *
      * @return $this
      */
-    public static function create($title, $detail = null): Error
+    public static function create(string|Label|null $title, string|Label|null $detail = null): static
     {
         $error = new static();
         $error->setTitle($title);
@@ -53,15 +42,15 @@ class Error
      * @param string|Label      $title      A short, human-readable summary of the problem that should not change
      *                                      from occurrence to occurrence of the problem.
      * @param string|Label|null $detail     A human-readable explanation specific to this occurrence of the problem
-     * @param int|null          $statusCode A status code should be returned for the error. Default value - 400
+     * @param int               $statusCode A status code should be returned for the error. Default value - 400
      *
      * @return $this
      */
     public static function createValidationError(
-        $title,
-        $detail = null,
+        string|Label $title,
+        string|Label|null $detail = null,
         int $statusCode = Response::HTTP_BAD_REQUEST
-    ): Error {
+    ): static {
         return static::create($title, $detail)->setStatusCode($statusCode);
     }
 
@@ -73,7 +62,7 @@ class Error
      *
      * @return $this
      */
-    public static function createConflictValidationError($detail = null): Error
+    public static function createConflictValidationError(string|Label|null $detail = null): static
     {
         return static::create(Constraint::CONFLICT, $detail)->setStatusCode(Response::HTTP_CONFLICT);
     }
@@ -85,7 +74,7 @@ class Error
      *
      * @return $this
      */
-    public static function createByException(\Exception $exception): Error
+    public static function createByException(\Exception $exception): static
     {
         $error = new static();
         $error->setInnerException($exception);
@@ -103,12 +92,8 @@ class Error
 
     /**
      * Sets the HTTP status code applicable to this problem.
-     *
-     * @param int|null $statusCode
-     *
-     * @return $this
      */
-    public function setStatusCode(?int $statusCode): Error
+    public function setStatusCode(?int $statusCode): static
     {
         $this->statusCode = $statusCode;
 
@@ -125,12 +110,8 @@ class Error
 
     /**
      * Sets an application-specific error code.
-     *
-     * @param string|null $code
-     *
-     * @return $this
      */
-    public function setCode(?string $code): Error
+    public function setCode(?string $code): static
     {
         $this->code = $code;
 
@@ -140,10 +121,8 @@ class Error
     /**
      * Gets a short, human-readable summary of the problem that should not change
      * from occurrence to occurrence of the problem.
-     *
-     * @return string|Label|null
      */
-    public function getTitle()
+    public function getTitle(): string|Label|null
     {
         return $this->title;
     }
@@ -151,12 +130,8 @@ class Error
     /**
      * Sets a short, human-readable summary of the problem that should not change
      * from occurrence to occurrence of the problem.
-     *
-     * @param string|Label $title
-     *
-     * @return $this
      */
-    public function setTitle($title): Error
+    public function setTitle(string|Label|null $title): static
     {
         $this->title = $title;
 
@@ -165,22 +140,16 @@ class Error
 
     /**
      * Gets a human-readable explanation specific to this occurrence of the problem.
-     *
-     * @return string|Label|null
      */
-    public function getDetail()
+    public function getDetail(): string|Label|null
     {
         return $this->detail;
     }
 
     /**
      * Sets a human-readable explanation specific to this occurrence of the problem.
-     *
-     * @param string|Label $detail
-     *
-     * @return $this
      */
-    public function setDetail($detail): Error
+    public function setDetail(string|Label|null $detail): static
     {
         $this->detail = $detail;
 
@@ -197,12 +166,8 @@ class Error
 
     /**
      * Sets a source of this occurrence of the problem.
-     *
-     * @param ErrorSource|null $source
-     *
-     * @return $this
      */
-    public function setSource(ErrorSource $source = null): Error
+    public function setSource(?ErrorSource $source): static
     {
         $this->source = $source;
 
@@ -219,12 +184,8 @@ class Error
 
     /**
      * Sets an exception object that caused this occurrence of the problem.
-     *
-     * @param \Exception|null $exception
-     *
-     * @return $this
      */
-    public function setInnerException(\Exception $exception = null): Error
+    public function setInnerException(?\Exception $exception): static
     {
         $this->innerException = $exception;
 

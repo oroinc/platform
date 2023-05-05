@@ -11,13 +11,13 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * Sets "__class__" and "id" configuration properties for a nested association.
+ */
 class NestedAssociationListener implements EventSubscriberInterface
 {
-    /** @var PropertyAccessorInterface */
-    protected $propertyAccessor;
-
-    /** @var EntityDefinitionFieldConfig */
-    protected $config;
+    private PropertyAccessorInterface $propertyAccessor;
+    private EntityDefinitionFieldConfig $config;
 
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
@@ -28,16 +28,16 @@ class NestedAssociationListener implements EventSubscriberInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::POST_SUBMIT => 'postSubmit'
         ];
     }
 
-    public function postSubmit(FormEvent $event)
+    public function postSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $form->getData();
@@ -48,13 +48,11 @@ class NestedAssociationListener implements EventSubscriberInterface
         $id = null;
         if (null !== $data) {
             if (!$data instanceof EntityIdentifier) {
-                throw new \UnexpectedValueException(
-                    sprintf(
-                        'Expected argument of type "%s", "%s" given.',
-                        EntityIdentifier::class,
-                        is_object($data) ? get_class($data) : gettype($data)
-                    )
-                );
+                throw new \UnexpectedValueException(sprintf(
+                    'Expected argument of type "%s", "%s" given.',
+                    EntityIdentifier::class,
+                    get_debug_type($data)
+                ));
             }
             $className = $data->getClass();
             $id = $data->getId();
@@ -63,18 +61,12 @@ class NestedAssociationListener implements EventSubscriberInterface
         $this->setPropertyValue($entityConfig, $entity, 'id', $id);
     }
 
-    /**
-     * @param EntityDefinitionConfig $entityConfig
-     * @param object                 $entity
-     * @param string                 $fieldName
-     * @param mixed                  $value
-     */
-    protected function setPropertyValue(
+    private function setPropertyValue(
         EntityDefinitionConfig $entityConfig,
-        $entity,
-        $fieldName,
-        $value
-    ) {
+        object $entity,
+        string $fieldName,
+        mixed $value
+    ): void {
         $this->propertyAccessor->setValue(
             $entity,
             $entityConfig->getField($fieldName)->getPropertyPath($fieldName),

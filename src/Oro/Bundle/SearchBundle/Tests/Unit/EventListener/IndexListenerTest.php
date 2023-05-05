@@ -10,13 +10,14 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\EventListener\IndexListener;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class IndexListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -110,11 +111,11 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             ['inserted' => $insertedEntity, 'updated' => $updatedEntity],
-            $listener->xgetSavedEntities()
+            ReflectionUtil::getPropertyValue($listener, 'savedEntities')
         );
         self::assertEquals(
             ['deleted' => $deletedEntityReference],
-            $listener->xgetDeletedEntities()
+            ReflectionUtil::getPropertyValue($listener, 'deletedEntities')
         );
     }
 
@@ -172,7 +173,7 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         $listener->onFlush(new OnFlushEventArgs($entityManager));
         $listener->postFlush(new PostFlushEventArgs($entityManager));
 
-        self::assertFalse($listener->xhasEntitiesToIndex());
+        self::assertFalse(ReflectionUtil::callMethod($listener, 'hasEntitiesToIndex', []));
     }
 
     public function testOnClear()
@@ -207,31 +208,16 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         $listener->onFlush(new OnFlushEventArgs($entityManager));
         $listener->onClear(new OnClearEventArgs($entityManager));
 
-        self::assertFalse($listener->xhasEntitiesToIndex());
+        self::assertFalse(ReflectionUtil::callMethod($listener, 'hasEntitiesToIndex', []));
     }
 
     private function createListener(): IndexListener
     {
-        $listener = new class(
+        $listener = new IndexListener(
             $this->doctrineHelper,
             $this->searchIndexer,
-            new PropertyAccessor()
-        ) extends IndexListener {
-            public function xhasEntitiesToIndex()
-            {
-                return parent::hasEntitiesToIndex();
-            }
-
-            public function xgetSavedEntities(): array
-            {
-                return $this->savedEntities;
-            }
-
-            public function xgetDeletedEntities(): array
-            {
-                return $this->deletedEntities;
-            }
-        };
+            PropertyAccess::createPropertyAccessor()
+        );
 
         $eventDispatcher = $this->createMock(EventDispatcher::class);
         $mapperProvider = new SearchMappingProvider($eventDispatcher);

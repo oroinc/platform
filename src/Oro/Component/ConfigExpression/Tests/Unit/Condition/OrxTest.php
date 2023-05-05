@@ -4,11 +4,11 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 class OrxTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Condition\Orx */
-    protected $condition;
+    private Condition\Orx $condition;
 
     protected function setUp(): void
     {
@@ -32,7 +32,7 @@ class OrxTest extends \PHPUnit\Framework\TestCase
     public function testEvaluateFalse()
     {
         $currentConditionError = 'Current condition error';
-        $nestedConditionError  = 'Nested condition error';
+        $nestedConditionError = 'Nested condition error';
 
         $this->condition->setMessage($currentConditionError);
 
@@ -61,7 +61,7 @@ class OrxTest extends \PHPUnit\Framework\TestCase
 
     public function testInitializeEmpty()
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have at least one element.');
 
         $this->condition->initialize([]);
@@ -70,7 +70,7 @@ class OrxTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected)
+    public function testToArray(array $options, ?string $message, array $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -80,7 +80,7 @@ class OrxTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -113,7 +113,7 @@ class OrxTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected)
+    public function testCompile(array $options, ?string $message, string $expected)
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -123,7 +123,7 @@ class OrxTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [

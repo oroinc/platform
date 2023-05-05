@@ -56,13 +56,13 @@ class LanguageRepositoryTest extends WebTestCase
     {
         /* @var AclHelper $aclHelper */
         $aclHelper = self::getContainer()->get('oro_security.acl_helper');
-
-        self::assertEquals(
-            [
-                $this->getReference(LoadLanguages::LANGUAGE3)
-            ],
+        $availableLanguageCodes = array_map(
+            fn (Language $language) => $language->getCode(),
             $this->getRepository()->getAvailableLanguagesByCurrentUser($aclHelper)
         );
+        sort($availableLanguageCodes);
+
+        self::assertEquals(['en', 'en_CA', 'en_US', 'fr_FR'], $availableLanguageCodes);
     }
 
     public function testGetTranslationsForExport()
@@ -87,7 +87,7 @@ class LanguageRepositoryTest extends WebTestCase
         $result = $this->getRepository()->getTranslationsForExport(LoadLanguages::LANGUAGE1);
 
         foreach ($expected as $translation) {
-            self::assertTrue(in_array($translation, $result));
+            self::assertContains($translation, $result);
         }
     }
 

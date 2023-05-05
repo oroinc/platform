@@ -8,12 +8,12 @@ use Oro\Bundle\ApiBundle\Filter\SelfIdentifiableFilterInterface;
 class SelfIdentifiableFilterStub extends ComparisonFilter implements SelfIdentifiableFilterInterface
 {
     /** @var string[]|\Exception|null */
-    private $foundFilterKeys;
+    private array|\Exception|null $foundFilterKeys = null;
 
     /**
      * @param string[]|\Exception|null $filterKeys
      */
-    public function setFoundFilterKeys($filterKeys): void
+    public function setFoundFilterKeys(array|\Exception|null $filterKeys): void
     {
         $this->foundFilterKeys = $filterKeys;
     }
@@ -27,10 +27,6 @@ class SelfIdentifiableFilterStub extends ComparisonFilter implements SelfIdentif
             throw $this->foundFilterKeys;
         }
 
-        if (null === $this->foundFilterKeys) {
-            return [];
-        }
-
-        return $this->foundFilterKeys;
+        return $this->foundFilterKeys ?? [];
     }
 }

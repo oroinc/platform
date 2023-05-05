@@ -18,6 +18,8 @@ services:
             - '@oro_migration.data_fixtures.loader'
             - '@oro_migration.data_fixtures.executor'
             - '@oro_migration.locator.fixture_path_locator'
+            - '@oro_config.global'
+            - '@doctrine'
         tags:
             - { name: console.command }
 

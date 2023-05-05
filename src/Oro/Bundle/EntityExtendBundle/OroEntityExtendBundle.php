@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle;
 
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler;
+use Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendedEntityFieldsProcessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -45,6 +45,23 @@ class OroEntityExtendBundle extends Bundle
         parent::boot();
 
         $this->ensureInitialized();
+
+        $entityFieldIterator = $this->container->get('oro_entity_extend.entity_field_iterator');
+        $metadataProvider = $this->container->get('oro_entity_extend.entity_metadata_provider');
+        ExtendedEntityFieldsProcessor::initialize($entityFieldIterator, $metadataProvider);
+
+        if (!class_exists('Symfony\Component\Validator\Mapping\PropertyMetadata', false)) {
+            class_alias(
+                'Oro\Bundle\EntityExtendBundle\Validator\Mapping\PropertyMetadata',
+                'Symfony\Component\Validator\Mapping\PropertyMetadata'
+            );
+        }
+        if (!class_exists('Symfony\Component\Validator\Mapping\GetterMetadata', false)) {
+            class_alias(
+                'Oro\Bundle\EntityExtendBundle\Validator\Mapping\GetterMetadata',
+                'Symfony\Component\Validator\Mapping\GetterMetadata'
+            );
+        }
     }
 
     /**
@@ -60,19 +77,15 @@ class OroEntityExtendBundle extends Bundle
         $container->addCompilerPass(new Compiler\ConfigLoaderPass());
         $container->addCompilerPass(new Compiler\EntityManagerPass());
         $container->addCompilerPass(new Compiler\MigrationConfigPass());
-        $container->addCompilerPass(
-            DoctrineOrmMappingsPass::createYamlMappingDriver(
-                [
-                    ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir) =>
-                        ExtendClassLoadingUtils::getEntityNamespace()
-                ]
-            )
-        );
+        $container->addCompilerPass(new Compiler\ExtendDuplicatorPass());
+        $container->addCompilerPass(new Compiler\ChangePropertyAccessorReflectionExtractorPass());
         $container->addCompilerPass(new Compiler\WarmerPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 
     private function ensureInitialized()
     {
+        // this needed on application update to run oro_entity_extend.warmer tagged services
+        // instead of regular cache warmup
         ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
         if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
             && !CommandExecutor::isCurrentCommand('oro:install')
@@ -84,7 +97,6 @@ class OroEntityExtendBundle extends Bundle
                 $this->checkConfigs();
                 $this->initializeCache();
             }
-            $this->ensureAliasesSet();
         }
     }
 
@@ -147,13 +159,6 @@ class OroEntityExtendBundle extends Bundle
                 sleep(self::CACHE_CHECKOUT_INTERVAL);
             }
         } while ($attempts < self::CACHE_CHECKOUT_ATTEMPTS);
-    }
-
-    private function ensureAliasesSet()
-    {
-        if (!CommandExecutor::isCurrentCommand('oro:entity-extend:update-config')) {
-            ExtendClassLoadingUtils::setAliases($this->cacheDir);
-        }
     }
 
     /**

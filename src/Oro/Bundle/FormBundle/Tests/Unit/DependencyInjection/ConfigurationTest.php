@@ -3,27 +3,17 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\FormBundle\DependencyInjection\Configuration;
-use Symfony\Component\Config\Definition\ArrayNode;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetConfigTreeBuilder()
+    private function processConfiguration(array $configs): array
     {
-        $configuration = new Configuration();
-        $builder = $configuration->getConfigTreeBuilder();
-        $this->assertInstanceOf(TreeBuilder::class, $builder);
-
-        $root = $builder->buildTree();
-        $this->assertInstanceOf(ArrayNode::class, $root);
-        $this->assertEquals('oro_form', $root->getName());
+        return (new Processor())->processConfiguration(new Configuration(), $configs);
     }
 
-    public function testProcessConfiguration()
+    public function testProcessConfiguration(): void
     {
-        $processor = new Processor();
-
         $this->assertEquals(
             [
                 'settings' => [
@@ -62,7 +52,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            $processor->processConfiguration(new Configuration(), [[
+            $this->processConfiguration([[
                 'html_purifier_modes' => [
                     'scope_1' => [],
                     'scope_2' => [
@@ -81,10 +71,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessConfigurationEmpty()
+    public function testProcessConfigurationEmpty(): void
     {
-        $processor = new Processor();
-
         $this->assertEquals(
             [
                 'settings' => [
@@ -96,7 +84,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 ],
                 'html_purifier_modes' => []
             ],
-            $processor->processConfiguration(new Configuration(), [])
+            $this->processConfiguration([])
         );
     }
 }

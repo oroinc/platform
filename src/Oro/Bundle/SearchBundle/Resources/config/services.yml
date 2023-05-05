@@ -324,8 +324,6 @@ services:
 
     oro_search.form.type.filter.search_boolean:
         class: Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchBooleanFilterType
-        arguments:
-            - '@translator'
         tags:
             - { name: form.type, alias: oro_search_type_boolean_filter }
 

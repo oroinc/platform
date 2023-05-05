@@ -12,7 +12,7 @@ use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User;
  */
 class SimpleEntitySerializerTest extends EntitySerializerTestCase
 {
-    public function testReuseExistingJoin()
+    public function testReuseExistingJoin(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->leftJoin('e.owner', 'user')
@@ -63,7 +63,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testReuseExistingInnerJoin()
+    public function testReuseExistingInnerJoin(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->innerJoin('e.owner', 'user')
@@ -114,7 +114,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testReuseExistingJoinWithCondition()
+    public function testReuseExistingJoinWithCondition(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->leftJoin('e.owner', 'user', 'WITH', 'e.owner = user.id AND user.name LIKE \'a%\'')
@@ -165,7 +165,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithoutConfig()
+    public function testSimpleEntityWithoutConfig(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -206,7 +206,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithExclusion()
+    public function testSimpleEntityWithExclusion(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -250,7 +250,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithComputedField()
+    public function testSimpleEntityWithComputedField(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -295,7 +295,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithExclusionAndPartialLoadDisabled()
+    public function testSimpleEntityWithExclusionAndPartialLoadDisabled(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -347,7 +347,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithSpecifiedFieldsButNoExclusionPolicy()
+    public function testSimpleEntityWithSpecifiedFieldsButNoExclusionPolicy(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -396,7 +396,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithSpecifiedFieldsOnly()
+    public function testSimpleEntityWithSpecifiedFieldsOnly(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -439,7 +439,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithSpecifiedFieldsAndExclusions()
+    public function testSimpleEntityWithSpecifiedFieldsAndExclusions(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -482,7 +482,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithMetadata()
+    public function testSimpleEntityWithMetadata(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -535,7 +535,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithMetadataWithoutPropertyPath()
+    public function testSimpleEntityWithMetadataWithoutPropertyPath(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -586,7 +586,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithMetadataAndExcludeAllPolicy()
+    public function testSimpleEntityWithMetadataAndExcludeAllPolicy(): void
     {
         $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -637,7 +637,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
      * tests that not configured relations is skipped
      * it is a temporary fix until the identifier field will not be used by default for them
      */
-    public function testNotConfiguredRelations()
+    public function testNotConfiguredRelations(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
@@ -679,7 +679,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
-    public function testSimpleEntityWithRenamedFields()
+    public function testSimpleEntityWithRenamedFields(): void
     {
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')

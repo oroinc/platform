@@ -4,6 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\ArrayOptionValueBuilder;
 use Oro\Component\Layout\Exception\InvalidArgumentException;
+use Oro\Component\Layout\Exception\UnexpectedTypeException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -43,28 +44,28 @@ class ArrayOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testAddThrowsExceptionIfInvalidValue()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $builder = new ArrayOptionValueBuilder();
         $builder->add(123);
     }
 
     public function testRemoveThrowsExceptionIfInvalidValue()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $builder = new ArrayOptionValueBuilder();
         $builder->remove(123);
     }
 
     public function testReplaceThrowsExceptionIfInvalidOldValue()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $builder = new ArrayOptionValueBuilder();
         $builder->replace(123, ['new']);
     }
 
     public function testReplaceThrowsExceptionIfInvalidNewValue()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $builder = new ArrayOptionValueBuilder();
         $builder->replace(['old'], 123);
     }

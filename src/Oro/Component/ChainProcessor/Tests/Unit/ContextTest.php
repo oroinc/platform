@@ -45,18 +45,16 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($context->get('test'));
         $this->assertNull($context['test']);
 
-        $this->assertEquals(1, count($context));
+        $this->assertCount(1, $context);
         $this->assertEquals(['test' => null], $context->toArray());
 
         $context->clear();
-        $this->assertEquals(0, count($context));
+        $this->assertCount(0, $context);
     }
 
     public function testAction()
     {
         $context = new Context();
-
-        $this->assertNull($context->getAction());
 
         $context->setAction('test');
         $this->assertEquals('test', $context->getAction());

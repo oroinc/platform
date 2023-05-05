@@ -90,7 +90,7 @@ class MigrateUserLoginAttemptsQuery extends ParametrizedMigrationQuery
             $params[] = $row['datetime'];
             $params[] = 'Successful login' === $row['message'];
             $params[] = 1;
-            $params[] = $username;
+            $params[] = substr($username, 0, 255);
             $params[] = $userId;
             $params[] = $ipAddress;
             $params[] = $context;

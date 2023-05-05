@@ -2,28 +2,24 @@
 
 namespace Oro\Bundle\LayoutBundle\Cache\Extension;
 
-use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
+use Oro\Component\Layout\LayoutContextStack;
 
 /**
  * Render cache extension that adds theme to varyBy cache metadata.
  */
 class ThemeRenderCacheExtension implements RenderCacheExtensionInterface
 {
-    /**
-     * @var LayoutContextHolder
-     */
-    private $contextHolder;
+    private LayoutContextStack $layoutContextStack;
 
-    public function __construct(LayoutContextHolder $contextHolder)
+    public function __construct(LayoutContextStack $layoutContextStack)
     {
-        $this->contextHolder = $contextHolder;
+        $this->layoutContextStack = $layoutContextStack;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function alwaysVaryBy(): array
     {
-        return ['theme' => $this->contextHolder->getContext()->get('theme')];
+        $context = $this->layoutContextStack->getCurrentContext();
+
+        return $context ? ['theme' => $context->get('theme')] : [];
     }
 }

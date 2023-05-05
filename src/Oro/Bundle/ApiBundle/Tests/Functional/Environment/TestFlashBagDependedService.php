@@ -6,8 +6,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 class TestFlashBagDependedService
 {
-    /** @var FlashBagInterface */
-    private $flashBag;
+    private FlashBagInterface $flashBag;
 
     public function __construct(FlashBagInterface $flashBag)
     {

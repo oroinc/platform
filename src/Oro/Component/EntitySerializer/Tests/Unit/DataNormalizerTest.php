@@ -10,7 +10,7 @@ class DataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDataProvider
      */
-    public function testNormalizeData($config, $data, $expectedData)
+    public function testNormalizeData(array $config, array $data, array $expectedData): void
     {
         $configConverter = new ConfigConverter();
         $normalizer = new DataNormalizer();
@@ -26,7 +26,7 @@ class DataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function normalizeDataProvider()
+    public function normalizeDataProvider(): array
     {
         return [
             'excluded fields should be removed'      => [
@@ -288,7 +288,7 @@ class DataNormalizerTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ]
-            ],
+            ]
         ];
     }
 }

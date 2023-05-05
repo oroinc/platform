@@ -3,12 +3,13 @@
 namespace Oro\Bundle\CronBundle\Async\Topic;
 
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
+use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Run a console command.
  */
-class RunCommandTopic extends AbstractTopic
+class RunCommandTopic extends AbstractTopic implements JobAwareTopicInterface
 {
     public static function getName(): string
     {
@@ -35,5 +36,24 @@ class RunCommandTopic extends AbstractTopic
             ->addAllowedTypes('command', 'string')
             ->addAllowedTypes('arguments', 'array')
             ->addAllowedTypes('jobId', 'int');
+    }
+
+    public function createJobName($messageBody): string
+    {
+        $commandArguments = $messageBody['arguments'];
+        $commandName = $messageBody['command'];
+
+        $jobName = sprintf('oro:cron:run_command:%s', $commandName);
+        if ($commandArguments) {
+            array_walk($commandArguments, static function ($item, $key) use (&$jobName) {
+                if (is_array($item)) {
+                    $item = implode(',', $item);
+                }
+
+                $jobName .= sprintf('-%s=%s', $key, $item);
+            });
+        }
+
+        return $jobName;
     }
 }

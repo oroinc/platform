@@ -12,20 +12,23 @@ use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class NumberFilterTypeTest extends AbstractTypeTestCase
 {
-    /** @var NumberFilterType */
-    private $type;
-
     /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $localeSettings;
 
     /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
     private $numberFormatter;
+
+    /** @var NumberFilterType */
+    private $type;
+
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -40,6 +43,13 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
+
+        $this->defaultLocale = \Locale::getDefault();
+    }
+
+    protected function tearDown(): void
+    {
+        \Locale::setDefault($this->defaultLocale);
     }
 
     protected function getTypeExtensions(): array
@@ -52,7 +62,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getTestFormType()
+    protected function getTestFormType(): AbstractType
     {
         return $this->type;
     }
@@ -60,7 +70,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function configureOptionsDataProvider()
+    public function configureOptionsDataProvider(): array
     {
         return [
             [
@@ -97,8 +107,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         // NOTE: must be executed after EntityBundle, because it will be fail result
 
         $locale = 'en';
-        $this->localeSettings
-            ->expects(self::atLeastOnce())
+        $this->localeSettings->expects(self::atLeastOnce())
             ->method('getLocale')
             ->willReturn($locale);
 
@@ -108,10 +117,10 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     }
 
     /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function bindDataProvider()
+    public function bindDataProvider(): array
     {
         return [
             'not formatted number' => [
@@ -291,8 +300,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         // NOTE: must be executed after EntityBundle, because it will be fail result
 
         $locale = 'de_DE';
-        $this->localeSettings
-            ->expects(self::atLeastOnce())
+        $this->localeSettings->expects(self::atLeastOnce())
             ->method('getLocale')
             ->willReturn($locale);
 
@@ -304,7 +312,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function bindDataWithAnotherLocaleProvider()
+    public function bindDataWithAnotherLocaleProvider(): array
     {
         return [
             'not formatted number' => [

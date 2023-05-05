@@ -17,23 +17,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
-    /** @var WorkflowTransitionType */
-    private $type;
+    private WorkflowTransitionType $type;
 
     protected function setUp(): void
     {
         $this->type = new WorkflowTransitionType();
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
         return [
-            new PreloadedExtension(
-                [
-                    WorkflowAttributesType::class => $this->createWorkflowAttributesType(),
-                ],
-                []
-            )
+            new PreloadedExtension([
+                $this->type,
+                $this->createWorkflowAttributesType()
+            ], [])
         ];
     }
 

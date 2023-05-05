@@ -9,12 +9,11 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Form\EventListener\Fixtures\ObjectWithNested
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var NestedAssociationListener */
-    private $listener;
+    private NestedAssociationListener $listener;
 
     protected function setUp(): void
     {
@@ -23,7 +22,7 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
         $targetConfig->addField('__class__')->setPropertyPath('relatedObjectClassName');
         $targetConfig->addField('id')->setPropertyPath('relatedObjectId');
 
-        $this->listener = new NestedAssociationListener(new PropertyAccessor(), $config);
+        $this->listener = new NestedAssociationListener(PropertyAccess::createPropertyAccessor(), $config);
     }
 
     private function getFormEvent(object $entity, mixed $data): FormEvent

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Entity;
 
-use DateTime;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
-use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
+use Oro\Bundle\DataAuditBundle\Tests\Unit\Fixture\LoggableClass as TestEntity;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\AuditField;
 
 class AuditFieldTest extends \PHPUnit\Framework\TestCase
@@ -20,7 +19,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider provider
+     * @dataProvider auditFieldDataProvider
      */
     public function testAuditField(
         string $field,
@@ -38,7 +37,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('message', $auditField->getTranslationDomain());
     }
 
-    public function provider(): array
+    public function auditFieldDataProvider(): array
     {
         return [
             ['field', 'boolean', true, false, 'boolean'],
@@ -49,13 +48,13 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
             ['field', 'text', 'new', 'old', 'text'],
             ['field', 'string', 'new', 'old', 'text'],
             ['field', 'guid', 'new', 'old', 'text'],
-            ['field', 'date', new DateTime('2014-01-05'), new DateTime('2014-01-07'), 'date'],
-            ['field', 'time', new DateTime('13:22:15'), new DateTime('13:32:15'), 'time'],
+            ['field', 'date', new \DateTime('2014-01-05'), new \DateTime('2014-01-07'), 'date'],
+            ['field', 'time', new \DateTime('13:22:15'), new \DateTime('13:32:15'), 'time'],
             [
                 'field',
                 'datetime',
-                new DateTime('2014-01-05 13:22:15'),
-                new DateTime('2014-01-07 13:34:07'),
+                new \DateTime('2014-01-05 13:22:15'),
+                new \DateTime('2014-01-07 13:34:07'),
                 'datetime'
             ],
             ['field', 'testingtype', 'old', 'new', 'testingtype'],
@@ -65,7 +64,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
     public function testShouldAllowAddEntityRemovedFromCollection()
     {
         $field = new AuditField('field', 'text', null, null);
-        $field->addEntityRemovedFromCollection(TestAuditDataOwner::class, 'theId', 'theName');
+        $field->addEntityRemovedFromCollection(TestEntity::class, 1, 'theName');
         $field->calculateNewValue();
 
         $this->assertEquals('Removed: theName', $field->getOldValue());
@@ -75,8 +74,8 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
     public function testShouldAllowAddSomeEntitiesRemovedFromCollection()
     {
         $field = new AuditField('field', 'text', null, null);
-        $field->addEntityRemovedFromCollection(TestAuditDataOwner::class, 'theId', 'theName');
-        $field->addEntityRemovedFromCollection(TestAuditDataOwner::class, 'theAnotherId', 'theAnotherName');
+        $field->addEntityRemovedFromCollection(TestEntity::class, 1, 'theName');
+        $field->addEntityRemovedFromCollection(TestEntity::class, 2, 'theAnotherName');
         $field->calculateNewValue();
 
         $this->assertEquals('Removed: theName, theAnotherName', $field->getOldValue());
@@ -86,7 +85,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
     public function testShouldAllowAddEntityAddedToCollection()
     {
         $field = new AuditField('field', 'text', null, null);
-        $field->addEntityAddedToCollection(TestAuditDataOwner::class, 'theId', 'theName');
+        $field->addEntityAddedToCollection(TestEntity::class, 1, 'theName');
         $field->calculateNewValue();
 
         $this->assertEquals(null, $field->getOldValue());
@@ -96,8 +95,8 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
     public function testShouldAllowAddSomeEntitiesAddedToCollection()
     {
         $field = new AuditField('field', 'text', null, null);
-        $field->addEntityAddedToCollection(TestAuditDataOwner::class, 'theId', 'theName');
-        $field->addEntityAddedToCollection(TestAuditDataOwner::class, 'theAnotherId', 'theAnotherName');
+        $field->addEntityAddedToCollection(TestEntity::class, 1, 'theName');
+        $field->addEntityAddedToCollection(TestEntity::class, 2, 'theAnotherName');
         $field->calculateNewValue();
 
         $this->assertEquals(null, $field->getOldValue());
@@ -107,8 +106,8 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
     public function testShouldAllowAddSomeEntitiesAsChangedToCollection()
     {
         $field = new AuditField('field', 'text', null, null);
-        $field->addEntityChangedInCollection(TestAuditDataOwner::class, 'theId', 'theName');
-        $field->addEntityChangedInCollection(TestAuditDataOwner::class, 'theAnotherId', 'theAnotherName');
+        $field->addEntityChangedInCollection(TestEntity::class, 1, 'theName');
+        $field->addEntityChangedInCollection(TestEntity::class, 2, 'theAnotherName');
         $field->calculateNewValue();
 
         $this->assertEquals(null, $field->getOldValue());
@@ -131,8 +130,8 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
     public function testShouldMergeEmptyCollectionFieldWithNotEmptyOne()
     {
         $field = new AuditField('field', 'text', null, null);
-        $field->addEntityAddedToCollection(TestAuditDataOwner::class, 'theId', 'theName');
-        $field->addEntityRemovedFromCollection(TestAuditDataOwner::class, 'theAnotherId', 'theAnotherName');
+        $field->addEntityAddedToCollection(TestEntity::class, 1, 'theName');
+        $field->addEntityRemovedFromCollection(TestEntity::class, 2, 'theAnotherName');
 
         $anotherField = new AuditField('field', 'text', null, null);
 
@@ -146,12 +145,12 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
     public function testShouldMergeNotEmptyCollectionFields()
     {
         $field = new AuditField('field', 'text', null, null);
-        $field->addEntityAddedToCollection(TestAuditDataOwner::class, 'theId', 'theName');
-        $field->addEntityRemovedFromCollection(TestAuditDataOwner::class, 'theAnotherId', 'theAnotherName');
+        $field->addEntityAddedToCollection(TestEntity::class, 1, 'theName');
+        $field->addEntityRemovedFromCollection(TestEntity::class, 2, 'theAnotherName');
 
         $anotherField = new AuditField('field', 'text', null, null);
-        $anotherField->addEntityAddedToCollection(TestAuditDataOwner::class, 'theId2', 'theFooName');
-        $anotherField->addEntityRemovedFromCollection(TestAuditDataOwner::class, 'theAnotherId2', 'theBarName');
+        $anotherField->addEntityAddedToCollection(TestEntity::class, 3, 'theFooName');
+        $anotherField->addEntityRemovedFromCollection(TestEntity::class, 4, 'theBarName');
 
         $field->mergeCollectionField($anotherField);
         $field->calculateNewValue();

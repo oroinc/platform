@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\EntitySerializer;
 
 /**
@@ -11,14 +13,14 @@ use Oro\Component\EntitySerializer\EntitySerializer;
  */
 class AclProtectedEntitySerializer extends EntitySerializer
 {
-    private $contextStack = [];
+    private array $contextStack = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function serialize(
         QueryBuilder $qb,
-        $config,
+        EntityConfig|array $config,
         array $context = [],
         bool $skipPostSerializationForPrimaryEntities = false
     ): array {
@@ -31,18 +33,38 @@ class AclProtectedEntitySerializer extends EntitySerializer
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function serializeEntities(
         array $entities,
         string $entityClass,
-        $config,
+        EntityConfig|array $config,
         array $context = [],
         bool $skipPostSerializationForPrimaryEntities = false
     ): array {
         $this->setContext($context);
         try {
             return parent::serializeEntities($entities, $entityClass, $config, $context);
+        } finally {
+            $this->resetContext();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function buildQuery(
+        QueryBuilder $qb,
+        EntityConfig|array $config,
+        array $context = [],
+        ?callable $queryModifier = null
+    ): Query {
+        if (null !== $queryModifier) {
+            $queryModifier = $this->getQueryModifier($queryModifier);
+        }
+        $this->setContext($context);
+        try {
+            return parent::buildQuery($qb, $config, $context, $queryModifier);
         } finally {
             $this->resetContext();
         }
@@ -68,9 +90,9 @@ class AclProtectedEntitySerializer extends EntitySerializer
             $this->applyContext($context);
         } else {
             // clear the context
-            $this->configConverter->setRequestType();
-            $this->queryFactory->setRequestType();
-            $this->fieldAccessor->setRequestType();
+            $this->configConverter->setRequestType(null);
+            $this->queryFactory->setRequestType(null);
+            $this->fieldAccessor->setRequestType(null);
         }
     }
 
@@ -82,5 +104,13 @@ class AclProtectedEntitySerializer extends EntitySerializer
             $this->queryFactory->setRequestType($requestType);
             $this->fieldAccessor->setRequestType($requestType);
         }
+    }
+
+    private function getQueryModifier(callable $queryModifier): callable
+    {
+        return function (QueryBuilder $qb, EntityConfig $entityConfig, array $context) use ($queryModifier) {
+            $queryModifier($qb, $entityConfig, $context);
+            (new ComputedFieldsWhereExpressionModifier())->updateQuery($qb);
+        };
     }
 }

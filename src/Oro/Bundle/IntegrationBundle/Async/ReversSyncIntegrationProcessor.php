@@ -124,9 +124,8 @@ class ReversSyncIntegrationProcessor implements
             return self::REJECT;
         }
 
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            'oro_integration:revers_sync_integration:' . $messageBody['integration_id'],
+        $result = $this->jobRunner->runUniqueByMessage(
+            $message,
             function () use ($integration, $messageBody) {
                 $this->setTemporaryIntegrationToken($integration);
                 $this->reverseSyncProcessor->process(

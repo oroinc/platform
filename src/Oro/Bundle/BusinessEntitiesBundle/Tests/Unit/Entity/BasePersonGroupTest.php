@@ -17,7 +17,7 @@ class BasePersonGroupTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider  getSetDataProvider
+     * @dataProvider getSetDataProvider
      */
     public function testSetGet(string $property, mixed $value = null, mixed $expected = null)
     {

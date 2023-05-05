@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\StringOptionValueBuilder;
 
 /**
@@ -11,8 +12,8 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructWithInvalidDelimiter()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
-        $builder = new StringOptionValueBuilder(null);
+        $this->expectException(UnexpectedTypeException::class);
+        new StringOptionValueBuilder(null);
     }
 
     public function testBuildWithDefaultOptions()
@@ -61,28 +62,28 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testAddThrowsExceptionIfInvalidValue()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->add(123);
     }
 
     public function testRemoveThrowsExceptionIfInvalidValue()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->remove(123);
     }
 
     public function testReplaceThrowsExceptionIfInvalidOldValue()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->replace(123, 'new');
     }
 
     public function testReplaceThrowsExceptionIfInvalidNewValue()
     {
-        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->replace('old', 123);
     }
@@ -115,7 +116,7 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $builder = new StringOptionValueBuilder();
         $builder->add('val1');
-        $builder->remove('', 'new');
+        $builder->remove('');
         $this->assertEquals('val1', $builder->get());
     }
 
@@ -124,7 +125,7 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
         $builder = new StringOptionValueBuilder();
         $builder->add('val1');
         $builder->add('val2');
-        $builder->remove('val1', '');
+        $builder->remove('val1');
         $this->assertEquals('val2', $builder->get());
     }
 }

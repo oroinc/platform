@@ -10,20 +10,20 @@ use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 class CreateProcessor extends RequestActionProcessor
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createContextObject()
+    protected function createContextObject(): CreateContext
     {
         return new CreateContext($this->configProvider, $this->metadataProvider);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getLogContext(NormalizeResultContext $context): array
     {
         $result = parent::getLogContext($context);
-        if (array_key_exists('id', $result) && empty($result['id'])) {
+        if (\array_key_exists('id', $result) && empty($result['id'])) {
             unset($result['id']);
         }
 

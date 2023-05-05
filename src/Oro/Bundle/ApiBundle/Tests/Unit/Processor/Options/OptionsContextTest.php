@@ -8,8 +8,7 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 
 class OptionsContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OptionsContext */
-    private $context;
+    private OptionsContext $context;
 
     protected function setUp(): void
     {

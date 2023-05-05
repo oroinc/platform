@@ -1,0 +1,12 @@
+services:
+    oro_behat_extension.isolation.redis_cache_isolator:
+        class: 'Oro\Bundle\RedisConfigBundle\Tests\Behat\Isolation\RedisCacheIsolator'
+        arguments:
+            - "@=service('fob_symfony.kernel').getContainer()"
+            -
+                'oro.cache.redis_provider': 'Cache'
+                'oro.cache.doctrine.redis_provider': 'Doctrine'
+                'oro.cache.layout.redis_provider': 'Layout Render'
+#                'oro_redis_config.session.redis_connection': 'Session'
+        tags:
+            - { name: 'oro_behat.isolator', priority: 100 }

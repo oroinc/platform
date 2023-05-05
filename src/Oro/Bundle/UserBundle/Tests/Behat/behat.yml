@@ -87,6 +87,18 @@ oro_behat_extension:
     Generate Key:
       selector: '#btn-apigen'
 
+    Grid View All Users:
+      selector: '.grid-views-item span.grid-views-choice:contains("All Users")'
+
+    Grid View Active Users:
+      selector: '.grid-views-item span.grid-views-choice:contains("Active Users")'
+
+    Grid View Cannot Login:
+      selector: '.grid-views-item span.grid-views-choice:contains("Cannot login")'
+
+    Grid View Disabled Users:
+      selector: '.grid-views-item span.grid-views-choice:contains("Disabled Users")'
+
   pages:
     Login:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\Login

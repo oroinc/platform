@@ -25,6 +25,7 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * The filter by an activity list.
@@ -89,25 +90,13 @@ class ActivityListFilter extends EntityFilter
     /**
      * {@inheritDoc}
      */
-    public function getForm()
-    {
-        if (!$this->form) {
-            $this->form = $this->formFactory->create($this->getFormType());
-        }
-
-        return $this->form;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getMetadata()
     {
         return [];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
@@ -356,10 +345,18 @@ class ActivityListFilter extends EntityFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getFormType()
     {
         return ActivityListFilterType::class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createForm(): FormInterface
+    {
+        return $this->formFactory->create($this->getFormType());
     }
 }

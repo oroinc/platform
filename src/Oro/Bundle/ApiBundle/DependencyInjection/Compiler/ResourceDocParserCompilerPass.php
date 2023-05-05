@@ -19,13 +19,13 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
     use ApiTaggedServiceTrait;
 
     private const RESOURCE_DOC_PARSER_REGISTRY_SERVICE_ID = 'oro_api.resource_doc_parser_registry';
-    private const DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID  = 'oro_api.resource_doc_parser.template';
-    private const RESOURCE_DOC_PARSER_TAG                 = 'oro.api.resource_doc_parser';
+    private const DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID = 'oro_api.resource_doc_parser.template';
+    private const RESOURCE_DOC_PARSER_TAG = 'oro.api.resource_doc_parser';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         // find resource documentation parsers
         $services = [];
@@ -62,11 +62,11 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
                     $id = self::DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID . '.' . $name;
                     $container->setDefinition($id, new ChildDefinition(self::DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID));
                     $services[$id] = new Reference($id);
-                    $defaultResourceDocParsers[] = [$id, \implode('&', $view['request_type'])];
+                    $defaultResourceDocParsers[] = [$id, implode('&', $view['request_type'])];
                 }
             }
         }
-        $resourceDocParsers = \array_merge($defaultResourceDocParsers, $resourceDocParsers);
+        $resourceDocParsers = array_merge($defaultResourceDocParsers, $resourceDocParsers);
 
         // register
         $container->getDefinition(self::RESOURCE_DOC_PARSER_REGISTRY_SERVICE_ID)
@@ -88,20 +88,20 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
      */
     private function getNormalizeRequestTypeExpr(array $aspects): string
     {
-        \rsort($aspects, SORT_STRING);
+        rsort($aspects, SORT_STRING);
 
-        return \implode('&', $aspects);
+        return implode('&', $aspects);
     }
 
     private function normalizeRequestType(string $requestTypeExpr): string
     {
         $requestType = ExpressionParser::parse($requestTypeExpr);
-        if (\is_string($requestType) || AbstractMatcher::OPERATOR_AND !== \key($requestType)) {
+        if (\is_string($requestType) || AbstractMatcher::OPERATOR_AND !== key($requestType)) {
             return $requestTypeExpr;
         }
 
         $isNormalizable = true;
-        $aspects = \current($requestType);
+        $aspects = current($requestType);
         foreach ($aspects as $aspect) {
             if (!\is_string($aspect)) {
                 $isNormalizable = false;

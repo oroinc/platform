@@ -9,18 +9,11 @@ use Oro\Component\Testing\ReflectionUtil;
 
 class SegmentDefinitionTestCase extends OrmQueryConverterTestCase
 {
-    protected const TEST_ENTITY          = 'AcmeBundle:UserEntity';
+    protected const TEST_ENTITY = 'AcmeBundle:UserEntity';
     protected const TEST_IDENTIFIER_NAME = 'id';
-    protected const TEST_IDENTIFIER      = 32;
+    protected const TEST_IDENTIFIER = 32;
 
-    /**
-     * @param array|null  $definition
-     * @param string|null $entity
-     * @param int|null    $identifier
-     *
-     * @return Segment
-     */
-    public function getSegment(array $definition = null, string $entity = null, bool $identifier = null)
+    public function getSegment(array $definition = null, string $entity = null, int $identifier = null): Segment
     {
         $segment = new Segment();
         ReflectionUtil::setId($segment, $identifier ?? self::TEST_IDENTIFIER);
@@ -30,10 +23,7 @@ class SegmentDefinitionTestCase extends OrmQueryConverterTestCase
         return $segment;
     }
 
-    /**
-     * @return array
-     */
-    protected function getDefaultDefinition()
+    protected function getDefaultDefinition(): array
     {
         return [
             'columns' => [

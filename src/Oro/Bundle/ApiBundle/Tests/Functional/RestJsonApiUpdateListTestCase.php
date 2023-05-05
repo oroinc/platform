@@ -2,35 +2,25 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListCreateChunkJobsTopic;
-use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListFinishTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic;
-use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListStartChunkJobsTopic;
-use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListTopic;
 use Oro\Bundle\ApiBundle\Batch\ChunkSizeProvider;
 use Oro\Bundle\ApiBundle\Batch\ErrorManager;
 use Oro\Bundle\ApiBundle\Batch\JsonUtil;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
-use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\BatchUpdateExceptionController;
 use Oro\Bundle\GaufretteBundle\FileManager;
-use Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException;
-use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Component\MessageQueue\Client\MessageBodyResolverInterface;
+use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
-use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
-use Oro\Component\MessageQueue\Transport\ConnectionInterface;
-use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * The base class for REST Batch API that conforms the JSON:API specification functional tests.
@@ -75,62 +65,17 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return self::getContainer()->get('oro_message_queue.client.message_body_resolver');
     }
 
-    private function getTokenStorage(): TokenStorageInterface
+    protected function getTokenStorage(): TokenStorageInterface
     {
         return self::getContainer()->get('security.token_storage');
     }
 
-    private function getTokenSerializer(): TokenSerializerInterface
-    {
-        return self::getContainer()->get('oro_security.token_serializer');
-    }
-
-    private function processMessage(string $processorServiceId, MessageInterface $message): string
-    {
-        $this->getEntityManager()->clear();
-        $this->getTokenStorage()->setToken(null);
-
-        $serializedToken = $message->getProperty(SecurityAwareDriver::PARAMETER_SECURITY_TOKEN);
-        if ($serializedToken) {
-            $token = $this->getTokenSerializer()->deserialize($serializedToken);
-            if (null === $token) {
-                throw new InvalidSecurityTokenException();
-            }
-            $this->getTokenStorage()->setToken($token);
-        }
-
-        /** @var MessageProcessorInterface $processor */
-        $processor = self::getContainer()->get($processorServiceId);
-        /** @var ConnectionInterface $connection */
-        $connection = self::getContainer()->get('oro_message_queue.transport.connection');
-
-        return $processor->process($message, $connection->createSession());
-    }
-
-    protected function createMessage(array $body): MessageInterface
-    {
-        $message = new Message();
-        $message->setMessageId(UUIDGenerator::v4());
-        $message->setBody($body);
-
-        $token = $this->getTokenStorage()->getToken();
-        if ($token instanceof TokenInterface) {
-            $serializedToken = $this->getTokenSerializer()->serialize($token);
-            if (null !== $serializedToken) {
-                $properties = $message->getProperties();
-                $properties[SecurityAwareDriver::PARAMETER_SECURITY_TOKEN] = $serializedToken;
-                $message->setProperties($properties);
-            }
-        }
-
-        return $message;
-    }
-
     protected function getFileContentAndDeleteFile(string $fileName): ?string
     {
-        $dataFileContent = $this->getFileManager()->getFileContent($fileName);
+        $fileManager = $this->getFileManager();
+        $dataFileContent = $fileManager->getFileContent($fileName);
         if (null !== $dataFileContent) {
-            $this->getFileManager()->deleteFile($fileName);
+            $fileManager->deleteFile($fileName);
         }
 
         return $dataFileContent;
@@ -169,36 +114,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         $this->getEntityManager()->flush();
 
         return $operation;
-    }
-
-    protected function createUpdateListMessage(
-        AsyncOperation $operation,
-        int $chunkSize = null,
-        int $includedDataChunkSize = null
-    ): MessageInterface {
-        if (null === $chunkSize) {
-            $chunkSize = $this->getChunkSizeProvider()
-                ->getChunkSize($operation->getEntityClass());
-        }
-        if (null === $includedDataChunkSize) {
-            $includedDataChunkSize = $this->getChunkSizeProvider()
-                ->getIncludedDataChunkSize($operation->getEntityClass());
-        }
-
-        $messageBody = $this->getMessageBodyResolver()->resolveBody(
-            UpdateListTopic::getName(),
-            [
-                'operationId'           => $operation->getId(),
-                'entityClass'           => $operation->getEntityClass(),
-                'requestType'           => $this->getRequestType()->toArray(),
-                'version'               => Version::LATEST,
-                'fileName'              => $operation->getDataFileName(),
-                'chunkSize'             => $chunkSize,
-                'includedDataChunkSize' => $includedDataChunkSize,
-            ]
-        );
-
-        return $this->createMessage($messageBody);
     }
 
     protected function assertAsyncOperationStatus(int $operationId, array $attributes): void
@@ -311,76 +226,43 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     protected function sendUpdateListRequest(string $entityClass, array|string $data): int
     {
         $response = $this->cpatch(['entity' => $this->getEntityType($entityClass)], $data);
-        $operationId = $this->extractOperationIdFromContentLocationHeader($response);
-        self::clearMessageCollector();
-
-        /** @var AsyncOperation $operation */
-        $operation = $this->getEntityManager()->find(AsyncOperation::class, $operationId);
-        $updateListMessage = $this->createUpdateListMessage($operation);
-        $this->processUpdateListMessage($updateListMessage);
-
-        return $operationId;
+        return $this->extractOperationIdFromContentLocationHeader($response);
     }
 
-    protected function processUpdateListMessage(MessageInterface $message): void
+    protected function processUpdateListMessage(Context $messageContext): void
     {
-        self::assertEquals(
-            MessageProcessorInterface::ACK,
-            $this->processMessage('oro_api.batch.async.update_list', $message)
-        );
-    }
-
-    /**
-     * @return array [[update list chunk message, update list chunk message processing result], ...]
-     */
-    protected function processUpdateListChunkMessages(): array
-    {
-        $result = [];
-        self::flushMessagesBuffer();
-        $messages = self::getSentMessagesByTopic(UpdateListProcessChunkTopic::getName());
-        $messageBodyResolver = $this->getMessageBodyResolver();
-        while ($messages) {
-            self::getMessageCollector()->clearTopicMessages(UpdateListProcessChunkTopic::getName());
-            foreach ($messages as $body) {
-                $message = $this->createMessage(
-                    $messageBodyResolver->resolveBody(UpdateListProcessChunkTopic::getName(), $body)
-                );
-                $result[] = [
-                    $message,
-                    $this->processMessage('oro_api.batch.async.update_list.process_chunk', $message)
-                ];
-            }
-            self::flushMessagesBuffer();
-            $messages = self::getSentMessagesByTopic(UpdateListProcessChunkTopic::getName());
-        }
-
-        self::flushMessagesBuffer();
-        $messages = self::getSentMessagesByTopic(RootJobStoppedTopic::getName(), true);
-        self::getMessageCollector()->clearTopicMessages(RootJobStoppedTopic::getName());
-        self::assertCount(1, $messages, RootJobStoppedTopic::getName());
-        foreach ($messages as $body) {
-            $this->processMessage('oro_message_queue.job.dependent_job_processor', $this->createMessage($body));
-        }
-
-        self::flushMessagesBuffer();
-        $messages = self::getSentMessagesByTopic(UpdateListFinishTopic::getName());
-        self::getMessageCollector()->clearTopicMessages(UpdateListFinishTopic::getName());
-        self::assertCount(1, $messages, UpdateListFinishTopic::getName());
-        foreach ($messages as $body) {
-            self::assertEquals(
-                MessageProcessorInterface::ACK,
-                $this->processMessage('oro_api.batch.async.update_list.finish', $this->createMessage($body))
-            );
-        }
-
-        return $result;
+        self::assertEquals(MessageProcessorInterface::ACK, $messageContext->getStatus());
     }
 
     protected function processUpdateList(string $entityClass, array|string $data, bool $assertNoErrors = true): int
     {
         $operationId = $this->sendUpdateListRequest($entityClass, $data);
 
-        $this->processUpdateListChunkMessages();
+        $tokenStorage = $this->getTokenStorage();
+        $token = $this->getTokenStorage()->getToken();
+
+        $this->consumeMessages();
+
+        //refresh token after resetting in consumer
+        $tokenStorage->setToken($token);
+        $this->consumeMessages();
+
+        $this->consumeMessages();
+
+        $this->consumeMessages();
+
+        $tokenStorage = $this->getTokenStorage();
+        $token = $this->getTokenStorage()->getToken();
+
+        $this->consumeMessages();
+
+        //refresh token after resetting in consumer
+        $tokenStorage->setToken($token);
+        $this->consumeMessages();
+
+        $this->consumeMessages();
+
+        $this->consumeMessages();
         if ($assertNoErrors) {
             $this->assertAsyncOperationErrors([], $operationId);
         }
@@ -388,14 +270,40 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return $operationId;
     }
 
+    private function getBatchUpdateExceptionController(): BatchUpdateExceptionController
+    {
+        return self::getContainer()->get('oro_api.tests.batch_update_exception_controller');
+    }
+
     protected function processUpdateListAndValidateJobs(
-        string $entityClass,
+        string       $entityClass,
         array|string $data,
-        array $expectedJobs
+        array        $expectedJobs,
+        ?string      $failedGroupName = null,
+        ?array       $entityConfig = null
     ): int {
         $operationId = $this->sendUpdateListRequest($entityClass, $data);
 
-        $processedUpdateListChunkMessages = $this->processUpdateListChunkMessages();
+        $tokenStorage = $this->getTokenStorage();
+        $token = $this->getTokenStorage()->getToken();
+
+        $this->consumeMessages();
+
+        if ($failedGroupName) {
+            $this->getBatchUpdateExceptionController()->setFailedGroups([$failedGroupName]);
+        }
+
+        if ($entityConfig) {
+            $this->appendEntityConfig($entityClass, $entityConfig);
+        }
+
+        //refresh token after resetting in consumer
+        $tokenStorage->setToken($token);
+
+        $processedUpdateListChunkMessages = $this->consumeAllMessages(
+            UpdateListProcessChunkTopic::getName()
+        );
+
         self::assertCount(
             count($expectedJobs),
             $processedUpdateListChunkMessages,
@@ -404,11 +312,11 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
 
         $messages = [];
         $i = 0;
-        foreach ($processedUpdateListChunkMessages as [$message, $result]) {
+        foreach ($processedUpdateListChunkMessages as $processedUpdateListChunkMessage) {
             $comment = sprintf('Job index: %d.', $i);
             $expectedResult = $expectedJobs[$i]['result'] ?? MessageProcessorInterface::ACK;
-            self::assertEquals($expectedResult, $result, $comment);
-            $messages[] = $message;
+            self::assertEquals($expectedResult, $processedUpdateListChunkMessage['context']->getStatus(), $comment);
+            $messages[] = $processedUpdateListChunkMessage['message'];
             $i++;
         }
 
@@ -434,64 +342,13 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     ): int {
         $response = $this->cpatch(['entity' => $this->getEntityType($entityClass)], $data);
         $operationId = $this->extractOperationIdFromContentLocationHeader($response);
-        self::clearMessageCollector();
 
-        // Creates chunk index before processing UpdateListMessage in order to delay creation of chunk jobs
-        $processingHelper = self::getContainer()->get('oro_api.batch.async.update_list_processing_helper');
-        $processingHelper->updateChunkIndex($operationId, []);
-
-        /** @var AsyncOperation $operation */
-        $operation = $this->getEntityManager()->find(AsyncOperation::class, $operationId);
-        $updateListMessage = $this->createUpdateListMessage($operation);
-        $this->processUpdateListMessage($updateListMessage);
-
-        $this->processUpdateListCreateChunkJobMessages();
+        $this->consumeAllMessages();
 
         if ($assertNoErrors) {
             $this->assertAsyncOperationErrors([], $operationId);
         }
 
         return $operationId;
-    }
-
-    /**
-     * @return array [[update list create chunk message, update list create chunk message processing result], ...]
-     */
-    protected function processUpdateListCreateChunkJobMessages(): array
-    {
-        $result = [];
-        $messageBodyResolver = $this->getMessageBodyResolver();
-
-        self::flushMessagesBuffer();
-        $messages = self::getSentMessagesByTopic(UpdateListCreateChunkJobsTopic::getName());
-
-        while ($messages) {
-            self::getMessageCollector()->clearTopicMessages(UpdateListCreateChunkJobsTopic::getName());
-            foreach ($messages as $body) {
-                $message = $this->createMessage(
-                    $messageBodyResolver->resolveBody(UpdateListCreateChunkJobsTopic::getName(), $body)
-                );
-                $result[] = [
-                    $message,
-                    $this->processMessage('oro_api.batch.async.update_list.create_chunk_jobs', $message)
-                ];
-            }
-            self::flushMessagesBuffer();
-            $messages = self::getSentMessagesByTopic(UpdateListCreateChunkJobsTopic::getName());
-        }
-
-        self::flushMessagesBuffer();
-        $message = self::getSentMessage(UpdateListStartChunkJobsTopic::getName());
-        self::getMessageCollector()->clearTopicMessages(UpdateListStartChunkJobsTopic::getName());
-        $this->processMessage(
-            'oro_api.batch.async.update_list.start_chunk_jobs',
-            $this->createMessage(
-                $messageBodyResolver->resolveBody(UpdateListStartChunkJobsTopic::getName(), $message)
-            )
-        );
-
-        $this->processUpdateListChunkMessages();
-
-        return $result;
     }
 }

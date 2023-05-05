@@ -160,12 +160,10 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->massActionHelper->isRequestMethodAllowed($massAction, Request::METHOD_DELETE));
     }
 
-    /**
-     * @param DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $datagrid
-     * @param array $extensions
-     */
-    private function setDatagridExtensions(DatagridInterface $datagrid, array $extensions)
-    {
+    private function setDatagridExtensions(
+        DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $datagrid,
+        array $extensions
+    ): void {
         $acceptor = $this->createMock(Acceptor::class);
         $acceptor->expects($this->once())
             ->method('getExtensions')

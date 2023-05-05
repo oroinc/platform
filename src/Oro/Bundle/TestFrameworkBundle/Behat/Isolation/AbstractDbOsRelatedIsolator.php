@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Doctrine\DBAL\DriverManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
@@ -15,31 +16,31 @@ use Symfony\Component\Process\Process;
  */
 abstract class AbstractDbOsRelatedIsolator extends AbstractOsRelatedIsolator implements IsolatorInterface
 {
-    /** @var string */
-    protected $dbHost;
-
-    /** @var string */
-    protected $dbPort;
-
-    /** @var string */
-    protected $dbName;
-
-    /** @var string */
-    protected $dbPass;
-
-    /** @var string */
-    protected $dbUser;
+    protected string $dbHost = '';
+    protected string $dbPort = '';
+    protected string $dbName = '';
+    protected string $dbPass = '';
+    protected string $dbUser = '';
 
     public function __construct(KernelInterface $kernel)
     {
         $kernel->boot();
-        $container = $kernel->getContainer();
 
-        $this->dbHost = $container->getParameter('database_host');
-        $this->dbPort = $container->getParameter('database_port');
-        $this->dbName = $container->getParameter('database_name');
-        $this->dbUser = $container->getParameter('database_user');
-        $this->dbPass = $container->getParameter('database_password');
+        $container = $kernel->getContainer();
+        $this->setupDatabaseUrl($container->getParameter('database_dsn'));
+    }
+
+    protected function setupDatabaseUrl(string $databaseUrl): void
+    {
+        $params = DriverManager::getConnection([
+            'url' => $databaseUrl,
+        ])->getParams();
+
+        $this->dbHost = $params['host'];
+        $this->dbPort = (string) ($params['port'] ?? '');
+        $this->dbName = $params['dbname'];
+        $this->dbUser = (string) ($params['user'] ?? '');
+        $this->dbPass = (string) ($params['password'] ?? '');
     }
 
     abstract protected function dump(): void;
