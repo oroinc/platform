@@ -3,7 +3,7 @@ import BooleanFilterTranslator from './boolean-filter-translator';
 import DateFilterTranslator from './date-filter-translator';
 import DatetimeFilterTranslator from './datetime-filter-translator';
 import DictionaryFilterTranslator from './dictionary-filter-translator';
-// import NumberFilterTranslator from './number-filter-translator';
+import NumberFilterTranslator from './number-filter-translator';
 import StringFilterTranslator from './string-filter-translator';
 
 const filterFromExpression = [
@@ -12,7 +12,7 @@ const filterFromExpression = [
     DateFilterTranslator,
     DatetimeFilterTranslator,
     DictionaryFilterTranslator,
-    // NumberFilterTranslator,
+    NumberFilterTranslator,
     StringFilterTranslator
 ];
 
