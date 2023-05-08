@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class PersistIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var PersistIncludedEntities */
@@ -163,6 +163,42 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->context->addAdditionalEntity($entity1);
         $this->context->addAdditionalEntity($entity2);
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessWithAdditionalEntitiesToRemove()
+    {
+        $entity1 = new \stdClass();
+        $entity2 = new \stdClass();
+
+        $em = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityManager')
+            ->withConsecutive(
+                [self::identicalTo($entity1), false],
+                [self::identicalTo($entity2), false]
+            )
+            ->willReturn($em);
+        $em->expects(self::exactly(2))
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+        $uow->expects(self::exactly(2))
+            ->method('getEntityState')
+            ->withConsecutive(
+                [self::identicalTo($entity1)],
+                [self::identicalTo($entity2)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                UnitOfWork::STATE_NEW,
+                UnitOfWork::STATE_MANAGED
+            );
+        $em->expects(self::once())
+            ->method('remove')
+            ->with(self::identicalTo($entity2));
+
+        $this->context->addAdditionalEntityToRemove($entity1);
+        $this->context->addAdditionalEntityToRemove($entity2);
         $this->processor->process($this->context);
     }
 }

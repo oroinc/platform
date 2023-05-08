@@ -55,16 +55,31 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
 
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
+        $entity3 = new \stdClass();
 
         $this->context->addAdditionalEntity($entity1);
         $this->context->addAdditionalEntity($entity2);
         self::assertSame([$entity1, $entity2], $this->context->getAdditionalEntities());
 
+        $this->context->addAdditionalEntityToRemove($entity3);
+        self::assertSame([$entity1, $entity2, $entity3], $this->context->getAdditionalEntities());
+
+        self::assertFalse($this->context->getAdditionalEntityCollection()->shouldEntityBeRemoved($entity1));
+        self::assertFalse($this->context->getAdditionalEntityCollection()->shouldEntityBeRemoved($entity2));
+        self::assertTrue($this->context->getAdditionalEntityCollection()->shouldEntityBeRemoved($entity3));
+
         $this->context->addAdditionalEntity($entity1);
-        self::assertSame([$entity1, $entity2], $this->context->getAdditionalEntities());
+        $this->context->addAdditionalEntityToRemove($entity3);
+        self::assertSame([$entity1, $entity2, $entity3], $this->context->getAdditionalEntities());
 
         $this->context->removeAdditionalEntity($entity1);
+        self::assertSame([$entity2, $entity3], $this->context->getAdditionalEntities());
+
+        $this->context->removeAdditionalEntity($entity3);
         self::assertSame([$entity2], $this->context->getAdditionalEntities());
+
+        $this->context->removeAdditionalEntity($entity2);
+        self::assertSame([], $this->context->getAdditionalEntities());
     }
 
     public function testEntityMapper()

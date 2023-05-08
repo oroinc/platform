@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Doctrine\ORM\UnitOfWork;
+use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
@@ -88,6 +91,21 @@ class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
                 ->willReturn(false);
         }
 
+        $additionalEntityCollection = new AdditionalEntityCollection();
+        $context->expects(self::any())
+            ->method('getAdditionalEntityCollection')
+            ->willReturn($additionalEntityCollection);
+        $context->expects(self::any())
+            ->method('addAdditionalEntity')
+            ->willReturnCallback(function ($entity) use ($additionalEntityCollection) {
+                $additionalEntityCollection->add($entity);
+            });
+        $context->expects(self::any())
+            ->method('addAdditionalEntityToRemove')
+            ->willReturnCallback(function ($entity) use ($additionalEntityCollection) {
+                $additionalEntityCollection->add($entity, true);
+            });
+
         return $context;
     }
 
@@ -131,6 +149,16 @@ class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('beginTransaction')
             ->willReturnCallback(function () use (&$calls) {
                 $calls[] = 'beginTransaction';
+            });
+        $em->expects(self::any())
+            ->method('persist')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'persist entity';
+            });
+        $em->expects(self::any())
+            ->method('remove')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'remove entity';
             });
         $em->expects(self::any())
             ->method('flush')
@@ -1041,6 +1069,118 @@ class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
                 'commitTransaction',
                 'post_save_data - included entity',
                 'collectFormErrors'
+            ],
+            $calls
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testFlushDataWhenAdditionalEntitiesWereAddedOnPreFlushEvent(): void
+    {
+        $form1 = $this->getForm();
+        $entityContext1 = $this->getFormContext($form1);
+        $form2 = $this->getForm();
+        $entityContext2 = $this->getFormContext($form2);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+
+        $additionalEntity1 = new \stdClass();
+        $additionalEntity2 = new \stdClass();
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $em->expects(self::any())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
+        $metadataFactory->expects(self::any())
+            ->method('isTransient')
+            ->willReturn(false);
+        $uow = $this->createMock(UnitOfWork::class);
+        $em->expects(self::any())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+        $uow->expects(self::any())
+            ->method('getEntityState')
+            ->willReturnCallback(function ($entity) use ($additionalEntity1, $additionalEntity2) {
+                if ($entity === $additionalEntity1) {
+                    return UnitOfWork::STATE_NEW;
+                }
+                if ($entity === $additionalEntity2) {
+                    return UnitOfWork::STATE_MANAGED;
+                }
+                throw new \LogicException('Unexpected entity');
+            });
+
+        $calls = [];
+        $this->expectsFlush($calls, $em);
+
+        $this->customizeFormDataEventDispatcher->expects(self::any())
+            ->method('dispatch')
+            ->willReturnCallback(function (
+                string $eventName,
+                FormInterface $form
+            ) use (
+                &$calls,
+                $form1,
+                $form2,
+                $entityContext1,
+                $additionalEntity1,
+                $additionalEntity2
+            ) {
+                $description = 'unknown entity';
+                if ($form1 === $form) {
+                    $description = 'entity 1';
+                } elseif ($form2 === $form) {
+                    $description = 'entity 2';
+                }
+                $calls[] = $eventName . ' - ' . $description;
+
+                if ($form1 === $form && CustomizeFormDataContext::EVENT_PRE_FLUSH_DATA === $eventName) {
+                    $entityContext1->addAdditionalEntity($additionalEntity1);
+                    $entityContext1->addAdditionalEntityToRemove($additionalEntity2);
+                }
+            });
+
+        $this->formErrorsCollector->expects(self::any())
+            ->method('process')
+            ->willReturnCallback(function (FormContext $formContext) use (&$calls, $entityContext1, $entityContext2) {
+                $description = 'unknown entity';
+                if ($entityContext1 === $formContext) {
+                    $description = 'entity 1';
+                } elseif ($entityContext2 === $formContext) {
+                    $description = 'entity 2';
+                }
+                $calls[] = 'collectFormErrors - ' . $description;
+            });
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
+
+        $this->handler->flushData(
+            $em,
+            new FlushDataHandlerContext([$entityContext1, $entityContext2], new ParameterBag())
+        );
+
+        self::assertEquals(
+            [
+                'getConnection',
+                'beginTransaction',
+                'pre_flush_data - entity 1',
+                'collectFormErrors - entity 1',
+                'pre_flush_data - entity 2',
+                'collectFormErrors - entity 2',
+                'persist entity',
+                'remove entity',
+                'flushData',
+                'post_flush_data - entity 1',
+                'collectFormErrors - entity 1',
+                'post_flush_data - entity 2',
+                'collectFormErrors - entity 2',
+                'commitTransaction',
+                'post_save_data - entity 1',
+                'collectFormErrors - entity 1',
+                'post_save_data - entity 2',
+                'collectFormErrors - entity 2'
             ],
             $calls
         );

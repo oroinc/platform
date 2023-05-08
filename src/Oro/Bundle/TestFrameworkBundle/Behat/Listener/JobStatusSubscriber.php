@@ -84,13 +84,13 @@ class JobStatusSubscriber implements EventSubscriberInterface
         while (true) {
             $this->startConsumerIfNotRunning();
 
-            $activeJobs = $connection->fetchFirstColumn(
-                'SELECT j.name FROM oro_message_queue_job j WHERE j.status IN (?) AND j.created_at > ?',
+            $activeJobs = $connection->fetchOne(
+                'SELECT j.id FROM oro_message_queue_job j WHERE j.status IN (?) AND j.created_at > ? LIMIT 1',
                 [self::ACTIVE_JOB_STATUSES, $this->startDateTime],
                 [Connection::PARAM_STR_ARRAY, Types::DATETIME_MUTABLE]
             );
 
-            if (0 == count($activeJobs)) {
+            if (!$activeJobs) {
                 return;
             }
 
