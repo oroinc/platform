@@ -43,7 +43,10 @@ class RedisLockingSessionHandler extends AbstractSessionHandler
 
     private string $logLevel = LogLevel::INFO;
 
-    protected \Predis\Client|\Redis $redis;
+    /**
+     * @var \Predis\Client|\Redis
+     */
+    protected $redis;
 
     /**
      * @var int Time to live in seconds
@@ -95,17 +98,16 @@ class RedisLockingSessionHandler extends AbstractSessionHandler
      * @param int $spinLockWait Microseconds to wait between acquire lock tries
      */
     public function __construct(
-        \Predis\Client|\Redis $redis,
+        $redis,
         array $options = [],
         string $prefix = 'session',
         bool $locking = true,
         int $spinLockWait = 150000
     ) {
         $this->redis = $redis;
-        $this->ttl = isset($options['gc_maxlifetime']) ? (int)$options['gc_maxlifetime'] : 0;
-        if (isset($options['cookie_lifetime']) && $options['cookie_lifetime'] > $this->ttl) {
-            $this->ttl = (int)$options['cookie_lifetime'];
-        }
+        $this->ttl = isset($options['gc_maxlifetime'])
+            ? (int) $options['gc_maxlifetime']
+            : (int) \ini_get('session.gc_maxlifetime');
         $this->prefix = $prefix;
 
         $this->locking = $locking;
