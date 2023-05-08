@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -59,9 +60,20 @@ interface FormContext extends ContextInterface, ChangeContextInterface
     public function addAdditionalEntity(object $entity): void;
 
     /**
+     * Adds an entity to the list of additional entities involved to the request processing
+     * when this entity should be removed from the database.
+     */
+    public function addAdditionalEntityToRemove(object $entity): void;
+
+    /**
      * Removes an entity from the list of additional entities involved to the request processing.
      */
     public function removeAdditionalEntity(object $entity): void;
+
+    /**
+     * Gets a collection contains the list of additional entities involved to the request processing.
+     */
+    public function getAdditionalEntityCollection(): AdditionalEntityCollection;
 
     /**
      * Gets a service that can be used to convert an entity object to a model object and vise versa.

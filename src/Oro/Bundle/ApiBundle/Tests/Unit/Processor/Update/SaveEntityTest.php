@@ -12,10 +12,10 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class SaveEntityTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FlushDataHandlerInterface */
+    /** @var FlushDataHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $flushDataHandler;
 
     /** @var SaveEntity */
@@ -24,6 +24,7 @@ class SaveEntityTest extends FormProcessorTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->context->setClassName(\stdClass::class);
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->flushDataHandler = $this->createMock(FlushDataHandlerInterface::class);
@@ -34,7 +35,9 @@ class SaveEntityTest extends FormProcessorTestCase
     public function testProcessWhenEntityAlreadySaved()
     {
         $this->doctrineHelper->expects(self::never())
-            ->method('getEntityManager');
+            ->method('getManageableEntityClass');
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityManagerForClass');
 
         $this->flushDataHandler->expects(self::never())
             ->method('flushData');
@@ -47,7 +50,9 @@ class SaveEntityTest extends FormProcessorTestCase
     public function testProcessWhenNoEntity()
     {
         $this->doctrineHelper->expects(self::never())
-            ->method('getEntityManager');
+            ->method('getManageableEntityClass');
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityManagerForClass');
 
         $this->flushDataHandler->expects(self::never())
             ->method('flushData');
@@ -59,7 +64,9 @@ class SaveEntityTest extends FormProcessorTestCase
     public function testProcessForNotSupportedEntity()
     {
         $this->doctrineHelper->expects(self::never())
-            ->method('getEntityManager');
+            ->method('getManageableEntityClass');
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityManagerForClass');
 
         $this->flushDataHandler->expects(self::never())
             ->method('flushData');
@@ -74,9 +81,11 @@ class SaveEntityTest extends FormProcessorTestCase
         $entity = new \stdClass();
 
         $this->doctrineHelper->expects(self::once())
-            ->method('getEntityManager')
-            ->with(self::identicalTo($entity), false)
+            ->method('getManageableEntityClass')
+            ->with(\stdClass::class, $this->context->getConfig())
             ->willReturn(null);
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityManagerForClass');
 
         $this->flushDataHandler->expects(self::never())
             ->method('flushData');
@@ -93,8 +102,12 @@ class SaveEntityTest extends FormProcessorTestCase
         $em = $this->createMock(EntityManager::class);
 
         $this->doctrineHelper->expects(self::once())
-            ->method('getEntityManager')
-            ->with(self::identicalTo($entity), false)
+            ->method('getManageableEntityClass')
+            ->with(\stdClass::class, $this->context->getConfig())
+            ->willReturn(\stdClass::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityManagerForClass')
+            ->with(\stdClass::class)
             ->willReturn($em);
 
         $this->flushDataHandler->expects(self::once())

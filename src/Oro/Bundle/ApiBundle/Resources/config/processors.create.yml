@@ -104,6 +104,11 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: save_data, priority: -10 }
 
+    oro_api.create.set_entity_id_to_context:
+        class: Oro\Bundle\ApiBundle\Processor\Create\SetEntityIdToContext
+        tags:
+            - { name: oro.api.processor, action: create, group: save_data, priority: -20 }
+
     #
     # normalize_data
     #

@@ -28,8 +28,9 @@ class CustomizeFormDataEventDispatcher
         FormUtil::assertSubmittedRootForm($form);
 
         $this->dispatchEventForChildren($eventName, $form);
-        if ($this->hasApiEventContext($form)) {
-            $this->dispatchEvent($eventName, $form);
+        $eventContext = $this->getApiEventContext($form);
+        if (null !== $eventContext) {
+            $this->customizationHandler->handleFormEvent($eventName, new FormEvent($form, $eventContext->getData()));
         }
     }
 
@@ -40,19 +41,18 @@ class CustomizeFormDataEventDispatcher
             if ($child->count() > 0) {
                 $this->dispatchEventForChildren($eventName, $child);
             }
-            if ($this->hasApiEventContext($child)) {
-                $this->dispatchEvent($eventName, $child);
+            $childEventContext = $this->getApiEventContext($child);
+            if (null !== $childEventContext) {
+                $this->customizationHandler->handleFormEvent(
+                    $eventName,
+                    new FormEvent($child, $childEventContext->getData())
+                );
             }
         }
     }
 
-    private function dispatchEvent(string $eventName, FormInterface $form): void
+    private function getApiEventContext(FormInterface $form): ?CustomizeFormDataContext
     {
-        $this->customizationHandler->handleFormEvent($eventName, new FormEvent($form, $form->getViewData()));
-    }
-
-    private function hasApiEventContext(FormInterface $form): bool
-    {
-        return $form->getConfig()->hasAttribute(CustomizeFormDataHandler::API_EVENT_CONTEXT);
+        return $form->getConfig()->getAttribute(CustomizeFormDataHandler::API_EVENT_CONTEXT);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
+use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -145,6 +146,14 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($includedEntities, $this->context->getIncludedEntities());
     }
 
+    public function testSetIncludedEntitiesWhenIncludedEntityCollectionWasAlreadyInitialized()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The collection of included entities was already initialized.');
+        $this->context->setIncludedEntities($this->createMock(IncludedEntityCollection::class));
+        $this->context->setIncludedEntities($this->createMock(IncludedEntityCollection::class));
+    }
+
     public function testIsPrimaryEntityRequestForPrimaryEntityRequest()
     {
         $primaryEntity = new \stdClass();
@@ -284,6 +293,40 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
             ->add($includedEntity, \stdClass::class, 1, $this->createMock(IncludedEntityData::class));
         self::assertSame([$includedEntity], $this->context->getAllEntities());
         self::assertSame([$includedEntity], $this->context->getAllEntities(true));
+    }
+
+    public function testAdditionalEntities()
+    {
+        $additionalEntityCollection = new AdditionalEntityCollection();
+        $this->context->setAdditionalEntityCollection($additionalEntityCollection);
+
+        self::assertSame([], $this->context->getAdditionalEntities());
+
+        $entity1 = new \stdClass();
+        $entity2 = new \stdClass();
+
+        $this->context->addAdditionalEntity($entity1);
+        $this->context->addAdditionalEntityToRemove($entity2);
+
+        self::assertSame([$entity1, $entity2], $this->context->getAdditionalEntities());
+
+        self::assertFalse($additionalEntityCollection->shouldEntityBeRemoved($entity1));
+        self::assertTrue($additionalEntityCollection->shouldEntityBeRemoved($entity2));
+    }
+
+    public function testAdditionalEntitiesWhenAdditionalEntityCollectionWasNotInitialized()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The collection of additional entities was not initialized.');
+        $this->context->getAdditionalEntities();
+    }
+
+    public function testSetAdditionalEntityCollectionWhenItWasAlreadyInitialized()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The collection of additional entities was already initialized.');
+        $this->context->setAdditionalEntityCollection($this->createMock(AdditionalEntityCollection::class));
+        $this->context->setAdditionalEntityCollection($this->createMock(AdditionalEntityCollection::class));
     }
 
     public function testEvent()
