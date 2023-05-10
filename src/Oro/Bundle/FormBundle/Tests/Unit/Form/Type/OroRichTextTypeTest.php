@@ -134,7 +134,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     public function optionsDataProvider(): array
     {
         $toolbar = [
-            'undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist ' .
+            'undo redo | blocks formatselect | bold italic underline | forecolor backcolor | bullist numlist ' .
             '| alignleft aligncenter alignright alignjustify | link image | fullscreen'
         ];
         $elements = [
