@@ -7,6 +7,7 @@ use Behat\Behat\Context\ServiceContainer\ContextExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\AppKernelInitializer;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\ScreenshotInitializer;
 use Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\ContextServiceEnvironmentHandler;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\OroSuiteGenerator;
@@ -374,6 +375,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
                 ['registerContextInitializer', [new Reference('oro_behat_browser_tab_manager_initializer')]],
                 ['registerContextInitializer', [new Reference('oro_behat_fixture_loader_initializer')]],
                 ['registerContextInitializer', [new Reference(AppKernelInitializer::class)]],
+                ['registerContextInitializer', [new Reference(ScreenshotInitializer::class)]],
             ],
             $containerBuilder->getDefinition($envHandlerId)
                 ->getMethodCalls()
