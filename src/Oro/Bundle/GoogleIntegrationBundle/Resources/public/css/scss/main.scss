@@ -8,13 +8,15 @@
     &-google {
         @include button-custom-variant($btn-brand-google...);
 
-        padding-left: 40px;
+        border-width: 2px;
+        padding: 0 40px;
         position: relative;
 
         &::before {
-            content: '\f0d5';
-            font-family: $fa-font-family;
-            font-size: 16px;
+            content: '';
+            height: 16px;
+            width: 16px;
+            background: url('#{$global-url}/orogoogleintegration/img/google-logo.svg') no-repeat;
             position: absolute;
             top: 50%;
             left: 16px;
