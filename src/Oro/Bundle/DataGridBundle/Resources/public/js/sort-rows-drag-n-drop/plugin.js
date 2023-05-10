@@ -102,18 +102,6 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             throw new Error('Option "$rootEl" is required');
         }
 
-        if (!this.options.formName) {
-            throw new Error('Options "formName" is required');
-        }
-
-        if (!this.options.route) {
-            throw new Error('Options "route" is required');
-        }
-
-        if (!this.options.route_parameters) {
-            throw new Error('Options "route_parameters" is required');
-        }
-
         this._collectSortOrderData();
 
         const {eventBus: externalEventBus} = this.options;
@@ -232,8 +220,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
 
         this.main.body.$el.on(`mousedown${this.ownEventNamespace()}`, 'tr', this.onMouseDown.bind(this));
         this.main.body.$el.on(`click${this.ownEventNamespace()}`, 'tr', this.onClick.bind(this));
-        const $rootElement = this.main.body.$el.closest('[role="dialog"]') || $(document.body);
-        $rootElement
+        this.main.$grid
             .bindFirst(`keydown${this.ownEventNamespace()}`, this.onKeyDown.bind(this))
             .on(`keyup${this.ownEventNamespace()}`, this.onKeyUp.bind(this));
     },
@@ -327,6 +314,11 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
      * @param {Event} e
      */
     onMouseDown(e) {
+        // set focus to table element, in order to properly handle keyDown and keyUp events (e.g. ESC key press)
+        this.main.$grid.focus({
+            preventScroll: true
+        });
+
         const currentItem = $(e.currentTarget);
         if (currentItem.is(this.SEPARATOR_ROW_SELECTOR) || !this.options.allowSelectMultiple) {
             // ignore selection if it's a separator row
@@ -417,7 +409,8 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                 order: 30,
                 dropHandler: this.removeSortOrderForSelected.bind(this),
                 enabled: () => {
-                    return this.main.collection.filter(model => {
+                    const sortAll = !this.options.highlightSortedItems && !this.main.collection.get('separator');
+                    return !sortAll && this.main.collection.filter(model => {
                         return model.get('_selected') && model.get('_sortOrder') !== void 0;
                     }).length > 0;
                 }
@@ -440,7 +433,7 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
                     .updateShiftProp(this._cursorOnRightSide(e.pageX))
                     .show();
             },
-            'sortable:stop': this.dropZoneMenuView.hide.bind(this.dropZoneMenuView)
+            'sortable:stop': () => this.dropZoneMenuView.hide()
         });
         this.dropZoneMenuView.$el.insertBefore(this.main.$('[role="grid"]'));
 
@@ -913,6 +906,13 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
     },
 
     _saveChanges() {
+        const {route, route_parameters: params, formName} = this.options;
+
+        if (!route || !params || !formName) {
+            // instant save changes mode is not enabled
+            return;
+        }
+
         const sortOrderData = this.main.collection
             .filter(model => {
                 const sortOrder = this._sortOrderData[model.get('id')];
@@ -934,7 +934,6 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
             this._activeAjaxActions = 0;
         }
 
-        const {route, route_parameters: params, formName} = this.options;
         const xhr = $.ajax({
             url: routing.generate(route, params),
             type: 'PUT',
@@ -997,6 +996,13 @@ const SortRowsDragNDropPlugin = BasePlugin.extend({
 
         if (this.options.renderDropZonesMenu && !isMobile() && !isSeparator) {
             $helper.css('width', currentItem.width() / 2);
+        }
+
+        const forcePlaceholderSize = this.main.body.$el.sortable('option', 'forcePlaceholderSize');
+        if (!forcePlaceholderSize) {
+            // height value has to be defined in style attribute in advance,
+            // to prevent height from been defined in jQuery-UI sortable
+            $helper.css('height', 'var(--sorting-helper-height)');
         }
 
         return $helper;
