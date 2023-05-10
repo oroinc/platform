@@ -3,6 +3,10 @@
 .sorting-helper {
     $root: &;
 
+    // CSS variable can be used in JS to set property value in style attribute,
+    // to prevent height from been defined in jQuery-UI sortable
+    --sorting-helper-height: 45px;
+
     opacity: .7;
 
     &__content {

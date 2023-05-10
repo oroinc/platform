@@ -24,6 +24,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Client\FileDownloader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AppKernelAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AppKernelAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\ScreenshotTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\SpinTrait;
@@ -64,13 +65,15 @@ class OroMainContext extends MinkContext implements
         '^(?:|I )should see Schema updated flash message$'.
     '/';
 
-    use AssertTrait, PageObjectDictionary, SessionAliasProviderAwareTrait, SpinTrait, AppKernelAwareTrait;
+    use AssertTrait,
+        PageObjectDictionary,
+        SessionAliasProviderAwareTrait,
+        SpinTrait,
+        AppKernelAwareTrait,
+        ScreenshotTrait;
 
-    /** @var Stopwatch */
-    private $stopwatch;
-
-    /** @var bool */
-    private $debug = false;
+    private ?Stopwatch $stopwatch = null;
+    private bool $debug = false;
 
     /**
      * @BeforeScenario
@@ -2533,6 +2536,17 @@ JS;
     {
         fwrite(STDOUT, "Press [RETURN] to continue...");
         fgets(STDIN, 1024);
+    }
+
+    /**
+     * Use this action only for debugging
+     *
+     * This method should be used only for debug
+     * @Then /^I make screenshot$/
+     */
+    public function iMakeScreenshot()
+    {
+        $this->makeScreenshot();
     }
 
     /**

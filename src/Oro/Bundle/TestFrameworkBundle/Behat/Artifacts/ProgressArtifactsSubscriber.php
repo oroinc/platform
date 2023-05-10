@@ -6,45 +6,30 @@ use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
 use Behat\Behat\EventDispatcher\Event\ExampleTested;
 use Behat\Behat\Output\Statistics\StepStatV2;
 use Behat\Behat\Output\Statistics\TotalStatistics;
-use Behat\Mink\Mink;
 use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 use Behat\Testwork\Output\NodeEventListeningFormatter;
 use Behat\Testwork\Output\Printer\OutputPrinter;
 use Behat\Testwork\Tester\Result\TestResult;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Prints artifacts links on Behat test fail
+ */
 class ProgressArtifactsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TotalStatistics
-     */
-    protected $statistics;
+    protected TotalStatistics   $statistics;
+    protected OutputPrinter     $printer;
+    protected array             $artifacts = [];
+    protected ScreenshotGenerator $screenshotGenerator;
 
-    /**
-     * @var OutputPrinter
-     */
-    protected $printer;
-
-    /**
-     * @var ArtifactsHandlerInterface[]
-     */
-    protected $artifactsHandlers;
-
-    /**
-     * @var Mink
-     */
-    protected $mink;
-
-    /**
-     * @var array
-     */
-    protected $artifacts;
-
-    public function __construct(TotalStatistics $statistics, NodeEventListeningFormatter $formatter, Mink $mink)
-    {
+    public function __construct(
+        TotalStatistics $statistics,
+        NodeEventListeningFormatter $formatter,
+        ScreenshotGenerator $screenshotGenerator
+    ) {
         $this->statistics = $statistics;
         $this->printer = $formatter->getOutputPrinter();
-        $this->mink = $mink;
+        $this->screenshotGenerator = $screenshotGenerator;
     }
 
     /**
@@ -59,11 +44,6 @@ class ProgressArtifactsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function addArtifactHandler(ArtifactsHandlerInterface $artifactsHandler)
-    {
-        $this->artifactsHandlers[] = $artifactsHandler;
-    }
-
     public function afterScenario(AfterScenarioTested $scope)
     {
         if (TestResult::FAILED !== $scope->getTestResult()->getResultCode()) {
@@ -72,10 +52,7 @@ class ProgressArtifactsSubscriber implements EventSubscriberInterface
 
         $scenarioPath = $scope->getFeature()->getFile().':'.$scope->getScenario()->getLine();
 
-        foreach ($this->artifactsHandlers as $artifactsHandler) {
-            $artifact = $artifactsHandler->save($this->mink->getSession()->getScreenshot());
-            $this->artifacts[$scenarioPath][] = $artifact;
-        }
+        $this->artifacts[$scenarioPath] = $this->screenshotGenerator->capture();
     }
 
     public function printFailedStatistic()
