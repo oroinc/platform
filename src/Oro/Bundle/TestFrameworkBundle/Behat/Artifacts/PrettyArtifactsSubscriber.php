@@ -6,38 +6,24 @@ use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
 use Behat\Behat\EventDispatcher\Event\AfterStepTested;
 use Behat\Behat\EventDispatcher\Event\ExampleTested;
 use Behat\Behat\EventDispatcher\Event\OutlineTested;
-use Behat\Mink\Mink;
 use Behat\Testwork\Output\NodeEventListeningFormatter;
 use Behat\Testwork\Output\Printer\OutputPrinter;
 use Behat\Testwork\Tester\Result\TestResult;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Prints artifacts links on Behat step fail
+ */
 class PrettyArtifactsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var bool
-     */
-    protected $isOutline;
+    protected bool $isOutline = false;
+    protected OutputPrinter $printer;
+    protected ScreenshotGenerator $screenshotGenerator;
 
-    /**
-     * @var OutputPrinter
-     */
-    protected $printer;
-
-    /**
-     * @var ArtifactsHandlerInterface[]
-     */
-    protected $artifactsHandlers;
-
-    /**
-     * @var Mink
-     */
-    protected $mink;
-
-    public function __construct(NodeEventListeningFormatter $formatter, Mink $mink)
+    public function __construct(NodeEventListeningFormatter $formatter, ScreenshotGenerator $screenshotGenerator)
     {
         $this->printer = $formatter->getOutputPrinter();
-        $this->mink = $mink;
+        $this->screenshotGenerator = $screenshotGenerator;
     }
 
     /**
@@ -51,11 +37,6 @@ class PrettyArtifactsSubscriber implements EventSubscriberInterface
             OutlineTested::AFTER   => ['afterOutline', 1500],
             ExampleTested::AFTER   => ['afterExample', 1500],
         ];
-    }
-
-    public function addArtifactHandler(ArtifactsHandlerInterface $artifactsHandler)
-    {
-        $this->artifactsHandlers[] = $artifactsHandler;
     }
 
     public function beforeOutline()
@@ -93,10 +74,8 @@ class PrettyArtifactsSubscriber implements EventSubscriberInterface
     public function saveArtifacts()
     {
         $this->printer->writeln(sprintf('      {+%s}+-- %s{-%s}', 'pending', 'Saved artifacts:', 'pending'));
-        foreach ($this->artifactsHandlers as $artifactsHandler) {
-            $this->printer->writeln(
-                '      {+pending}'.$artifactsHandler->save($this->mink->getSession()->getScreenshot()).'{-pending}'
-            );
+        foreach ($this->screenshotGenerator->capture() as $url) {
+            $this->printer->writeln('      {+pending}' . $url . '{-pending}');
         }
     }
 }
