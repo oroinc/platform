@@ -15,6 +15,8 @@
     $focus-border: null,
     $focus-color: null,
     $focus-box-shadow: null,
+    $focus-visible-border: null,
+    $focus-visible-box-shadow: null,
     $disabled-color: $color,
     $disabled-background: $background,
     $disabled-border: $border,
@@ -48,6 +50,11 @@
         } @else {
             box-shadow: $focus-box-shadow;
         }
+    }
+
+    &.focus-visible {
+        border-color: $focus-visible-border;
+        box-shadow: $focus-visible-box-shadow;
     }
 
     // Disabled comes first so active can properly restyle

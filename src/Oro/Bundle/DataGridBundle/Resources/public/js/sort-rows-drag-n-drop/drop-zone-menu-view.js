@@ -43,16 +43,42 @@ const DropZoneMenuView = BaseView.extend({
     /**
      * @inheritdoc
      */
-    initialize(options) {
+    preinitialize(options) {
         this.datagrid = options.datagrid;
 
         if (this.datagrid === void 0) {
             throw new Error('Option "datagrid" is required for DropZoneMenuView');
         }
+    },
 
+    /**
+     * @inheritdoc
+     */
+    initialize(options) {
         this.zones = options.dropZones;
 
         DropZoneMenuView.__super__.initialize.call(this, options);
+    },
+
+    /**
+     * @inheritdoc
+     */
+    delegateEvents(events) {
+        DropZoneMenuView.__super__.delegateEvents.call(this, events);
+        this.datagrid.body.$el.on(`mousemove${this.eventNamespace()}`, e => {
+            this.mouseY = e.clientY;
+        });
+    },
+
+    /**
+     * @inheritdoc
+     */
+    undelegateEvents() {
+        if (this.$el) {
+            // this.$el might be not set yet
+            this.datagrid.body.$el.off(this.eventNamespace());
+        }
+        DropZoneMenuView.__super__.undelegateEvents.call(this);
     },
 
     /**
@@ -138,29 +164,29 @@ const DropZoneMenuView = BaseView.extend({
     },
 
     updatePosition() {
-        if (!document.contains(this.el)) {
+        if (!document.contains(this.el) || this.mouseY === void 0) {
             return;
         }
+
         const $referenceEl = this.$el.parents('.grid-scrollable-container, body');
         const hasOwnScroll = $referenceEl.is('.scrollbar-is-visible');
-        const referenceHeight = $referenceEl[0].clientHeight;
-        const referenceParentHeight = $referenceEl.scrollParent()[0].clientHeight;
-        const {top: referenceTop, left: referenceLeft} = $referenceEl.offset();
-        const tBodyTop = referenceTop + this.datagrid.header.$el.height();
+        const {left: referenceLeft} = $referenceEl.offset();
+        let gridBodyTop = this.datagrid.body.$el.offset().top;
+        let gridBodyBottom = gridBodyTop + this.datagrid.body.$el.height();
 
-        let cssTop;
-        // Datagrid has its own scroll or just a few rows
-        if (referenceHeight <= referenceParentHeight) {
-            cssTop = Math.max(
-                tBodyTop,
-                (tBodyTop + (referenceHeight - this.datagrid.header.$el.height()) / 2) - this.$el.height() / 2
-            );
-        } else {
-            cssTop = Math.max(
-                tBodyTop,
-                referenceTop + referenceParentHeight / 2 - this.$el.height() / 2
-            );
-            cssTop += $referenceEl.scrollParent().scrollTop();
+        if (hasOwnScroll) {
+            gridBodyTop = $referenceEl.offset().top + this.datagrid.header.$el.height();
+            gridBodyBottom = gridBodyTop + $referenceEl.height();
+        }
+
+        let cssTop = this.mouseY - this.$el.height() / 2;
+        // Drop-zone cannot be placed above $referenceEl
+        if (cssTop < gridBodyTop) {
+            cssTop = gridBodyTop;
+        // Drop-zone cannot be placed below $referenceEl
+        } else if (this.mouseY + this.$el.height() > gridBodyBottom) {
+            const delta = this.mouseY + this.$el.height() - gridBodyBottom;
+            cssTop -= delta;
         }
 
         const referenceWidth = hasOwnScroll
