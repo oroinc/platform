@@ -2542,11 +2542,11 @@ JS;
      * Use this action only for debugging
      *
      * This method should be used only for debug
-     * @Then /^I make screenshot$/
+     * @Then /^I take screenshot$/
      */
-    public function iMakeScreenshot()
+    public function iTakeScreenshot()
     {
-        $this->makeScreenshot();
+        $this->takeScreenshot();
     }
 
     /**

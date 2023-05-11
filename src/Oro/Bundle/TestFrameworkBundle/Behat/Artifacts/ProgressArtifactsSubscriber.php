@@ -52,7 +52,7 @@ class ProgressArtifactsSubscriber implements EventSubscriberInterface
 
         $scenarioPath = $scope->getFeature()->getFile().':'.$scope->getScenario()->getLine();
 
-        $this->artifacts[$scenarioPath] = $this->screenshotGenerator->capture();
+        $this->artifacts[$scenarioPath] = $this->screenshotGenerator->take();
     }
 
     public function printFailedStatistic()

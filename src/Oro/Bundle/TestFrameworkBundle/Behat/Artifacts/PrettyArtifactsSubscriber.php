@@ -74,7 +74,7 @@ class PrettyArtifactsSubscriber implements EventSubscriberInterface
     public function saveArtifacts()
     {
         $this->printer->writeln(sprintf('      {+%s}+-- %s{-%s}', 'pending', 'Saved artifacts:', 'pending'));
-        foreach ($this->screenshotGenerator->capture() as $url) {
+        foreach ($this->screenshotGenerator->take() as $url) {
             $this->printer->writeln('      {+pending}' . $url . '{-pending}');
         }
     }
