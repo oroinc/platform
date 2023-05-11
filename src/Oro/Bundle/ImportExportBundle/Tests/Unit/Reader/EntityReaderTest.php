@@ -426,7 +426,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->expects(self::exactly(2))
+        $queryBuilder->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 

@@ -157,7 +157,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
 
         $metadata = $entityManager->getClassMetadata($entityName);
 
-        if (count($identifierNames = $metadata->getIdentifierFieldNames()) > 1) {
+        if (count($metadata->getIdentifierFieldNames()) > 1) {
             throw new \LogicException(sprintf(
                 'Not supported entity (%s) with composite primary key.',
                 $entityName
@@ -175,8 +175,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
 
         $organization = $options['organization'] ?? null;
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
-        $this->applyAcl($queryBuilder);
-        $result = $queryBuilder->getQuery()->getResult(AbstractQuery::HYDRATE_ARRAY);
+        $result = $this->applyAcl($queryBuilder)->getResult(AbstractQuery::HYDRATE_ARRAY);
 
         return array_keys($result);
     }
