@@ -12,13 +12,15 @@
         box-shadow: 0 0 0 $sorting-placeholder-thin-box-shadow-size $secondary-dark;
 
         &:first-child {
-            box-shadow: 0 $sorting-placeholder-thin-box-shadow-size 0
-                        $sorting-placeholder-thin-box-shadow-size $secondary-dark;
+            box-shadow:
+                0 $sorting-placeholder-thin-box-shadow-size 0
+                $sorting-placeholder-thin-box-shadow-size $secondary-dark;
         }
 
         &:last-child {
-            box-shadow: 0 (- $sorting-placeholder-thin-box-shadow-size)
-                        0 $sorting-placeholder-thin-box-shadow-size $secondary-dark;
+            box-shadow:
+                0 (- $sorting-placeholder-thin-box-shadow-size)
+                0 $sorting-placeholder-thin-box-shadow-size $secondary-dark;
         }
 
         td {
