@@ -19,7 +19,7 @@ class ScreenshotGenerator
     ) {
     }
 
-    public function capture(): array
+    public function take(): array
     {
         $urls = [];
         foreach ($this->artifactsHandlers as $artifactsHandler) {

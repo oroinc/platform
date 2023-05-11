@@ -16,9 +16,9 @@ trait ScreenshotTrait
         $this->screenshotGenerator = $screenshotGenerator;
     }
 
-    private function makeScreenshot(): void
+    private function takeScreenshot(): void
     {
-        $urls = $this->screenshotGenerator->capture();
+        $urls = $this->screenshotGenerator->take();
         foreach ($urls as $url) {
             echo 'Screenshot: ' . $url;
         }
