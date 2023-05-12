@@ -2,34 +2,48 @@
 
 namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation;
 
-use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
 
 /**
  * The base implementation of a service to convert validation constraint to a form suitable for JS validation.
- * Creates a constraint based on jsValidation payload if any, returns as-is otherwise.
  */
 class ConstraintConverter implements ConstraintConverterInterface
 {
-    private ConstraintFactory $constraintFactory;
+    /** @var iterable|ConstraintConverterInterface[] */
+    private iterable $processors;
 
-    public function __construct(ConstraintFactory $constraintFactory)
-    {
-        $this->constraintFactory = $constraintFactory;
+    public function __construct(
+        iterable $processors
+    ) {
+        $this->processors = $processors;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function convertConstraint(Constraint $constraint): ?Constraint
+    public function supports(Constraint $constraint, ?FormInterface $form = null): bool
     {
-        if (isset($constraint->payload['jsValidation']['type'])) {
-            return $this->constraintFactory->create(
-                $constraint->payload['jsValidation']['type'],
-                $constraint->payload['jsValidation']['options'] ?? []
-            );
+        foreach ($this->processors as $processor) {
+            if ($processor->supports($constraint, $form)) {
+                return true;
+            }
         }
 
-        return $constraint;
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertConstraint(Constraint $constraint, ?FormInterface $form = null): ?Constraint
+    {
+        foreach ($this->processors as $processor) {
+            if ($processor->supports($constraint, $form)) {
+                return $processor->convertConstraint($constraint, $form);
+            }
+        }
+
+        return null;
     }
 }

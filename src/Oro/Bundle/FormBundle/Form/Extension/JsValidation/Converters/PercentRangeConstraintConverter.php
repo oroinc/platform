@@ -1,8 +1,10 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation;
+namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation\Converters;
 
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface;
 use Oro\Bundle\FormBundle\Validator\Constraints\PercentRange;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Range;
 
@@ -11,28 +13,23 @@ use Symfony\Component\Validator\Constraints\Range;
  */
 class PercentRangeConstraintConverter implements ConstraintConverterInterface
 {
-    /** @var ConstraintConverterInterface */
-    private $innerConverter;
-
-    public function __construct(ConstraintConverterInterface $innerConverter)
+    /**
+     * {@inheritDoc}
+     */
+    public function supports(Constraint $constraint, ?FormInterface $form = null): bool
     {
-        $this->innerConverter = $innerConverter;
+        return $constraint instanceof PercentRange;
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @param PercentRange $constraint
      */
-    public function convertConstraint(Constraint $constraint): ?Constraint
-    {
-        return $constraint instanceof PercentRange
-            ? $this->convertPercentRangeToRange($constraint)
-            : $this->innerConverter->convertConstraint($constraint);
-    }
-
-    private function convertPercentRangeToRange(PercentRange $constraint): Range
+    public function convertConstraint(Constraint $constraint, ?FormInterface $form = null): ?Constraint
     {
         $options = [
-            'invalidMessage' => $constraint->invalidMessage
+            'invalidMessage' => $constraint->invalidMessage,
         ];
         if (null !== $constraint->min && null !== $constraint->max) {
             $options['min'] = $constraint->min;
