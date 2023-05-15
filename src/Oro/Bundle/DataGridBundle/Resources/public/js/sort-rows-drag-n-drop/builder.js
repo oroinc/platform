@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import SortRowsDragNDropPlugin from 'orodatagrid/js/sort-rows-drag-n-drop/plugin';
 import SortRowsDragNDropRow from 'orodatagrid/js/sort-rows-drag-n-drop/row';
 import SortRowsDragNDropModel from 'orodatagrid/js/sort-rows-drag-n-drop/model';
@@ -5,18 +6,22 @@ import SortRowsDragNDropModel from 'orodatagrid/js/sort-rows-drag-n-drop/model';
 import loadModules from 'oroui/js/app/services/load-modules';
 
 export default {
+    SORT_ORDER_COLUMN_NAME: 'sortOrder',
+
     processDatagridOptions(deferred, options) {
+        if (_.isMobile()) {
+            // sorting via drag n drop is not supported on mobile version
+            deferred.resolve();
+            return;
+        }
+
         const {sortRowsDragNDropBuilder = {}} = options.gridBuildersOptions;
         const {
-            sortOrderColumnName,
+            sortOrderColumnName = this.SORT_ORDER_COLUMN_NAME,
             renderDraggableSeparator = false,
             dropZones = {},
             ...pluginOptions
         } = sortRowsDragNDropBuilder;
-
-        if (sortOrderColumnName === void 0) {
-            throw new Error('Options "sortOrderColumnName" is required');
-        }
 
         if (!options.metadata.plugins) {
             options.metadata.plugins = [];
@@ -52,6 +57,7 @@ export default {
 
         const updateData = data => {
             if (renderDraggableSeparator && data.length) {
+                // Add fake model for a separator row to grid collection
                 data.push({
                     id: SortRowsDragNDropModel.SEPARATOR_ID,
                     [sortOrderColumnName]: Infinity
@@ -61,9 +67,27 @@ export default {
         };
 
         options.data.data = updateData(options.data.data);
+        const {
+            parseResponseModels,
+            parseResponseOptions
+        } = options.metadata.options;
         Object.assign(options.metadata.options, {
-            parseResponseModels: resp => {
+            parseResponseModels: function(resp) {
+                if (parseResponseModels) {
+                    resp = parseResponseModels.call(this, resp);
+                }
                 return 'data' in resp ? updateData(resp.data) : resp;
+            },
+            parseResponseOptions: function(resp = {}) {
+                if (parseResponseOptions) {
+                    resp = parseResponseOptions.call(this, resp);
+                }
+                const {options = {}} = resp;
+                return {
+                    comparator: '_sortOrder',
+                    sortOrderAttrName: sortOrderColumnName,
+                    ...options
+                };
             }
         });
 

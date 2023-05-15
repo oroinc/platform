@@ -357,6 +357,30 @@ use ExtendEntityTrait;
   `Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator $fileManipulator`
   instead of `$fileManager`, also the `$authorizationChecker` argument is removed.
 
+### CacheBundle
+
+* The `oro.cache.abstract` abstract service is removed, use `oro.data.cache` instead, with the `cache.pool` tag 
+and the namespace in a tag attribute.
+
+  Before: 
+  ```yaml
+  services:
+      oro_catalog.layout.data_provider.category.cache:
+          parent: oro.cache.abstract
+          public: false
+          calls:
+              - [ setNamespace, [ 'oro_catalog_category' ] ]
+  ```
+  After:
+  ```yaml
+  services:
+      oro_catalog.layout.data_provider.category.cache:
+          parent: oro.data.cache
+          public: false
+          tags:
+              - { name: 'cache.pool', namespace: 'oro_catalog_category' }
+  ```
+
 #### DataGridBundle
 * The `iconHideText` option for `action-launcher` and `dropdown-select-choice-launcher` views was removed, use the `launcherMode` option instead.
   The `launcherMode` option can have three different values:
@@ -482,6 +506,9 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 
 #### NavigationBundle
 * Changed the sorting mechanism in `\Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider`: menu items are sorted as a single list instead of separate - sorted and unsorted parts. 
+
+#### MessageQueueBundle
+* Every custom MQ topic needs a `topic` class now; see more in the [Message Queue Topics](https://doc.oroinc.com/backend/mq/message-queue-topics/) topic.
 
 ### Removed
 

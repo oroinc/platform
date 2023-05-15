@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\Handler;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
@@ -44,6 +45,7 @@ class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
 
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function flushData(array $items): void
     {
@@ -72,7 +74,9 @@ class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
                     $staredData = $itemTargetContext->getSharedData();
                 }
             }
-            if ($itemContext->getTargetAction() === ApiAction::CREATE) {
+            if ($itemContext->getTargetAction() === ApiAction::CREATE
+                && $this->isManageableEntity($this->entityManager, $itemEntity)
+            ) {
                 $this->entityManager->persist($itemEntity);
             }
         }
@@ -99,5 +103,10 @@ class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
             $this->entityManager->clear();
             $this->entityManager = null;
         }
+    }
+
+    public function isManageableEntity(EntityManagerInterface $entityManager, object $entity): bool
+    {
+        return !$entityManager->getMetadataFactory()->isTransient(ClassUtils::getClass($entity));
     }
 }

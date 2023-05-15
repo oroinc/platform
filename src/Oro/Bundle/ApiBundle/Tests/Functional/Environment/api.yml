@@ -148,6 +148,8 @@ api:
                             property_path: relatedClass
                         id:
                             property_path: relatedId
+                linkedField:
+                    property_path: linked.key
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             filters:
                 fields:

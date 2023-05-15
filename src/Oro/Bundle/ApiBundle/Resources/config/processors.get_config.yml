@@ -106,6 +106,8 @@ services:
             - '@oro_api.complete_descriptions.resource_doc_parser_provider'
             - '@oro_api.complete_descriptions.description_processor'
             - '@oro_api.complete_descriptions_helper.identifier'
+            - '%oro_api.max_entities%'
+            - '%oro_api.max_delete_entities%'
 
     oro_api.complete_descriptions_helper.fields:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FieldsDescriptionHelper

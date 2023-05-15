@@ -790,7 +790,7 @@ services:
     oro_attachment.event_listener.original_file_names_configuration_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\OriginalFileNamesConfigurationListener
         arguments:
-            - '@session'
+            - '@request_stack'
             - '@translator'
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: afterUpdate }

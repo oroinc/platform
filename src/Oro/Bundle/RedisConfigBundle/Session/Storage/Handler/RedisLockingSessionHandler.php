@@ -89,23 +89,18 @@ class RedisLockingSessionHandler extends AbstractSessionHandler
      * Redis session storage constructor.
      *
      * @param \Predis\Client|\Redis $redis Redis database connection
-     * @param array $options Session options
      * @param string $prefix Prefix to use when writing session data
      * @param bool $locking Indicates an sessions should be locked
      * @param int $spinLockWait Microseconds to wait between acquire lock tries
      */
     public function __construct(
         \Predis\Client|\Redis $redis,
-        array $options = [],
         string $prefix = 'session',
         bool $locking = true,
         int $spinLockWait = 150000
     ) {
         $this->redis = $redis;
-        $this->ttl = isset($options['gc_maxlifetime']) ? (int)$options['gc_maxlifetime'] : 0;
-        if (isset($options['cookie_lifetime']) && $options['cookie_lifetime'] > $this->ttl) {
-            $this->ttl = (int)$options['cookie_lifetime'];
-        }
+        $this->ttl = (int) \ini_get('session.gc_maxlifetime');
         $this->prefix = $prefix;
 
         $this->locking = $locking;

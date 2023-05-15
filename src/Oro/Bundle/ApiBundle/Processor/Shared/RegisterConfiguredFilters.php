@@ -79,7 +79,15 @@ class RegisterConfiguredFilters extends RegisterFilters
                 continue;
             }
             $propertyPath = $field->getPropertyPath($filterKey);
-            $filter = $this->createFilter($field, $propertyPath, $context);
+            try {
+                $filter = $this->createFilter($field, $propertyPath, $context);
+            } catch (\Throwable $e) {
+                throw new \LogicException(
+                    sprintf('The filter "%s" for "%s" cannot be created.', $filterKey, $entityClass),
+                    $e->getCode(),
+                    $e
+                );
+            }
             if (null !== $filter) {
                 if ($filter instanceof FieldAwareFilterInterface) {
                     if ($idFieldName && $filterKey === $idFieldName) {

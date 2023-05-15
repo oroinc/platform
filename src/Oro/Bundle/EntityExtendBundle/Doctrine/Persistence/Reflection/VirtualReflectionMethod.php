@@ -21,9 +21,9 @@ class VirtualReflectionMethod extends \ReflectionMethod
             $this->isRealMethod = true;
         } catch (\ReflectionException $exception) {
             // If it is not possible to create a reflection method, we try to create a virtual method
+            $this->virtualMethod = $method;
+            parent::__construct($objectOrMethod, static::DONOR_METHOD_NAME);
         }
-        $this->virtualMethod = $method;
-        parent::__construct($objectOrMethod, static::DONOR_METHOD_NAME);
     }
 
     public static function create(object|string $objectOrMethod, string $method): self

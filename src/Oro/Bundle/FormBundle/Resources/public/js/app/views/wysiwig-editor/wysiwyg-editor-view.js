@@ -30,8 +30,8 @@ define(function(require) {
             plugins: ['code', 'lists', 'advlist', 'image'],
             pluginsMap: {},
             menubar: false,
-            toolbar: ['undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist' +
-            '| alignleft aligncenter alignright alignjustify | image'],
+            toolbar: ['undo redo | blocks formatselect | bold italic underline | forecolor backcolor |' +
+            '  bullist numlist | alignleft aligncenter alignright alignjustify | image'],
             toolbar_mode: 'sliding',
             elementpath: false,
             branding: false,

@@ -4,6 +4,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\UIBundle\Tools\FlashMessageHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -12,6 +13,9 @@ class FlashMessageHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
     private $session;
+
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
@@ -27,8 +31,11 @@ class FlashMessageHelperTest extends \PHPUnit\Framework\TestCase
         $this->session = $this->createMock(Session::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
-
-        $this->helper = new FlashMessageHelper($this->session, $this->translator, $this->htmlTagHelper);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack->expects($this->any())
+            ->method('getSession')
+            ->willReturn($this->session);
+        $this->helper = new FlashMessageHelper($this->requestStack, $this->translator, $this->htmlTagHelper);
     }
 
     public function testAddFlashMessage()

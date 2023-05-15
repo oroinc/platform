@@ -59,7 +59,10 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
                             )
                         );
                     } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-                        $this->errors[] = [[JsonApiDoc::DATA], $e->getMessage()];
+                        $this->errors[] = [
+                            [JsonApiDoc::DATA],
+                            $e->getMessage() . PHP_EOL . $e->getComparisonFailure()?->toString()
+                        ];
 
                         return false;
                     }
