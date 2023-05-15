@@ -212,9 +212,17 @@ class RegisterDynamicFilters extends RegisterFilters
             return null;
         }
 
-        [$filterConfig, $propertyPath] = $filterInfo;
+        [$filterConfig, $propertyPath, $fieldName] = $filterInfo;
 
-        return $this->createFilter($filterConfig, $propertyPath, $context);
+        try {
+            return $this->createFilter($filterConfig, $propertyPath, $context);
+        } catch (\Throwable $e) {
+            throw new \LogicException(
+                sprintf('The filter "%s" for "%s" cannot be created.', $fieldName, $entityClass),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 
     /**
@@ -222,7 +230,7 @@ class RegisterDynamicFilters extends RegisterFilters
      * @param ClassMetadata $metadata
      * @param Context       $context
      *
-     * @return array|null [filter config, property path]
+     * @return array|null [filter config, property path, field name]
      */
     private function getFilterInfo(string $propertyPath, ClassMetadata $metadata, Context $context): ?array
     {
@@ -249,7 +257,7 @@ class RegisterDynamicFilters extends RegisterFilters
                 if ($associationPropertyPath) {
                     $propertyPath = $associationPropertyPath . '.' . $propertyPath;
                 }
-                $result = [$filterConfig, $propertyPath];
+                $result = [$filterConfig, $propertyPath, $fieldName];
             }
         }
 

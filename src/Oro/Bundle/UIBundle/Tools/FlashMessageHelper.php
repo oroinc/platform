@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tools;
 
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -10,27 +10,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FlashMessageHelper
 {
-    /** @var Session */
-    protected $session;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var HtmlTagHelper */
-    protected $htmlTagHelper;
-
-    public function __construct(Session $session, TranslatorInterface $translator, HtmlTagHelper $htmlTagHelper)
-    {
-        $this->session = $session;
-        $this->translator = $translator;
-        $this->htmlTagHelper = $htmlTagHelper;
+    public function __construct(
+        protected RequestStack $requestStack,
+        protected TranslatorInterface $translator,
+        protected HtmlTagHelper $htmlTagHelper
+    ) {
     }
 
     public function addFlashMessage(string $type, string $message, array $params, string $domain = null)
     {
         $message = $this->translator->trans($message, $params, $domain);
 
-        $this->session->getFlashBag()
+        $this->requestStack->getSession()->getFlashBag()
             ->add(
                 $type,
                 $this->htmlTagHelper->sanitize($message)

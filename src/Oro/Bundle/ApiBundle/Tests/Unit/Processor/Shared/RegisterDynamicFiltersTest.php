@@ -209,6 +209,38 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
     }
 
+    public function testProcessWhenFilterCreationFailed()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The filter "name" for "%s" cannot be created.',
+            Entity\User::class
+        ));
+
+        $request = $this->getRequest('filter[category.name]=test');
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn(
+                $this->getConfig(
+                    ['name'],
+                    ['name' => 'string']
+                )
+            );
+
+        $exception = new \TypeError('some error');
+        $this->filterFactory->expects(self::once())
+            ->method('createFilter')
+            ->with('string', [])
+            ->willThrowException($exception);
+
+        $this->context->setClassName(Entity\User::class);
+        $this->context->setConfig($this->getEntityDefinitionConfig(['id', 'category']));
+        $this->context->setConfigOfFilters($this->getFiltersConfig());
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->processor->process($this->context);
+    }
+
     public function testProcessForPrimaryEntityFields()
     {
         $primaryEntityConfig = $this->getEntityDefinitionConfig(['name', 'label']);

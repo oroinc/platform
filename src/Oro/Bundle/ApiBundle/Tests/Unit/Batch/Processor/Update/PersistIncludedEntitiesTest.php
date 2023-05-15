@@ -8,6 +8,7 @@ use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItem;
 use Oro\Bundle\ApiBundle\Batch\Processor\Update\PersistIncludedEntities;
 use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\BatchUpdateItemContext;
+use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
@@ -15,7 +16,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var PersistIncludedEntities */
@@ -82,8 +83,8 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
             ->method('getIncludedEntities')
             ->willReturn(null);
         $itemTargetContext->expects(self::once())
-            ->method('getAdditionalEntities')
-            ->willReturn([]);
+            ->method('getAdditionalEntityCollection')
+            ->willReturn(new AdditionalEntityCollection());
 
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
@@ -107,8 +108,8 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
             ->method('getIncludedEntities')
             ->willReturn(new IncludedEntityCollection());
         $itemTargetContext->expects(self::once())
-            ->method('getAdditionalEntities')
-            ->willReturn([]);
+            ->method('getAdditionalEntityCollection')
+            ->willReturn(new AdditionalEntityCollection());
 
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
@@ -144,8 +145,8 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
             ->method('getIncludedEntities')
             ->willReturn($includedEntities);
         $itemTargetContext->expects(self::once())
-            ->method('getAdditionalEntities')
-            ->willReturn([]);
+            ->method('getAdditionalEntityCollection')
+            ->willReturn(new AdditionalEntityCollection());
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
@@ -183,8 +184,8 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
             ->method('getIncludedEntities')
             ->willReturn($includedEntities);
         $itemTargetContext->expects(self::once())
-            ->method('getAdditionalEntities')
-            ->willReturn([]);
+            ->method('getAdditionalEntityCollection')
+            ->willReturn(new AdditionalEntityCollection());
 
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
@@ -220,8 +221,8 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
             ->method('getIncludedEntities')
             ->willReturn($includedEntities);
         $itemTargetContext->expects(self::once())
-            ->method('getAdditionalEntities')
-            ->willReturn([]);
+            ->method('getAdditionalEntityCollection')
+            ->willReturn(new AdditionalEntityCollection());
 
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper->expects(self::once())
@@ -241,6 +242,10 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
 
+        $additionalEntityCollection = new AdditionalEntityCollection();
+        $additionalEntityCollection->add($entity1);
+        $additionalEntityCollection->add($entity2);
+
         $item = $this->createMock(BatchUpdateItem::class);
         $itemContext = $this->createMock(BatchUpdateItemContext::class);
         $itemTargetContext = $this->createMock(CreateContext::class);
@@ -254,8 +259,8 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
             ->method('getIncludedEntities')
             ->willReturn(null);
         $itemTargetContext->expects(self::once())
-            ->method('getAdditionalEntities')
-            ->willReturn([$entity1, $entity2]);
+            ->method('getAdditionalEntityCollection')
+            ->willReturn($additionalEntityCollection);
 
         $em = $this->createMock(EntityManager::class);
         $uow = $this->createMock(UnitOfWork::class);
@@ -282,6 +287,61 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $em->expects(self::once())
             ->method('persist')
             ->with(self::identicalTo($entity1));
+
+        $this->context->setBatchItems([$item]);
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessWithAdditionalEntitiesToRemove()
+    {
+        $entity1 = new \stdClass();
+        $entity2 = new \stdClass();
+
+        $additionalEntityCollection = new AdditionalEntityCollection();
+        $additionalEntityCollection->add($entity1, true);
+        $additionalEntityCollection->add($entity2, true);
+
+        $item = $this->createMock(BatchUpdateItem::class);
+        $itemContext = $this->createMock(BatchUpdateItemContext::class);
+        $itemTargetContext = $this->createMock(CreateContext::class);
+        $item->expects(self::once())
+            ->method('getContext')
+            ->willReturn($itemContext);
+        $itemContext->expects(self::once())
+            ->method('getTargetContext')
+            ->willReturn($itemTargetContext);
+        $itemTargetContext->expects(self::once())
+            ->method('getIncludedEntities')
+            ->willReturn(null);
+        $itemTargetContext->expects(self::once())
+            ->method('getAdditionalEntityCollection')
+            ->willReturn($additionalEntityCollection);
+
+        $em = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityManager')
+            ->withConsecutive(
+                [self::identicalTo($entity1), false],
+                [self::identicalTo($entity2), false]
+            )
+            ->willReturn($em);
+        $em->expects(self::exactly(2))
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+        $uow->expects(self::exactly(2))
+            ->method('getEntityState')
+            ->withConsecutive(
+                [self::identicalTo($entity1)],
+                [self::identicalTo($entity2)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                UnitOfWork::STATE_NEW,
+                UnitOfWork::STATE_MANAGED
+            );
+        $em->expects(self::once())
+            ->method('remove')
+            ->with(self::identicalTo($entity2));
 
         $this->context->setBatchItems([$item]);
         $this->processor->process($this->context);

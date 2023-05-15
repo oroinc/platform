@@ -54,24 +54,24 @@ define(function(require, exports, module) {
 
         /** @property */
         baseMarkup: _.template(
-            '<div class="more-bar-holder">' +
-                '<div class="dropleft">' +
-                    '<a class="dropdown-toggle" href="#" role="button" id="<%- togglerId %>" data-toggle="dropdown" ' +
-                        'aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>">' +
-                        '<span class="icon fa-ellipsis-h fa--no-offset" aria-hidden="true"></span>' +
-                    '</a>' +
-                    '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
-                        'aria-labelledby="<%- togglerId %>"></ul>' +
-                '</div>' +
-            '</div>'
+            `<div class="more-bar-holder">
+                <div class="dropleft">
+                    <a class="dropdown-toggle" href="#" role="button" id="<%- togglerId %>" data-toggle="dropdown" 
+                        aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>">
+                        <span class="icon fa-ellipsis-h fa--no-offset" aria-hidden="true"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" 
+                        aria-labelledby="<%- togglerId %>"></ul>
+                </div>
+            </div>`
         ),
 
         /** @property */
-        simpleBaseMarkup: _.template('<div class="more-bar-holder action-row"></div>'),
+        simpleBaseMarkup: _.template(`<div class="more-bar-holder action-row"></div>`),
 
         /** @property */
         closeButtonTemplate: _.template(
-            '<li class="dropdown-close"><i class="fa-close hide-text">' + __('Close') + '</i></li>'
+            `<li class="dropdown-close"><i class="fa-close hide-text">${__('Close')}</i></li>`
         ),
 
         /** @property */
@@ -79,25 +79,25 @@ define(function(require, exports, module) {
 
         /** @property */
         launchersListTemplate: _.template(
-            '<% if (withIcons) { %>' +
-                '<li><ul class="launchers-list"></ul></li>' +
-            '<% } else { %>' +
-                '<li class="well-small"><ul class="list-unstyled launchers-list"></ul></li>' +
-            '<% } %>'
+            `<% if (withIcons) { %>
+                <li><ul class="launchers-list"></ul></li>
+            <% } else { %>
+                <li class="well-small"><ul class="list-unstyled launchers-list"></ul></li>
+            <% } %>`
         ),
 
         /** @property */
         simpleLaunchersListTemplate: _.template(
-            '<% if (withIcons) { %>' +
-                '<ul class="nav nav--block nav-pills icons-holder launchers-list"></ul>' +
-            '<% } else { %>' +
-                '<ul class="unstyled launchers-list"></ul>' +
-            '<% } %>'
+            `<% if (withIcons) { %>
+                <ul class="nav nav--block nav-pills icons-holder launchers-list"></ul>
+            <% } else { %>
+                <ul class="unstyled launchers-list"></ul>
+            <% } %>`
         ),
 
         /** @property */
         launcherItemTemplate: _.template(
-            '<li class="launcher-item<% if (className) { %> <%= \'mode-\' + className %><% } %>"></li>'
+            `<li class="launcher-item<% if (className) { %> <%= 'mode-' + className %><% } %>"></li>`
         ),
 
         /** @property */
@@ -430,6 +430,7 @@ define(function(require, exports, module) {
                 this.$('[data-toggle="dropdown"]').dropdown('toggle');
             }
             this.model.set('isDropdownActions', this.isDropdownActions);
+            e.preventDefault();
             e.stopPropagation();
         },
 

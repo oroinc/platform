@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\EventListener;
 
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -12,22 +12,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class PasswordChangeExceptionListener
 {
-    private SessionInterface $session;
-
-    private TranslatorInterface $translator;
-
     public function __construct(
-        SessionInterface $session,
-        TranslatorInterface $translator
+        private RequestStack $requestStack,
+        private TranslatorInterface $translator
     ) {
-        $this->translator = $translator;
-        $this->session = $session;
     }
 
     public function onKernelException(ExceptionEvent $event)
     {
         if ($event->getThrowable() instanceof PasswordChangedException) {
-            $this->session->getFlashBag()->add(
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'error',
                 $this->translator->trans('oro.user.security.password_changed.message')
             );

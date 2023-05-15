@@ -375,7 +375,7 @@ services:
     oro_user.event_listener.password_change_exception_listener:
         class: Oro\Bundle\UserBundle\EventListener\PasswordChangeExceptionListener
         arguments:
-            - '@session'
+            - '@request_stack'
             - '@translator'
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: 255 }

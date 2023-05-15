@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchFlushDataHandler;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItem;
 use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\BatchUpdateItemContext;
@@ -180,14 +181,100 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         $this->prepareBatchUpdateItemContext($item6, ApiAction::CREATE, true, $item6TargetContext, $item6Entity);
 
         $em = $this->createMock(EntityManagerInterface::class);
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManagerForClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn($em);
         $em->expects(self::once())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
+        $metadataFactory->expects(self::once())
+            ->method('isTransient')
+            ->with(get_class($item1Entity))
+            ->willReturn(false);
+        $em->expects(self::once())
             ->method('persist')
             ->with(self::identicalTo($item1Entity));
+
+        $entityContexts = [$item1TargetContext, $item2TargetContext];
+        $this->flushDataHandler->expects(self::once())
+            ->method('flushData')
+            ->with(self::identicalTo($em), self::isInstanceOf(FlushDataHandlerContext::class))
+            ->willReturnCallback(function (
+                EntityManagerInterface $em,
+                FlushDataHandlerContext $context
+            ) use (
+                $entityContexts,
+                $sharedData
+            ) {
+                self::assertCount(count($entityContexts), $context->getEntityContexts());
+                foreach ($entityContexts as $i => $entityContext) {
+                    self::assertSame(
+                        $entityContext,
+                        $context->getEntityContexts()[$i],
+                        sprintf('Entity Context #%d', $i)
+                    );
+                }
+                self::assertSame($sharedData, $context->getSharedData());
+            });
+
+        $items = [$item1, $item2, $item3, $item4, $item5, $item6];
+        $this->handler->startFlushData($items);
+        $this->handler->flushData($items);
+    }
+
+    public function testFlushDataWhenNoErrorForNotManageableEntity()
+    {
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+
+        $item1 = $this->createMock(BatchUpdateItem::class);
+        $item1TargetContext = $this->createMock(CreateContext::class);
+        $item1Entity = $this->createMock(\stdClass::class);
+        $this->prepareBatchUpdateItemContext($item1, ApiAction::CREATE, false, $item1TargetContext, $item1Entity);
+        $item1TargetContext->expects(self::once())
+            ->method('getSharedData')
+            ->willReturn($sharedData);
+
+        $item2 = $this->createMock(BatchUpdateItem::class);
+        $item2TargetContext = $this->createMock(UpdateContext::class);
+        $item2Entity = $this->createMock(\stdClass::class);
+        $this->prepareBatchUpdateItemContext($item2, ApiAction::UPDATE, false, $item2TargetContext, $item2Entity);
+
+        $item3 = $this->createMock(BatchUpdateItem::class);
+        $item3TargetContext = $this->createMock(DeleteContext::class);
+        $item3Entity = $this->createMock(\stdClass::class);
+        $this->prepareBatchUpdateItemContext($item3, ApiAction::DELETE, false, $item3TargetContext, $item3Entity);
+
+        $item4 = $this->createMock(BatchUpdateItem::class);
+        $this->prepareBatchUpdateItemContext($item4, ApiAction::CREATE, false, null, null);
+
+        $item5 = $this->createMock(BatchUpdateItem::class);
+        $item5TargetContext = $this->createMock(CreateContext::class);
+        $this->prepareBatchUpdateItemContext($item5, ApiAction::CREATE, false, $item5TargetContext, null);
+
+        $item6 = $this->createMock(BatchUpdateItem::class);
+        $item6TargetContext = $this->createMock(CreateContext::class);
+        $item6Entity = $this->createMock(\stdClass::class);
+        $this->prepareBatchUpdateItemContext($item6, ApiAction::CREATE, true, $item6TargetContext, $item6Entity);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityManagerForClass')
+            ->with(self::ENTITY_CLASS)
+            ->willReturn($em);
+        $em->expects(self::once())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
+        $metadataFactory->expects(self::once())
+            ->method('isTransient')
+            ->with(get_class($item1Entity))
+            ->willReturn(true);
+        $em->expects(self::never())
+            ->method('persist');
 
         $entityContexts = [$item1TargetContext, $item2TargetContext];
         $this->flushDataHandler->expects(self::once())

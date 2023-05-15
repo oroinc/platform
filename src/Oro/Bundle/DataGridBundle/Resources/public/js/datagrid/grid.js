@@ -1383,7 +1383,8 @@ define(function(require) {
                 let params = _.pick(collection.options, fetchKeys);
 
                 if (collection.options.parseResponseOptions) {
-                    params = _.extend( params, _.pick(collection.options.parseResponseOptions(), fetchKeys));
+                    params = _.extend(params,
+                        _.pick(collection.options.parseResponseOptions.call(collection), fetchKeys));
                 }
 
                 fetchOptions = _.extend(fetchOptions, params, _.pick(options, fetchKeys));

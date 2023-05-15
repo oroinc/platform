@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Util;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
@@ -15,14 +16,21 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
     /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
     private $session;
 
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
+
     /** @var FieldSessionStorage */
     private $storage;
 
     protected function setUp(): void
     {
         $this->session = $this->createMock(Session::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack->expects($this->any())
+            ->method('getSession')
+            ->willReturn($this->session);
 
-        $this->storage = new FieldSessionStorage($this->session);
+        $this->storage = new FieldSessionStorage($this->requestStack);
     }
 
     public function testGetFieldInfo()
