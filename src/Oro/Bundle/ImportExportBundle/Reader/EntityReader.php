@@ -9,6 +9,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -240,13 +241,19 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
      */
     protected function createSourceIterator($source)
     {
+        $iteratorBatchSize = null;
         if ($this->stepExecution) {
-            // Only the ExportBufferedIdentityQueryResultIterator can be responsible for cleaning the doctrine manager,
-            // since the iterator does not provide details of the data processing.
+            // Only the ExportBufferedIdentityQueryResultIterator can be responsible for cleaning the doctrine manager.
             $this->getContext()->setValue(DoctrineClearWriter::SKIP_CLEAR, true);
+            $iteratorBatchSize = $this->getContext()->getValue(ItemStep::BATCH_SIZE);
         }
 
-        return (new ExportBufferedIdentityQueryResultIterator($source))
+        $iterator = new ExportBufferedIdentityQueryResultIterator($source);
+        if ($iteratorBatchSize) {
+            $iterator->setBufferSize($iteratorBatchSize);
+        }
+
+        return ($iterator)
             ->setPageCallback(fn () => $this->registry->getManager()->clear())
             ->setPageLoadedCallback(function (array $rows) {
                 if (!$this->dispatcher->hasListeners(Events::AFTER_ENTITY_PAGE_LOADED)) {

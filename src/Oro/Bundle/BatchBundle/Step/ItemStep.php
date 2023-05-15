@@ -13,7 +13,9 @@ use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
  */
 class ItemStep extends AbstractStep implements StepExecutionWarningHandlerInterface
 {
-    protected ?int $batchSize = null;
+    public const BATCH_SIZE = 'batch_size';
+
+    protected ?int $batchSize = 100;
 
     protected ?StepExecution $stepExecution = null;
 
@@ -122,6 +124,9 @@ class ItemStep extends AbstractStep implements StepExecutionWarningHandlerInterf
      */
     protected function doExecute(StepExecution $stepExecution)
     {
+        if (null !== $this->batchSize) {
+            $stepExecution->getExecutionContext()->put(self::BATCH_SIZE, $this->batchSize);
+        }
         $this->initializeStepElements($stepExecution);
 
         $stepExecutor = $this->createStepExecutor();
@@ -129,9 +134,6 @@ class ItemStep extends AbstractStep implements StepExecutionWarningHandlerInterf
             ->setReader($this->reader)
             ->setProcessor($this->processor)
             ->setWriter($this->writer);
-        if (null !== $this->batchSize) {
-            $stepExecutor->setBatchSize($this->batchSize);
-        }
 
         $stepExecutor->execute($this);
         $this->flushStepElements();
@@ -141,7 +143,12 @@ class ItemStep extends AbstractStep implements StepExecutionWarningHandlerInterf
 
     protected function createStepExecutor(): StepExecutor
     {
-        return new StepExecutor();
+        $stepExecutor = new StepExecutor();
+        if (null !== $this->batchSize) {
+            $stepExecutor->setBatchSize($this->batchSize);
+        }
+
+        return $stepExecutor;
     }
 
     protected function initializeStepElements(StepExecution $stepExecution): void
