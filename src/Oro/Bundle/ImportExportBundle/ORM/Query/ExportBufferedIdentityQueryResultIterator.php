@@ -108,14 +108,8 @@ final class ExportBufferedIdentityQueryResultIterator extends AbstractBufferedQu
 
     private function loadNextPage(): void
     {
-        if ($this->page === $this->lastPage) {
-            $this->rows = [];
-
-            return;
-        }
-
         if ($this->pageCallback && $this->page !== -1) {
-            call_user_func($this->pageCallback);
+            call_user_func($this->pageCallback, $this->page === $this->lastPage);
         }
 
         $this->page++;

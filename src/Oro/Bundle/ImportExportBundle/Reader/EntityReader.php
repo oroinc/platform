@@ -9,6 +9,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -29,7 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * Prepares the list of entities for export.
  * Responsible for creating a list for each batch during export
  */
-class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterface
+class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterface, ClosableInterface
 {
     protected ManagerRegistry $registry;
     protected OwnershipMetadataProviderInterface $ownershipMetadata;
@@ -254,7 +255,11 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         }
 
         return ($iterator)
-            ->setPageCallback(fn () => $this->registry->getManager()->clear())
+            ->setPageCallback(function (bool $lastPage) {
+                if (!$lastPage) {
+                    $this->registry->getManager()->clear();
+                }
+            })
             ->setPageLoadedCallback(function (array $rows) {
                 if (!$this->dispatcher->hasListeners(Events::AFTER_ENTITY_PAGE_LOADED)) {
                     return $rows;
@@ -279,5 +284,10 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         }
 
         return $queryBuilder->getQuery();
+    }
+
+    public function close(): void
+    {
+        $this->registry->getManager()->clear();
     }
 }
