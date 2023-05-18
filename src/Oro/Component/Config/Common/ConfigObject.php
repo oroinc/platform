@@ -326,4 +326,12 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
 
         return $this;
     }
+
+    /**
+     * @return array<int, string>
+     */
+    public function __sleep(): array
+    {
+        return ['params'];
+    }
 }
