@@ -9,6 +9,9 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
 {
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testGrouping()
     {
         $en = 'Acme\Entity\TestEntity';
@@ -24,6 +27,17 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
                         'group_name' => 'string',
                         'group_type' => 'aggregates'
                     ]
+                ],
+                [
+                    'name'    => 'column3',
+                    'label'   => 'lbl3',
+                    'sorting' => '',
+                    'func'    => [
+                        'name'       => 'Year',
+                        'group_name' => 'date',
+                        'group_type' => 'converters',
+                        'return_type' => 'number',
+                    ]
                 ]
             ],
             'filters'          => [],
@@ -31,7 +45,7 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
         ];
         $doctrine = $this->getDoctrine(
             [
-                $en => ['column1' => 'string', 'column2' => 'string']
+                $en => ['column1' => 'string', 'column2' => 'string', 'column3' => 'date'],
             ]
         );
         $functionProvider = $this->getFunctionProvider(
@@ -41,6 +55,12 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
                     'string',
                     'aggregates',
                     ['name' => 'Count', 'return_type' => 'integer', 'expr' => 'COUNT($column)']
+                ],
+                [
+                    'Year',
+                    'date',
+                    'converters',
+                    ['name' => 'Year', 'return_type' => 'number', 'expr' => 'YEAR($column)']
                 ]
             ]
         );
@@ -55,7 +75,8 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
                 'query'        => [
                     'select'  => [
                         't1.column1 as c1',
-                        'COUNT(t1.column2) as c2'
+                        'COUNT(t1.column2) as c2',
+                        'YEAR(t1.column3) as c3'
                     ],
                     'from'    => [
                         ['table' => $en, 'alias' => 't1']
@@ -68,17 +89,23 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
                     ],
                     'column_aliases' => [
                         'column1'                          => 'c1',
-                        'column2(Count,string,aggregates)' => 'c2'
+                        'column2(Count,string,aggregates)' => 'c2',
+                        'column3(Year,date,converters)'    => 'c3',
                     ],
                 ]
             ],
             'columns' => [
                 'c1' => ['label' => 'lbl1', 'frontend_type' => 'string', 'translatable' => false],
                 'c2' => ['label' => 'lbl2', 'frontend_type' => 'integer', 'translatable' => false],
+                'c3' => ['label' => 'lbl3', 'frontend_type' => 'number', 'translatable' => false],
             ],
             'name'    => 'test_grid',
             'sorters' => [
-                'columns' => ['c1' => ['data_name' => 'c1'], 'c2' => ['data_name' => 'c2']],
+                'columns' => [
+                    'c1' => ['data_name' => 'c1'],
+                    'c2' => ['data_name' => 'c2'],
+                    'c3' => ['data_name' => 'c3']
+                ],
                 'default' => ['c1' => 'DESC']
             ],
             'filters' => [
@@ -90,10 +117,144 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
                         'translatable'               => false,
                         FilterUtility::BY_HAVING_KEY => true
                     ],
+                    'c3' => [
+                        'data_name'                  => 'c3',
+                        'type'                       => 'number',
+                        'translatable'               => false,
+                        FilterUtility::BY_HAVING_KEY => true,
+                    ]
                 ]
             ],
             'fields_acl' => [
-                'columns' => ['c1' => ['data_name' => 't1.column1'], 'c2' => ['data_name' => 't1.column2']]
+                'columns' => [
+                    'c1' => ['data_name' => 't1.column1'],
+                    'c2' => ['data_name' => 't1.column2'],
+                    'c3' => ['data_name' => 't1.column3'],
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testWithoutGrouping()
+    {
+        $en = 'Acme\Entity\TestEntity';
+        $definition = [
+            'columns'          => [
+                ['name' => 'column1', 'label' => 'lbl1', 'sorting' => 'DESC'],
+                [
+                    'name'    => 'column2',
+                    'label'   => 'lbl2',
+                    'sorting' => '',
+                    'func'    => [
+                        'name'       => 'Count',
+                        'group_name' => 'string',
+                        'group_type' => 'aggregates'
+                    ]
+                ],
+                [
+                    'name'    => 'column3',
+                    'label'   => 'lbl3',
+                    'sorting' => '',
+                    'func'    => [
+                        'name'       => 'Year',
+                        'group_name' => 'date',
+                        'group_type' => 'converters',
+                        'return_type' => 'number',
+                    ]
+                ]
+            ],
+            'filters'          => [],
+        ];
+        $doctrine = $this->getDoctrine(
+            [
+                $en => ['column1' => 'string', 'column2' => 'string', 'column3' => 'date'],
+            ]
+        );
+        $functionProvider = $this->getFunctionProvider(
+            [
+                [
+                    'Count',
+                    'string',
+                    'aggregates',
+                    ['name' => 'Count', 'return_type' => 'integer', 'expr' => 'COUNT($column)']
+                ],
+                [
+                    'Year',
+                    'date',
+                    'converters',
+                    ['name' => 'Year', 'return_type' => 'number', 'expr' => 'YEAR($column)']
+                ]
+            ]
+        );
+
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
+        $builder = $this->createDatagridConfigurationBuilder($model, $doctrine, $functionProvider);
+        $result = $builder->getConfiguration()->toArray();
+
+        $expected = [
+            'source'  => [
+                'type'         => 'orm',
+                'query'        => [
+                    'select'  => [
+                        't1.column1 as c1',
+                        'COUNT(t1.column2) as c2',
+                        'YEAR(t1.column3) as c3'
+                    ],
+                    'from'    => [
+                        ['table' => $en, 'alias' => 't1']
+                    ],
+                ],
+                'query_config' => [
+                    'table_aliases'  => [
+                        '' => 't1'
+                    ],
+                    'column_aliases' => [
+                        'column1'                          => 'c1',
+                        'column2(Count,string,aggregates)' => 'c2',
+                        'column3(Year,date,converters)'    => 'c3',
+                    ],
+                ]
+            ],
+            'columns' => [
+                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string', 'translatable' => false],
+                'c2' => ['label' => 'lbl2', 'frontend_type' => 'integer', 'translatable' => false],
+                'c3' => ['label' => 'lbl3', 'frontend_type' => 'number', 'translatable' => false],
+            ],
+            'name'    => 'test_grid',
+            'sorters' => [
+                'columns' => [
+                    'c1' => ['data_name' => 'c1'],
+                    'c2' => ['data_name' => 'c2'],
+                    'c3' => ['data_name' => 'c3']
+                ],
+                'default' => ['c1' => 'DESC']
+            ],
+            'filters' => [
+                'columns' => [
+                    'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false],
+                    'c2' => [
+                        'data_name'                  => 'c2',
+                        'type'                       => 'number',
+                        'translatable'               => false,
+                    ],
+                    'c3' => [
+                        'data_name'                  => 'c3',
+                        'type'                       => 'number',
+                        'translatable'               => false,
+                    ]
+                ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't1.column1'],
+                    'c2' => ['data_name' => 't1.column2'],
+                    'c3' => ['data_name' => 't1.column3'],
+                ]
             ]
         ];
 
