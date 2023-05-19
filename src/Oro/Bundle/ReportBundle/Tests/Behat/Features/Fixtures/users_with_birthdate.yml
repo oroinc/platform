@@ -1,0 +1,31 @@
+Oro\Bundle\UserBundle\Entity\User:
+  user_1:
+    firstName: User 1
+    lastName: <lastName()>
+    username (unique): <username()>
+    organization: '@organization'
+    owner: '@business_unit'
+    email (unique): <email()>
+    birthday: '<(new \DateTime("2000-01-01", new \DateTimeZone("UTC")))>'
+    password: password
+    salt: salt
+  user_2:
+    firstName: User 2
+    lastName: <lastName()>
+    username (unique): <username()>
+    organization: '@organization'
+    owner: '@business_unit'
+    email (unique): <email()>
+    birthday: '<(new \DateTime("2005-05-05", new \DateTimeZone("UTC")))>'
+    password: password
+    salt: salt
+  user_3:
+    firstName: User 3
+    lastName: <lastName()>
+    username (unique): <username()>
+    organization: '@organization'
+    owner: '@business_unit'
+    email (unique): <email()>
+    birthday: '<(new \DateTime("2010-10-10", new \DateTimeZone("UTC")))>'
+    password: password
+    salt: salt

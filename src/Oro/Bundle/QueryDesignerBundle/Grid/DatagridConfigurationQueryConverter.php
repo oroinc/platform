@@ -160,7 +160,8 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
                 'translatable' => false
             ],
         ];
-        if (null !== $functionExpr) {
+        $groupingColumns = $this->context()->getDefinition()['grouping_columns'] ?? null;
+        if (null !== $functionExpr && $groupingColumns) {
             $columnOptions[DatagridGuesser::FILTER][FilterUtility::BY_HAVING_KEY] = true;
         }
         $this->datagridGuesser->applyColumnGuesses($entityClass, $fieldName, $fieldType, $columnOptions);
