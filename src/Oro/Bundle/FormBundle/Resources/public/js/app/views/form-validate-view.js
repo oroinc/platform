@@ -13,7 +13,13 @@ define(function(require) {
         validationOptions: null,
 
         events: {
-            doReset: 'onReset'
+            'doReset': 'onReset',
+            'invalid-content:shown': 'focusInvalid'
+        },
+
+        listen: {
+            'page:afterChange mediator': 'focusInvalid',
+            'page:afterPagePartChange mediator': 'focusInvalid'
         },
 
         /**
@@ -26,12 +32,12 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        initialize: function(options) {
+        initialize(options) {
             _.extend(this, _.pick(options, 'validationOptions'));
             FormValidateView.__super__.initialize.call(this, options);
         },
 
-        render: function() {
+        render() {
             if (this.$el.data('validator')) {
                 // form already has initialized validator
                 return this;
@@ -52,7 +58,15 @@ define(function(require) {
             }
         },
 
-        dispose: function() {
+        focusInvalid() {
+            _.defer(() => {
+                if (!this.disposed && this.validator) {
+                    this.validator.focusInvalid();
+                }
+            });
+        },
+
+        dispose() {
             if (this.disposed) {
                 return;
             }
