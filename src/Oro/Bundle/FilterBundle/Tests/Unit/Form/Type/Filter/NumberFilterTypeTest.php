@@ -7,7 +7,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Bundle\FormBundle\Form\Extension\ConstraintAsOptionExtension;
 use Oro\Bundle\FormBundle\Form\Extension\NumberTypeExtension;
+use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
@@ -32,6 +34,9 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
 
     protected function setUp(): void
     {
+        $constraintFactory = new ConstraintFactory();
+        $constraintExtension = new ConstraintAsOptionExtension($constraintFactory);
+
         $translator = $this->createMockTranslator();
         $this->localeSettings = $this->createMock(LocaleSettings::class);
         $this->numberFormatter = new NumberFormatter(
@@ -40,7 +45,14 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         );
         $this->type = new NumberFilterType($translator, $this->numberFormatter);
         $this->formExtensions[] = new CustomFormExtension([new FilterType($translator)]);
-        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
+        $this->formExtensions[] = new PreloadedExtension([
+            $this->type,
+        ], [
+            NumberType::class => [$constraintExtension],
+            NumberFilterType::class => [$constraintExtension],
+            IntegerType::class => [$constraintExtension],
+            MoneyType::class => [$constraintExtension],
+        ]);
 
         parent::setUp();
 
@@ -89,7 +101,8 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                         'oro.filter.form.label_type_not_empty' => FilterUtility::TYPE_NOT_EMPTY,
                     ],
                     'data_type' => NumberFilterType::DATA_INTEGER,
-                    'formatter_options' => []
+                    'formatter_options' => [],
+                    'enable_int_restrictions' => true,
                 ]
             ]
         ];

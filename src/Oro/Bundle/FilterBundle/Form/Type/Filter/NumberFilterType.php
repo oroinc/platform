@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -24,6 +25,9 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
     public const NAME = 'oro_type_number_filter';
     public const ARRAY_SEPARATOR = ',';
     public const OPTION_KEY_FORMATTER_OPTION = 'formatter_options';
+
+    private const INT_MIN = -2147483647;
+    private const INT_MAX = 2147483647;
 
     /**
      * @var TranslatorInterface
@@ -110,12 +114,20 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
                 'field_type' => NumberType::class,
                 'operator_choices' => $operatorChoices,
                 'data_type' => self::DATA_INTEGER,
-                self::OPTION_KEY_FORMATTER_OPTION => []
+                self::OPTION_KEY_FORMATTER_OPTION => [],
+                'enable_int_restrictions' => true,
             ]
         );
         $resolver->setNormalizer('field_options', function (Options $options, $fieldOptions) {
             if ($options['data_type'] !== self::DATA_INTEGER && $options['field_type'] === NumberType::class) {
                 $fieldOptions['limit_decimals'] = false;
+            }
+
+            if ($options['enable_int_restrictions'] && self::DATA_INTEGER === $options['data_type']) {
+                $fieldOptions['constraints'] = \array_merge(
+                    $fieldOptions['constraints'] ?? [],
+                    [new Range(['min' => self::INT_MIN, 'max' => self::INT_MAX])]
+                );
             }
 
             return $fieldOptions;
@@ -161,5 +173,10 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
         $view->vars['array_operators'] = self::ARRAY_TYPES;
         $view->vars['data_type'] = $dataType;
         $view->vars['limit_decimals'] = $options['field_options']['limit_decimals'] ?? false;
+
+        if ($options['enable_int_restrictions'] && self::DATA_INTEGER === $dataType) {
+            $view->vars['min'] = self::INT_MIN;
+            $view->vars['max'] = self::INT_MAX;
+        }
     }
 }
