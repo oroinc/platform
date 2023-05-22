@@ -15,11 +15,40 @@ $.widget('ui.dialog', $.ui.dialog, {
     },
 
     _title: function(title) {
-        if (!this.options.title) {
+        const {title: titleText, closeOnDialogTitle} = this.options;
+
+        if (!titleText) {
             title.hide();
         }
-        title.html(
-            $('<span/>', {'class': 'ui-dialog-title__inner'}).text(this.options.title)
+
+        title.append(
+            this._renderBadge(),
+            $('<span/>', {'class': 'ui-dialog-title__inner'}).text(titleText)
         );
+
+        if (closeOnDialogTitle && titleText) {
+            title
+                .attr({role: 'button', tabindex: '0'})
+                .on('click', e => {
+                    e.preventDefault();
+                    this.close(e);
+                });
+        }
+    },
+
+    _renderBadge() {
+        const {dialogTitleIcon, dialogTitleBadge} = this.options;
+
+        if (dialogTitleIcon) {
+            let $icon = $('<span />', {'class': dialogTitleIcon, 'aria-hidden': 'true'});
+
+            if (dialogTitleBadge) {
+                $icon.wrap($('<span />', {'class': 'dialog-badge', 'aria-hidden': 'true'}));
+                $icon = $icon.parent();
+            }
+            return $icon;
+        }
+
+        return $();
     }
 });
