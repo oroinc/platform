@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\UnitOfWork;
+use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -21,18 +23,29 @@ class PersistIncludedEntities implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */
 
-        $additionalEntities = $context->getAdditionalEntities();
-        foreach ($additionalEntities as $entity) {
-            $this->persistEntity($entity, true);
-        }
+        $this->persistAdditionalEntities($context->getAdditionalEntityCollection());
+        $this->persistIncludedEntities($context->getIncludedEntities());
+    }
 
-        $includedEntities = $context->getIncludedEntities();
+    private function persistAdditionalEntities(AdditionalEntityCollection $additionalEntities): void
+    {
+        foreach ($additionalEntities->getEntities() as $entity) {
+            if ($additionalEntities->shouldEntityBeRemoved($entity)) {
+                $this->removeEntity($entity);
+            } else {
+                $this->persistEntity($entity, true);
+            }
+        }
+    }
+
+    private function persistIncludedEntities(?IncludedEntityCollection $includedEntities): void
+    {
         if (null !== $includedEntities) {
             foreach ($includedEntities as $entity) {
                 if (!$includedEntities->getData($entity)->isExisting()) {
@@ -54,5 +67,19 @@ class PersistIncludedEntities implements ProcessorInterface
         }
 
         $em->persist($entity);
+    }
+
+    private function removeEntity(object $entity): void
+    {
+        $em = $this->doctrineHelper->getEntityManager($entity, false);
+        if (null === $em) {
+            return;
+        }
+
+        if (UnitOfWork::STATE_MANAGED !== $em->getUnitOfWork()->getEntityState($entity)) {
+            return;
+        }
+
+        $em->remove($entity);
     }
 }

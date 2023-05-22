@@ -1,0 +1,134 @@
+services:
+    oro_translation.api.translation_domain_repository:
+        class: Oro\Bundle\TranslationBundle\Api\Repository\TranslationDomainRepository
+        arguments:
+            - '@doctrine'
+            - '@oro_translation.provider.translation_domain_description'
+
+    oro_translation.api.translation_data_loader:
+        class: Oro\Bundle\TranslationBundle\Api\Repository\TranslationDataLoader
+        arguments:
+            - '@oro_api.entity_serializer'
+            - '@oro_translation.api.translation_query_modifier'
+
+    oro_translation.api.translation_query_modifier:
+        class: Oro\Bundle\TranslationBundle\Api\Repository\TranslationQueryModifier
+
+    oro_translation.api.predefined_language_code_resolver_registry:
+        class: Oro\Bundle\TranslationBundle\Api\PredefinedLanguageCodeResolverRegistry
+        arguments:
+            - !abstract '$predefinedLanguageCodes defined in Oro\Bundle\TranslationBundle\OroTranslationBundle'
+            - !abstract '$resolverContainer defined in Oro\Bundle\TranslationBundle\OroTranslationBundle'
+
+    oro_translation.api.predefined_language_code_documentation_provider:
+        class: Oro\Bundle\TranslationBundle\Api\PredefinedLanguageCodeDocumentationProvider
+        arguments:
+            - '@oro_translation.api.predefined_language_code_resolver_registry'
+
+    oro_translation.api.predefined_language_code_resolver:
+        class: Oro\Bundle\TranslationBundle\Api\RequestPredefinedLanguageCodeResolver
+        arguments:
+            - '@request_stack'
+        tags:
+            - { name: oro_translation.api.language_code_resolver, id: current }
+
+    oro_translation.api.filter_factory.language_code:
+        class: Oro\Bundle\TranslationBundle\Api\Filter\LanguageCodeFilterFactory
+        arguments:
+            - '@oro_translation.api.predefined_language_code_resolver_registry'
+
+    oro_translation.api.load_translation_domains:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\LoadTranslationDomains
+        arguments:
+            - '@oro_translation.api.translation_domain_repository'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\TranslationBundle\Api\Model\TranslationDomain }
+
+    oro_translation.api.add_predefined_language_code_documentation:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\AddPredefinedLanguageCodeDocumentation
+        arguments:
+            - '@oro_translation.api.predefined_language_code_documentation_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, targetAction: get_list, extra: 'descriptions&!identifier_fields_only', class: Oro\Bundle\TranslationBundle\Entity\TranslationKey, priority: -220 }
+
+    oro_translation.api.build_translation_query:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\BuildTranslationQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.filter_names_registry'
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey, priority: -90 }
+            - { name: oro.api.processor, action: get_list, group: build_query, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey, priority: -90 }
+
+    oro_translation.api.add_translation_id_to_query:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\AddTranslationIdToQuery
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey, priority: -95 }
+
+    oro_translation.api.load_translations:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesByDataLoader
+        arguments:
+            - '@oro_translation.api.translation_data_loader'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey }
+
+    oro_translation.api.load_translation:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByDataLoader
+        arguments:
+            - '@oro_translation.api.translation_data_loader'
+            - '@oro_api.doctrine_helper'
+            - '@oro_entity.orm.entity_class_resolver'
+        tags:
+            - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey }
+
+    oro_translation.api.compute_translation_id:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\ComputeTranslationId
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey }
+
+    oro_translation.api.compute_translation_value:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\ComputeTranslationValue
+        arguments:
+            - '@translator'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey }
+
+    oro_translation.api.reset_identifier_generator_for_translation_update:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\ResetIdentifierGenerator
+        tags:
+            - { name: oro.api.processor, action: get_metadata, targetAction: update, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey, priority: -50 }
+
+    oro_translation.api.load_translation_create:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\LoadTranslationCreate
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.query_acl_helper'
+        tags:
+            - { name: oro.api.processor, action: create, group: load_data, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey }
+
+    oro_translation.api.load_translation_update:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\LoadTranslationUpdate
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.query_acl_helper'
+        tags:
+            - { name: oro.api.processor, action: update, group: load_data, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey }
+
+    oro_translation.api.prepare_translation_model_to_save:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\PrepareTranslationModelToSave
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_flush_data, parentAction: create|update, class: Oro\Bundle\TranslationBundle\Api\Model\TranslationModel }
+
+    oro_translation.api.set_translation_id_to_context:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\SetTranslationIdToContext
+        tags:
+            - { name: oro.api.processor, action: create, group: save_data, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey, priority: -18 }
+
+    oro_translation.api.load_normalized_translation_create:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity
+        arguments:
+            - '@oro_api.action_processor_bag'
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_data, class: Oro\Bundle\TranslationBundle\Entity\TranslationKey }

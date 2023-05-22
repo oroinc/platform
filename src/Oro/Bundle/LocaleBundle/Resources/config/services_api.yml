@@ -1,4 +1,19 @@
 services:
+    oro_locale.api.predefined_language_code_resolver:
+        class: Oro\Bundle\LocaleBundle\Api\UserPredefinedLanguageCodeResolver
+        arguments:
+            - '@oro_locale.manager.localization'
+            - '@oro_config.user'
+        tags:
+            - { name: oro_translation.api.language_code_resolver, id: user }
+
+    oro_locale.api.compute_language_name:
+        class: Oro\Bundle\LocaleBundle\Api\Processor\ComputeLanguageName
+        arguments:
+            - '@oro_locale.formatter.language_code'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\TranslationBundle\Entity\Language }
+
     oro_locale.api.complete_localized_values:
         class: Oro\Bundle\LocaleBundle\Api\Processor\CompleteLocalizedValues
         arguments:
@@ -7,3 +22,10 @@ services:
             - '@oro_api.form_property_accessor'
         tags:
             - { name: oro.api.processor, action: customize_form_data, event: post_validate, parentAction: create, priority: -200 }
+
+    oro_locale.api.add_predefined_language_code_documentation:
+        class: Oro\Bundle\TranslationBundle\Api\Processor\AddPredefinedLanguageCodeDocumentation
+        arguments:
+            - '@oro_translation.api.predefined_language_code_documentation_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, targetAction: get_list, extra: 'descriptions&!identifier_fields_only', class: Oro\Bundle\LocaleBundle\Entity\Localization, priority: -220 }

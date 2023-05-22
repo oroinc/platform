@@ -12,7 +12,7 @@ trait NormalizeFieldTrait
     private function normalizeField(string $field, array $placeholders): string
     {
         $normalizedField = null;
-        if (!str_starts_with($field, '{')) {
+        if (!str_starts_with($field, Criteria::PLACEHOLDER_START)) {
             $lastDelimiter = strrpos($field, '.');
             if (false !== $lastDelimiter) {
                 $path = sprintf(Criteria::PLACEHOLDER_TEMPLATE, substr($field, 0, $lastDelimiter));

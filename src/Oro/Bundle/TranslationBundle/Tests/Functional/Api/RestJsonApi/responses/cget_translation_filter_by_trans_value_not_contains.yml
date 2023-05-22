@@ -1,0 +1,12 @@
+data:
+    -
+        type: translations
+        id: '<@tk-another_trans1-test_domain->id>-<@fr_FR->code>'
+        attributes:
+            key: another.trans1
+            domain: test_domain
+            hasTranslation: true
+            languageCode: fr_FR
+            value: 'another trans1 (fr_FR)'
+            englishValue: another.trans1
+            translatedValue: 'another trans1 (fr_FR)'

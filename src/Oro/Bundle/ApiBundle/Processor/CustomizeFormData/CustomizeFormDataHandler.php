@@ -76,6 +76,7 @@ class CustomizeFormDataHandler
         if (null !== $includedEntities) {
             $context->setIncludedEntities($includedEntities);
         }
+        $context->setAdditionalEntityCollection($formContext->getAdditionalEntityCollection());
         $context->setEntityMapper($formContext->getEntityMapper());
 
         return $context;

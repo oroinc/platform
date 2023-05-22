@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -92,7 +93,9 @@ class SetTotalCountHeader implements ProcessorInterface
 
     private function calculateTotalCount(mixed $query, ?EntityDefinitionConfig $config): int
     {
+        $useCountDistinct = false;
         if ($query instanceof QueryBuilder) {
+            $useCountDistinct = !$this->hasComputedFields($query);
             $countQuery = $this->countQueryBuilderOptimizer
                 ->getCountQueryBuilder($query)
                 ->getQuery()
@@ -100,6 +103,7 @@ class SetTotalCountHeader implements ProcessorInterface
                 ->setFirstResult(null);
             $this->resolveQuery($countQuery, $config);
         } elseif ($query instanceof Query) {
+            $useCountDistinct = true;
             $countQuery = QueryUtil::cloneQuery($query)
                 ->setMaxResults(null)
                 ->setFirstResult(null);
@@ -125,7 +129,7 @@ class SetTotalCountHeader implements ProcessorInterface
             ));
         }
 
-        if ($countQuery instanceof Query) {
+        if ($useCountDistinct) {
             return QueryCountCalculator::calculateCountDistinct($countQuery);
         }
 
@@ -137,5 +141,20 @@ class SetTotalCountHeader implements ProcessorInterface
         if (null !== $config) {
             $this->queryResolver->resolveQuery($query, $config);
         }
+    }
+
+    private function hasComputedFields(QueryBuilder $query): bool
+    {
+        /** @var Expr\Select[] $selectPart */
+        $selectPart = $query->getDQLPart('select');
+        foreach ($selectPart as $select) {
+            foreach ($select->getParts() as $part) {
+                if (preg_match('/.+ AS [\w\-]+$/i', $part) === 1) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

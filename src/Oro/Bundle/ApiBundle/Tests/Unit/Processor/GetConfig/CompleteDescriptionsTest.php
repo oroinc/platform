@@ -106,17 +106,21 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
         $identifierDescriptionHelper = new IdentifierDescriptionHelper($this->doctrineHelper);
 
+        $entityDescriptionHelper = new EntityDescriptionHelper(
+            $this->entityDescriptionProvider,
+            new EntityNameProvider($this->entityDescriptionProvider, (new InflectorFactory())->build()),
+            $this->translator,
+            $this->resourceDocProvider,
+            $resourceDocParserProvider,
+            $descriptionProcessor,
+            $identifierDescriptionHelper
+        );
+        $entityDescriptionHelper->setMaxEntitiesLimit(-1);
+        $entityDescriptionHelper->setMaxDeleteEntitiesLimit(100);
+
         $this->processor = new CompleteDescriptions(
             $this->resourcesProvider,
-            new EntityDescriptionHelper(
-                $this->entityDescriptionProvider,
-                new EntityNameProvider($this->entityDescriptionProvider, (new InflectorFactory())->build()),
-                $this->translator,
-                $this->resourceDocProvider,
-                $resourceDocParserProvider,
-                $descriptionProcessor,
-                $identifierDescriptionHelper
-            ),
+            $entityDescriptionHelper,
             new FieldsDescriptionHelper(
                 $this->entityDescriptionProvider,
                 $this->translator,
@@ -1865,6 +1869,58 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 ]
             ],
             $this->context->getFilters()
+        );
+    }
+
+    public function testEntityDocumentationForGetListActionWhenThereIsMaxResultsLimit()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'documentation'    => 'Test documentation',
+            'max_results'      => 1000
+        ];
+
+        $this->context->getRequestType()->set(new RequestType([RequestType::JSON_API]));
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'max_results'            => 1000,
+                'identifier_description' => self::ID_DESCRIPTION,
+                'documentation'          => 'Test documentation'
+                    . '<p><strong>Note:</strong>'
+                    . ' The maximum number of records this endpoint can return is 1000.</p>'
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testEntityDocumentationForDeleteListActionWhenThereIsMaxResultsLimit()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'documentation'    => 'Test documentation',
+            'max_results'      => 1000
+        ];
+
+        $this->context->getRequestType()->set(new RequestType([RequestType::JSON_API]));
+        $this->context->setTargetAction('delete_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'max_results'            => 1000,
+                'identifier_description' => self::ID_DESCRIPTION,
+                'documentation'          => 'Test documentation'
+                    . '<p><strong>Note:</strong>'
+                    . ' The maximum number of records this endpoint can delete at a time is 1000.</p>'
+            ],
+            $this->context->getResult()
         );
     }
 

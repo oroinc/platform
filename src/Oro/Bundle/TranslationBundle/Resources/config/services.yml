@@ -233,6 +233,9 @@ services:
             - '@doctrine'
             - '@oro_translation.cache'
 
+    oro_translation.provider.translation_domain_description:
+        class: Oro\Bundle\TranslationBundle\Provider\TranslationDomainDescriptionProvider
+
     oro_translation.provider.translation:
         class: Oro\Bundle\TranslationBundle\Provider\TranslationProvider
         arguments:

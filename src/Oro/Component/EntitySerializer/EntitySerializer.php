@@ -229,6 +229,21 @@ class EntitySerializer
         return $this->dataNormalizer->normalizeData($data, $entityConfig);
     }
 
+    public function buildQuery(
+        QueryBuilder $qb,
+        EntityConfig|array $config,
+        array $context = [],
+        ?callable $queryModifier = null
+    ): Query {
+        $entityConfig = $this->normalizeConfig($config);
+        $this->queryModifier->updateQuery($qb, $entityConfig);
+        if (null !== $queryModifier) {
+            $queryModifier($qb, $entityConfig, $context);
+        }
+
+        return $this->getQuery($qb, $entityConfig);
+    }
+
     public function prepareQuery(QueryBuilder $qb, EntityConfig|array $config): void
     {
         $this->queryModifier->updateQuery($qb, $this->normalizeConfig($config));
