@@ -23,6 +23,7 @@ final class ExportBufferedIdentityQueryResultIterator extends AbstractBufferedQu
     private ?int $maxResults = null;
     private ?int $totalCount = null;
     private int $page = -1;
+    private ?int $lastPage = null;
     private int $offset = -1;
     private int $position = -1;
     private bool $load = true;
@@ -108,7 +109,7 @@ final class ExportBufferedIdentityQueryResultIterator extends AbstractBufferedQu
     private function loadNextPage(): void
     {
         if ($this->pageCallback && $this->page !== -1) {
-            call_user_func($this->pageCallback);
+            call_user_func($this->pageCallback, $this->page === $this->lastPage);
         }
 
         $this->page++;
@@ -145,6 +146,8 @@ final class ExportBufferedIdentityQueryResultIterator extends AbstractBufferedQu
 
         try {
             $this->identifiers = $query->execute();
+            // The page count starts from 0, so subtract 1 from the total pages count.
+            $this->lastPage = ceil(count($this->identifiers) / $this->pageSize) - 1;
         } catch (\Exception $e) {
             $this->handleException($e);
         }
