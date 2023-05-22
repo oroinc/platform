@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository")
  * @ORM\Table(name="oro_translation_key", options={"collate"="utf8_bin", "charset"="utf8"}, uniqueConstraints={
- *      @ORM\UniqueConstraint(name="key_domain_uniq", columns={"key", "domain"})
+ *      @ORM\UniqueConstraint(name="oro_translation_key_uidx", columns={"domain", "key"})
  * })
  */
 class TranslationKey

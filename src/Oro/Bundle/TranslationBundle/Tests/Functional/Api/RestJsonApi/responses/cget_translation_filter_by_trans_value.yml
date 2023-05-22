@@ -1,0 +1,12 @@
+data:
+    -
+        type: translations
+        id: '<@tk-test_trans1-test_domain->id>-<@en->code>'
+        attributes:
+            key: test.trans1
+            domain: test_domain
+            hasTranslation: true
+            languageCode: en
+            value: 'test trans1 (en)'
+            englishValue: 'test trans1 (en)'
+            translatedValue: 'test trans1 (en)'

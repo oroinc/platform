@@ -4,6 +4,12 @@ trusted_data:
         Oro\Bundle\TranslationBundle\Translation\DatabasePersister:
             executeBatchTranslationInsert:
                 sqlData: true
+        Oro\Bundle\TranslationBundle\Api\Repository\TranslationLanguageJoinOptimizer:
+            removeOrderByLanguageCode:
+                orderBy: true
+        Oro\Bundle\TranslationBundle\Api\Repository\TranslationQueryModifier:
+            addComputedFields:
+                languageCode: true
     safe_static_methods:
         Oro\Bundle\TranslationBundle\EventListener\UpdateTranslatableDictionariesListener:
             getTranslationEntityTable: true

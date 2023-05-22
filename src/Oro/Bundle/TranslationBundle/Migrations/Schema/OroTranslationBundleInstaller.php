@@ -9,15 +9,15 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroTranslationBundleInstaller implements Installation
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_7';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
@@ -74,7 +74,7 @@ class OroTranslationBundleInstaller implements Installation
         $table->addColumn('key', 'string', ['length' => 255]);
         $table->addColumn('domain', 'string', ['default' => 'messages', 'length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['key', 'domain'], 'key_domain_uniq');
+        $table->addUniqueIndex(['domain', 'key'], 'oro_translation_key_uidx');
         /**
          * Required to support Case Sensitive keys in MySQL
          */
