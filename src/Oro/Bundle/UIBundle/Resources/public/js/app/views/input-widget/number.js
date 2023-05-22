@@ -28,6 +28,8 @@ define(function(require) {
 
         limitDecimals: true,
 
+        groupingUsed: void 0,
+
         /**
          * @inheritdoc
          */
@@ -54,6 +56,7 @@ define(function(require) {
         refresh: function() {
             this._setPrecision();
             this._setLimitDecimals();
+            this._setGroupingUsed();
             this._setAttr();
         },
 
@@ -65,6 +68,15 @@ define(function(require) {
         _setLimitDecimals: function() {
             const limitDecimals = this.$el.data('limit-decimals');
             this.limitDecimals = _.isUndefined(limitDecimals) ? true : limitDecimals;
+        },
+
+        _setGroupingUsed: function() {
+            const groupingUsed = this.$el.data('grouping-used');
+            if (groupingUsed !== void 0) {
+                this.groupingUsed = groupingUsed === '' ? true : Boolean(groupingUsed);
+            } else {
+                delete this.groupingUsed;
+            }
         },
 
         _setAttr: function() {
@@ -108,10 +120,14 @@ define(function(require) {
                 if (initialAttr.type === 'text') {
                     value = NumberFormatter.unformatStrict(value);
                 }
-                const localizedFloat = NumberFormatter.formatDecimal(value, {
+                const options = {
                     min_fraction_digits: 0,
                     max_fraction_digits: this.precision
-                });
+                };
+                if (this.groupingUsed !== void 0) {
+                    Object.assign(options, {grouping_used: this.groupingUsed});
+                }
+                const localizedFloat = NumberFormatter.formatDecimal(value, options);
                 this.$el.val(localizedFloat);
             }
         },

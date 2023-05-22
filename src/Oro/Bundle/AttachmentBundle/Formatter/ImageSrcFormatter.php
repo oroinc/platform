@@ -14,6 +14,8 @@ class ImageSrcFormatter implements FormatterInterface
     private const WIDTH_ATTRIBUTE  = 'width';
     private const HEIGHT_ATTRIBUTE = 'height';
 
+    private const FORMAT_ATTRIBUTE = 'format';
+
     /** @var AttachmentManager */
     private $manager;
 
@@ -37,7 +39,18 @@ class ImageSrcFormatter implements FormatterInterface
             $width = (int)$formatterArguments[self::WIDTH_ATTRIBUTE];
         }
 
-        return $this->manager->getResizedImageUrl($value, $width, $height, UrlGeneratorInterface::ABSOLUTE_URL);
+        $format = AttachmentManager::DEFAULT_FORMAT;
+        if (array_key_exists(self::FORMAT_ATTRIBUTE, $formatterArguments)) {
+            $format = (string)$formatterArguments[self::FORMAT_ATTRIBUTE];
+        }
+
+        return $this->manager->getResizedImageUrl(
+            $value,
+            $width,
+            $height,
+            $format,
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
     }
 
     /**

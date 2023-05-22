@@ -77,7 +77,7 @@ class DatagridExportIdFetcher implements ContextAwareInterface
     public function getGridRootEntity(): string
     {
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->grid->getAcceptedDatasource()->getQueryBuilder();
+        $queryBuilder = $this->grid->getDatasource()->getQueryBuilder();
 
         return $queryBuilder->getRootEntities()[0];
     }

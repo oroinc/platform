@@ -114,6 +114,10 @@ class ChangeSetToAuditFieldsConverter implements ChangeSetToAuditFieldsConverter
             $this->processDeleted($auditEntryClass, $this->extractValue($old, 'deleted'), $field);
 
             $field->calculateNewValue();
+
+            if ($field->getNewValue() === $field->getOldValue()) {
+                unset($fields[$fieldName]);
+            }
         } else {
             $fields[$fieldName] = $this->createAuditFieldEntity(
                 $auditFieldClass,
@@ -237,6 +241,11 @@ class ChangeSetToAuditFieldsConverter implements ChangeSetToAuditFieldsConverter
             if (!$entityName) {
                 continue;
             }
+
+            if (!$this->configProvider->isAuditableEntity($entity['entity_class'])) {
+                continue;
+            }
+
             $entityClass = $entity['entity_class'];
             $changeSet = array_filter(
                 $entity['change_set'] ?? [],
@@ -245,6 +254,11 @@ class ChangeSetToAuditFieldsConverter implements ChangeSetToAuditFieldsConverter
                 },
                 ARRAY_FILTER_USE_KEY
             );
+
+            if (empty($changeSet)) {
+                continue;
+            }
+
             $field->addEntityChangedInCollectionWithChangeSet(
                 $entity['entity_class'],
                 $entity['entity_id'],

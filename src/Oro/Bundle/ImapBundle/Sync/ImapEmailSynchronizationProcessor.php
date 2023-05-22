@@ -365,7 +365,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             } catch (EmailAddressParseException $e) {
                 $errorContext = $this->getFailedEmailHeaders($email);
 
-                $this->emailErrorsLogger->error($e->getMessage(), ['headers' => json_encode($errorContext)]);
+                $this->emailErrorsLogger->warning($e->getMessage(), ['headers' => json_encode($errorContext)]);
                 $notificationBag->addNotification(
                     EmailSyncNotificationAlert::createForConvertFailed(
                         'Cannot convert message. Exception:' . $e->getMessage(),

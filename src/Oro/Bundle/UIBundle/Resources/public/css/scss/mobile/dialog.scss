@@ -39,6 +39,10 @@
         margin: $dialog-mobile-header-outer-offset;
     }
 
+    .dropdown-menu {
+        z-index: $dialog-mobile-header-z-index + 1;
+    }
+
     &.ui-dialog-minimized {
         /* stylelint-disable declaration-no-important */
         width: auto !important;

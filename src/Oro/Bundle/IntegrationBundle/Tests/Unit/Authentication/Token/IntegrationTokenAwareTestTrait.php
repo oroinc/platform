@@ -7,18 +7,20 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 trait IntegrationTokenAwareTestTrait
 {
-    private function getTokenStorageMock(): \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface
-    {
+    private function getTokenStorageMock(
+        int $getTokenCallsCount = 1,
+        int $setTokenCallsCount = 1,
+    ): \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface {
         $token = $this->createMock(TokenInterface::class);
         $token->expects(self::once())
             ->method('setAttribute')
             ->with('owner_description');
 
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $tokenStorage->expects(self::once())
+        $tokenStorage->expects(self::exactly($getTokenCallsCount))
             ->method('getToken')
             ->willReturn($token);
-        $tokenStorage->expects(self::once())
+        $tokenStorage->expects(self::exactly($setTokenCallsCount))
             ->method('setToken')
             ->willReturn($token);
 

@@ -21,17 +21,22 @@ const NavigationMenuView = BaseView.extend({
      * @inheritdoc
      */
     events() {
-        return {
+        const events = {
             'keydown': 'onKeyDown',
             [`focus ${this.options.focusableElements}`]: 'onFocus',
             [`focusin ${this.options.focusableElements}`]: 'onFocusInToFocusable',
             [`focusout ${this.options.focusableElements}`]: 'onFocusOutToFocusable',
             'focusout': 'onFocusOut',
             'show.bs.dropdown': 'onDropdownToggle',
-            'hide.bs.dropdown': 'onDropdownToggle',
-            [`mousemove ${this.options.itemSelector}`]: 'onMouseMove',
-            [`mouseleave ${this.options.itemSelector}`]: 'onMouseLeave'
+            'hide.bs.dropdown': 'onDropdownToggle'
         };
+
+        if (_.isTouchDevice() === false) {
+            events[`mousemove ${this.options.itemSelector}`] = 'onMouseMove';
+            events[`mouseleave ${this.options.itemSelector}`] = 'onMouseLeave';
+        }
+
+        return events;
     },
 
     hasFocus: false,

@@ -148,8 +148,11 @@ class TagsExtension extends AbstractTagsExtension
             },
             'editable' => false,
             'translatable' => true,
-            'notMarkAsBlank' => true,
-            'renderable' => $this->taggableHelper->isEnableGridColumn($className)
+            'notMarkAsBlank' => false,
+            'renderable' => $this->taggableHelper->isEnableGridColumn($className),
+            'inline_editing' => [
+                'enable' => $config->offsetGetByPath($this->getInlineEditingEnabledPathForColumn(), true)
+            ]
         ];
     }
 
@@ -197,11 +200,21 @@ class TagsExtension extends AbstractTagsExtension
     private function enableInlineEditing(DatagridConfiguration $config): void
     {
         if ($this->inlineEditingConfigurator->isInlineEditingSupported($config)
-            && !$config->offsetGetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH)
+            && $config->offsetGetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH) !== false
+            && $config->offsetGetByPath($this->getInlineEditingEnabledPathForColumn()) !== false
         ) {
             $config->offsetSetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH, true);
             $this->inlineEditingConfigurator->configureInlineEditingForGrid($config);
             $this->inlineEditingConfigurator->configureInlineEditingForColumn($config, self::COLUMN_NAME);
         }
+    }
+
+    private function getInlineEditingEnabledPathForColumn(): string
+    {
+        return sprintf(
+            '[columns][%s]%s',
+            self::COLUMN_NAME,
+            InlineEditingConfiguration::ENABLED_CONFIG_PATH
+        );
     }
 }
