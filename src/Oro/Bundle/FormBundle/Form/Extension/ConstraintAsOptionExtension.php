@@ -31,6 +31,8 @@ class ConstraintAsOptionExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setDefault('constraints', []);
+
         $resolver->setAllowedTypes(
             'constraints',
             [Constraint::class, Constraint::class . '[]', 'array', 'string', 'null']
