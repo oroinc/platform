@@ -25,9 +25,10 @@ class JobStatusSubscriber implements EventSubscriberInterface
 {
     private const ACTIVE_JOB_STATUSES = [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED];
     private \DateTime $startDateTime;
-    private ?Process  $process = null;
     private string $phpExecutablePath;
     private bool   $shouldNotRunConsumer = false;
+    private array $processes = [];
+    private int $countConsumers;
 
     public function __construct(private KernelInterface $kernel)
     {
@@ -111,14 +112,21 @@ class JobStatusSubscriber implements EventSubscriberInterface
         );
     }
 
+    public function setCountConsumersFromOption(int $countConsumers)
+    {
+        $this->countConsumers = $countConsumers;
+    }
+
     private function startConsumerIfNotRunning(): void
     {
         if ($this->shouldNotRunConsumer) {
             return;
         }
 
-        if ($this->process && $this->process->isRunning()) {
-            return;
+        foreach ($this->processes as $process) {
+            if ($process->isRunning()) {
+                return;
+            }
         }
         /** @var Filesystem $filesystem */
         $filesystem = $this->kernel->getContainer()->get('filesystem');
@@ -132,15 +140,18 @@ class JobStatusSubscriber implements EventSubscriberInterface
             sprintf('--env=%s', $this->kernel->getEnvironment()),
         ];
 
-        $process = new Process($command);
+        for ($i=0; $i < $this->countConsumers; $i++) {
+            $process = new Process($command);
 
-        $process->start(function ($type, $buffer) use ($filesystem, $logDir) {
-            if (Process::ERR === $type) {
-                $this->getLogger()->error($buffer);
-            }
-            $filesystem->appendToFile(sprintf('%s/mq.log', $logDir), $buffer);
-        });
-        $this->process = $process;
+            $process->start(function ($type, $buffer) use ($filesystem, $logDir) {
+                if (Process::ERR === $type) {
+                    $this->getLogger()->error($buffer);
+                }
+                $filesystem->appendToFile(sprintf('%s/mq.log', $logDir), $buffer);
+            });
+
+            $this->processes[$process->getPid()] = $process;
+        }
     }
 
     private function getLogger(): LoggerInterface
