@@ -8,10 +8,13 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Bundle\FormBundle\Form\Extension\ConstraintAsOptionExtension;
+use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NumberRangeFilterTypeTest extends AbstractTypeTestCase
@@ -24,6 +27,9 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
      */
     protected function setUp(): void
     {
+        $constraintFactory = new ConstraintFactory();
+        $constraintExtension = new ConstraintAsOptionExtension($constraintFactory);
+
         $translator = $this->createMockTranslator();
         $this->type = new NumberRangeFilterType($translator);
 
@@ -37,7 +43,11 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
             new FilterType($translator),
             new NumberFilterType($translator, $numberFormatter),
         ]);
-        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
+        $this->formExtensions[] = new PreloadedExtension([
+            $this->type,
+        ], [
+            NumberType::class => [$constraintExtension],
+        ]);
 
         parent::setUp();
     }

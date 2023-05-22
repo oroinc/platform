@@ -385,7 +385,9 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
             'arraySeparator' => ',',
             'arrayOperators' => [9, 10],
             'dataType' => 'data_integer',
-            'limitDecimals' => true
+            'limitDecimals' => true,
+            'min' => null,
+            'max' => null,
         ];
         $this->assertEquals($expected, $this->filter->getMetadata());
     }
