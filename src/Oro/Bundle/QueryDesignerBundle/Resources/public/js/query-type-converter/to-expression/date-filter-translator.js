@@ -1,6 +1,7 @@
-import _ from 'underscore';
+import {has, result} from 'underscore';
 import AbstractConditionTranslatorToExpression from './abstract-filter-translator';
-import {BinaryNode, ConstantNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {BinaryNode, ConstantNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {cloneAST, createFunctionNode} from 'oroexpressionlanguage/js/expression-language-tools';
 
 class DateFilterTranslatorToExpression extends AbstractConditionTranslatorToExpression {
     /**
@@ -170,19 +171,19 @@ class DateFilterTranslatorToExpression extends AbstractConditionTranslatorToExpr
      */
     testToConfig(filterValue) {
         const {part, value} = filterValue;
-        let result =
+        let resolution =
             super.testToConfig(filterValue) &&
             // check is filter part is available in config
-            _.has(this.filterConfig.dateParts, part);
+            has(this.filterConfig.dateParts, part);
 
-        if (result) {
-            const varsConfig = _.result(_.result(this.filterConfig.externalWidgetOptions, 'dateVars'), part, {});
+        if (resolution) {
+            const varsConfig = result(result(this.filterConfig.externalWidgetOptions, 'dateVars'), part, {});
             const partParams = this.constructor.PART_MAP[part];
 
-            result =
+            resolution =
                 // at least some of two values is not empty
                 (value.start || value.end) &&
-                _.all(value, singleValue => {
+                Object.values(value).every(singleValue => {
                     let variableMatch;
                     return singleValue === '' ||
                         // filter part has restriction for value by patter and the value matches it
@@ -199,7 +200,7 @@ class DateFilterTranslatorToExpression extends AbstractConditionTranslatorToExpr
                 });
         }
 
-        return result;
+        return resolution;
     }
 
     /**
@@ -214,7 +215,7 @@ class DateFilterTranslatorToExpression extends AbstractConditionTranslatorToExpr
             result = new BinaryNode(
                 operatorParams.operator,
                 this.translateSingleValue(leftOperand, filterValue, operatorParams.left),
-                this.translateSingleValue(tools.cloneAST(leftOperand), filterValue, operatorParams.right)
+                this.translateSingleValue(cloneAST(leftOperand), filterValue, operatorParams.right)
             );
         } else {
             result = this.translateSingleValue(leftOperand, filterValue, operatorParams);
@@ -282,7 +283,7 @@ class DateFilterTranslatorToExpression extends AbstractConditionTranslatorToExpr
         let variableMatch;
 
         if (partParams.propModifier) {
-            leftOperand = tools.createFunctionNode(partParams.propModifier, [leftOperand]);
+            leftOperand = createFunctionNode(partParams.propModifier, [leftOperand]);
         }
 
         if (
@@ -290,7 +291,7 @@ class DateFilterTranslatorToExpression extends AbstractConditionTranslatorToExpr
             (variableMatch = singleValue.match(this.constructor.VARIABLE_PATTERN)) !== null &&
             variableMatch[1] in partParams.variables
         ) {
-            rightOperand = tools.createFunctionNode(partParams.variables[variableMatch[1]]);
+            rightOperand = createFunctionNode(partParams.variables[variableMatch[1]]);
         } else {
             rightOperand = new ConstantNode(singleValue);
         }

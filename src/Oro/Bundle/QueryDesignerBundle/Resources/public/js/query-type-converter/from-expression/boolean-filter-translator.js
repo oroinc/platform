@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import AbstractFilterTranslatorFromExpression from './abstract-filter-translator';
 import BooleanFilterTranslatorToExpression from '../to-expression/boolean-filter-translator';
 import {BinaryNode, ConstantNode, GetAttrNode, UnaryNode} from 'oroexpressionlanguage/js/expression-language-library';
@@ -44,7 +43,7 @@ class BooleanFilterTranslatorFromExpression extends AbstractFilterTranslatorFrom
      * @inheritDoc
      */
     checkOperation(filterConfig, operatorParams) {
-        return _.pluck(filterConfig.choices, 'value').indexOf(operatorParams.value) !== -1;
+        return filterConfig.choices.some(option => option.value === operatorParams.value);
     }
 
     /**

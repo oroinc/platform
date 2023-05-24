@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import {findKey} from 'underscore';
 import AbstractFilterTranslatorFromExpression from './abstract-filter-translator';
 import DictionaryFilterTranslatorToExpression from '../to-expression/dictionary-filter-translator';
 import {BinaryNode, ConstantNode, GetAttrNode} from 'oroexpressionlanguage/js/expression-language-library';
@@ -25,7 +25,10 @@ class DictionaryFilterTranslatorFromExpression extends AbstractFilterTranslatorF
      * @protected
      */
     checkValueAST(node) {
-        return node instanceof ConstantNode && _.isString(node.attrs.value);
+        return node instanceof ConstantNode && (
+            typeof node.attrs.value === 'string' ||
+            typeof node.attrs.value === 'number' && isFinite(node.attrs.value)
+        );
     }
 
     /**
@@ -37,7 +40,7 @@ class DictionaryFilterTranslatorFromExpression extends AbstractFilterTranslatorF
             node.nodes[0] instanceof GetAttrNode &&
             this.checkListOperandAST(node.nodes[1], this.checkValueAST)
         ) {
-            const criterion = _.findKey(this.constructor.OPERATOR_MAP, operatorParams => {
+            const criterion = findKey(this.constructor.OPERATOR_MAP, operatorParams => {
                 return operatorParams.operator === node.attrs.operator;
             });
 

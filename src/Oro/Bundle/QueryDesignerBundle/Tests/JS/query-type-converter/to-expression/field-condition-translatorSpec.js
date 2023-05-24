@@ -1,9 +1,10 @@
 import FieldConditionTranslatorToExpression
     from 'oroquerydesigner/js/query-type-converter/to-expression/field-condition-translator';
-import {BinaryNode, ConstantNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {BinaryNode, ConstantNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {createGetAttrNode} from 'oroexpressionlanguage/js/expression-language-tools';
 import 'lib/jasmine-oro';
 
-const createLeftOperand = () => tools.createGetAttrNode('foo.bar');
+const createLeftOperand = () => createGetAttrNode('foo.bar');
 
 describe('oroquerydesigner/js/query-type-converter/to-expression/field-condition-translator', () => {
     let translator;
@@ -115,22 +116,6 @@ describe('oroquerydesigner/js/query-type-converter/to-expression/field-condition
             }
         });
         expect(fieldIdTranslatorMock.translate).toHaveBeenCalledWith('bar');
-    });
-
-    it('translates condition to appropriate AST', () => {
-        const result = translator.tryToTranslate({
-            columnName: 'bar',
-            criterion: {
-                filter: 'string',
-                data: {
-                    type: '3',
-                    value: 'baz'
-                }
-            }
-        });
-        const expectedAST = new BinaryNode('=', createLeftOperand(), new ConstantNode('baz'));
-
-        expect(result).toEqual(expectedAST);
     });
 
     describe('can not translate condition because of', () => {

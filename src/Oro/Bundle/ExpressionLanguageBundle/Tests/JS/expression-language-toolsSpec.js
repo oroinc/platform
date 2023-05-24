@@ -1,10 +1,11 @@
 import {ArgumentsNode, ArrayNode, BinaryNode, ConditionalNode, ConstantNode, FunctionNode,
-    GetAttrNode, NameNode, Node, UnaryNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+    GetAttrNode, NameNode, Node, UnaryNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {isIndexedArrayNode, createArrayNode, createGetAttrNode, createFunctionNode, compareAST, cloneAST}
+    from 'oroexpressionlanguage/js/expression-language-tools';
 import 'lib/jasmine-oro';
 
 describe('oroexpressionlanguage/js/expression-language-tools', () => {
     describe('isIndexedArrayNode', () => {
-        const isIndexedArrayNode = tools.isIndexedArrayNode;
         const cases = {
             'indexed array': [
                 (() => {
@@ -47,8 +48,6 @@ describe('oroexpressionlanguage/js/expression-language-tools', () => {
     });
 
     describe('createArrayNode', () => {
-        const createArrayNode = tools.createArrayNode;
-
         const cases = {
             'indexed array': [
                 ['foo', null, 42, 3.14],
@@ -91,8 +90,6 @@ describe('oroexpressionlanguage/js/expression-language-tools', () => {
     });
 
     describe('createGetAttrNode', () => {
-        const createGetAttrNode = tools.createGetAttrNode;
-
         const cases = {
             'one element in list': [
                 ['foo'],
@@ -138,8 +135,6 @@ describe('oroexpressionlanguage/js/expression-language-tools', () => {
     });
 
     describe('createFunctionNode', () => {
-        const createFunctionNode = tools.createFunctionNode;
-
         const cases = {
             'function without arguments': [
                 'foo',
@@ -165,8 +160,6 @@ describe('oroexpressionlanguage/js/expression-language-tools', () => {
     });
 
     describe('compareAST', () => {
-        const compareAST = tools.compareAST;
-
         const cases = {
             'different types of node': [
                 // first node
@@ -273,7 +266,7 @@ describe('oroexpressionlanguage/js/expression-language-tools', () => {
                     })()
                 ]))
             );
-            clonedAST = tools.cloneAST(originalAST);
+            clonedAST = cloneAST(originalAST);
         });
 
         it('AST is identical', () => {

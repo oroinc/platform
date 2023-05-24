@@ -1,9 +1,8 @@
 import NumberFilterTranstatorFromExpression
     from 'oroquerydesigner/js/query-type-converter/from-expression/number-filter-translator';
 import FieldIdTranslator from 'oroquerydesigner/js/query-type-converter/from-expression/field-id-translator';
-import {BinaryNode, ConstantNode, NameNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
-
-const {createArrayNode, createGetAttrNode} = tools;
+import {BinaryNode, ConstantNode, NameNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {createArrayNode, createGetAttrNode} from 'oroexpressionlanguage/js/expression-language-tools';
 
 describe('oroquerydesigner/js/query-type-converter/from-expression/number-filter-translator', () => {
     let translator;

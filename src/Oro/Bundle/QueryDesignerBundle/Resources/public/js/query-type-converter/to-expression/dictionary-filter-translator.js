@@ -1,5 +1,6 @@
 import AbstractConditionTranslatorToExpression from './abstract-filter-translator';
-import {BinaryNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {BinaryNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {createArrayNode} from 'oroexpressionlanguage/js/expression-language-tools';
 
 class DictionaryFilterTranslatorToExpression extends AbstractConditionTranslatorToExpression {
     /**
@@ -36,7 +37,7 @@ class DictionaryFilterTranslatorToExpression extends AbstractConditionTranslator
                 type: {type: 'string'},
                 value: {
                     type: 'array',
-                    items: {type: 'string'}
+                    items: {type: ['integer', 'string']}
                 },
                 params: {type: 'object'}
             }
@@ -48,7 +49,7 @@ class DictionaryFilterTranslatorToExpression extends AbstractConditionTranslator
      */
     translate(leftOperand, filterValue) {
         const operatorParams = this.constructor.OPERATOR_MAP[filterValue.type];
-        const rightOperand = tools.createArrayNode(filterValue.value);
+        const rightOperand = createArrayNode(filterValue.value);
 
         return new BinaryNode(operatorParams.operator, leftOperand, rightOperand);
     }

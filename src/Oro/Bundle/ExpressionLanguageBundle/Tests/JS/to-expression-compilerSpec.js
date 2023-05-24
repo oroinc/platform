@@ -1,8 +1,7 @@
 import ToExpressionCompiler from 'oroexpressionlanguage/js/to-expression-compiler';
-import {BinaryNode, GetAttrNode, ConstantNode, NameNode, ArgumentsNode, ConditionalNode, UnaryNode, tools}
+import {BinaryNode, GetAttrNode, ConstantNode, NameNode, ArgumentsNode, ConditionalNode, UnaryNode}
     from 'oroexpressionlanguage/js/expression-language-library';
-
-const {createArrayNode, createFunctionNode} = tools;
+import {createArrayNode, createFunctionNode} from 'oroexpressionlanguage/js/expression-language-tools';
 
 function createGetAttrNode(node, item, type) {
     return new GetAttrNode(node, new ConstantNode(item), new ArgumentsNode(), type);

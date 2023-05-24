@@ -45,7 +45,7 @@ describe('oroquerydesigner/js/query-type-converter/to-expression/query-condition
         };
 
         jasmine.itEachCase(cases, condition => {
-            expect(converterToExpression.convert(condition)).toBe(void 0);
+            expect(converterToExpression.convert(condition)).toBe(null);
         });
     });
 
@@ -60,12 +60,12 @@ describe('oroquerydesigner/js/query-type-converter/to-expression/query-condition
                 '"bar"'
             ],
             'several conditions': [
-                [{constant: 'bar'}, 'AND', {constant: true}, 'OR', {constant: 42}],
-                '"bar" and true or 42'
+                [{constant: true}, 'OR', {constant: 42}, 'AND', {constant: 'bar'}],
+                'true or 42 and "bar"'
             ],
             'tested conditions': [
-                [{constant: 'bar'}, 'AND', [{constant: true}, 'OR', {constant: 42}]],
-                '"bar" and (true or 42)'
+                [[{constant: true}, 'OR', {constant: 42}], 'AND', {constant: 'bar'}],
+                '(true or 42) and "bar"'
             ]
         };
 

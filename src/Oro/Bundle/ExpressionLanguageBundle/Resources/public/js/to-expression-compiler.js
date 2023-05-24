@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import {isObject, findKey, isEqual, result} from 'underscore';
 import addcslashes from 'oroexpressionlanguage/lib/php-to-js/addcslashes';
 import ASTNodeWrapper from 'oroexpressionlanguage/js/ast-node-wrapper';
 import * as expressionLanguageLibrary from 'oroexpressionlanguage/js/expression-language-library';
@@ -30,10 +30,10 @@ class ToExpressionCompiler {
     _compile(node) {
         const constructor = node.origin().constructor;
         // retrieves original name of the Node constructor (workaround for broken after minification names)
-        const name = constructor && _.findKey(expressionLanguageLibrary, item => item === constructor);
+        const name = constructor && findKey(expressionLanguageLibrary, item => item === constructor);
         if (name) {
             const methodName = `_compile${name}`;
-            if (_.isFunction(this[methodName])) {
+            if (this[methodName] instanceof Function) {
                 return this[methodName](node);
             }
         }
@@ -60,7 +60,7 @@ class ToExpressionCompiler {
      */
     _compileNameNode(node) {
         const name = node.attr('name');
-        if (_.isObject(this.names) && !_.isArray(this.names) && name in this.names) {
+        if (isObject(this.names) && !Array.isArray(this.names) && name in this.names) {
             return this.names[name];
         }
         return name;
@@ -96,8 +96,7 @@ class ToExpressionCompiler {
      */
     _compileArgumentsNode(node) {
         const pairs = this._getKeyValuePairs(node);
-
-        return _.pluck(pairs, 'value').join(', ');
+        return pairs.map(pair => pair.value).join(', ');
     }
 
     /**
@@ -109,11 +108,11 @@ class ToExpressionCompiler {
      */
     _compileArrayNode(node) {
         let pairs = this._getKeyValuePairs(node);
-
-        if (_.isEqual(_.range(pairs.length), _.pluck(pairs, 'key'))) {
-            return `[${_.pluck(pairs, 'value').join(', ')}]`;
+        const {length} = pairs;
+        if (isEqual(Array.from({length}, (_, i) => i), pairs.map(pair => pair.key))) {
+            return `[${pairs.map(pair => pair.value).join(', ')}]`;
         } else {
-            pairs = _.map(pairs, pair => pair.key + ': ' + pair.value);
+            pairs = pairs.map(pair => pair.key + ': ' + pair.value);
             return `{${pairs.join(', ')}}`;
         }
     }
@@ -226,20 +225,20 @@ class ToExpressionCompiler {
 
         const operator = node.attr('operator');
         const operatorsKey = node.instanceOf(UnaryNode) ? 'UNARY_OPERATORS' : 'BINARY_OPERATORS';
-        const result = _.result(Parser[operatorsKey][operator], 'precedence');
+        const res = result(Parser[operatorsKey][operator], 'precedence');
 
-        if (result === void 0) {
+        if (res === void 0) {
             throw new Error(`The compiler doesn't support \`${operator}\` operator`);
         }
 
-        return result;
+        return res;
     }
 
     /**
      * Gets key-value pairs from ArrayNode and compiles them
      *
      * @param {ASTNodeWrapper} node
-     * @returns {number}
+     * @returns {Array<{key:string, value:string}>}
      * @throws {Error} when passed wrong type node
      * @protected
      */
@@ -250,7 +249,7 @@ class ToExpressionCompiler {
 
         const pairs = node.origin().getKeyValuePairs();
 
-        return _.map(pairs, ({key, value}) => ({
+        return pairs.map(({key, value}) => ({
             key: this._compileObjectKey(new ASTNodeWrapper(key)),
             value: this._compile(new ASTNodeWrapper(value))
         }));
@@ -266,7 +265,7 @@ class ToExpressionCompiler {
         let result = '';
         if (value === null || typeof value === 'number' || typeof value === 'boolean') {
             result = String(value);
-        } else if (_.isArray(value)) {
+        } else if (Array.isArray(value)) {
             const items = value.map(val => this.format(val));
             result = `[${items.join(', ')}]`;
         } else if (typeof value === 'object') {

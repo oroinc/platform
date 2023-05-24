@@ -22,7 +22,6 @@ import ParsedExpression from 'oroexpressionlanguage/js/library/parsed-expression
 import Parser from 'oroexpressionlanguage/js/extend/parser';
 import Token from 'oroexpressionlanguage/js/extend/token';
 import TokenStream from 'oroexpressionlanguage/js/library/token-stream';
-import tools from 'oroexpressionlanguage/js/expression-language-tools';
 
 export {
     // node
@@ -51,6 +50,5 @@ export {
     ParsedExpression,
     Parser,
     Token,
-    TokenStream,
-    tools
+    TokenStream
 };

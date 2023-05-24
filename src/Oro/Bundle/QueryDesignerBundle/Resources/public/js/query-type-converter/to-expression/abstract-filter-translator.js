@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import jsonSchemaValidator from 'oroui/js/tools/json-schema-validator';
 
 /**
@@ -80,7 +79,7 @@ class AbstractFilterTranslatorToExpression {
      * @return {boolean}
      */
     testToConfig(filterValue) {
-        return _.any(this.filterConfig.choices, {value: String(filterValue.type)});
+        return this.filterConfig.choices.some(option => option.value === String(filterValue.type));
     }
 
     /**

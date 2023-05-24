@@ -1,8 +1,6 @@
 import FieldIdTranslatorToExpression from 'oroquerydesigner/js/query-type-converter/to-expression/field-id-translator';
-import {tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {createGetAttrNode} from 'oroexpressionlanguage/js/expression-language-tools';
 import 'lib/jasmine-oro';
-
-const {createGetAttrNode} = tools;
 
 describe('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator', () => {
     let entityStructureDataProviderMock;

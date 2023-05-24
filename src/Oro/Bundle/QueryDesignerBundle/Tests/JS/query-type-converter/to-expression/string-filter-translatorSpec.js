@@ -1,9 +1,9 @@
 import StringFilterTranslatorToExpression
     from 'oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator';
-import {BinaryNode, ConstantNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {BinaryNode, ConstantNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {createArrayNode, createGetAttrNode, createFunctionNode}
+    from 'oroexpressionlanguage/js/expression-language-tools';
 import 'lib/jasmine-oro';
-
-const {createArrayNode, createGetAttrNode, createFunctionNode} = tools;
 
 describe('oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator', () => {
     let translator;

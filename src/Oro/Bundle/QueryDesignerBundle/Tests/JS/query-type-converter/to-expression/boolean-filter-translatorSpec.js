@@ -1,9 +1,8 @@
 import BooleanFilterTranslatorToExpression
     from 'oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator';
-import {BinaryNode, ConstantNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {BinaryNode, ConstantNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {createGetAttrNode} from 'oroexpressionlanguage/js/expression-language-tools';
 import 'lib/jasmine-oro';
-
-const {createGetAttrNode} = tools;
 
 describe('oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator', () => {
     let translator;

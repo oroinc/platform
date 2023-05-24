@@ -1,5 +1,5 @@
-import _ from 'underscore';
-import {ArrayNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {ArrayNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {isIndexedArrayNode} from 'oroexpressionlanguage/js/expression-language-tools';
 
 /**
  * @typedef {Object} OperatorParams
@@ -32,7 +32,7 @@ class AbstractFilterTranslatorFromExpression {
      * @param {FieldIdTranslatorFromExpression} fieldIdTranslator
      * @param {FilterConfigProvider} filterConfigProvider
      * @constructor
-     * @throws TypeError if instance of FieldIdTranslatorFromExpression is missing
+     * @throws TypeError if some required argument is missing
      */
     constructor(fieldIdTranslator, filterConfigProvider) {
         if (!fieldIdTranslator) {
@@ -76,7 +76,7 @@ class AbstractFilterTranslatorFromExpression {
      */
     checkListOperandAST(node, callback) {
         return node instanceof ArrayNode &&
-            tools.isIndexedArrayNode(node) && (
+            isIndexedArrayNode(node) && (
             !callback || node.getKeyValuePairs().every(pair => callback(pair.value))
         );
     }
@@ -138,7 +138,7 @@ class AbstractFilterTranslatorFromExpression {
      * @protected
      */
     checkOperation(filterConfig, operatorParams) {
-        return _.pluck(filterConfig.choices, 'value').indexOf(operatorParams.criterion) !== -1;
+        return filterConfig.choices.some(option => option.value === operatorParams.criterion);
     }
 
     /**

@@ -2,9 +2,8 @@ import ExpressionOperandTypeValidator from 'oroform/js/expression-operand-type-v
 import DataProviderMock from './Fixture/entity-structure-data-provider-mock.js';
 import entitiesData from './Fixture/entities-data.json';
 import {ParsedExpression, BinaryNode, GetAttrNode, ConstantNode, NameNode,
-    ArgumentsNode, ConditionalNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
-
-const {createArrayNode} = tools;
+    ArgumentsNode, ConditionalNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {createArrayNode} from 'oroexpressionlanguage/js/expression-language-tools';
 
 // pre-calculated object to using in `createValidatorOptions` function only
 const _operationsValidatorOption = Object.fromEntries(

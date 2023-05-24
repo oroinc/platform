@@ -1,9 +1,8 @@
 import DateFilterTranslatorToExpression
     from 'oroquerydesigner/js/query-type-converter/to-expression/date-filter-translator';
-import {BinaryNode, ConstantNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {BinaryNode, ConstantNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {createFunctionNode, createGetAttrNode} from 'oroexpressionlanguage/js/expression-language-tools';
 import 'lib/jasmine-oro';
-
-const {createFunctionNode, createGetAttrNode} = tools;
 
 describe('oroquerydesigner/js/query-type-converter/to-expression/date-filter-translator', () => {
     let translator;
