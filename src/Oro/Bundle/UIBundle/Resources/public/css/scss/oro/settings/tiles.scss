@@ -1,0 +1,10 @@
+/* @theme: admin.oro; */
+
+$tiles-column-count: var(--tiles-column-count, 1) !default;
+$tiles-row-gap: var(--tiles-row-gap, #{$offset-block}) !default;
+$tiles-column-gap: var(--tiles-column-gap, #{$offset-inline}) !default;
+$tiles-justify-content: center !default;
+
+$tiles-item-width: calc(
+    100% / #{$tiles-column-count} - #{$tiles-column-gap} * (#{$tiles-column-count} - 1) / #{$tiles-column-count}
+) !default;
