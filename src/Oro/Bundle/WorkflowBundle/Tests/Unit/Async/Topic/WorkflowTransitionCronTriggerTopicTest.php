@@ -51,6 +51,16 @@ class WorkflowTransitionCronTriggerTopicTest extends AbstractTopicTestCase
                     TransitionTriggerMessage::MAIN_ENTITY => ['id' => 4242],
                 ],
             ],
+            'required only when mainEntity is null' => [
+                'body' => [
+                    TransitionTriggerMessage::TRANSITION_TRIGGER => 42,
+                    TransitionTriggerMessage::MAIN_ENTITY => null,
+                ],
+                'expectedBody' => [
+                    TransitionTriggerMessage::TRANSITION_TRIGGER => 42,
+                    TransitionTriggerMessage::MAIN_ENTITY => null,
+                ],
+            ],
         ];
     }
 

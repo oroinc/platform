@@ -19,9 +19,5 @@ abstract class AbstractWorkflowTransitionTriggerTopic extends AbstractTopic
             ->setRequired(TransitionTriggerMessage::TRANSITION_TRIGGER)
             ->setAllowedTypes(TransitionTriggerMessage::TRANSITION_TRIGGER, 'int')
             ->setAllowedValues(TransitionTriggerMessage::TRANSITION_TRIGGER, static fn (int $value) => $value > 0);
-
-        $resolver
-            ->setRequired(TransitionTriggerMessage::MAIN_ENTITY)
-            ->setAllowedTypes(TransitionTriggerMessage::MAIN_ENTITY, ['int', 'string', 'array']);
     }
 }
