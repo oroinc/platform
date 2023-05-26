@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\UnitOfWork;
+use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * The handler to flush all ORM entities that are changed by API to the database.
@@ -65,6 +69,11 @@ class FlushDataHandler implements FlushDataHandlerInterface
     ): bool {
         if (!$this->dispatchFlushEvent(CustomizeFormDataContext::EVENT_PRE_FLUSH_DATA, $context, $connection)) {
             return false;
+        }
+
+        $entityContexts = $context->getEntityContexts();
+        foreach ($entityContexts as $entityContext) {
+            $this->persistAdditionalEntities($entityManager, $entityContext->getAdditionalEntityCollection());
         }
 
         $entityManager->flush();
@@ -150,8 +159,27 @@ class FlushDataHandler implements FlushDataHandlerInterface
         }
         $form = $entityContext->getForm();
         if (null !== $form) {
-            $this->customizeFormDataEventDispatcher->dispatch($eventName, $form);
+            $eventContext = $this->getApiEventContext($form);
+            if (null === $eventContext) {
+                $this->customizeFormDataEventDispatcher->dispatch($eventName, $form);
+            } elseif ($entityContext->hasResult()) {
+                $eventContext->setData($entityContext->getResult());
+                $this->customizeFormDataEventDispatcher->dispatch($eventName, $form);
+                $entityContext->setResult($eventContext->getData());
+            } else {
+                $eventContext->setData(null);
+                $this->customizeFormDataEventDispatcher->dispatch($eventName, $form);
+                $data = $eventContext->getData();
+                if (null !== $data) {
+                    $entityContext->setResult($data);
+                }
+            }
         }
+    }
+
+    private function getApiEventContext(FormInterface $form): ?CustomizeFormDataContext
+    {
+        return $form->getConfig()->getAttribute(CustomizeFormDataHandler::API_EVENT_CONTEXT);
     }
 
     /**
@@ -181,5 +209,45 @@ class FlushDataHandler implements FlushDataHandlerInterface
         }
 
         return false;
+    }
+
+    private function persistAdditionalEntities(
+        EntityManagerInterface $entityManager,
+        AdditionalEntityCollection $additionalEntities
+    ): void {
+        foreach ($additionalEntities->getEntities() as $entity) {
+            if (!$this->isManageableEntity($entityManager, $entity)) {
+                continue;
+            }
+
+            if ($additionalEntities->shouldEntityBeRemoved($entity)) {
+                $this->removeEntity($entityManager, $entity);
+            } else {
+                $this->persistEntity($entityManager, $entity);
+            }
+        }
+    }
+
+    private function persistEntity(EntityManagerInterface $entityManager, object $entity): void
+    {
+        if (UnitOfWork::STATE_NEW !== $entityManager->getUnitOfWork()->getEntityState($entity)) {
+            return;
+        }
+
+        $entityManager->persist($entity);
+    }
+
+    private function removeEntity(EntityManagerInterface $entityManager, object $entity): void
+    {
+        if (UnitOfWork::STATE_MANAGED !== $entityManager->getUnitOfWork()->getEntityState($entity)) {
+            return;
+        }
+
+        $entityManager->remove($entity);
+    }
+
+    public function isManageableEntity(EntityManagerInterface $entityManager, object $entity): bool
+    {
+        return !$entityManager->getMetadataFactory()->isTransient(ClassUtils::getClass($entity));
     }
 }

@@ -6,13 +6,14 @@
 @use 'sass:string';
 @use 'sass:map';
 
-// @return the value with a nested map;
-// $map: (
-//     'main': (
-//         'foo': 'bar',
-//     )
-// );
-// Use: get-nested-map-value($map, 'main', 'foo') => bar;
+/** @return the value with a nested map;
+    $map: (
+        'main': (
+            'foo': 'bar',
+        )
+    );
+    Use: get-nested-map-value($map, 'main', 'foo') => bar;
+*/
 
 @function get-nested-map-value($map: null, $key: 'main', $value: 'main') {
     @if (type-of($map) == 'map') {
@@ -20,9 +21,10 @@
     }
 }
 
-// @return the value from a $color-palette map associated with a given key;
-// Use: color: get-color('primary', 'base') => color: #000;
-// Use: color: get-color('primary', 'base', 10%) => color: rgba(0 0 0 / 10%);
+/** @return the value from a $color-palette map associated with a given key;
+    Use: color: get-color('primary', 'base') => color: #000;
+    Use: color: get-color('primary', 'base', 10%) => color: rgba(0 0 0 / 10%);
+*/
 
 @function get-color($palette: 'primary', $key: 'main', $opacity: null) {
     $color-key: get-nested-map-value($color-palette, $palette, $key);
@@ -38,8 +40,9 @@
     }
 }
 
-// @return the value in a $theme-fonts map associated with a given key;
-// Use: font-family: get-font-name('main') => font-family: 'Lato';
+/** @return the value in a $theme-fonts map associated with a given key;
+    Use: font-family: get-font-name('main') => font-family: 'Lato';
+*/
 
 @function get-font-name($key) {
     $font: get-nested-map-value($theme-fonts, $key, 'family');
@@ -51,8 +54,9 @@
     }
 }
 
-// @return the value in a $font-weights map associated with a given key;
-// Use: font-weight: font-weight('bold') => font-weight: 700;
+/** @return the value in a $font-weights map associated with a given key;
+    Use: font-weight: font-weight('bold') => font-weight: 700;
+*/
 
 @function font-weight($key) {
     $font-weight-key: map.get($font-weights, $key);
@@ -64,8 +68,9 @@
     }
 }
 
-// @return: the value in a map associated with a given key
-// Use: z-index: z('base');
+/** @return: the value in a map associated with a given key
+    Use: z-index: z('base');
+*/
 
 @function z($layer: 'base') {
     $layers: (
@@ -81,18 +86,20 @@
     @return $z-index;
 }
 
-// Remove the unit of a length
-// @return number
-// Use: $value: strip-units(10px); -> 10
+/** Remove the unit of a length
+    @return number
+    Use: $value: strip-units(10px); -> 10
+*/
 
 @function strip-units($value) {
     @return math.div($value, $value * 0 + 1);
 }
 
-// In SASS we can only once set a value to variable with flag !default, all others values will be ignored.
-// The variable must be declared.
-// @return new value with flag !default;
-// Use: $component-var: reset-var($component-var, 10);
+/** In SASS we can only once set a value to variable with flag !default, all others values will be ignored.
+    The variable must be declared.
+    @return new value with flag !default;
+    Use: $component-var: reset-var($component-var, 10);
+*/
 
 @function update-default($var, $value: null) {
     $var: null;
@@ -101,8 +108,9 @@
     @return $var;
 }
 
-// Extended default map-merge
-// Merge two maps together into new map, w/o null keys
+/** Extended default map-merge
+    Merge two maps together into new map, w/o null keys
+*/
 
 @function map-merge-wo-null($map1, $map2) {
     $result: map.merge($map1, $map2);
@@ -116,29 +124,31 @@
     @return $result;
 }
 
-// Merge breakpoints
-// $old-breakpoints: (
-//     'desktop': '(min-width: 1100px)',
-//     'tablet': '(max-width: 1099px )'
-// );
-// $new-breakpoints: (
-//     'desktop': '(min-width: 1200px)',
-//     'tablet': null,
-//     'mobile': '(max-width: 640px)'
-// );
-// @return the value with a merged breakpoints;
-// $breakpoints: (
-//     'desktop''(min-width: 1200px)',
-//     'mobile': '(max-width: 640px)'
-// );
-// Use: merge-breakpoints($old-breakpoints, $new-breakpoints);
+/** Merge breakpoints
+    $old-breakpoints: (
+        'desktop': '(min-width: 1100px)',
+        'tablet': '(max-width: 1099px )'
+    );
+    $new-breakpoints: (
+        'desktop': '(min-width: 1200px)',
+        'tablet': null,
+        'mobile': '(max-width: 640px)'
+    );
+    @return the value with a merged breakpoints;
+    $breakpoints: (
+        'desktop''(min-width: 1200px)',
+        'mobile': '(max-width: 640px)'
+    );
+    Use: merge-breakpoints($old-breakpoints, $new-breakpoints);
+*/
 
 @function merge-breakpoints($breakpoints1, $news-breakpoint2) {
     @return map-merge-wo-null($breakpoints1, $news-breakpoint2);
 }
 
-// Get base breakpoint list
-// @return the list of base breakpoints;
+/** Get base breakpoint list
+    @return the list of base breakpoints;
+*/
 @function get-breakpoints-list() {
     $breakpoints-list: ();
 
@@ -151,8 +161,9 @@
     @return $breakpoints-list;
 }
 
-// @return modified selector
-// Use: modify-selector($selector: 'a', $part-before: '~ ') => '~ a';
+/** @return modified selector
+    Use: modify-selector($selector: 'a', $part-before: '~ ') => '~ a';
+*/
 @function modify-selector($selector, $part-before: null, $part-after: null) {
     @if ($part-before) {
         $selector: $part-before + $selector;
@@ -165,8 +176,9 @@
     @return $selector;
 }
 
-// @return modified list of selectors
-// Use: modify-selector(selectors: 'a , button', $part-before: '~ ') => '~ a, ~ button';
+/** @return modified list of selectors
+    Use: modify-selector(selectors: 'a , button', $part-before: '~ ') => '~ a, ~ button';
+*/
 @function modify-selectors($selectors, $part-before: null, $part-after: null) {
     @if (meta.type-of($selectors) != 'list') {
         @warn '$selectors: #{$selectors} must be a list type';
@@ -186,8 +198,9 @@
     @return $modified-selectors;
 }
 
-// @return the list of CSS selectors for HTML elements that can receive focus
-// Use: font-get-focusable-selector() => 'a[href]:not([tabindex="-1"]), input:not([disabled]):not([tabindex="-1"])';
+/** @return the list of CSS selectors for HTML elements that can receive focus
+    Use: font-get-focusable-selector() => 'a[href]:not([tabindex="-1"]), input:not([disabled]):not([tabindex="-1"])';
+*/
 @function get-focusable-selectors($whole-list: false, $part-before: null, $part-after: null) {
     $base: (
         'a[href]',

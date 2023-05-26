@@ -2,44 +2,27 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQueryBuilder;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
-use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
-use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 
 /**
  * The API manager to find entities associated with the email activity.
  */
 class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
 {
-    /** @var EntityNameResolver  */
-    protected $entityNameResolver;
-
-    /**
-     * @param string             $class
-     * @param ObjectManager      $om
-     * @param ActivityManager    $activityManager
-     * @param SearchIndexer      $searchIndexer
-     * @param EntityNameResolver $entityNameResolver
-     */
     public function __construct(
-        $class,
+        string $class,
         ObjectManager $om,
         ActivityManager $activityManager,
-        SearchIndexer $searchIndexer,
-        EntityNameResolver $entityNameResolver
+        SearchIndexer $searchIndexer
     ) {
         parent::__construct($om, $activityManager, $searchIndexer);
         $this->setClass($class);
-        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -95,70 +78,24 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
         ];
 
         if ($searchResult->count() > 0) {
-            $entities = $this->getEmailAssociatedEntitiesQueryBuilder($searchResult)->getQuery()->getResult();
-            $result['result'] = $entities;
+            $result['result'] = $this->convertSearchResultToEntityList($searchResult);
         }
 
         return $result;
     }
 
-    /**
-     * Returns a query builder that contains entities from the search result in which titles replaced with
-     * text representation of appropriate entities.
-     *
-     * Note! This functionality will be removed in the BAP-8995.
-     *
-     * @param SearchResult $searchResult
-     *
-     * @return SqlQueryBuilder
-     */
-    protected function getEmailAssociatedEntitiesQueryBuilder(SearchResult $searchResult)
+    protected function convertSearchResultToEntityList(SearchResult $searchResult): array
     {
-        /** @var EntityManager $em */
-        $em = $this->getObjectManager();
-
-        $qb = new UnionQueryBuilder($em);
-        $qb
-            ->addSelect('id', 'id', Types::INTEGER)
-            ->addSelect('entityClass', 'entity')
-            ->addSelect('entityTitle', 'title');
-        foreach ($this->getAssociatedEntitiesFilters($searchResult) as $entityClass => $ids) {
-            $subQb = $em->getRepository($entityClass)->createQueryBuilder('e');
-            $subQb
-                ->select(
-                    'e.id AS id',
-                    (string)$subQb->expr()->literal($entityClass) . ' AS entityClass',
-                    $this->entityNameResolver->prepareNameDQL(
-                        $this->entityNameResolver->getNameDQL($entityClass, 'e'),
-                        true
-                    ) . ' AS entityTitle'
-                );
-            $subQb->where($subQb->expr()->in('e.id', $ids));
-            $qb->addSubQuery($subQb->getQuery());
-        }
-
-        return $qb->getQueryBuilder();
-    }
-
-    /**
-     * Extracts ids of the entities from a given search result.
-     *
-     * @param SearchResult $searchResult
-     *
-     * @return array example: ['Acme\Entity\Activity' => [1, 2, 3], ...]
-     */
-    protected function getAssociatedEntitiesFilters(SearchResult $searchResult)
-    {
-        $filters = [];
+        $result = [];
         /** @var SearchResultItem $item */
         foreach ($searchResult as $item) {
-            $entityClass = $item->getEntityName();
-            if (!isset($filters[$entityClass])) {
-                $filters[$entityClass] = [];
-            }
-            $filters[$entityClass][] = $item->getRecordId();
+            $result[] = [
+                'id' => $item->getRecordId(),
+                'entity' => $item->getEntityName(),
+                'title' => $item->getSelectedData()['name']
+            ];
         }
 
-        return $filters;
+        return $result;
     }
 }

@@ -8,7 +8,13 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 /**
  * IMAP Email
  *
- * @ORM\Table(name="oro_email_imap")
+ * @ORM\Table(
+ *     name="oro_email_imap",
+ *     indexes={
+ *          @ORM\Index(name="email_imap_uid_idx", columns={"uid"})
+ *      }
+ * )
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository")
  */
 class ImapEmail

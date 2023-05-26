@@ -115,6 +115,24 @@ class NormalizePagingTest extends GetListProcessorTestCase
         self::assertSame(2, $criteria->getFirstResult());
     }
 
+    public function testProcessWhenUnlimitedPageSizeRequestedButThereIsMaxResultsLimit()
+    {
+        $criteria = new Criteria();
+        $criteria->setFirstResult(1);
+        $criteria->setMaxResults(-1);
+
+        $config = new EntityDefinitionConfig();
+        $config->setMaxResults(100);
+
+        $this->context->setConfig($config);
+        $this->context->setCriteria($criteria);
+        $processor = $this->getProcessor(-1);
+        $processor->process($this->context);
+
+        self::assertSame(100, $criteria->getMaxResults());
+        self::assertSame(1, $criteria->getFirstResult());
+    }
+
     public function testProcessWithMaxEntitiesLimit()
     {
         $criteria = new Criteria();

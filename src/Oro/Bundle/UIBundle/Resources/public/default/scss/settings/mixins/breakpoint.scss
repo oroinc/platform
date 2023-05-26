@@ -1,8 +1,9 @@
 /* @theme: default; */
 
-// Use: @include breakpoint('desktop') {
-//  content
-// }
+/** Use: @include breakpoint('desktop') {
+        content
+    }
+*/
 @mixin breakpoint($type) {
     // $breakpoints - global variable;
 

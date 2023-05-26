@@ -15,6 +15,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -37,6 +38,9 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
     private $session;
 
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
+
     /** @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldConfigModel;
 
@@ -54,12 +58,16 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->session = $this->createMock(Session::class);
         $this->fieldConfigModel = $this->createMock(FieldConfigModel::class);
         $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack->expects($this->any())
+            ->method('getSession')
+            ->willReturn($this->session);
 
         $this->handler = new RemoveRestoreConfigFieldHandler(
             $this->configManager,
             $this->validationHelper,
             $this->configHelper,
-            $this->session,
+            $this->requestStack,
             $this->registry
         );
     }

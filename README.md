@@ -1,6 +1,6 @@
 # OroPlatform
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/oroinc/platform/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/oroinc/platform/?branch=master) [![Travis CI build status](https://travis-ci.org/oroinc/platform.svg?branch=master)](https://travis-ci.org/oroinc/platform)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/oroinc/platform/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/oroinc/platform/?branch=master)
 
 OroPlatform is a PHP Business Application Platform (BAP) designed to make development of custom business applications
 easier and faster. Built with [Symfony](http://symfony.com/) full-stack web framework, it offers unlimited flexibility,

@@ -701,14 +701,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
         ]);
 
         $this->processor->process($message, $this->getConnection()->createSession());
-
-        $this->assertStoredAuditCount(1);
-        $audit = $this->findLastStoredAudit();
-        self::assertNull($audit->getField('childrenManyToMany')->getOldValue());
-        self::assertEquals(
-            ['added' => [], 'removed' => [], 'changed' => []],
-            $audit->getField('childrenManyToMany')->getCollectionDiffs()
-        );
+        self::assertEmpty($this->getEntityManager()->getRepository(Audit::class)->findAll());
     }
 
     /**
@@ -739,14 +732,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
         ]);
 
         $this->processor->process($message, $this->getConnection()->createSession());
-
-        $this->assertStoredAuditCount(1);
-        $audit = $this->findLastStoredAudit();
-        self::assertNull($audit->getField('childrenManyToMany')->getOldValue());
-        self::assertEquals(
-            ['added' => [], 'removed' => [], 'changed' => []],
-            $audit->getField('childrenManyToMany')->getCollectionDiffs()
-        );
+        self::assertEmpty($this->getEntityManager()->getRepository(Audit::class)->findAll());
     }
 
     /**
@@ -777,14 +763,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
         ]);
 
         $this->processor->process($message, $this->getConnection()->createSession());
-
-        $this->assertStoredAuditCount(1);
-        $audit = $this->findLastStoredAudit();
-        self::assertNull($audit->getField('childrenManyToMany')->getOldValue());
-        self::assertEquals(
-            ['added' => [], 'removed' => [], 'changed' => []],
-            $audit->getField('childrenManyToMany')->getCollectionDiffs()
-        );
+        self::assertEmpty($this->getEntityManager()->getRepository(Audit::class)->findAll());
     }
 
     private function assertStoredAuditCount($expected)

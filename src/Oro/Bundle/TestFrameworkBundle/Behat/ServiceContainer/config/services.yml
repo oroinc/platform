@@ -168,6 +168,12 @@ services:
         tags:
             - { name: 'context.initializer' }
 
+    Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\ScreenshotInitializer:
+        arguments:
+            - '@oro_test.artifacts.screenshot_generator'
+        tags:
+            - { name: 'context.initializer' }
+
     Oro\Bundle\TestFrameworkBundle\Behat\Client\EmailClient:
         arguments:
             - !service { class: GuzzleHttp\Client }

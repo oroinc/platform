@@ -8,11 +8,17 @@ services:
     tags:
       - { name: event_dispatcher.subscriber, priority: 10 }
 
+  oro_test.artifacts.screenshot_generator:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ScreenshotGenerator
+    arguments:
+      - '@mink'
+      - !abstract '$handlers defined in Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension'
+
   oro_test.artifacts.pretty_artifacts_subscriber:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\PrettyArtifactsSubscriber
     arguments:
       - '@output.formatter.pretty'
-      - '@mink'
+      - '@oro_test.artifacts.screenshot_generator'
 
   oro_test.artifacts.failed_feature_subscriber:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\FailedFeaturesSubscriber
@@ -20,13 +26,13 @@ services:
     - '@oro_test.storage.failed_features'
     tags:
     - { name: event_dispatcher.subscriber }
-  
+
   oro_test.artifacts.progress_artifacts_subscriber:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ProgressArtifactsSubscriber
     arguments:
       - '@output.progress.statistics'
       - '@output.formatter.progress'
-      - '@mink'
+      - '@oro_test.artifacts.screenshot_generator'
 
   oro_test.artifacts.ftp_handler:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\FtpHandler

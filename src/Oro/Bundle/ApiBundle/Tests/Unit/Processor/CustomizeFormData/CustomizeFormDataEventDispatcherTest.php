@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataEventDispatcher;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
-use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
@@ -26,13 +26,24 @@ class CustomizeFormDataEventDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         $this->customizationHandler = $this->createMock(CustomizeFormDataHandler::class);
 
-        $this->eventDispatcher = new CustomizeFormDataEventDispatcher(
-            $this->customizationHandler
-        );
+        $this->eventDispatcher = new CustomizeFormDataEventDispatcher($this->customizationHandler);
     }
 
-    private function getForm(string $name, bool $compound = false, bool $hasApiEventContext = false): FormInterface
+    private function getApiEventContext(mixed $data): CustomizeFormDataContext
     {
+        $apiEventContext = $this->createMock(CustomizeFormDataContext::class);
+        $apiEventContext->expects(self::any())
+            ->method('getData')
+            ->willReturn($data);
+
+        return $apiEventContext;
+    }
+
+    private function getForm(
+        string $name,
+        bool $compound = false,
+        ?CustomizeFormDataContext $apiEventContext = null
+    ): FormInterface {
         $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig->expects(self::any())
             ->method('getName')
@@ -50,36 +61,23 @@ class CustomizeFormDataEventDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('getAutoInitialize')
             ->willReturn(false);
         $formConfig->expects(self::any())
-            ->method('hasAttribute')
+            ->method('getAttribute')
             ->with(CustomizeFormDataHandler::API_EVENT_CONTEXT)
-            ->willReturn($hasApiEventContext);
+            ->willReturn($apiEventContext);
 
         return new Form($formConfig);
-    }
-
-    private function markFormAsSubmitted(FormInterface $form): void
-    {
-        FormUtil::markAsSubmitted($form);
-    }
-
-    private function setFormViewData(FormInterface $form, $data): void
-    {
-        ReflectionUtil::setPropertyValue($form, 'defaultDataSet', true);
-        ReflectionUtil::setPropertyValue($form, 'viewData', $data);
     }
 
     public function testDispatchWithCompoundChildWithApiEventContext(): void
     {
         $childEntity = $this->createMock(\stdClass::class);
-        $childEntityForm = $this->getForm('compound1', true, true);
-        $this->setFormViewData($childEntityForm, $childEntity);
+        $childEntityForm = $this->getForm('compound1', true, $this->getApiEventContext($childEntity));
 
         $entity = $this->createMock(\stdClass::class);
-        $form = $this->getForm('root', true, true);
+        $form = $this->getForm('root', true, $this->getApiEventContext($entity));
         $form->add($this->getForm('field1'));
         $form->add($childEntityForm);
-        $this->setFormViewData($form, $entity);
-        $this->markFormAsSubmitted($form);
+        FormUtil::markAsSubmitted($form);
 
         $this->customizationHandler->expects(self::exactly(2))
             ->method('handleFormEvent')
@@ -110,10 +108,9 @@ class CustomizeFormDataEventDispatcherTest extends \PHPUnit\Framework\TestCase
     public function testDispatchWithoutCompoundChild(): void
     {
         $entity = $this->createMock(\stdClass::class);
-        $form = $this->getForm('root', true, true);
+        $form = $this->getForm('root', true, $this->getApiEventContext($entity));
         $form->add($this->getForm('field1'));
-        $this->setFormViewData($form, $entity);
-        $this->markFormAsSubmitted($form);
+        FormUtil::markAsSubmitted($form);
 
         $this->customizationHandler->expects(self::once())
             ->method('handleFormEvent')
@@ -132,11 +129,9 @@ class CustomizeFormDataEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testDispatchWhenPrimaryEntityFormDoesNotHaveApiEventContext(): void
     {
-        $entity = $this->createMock(\stdClass::class);
         $form = $this->getForm('root', true);
         $form->add($this->getForm('field1'));
-        $this->setFormViewData($form, $entity);
-        $this->markFormAsSubmitted($form);
+        FormUtil::markAsSubmitted($form);
 
         $this->customizationHandler->expects(self::never())
             ->method('handleFormEvent');
@@ -146,16 +141,13 @@ class CustomizeFormDataEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testDispatchWhenCompoundChildDoesNotHaveApiEventContext(): void
     {
-        $childEntity = $this->createMock(\stdClass::class);
         $childEntityForm = $this->getForm('compound1', true);
-        $this->setFormViewData($childEntityForm, $childEntity);
 
         $entity = $this->createMock(\stdClass::class);
-        $form = $this->getForm('root', true, true);
+        $form = $this->getForm('root', true, $this->getApiEventContext($entity));
         $form->add($this->getForm('field1'));
         $form->add($childEntityForm);
-        $this->setFormViewData($form, $entity);
-        $this->markFormAsSubmitted($form);
+        FormUtil::markAsSubmitted($form);
 
         $this->customizationHandler->expects(self::once())
             ->method('handleFormEvent')

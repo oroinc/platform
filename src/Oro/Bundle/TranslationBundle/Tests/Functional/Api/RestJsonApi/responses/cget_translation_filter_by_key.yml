@@ -1,0 +1,45 @@
+data:
+    -
+        type: translations
+        id: '<@tk-test_trans1-test_domain->id>-<@en->code>'
+        attributes:
+            key: test.trans1
+            domain: test_domain
+            hasTranslation: true
+            languageCode: en
+            value: 'test trans1 (en)'
+            englishValue: 'test trans1 (en)'
+            translatedValue: 'test trans1 (en)'
+    -
+        type: translations
+        id: '<@tk-test_trans1-test_domain->id>-<@en_CA->code>'
+        attributes:
+            key: test.trans1
+            domain: test_domain
+            hasTranslation: true
+            languageCode: en_CA
+            value: 'test trans1 (en_CA)'
+            englishValue: 'test trans1 (en)'
+            translatedValue: 'test trans1 (en_CA)'
+    -
+        type: translations
+        id: '<@tk-test_trans1-test_domain->id>-<@en_US->code>'
+        attributes:
+            key: test.trans1
+            domain: test_domain
+            hasTranslation: false
+            languageCode: en_US
+            value: 'test trans1 (en)'
+            englishValue: 'test trans1 (en)'
+            translatedValue: null
+    -
+        type: translations
+        id: '<@tk-test_trans1-test_domain->id>-<@fr_FR->code>'
+        attributes:
+            key: test.trans1
+            domain: test_domain
+            hasTranslation: true
+            languageCode: fr_FR
+            value: 'test trans1 (fr_FR)'
+            englishValue: 'test trans1 (en)'
+            translatedValue: 'test trans1 (fr_FR)'

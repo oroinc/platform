@@ -1,18 +1,15 @@
 /* @theme: admin.oro; */
-
 @use 'sass:color';
 
-$btn-brand-google-base-color: #dc4e41 !default;
-
 $btn-brand-google: (
-    'background': $btn-brand-google-base-color,
-    'border': $btn-brand-google-base-color,
-    'color': $primary-inverse,
-    'hover-background': color.adjust($btn-brand-google-base-color, $lightness: -5%),
-    'hover-border': color.adjust($btn-brand-google-base-color, $lightness: -5%),
-    'hover-color': $primary-inverse,
-    'active-background': color.adjust($btn-brand-google-base-color, $lightness: 25%),
-    'active-border': color.adjust($btn-brand-google-base-color, $lightness: -5%),
-    'active-color': color.adjust($btn-brand-google-base-color, $lightness: -5%),
+    'background': #fff,
+    'border': #dadce0,
+    'color': #3c4043,
+    'hover-background': rgba(66, 133, 244, .04),
+    'hover-border': #d2e3fc,
+    'hover-color': #3c4043,
+    'active-background': rgba(66, 133, 244, .1),
+    'active-border': #d2e3fc,
+    'active-color': #3c4043,
     'active-box-shadow': none
 ) !default;

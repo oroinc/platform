@@ -8,7 +8,9 @@
         linear-gradient(45deg, transparent 75%, $pattern-color 75%),
         linear-gradient(-45deg, transparent 75%, $pattern-color 75%);
     background-size: $pattern-size $pattern-size;
-    background-position: 0 0, 0 #{$pattern-size * .5},
-                         #{$pattern-size * .5} -#{$pattern-size * .5},
-                         -#{$pattern-size * .5} 0;
+    background-position:
+        0 0,
+        0 #{$pattern-size * .5},
+        #{$pattern-size * .5} -#{$pattern-size * .5},
+        -#{$pattern-size * .5} 0;
 }

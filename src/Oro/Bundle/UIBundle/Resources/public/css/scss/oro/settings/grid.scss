@@ -1,0 +1,10 @@
+/* @theme: admin.oro; */
+
+$grid-column-count: 12 !default;
+$grid-template-columns: var(
+    --grid-template-columns,
+    repeat(var(--grid-column-count, #{$grid-column-count}), minmax(0, 1fr))
+) !default;
+$grid-gap: var(--grid-gap, #{$offset-inline}) !default;
+
+$grid-aligns: start, center, end !default;

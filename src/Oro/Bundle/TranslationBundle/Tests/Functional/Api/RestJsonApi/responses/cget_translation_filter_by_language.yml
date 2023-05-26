@@ -1,0 +1,34 @@
+data:
+    -
+        type: translations
+        id: '<@tk-test_trans1-test_domain->id>-<@en_CA->code>'
+        attributes:
+            key: test.trans1
+            domain: test_domain
+            hasTranslation: true
+            languageCode: en_CA
+            value: 'test trans1 (en_CA)'
+            englishValue: 'test trans1 (en)'
+            translatedValue: 'test trans1 (en_CA)'
+    -
+        type: translations
+        id: '<@tk-test_trans2-test_domain->id>-<@en_CA->code>'
+        attributes:
+            key: test.trans2
+            domain: test_domain
+            hasTranslation: true
+            languageCode: en_CA
+            value: 'test trans2 (en_CA)'
+            englishValue: test.trans2
+            translatedValue: 'test trans2 (en_CA)'
+    -
+        type: translations
+        id: '<@tk-another_trans1-test_domain->id>-<@en_CA->code>'
+        attributes:
+            key: another.trans1
+            domain: test_domain
+            hasTranslation: false
+            languageCode: en_CA
+            value: another.trans1
+            englishValue: another.trans1
+            translatedValue: null

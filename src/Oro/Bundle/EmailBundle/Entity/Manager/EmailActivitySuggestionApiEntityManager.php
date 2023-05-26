@@ -118,7 +118,7 @@ class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEnti
         $searchResult = $this->searchIndexer->query($searchQueryBuilder);
 
         if ($searchResult->count() > 0) {
-            $entities = $this->getEmailAssociatedEntitiesQueryBuilder($searchResult)->getQuery()->getResult();
+            $entities = $this->convertSearchResultToEntityList($searchResult);
         }
 
         return $entities;
