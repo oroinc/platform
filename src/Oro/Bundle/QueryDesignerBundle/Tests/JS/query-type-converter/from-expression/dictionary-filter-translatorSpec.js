@@ -102,6 +102,38 @@ describe('oroquerydesigner/js/query-type-converter/from-expression/dictionary-fi
                         }
                     }
                 }
+            ],
+            'not value are available in filter config': [
+                {
+                    type: 'dictionary',
+                    name: 'multicurrency',
+                    choices: [{value: '1'}, {value: '2'}],
+                    select2ConfigData: [
+                        {id: '1', value: 'UAH', text: 'Ukrainian Hryvnia (UAH)'}
+                    ]
+                },
+                null
+            ],
+            'successful translation values with predefined options set in filter config': [
+                {
+                    type: 'dictionary',
+                    name: 'multicurrency',
+                    choices: [{value: '1'}, {value: '2'}],
+                    select2ConfigData: [
+                        {id: '1', value: 'UAH', text: 'Ukrainian Hryvnia (UAH)'},
+                        {id: '2', value: 'USD', text: 'US Dollar ($)'}
+                    ]
+                },
+                {
+                    columnName: 'bar',
+                    criterion: {
+                        filter: 'multicurrency',
+                        data: {
+                            type: '1',
+                            value: ['1', '2']
+                        }
+                    }
+                }
             ]
         };
 

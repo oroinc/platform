@@ -57,6 +57,7 @@ class DictionaryFilterTranslatorFromExpression extends AbstractFilterTranslatorF
      */
     translate(node, filterConfig, operatorParams) {
         const fieldId = this.fieldIdTranslator.translate(this.resolveFieldAST(node));
+        const {filterParams, select2ConfigData} = filterConfig;
 
         const condition = {
             columnName: fieldId,
@@ -69,8 +70,17 @@ class DictionaryFilterTranslatorFromExpression extends AbstractFilterTranslatorF
             }
         };
 
-        if (filterConfig.filterParams) {
-            condition.criterion.data.params = filterConfig.filterParams;
+        if (filterParams) {
+            condition.criterion.data.params = filterParams;
+        }
+
+        if (select2ConfigData) {
+            const availableOption = select2ConfigData.map(item => String(item.id));
+            if (!condition.criterion.data.value.every(value => availableOption.indexOf(value) !== -1)) {
+                // dictionary filter has predefined set of available option
+                // and not all values from expression are found within available options
+                return null;
+            }
         }
 
         return condition;
