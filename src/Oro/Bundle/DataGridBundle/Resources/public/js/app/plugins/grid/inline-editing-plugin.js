@@ -167,8 +167,13 @@ define(function(require) {
             }
         },
 
-        patchCellConstructor: function(column) {
-            const Cell = column.get('cell');
+        /**
+         * Extend passed cell constructor via some methods and properties
+         *
+         * @param {Constructor} Cell
+         * @returns {Constructor}
+         */
+        cellPatcher(Cell) {
             const inlineEditingPlugin = this;
             const oldClassName = Cell.prototype.className;
             const splitEventsList = new SplitEventList(Cell, 'isEditable', {
@@ -177,7 +182,8 @@ define(function(require) {
                 'click': _.noop,
                 'mouseenter': 'delayedIconRender'
             });
-            const extended = Cell.extend({
+
+            return Cell.extend({
                 constructor: function(options) {
                     // column should be initialized to valid work of className generation
                     this.column = options.column;
@@ -199,13 +205,13 @@ define(function(require) {
 
                 delayedIconRender: function() {
                     if (!this.$('[data-role="edit"]').length) {
-                        this.$el.append('<span class="inline-editor-edit-action">' +
-                            '<button data-role="edit" ' +
-                                    'class="inline-actions-btn skip-row-click hide-text"' +
-                                    'title="' + _.escape(__('Edit')) + '">' +
-                                '<span class="fa-pencil" aria-hidden="true"></span>' +
-                            '</button>' +
-                        '</span>');
+                        this.$el.append(`<span class="inline-editor-edit-action"
+                            <button data-role="edit"
+                                    class="inline-actions-btn skip-row-click hide-text
+                                    title="${_.escape(__('Edit'))}"
+                                <span class="fa-pencil" aria-hidden="true"></span
+                            </button
+                       </span>`);
                         this.$el.attr('title', inlineEditingPlugin.helpMessage);
                     }
                 },
@@ -222,9 +228,14 @@ define(function(require) {
                     e.stopPropagation();
                 }
             });
+        },
+
+        patchCellConstructor: function(column) {
+            const Cell = column.get('cell');
 
             column.set({
-                cell: extended,
+                cellPatcher: this.cellPatcher.bind(this),
+                cell: this.cellPatcher(Cell),
                 oldCell: Cell
             });
         },
