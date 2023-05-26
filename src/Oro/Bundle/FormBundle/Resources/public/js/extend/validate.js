@@ -220,12 +220,7 @@ define(function(require, exports, module) {
                 .focus()
                 .trigger('focusin');
         } else if (!$elem.filter(':visible').length && $firstValidationError.length) {
-            const $scrollableContainer = $firstValidationError.closest('.scrollable-container');
-            const scrollTop = $firstValidationError.position().top + $scrollableContainer.scrollTop();
-
-            $scrollableContainer.animate({
-                scrollTop: scrollTop
-            }, scrollTop / 2);
+            $firstValidationError[0].scrollIntoView({block: 'center'});
         } else {
             return func.call(this);
         }
@@ -245,15 +240,15 @@ define(function(require, exports, module) {
             }
 
             $(this.currentForm).on({
-                'content:initialized.validate': function(e) {
+                'content:initialized.validate': e => {
                     this.bindInitialErrors(e.target);
-                }.bind(this),
-                'content:changed.validate': function(event) {
-                    validationHandler.initializeOptionalValidationGroupHandlers($(event.target));
                 },
-                'disabled.validate': function(e) {
+                'content:changed.validate': e => {
+                    validationHandler.initializeOptionalValidationGroupHandlers($(e.target));
+                },
+                'disabled.validate': e => {
                     this.hideElementErrors(e.target);
-                }.bind(this)
+                }
             });
 
             $.validator.preloadMethods()
@@ -508,6 +503,16 @@ define(function(require, exports, module) {
                         }
 
                         updateListElement($elements, true);
+                    });
+            }
+
+            // Process initial errors from backend side
+            if (this.numberOfInvalids()) {
+                Object.entries(this.invalid)
+                    .forEach(([elementName, isValid]) => {
+                        if (isValid) {
+                            updateListElement($(`[name="${elementName}"]`), true);
+                        }
                     });
             }
 

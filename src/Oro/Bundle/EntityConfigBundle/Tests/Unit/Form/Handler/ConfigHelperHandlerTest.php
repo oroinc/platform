@@ -16,10 +16,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,6 +28,8 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 
     private Session|\PHPUnit\Framework\MockObject\MockObject $session;
 
+    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
+
     private Router|\PHPUnit\Framework\MockObject\MockObject $router;
 
     private ConfigHelper|\PHPUnit\Framework\MockObject\MockObject $configHelper;
@@ -37,7 +38,6 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 
     private Request|\PHPUnit\Framework\MockObject\MockObject $request;
 
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
     private ConfigHelperHandler $handler;
 
@@ -49,16 +49,16 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
         $this->configHelper = $this->createMock(ConfigHelper::class);
         $this->form = $this->createMock(FormInterface::class);
         $this->request = $this->createMock(Request::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack
+            ->method('getSession')
+            ->willReturn($this->session);
 
         $this->handler = new ConfigHelperHandler(
             $this->formFactory,
-            $this->session,
+            $this->requestStack,
             $this->router,
             $this->configHelper,
-            $this->translator,
-            $urlGenerator
         );
     }
 

@@ -9,6 +9,6 @@ services:
     oro_ui.content_provider.flash_messages:
         class: Oro\Bundle\UIBundle\ContentProvider\FlashMessagesContentProvider
         arguments:
-            - '@session'
+            - '@request_stack'
         tags:
             - { name: oro_ui.content_provider, alias: flashMessages }

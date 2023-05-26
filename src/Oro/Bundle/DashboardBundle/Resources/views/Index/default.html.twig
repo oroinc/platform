@@ -159,7 +159,7 @@
                         dashboardMacros.renderWidgetsColumn({
                             'widgets': dashboard.getOrderedColumnWidgets(0, false, true),
                             'columnElementId': 'dashboard-column-0',
-                            'columnClass': 'dashboard-column',
+                            'columnClass': 'responsive-cell dashboard-column',
                             'widgetIdPrefix': widgetIdPrefix,
                             'allowEdit': allowEdit
                         })
@@ -168,7 +168,7 @@
                         dashboardMacros.renderWidgetsColumn({
                             'widgets': dashboard.getOrderedColumnWidgets(1, true, false),
                             'columnElementId': 'dashboard-column-1',
-                            'columnClass': 'dashboard-column',
+                            'columnClass': 'responsive-cell dashboard-column',
                             'widgetIdPrefix': widgetIdPrefix,
                             'allowEdit': allowEdit
                         })
@@ -182,7 +182,7 @@
 {% endblock content %}
 
 {% macro renderWidgetsColumn(options) %}
-    <div id="{{ options.columnElementId }}" class="responsive-cell dashboard-column">
+    <div id="{{ options.columnElementId }}" class="{{ options.columnClass }}">
         {% for widget in options.widgets %}
             {% if widget.config.acl is not defined or is_granted(widget.config.acl) %}
                 {{

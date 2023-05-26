@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\EventListener;
 
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -13,22 +13,19 @@ class OriginalFileNamesConfigurationListener
 {
     private const ATTACHMENT_ORIGINAL_FILE_NAMES_ENABLED = 'oro_attachment.original_file_names_enabled';
 
-    private Session $session;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(Session $session, TranslatorInterface $translator)
+    public function __construct(private RequestStack $requestStack, private TranslatorInterface $translator)
     {
-        $this->session = $session;
-        $this->translator = $translator;
     }
 
     public function afterUpdate(ConfigUpdateEvent $event): void
     {
         $changeSet = $event->getChangeSet();
+        $request = $this->requestStack->getCurrentRequest();
         foreach ($changeSet as $configKey => $change) {
-            if ($configKey === self::ATTACHMENT_ORIGINAL_FILE_NAMES_ENABLED) {
-                $this->session->getFlashBag()->add(
+            if ($configKey === self::ATTACHMENT_ORIGINAL_FILE_NAMES_ENABLED
+                && null !== $request
+                && $request->hasSession()) {
+                $request->getSession()->getFlashBag()->add(
                     'warning',
                     $this->translator->trans('oro.attachment.config.notice.storage_check_space')
                 );

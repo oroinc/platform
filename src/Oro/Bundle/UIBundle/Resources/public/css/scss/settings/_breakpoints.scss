@@ -1,0 +1,16 @@
+/* @theme: admin.oro; */
+
+// Native breakpoints;
+
+$breakpoints: (
+    'lg': '(min-width: #{$breakpoint-lg})',
+    'big': '(max-width: #{$breakpoint-big})',
+    'md': '(max-width: #{$breakpoint-md})',
+    'sm': '(max-width: #{$breakpoint-sm})',
+    'print': 'print'
+);
+
+// Variable for extend native breakpoints is empty by default;
+$custom-breakpoints: () !default;
+
+$breakpoints: merge-breakpoints(breakpoints, $custom-breakpoints) !default;

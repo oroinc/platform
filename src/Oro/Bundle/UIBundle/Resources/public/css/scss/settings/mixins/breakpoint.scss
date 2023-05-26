@@ -1,0 +1,37 @@
+/* @theme: admin.oro; */
+
+/** Use: @include breakpoint('desktop') {
+        content
+    }
+*/
+@mixin breakpoint($type) {
+    // $breakpoints - global variable;
+
+    @if (length($breakpoints) > 0) {
+        @if (map-has-key($breakpoints, $type) and map-get($breakpoints, $type)) {
+            @media #{map-get($breakpoints, $type)} {
+                @content;
+            }
+        } @else {
+            @warn 'Absent breakpoint type: ' + $type;
+        }
+    }
+}
+
+/** Use: @include container-query('desktop') {
+        content
+    }
+*/
+@mixin container-query($type, $name: null) {
+    // $breakpoints - global variable;
+
+    @if (length($breakpoints) > 0) {
+        @if (map-has-key($breakpoints, $type) and map-get($breakpoints, $type)) {
+            @container #{$name} #{map-get($breakpoints, $type)} {
+                @content;
+            }
+        } @else {
+            @warn 'Absent breakpoint type: ' + $type;
+        }
+    }
+}

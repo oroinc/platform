@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
+use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\ChangeContextInterface;
@@ -85,6 +86,7 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     private ?FormInterface $form = null;
     private mixed $data = null;
     private ?IncludedEntityCollection $includedEntities = null;
+    private ?AdditionalEntityCollection $additionalEntities = null;
     private ?EntityMapper $entityMapper = null;
 
     /**
@@ -227,6 +229,9 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
      */
     public function setIncludedEntities(IncludedEntityCollection $includedEntities): void
     {
+        if (null !== $this->includedEntities) {
+            throw new \LogicException('The collection of included entities was already initialized.');
+        }
         $this->includedEntities = $includedEntities;
     }
 
@@ -265,6 +270,82 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     }
 
     /**
+     * Gets the list of additional entities involved to the request processing.
+     *
+     * @return object[]
+     */
+    public function getAdditionalEntities(): array
+    {
+        return $this->getAdditionalEntityCollection()->getEntities();
+    }
+
+    /**
+     * Adds the entity to a list of additional entities involved to the request processing.
+     * For example when an association is represented as a field,
+     * a target entity of this association does not exist in the list of included entities
+     * and need to be persisted manually, so, it should be added to the list of additional entities.
+     */
+    public function addAdditionalEntity(object $entity): void
+    {
+        $this->getAdditionalEntityCollection()->add($entity);
+    }
+    /**
+     * Adds an entity to the list of additional entities involved to the request processing
+     * when this entity should be removed from the database.
+     */
+    public function addAdditionalEntityToRemove(object $entity): void
+    {
+        $this->getAdditionalEntityCollection()->add($entity, true);
+    }
+
+    /**
+     * Removes an entity from the list of additional entities involved to the request processing.
+     */
+    public function removeAdditionalEntity(object $entity): void
+    {
+        $this->getAdditionalEntityCollection()->remove($entity);
+    }
+
+    /**
+     * Initializes the collection of additional entities.
+     */
+    public function setAdditionalEntityCollection(AdditionalEntityCollection $additionalEntities): void
+    {
+        if (null !== $this->additionalEntities) {
+            throw new \LogicException('The collection of additional entities was already initialized.');
+        }
+        $this->additionalEntities = $additionalEntities;
+    }
+
+    /**
+     * Gets a collection contains the list of additional entities involved to the request processing.
+     */
+    private function getAdditionalEntityCollection(): AdditionalEntityCollection
+    {
+        if (null === $this->additionalEntities) {
+            throw new \LogicException('The collection of additional entities was not initialized.');
+        }
+
+        return $this->additionalEntities;
+    }
+
+    /**
+     * Gets a service that can be used to convert an entity object to a model object and vise versa.
+     */
+    public function getEntityMapper(): ?EntityMapper
+    {
+        return $this->entityMapper;
+    }
+
+    /**
+     * Sets a service that can be used to convert an entity object to a model object and vise versa.
+     */
+    public function setEntityMapper(?EntityMapper $entityMapper): void
+    {
+        $this->entityMapper = $entityMapper;
+    }
+
+    /**
      * This method is just an alias for getData.
      */
     public function getResult(): mixed
@@ -294,21 +375,5 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     public function removeResult(): void
     {
         throw new \BadMethodCallException('Not implemented.');
-    }
-
-    /**
-     * Gets a service that can be used to convert an entity object to a model object and vise versa.
-     */
-    public function getEntityMapper(): ?EntityMapper
-    {
-        return $this->entityMapper;
-    }
-
-    /**
-     * Sets a service that can be used to convert an entity object to a model object and vise versa.
-     */
-    public function setEntityMapper(?EntityMapper $entityMapper): void
-    {
-        $this->entityMapper = $entityMapper;
     }
 }

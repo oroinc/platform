@@ -5,41 +5,20 @@ namespace Oro\Bundle\EntityPaginationBundle\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Message manager class.
+ */
 class MessageManager
 {
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var EntityPaginationNavigation
-     */
-    protected $navigation;
-
-    /**
-     * @var EntityPaginationStorage
-     */
-    protected $storage;
-
     public function __construct(
-        Session $session,
-        TranslatorInterface $translator,
-        EntityPaginationNavigation $navigation,
-        EntityPaginationStorage $storage
+        protected RequestStack $requestStack,
+        protected TranslatorInterface $translator,
+        protected EntityPaginationNavigation $navigation,
+        protected EntityPaginationStorage $storage
     ) {
-        $this->session = $session;
-        $this->translator = $translator;
-        $this->navigation = $navigation;
-        $this->storage = $storage;
     }
 
     /**
@@ -48,7 +27,7 @@ class MessageManager
      */
     public function addFlashMessage($type, $message)
     {
-        $this->session->getFlashBag()->add($type, $message);
+        $this->requestStack->getSession()->getFlashBag()->add($type, $message);
     }
 
     /**
