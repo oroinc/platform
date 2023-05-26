@@ -10,12 +10,11 @@ use Symfony\Component\Validator\Constraint;
  */
 class ConstraintConverter implements ConstraintConverterInterface
 {
-    /** @var iterable|ConstraintConverterInterface[] */
+    /** @var iterable<ConstraintConverterInterface> */
     private iterable $processors;
 
-    public function __construct(
-        iterable $processors
-    ) {
+    public function __construct(iterable $processors)
+    {
         $this->processors = $processors;
     }
 

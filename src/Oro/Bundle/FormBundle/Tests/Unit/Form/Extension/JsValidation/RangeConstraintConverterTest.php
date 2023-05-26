@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension\JsValidation\Converters;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension\JsValidation;
 
-use Oro\Bundle\FormBundle\Form\Extension\JsValidation\Converters\RangeConstraintConverter;
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\RangeConstraintConverter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;

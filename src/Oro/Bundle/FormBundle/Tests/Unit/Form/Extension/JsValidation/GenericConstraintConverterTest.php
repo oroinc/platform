@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension\JsValidation\Converters;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension\JsValidation;
 
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface;
-use Oro\Bundle\FormBundle\Form\Extension\JsValidation\Converters\GenericConstraintConverter;
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\GenericConstraintConverter;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

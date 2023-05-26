@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation\Converters;
+namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation;
 
-use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;

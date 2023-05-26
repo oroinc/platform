@@ -1,8 +1,7 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation\Converters;
+namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation;
 
-use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface;
 use Oro\Bundle\FormBundle\Validator\Constraints\PercentRange;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;

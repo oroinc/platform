@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\FormBundle\Tests\Functional\Command;
 
-use Oro\Bundle\FormBundle\Form\Extension\JsValidation\Converters\GenericConstraintConverter;
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\GenericConstraintConverter;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Command\CommandTestingTrait;
 
