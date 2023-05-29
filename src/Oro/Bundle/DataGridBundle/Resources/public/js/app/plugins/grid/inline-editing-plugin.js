@@ -205,12 +205,12 @@ define(function(require) {
 
                 delayedIconRender: function() {
                     if (!this.$('[data-role="edit"]').length) {
-                        this.$el.append(`<span class="inline-editor-edit-action"
+                        this.$el.append(`<span class="inline-editor-edit-action">
                             <button data-role="edit"
-                                    class="inline-actions-btn skip-row-click hide-text
-                                    title="${_.escape(__('Edit'))}"
-                                <span class="fa-pencil" aria-hidden="true"></span
-                            </button
+                                    class="inline-actions-btn skip-row-click hide-text"
+                                    title="${_.escape(__('Edit'))}">
+                                <span class="fa-pencil" aria-hidden="true"></span>
+                            </button>
                        </span>`);
                         this.$el.attr('title', inlineEditingPlugin.helpMessage);
                     }
