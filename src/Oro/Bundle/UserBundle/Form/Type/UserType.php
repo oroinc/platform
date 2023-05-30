@@ -199,7 +199,7 @@ class UserType extends AbstractType
             [
                 'data_class'           => User::class,
                 'csrf_token_id'        => 'user',
-                'validation_groups'    => ['Roles', 'Default'],
+                'validation_groups'    => ['Roles', 'UserForm', 'Default'],
                 'ownership_disabled'   => $this->isMyProfilePage
             ]
         );

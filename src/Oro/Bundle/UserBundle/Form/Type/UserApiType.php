@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for User entity for API calls.
+ */
 class UserApiType extends UserType
 {
     /** ConfigManager */
@@ -62,8 +65,8 @@ class UserApiType extends UserType
                 }
 
                 return $user && $user->getId()
-                    ? ['ProfileAPI', 'Default']
-                    : ['Registration', 'ProfileAPI', 'Default'];
+                    ? ['ProfileAPI', 'UserForm', 'Default']
+                    : ['Registration', 'ProfileAPI', 'UserForm', 'Default'];
             },
         ]);
     }

@@ -19,6 +19,7 @@ Oro\Bundle\UserBundle\Entity\User:
                 min: 6
                 max: 255
                 allowEmptyString: false
+                groups: [UserForm, Registration]
             - Email:        ~
         plainPassword:
             - NotBlank:
