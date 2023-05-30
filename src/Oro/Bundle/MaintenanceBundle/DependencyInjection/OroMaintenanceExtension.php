@@ -29,6 +29,10 @@ class OroMaintenanceExtension extends Extension
 
     private function configureMaintenanceParameters(ContainerBuilder $container, array $config): void
     {
+        if ($container->hasParameter('maintenance_lock_file_path')) {
+            $config['driver']['options']['file_path'] = $container->getParameter('maintenance_lock_file_path');
+        }
+
         $container->setParameter('oro_maintenance.driver', $config['driver']);
         $container->setParameter('oro_maintenance.authorized.path', $config['authorized']['path']);
         $container->setParameter('oro_maintenance.authorized.host', $config['authorized']['host']);
