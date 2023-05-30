@@ -1,7 +1,4 @@
 services:
-    _defaults:
-        public: false
-
     Oro\Bundle\FormBundle\Command\DebugJsConstraintConvertersCommand:
         arguments:
             - !tagged_iterator oro_form.extension.js_validation.constraint_converter
