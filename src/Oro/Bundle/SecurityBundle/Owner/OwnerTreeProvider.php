@@ -76,6 +76,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
             }
         }
 
+        $businessUnitRelations = $this->rearrangeBusinessUnitRelations($businessUnitRelations);
         $this->setSubordinateBusinessUnitIds($tree, $this->buildTree($businessUnitRelations, $businessUnitClass));
 
         list($users, $columnMap) = $this->executeQuery(
@@ -147,5 +148,29 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     private function getRepository(string $entityClass): EntityRepository
     {
         return $this->getManagerForClass($entityClass)->getRepository($entityClass);
+    }
+
+    /**
+     * Moves parent business unit before child business unit, of needs.
+     *
+     * @param array $businessUnitRelations
+     * @return array
+     */
+    private function rearrangeBusinessUnitRelations(array $businessUnitRelations): array
+    {
+        $relations = [];
+
+        foreach ($businessUnitRelations as $buId => $parentId) {
+            if ($parentId && !array_key_exists($parentId, $relations)
+                && array_key_exists($parentId, $businessUnitRelations)
+            ) {
+                $relations[$parentId] = $businessUnitRelations[$parentId];
+                unset($businessUnitRelations[$parentId]);
+            }
+
+            $relations[$buId] = $parentId;
+        }
+
+        return $relations;
     }
 }
