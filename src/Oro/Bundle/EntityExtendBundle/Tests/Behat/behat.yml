@@ -38,6 +38,8 @@ oro_behat_extension:
       options:
         mapping:
           Option First: 'oro_entity_config_type[enum][enum_options][0][label]'
+          Option Second: 'oro_entity_config_type[enum][enum_options][1][label]'
+          Option Third: 'oro_entity_config_type[enum][enum_options][2][label]'
 
     CustomEntityForm:
       selector: "form[name='custom_entity_type']"
