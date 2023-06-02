@@ -499,6 +499,8 @@ services:
         class: Oro\Bundle\EntityExtendBundle\ImportExport\Serializer\EnumNormalizer
         arguments:
             - "@oro_entity.helper.field_helper"
+        calls:
+            - [setEnumValueProvider, ['@oro_entity_extend.enum_value_provider']]
         tags:
             - { name: oro_importexport.normalizer, priority: 20 }
 

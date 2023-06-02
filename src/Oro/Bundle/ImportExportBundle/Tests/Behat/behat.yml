@@ -38,3 +38,7 @@ oro_behat_extension:
 
     ExportButtonDropdown:
       selector: '.export-btn + .dropdown-toggle'
+
+    Import File Field:
+      selector: ".import-widget-content .tab-pane.active input[id^='oro_importexport_import_file']"
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\FileField
