@@ -318,6 +318,11 @@ class AclRoleHandler
             $this->configurableFilter->filter(new ArrayCollection($formPrivileges), $this->configurableName)
         );
 
+        $this->clearAclCache($role);
+    }
+
+    protected function clearAclCache(AbstractRole $role): void
+    {
         $this->aclCache->clearCache();
 
         // Clear doctrine query cache to be sure that queries will process hints

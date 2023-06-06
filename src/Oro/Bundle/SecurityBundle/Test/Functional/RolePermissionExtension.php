@@ -30,7 +30,12 @@ trait RolePermissionExtension
         if ($cacheDriver instanceof AdapterInterface) {
             $cacheDriver->clear();
         }
-        self::getContainer()->get('oro_security.tests.security.acl.cache.doctrine')->clearCache();
+        $container = self::getContainer();
+        $container->get('oro_security.tests.security.acl.cache.doctrine')->clearCache();
+
+        if ($container->has('oro_customer.security.acl.visitor.cache')) {
+            $container->get('oro_customer.security.acl.visitor.cache')->clearCache();
+        }
     }
 
     /**
