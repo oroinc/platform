@@ -1,11 +1,10 @@
 <?php
 
-namespace Unit\Monolog\Handler;
+namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog\Handler;
 
 use Oro\Bundle\LoggerBundle\Monolog\Handler\ExcludeLogByMessageHandler;
-use PHPUnit\Framework\TestCase;
 
-class ExcludeLogByMessageHandlerTest extends TestCase
+class ExcludeLogByMessageHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @see ExcludeLogByMessageHandler::isHandling()
