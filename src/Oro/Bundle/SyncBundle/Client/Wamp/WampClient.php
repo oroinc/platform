@@ -11,6 +11,7 @@ use Gos\Component\WebSocketClient\Wamp\Protocol;
 use Gos\Component\WebSocketClient\Wamp\WebsocketPayload;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 
 /**
  * Overrides GosClient to add the ability to set socket transport and context options.
@@ -88,12 +89,23 @@ class WampClient implements ClientInterface, LoggerAwareInterface
      */
     private $gosClient;
 
+    /**
+     * @var int Timeout to wait for data in a stream.
+     */
+    private int $streamWaitTimeoutSec = 1;
+
+    /**
+     * User Agent connection header
+     */
+    private ?string $userAgent = null;
+
     public function __construct(
         string $host,
         int $port,
         string $transport,
         array $contextOptions = [],
-        ?string $origin = null
+        ?string $origin = null,
+        ?string $userAgent = null,
     ) {
         $this->serverHost = $host;
         $this->serverPort = $port;
@@ -102,6 +114,9 @@ class WampClient implements ClientInterface, LoggerAwareInterface
         $this->payloadGenerator = new PayloadGenerator();
         $this->contextOptions = $contextOptions;
         $this->endpoint = "{$transport}://{$host}:{$port}";
+        $this->userAgent = $userAgent;
+
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -114,7 +129,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
         $this->target = '/' . ltrim($target, '/');
 
         if ($this->connected) {
-            return (string) $this->sessionId;
+            return (string)$this->sessionId;
         }
 
         $this->socket = $this->openSocket();
@@ -133,7 +148,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
             $this->connected = true;
         }
 
-        return (string) $this->sessionId;
+        return (string)$this->sessionId;
     }
 
     /**
@@ -156,9 +171,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
         $firstByte = fread($this->socket, 1);
 
         if (false === $firstByte) {
-            if (null !== $this->logger) {
-                $this->logger->error('Could not extract the payload from the buffer.', ['error' => error_get_last()]);
-            }
+            $this->logger->error('Could not extract the payload from the buffer.', ['error' => error_get_last()]);
 
             throw new WebsocketException('Could not extract the payload from the buffer.');
         }
@@ -167,9 +180,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
         $payload = fread($this->socket, $payloadLength);
 
         if (false === $payload) {
-            if (null !== $this->logger) {
-                $this->logger->error('Could not extract the payload from the buffer.', ['error' => error_get_last()]);
-            }
+            $this->logger->error('Could not extract the payload from the buffer.', ['error' => error_get_last()]);
 
             throw new WebsocketException('Could not extract the payload from the buffer.');
         }
@@ -203,9 +214,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
      */
     public function prefix(string $prefix, string $uri): void
     {
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Establishing prefix "%s" for URI "%s"', $prefix, $uri));
-        }
+        $this->logger->info(sprintf('Establishing prefix "%s" for URI "%s"', $prefix, $uri));
 
         $this->send([Protocol::MSG_PREFIX, $prefix, $uri]);
     }
@@ -226,14 +235,12 @@ class WampClient implements ClientInterface, LoggerAwareInterface
             array_shift($args);
         }
 
-        if (null !== $this->logger) {
-            $this->logger->info(
-                sprintf('Websocket client calling %s', $procUri),
-                [
-                    'callArguments' => $args,
-                ]
-            );
-        }
+        $this->logger->info(
+            sprintf('Websocket client calling %s', $procUri),
+            [
+                'callArguments' => $args,
+            ]
+        );
 
         $this->send(
             array_merge(
@@ -256,16 +263,14 @@ class WampClient implements ClientInterface, LoggerAwareInterface
     public function publish(string $topicUri, string $payload, array $exclude = [], array $eligible = []): void
     {
         $payload = json_decode($payload, JSON_OBJECT_AS_ARRAY);
-        if (null !== $this->logger) {
-            $this->logger->info(
-                sprintf('Websocket client publishing to %s', $topicUri),
-                [
-                    'payload' => $payload,
-                    'excludedIds' => $exclude,
-                    'eligibleIds' => $eligible,
-                ]
-            );
-        }
+        $this->logger->info(
+            sprintf('Websocket client publishing to %s', $topicUri),
+            [
+                'payload' => $payload,
+                'excludedIds' => $exclude,
+                'eligibleIds' => $eligible,
+            ]
+        );
 
         $this->send([Protocol::MSG_PUBLISH, $topicUri, $payload, $exclude, $eligible]);
     }
@@ -282,29 +287,25 @@ class WampClient implements ClientInterface, LoggerAwareInterface
     public function event(string $topicUri, string $payload): void
     {
         $payload = json_decode($payload, JSON_OBJECT_AS_ARRAY);
-        if (null !== $this->logger) {
-            $this->logger->info(
-                sprintf('Websocket client sending event to %s', $topicUri),
-                [
-                    'payload' => $payload,
-                ]
-            );
-        }
+        $this->logger->info(
+            sprintf('Websocket client sending event to %s', $topicUri),
+            [
+                'payload' => $payload,
+            ]
+        );
 
         $this->send([Protocol::MSG_EVENT, $topicUri, $payload]);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Taken from the 1.0 version of WAMP client of GeniusesOfSymfony/WebSocketPhpClient.
      *
      * @throws BadResponseException
      */
     protected function read(): string
     {
-        $streamBody = stream_get_contents($this->socket, stream_get_meta_data($this->socket)['unread_bytes']);
-        if (false === $streamBody) {
+        $streamBody = $this->streamGetContents($this->streamWaitTimeoutSec);
+        if (!$streamBody) {
             throw new BadResponseException('The stream buffer could not be read.');
         }
 
@@ -312,10 +313,51 @@ class WampClient implements ClientInterface, LoggerAwareInterface
         $endPos = strpos($streamBody, ']');
 
         if (false === $startPos || false === $endPos) {
+            $this->logger->error(
+                'Could not extract response body from stream: {stream_body}',
+                [
+                    'stream_body' => $streamBody,
+                    'endpoint' => $this->endpoint,
+                    'context_options' => $this->contextOptions,
+                    'origin' => $this->origin,
+                    'user_agent' => $this->userAgent,
+                ]
+            );
+
             throw new BadResponseException('Could not extract response body from stream.');
         }
 
         return substr($streamBody, $startPos, $endPos);
+    }
+
+    protected function streamGetContents(int $timeout): string
+    {
+        $read = [$this->socket];
+        $write = [];
+        $except = [];
+        $streamBody = '';
+        try {
+            stream_set_blocking($this->socket, 0);
+            while (stream_select($read, $write, $except, $timeout) > 0) {
+                $streamBody .= stream_get_contents($this->socket);
+            }
+        } catch (\Throwable $throwable) {
+            $this->logger->error(
+                'Could not read stream body: {error}',
+                [
+                    'error' => $throwable->getMessage(),
+                    'throwable' => $throwable,
+                    'endpoint' => $this->endpoint,
+                    'context_options' => $this->contextOptions,
+                    'origin' => $this->origin,
+                    'user_agent' => $this->userAgent,
+                ]
+            );
+        } finally {
+            stream_set_blocking($this->socket, 1);
+        }
+
+        return $streamBody;
     }
 
     /**
@@ -345,10 +387,37 @@ class WampClient implements ClientInterface, LoggerAwareInterface
                 stream_context_create($this->contextOptions)
             );
             if (!$socket) {
+                $this->logger->error(
+                    'Could not open socket. Reason: {error}',
+                    [
+                        'error' => $errstr,
+                        'errno' => $errno,
+                        'endpoint' => $this->endpoint,
+                        'context_options' => $this->contextOptions,
+                        'origin' => $this->origin,
+                        'user_agent' => $this->userAgent,
+                    ]
+                );
+
                 throw new BadResponseException('Could not open socket. Reason: ' . $errstr);
             }
-        } catch (\ErrorException $exception) {
-            throw new BadResponseException('Could not open socket. Reason: ' . $errstr, 0, $exception);
+
+            stream_set_read_buffer($socket, 0);
+            stream_set_write_buffer($socket, 0);
+        } catch (\Throwable $throwable) {
+            $this->logger->error(
+                'Could not open socket. Reason: {error}',
+                [
+                    'error' => $throwable->getMessage(),
+                    'throwable' => $throwable,
+                    'endpoint' => $this->endpoint,
+                    'context_options' => $this->contextOptions,
+                    'origin' => $this->origin,
+                    'user_agent' => $this->userAgent,
+                ]
+            );
+
+            throw new BadResponseException('Could not open socket. Reason: ' . $errstr, 0, $throwable);
         }
 
         return $socket;
@@ -404,17 +473,25 @@ class WampClient implements ClientInterface, LoggerAwareInterface
         $key = $this->generateKey();
 
         if (!str_contains($target, '/')) {
-            if (null !== $this->logger) {
-                $this->logger->error('Invalid target path for WAMP server.', ['target' => $target]);
-            }
+            $this->logger->error(
+                'Invalid target path for WAMP server.',
+                [
+                    'target' => $target,
+                    'endpoint' => $this->endpoint,
+                    'context_options' => $this->contextOptions,
+                    'origin' => $this->origin,
+                    'user_agent' => $this->userAgent,
+                ]
+            );
 
             throw new WebsocketException('WAMP server target must contain a "/"');
         }
 
-        $protocol = $this->secured ? 'wss' : 'ws';
-
-        $out = "GET {$protocol}://{$this->serverHost}:{$this->serverPort}{$target} HTTP/1.1\r\n";
+        $out = "GET {$target} HTTP/1.1\r\n";
         $out .= "Host: {$this->serverHost}:{$this->serverPort}\r\n";
+        if ($this->userAgent) {
+            $out .= "User-Agent: {$this->userAgent}\r\n";
+        }
         $out .= "Pragma: no-cache\r\n";
         $out .= "Cache-Control: no-cache\r\n";
         $out .= "Upgrade: WebSocket\r\n";
@@ -453,22 +530,39 @@ class WampClient implements ClientInterface, LoggerAwareInterface
     private function verifyResponse($response): void
     {
         if (false === $response) {
-            if (null !== $this->logger) {
-                $this->logger->error('WAMP Server did not respond properly');
-            }
+            $this->logger->error(
+                'WAMP Server did not respond properly',
+                [
+                    'endpoint' => $this->endpoint,
+                    'context_options' => $this->contextOptions,
+                    'origin' => $this->origin,
+                    'user_agent' => $this->userAgent,
+                ]
+            );
 
-            throw new BadResponseException('WAMP Server did not respond properly');
+            throw new BadResponseException('WAMP Server did not respond properly.');
         }
 
         $responseStatus = substr($response, 0, 12);
 
         if ('HTTP/1.1 101' !== $responseStatus) {
-            if (null !== $this->logger) {
-                $this->logger->error('Unexpected HTTP response from WAMP server.', ['response' => $response]);
-            }
+            $this->logger->error(
+                'Unexpected HTTP response from WAMP server. Expected "HTTP/1.1 101", got "{status}": {response}',
+                [
+                    'status' => $responseStatus,
+                    'response' => $response,
+                    'endpoint' => $this->endpoint,
+                    'context_options' => $this->contextOptions,
+                    'origin' => $this->origin,
+                    'user_agent' => $this->userAgent,
+                ]
+            );
 
             throw new BadResponseException(
-                sprintf('Unexpected response status. Expected "HTTP/1.1 101", got "%s".', $responseStatus)
+                sprintf(
+                    'Unexpected HTTP response from WAMP server. Expected "HTTP/1.1 101", got "%s".',
+                    $responseStatus
+                )
             );
         }
     }
