@@ -36,6 +36,10 @@ services:
 
     oro_sync.client.wamp.factory:
         class: Oro\Bundle\SyncBundle\Client\Wamp\Factory\WampClientFactory
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }
 
     oro_sync.client.wamp.factory.client_attributes:
         class: Oro\Bundle\SyncBundle\Client\Wamp\Factory\ClientAttributes
@@ -45,3 +49,6 @@ services:
             - '%websocket_backend_path%'
             - '%websocket_backend_transport%'
             - '%websocket_backend_ssl_context_options%'
+        calls:
+            - ['setConfigManager', ['@oro_config.manager']]
+            - [ 'setUserAgent', [ '%websocket_backend_user_agent%' ] ]

@@ -19,14 +19,17 @@ class OroSyncExtension extends Extension
     const CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST = 'websocket_host';
     const CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT = 'websocket_port';
     const CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH = 'websocket_path';
+    const CONFIG_PARAM_WEBSOCKET_DEFAULT_USER_AGENT = 'websocket_user_agent';
     const CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS = 'websocket_bind_address';
     const CONFIG_PARAM_WEBSOCKET_BIND_PORT = 'websocket_bind_port';
     const CONFIG_PARAM_WEBSOCKET_BACKEND_HOST = 'websocket_backend_host';
     const CONFIG_PARAM_WEBSOCKET_BACKEND_PORT = 'websocket_backend_port';
     const CONFIG_PARAM_WEBSOCKET_BACKEND_PATH = 'websocket_backend_path';
+    const CONFIG_PARAM_WEBSOCKET_BACKEND_USER_AGENT = 'websocket_backend_user_agent';
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST = 'websocket_frontend_host';
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT = 'websocket_frontend_port';
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH = 'websocket_frontend_path';
+    const CONFIG_PARAM_WEBSOCKET_FRONTEND_USER_AGENT = 'websocket_frontend_user_agent';
     const CONFIG_PARAM_WEBSOCKET_BACKEND_TRANSPORT = 'websocket_backend_transport';
     const CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS = 'websocket_backend_ssl_context_options';
     const KNOWN_CONTEXT_OPTIONS = [
@@ -94,6 +97,15 @@ class OroSyncExtension extends Extension
             [
                 self::CONFIG_PARAM_WEBSOCKET_BACKEND_PATH,
                 self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH,
+            ]
+        );
+
+        $this->cloneParameters(
+            $container,
+            self::CONFIG_PARAM_WEBSOCKET_DEFAULT_USER_AGENT,
+            [
+                self::CONFIG_PARAM_WEBSOCKET_BACKEND_USER_AGENT,
+                self::CONFIG_PARAM_WEBSOCKET_FRONTEND_USER_AGENT,
             ]
         );
 

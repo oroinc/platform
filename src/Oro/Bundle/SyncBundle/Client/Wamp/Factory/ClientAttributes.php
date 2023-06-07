@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SyncBundle\Client\Wamp\Factory;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
 /**
  * This class represents connection attributes which will be used to create an instance of WampClient.
  */
@@ -30,6 +32,13 @@ class ClientAttributes
      */
     private $contextOptions;
 
+    private ?ConfigManager $configManager = null;
+
+    /**
+     * user_agent parameter for websocket connection header
+     */
+    private ?string $userAgent = null;
+
     public function __construct(
         string $host,
         int $port,
@@ -37,10 +46,6 @@ class ClientAttributes
         string $transport,
         array $contextOptions
     ) {
-        if ($host === '*') {
-            $host = '127.0.0.1';
-        }
-
         $this->host = $host;
         $this->port = $port;
         $this->path = $path;
@@ -50,7 +55,15 @@ class ClientAttributes
 
     public function getHost(): string
     {
-        return $this->host;
+        $host = $this->host === '*' ? '127.0.0.1' : $this->host;
+
+        if (!is_null($this->configManager) && $this->host === '*') {
+            $appUrl = $this->configManager->get('oro_ui.application_url');
+            $parsedAppUrl = parse_url($appUrl);
+            $host = $parsedAppUrl['host'];
+        }
+
+        return $host;
     }
 
     public function getPort(): int
@@ -71,5 +84,20 @@ class ClientAttributes
     public function getContextOptions(): array
     {
         return $this->contextOptions;
+    }
+
+    public function setConfigManager(ConfigManager $configManager): void
+    {
+        $this->configManager = $configManager;
+    }
+
+    public function setUserAgent(?string $userAgent): void
+    {
+        $this->userAgent = $userAgent;
+    }
+
+    public function getUserAgent(): ?string
+    {
+        return $this->userAgent;
     }
 }
