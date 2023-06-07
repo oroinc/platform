@@ -36,4 +36,33 @@ class OroMaintenanceExtensionTest extends ExtensionTestCase
         ];
         $this->assertParametersLoaded($expectedParameters);
     }
+
+    public function testThatLockFilePathIsOverridable()
+    {
+        $containerBuilder = parent::getContainerMock();
+        $containerBuilder
+            ->expects($this->once())
+            ->method('hasParameter')
+            ->with('maintenance_lock_file_path')
+            ->willReturn(true);
+
+        $containerBuilder
+            ->expects($this->once())
+            ->method('getParameter')
+            ->with('maintenance_lock_file_path')
+            ->willReturn('/tmp/maintenance_lock');
+
+        $extension = new OroMaintenanceExtension();
+
+        $extension->load([], $containerBuilder);
+
+        static::assertEquals(
+            [
+                'options' => [
+                    'file_path' => '/tmp/maintenance_lock'
+                ]
+            ],
+            $this->actualParameters['oro_maintenance.driver']
+        );
+    }
 }

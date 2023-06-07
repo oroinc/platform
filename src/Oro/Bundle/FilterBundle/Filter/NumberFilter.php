@@ -261,6 +261,8 @@ class NumberFilter extends AbstractFilter
         $metadata['arrayOperators'] = $formView->vars['array_operators'];
         $metadata['dataType'] = $formView->vars['data_type'];
         $metadata['limitDecimals'] = $formView->vars['limit_decimals'] ?? false;
+        $metadata['min'] = $formView->vars['min'] ?? null;
+        $metadata['max'] = $formView->vars['max'] ?? null;
 
         return $metadata;
     }

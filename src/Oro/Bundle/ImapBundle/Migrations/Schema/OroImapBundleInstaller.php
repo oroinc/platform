@@ -20,7 +20,7 @@ class OroImapBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_10_1';
+        return 'v1_11';
     }
 
     /**
@@ -91,6 +91,7 @@ class OroImapBundleInstaller implements Installation
         $table->setPrimaryKey(['id']);
         $table->addIndex(['email_id'], 'IDX_17E00D83A832C1C9', []);
         $table->addIndex(['imap_folder_id'], 'IDX_17E00D834F00B133', []);
+        $table->addIndex(['uid'], 'email_imap_uid_idx');
     }
 
     /**

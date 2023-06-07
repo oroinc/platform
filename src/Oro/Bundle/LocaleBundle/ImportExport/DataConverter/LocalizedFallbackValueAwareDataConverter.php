@@ -97,11 +97,13 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
         $localizationCodes = $this->getNames();
         $targetField = $this->fieldHelper->getConfigValue($entityName, $field['name'], 'fallback_field', 'string');
         $fieldName = $field['name'];
+        $fieldLabel = $field['label'];
 
-        list($rules, $backendHeaders) = $this->processLocalizationCodes(
+        list($rules, $backendHeaders) = $this->processLocalizationCodesLabel(
             $fieldOrder,
             $localizationCodes,
             $fieldName,
+            $fieldLabel,
             $targetField
         );
 
@@ -123,11 +125,13 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
             $localizationCodes = $this->getNames();
             $targetField = $this->fieldHelper->getConfigValue($entityName, $field['name'], 'fallback_field', 'string');
             $fieldName = $field['name'];
+            $fieldLabel = $field['label'];
 
-            list($rules, $backendHeaders) = $this->processLocalizationCodes(
+            list($rules, $backendHeaders) = $this->processLocalizationCodesLabel(
                 $fieldOrder,
                 $localizationCodes,
                 $fieldName,
+                $fieldLabel,
                 $targetField
             );
 
@@ -216,5 +220,69 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
         }
 
         return [$rules, $backendHeaders];
+    }
+
+    protected function processLocalizationCodesLabel(
+        int $fieldOrder,
+        array $localizationCodes,
+        string $fieldName,
+        string $fieldLabel,
+        string $targetField
+    ): array {
+        $rules = [];
+        $backendHeaders = [];
+        $subOrder = 0;
+
+        foreach ($localizationCodes as $localizationCode) {
+            $frontendHeader = $this->getHeader(
+                $fieldLabel,
+                $localizationCode,
+                self::FIELD_FALLBACK,
+                $this->relationDelimiter
+            );
+            $backendHeader = $this->getHeader(
+                $fieldName,
+                $localizationCode,
+                self::FIELD_FALLBACK,
+                $this->convertDelimiter
+            );
+            $rules[$frontendHeader] = [
+                'value' => $backendHeader,
+                'order' => $fieldOrder,
+                'subOrder' => $subOrder++
+            ];
+            $backendHeaders[] = $rules[$frontendHeader];
+
+            $frontendHeader = $this->getHeader(
+                $fieldLabel,
+                $localizationCode,
+                self::FIELD_VALUE,
+                $this->relationDelimiter
+            );
+            $backendHeader = $this->getHeader(
+                $fieldName,
+                $localizationCode,
+                $targetField,
+                $this->convertDelimiter
+            );
+
+            $rules[$frontendHeader] = [
+                'value' => $backendHeader,
+                'order' => $fieldOrder,
+                'subOrder' => $subOrder++
+            ];
+            $backendHeaders[] = $rules[$frontendHeader];
+        }
+
+        return [$rules, $backendHeaders];
+    }
+
+    protected function getFieldHeader($entityName, $field): string
+    {
+        if (!is_array($field) || !array_key_exists('name', $field)) {
+            throw new \InvalidArgumentException('Property is not array or key "name" is not exist.');
+        }
+
+        return $this->fieldHelper->getConfigValue($entityName, $field['name'], 'header', $field['label']);
     }
 }
