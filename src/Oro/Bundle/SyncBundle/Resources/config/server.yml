@@ -17,3 +17,11 @@ services:
             - '@gos_web_socket.registry.server'
         tags:
             - { name: console.command, command: gos:websocket:server }
+
+    oro_sync.event_listener.websocket_server_command_listener:
+        class: Oro\Bundle\SyncBundle\EventListener\WebsocketServerCommandListener
+        arguments:
+            - '@oro_sync.gos_websocket_server.parameters_provider'
+            - 'gos:websocket:server'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 255 }

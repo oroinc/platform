@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SyncBundle\Client;
 
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
+use Oro\Bundle\SyncBundle\Provider\WebsocketClientParametersProviderInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -19,13 +20,23 @@ class ConnectionChecker implements LoggerAwareInterface, ResettableInterface
 
     private ApplicationState $applicationState;
 
+    private ?WebsocketClientParametersProviderInterface $websocketClientParametersProvider = null;
+
     private ?bool $isConnected = null;
 
-    public function __construct(WebsocketClientInterface $client, ApplicationState $applicationState)
-    {
+    public function __construct(
+        WebsocketClientInterface $client,
+        ApplicationState $applicationState
+    ) {
         $this->client = $client;
         $this->applicationState = $applicationState;
         $this->logger = new NullLogger();
+    }
+
+    public function setWebsocketClientParametersProvider(
+        ?WebsocketClientParametersProviderInterface $websocketClientParametersProvider
+    ): void {
+        $this->websocketClientParametersProvider = $websocketClientParametersProvider;
     }
 
     /**
@@ -33,6 +44,10 @@ class ConnectionChecker implements LoggerAwareInterface, ResettableInterface
      */
     public function checkConnection(): bool
     {
+        if ($this->isConfigured() === false) {
+            return false;
+        }
+
         if ($this->isConnected === null) {
             try {
                 $this->client->connect();
@@ -50,6 +65,16 @@ class ConnectionChecker implements LoggerAwareInterface, ResettableInterface
         }
 
         return $this->isConnected;
+    }
+
+    public function isConfigured(): bool
+    {
+        if ($this->websocketClientParametersProvider === null) {
+            // Assumes that websocket server is always configured - as a BC layer.
+            return true;
+        }
+
+        return $this->websocketClientParametersProvider->getHost() !== '';
     }
 
     public function reset(): void

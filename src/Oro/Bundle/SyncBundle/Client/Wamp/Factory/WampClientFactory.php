@@ -4,20 +4,27 @@ namespace Oro\Bundle\SyncBundle\Client\Wamp\Factory;
 
 use Oro\Bundle\SyncBundle\Client\Wamp\WampClient;
 use Oro\Bundle\SyncBundle\Provider\WebsocketClientParametersProviderInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 
 /**
  * Creates websocket server client.
  */
-class WampClientFactory implements WampClientFactoryInterface
+class WampClientFactory implements WampClientFactoryInterface, LoggerAwareInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    use LoggerAwareTrait;
+
+    public function __construct()
+    {
+        $this->logger = new NullLogger();
+    }
+
     public function createClient(WebsocketClientParametersProviderInterface $clientParametersProvider): WampClient
     {
         $options = $clientParametersProvider->getContextOptions();
 
-        return new WampClient(
+        $wampClient = new WampClient(
             $clientParametersProvider->getHost(),
             $clientParametersProvider->getPort(),
             $clientParametersProvider->getTransport(),
@@ -25,5 +32,16 @@ class WampClientFactory implements WampClientFactoryInterface
             // We don't have to check origin when connecting from backend.
             '127.0.0.1'
         );
+
+        if (is_callable([$clientParametersProvider, 'getUserAgent'])) {
+            $wampClient->setUserAgent(call_user_func_array(
+                [$clientParametersProvider, 'getUserAgent'],
+                []
+            ));
+        }
+
+        $wampClient->setLogger($this->logger);
+
+        return $wampClient;
     }
 }

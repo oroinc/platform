@@ -46,6 +46,7 @@ services:
             - '@oro_sync.websocket_client.basic'
             - '@oro_distribution.handler.application_status'
         calls:
+            - [setWebsocketClientParametersProvider, ['@oro_sync.client.backend_websocket_parameters.provider']]
             - [setLogger, ['@logger']]
         tags:
             - { name: monolog.logger, channel: oro_websocket }
