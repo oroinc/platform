@@ -49,7 +49,7 @@ class DsnBasedParametersTest extends \PHPUnit\Framework\TestCase
     public function properDsnProvider(): array
     {
         return [
-            'full_info_dsn' => [
+            'full info dsn' => [
                 'dsn' => 'ssl://host:1234/ws?context_options[opt1]=opt1_val',
                 'scheme' => 'ssl',
                 'host' => 'host',
@@ -58,11 +58,11 @@ class DsnBasedParametersTest extends \PHPUnit\Framework\TestCase
                 'parameters' => ['context_options' => ['opt1' => 'opt1_val']],
                 'parameter' => ['context_options' => ['opt1' => 'opt1_val']]
             ],
-            'default_scheme_and_host_set' => [
+            'empty dsn' => [
                 'dsn' => '',
                 'scheme' => 'tcp',
-                'host' => '*',
-                'port' => '',
+                'host' => '',
+                'port' => '8080',
                 'path' => '',
                 'parameters' => [],
                 'parameter' => ['non_existent' => null]

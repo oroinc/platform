@@ -54,6 +54,11 @@ class WebsocketClientParametersProvider implements WebsocketClientParametersProv
      */
     private $contextOptions;
 
+    /**
+     * user_agent parameter for websocket connection header
+     */
+    private ?string $userAgent = null;
+
     public function __construct(string $dsn)
     {
         $parametersBag = new DsnBasedParameters($dsn);
@@ -63,6 +68,7 @@ class WebsocketClientParametersProvider implements WebsocketClientParametersProv
         $this->path = $parametersBag->getPath();
         $this->transport = $parametersBag->getScheme();
         $this->contextOptions = $parametersBag->getParamValue('context_options') ?: [];
+        $this->userAgent = $parametersBag->getParamValue('user_agent');
 
         $this->validateTransport();
         $this->validateAndNormalizeContextOptions();
@@ -91,6 +97,11 @@ class WebsocketClientParametersProvider implements WebsocketClientParametersProv
     public function getContextOptions(): array
     {
         return $this->contextOptions;
+    }
+
+    public function getUserAgent(): ?string
+    {
+        return $this->userAgent;
     }
 
     private function validateTransport(): void

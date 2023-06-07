@@ -16,4 +16,6 @@ interface WebsocketClientParametersProviderInterface
     public function getTransport(): string;
 
     public function getContextOptions(): array;
+
+    public function getUserAgent(): ?string;
 }
