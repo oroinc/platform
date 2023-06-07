@@ -31,7 +31,12 @@ trait RolePermissionExtension
         if ($cacheDriver && !($cacheDriver instanceof ApcCache && $cacheDriver instanceof XcacheCache)) {
             $cacheDriver->deleteAll();
         }
-        self::getContainer()->get('oro_security.tests.security.acl.cache.doctrine')->clearCache();
+        $container = self::getContainer();
+        $container->get('oro_security.tests.security.acl.cache.doctrine')->clearCache();
+
+        if ($container->has('oro_customer.security.acl.visitor.cache')) {
+            $container->get('oro_customer.security.acl.visitor.cache')->clearCache();
+        }
     }
 
     /**
