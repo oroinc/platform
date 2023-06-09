@@ -15,7 +15,6 @@
 
 .app-header {
     ~ * .sticky,
-    ~ * .floatThead.floatThead-fixed .grid-header:first-child,
     &.sticky {
         transition: margin-top 500ms, transform 500ms;
     }
@@ -28,11 +27,32 @@
 :not(.disable-touch-scrolling) & {
     &.scrolled-down,
     &.input-focused {
-        .app-header.sticky-out-of-viewport {
-            ~ * .sticky-pinned,
-            ~ * .floatThead.floatThead-fixed .grid-header:first-child,
-            &.sticky-pinned {
-                margin-top: -$app-header-height;
+        .app-header {
+            &.sticky-out-of-viewport {
+                ~ * .sticky-pinned,
+                &.sticky-pinned {
+                    margin-top: -$app-header-height;
+                }
+            }
+        }
+    }
+
+    &.scrolled-down {
+        .app-header {
+            &.sticky-out-of-viewport {
+                ~ * .oro-datagrid {
+                    --app-header-height: 0px;
+                }
+            }
+        }
+    }
+
+    &.scrolled-up {
+        .app-header {
+            &.sticky-out-of-viewport {
+                ~ * .oro-datagrid {
+                    --app-header-height: #{$app-header-height};
+                }
             }
         }
     }

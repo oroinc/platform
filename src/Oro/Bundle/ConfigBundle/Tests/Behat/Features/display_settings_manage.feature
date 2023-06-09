@@ -68,20 +68,6 @@ Feature: Display settings manage
     Then per page amount should be 10
     And records in grid should be 10
 
-  Scenario: Make grid header sticky
-    # I'm at Activities/ Calendar Events
-    Given I see that grid has scrollable header
-
-    When I proceed as the Config
-    And I fill "System Config Form" with:
-      | Lock headers in grids | false |
-    And I save form
-
-    Given I proceed as the Check
-    # I'm at Activities/ Calendar Events
-    And I reload the page
-    Then I see that grid header is sticky
-
   Scenario: Disable navigation through grid entity from a view page
     # I'm at Activities/ Calendar Events
     Given I click view 1 in grid

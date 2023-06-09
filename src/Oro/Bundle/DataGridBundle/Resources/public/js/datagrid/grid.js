@@ -79,8 +79,7 @@ define(function(require) {
             },
             noDataBlock: '.no-data',
             filterBox: '.filter-box',
-            loadingMaskContainer: '.other-scroll-container',
-            floatTheadContainer: '.floatThead-container'
+            loadingMaskContainer: '.other-scroll-container'
         },
 
         /** @property {orodatagrid.datagrid.Header} */
@@ -1076,6 +1075,7 @@ define(function(require) {
                 tableClassName: this.themeOptions.tableClassName || ''
             }));
             this.$grid = this.$(this.selectors.grid);
+            this.grid = this.el.querySelector(this.selectors.grid);
             this.renderToolbar();
             this.renderGrid();
             this.renderNoDataBlock();

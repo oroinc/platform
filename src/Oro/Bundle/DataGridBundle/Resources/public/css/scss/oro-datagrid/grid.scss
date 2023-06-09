@@ -11,14 +11,48 @@
 
     border-collapse: separate;
     border-spacing: 0;
-
-    overflow: hidden;
-
     background-color: $primary-inverse;
 }
 
-.grid-header.thead-sizing {
-    display: none;
+.datagrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+
+    &-header {
+        grid-column: 1;
+        grid-row: 1 / 2;
+        position: sticky;
+        top: calc(var(--datagrid-sticky-offset, 0px));
+        transition: top 500ms;
+        z-index: 1;
+    }
+
+    &-content {
+        grid-column: 1;
+        grid-row: 1 / 3;
+    }
+
+    &-sticky {
+        overflow-x: hidden;
+    }
+
+    &-table {
+        background-color: $oro-datagrid-header-background;
+        border-radius: $oro-datagrid-header-cell-radius;
+    }
+
+    &-thead {
+        &-invisible {
+            visibility: hidden;
+        }
+    }
+}
+
+&.stuck {
+    .datagrid-sticky {
+        box-shadow: $oro-datagrid-sticky-shadow;
+    }
 }
 
 .grid-body {
@@ -267,7 +301,7 @@
 }
 
 .grid-header {
-    will-change: width, height, top, right, bottom, left, margin;
+    will-change: top;
 }
 
 .grid-header,
@@ -296,6 +330,15 @@
 
             @include fa-icon($oro-datagrid-caret-descending-icon);
         }
+    }
+}
+
+.grid-container {
+    .grid-header {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        box-shadow: $oro-datagrid-sticky-shadow;
     }
 }
 

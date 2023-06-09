@@ -105,6 +105,7 @@ Feature: Update user profile and user entity ACL
     And I go to System/User Management/Roles
     And I click edit Sales Manager in grid
     And I check "Update User Profile" entity permission
+    And I click "Entity" in scrollspy
     And select following permissions:
       | User | View:Global | Edit:Global |
     And I save and close form
@@ -132,6 +133,7 @@ Feature: Update user profile and user entity ACL
     And I should be on Role View page
     When I click "Edit"
     And I uncheck "Update User Profile" entity permission
+    And I click "Entity" in scrollspy
     And select following permissions:
       | User | View:Global | Edit:Global |
     And I save and close form

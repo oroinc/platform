@@ -161,5 +161,6 @@ oro_behat_extension:
         - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
         - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
         - Oro\Bundle\ApiBundle\Tests\Behat\Context\ApiContext
+        - Oro\Bundle\NavigationBundle\Tests\Behat\Context\ScrollspyContext
       paths:
         - '@OroUserBundle/Tests/Behat/Features'

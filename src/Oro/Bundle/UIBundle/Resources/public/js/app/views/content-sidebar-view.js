@@ -51,8 +51,7 @@ define(function(require, exports, module) {
                 'click [data-role="sidebar-minimize"]': 'minimize',
                 'click [data-role="sidebar-maximize"]': 'maximize',
                 'swipeleft': 'minimize',
-                'swiperight': 'maximize',
-                [`transitionend ${this.sidebar}`]: '_calculateContentWidth'
+                'swiperight': 'maximize'
             };
         },
 
@@ -127,11 +126,7 @@ define(function(require, exports, module) {
         initResizableSidebar: function() {
             this.pluginManager = new PluginManager(this);
             this.pluginManager.create(ResizableAreaPlugin, {
-                $resizableEl: this.sidebar,
-                resizableOptions: {
-                    resize: this._resize.bind(this),
-                    create: this._calculateContentWidth.bind(this)
-                }
+                $resizableEl: this.sidebar
             });
         },
 
@@ -149,20 +144,6 @@ define(function(require, exports, module) {
             if (!event || event.pageX <= this.$(this.sidebar).width()) {
                 this._toggle('on');
             }
-        },
-
-        _calculateContentWidth: function() {
-            if (!_.isMobile()) {
-                this.resizableSidebar && this.$(this.content).css({
-                    width: 'calc(100% - ' + this.$(this.sidebar).outerWidth() + 'px)'
-                });
-            }
-        },
-
-        _resize: function(event, ui) {
-            this.$(this.content).css({
-                width: 'calc(100% - ' + ui.size.width + 'px)'
-            });
         },
 
         /**
@@ -189,7 +170,6 @@ define(function(require, exports, module) {
             }
 
             this.$(this.sidebar).toggleClass('content-sidebar-minimized', !show);
-            this._calculateContentWidth();
             this.toggleLinePattern(!show);
 
             mediator.execute('changeUrlParam', 'sidebar', show ? null : state);
