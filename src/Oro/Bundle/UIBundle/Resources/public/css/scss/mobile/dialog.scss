@@ -85,6 +85,7 @@
         height: $dialog-mobile-content-height;
         margin: $dialog-mobile-content-outer-offset;
         background: $primary-inverse;
+        overflow: $dialog-mobile-content-overflow;
 
         @include safe-area-offset(padding, $dialog-mobile-content-inner-offset, 10px 0 10px);
     }
@@ -125,6 +126,10 @@
     .ui-dialog-titlebar-maximize {
         // stylelint-disable-next-line declaration-no-important
         display: none !important;
+    }
+
+    .datagrid {
+        --datagrid-sticky-offset: #{$dialog-mobile-header-height};
     }
 }
 

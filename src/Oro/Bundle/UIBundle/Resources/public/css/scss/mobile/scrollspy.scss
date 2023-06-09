@@ -1,6 +1,8 @@
 /* @theme: admin.oro; */
 
 .scrollspy {
+    overflow: $scrollspy-mobile-overflow;
+
     .accordion-group {
         margin-bottom: $scrollspy-mobile-accordion-group-offset;
 

@@ -22,10 +22,12 @@ define(function(require, exports, module) {
     const HIDING_EVENT = 'hiding' + EVENT_KEY;
     const HIDDEN_EVENT = 'hidden' + EVENT_KEY;
     const GRID_SCROLLABLE_CONTAINER = '.grid-scrollable-container';
+    const GRID_STICKY_CONTAINER = '.datagrid-sticky';
     const DIALOG_SCROLLABLE_CONTAINER = '.ui-dialog-content';
     const SCROLLABLE_CONTAINER = [
         DIALOG_SCROLLABLE_CONTAINER,
-        GRID_SCROLLABLE_CONTAINER
+        GRID_SCROLLABLE_CONTAINER,
+        GRID_STICKY_CONTAINER
     ].join(',');
     const ESCAPE_KEYCODE = 27; // KeyboardEvent.which value for Escape (Esc) key
     const SPACE_KEYCODE = 32; // KeyboardEvent.which value for space key
