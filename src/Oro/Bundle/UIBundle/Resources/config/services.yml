@@ -145,6 +145,7 @@ services:
 
     oro_ui.html_tag_helper:
         class: Oro\Bundle\UIBundle\Tools\HtmlTagHelper
+        public: true
         arguments:
             - '@oro_form.provider.html_tag_provider'
             - '%kernel.cache_dir%/oro/html_purifier'
