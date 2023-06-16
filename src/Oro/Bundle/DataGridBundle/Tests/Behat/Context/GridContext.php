@@ -1624,10 +1624,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Click on row action. Row will founded by it's content
+     * The search string should match the contents of the string as closely as possible
      * Example: And click view Charlie in grid
      * Example: When I click edit Call to Jennyfer in grid
      * Example: And I click delete Sign a contract with Charlie in grid
      * Example: And I click "Delete Current User" on row "John" in grid
+     * Example: And I click "View" on row "2-2 PO1 USD $13.00" in grid "Orders Grid"
      *
      * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
      * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in "(?P<gridName>[^"]+)"$/
