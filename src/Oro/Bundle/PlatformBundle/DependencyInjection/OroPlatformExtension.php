@@ -21,6 +21,10 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
      */
     public function prepend(ContainerBuilder $container): void
     {
+        if (!$container->hasParameter('web_backend_prefix')) {
+            $container->setParameter('web_backend_prefix', '/admin');
+        }
+
         $this->loadAppConfigsFromBundles($container);
         $this->preparePostgreSql($container);
         $this->configureJmsSerializer($container);
