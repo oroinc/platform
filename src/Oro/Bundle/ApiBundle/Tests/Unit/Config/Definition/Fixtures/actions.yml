@@ -359,7 +359,7 @@ enable_meta_properties:
     expected:
         actions:
             get_list:
-                disable_meta_properties: false
+                disable_meta_properties: [false]
 
 disable_meta_properties:
     config:
@@ -369,7 +369,17 @@ disable_meta_properties:
     expected:
         actions:
             get_list:
-                disable_meta_properties: true
+                disable_meta_properties: [true]
+
+disable_specified_meta_properties:
+    config:
+        actions:
+            get_list:
+                disable_meta_properties: [ prop1, prop2 ]
+    expected:
+        actions:
+            get_list:
+                disable_meta_properties: [ prop1, prop2 ]
 
 invalid_value_for_disable_meta_properties:
     config:
@@ -377,7 +387,7 @@ invalid_value_for_disable_meta_properties:
             get_list:
                 disable_meta_properties: 123
     expected: []
-    error: 'Invalid type for path "entity.actions.get_list.disable_meta_properties". Expected "bool", but got "int"'
+    error: 'Invalid type for path "entity.actions.get_list.disable_meta_properties". Expected "array", but got "int"'
 
 null_status_codes:
     config:

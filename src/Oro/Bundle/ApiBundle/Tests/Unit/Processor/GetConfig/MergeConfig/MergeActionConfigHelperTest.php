@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeActionConfigHelper
  */
 class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MergeActionConfigHelper */
-    private $mergeActionConfigHelper;
+    private MergeActionConfigHelper $mergeActionConfigHelper;
 
     protected function setUp(): void
     {
@@ -35,14 +34,14 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         $actionConfig = [
             'exclude' => true,
             'fields'  => [
-                'action1' => null
+                'field1' => null
             ]
         ];
 
         self::assertEquals(
             [
                 'fields' => [
-                    'action1' => null
+                    'field1' => null
                 ]
             ],
             $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
@@ -70,49 +69,101 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testMergeActionDisabledMetaPropertiesConfig()
+    {
+        $config = [
+            'disabled_meta_properties' => ['prop1', 'prop3']
+        ];
+        $actionConfig = [
+            'disabled_meta_properties' => ['prop1', 'prop2']
+        ];
+
+        self::assertEquals(
+            [
+                'disabled_meta_properties' => ['prop1', 'prop3', 'prop2']
+            ],
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
+        );
+    }
+
+    public function testMergeActionDisabledMetaPropertiesConfigWhenActionDoesNotHaveDisabledMetaProperties()
+    {
+        $config = [
+            'disabled_meta_properties' => ['prop1', 'prop2']
+        ];
+        $actionConfig = [];
+
+        self::assertEquals(
+            $config,
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
+        );
+    }
+
     public function testMergeActionFieldsConfig()
     {
         $config = [
             'fields' => [
-                'action1' => [
+                'field1' => [
                     'description' => 'description 1'
                 ],
-                'action2' => [
+                'field2' => [
                     'description' => 'description 2'
                 ],
-                'action3' => null,
-                'action4' => null
+                'field3' => null,
+                'field4' => null
             ]
         ];
         $actionConfig = [
             'fields' => [
-                'action1' => [
+                'field1' => [
                     'description' => 'action description 1'
                 ],
-                'action2' => null,
-                'action3' => [
+                'field2' => null,
+                'field3' => [
                     'description' => 'action description 3'
                 ],
-                'action5' => null
+                'field5' => null
             ]
         ];
 
         self::assertEquals(
             [
                 'fields' => [
-                    'action1' => [
+                    'field1' => [
                         'description' => 'action description 1'
                     ],
-                    'action2' => [
+                    'field2' => [
                         'description' => 'description 2'
                     ],
-                    'action3' => [
+                    'field3' => [
                         'description' => 'action description 3'
                     ],
-                    'action4' => null,
-                    'action5' => null
+                    'field4' => null,
+                    'field5' => null
                 ]
             ],
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
+        );
+    }
+
+    public function testMergeActionFieldsConfigWhenActionDoesNotHaveFields()
+    {
+        $config = [
+            'fields' => [
+                'field1' => [
+                    'description' => 'description 1'
+                ],
+                'field2' => [
+                    'description' => 'description 2'
+                ],
+                'field3' => null,
+                'field4' => null
+            ]
+        ];
+        $actionConfig = [];
+
+        self::assertEquals(
+            $config,
             $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
         );
     }
@@ -123,7 +174,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         $actionConfig = [
             'exclude'      => true,
             'fields'       => [
-                'action1' => null
+                'field1' => null
             ],
             'status_codes' => [
                 'code1' => null
@@ -133,7 +184,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 'fields' => [
-                    'action1' => null
+                    'field1' => null
                 ]
             ],
             $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, false)
@@ -146,7 +197,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         $actionConfig = [
             'exclude'      => true,
             'fields'       => [
-                'action1' => null
+                'field1' => null
             ],
             'status_codes' => [
                 'code1' => null
@@ -159,7 +210,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 'fields'       => [
-                    'action1' => null
+                    'field1' => null
                 ],
                 'status_codes' => $expectedStatusCodes
             ],
@@ -178,7 +229,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         $actionConfig = [
             'exclude'      => true,
             'fields'       => [
-                'action1' => null
+                'field1' => null
             ],
             'status_codes' => [
                 'code1' => [
@@ -198,7 +249,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 'fields'       => [
-                    'action1' => null
+                    'field1' => null
                 ],
                 'status_codes' => $expectedStatusCodes
             ],

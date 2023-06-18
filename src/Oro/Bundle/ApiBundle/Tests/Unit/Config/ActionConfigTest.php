@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ActionConfigTest extends \PHPUnit\Framework\TestCase
@@ -289,6 +290,68 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
+    public function testMetaProperties()
+    {
+        $config = new ActionConfig();
+        self::assertFalse($config->hasDisableMetaProperties());
+        self::assertSame([], $config->getDisabledMetaProperties());
+
+        $config->disableMetaProperty('prop1');
+        self::assertTrue($config->hasDisableMetaProperties());
+        self::assertTrue($config->isMetaPropertiesEnabled());
+        self::assertEquals(['disabled_meta_properties' => ['prop1']], $config->toArray());
+        self::assertFalse($config->isMetaPropertyEnabled('prop1'));
+        self::assertSame(['prop1'], $config->getDisabledMetaProperties());
+
+        $config->disableMetaProperty('prop2');
+        self::assertTrue($config->hasDisableMetaProperties());
+        self::assertTrue($config->isMetaPropertiesEnabled());
+        self::assertEquals(['disabled_meta_properties' => ['prop1', 'prop2']], $config->toArray());
+        self::assertFalse($config->isMetaPropertyEnabled('prop1'));
+        self::assertFalse($config->isMetaPropertyEnabled('prop2'));
+        self::assertSame(['prop1', 'prop2'], $config->getDisabledMetaProperties());
+
+        $config->disableMetaProperty('prop1');
+        self::assertTrue($config->hasDisableMetaProperties());
+        self::assertTrue($config->isMetaPropertiesEnabled());
+        self::assertEquals(['disabled_meta_properties' => ['prop1', 'prop2']], $config->toArray());
+        self::assertFalse($config->isMetaPropertyEnabled('prop1'));
+        self::assertFalse($config->isMetaPropertyEnabled('prop2'));
+        self::assertSame(['prop1', 'prop2'], $config->getDisabledMetaProperties());
+
+        $config->enableMetaProperty('prop1');
+        self::assertTrue($config->hasDisableMetaProperties());
+        self::assertTrue($config->isMetaPropertiesEnabled());
+        self::assertEquals(['disabled_meta_properties' => ['prop2']], $config->toArray());
+        self::assertTrue($config->isMetaPropertyEnabled('prop1'));
+        self::assertFalse($config->isMetaPropertyEnabled('prop2'));
+        self::assertSame(['prop2'], $config->getDisabledMetaProperties());
+
+        $config->enableMetaProperty('prop1');
+        self::assertTrue($config->hasDisableMetaProperties());
+        self::assertTrue($config->isMetaPropertiesEnabled());
+        self::assertEquals(['disabled_meta_properties' => ['prop2']], $config->toArray());
+        self::assertTrue($config->isMetaPropertyEnabled('prop1'));
+        self::assertFalse($config->isMetaPropertyEnabled('prop2'));
+        self::assertSame(['prop2'], $config->getDisabledMetaProperties());
+
+        $config->enableMetaProperty('prop2');
+        self::assertFalse($config->hasDisableMetaProperties());
+        self::assertTrue($config->isMetaPropertiesEnabled());
+        self::assertEquals([], $config->toArray());
+        self::assertTrue($config->isMetaPropertyEnabled('prop1'));
+        self::assertTrue($config->isMetaPropertyEnabled('prop2'));
+        self::assertSame([], $config->getDisabledMetaProperties());
+
+        $config->disableMetaProperties();
+        self::assertTrue($config->hasDisableMetaProperties());
+        self::assertFalse($config->isMetaPropertiesEnabled());
+        self::assertEquals(['disable_meta_properties' => true], $config->toArray());
+        self::assertFalse($config->isMetaPropertyEnabled('prop1'));
+        self::assertFalse($config->isMetaPropertyEnabled('prop2'));
+        self::assertSame([], $config->getDisabledMetaProperties());
+    }
+
     public function testFormType()
     {
         $config = new ActionConfig();
@@ -399,13 +462,6 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         $config->setFormEventSubscribers(null);
         self::assertNull($config->getFormOptions());
         self::assertEquals([], $config->toArray());
-    }
-
-    public function testSetInvalidValueToFormEventSubscribers()
-    {
-        $this->expectException(\TypeError::class);
-        $config = new ActionConfig();
-        $config->setFormEventSubscribers('subscriber1');
     }
 
     public function testFields()

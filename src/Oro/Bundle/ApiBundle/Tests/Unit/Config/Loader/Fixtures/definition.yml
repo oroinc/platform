@@ -78,16 +78,29 @@ enable_fieldset:
         disable_fieldset: false
     expected: []
 
+enable_meta_properties:
+    config:
+        disable_meta_properties: false
+    expected: []
+
 disable_meta_properties:
     config:
         disable_meta_properties: true
     expected:
         disable_meta_properties: true
 
-enable_meta_properties:
+disable_specified_meta_properties:
     config:
-        disable_meta_properties: false
-    expected: []
+        disable_meta_properties: [ prop1, prop2 ]
+    expected:
+        disabled_meta_properties: [ prop1, prop2 ]
+
+disable_specified_meta_properties_when_all_meta_properties_are_disabled:
+    config:
+        disable_meta_properties: [ prop1, prop2, true, prop3 ]
+    expected:
+        disable_meta_properties: true
+        disabled_meta_properties: [ prop1, prop2, prop3 ]
 
 disable_partial_load:
     config:
