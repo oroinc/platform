@@ -1,10 +1,14 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema as BaseSchema;
 
+/**
+ * Defines a database schema for the message queue
+ */
 class DbalSchema extends BaseSchema
 {
     /**

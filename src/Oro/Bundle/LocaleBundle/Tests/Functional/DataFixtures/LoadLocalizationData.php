@@ -18,11 +18,10 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
  */
 class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
     public const DEFAULT_LOCALIZATION_CODE = 'en_US';
     public const EN_CA_LOCALIZATION_CODE = 'en_CA';
     public const ES_LOCALIZATION_CODE = 'es';
-
-    use ContainerAwareTrait;
 
     /** @var array */
     protected static $languages = ['en', 'en_CA', 'es', 'es_ES', 'es_MX'];

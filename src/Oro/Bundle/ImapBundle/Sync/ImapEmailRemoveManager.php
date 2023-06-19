@@ -41,7 +41,7 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
     public function removeRemotelyRemovedEmails($imapFolder, $folder, $manager)
     {
         $this->em->transactional(function () use ($imapFolder, $folder, $manager) {
-            $existingUids = $manager->getEmailUIDs();
+            $existingUids = array_map('intval', $manager->getEmailUIDs());
 
             $staleImapEmailsQb = $this->em->getRepository(ImapEmail::class)
                 ->createQueryBuilder('ie');
@@ -49,14 +49,13 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
                 ->andWhere($staleImapEmailsQb->expr()->eq('ie.imapFolder', ':imap_folder'))
                 ->setParameter('imap_folder', $imapFolder);
 
-            if ($existingUids) {
-                $staleImapEmailsQb
-                    ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
-                    ->setParameter('uids', $existingUids);
-            }
-
+            $needFlush = false;
             $staleImapEmails = (new BufferedIdentityQueryResultIterator($staleImapEmailsQb))
-                ->setPageCallback(function () {
+                ->setPageCallback(function () use (&$needFlush) {
+                    if (!$needFlush) {
+                        return;
+                    }
+
                     $this->em->flush();
                     $clearClass = [
                         'Oro\Bundle\EmailBundle\Entity\Email',
@@ -69,10 +68,16 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
                     foreach ($clearClass as $item) {
                         $this->em->clear($item);
                     }
+
+                    $needFlush = false;
                 });
 
             /* @var $staleImapEmails ImapEmail[] */
             foreach ($staleImapEmails as $imapEmail) {
+                if (in_array($imapEmail->getUid(), $existingUids)) {
+                    continue;
+                }
+
                 $email = $imapEmail->getEmail();
                 $email->getEmailUsers()
                     ->forAll(function ($key, EmailUser $emailUser) use ($folder, $imapEmail) {
@@ -87,6 +92,7 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
                         }
                     });
                 $this->em->remove($imapEmail);
+                $needFlush = true;
             }
         });
     }

@@ -169,6 +169,27 @@ class DocumentationTest extends RestJsonApiTestCase
      * @depends testWarmUpCache
      * This test should be at the end to avoid unnecessary warming up documentation cache in previous tests.
      */
+    public function testFiltersWhenRequestingSomeMetaPropertiesIsDisabled()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            ['disable_meta_properties' => ['title']],
+            true
+        );
+        $this->warmUpDocumentationCache();
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::GET_LIST);
+
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        $expectedData = $this->loadYamlData('filters.yml', 'documentation');
+        self::assertArrayContainsAndSectionKeysEqual($expectedData, $resourceData);
+    }
+
+    /**
+     * @depends testWarmUpCache
+     * This test should be at the end to avoid unnecessary warming up documentation cache in previous tests.
+     */
     public function testFiltersWhenMetaAndIncludeAndFieldsFiltersAreDisabled()
     {
         $this->appendEntityConfig(

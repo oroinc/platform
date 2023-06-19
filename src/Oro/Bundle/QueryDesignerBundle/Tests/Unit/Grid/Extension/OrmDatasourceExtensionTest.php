@@ -24,6 +24,8 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
+use Oro\Bundle\FormBundle\Form\Extension\ConstraintAsOptionExtension;
+use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
@@ -34,6 +36,7 @@ use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
@@ -51,6 +54,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
 
     protected function setUp(): void
     {
+        $constraintFactory = new ConstraintFactory();
+        $constraintExtension = new ConstraintAsOptionExtension($constraintFactory);
+
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::any())
             ->method('trans')
@@ -97,7 +103,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                         'oro_type_date_range'            => new DateRangeType($this->localeSettings),
                         'oro_type_filter'                => new FilterType($translator),
                     ],
-                    []
+                    [
+                        NumberType::class => [$constraintExtension],
+                    ]
                 ),
                 new CsrfExtension(
                     $this->createMock(CsrfTokenManagerInterface::class)

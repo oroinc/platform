@@ -1,35 +1,31 @@
-define(function(require) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
+import $ from 'jquery';
 
-    const BaseView = require('oroui/js/app/views/base/view');
-    const $ = require('jquery');
+const DashboardTypeWatcherView = BaseView.extend({
+    events: {
+        change: 'updateClientView'
+    },
 
-    const DashboardTypeWatcherView = BaseView.extend({
-        events: {
-            change: 'updateClientView'
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function DashboardTypeWatcherView(options) {
+        DashboardTypeWatcherView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function DashboardTypeWatcherView(options) {
-            DashboardTypeWatcherView.__super__.constructor.call(this, options);
-        },
+    initialize(options) {
+        this.startDashboardrField = $(options.startDashboardrField);
+        this.updateClientView();
+    },
 
-        initialize: function(options) {
-            this.startDashboardrField = $(options.startDashboardrField);
-            this.updateClientView();
-        },
-
-        updateClientView: function() {
-            const selectedType = this.$el.find(':selected').val();
-            if ('widgets' === selectedType) {
-                this.startDashboardrField.removeClass('hide');
-            } else {
-                this.startDashboardrField.addClass('hide');
-            }
+    updateClientView() {
+        const selectedType = this.$el.find(':selected').val();
+        if ('widgets' === selectedType) {
+            this.startDashboardrField.removeClass('hide');
+        } else {
+            this.startDashboardrField.addClass('hide');
         }
-    });
-
-    return DashboardTypeWatcherView;
+    }
 });
+
+export default DashboardTypeWatcherView;

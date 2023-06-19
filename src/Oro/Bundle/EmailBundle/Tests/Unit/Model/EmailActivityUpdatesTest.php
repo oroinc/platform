@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;

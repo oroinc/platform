@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
@@ -69,7 +70,7 @@ class BusinessUnitRepository extends EntityRepository
         $businessUnits = $businessUnits->getQuery()->getArrayResult();
         $children      = [];
         foreach ($businessUnits as &$businessUnit) {
-            $parent              = $businessUnit['parent'] ? : 0;
+            $parent              = $businessUnit['parent'] ?: 0;
             $children[$parent][] = & $businessUnit;
         }
         unset($businessUnit);

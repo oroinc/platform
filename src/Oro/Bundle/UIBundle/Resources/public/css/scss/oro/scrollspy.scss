@@ -67,6 +67,20 @@
             display: none;
         }
     }
+
+    &-main-container {
+        --datagrid-sticky-offset: 8px;
+
+        .oro-datagrid {
+            .datagrid-header {
+                z-index: 2;
+            }
+
+            &.stuck .datagrid-sticky {
+                box-shadow: $scrollspy-datagrid-sticky-shadow;
+            }
+        }
+    }
 }
 
 [data-scroll-focus] {

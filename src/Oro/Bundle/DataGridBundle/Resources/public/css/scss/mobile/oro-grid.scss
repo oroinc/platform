@@ -9,3 +9,21 @@
     overflow-scrolling: touch;
     touch-action: auto;
 }
+
+.datagrid {
+    --datagrid-sticky-offset: 8px;
+}
+
+.oro-datagrid.stuck {
+    .datagrid {
+        &-header {
+            &::before {
+                content: '';
+                height: var(--app-header-height, 0px);
+                transition: height 500ms;
+                display: block;
+                pointer-events: none;
+            }
+        }
+    }
+}

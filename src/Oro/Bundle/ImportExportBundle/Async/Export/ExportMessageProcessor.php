@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;

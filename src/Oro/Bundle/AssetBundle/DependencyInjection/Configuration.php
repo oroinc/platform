@@ -13,7 +13,7 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $finder = new NodeJsExecutableFinder;
+        $finder = new NodeJsExecutableFinder();
         $treeBuilder = new TreeBuilder('oro_asset');
         $treeBuilder->getRootNode()
             ->children()

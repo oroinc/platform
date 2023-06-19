@@ -1,9 +1,13 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Job;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema as BaseSchema;
 
+/**
+ * Defines a database schema for the job queue
+ */
 class Schema extends BaseSchema
 {
     /**

@@ -1,6 +1,10 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Provider;
 
+/**
+ * Provides configuration for jobs
+ */
 interface JobConfigurationProviderInterface
 {
     /**

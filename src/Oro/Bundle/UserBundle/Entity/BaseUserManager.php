@@ -41,7 +41,7 @@ class BaseUserManager
     {
         $class = $this->userLoader->getUserClass();
 
-        return new $class;
+        return new $class();
     }
 
     /**

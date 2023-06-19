@@ -72,11 +72,10 @@ class CumulativeItemStepTest extends \PHPUnit\Framework\TestCase
 
     public function testGetBatchSize(): void
     {
-        self::assertNull($this->itemStep->getBatchSize());
+        self::assertEquals(100, $this->itemStep->getBatchSize());
 
-        $batchSize = 100;
+        $batchSize = 200;
         $this->itemStep->setBatchSize($batchSize);
-
         self::assertSame($batchSize, $this->itemStep->getBatchSize());
     }
 }

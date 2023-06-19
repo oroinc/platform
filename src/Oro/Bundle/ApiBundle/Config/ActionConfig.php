@@ -19,6 +19,8 @@ class ActionConfig
     private array $items = [];
     /** @var ActionFieldConfig[] */
     private array $fields = [];
+    /** @var string[] */
+    private array $disabledMetaProperties = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
@@ -46,6 +48,9 @@ class ActionConfig
             && false === $result[ConfigUtil::DISABLE_META_PROPERTIES]
         ) {
             unset($result[ConfigUtil::DISABLE_META_PROPERTIES]);
+        }
+        if ($this->disabledMetaProperties) {
+            $result[ConfigUtil::DISABLED_META_PROPERTIES] = $this->disabledMetaProperties;
         }
         if (isset($result[ConfigUtil::DISABLE_PARTIAL_LOAD])
             && false === $result[ConfigUtil::DISABLE_PARTIAL_LOAD]
@@ -521,7 +526,7 @@ class ActionConfig
      */
     public function hasDisableMetaProperties(): bool
     {
-        return $this->has(ConfigUtil::DISABLE_META_PROPERTIES);
+        return $this->has(ConfigUtil::DISABLE_META_PROPERTIES) || !empty($this->disabledMetaProperties);
     }
 
     /**
@@ -546,6 +551,48 @@ class ActionConfig
     public function disableMetaProperties(): void
     {
         $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = true;
+    }
+
+    /**
+     * Indicates whether a requesting of the given additional meta property is enabled.
+     */
+    public function isMetaPropertyEnabled(string $metaPropertyName): bool
+    {
+        return
+            $this->isMetaPropertiesEnabled()
+            && !\in_array($metaPropertyName, $this->disabledMetaProperties, true);
+    }
+
+    /**
+     * Enables a requesting of the given additional meta property.
+     */
+    public function enableMetaProperty(string $metaPropertyName): void
+    {
+        $index = array_search($metaPropertyName, $this->disabledMetaProperties, true);
+        if (false !== $index) {
+            unset($this->disabledMetaProperties[$index]);
+            $this->disabledMetaProperties = array_values($this->disabledMetaProperties);
+        }
+    }
+
+    /**
+     * Disables a requesting of the given additional meta property.
+     */
+    public function disableMetaProperty(string $metaPropertyName): void
+    {
+        if (!\in_array($metaPropertyName, $this->disabledMetaProperties, true)) {
+            $this->disabledMetaProperties[] = $metaPropertyName;
+        }
+    }
+
+    /**
+     * Gets the names of additional meta properties a requesting of that are disabled.
+     *
+     * @return string[]
+     */
+    public function getDisabledMetaProperties(): array
+    {
+        return $this->disabledMetaProperties;
     }
 
     /**

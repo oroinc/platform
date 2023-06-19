@@ -57,7 +57,7 @@ class BatchUpdateItem
     /**
      * Gets included data.
      */
-    public function getIncludedData():? IncludedData
+    public function getIncludedData(): ?IncludedData
     {
         return $this->updateContext->getIncludedData();
     }

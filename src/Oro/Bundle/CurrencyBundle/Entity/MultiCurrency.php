@@ -1,8 +1,12 @@
 <?php
+
 namespace Oro\Bundle\CurrencyBundle\Entity;
 
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 
+/**
+ * Multi currency value object
+ */
 class MultiCurrency implements EmptyItem
 {
     use CurrencyAwareTrait;

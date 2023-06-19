@@ -25,7 +25,7 @@ class WorkflowConfigurationTest extends \PHPUnit\Framework\TestCase
     {
         $fileName = __DIR__ . '/Stub/CorrectConfiguration/Resources/config/oro/workflows.yml';
         $this->assertFileExists($fileName);
-        $data = Yaml::parse(file_get_contents($fileName)) ? : [];
+        $data = Yaml::parse(file_get_contents($fileName)) ?: [];
 
         return current($data);
     }

@@ -1,4 +1,6 @@
-<?php return [
+<?php
+
+return [
     'with_split_parts' => [
         'entity' => 'Some\\Entity',
         'steps' => [

@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Mock;
 
 use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;

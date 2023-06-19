@@ -1,0 +1,66 @@
+data:
+    -
+        type: localizations
+        id: '<toString(@en_US->id)>'
+        attributes:
+            name: 'English (United States)'
+            languageCode: en
+            formattingCode: en_US
+            rtlMode: false
+            createdAt: '@en_US->createdAt->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@en_US->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        relationships:
+            titles:
+                data:
+                    -
+                        type: localizedfallbackvalues
+                        id: '<toString(@en_US->defaultTitle->id)>'
+            parentLocalization:
+                data: null
+            childLocalizations:
+                data:
+                    -
+                        type: localizations
+                        id: '<toString(@en_CA->id)>'
+    -
+        type: localizations
+        id: '<toString(@en_CA->id)>'
+        attributes:
+            name: 'English (Canada)'
+            languageCode: null
+            formattingCode: en_CA
+            rtlMode: false
+            createdAt: '@en_CA->createdAt->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@en_CA->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        relationships:
+            titles:
+                data:
+                    -
+                        type: localizedfallbackvalues
+                        id: '<toString(@en_CA->defaultTitle->id)>'
+            parentLocalization:
+                data:
+                    type: localizations
+                    id: '<toString(@en_US->id)>'
+            childLocalizations:
+                data: []
+    -
+        type: localizations
+        id: '<toString(@es->id)>'
+        attributes:
+            name: 'Spanish'
+            languageCode: null
+            formattingCode: es
+            rtlMode: false
+            createdAt: '@es->createdAt->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@es->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        relationships:
+            titles:
+                data:
+                    -
+                        type: localizedfallbackvalues
+                        id: '<toString(@es->defaultTitle->id)>'
+            parentLocalization:
+                data: null
+            childLocalizations:
+                data: []

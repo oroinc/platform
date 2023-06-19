@@ -73,7 +73,7 @@ abstract class AbstractAccessTokenController extends AbstractController
     {
         $decoded = base64_decode($state, true);
 
-        return false !== $decoded ? $decoded: $state;
+        return false !== $decoded ? $decoded : $state;
     }
 
     public static function getSubscribedServices()

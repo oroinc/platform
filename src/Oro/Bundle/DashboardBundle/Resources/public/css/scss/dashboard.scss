@@ -57,13 +57,12 @@
         }
     }
 
-    .responsive-section {
+    .dashboard-container {
         padding-top: $content-padding;
-
         background: $dashboard-wrapper-bg;
 
-        .responsive-cell > div {
-            padding-bottom: $content-padding-medium;
+        .dashboard-column > div:not(:last-child) {
+            margin-bottom: $offset-block;
         }
     }
 
@@ -85,8 +84,8 @@
     }
 
     .dashboard-widget {
+        background-color: $primary-inverse;
         position: relative;
-
         border-radius: 1px;
         box-shadow: $dashboard-widget-box-shadow;
 

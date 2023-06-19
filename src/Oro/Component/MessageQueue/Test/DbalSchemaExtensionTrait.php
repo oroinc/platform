@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Test;
 
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;

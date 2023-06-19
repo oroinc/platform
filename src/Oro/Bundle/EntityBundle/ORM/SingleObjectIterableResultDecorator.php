@@ -46,7 +46,7 @@ class SingleObjectIterableResultDecorator implements \Iterator
     public function current(): mixed
     {
         $current = $this->iterableResult->current();
-        return is_iterable($current)? reset($current):$current;
+        return is_iterable($current) ? reset($current) : $current;
     }
 
     /**

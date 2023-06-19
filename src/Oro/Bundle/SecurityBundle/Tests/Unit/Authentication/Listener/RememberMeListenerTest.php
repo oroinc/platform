@@ -146,7 +146,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn(self::SESSION_NAME);
         $request->setSession($session);
-        
+
         if ($isXmlHttpRequest) {
             $request->headers->set('X-Requested-With', 'XMLHttpRequest');
         }

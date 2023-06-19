@@ -6,3 +6,12 @@ framework:
 oro_translation:
     package_names:
         - Oro
+
+oro_api:
+    filters:
+        translationId:
+            class: Oro\Bundle\TranslationBundle\Api\Filter\TranslationIdFilter
+            supported_operators: ['=', '!=']
+        languageCode:
+            factory: ['@oro_translation.api.filter_factory.language_code', 'createFilter']
+            supported_operators: ['=', '!=']

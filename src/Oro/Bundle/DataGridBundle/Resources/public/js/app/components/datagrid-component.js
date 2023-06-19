@@ -17,7 +17,7 @@ define(function(require) {
     const DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
 
     const pluginModules = {
-        FloatingHeaderPlugin: 'orodatagrid/js/app/plugins/grid/floating-header-plugin',
+        StickyHeaderPlugin: 'orodatagrid/js/app/plugins/grid/sticky-header-plugin',
         FullscreenPlugin: 'orodatagrid/js/app/plugins/grid/fullscreen-plugin',
         DatagridSettingsPlugin: 'orodatagrid/js/app/plugins/grid/datagrid-settings-plugin',
         ToolbarMassActionPlugin: 'orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin',
@@ -26,15 +26,9 @@ define(function(require) {
     };
 
     const helpers = {
-        cellType: function(type) {
-            return type + 'Cell';
-        },
-        actionType: function(type) {
-            return type + 'Action';
-        },
-        customType: function(type) {
-            return type + 'Custom';
-        }
+        cellType: type => `${type}Cell`,
+        actionType: type => `${type}Action`,
+        customType: type => `${type}Custom`
     };
 
     const DataGridComponent = BaseComponent.extend({
@@ -141,6 +135,7 @@ define(function(require) {
                         self.$el.show();
                         self.grid.shown = true;
                         self.grid.trigger('shown');
+                        self.grid.$el.trigger('shown');
                     });
                 });
             });
@@ -260,9 +255,11 @@ define(function(require) {
 
             // load pluginsModules
             if (!this.themeOptions.headerHide) {
-                if (this.metadata.enableFloatingHeaderPlugin) {
-                    modules.FloatingHeaderPlugin = pluginModules.FloatingHeaderPlugin;
-                } else if (this.metadata.enableFullScreenLayout) {
+                if (this.metadata.enableStickyHeaderPlugin) {
+                    modules.StickyHeaderPlugin = pluginModules.StickyHeaderPlugin;
+                }
+
+                if (this.metadata.enableFullScreenLayout) {
                     modules.FullscreenPlugin = pluginModules.FullscreenPlugin;
                 }
             }
@@ -457,7 +454,7 @@ define(function(require) {
             const extraActions = this.buildActionsOptions(this.metadata.extraActions);
 
             Object.values(_.pick(modules, [
-                'FloatingHeaderPlugin',
+                'StickyHeaderPlugin',
                 'FullscreenPlugin',
                 'DatagridSettingsPlugin',
                 'ToolbarMassActionPlugin',

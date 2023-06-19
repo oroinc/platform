@@ -5,6 +5,7 @@ $global-url: '~bundles' !default;
 @import 'functions';
 @import 'colors';
 @import 'global-variables';
+@import 'breakpoints';
 @import 'mixins/main';
 @import '../font-awesome/config';
 @import '../bootstrap/functions';

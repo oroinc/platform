@@ -7,13 +7,12 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * Class LoggerStrategy
+ * Logger strategy for integration bundle that allows to log memory usage
  */
 class LoggerStrategy implements LoggerInterface
 {
-    const FORMAT = '[%.2F MiB/%.2F MiB] %s';
-
     use LoggerAwareTrait;
+    const FORMAT = '[%.2F MiB/%.2F MiB] %s';
 
     /** @var bool */
     protected $debug;

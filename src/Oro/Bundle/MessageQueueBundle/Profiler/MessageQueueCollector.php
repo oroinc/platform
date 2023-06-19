@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Profiler;
 
 use Oro\Component\MessageQueue\Client\MessagePriority;

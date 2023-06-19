@@ -9,7 +9,7 @@ $scrollspy-nav-border-radius: 16px !default;
 $scrollspy-nav-position: relative !default;
 $scrollspy-nav-z-index: 2 !default;
 
-$scrollspy-nav-gradient: linear-gradient(to bottom, #fff, rgba(255 255 255 / 0%)) !default;
+$scrollspy-nav-gradient: linear-gradient(180deg, rgba(255 255 255 / 100%), rgba(255 255 255 / 0%)) !default;
 $scrollspy-nav-gradient-height: 16px !default;
 
 $scrollspy-nav-target-height: 20px !default;
@@ -30,3 +30,7 @@ $scrollspy-title-inner-offset: 8px 16px !default;
 $scrollspy-title-border-radius: 4px !default;
 
 $scrollspy-data-scroll-focus-outline: 0 none !default;
+
+$scrollspy-datagrid-sticky-shadow:
+    0 6px 6px -4px rgba(0, 0, 0, .5),
+    0 -8px #fff !default;

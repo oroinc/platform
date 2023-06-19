@@ -1,0 +1,6 @@
+query_designer:
+    filters:
+        short_money:
+            type: string
+            query_type: [all]
+            applicable: [ { type: string } ]

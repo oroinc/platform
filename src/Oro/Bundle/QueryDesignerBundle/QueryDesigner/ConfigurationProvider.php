@@ -48,7 +48,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider
             'oro_query_designer',
             [
                 new YamlCumulativeFileLoader(self::CONFIG_FILE),
-                new FolderYamlCumulativeFileLoader(self::APP_CONFIG_PATH),
+                new FolderYamlCumulativeFileLoader($this->getAppConfigPath()),
             ]
         );
         $resources = $configLoader->load($resourcesContainer);
@@ -114,5 +114,10 @@ class ConfigurationProvider extends PhpArrayConfigProvider
             // this function should use a label of overridden function
             $func[$labelName] = '';
         }
+    }
+
+    protected function getAppConfigPath(): string
+    {
+        return self::APP_CONFIG_PATH;
     }
 }

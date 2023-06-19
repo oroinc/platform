@@ -24,6 +24,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class FormContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -1016,5 +1017,27 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     {
         $element = $this->getFieldInForm($fieldName, $formName);
         $element->setValue($this->locatePath($url));
+    }
+
+    /**
+     * Example: And I click button "Add" on "Work for you"
+     *
+     * @Given /^(?:|I )click button "(?P<action>[\w\s]*)" on "(?P<content>[\w\s]*)"$/
+     */
+    public function clickActionOnContent($action, $content)
+    {
+        $xpath = sprintf(
+            '//label[contains(translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"),"%s")]' .
+            '//ancestor::div[contains(@class, "control-group")]' .
+            '//button[contains(translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"),"%s")]',
+            strtolower($content),
+            strtolower($action)
+        );
+        $label = $this->getPage()->find('xpath', $xpath);
+        if ($label) {
+            $label->click();
+        } else {
+            self::fail(sprintf('There is no "%s" action for this "%s" content', $action, $content));
+        }
     }
 }

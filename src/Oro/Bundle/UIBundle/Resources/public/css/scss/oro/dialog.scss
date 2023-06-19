@@ -313,6 +313,16 @@
             margin-left: $dialog-buttonpane-action-wrapper-offset-left;
         }
     }
+
+    .datagrid {
+        --datagrid-sticky-offset: #{$dialog-sticky-offset};
+    }
+
+    .oro-datagrid {
+        &.stuck .datagrid-sticky {
+            box-shadow: $dialog-datagrid-sticky-shadow;
+        }
+    }
 }
 
 .ui-dialog .ui-resizable-se {

@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\TagBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;

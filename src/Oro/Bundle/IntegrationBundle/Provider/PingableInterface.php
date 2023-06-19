@@ -1,6 +1,10 @@
 <?php
+
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+/**
+ * Checks integration availability
+ */
 interface PingableInterface
 {
     /**

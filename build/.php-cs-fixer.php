@@ -17,6 +17,8 @@ $config->setRules([
         '@PSR2' => true,
         'psr_autoloading' => true,
 
+        '@PSR12' => true,
+        'visibility_required' => ['elements' => ['method', 'property']],
         // imports
         'ordered_imports' => true,
         'no_unused_imports' => true,

@@ -60,7 +60,6 @@ features:
             - 'user_mailbox'
             - 'user_bar_settings'
             - 'integration_email_settings'
-            - 'oro_hangouts_call.enable_google_hangouts_for_email'
         sidebar_widgets:
             - 'recent_emails'
         dashboard_widgets:

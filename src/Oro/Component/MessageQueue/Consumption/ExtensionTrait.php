@@ -1,6 +1,10 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption;
 
+/**
+ * Implements all methods from ExtensionInterface with empty body.
+ */
 trait ExtensionTrait
 {
     public function onStart(Context $context)

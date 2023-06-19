@@ -226,19 +226,25 @@ enable_meta_properties:
     config:
         disable_meta_properties: false
     expected:
-        disable_meta_properties: false
+        disable_meta_properties: [false]
 
 disable_meta_properties:
     config:
         disable_meta_properties: true
     expected:
-        disable_meta_properties: true
+        disable_meta_properties: [true]
+
+disable_specified_meta_properties:
+    config:
+        disable_meta_properties: [ prop1, prop2 ]
+    expected:
+        disable_meta_properties: [ prop1, prop2 ]
 
 invalid_value_for_disable_meta_properties:
     config:
         disable_meta_properties: 123
     expected: []
-    error: 'Invalid type for path "entity.disable_meta_properties". Expected "bool", but got "int"'
+    error: 'Invalid type for path "entity.disable_meta_properties". Expected "array", but got "int"'
 
 enable_partial_load:
     config:

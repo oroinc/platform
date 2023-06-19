@@ -82,7 +82,7 @@ class BuildVersionStrategyTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        
+
         return $crawler;
     }
 }

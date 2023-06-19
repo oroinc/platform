@@ -1,6 +1,10 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Job;
 
+/**
+ * Context DTO for job with dependent jobs
+ */
 class DependentJobContext
 {
     /**

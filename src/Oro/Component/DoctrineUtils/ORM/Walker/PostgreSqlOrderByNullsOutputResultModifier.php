@@ -163,7 +163,7 @@ class PostgreSqlOrderByNullsOutputResultModifier extends AbstractOutputResultMod
         foreach ($selectClause->selectExpressions as $selectExpression) {
             $expr = $selectExpression->expression;
             if ($expr instanceof AST\PathExpression) {
-                $identifier = $selectExpression->fieldIdentificationVariable ? : $expr->field;
+                $identifier = $selectExpression->fieldIdentificationVariable ?: $expr->field;
                 $this->resolvedColumnAliases[$identifier] = [
                     'table' => $expr->identificationVariable,
                     'field' => $expr->field

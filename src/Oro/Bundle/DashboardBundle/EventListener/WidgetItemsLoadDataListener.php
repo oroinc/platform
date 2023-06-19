@@ -4,6 +4,9 @@ namespace Oro\Bundle\DashboardBundle\EventListener;
 
 use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
 
+/**
+ * Filters and sorts widget items according to widget configuration
+ */
 class WidgetItemsLoadDataListener
 {
     public function filterItemsByItemsChoice(WidgetItemsLoadDataEvent $event)
@@ -17,7 +20,7 @@ class WidgetItemsLoadDataListener
             return;
         }
 
-        $visibleItems = $event->getWidgetOptions()->get('subWidgets') ? : [];
+        $visibleItems = $event->getWidgetOptions()->get('subWidgets') ?: [];
         $items        = $event->getItems();
         $event->setItems(array_intersect_key($items, array_flip($visibleItems)));
     }

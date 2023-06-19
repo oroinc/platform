@@ -1,4 +1,6 @@
-<?php return [
+<?php
+
+return [
     'first' => [
         'entity' => 'Entity1',
         'steps' => [

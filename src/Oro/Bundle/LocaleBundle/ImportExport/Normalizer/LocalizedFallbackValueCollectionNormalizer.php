@@ -42,7 +42,7 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
         $this->localizedFallbackValueClass = $localizedFallbackValueClass;
         $this->localizationClass = $localizationClass;
 
-        $this->localization = new $localizationClass;
+        $this->localization = new $localizationClass();
     }
 
     /** {@inheritdoc} */

@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Form type for configuration checkbox field
+ */
 class ConfigCheckbox extends AbstractType
 {
     const NAME = 'oro_config_checkbox';
@@ -46,7 +49,7 @@ class ConfigCheckbox extends AbstractType
             function (FormEvent $event) {
                 $data = $event->getData();
                 if (null !== $data && !is_bool($data)) {
-                    $event->setData((boolean)$data);
+                    $event->setData((bool)$data);
                 }
             }
         );
