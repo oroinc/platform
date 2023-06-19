@@ -142,7 +142,7 @@ class ApiEntityManager
      */
     public function createEntity()
     {
-        return new $this->class;
+        return new $this->class();
     }
 
     /**

@@ -127,7 +127,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
 
         $this->renderer->renderTemplate('');
 
-        $entity = new $entityClass;
+        $entity = new $entityClass();
         $this->securityPolicy->checkPropertyAllowed($entity, 'field2');
         $this->securityPolicy->checkMethodAllowed($entity, 'getField1');
         $this->securityPolicy->checkMethodAllowed($entity, '__toString');

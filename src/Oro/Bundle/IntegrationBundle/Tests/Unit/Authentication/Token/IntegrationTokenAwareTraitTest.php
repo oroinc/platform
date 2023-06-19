@@ -27,7 +27,7 @@ class IntegrationTokenAwareTraitTest extends \PHPUnit\Framework\TestCase
 
         /** @var OrganizationToken $token */
         $token = ReflectionUtil::getPropertyValue($class, 'tokenStorage')->getToken();
-        
+
         self::assertEquals($organization, $token->getOrganization());
     }
 

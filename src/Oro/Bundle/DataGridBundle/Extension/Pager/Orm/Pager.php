@@ -124,7 +124,7 @@ class Pager extends AbstractPager
      */
     public function computeNbResult()
     {
-        $countQb = $this->countQb ? : $this->qb;
+        $countQb = $this->countQb ?: $this->qb;
         $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($countQb);
         $query = $countQb->getQuery();
         if (!$this->skipAclCheck) {

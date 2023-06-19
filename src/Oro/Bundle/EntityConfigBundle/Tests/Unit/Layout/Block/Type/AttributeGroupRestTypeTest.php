@@ -25,7 +25,7 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
     {
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
 
-        $this->attributeRenderRegistry = new AttributeRenderRegistry;
+        $this->attributeRenderRegistry = new AttributeRenderRegistry();
 
         $restBlockType = new AttributeGroupRestType($this->attributeRenderRegistry);
 

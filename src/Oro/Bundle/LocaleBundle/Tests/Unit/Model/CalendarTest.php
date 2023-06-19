@@ -87,7 +87,7 @@ class CalendarTest extends TestCase
             \IntlDateFormatter::NONE,
             'UTC',
             \IntlDateFormatter::GREGORIAN,
-            $widthToPatternMap[$width ? : Calendar::WIDTH_WIDE]
+            $widthToPatternMap[$width ?: Calendar::WIDTH_WIDE]
         );
 
         foreach ($actual as $monthNum => $monthName) {
@@ -133,7 +133,7 @@ class CalendarTest extends TestCase
             \IntlDateFormatter::NONE,
             'UTC',
             \IntlDateFormatter::GREGORIAN,
-            $widthToPatternMap[$width ? : Calendar::WIDTH_WIDE]
+            $widthToPatternMap[$width ?: Calendar::WIDTH_WIDE]
         );
         foreach ($actual as $dayNum => $dayName) {
             $checkDate = new \DateTime('2013/09/0' . $dayNum, new \DateTimeZone('UTC'));

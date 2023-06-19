@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\Persistence\ManagerRegistry;

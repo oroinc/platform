@@ -84,7 +84,7 @@ trait JobsAwareTestTrait
 
     protected function assertUniqueJobsProcessed(): void
     {
-        self::assertThat($this->getJobManager(), new UniqueJobsProcessedConstraint);
+        self::assertThat($this->getJobManager(), new UniqueJobsProcessedConstraint());
     }
 
     protected function assertUniqueJobsNotProcessed(): void

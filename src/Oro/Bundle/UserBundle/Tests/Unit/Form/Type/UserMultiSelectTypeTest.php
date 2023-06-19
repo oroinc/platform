@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;

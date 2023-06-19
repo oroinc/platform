@@ -14,7 +14,7 @@ class DriverConnectionMock implements \Doctrine\DBAL\Driver\Connection
 
     public function query()
     {
-        return new StatementMock;
+        return new StatementMock();
     }
 
     public function quote($input, $type = \PDO::PARAM_STR)

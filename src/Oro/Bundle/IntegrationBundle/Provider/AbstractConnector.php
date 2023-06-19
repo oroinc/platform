@@ -91,7 +91,7 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
     protected function addStatusData($key, $value)
     {
         $context    = $this->getStepExecution()->getExecutionContext();
-        $data       = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY) ? : [];
+        $data       = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY) ?: [];
         $data[$key] = $value;
 
         $context->put(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY, $data);
@@ -108,7 +108,7 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
     protected function getStatusData($key = null, $defaultValue = null)
     {
         $context = $this->getStepExecution()->getExecutionContext();
-        $data    = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY) ? : [];
+        $data    = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY) ?: [];
 
         return array_key_exists($key, $data) ? $data[$key] : $defaultValue;
     }

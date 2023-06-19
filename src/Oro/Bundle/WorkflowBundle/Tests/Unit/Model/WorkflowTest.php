@@ -509,12 +509,12 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflow->getAttributeManager()->setAttributes([$entityAttribute]);
         $workflow->getAttributeManager()->setEntityAttributeName($entityAttribute->getName());
 
-        $item = $workflow->start(new EntityWithWorkflow(), [$entityAttributeName => new $entityClass]);
+        $item = $workflow->start(new EntityWithWorkflow(), [$entityAttributeName => new $entityClass()]);
 
         $this->assertInstanceOf(WorkflowItem::class, $item);
         $this->assertEquals(new \stdClass(), $item->getEntity());
         $this->assertEquals(
-            ['entity' => new EntityWithWorkflow(), $entityAttributeName => new $entityClass],
+            ['entity' => new EntityWithWorkflow(), $entityAttributeName => new $entityClass()],
             $item->getData()->getValues()
         );
     }

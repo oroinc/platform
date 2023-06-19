@@ -1,4 +1,5 @@
 <?php
+
 return [
     'workflow_with_numeric_array' => [
             'entity' => 'Some\\Another\\Entity',

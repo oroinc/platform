@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType;

@@ -72,7 +72,7 @@ class Calendar
      */
     public function getLanguage()
     {
-        return $this->language ? : $this->getLocale();
+        return $this->language ?: $this->getLocale();
     }
 
     /**
@@ -195,7 +195,7 @@ class Calendar
     protected function getFormatter($pattern = null, $locale = null)
     {
         return new \IntlDateFormatter(
-            $locale ? : $this->getLocale(),
+            $locale ?: $this->getLocale(),
             \IntlDateFormatter::NONE,
             \IntlDateFormatter::NONE,
             'UTC',

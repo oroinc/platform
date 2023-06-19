@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\Layout\Form;
 
 use Symfony\Component\Form\FormRendererInterface as BaseFormRendererInterface;

@@ -61,7 +61,7 @@ class WebSocketSendProcessor
 
                 $topic = self::getUserTopic($ownerId, $emailUser->getOrganization());
                 $messageData = [
-                    'hasNewEmail' => array_key_exists('new', $item) === true && $item['new'] > 0 ? : false
+                    'hasNewEmail' => array_key_exists('new', $item) === true && $item['new'] > 0 ?: false
                 ];
 
                 $this->websocketClient->publish($topic, $messageData);

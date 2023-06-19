@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine;
 
 use Doctrine\ORM\EntityManager;

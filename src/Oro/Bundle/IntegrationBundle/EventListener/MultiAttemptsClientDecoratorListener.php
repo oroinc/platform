@@ -8,9 +8,13 @@ use Oro\Bundle\IntegrationBundle\Utils\MultiAttemptsConfigTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
+/**
+ * Decorates REST client to retry requests in case of connection problems
+ */
 class MultiAttemptsClientDecoratorListener extends AbstractClientDecoratorListener implements LoggerAwareInterface
 {
-    use LoggerAwareTrait, MultiAttemptsConfigTrait;
+    use LoggerAwareTrait;
+    use MultiAttemptsConfigTrait;
 
     /**
      * {@inheritdoc}

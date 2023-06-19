@@ -49,7 +49,7 @@ class AclCache implements AclCacheInterface
     /**
      * Retrieves an ACL for the given object identity from the cache
      */
-    public function getFromCacheByIdentityAndSids(ObjectIdentityInterface $oid, array $sids):? AclInterface
+    public function getFromCacheByIdentityAndSids(ObjectIdentityInterface $oid, array $sids): ?AclInterface
     {
         $key = $this->getDataKeyByIdentity($oid);
         $sidKey = $this->getSidKey($sids);

@@ -1,5 +1,7 @@
 <?php
+
 // phpcs:ignoreFile - keep the original style to simplify maintenance
+
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
 
 use PHPUnit\Framework\Assert as Assert;

@@ -161,7 +161,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
     {
         $userIds = array_intersect_key($this->assignedBusinessUnitUserIds, array_flip($businessUnitIds));
 
-        return !$userIds ? [] :array_values(
+        return !$userIds ? [] : array_values(
             array_unique(
                 call_user_func_array(
                     'array_merge',
