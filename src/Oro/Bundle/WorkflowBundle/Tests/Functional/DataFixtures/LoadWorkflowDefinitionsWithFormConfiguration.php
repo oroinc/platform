@@ -16,6 +16,6 @@ class LoadWorkflowDefinitionsWithFormConfiguration extends LoadWorkflowDefinitio
      */
     protected function getWorkflowConfiguration()
     {
-        return Yaml::parse(file_get_contents(__DIR__ . '/config/oro/workflows_with_form_configuration.yml')) ? : [];
+        return Yaml::parse(file_get_contents(__DIR__ . '/config/oro/workflows_with_form_configuration.yml')) ?: [];
     }
 }

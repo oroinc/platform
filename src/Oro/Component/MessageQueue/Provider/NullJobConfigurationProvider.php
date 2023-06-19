@@ -1,6 +1,10 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Provider;
 
+/**
+ * Null implementation of JobConfigurationProviderInterface
+ */
 class NullJobConfigurationProvider implements JobConfigurationProviderInterface
 {
     /**

@@ -175,7 +175,7 @@ class ObjectMapper extends AbstractMapper
      * Gathers additionally selected fields from the search index
      * into an output array.
      */
-    public function mapSelectedData(Query $query, array $resultItem) : array
+    public function mapSelectedData(Query $query, array $resultItem): array
     {
         $dataFields = $query->getSelectDataFields();
 

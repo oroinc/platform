@@ -200,7 +200,7 @@ class ConfigController extends AbstractController
                 )) {
                     continue;
                 }
-                $fields[$field['name']] = $field['label'] ? : $field['name'];
+                $fields[$field['name']] = $field['label'] ?: $field['name'];
             }
         }
 

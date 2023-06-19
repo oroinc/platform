@@ -45,6 +45,6 @@ abstract class AbstractFormTypeExtensionStub implements FormTypeExtensionInterfa
             };
         EOF);
 
-        return new $extensionClass;
+        return new $extensionClass();
     }
 }

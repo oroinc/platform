@@ -63,7 +63,7 @@ class DbalDriver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function createTransportMessage():  MessageInterface
+    public function createTransportMessage(): MessageInterface
     {
         return $this->session->createMessage();
     }

@@ -76,7 +76,7 @@ class LocalizationController extends AbstractController
     {
         return $this->update($localization);
     }
-    
+
     protected function update(Localization $localization): array|RedirectResponse
     {
         return $this->get(UpdateHandlerFacade::class)->update(

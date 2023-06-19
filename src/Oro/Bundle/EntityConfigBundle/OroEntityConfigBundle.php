@@ -18,7 +18,7 @@ class OroEntityConfigBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new Compiler\EntityConfigPass);
+        $container->addCompilerPass(new Compiler\EntityConfigPass());
         $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
             'oro_entity_config.registry.attribute_type',
             'oro_entity_config.attribute_type',

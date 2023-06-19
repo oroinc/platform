@@ -124,7 +124,7 @@ abstract class AbstractEngine implements ExtendedEngineInterface
     {
         $entityManager = $this->registry->getManagerForClass('Oro\Bundle\SearchBundle\Entity\Query');
 
-        $logRecord = new QueryLog;
+        $logRecord = new QueryLog();
         $logRecord->setEntity(implode(',', array_values($result->getQuery()->getFrom())));
         $logRecord->setQuery(serialize($result->getQuery()->getCriteria()));
         $logRecord->setResultCount($result->count());

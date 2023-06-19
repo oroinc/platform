@@ -31,7 +31,7 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
                 'expectation' => [],
             ],
             [
-                'collection' => (new AttributeGroup)->getAttributeRelations(),
+                'collection' => (new AttributeGroup())->getAttributeRelations(),
                 'expectation' => [],
             ],
             [
@@ -60,44 +60,44 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
             'new group with attributes selected' => [
                 'attributeGroup' => null,
                 'selectedAttributes' => [333],
-                'expectation' => (new AttributeGroup)
+                'expectation' => (new AttributeGroup())
                     ->addAttributeRelation(
                         (new AttributeGroupRelation())->setEntityConfigFieldId(333)
                     )
                     ->getAttributeRelations(),
             ],
             'existing group with all attributes removed' => [
-                'attributeGroup' => (new AttributeGroup)
+                'attributeGroup' => (new AttributeGroup())
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(111))
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(333)),
                 'selectedAttributes' => [],
                 'expectation' => new ArrayCollection(),
             ],
             'existing group with new attribute added' => [
-                'attributeGroup' => (new AttributeGroup)
+                'attributeGroup' => (new AttributeGroup())
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(777)),
                 'selectedAttributes' => [111, 777],
-                'expectation' => (new AttributeGroup)
+                'expectation' => (new AttributeGroup())
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(111))
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(777))
                     ->getAttributeRelations(),
             ],
             'existing group with attributes order changed' => [
-                'attributeGroup' => (new AttributeGroup)
+                'attributeGroup' => (new AttributeGroup())
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(111))
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(333)),
                 'selectedAttributes' => [333, 111],
-                'expectation' => (new AttributeGroup)
+                'expectation' => (new AttributeGroup())
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(333))
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(111))
                     ->getAttributeRelations(),
             ],
             'existing group with attributes changed' => [
-                'attributeGroup' => (new AttributeGroup)
+                'attributeGroup' => (new AttributeGroup())
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(111))
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(333)),
                 'selectedAttributes' => [777, 333],
-                'expectation' => (new AttributeGroup)
+                'expectation' => (new AttributeGroup())
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(777))
                     ->addAttributeRelation((new AttributeGroupRelation())->setEntityConfigFieldId(333))
                     ->getAttributeRelations(),

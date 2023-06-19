@@ -4,6 +4,9 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 
+/**
+ * Provides methods to work with translation fields iterator
+ */
 trait TranslationFieldsIteratorTrait
 {
     /** @var TranslationKeyTemplateInterface[] */
@@ -94,7 +97,7 @@ trait TranslationFieldsIteratorTrait
                 );
             }
 
-            $this->templateInstances[$templateClass] = new $templateClass;
+            $this->templateInstances[$templateClass] = new $templateClass();
         }
 
         return $this->templateInstances[$templateClass];

@@ -109,7 +109,7 @@ class HTMLPurifier extends \HTMLPurifier implements TranslatorAwareInterface
                 continue;
             }
             $class = "HTMLPurifier_Filter_$filter";
-            $filters[] = new $class;
+            $filters[] = new $class();
         }
 
         foreach ($customFilters as $filter) {

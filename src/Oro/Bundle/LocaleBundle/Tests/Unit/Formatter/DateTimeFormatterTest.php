@@ -72,8 +72,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->localeSettings->expects($this->exactly($methodCalls))
             ->method($this->anything());
 
-        $pattern = $this->getPattern($locale ? : $defaultLocale, $expectedDateType, $expectedTimeType);
-        $formatter = $this->getFormatter($language, $timeZone ? : $defaultTimeZone, $pattern);
+        $pattern = $this->getPattern($locale ?: $defaultLocale, $expectedDateType, $expectedTimeType);
+        $formatter = $this->getFormatter($language, $timeZone ?: $defaultTimeZone, $pattern);
         $expected = $formatter->format((int)$expectedDate->format('U'));
 
         $this->assertEquals(
@@ -235,8 +235,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->localeSettings->expects($this->exactly($methodCalls))
             ->method($this->anything());
 
-        $pattern = $this->getPattern($locale ? : $defaultLocale, $expectedDateType, \IntlDateFormatter::NONE);
-        $formatter = $this->getFormatter($language, $timeZone ? : $defaultTimeZone, $pattern);
+        $pattern = $this->getPattern($locale ?: $defaultLocale, $expectedDateType, \IntlDateFormatter::NONE);
+        $formatter = $this->getFormatter($language, $timeZone ?: $defaultTimeZone, $pattern);
         $expected = $formatter->format((int)$date->format('U'));
 
         $this->assertEquals(
@@ -341,8 +341,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->localeSettings->expects($this->exactly($methodCalls))
             ->method($this->anything());
 
-        $pattern = $this->getPattern($locale ? : $defaultLocale, \IntlDateFormatter::NONE, $expectedTimeType);
-        $formatter = $this->getFormatter($language, $timeZone ? : $defaultTimeZone, $pattern);
+        $pattern = $this->getPattern($locale ?: $defaultLocale, \IntlDateFormatter::NONE, $expectedTimeType);
+        $formatter = $this->getFormatter($language, $timeZone ?: $defaultTimeZone, $pattern);
         $expected = $formatter->format((int)$date->format('U'));
 
         $this->assertEquals(
@@ -522,7 +522,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'DateTime' => [
-                'date' => new \DateTime,
+                'date' => new \DateTime(),
             ],
             'DateTimeImmutable' => [
                 'date' => new \DateTimeImmutable(),

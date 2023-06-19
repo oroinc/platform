@@ -87,7 +87,7 @@ class PrimaryFieldFilter extends ComparisonFilter
 
         return Criteria::expr()->andX(
             $expr,
-            Criteria::expr()->eq($field . '.' . ($this->primaryFlagField  ?: 'primary'), true)
+            Criteria::expr()->eq($field . '.' . ($this->primaryFlagField ?: 'primary'), true)
         );
     }
 }

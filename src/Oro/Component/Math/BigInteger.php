@@ -83,7 +83,7 @@ final class BigInteger extends BigNumber
     /**
      * {@inheritdoc}
      */
-    public function __unserialize(array $serialized):void
+    public function __unserialize(array $serialized): void
     {
         if ($this->getTargetObject() !== null) {
             throw new \LogicException('unserialize() must not be called directly.');

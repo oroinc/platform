@@ -12,12 +12,11 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadTestEntitiesData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
+    use ContainerAwareTrait;
     const FIRST_SIMPLE_USER_ENTITY = 'firstSimpleUserEntity';
     const SECOND_SIMPLE_USER_ENTITY = 'secondSimpleUserEntity';
     const THIRD_SIMPLE_USER_ENTITY = 'thirdSimpleUserEntity';
     const FIRST_NOT_SIMPLE_USER_ENTITY = 'firstNotSimpleUserEntity';
-
-    use ContainerAwareTrait;
 
     private static $testEntities = [
         [

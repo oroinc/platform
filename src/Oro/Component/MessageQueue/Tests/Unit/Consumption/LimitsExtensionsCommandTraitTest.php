@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;

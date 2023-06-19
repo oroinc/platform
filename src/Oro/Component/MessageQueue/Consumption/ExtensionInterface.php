@@ -1,6 +1,10 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption;
 
+/**
+ * The interface for the consumption extensions
+ */
 interface ExtensionInterface
 {
     /**

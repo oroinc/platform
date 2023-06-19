@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Doctrine\Inflector\Inflector;

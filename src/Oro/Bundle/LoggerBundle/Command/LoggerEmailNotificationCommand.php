@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\LoggerBundle\Command;
@@ -112,7 +113,7 @@ HELP
         $emails = explode(';', $recipients);
         $errors = [];
         foreach ($emails as $email) {
-            $violations = $this->validator->validate($email, new Email);
+            $violations = $this->validator->validate($email, new Email());
             if (0 !== count($violations)) {
                 foreach ($violations as $violation) {
                     $errors[] = sprintf('%s - %s', $email, $violation->getMessage());

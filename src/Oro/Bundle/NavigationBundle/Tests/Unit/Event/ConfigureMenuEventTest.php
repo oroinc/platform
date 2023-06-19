@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
 use Knp\Menu\FactoryInterface;

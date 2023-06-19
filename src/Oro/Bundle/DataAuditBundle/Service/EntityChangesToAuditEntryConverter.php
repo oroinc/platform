@@ -226,10 +226,10 @@ class EntityChangesToAuditEntryConverter
         }
 
         if ($audit->getVersion() < 2) {
-            return $defaultAction ? : AbstractAudit::ACTION_CREATE;
+            return $defaultAction ?: AbstractAudit::ACTION_CREATE;
         }
 
-        return $defaultAction ? : AbstractAudit::ACTION_UPDATE;
+        return $defaultAction ?: AbstractAudit::ACTION_UPDATE;
     }
 
     /**

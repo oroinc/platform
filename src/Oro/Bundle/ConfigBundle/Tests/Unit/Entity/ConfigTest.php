@@ -13,7 +13,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->object = new Config;
+        $this->object = new Config();
     }
 
     public function testGetId()

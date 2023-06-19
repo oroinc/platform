@@ -1,8 +1,12 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption\Dbal;
 
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * Creates, removes and lists pid files for consumers
+ */
 class DbalPidFileManager
 {
     /**

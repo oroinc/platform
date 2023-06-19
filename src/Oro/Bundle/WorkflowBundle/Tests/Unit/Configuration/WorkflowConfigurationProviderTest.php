@@ -207,7 +207,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testImportSelfContainedConfig(): void
     {
-        $bundles = [new Stub\ImportSelfConfiguration\ImportSelfConfigurationBundle];
+        $bundles = [new Stub\ImportSelfConfiguration\ImportSelfConfigurationBundle()];
 
         $configurationProvider = $this->buildProvider($bundles);
 
@@ -221,8 +221,8 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     public function testImportComplexChainConfig(): void
     {
         $bundles = [
-            new Stub\ImportComplexConfiguration\ImportComplexConfigurationBundle,
-            new Stub\ImportSelfConfiguration\ImportSelfConfigurationBundle
+            new Stub\ImportComplexConfiguration\ImportComplexConfigurationBundle(),
+            new Stub\ImportSelfConfiguration\ImportSelfConfigurationBundle()
         ];
 
         $configurationProvider = $this->buildProvider($bundles);
@@ -239,7 +239,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testImportWorkflowPartFromOuterFile(): void
     {
-        $bundles = [new Stub\ImportPartsFromOuterFileConfiguration\ImportPartsFromOuterFileConfigurationBundle];
+        $bundles = [new Stub\ImportPartsFromOuterFileConfiguration\ImportPartsFromOuterFileConfigurationBundle()];
 
         $configurationProvider = $this->buildProvider($bundles);
 
@@ -267,7 +267,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testImportWrongConfiguration(): void
     {
-        $bundles = [new Stub\ImportIncorrectOptions\ImportIncorrectOptionsBundle];
+        $bundles = [new Stub\ImportIncorrectOptions\ImportIncorrectOptionsBundle()];
 
         $configurationProvider = $this->buildProvider($bundles);
 
@@ -284,7 +284,7 @@ TEXT;
 
     public function testImportUnknownWorkflowException(): void
     {
-        $bundles = [new Stub\ImportUnknownWorkflow\ImportUnknownWorkflowBundle];
+        $bundles = [new Stub\ImportUnknownWorkflow\ImportUnknownWorkflowBundle()];
 
         $configurationProvider = $this->buildProvider($bundles);
 

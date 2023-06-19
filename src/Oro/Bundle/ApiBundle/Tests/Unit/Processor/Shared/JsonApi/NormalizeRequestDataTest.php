@@ -51,7 +51,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         string $associationName,
         string $targetClass,
         bool $isCollection
-    ):AssociationMetadata {
+    ): AssociationMetadata {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);

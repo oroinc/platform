@@ -11,5 +11,5 @@ interface ValueFormatterInterface
      * @param mixed $value
      * @return string
      */
-    public function format($value) : string;
+    public function format($value): string;
 }

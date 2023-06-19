@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;

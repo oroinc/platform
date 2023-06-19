@@ -938,7 +938,7 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function generateRandomString($length = 10)
     {
         $random = "";
-        mt_srand((double)microtime() * 1000000);
+        mt_srand((float)microtime() * 1000000);
         $char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         $char_list .= "abcdefghijklmnopqrstuvwxyz";
         $char_list .= "1234567890_";

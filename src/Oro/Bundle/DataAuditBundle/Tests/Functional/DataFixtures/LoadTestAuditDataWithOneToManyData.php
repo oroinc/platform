@@ -11,9 +11,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadTestAuditDataWithOneToManyData extends AbstractFixture implements ContainerAwareInterface
 {
-    private const CHILD_COUNT = 4;
-
     use ContainerAwareTrait;
+    private const CHILD_COUNT = 4;
 
     /**
      * {@inheritdoc}

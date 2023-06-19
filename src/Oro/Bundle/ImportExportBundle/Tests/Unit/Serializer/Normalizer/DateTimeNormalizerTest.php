@@ -59,7 +59,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
                 true
             ],
             'not supports object' => [
-                new \stdClass,
+                new \stdClass(),
                 false
             ],
             'empty data'          => [

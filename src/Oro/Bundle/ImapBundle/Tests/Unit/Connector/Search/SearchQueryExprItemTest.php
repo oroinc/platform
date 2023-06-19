@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector\Search;
 
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprItem;

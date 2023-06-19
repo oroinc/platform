@@ -17,7 +17,8 @@ use WebDriver\Exception\NoSuchElement;
  */
 class Element extends NodeElement
 {
-    use AssertTrait, SpinTrait;
+    use AssertTrait;
+    use SpinTrait;
 
     /**
      * @var OroElementFactory

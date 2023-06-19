@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Transport;
 
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
@@ -8,6 +9,9 @@ use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
+/**
+ * Abstract REST transport that uses REST client factory to create REST client
+ */
 abstract class AbstractRestTransport implements TransportInterface
 {
     /**

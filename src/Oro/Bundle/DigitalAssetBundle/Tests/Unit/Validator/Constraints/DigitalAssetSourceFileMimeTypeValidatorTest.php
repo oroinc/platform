@@ -149,7 +149,7 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
             new ArrayCollection()
         );
         $childFiles->setInitialized(false);
-        $childFiles->setOwner(new \stdClass, ['inversedBy' => 'sample-data']);
+        $childFiles->setOwner(new \stdClass(), ['inversedBy' => 'sample-data']);
 
         $entityManager->expects($this->any())
             ->method('getUnitOfWork')

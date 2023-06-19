@@ -230,7 +230,7 @@ class UpdateWorkflowDefinitionConfigurationQuery extends ParametrizedMigrationQu
     private function createIconName($name)
     {
         foreach (self::$iconReplaceMask as $pattern => $replace) {
-            $exact = str_ends_with($pattern, '*') ? '': '$';
+            $exact = str_ends_with($pattern, '*') ? '' : '$';
             $pattern = '/' . $pattern . $exact .'/';
             $next = false;
 

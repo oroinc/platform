@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
@@ -6,6 +7,9 @@ use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting Country entity
+ */
 class CountryType extends AbstractType
 {
     /**

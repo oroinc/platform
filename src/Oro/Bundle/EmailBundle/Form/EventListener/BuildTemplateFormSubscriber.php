@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Form\EventListener;
 
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;

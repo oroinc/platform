@@ -13,7 +13,7 @@ trait CheckProcessorsTrait
 {
     protected function checkProcessors(): void
     {
-        $processorsFinder = new ProcessorHelper('', '', new NullAdapter);
+        $processorsFinder = new ProcessorHelper('', '', new NullAdapter());
         if (!$processorsFinder->librariesExists()) {
             $this->markTestSkipped(
                 sprintf(

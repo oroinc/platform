@@ -189,7 +189,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         ;
 
         if (!$result) {
-            return new $this->className;
+            return new $this->className();
         }
 
         $model = $this->className::fromArray($result);

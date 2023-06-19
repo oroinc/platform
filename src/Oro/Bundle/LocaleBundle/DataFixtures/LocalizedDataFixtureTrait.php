@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\DataFixtures;
@@ -19,7 +20,7 @@ trait LocalizedDataFixtureTrait
     /**
      * @return string[]
      */
-    public function getSupportedLocales() : array
+    public function getSupportedLocales(): array
     {
         return static::SUPPORTED_LOCALES;
     }

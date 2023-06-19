@@ -493,11 +493,11 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
 
         return sprintf(
             '%s%s%s%s%s',
-            isset($urlParts['scheme'])? $urlParts['scheme'] . '://' : '',
+            isset($urlParts['scheme']) ? $urlParts['scheme'] . '://' : '',
             $urlParts['host'] ?? '',
             isset($urlParts['port']) ? ':' . $urlParts['port'] : '',
             $urlParts['path'] ?? '',
-            $urlParts['query'] ? '?' . $urlParts['query']: ''
+            $urlParts['query'] ? '?' . $urlParts['query'] : ''
         );
     }
 

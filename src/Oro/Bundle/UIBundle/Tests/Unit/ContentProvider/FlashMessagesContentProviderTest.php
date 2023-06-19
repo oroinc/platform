@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\UIBundle\Tests\Unit\ContentProvider;
 
 use Oro\Bundle\UIBundle\ContentProvider\FlashMessagesContentProvider;

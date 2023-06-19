@@ -88,7 +88,7 @@ class SearchStringManager extends AbstractSearchStringManager
     protected function arrangeExpr(SearchQueryExpr $expr)
     {
         // Make a clone of the expression and find out OR operators
-        $result = new SearchQueryExpr;
+        $result = new SearchQueryExpr();
         $orOperatorPositions = array();
         $i = 0;
         foreach ($expr as $item) {

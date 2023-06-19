@@ -1,4 +1,6 @@
-<?php return [
+<?php
+
+return [
     'change' => [
         'entity' => 'MyOwn\\SuperCustom\\Entity',
         'steps' => [
