@@ -11,7 +11,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function configureEntityNode(NodeBuilder $node): void
     {
@@ -23,7 +23,11 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
             ->end()
             ->booleanNode(ConfigUtil::DISABLE_INCLUSION)->end()
             ->booleanNode(ConfigUtil::DISABLE_FIELDSET)->end()
-            ->booleanNode(ConfigUtil::DISABLE_META_PROPERTIES)->end()
+            ->arrayNode(ConfigUtil::DISABLE_META_PROPERTIES)
+                ->treatFalseLike([false])
+                ->treatTrueLike([true])
+                ->prototype('scalar')->end()
+            ->end()
             ->booleanNode(ConfigUtil::DISABLE_PARTIAL_LOAD)->end()
             ->arrayNode(ConfigUtil::INNER_JOIN_ASSOCIATIONS)
                 ->prototype('scalar')->end()
@@ -40,7 +44,7 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function postProcessConfig(array $config): array
     {
@@ -54,12 +58,15 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         if (empty($config[ConfigUtil::DOCUMENTATION_RESOURCE])) {
             unset($config[ConfigUtil::DOCUMENTATION_RESOURCE]);
         }
+        if (empty($config[ConfigUtil::DISABLE_META_PROPERTIES])) {
+            unset($config[ConfigUtil::DISABLE_META_PROPERTIES]);
+        }
 
         return $config;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function configureFieldNode(NodeBuilder $node): void
     {

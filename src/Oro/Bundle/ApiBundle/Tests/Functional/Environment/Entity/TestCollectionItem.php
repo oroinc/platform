@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
  * @ORM\Entity()
@@ -15,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class TestCollectionItem
+class TestCollectionItem implements TestFrameworkEntityInterface
 {
     /**
      * @var int|null

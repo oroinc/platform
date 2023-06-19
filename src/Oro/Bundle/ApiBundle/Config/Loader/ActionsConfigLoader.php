@@ -25,7 +25,6 @@ class ActionsConfigLoader extends AbstractConfigLoader
         ConfigUtil::DISABLE_SORTING         => ['disableSorting', 'enableSorting'],
         ConfigUtil::DISABLE_INCLUSION       => ['disableInclusion', 'enableInclusion'],
         ConfigUtil::DISABLE_FIELDSET        => ['disableFieldset', 'enableFieldset'],
-        ConfigUtil::DISABLE_META_PROPERTIES => ['disableMetaProperties', 'enableMetaProperties'],
         ConfigUtil::FORM_EVENT_SUBSCRIBER   => 'setFormEventSubscribers'
     ];
 
@@ -41,7 +40,7 @@ class ActionsConfigLoader extends AbstractConfigLoader
     private ?StatusCodesConfigLoader $statusCodesConfigLoader = null;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(array $config): mixed
     {
@@ -63,6 +62,8 @@ class ActionsConfigLoader extends AbstractConfigLoader
                 $this->loadStatusCodes($action, $value);
             } elseif (ConfigUtil::FIELDS === $key) {
                 $this->loadFields($action, $value);
+            } elseif (ConfigUtil::DISABLE_META_PROPERTIES === $key) {
+                $this->loadDisabledMetaProperties($action, $value);
             } else {
                 $this->loadConfigValue($action, $key, $value, self::METHOD_MAP);
             }
@@ -100,5 +101,18 @@ class ActionsConfigLoader extends AbstractConfigLoader
         }
 
         return $field;
+    }
+
+    private function loadDisabledMetaProperties(ActionConfig $action, mixed $value): void
+    {
+        foreach ((array)$value as $val) {
+            if (true === $val) {
+                $action->disableMetaProperties();
+            } elseif (false === $val) {
+                $action->enableMetaProperties();
+            } else {
+                $action->disableMetaProperty($val);
+            }
+        }
     }
 }

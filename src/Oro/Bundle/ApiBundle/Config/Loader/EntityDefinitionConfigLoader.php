@@ -24,7 +24,6 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         ConfigUtil::DISABLE_SORTING         => ['disableSorting', 'enableSorting'],
         ConfigUtil::DISABLE_INCLUSION       => ['disableInclusion', 'enableInclusion'],
         ConfigUtil::DISABLE_FIELDSET        => ['disableFieldset', 'enableFieldset'],
-        ConfigUtil::DISABLE_META_PROPERTIES => ['disableMetaProperties', 'enableMetaProperties'],
         ConfigUtil::DISABLE_PARTIAL_LOAD    => ['disablePartialLoad', 'enablePartialLoad'],
         ConfigUtil::FORM_EVENT_SUBSCRIBER   => 'setFormEventSubscribers'
     ];
@@ -32,7 +31,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
     private ConfigLoaderFactory $factory;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setConfigLoaderFactory(ConfigLoaderFactory $factory): void
     {
@@ -40,7 +39,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(array $config): mixed
     {
@@ -59,6 +58,8 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         foreach ($config as $key => $value) {
             if (ConfigUtil::FIELDS === $key) {
                 $this->loadFields($definition, $value);
+            } elseif (ConfigUtil::DISABLE_META_PROPERTIES === $key) {
+                $this->loadDisabledMetaProperties($definition, $value);
             } elseif ($this->factory->hasLoader($key)) {
                 $this->loadSection($definition, $this->factory->getLoader($key), $key, $value);
             } else {
@@ -75,6 +76,19 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
                     $name,
                     $this->factory->getLoader(ConfigUtil::FIELDS)->load($config ?? [])
                 );
+            }
+        }
+    }
+
+    private function loadDisabledMetaProperties(EntityDefinitionConfig $definition, mixed $value): void
+    {
+        foreach ((array)$value as $val) {
+            if (true === $val) {
+                $definition->disableMetaProperties();
+            } elseif (false === $val) {
+                $definition->enableMetaProperties();
+            } else {
+                $definition->disableMetaProperty($val);
             }
         }
     }
