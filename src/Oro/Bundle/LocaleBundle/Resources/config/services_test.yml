@@ -1,0 +1,16 @@
+services:
+    oro_locale.tests.entity_name_resolver.classes_provider:
+        class: Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestEntityNameResolverConfigurableClassesProvider
+        decorates: oro_entity.tests.entity_name_resolver.classes_provider
+        arguments:
+            - '@.inner'
+            - ['Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue']
+
+    oro_locale.tests.entity_name_resolver.data_loader:
+        class: Oro\Bundle\LocaleBundle\Tests\Functional\Environment\TestEntityNameResolverDataLoader
+        decorates: oro_entity.tests.entity_name_resolver.data_loader
+        decoration_priority: 90
+        arguments:
+            - '@.inner'
+            - '@doctrine'
+            - '@translator'

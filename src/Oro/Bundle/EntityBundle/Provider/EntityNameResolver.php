@@ -52,7 +52,7 @@ class EntityNameResolver
      * @param string|null|Localization $locale The representation locale.
      *                                         If not specified a default locale is used
      *
-     * @return string A text representation of an entity or NULL if the name cannot be resolved
+     * @return string|null A text representation of an entity or NULL if the name cannot be resolved
      */
     public function getName($entity, $format = null, $locale = null)
     {
@@ -83,7 +83,7 @@ class EntityNameResolver
      * @param string|null|Localization $locale    The representation locale.
      *                                            If not specified a default locale is used
      *
-     * @return string A DQL expression or NULL if the name cannot be resolved
+     * @return string|null A DQL expression or NULL if the name cannot be resolved
      */
     public function getNameDQL($className, $alias, $format = null, $locale = null)
     {

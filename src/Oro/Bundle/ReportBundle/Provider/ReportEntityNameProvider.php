@@ -3,10 +3,10 @@
 namespace Oro\Bundle\ReportBundle\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
-use Oro\Bundle\ReportBundle\Entity\Report;
 
 /**
  * Provides a text representation of Report entity.
+ * Will be removed in the next version.
  */
 class ReportEntityNameProvider implements EntityNameProviderInterface
 {
@@ -15,11 +15,7 @@ class ReportEntityNameProvider implements EntityNameProviderInterface
      */
     public function getName($format, $locale, $entity)
     {
-        if (!$entity instanceof Report || !\in_array($format, [self::SHORT, self::FULL], true)) {
-            return false;
-        }
-
-        return $entity->getName() ?: $entity->getId();
+        return false;
     }
 
     /**
@@ -27,10 +23,6 @@ class ReportEntityNameProvider implements EntityNameProviderInterface
      */
     public function getNameDQL($format, $locale, $className, $alias)
     {
-        if (!is_a($className, Report::class, true) || !\in_array($format, [self::SHORT, self::FULL], true)) {
-            return false;
-        }
-
-        return sprintf('COALESCE(NULLIF(%1$s.name, \'\'), %1$s.id)', $alias);
+        return false;
     }
 }

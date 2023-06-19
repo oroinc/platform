@@ -79,6 +79,8 @@ oro_user:
 
 oro_entity:
     entity_name_representation:
+        Oro\Bundle\UserBundle\Entity\User:
+            short: [ firstName, lastName ]
         Oro\Bundle\UserBundle\Entity\Role:
             full: [ label ]
             short: [ label ]
