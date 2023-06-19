@@ -1087,19 +1087,19 @@ services:
     oro_email.mailbox.entity_name_provider:
         class: Oro\Bundle\EmailBundle\Provider\MailboxEntityNameProvider
         arguments:
-            - '@translator.default'
+            - '@translator'
         tags:
-            - { name: oro_entity.name_provider, priority: 0}
+            - { name: oro_entity.name_provider, priority: 100}
 
     oro_email.email_user.provider.email_user_entity_name_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailUserEntityNameProvider
         tags:
-            - { name: oro_entity.name_provider, priority: 0 }
+            - { name: oro_entity.name_provider, priority: 100 }
 
     oro_email.email_body_entity_name_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailBodyEntityNameProvider
         tags:
-            - { name: oro_entity.name_provider, priority: 0 }
+            - { name: oro_entity.name_provider, priority: 100 }
 
     oro_email.listener.mailbox_process_trigger_listener:
         class: Oro\Bundle\EmailBundle\EventListener\MailboxProcessTriggerListener

@@ -16,3 +16,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }
+
+    oro_dataaudit.tests.entity_name_resolver.classes_provider:
+        class: Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\TestEntityNameResolverClassesProvider
+        decorates: oro_entity.tests.entity_name_resolver.classes_provider
+        arguments:
+            - '@.inner'
+            - '@oro_entity_config.config_manager'
+            - '@doctrine'

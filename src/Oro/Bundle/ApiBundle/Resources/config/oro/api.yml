@@ -26,6 +26,7 @@ api:
 
         Oro\Bundle\ApiBundle\Entity\AsyncOperation:
             documentation_resource: '@OroApiBundle/Resources/doc/api/async_operation.md'
+            disable_meta_properties: true
             fields:
                 entityType:
                     data_type: entityType

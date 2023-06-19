@@ -2,6 +2,7 @@ api:
     entities:
         Oro\Bundle\CommentBundle\Entity\Comment:
             documentation_resource: '@OroCommentBundle/Resources/doc/api/comment.md'
+            disable_meta_properties: [ title ]
             fields:
                 target:
                     data_type: association:manyToOne

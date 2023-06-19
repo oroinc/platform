@@ -14,6 +14,7 @@ class OroReportExtensionTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
+        $this->container->setParameter('kernel.environment', 'prod');
         $this->extension = new OroReportExtension();
     }
 
