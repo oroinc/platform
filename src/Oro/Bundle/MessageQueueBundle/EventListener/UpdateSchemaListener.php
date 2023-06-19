@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\EventListener;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension;

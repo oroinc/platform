@@ -131,7 +131,7 @@ abstract class AbstractEnumType extends AbstractType
         $repo = $this->doctrine->getRepository($formConfig->getOption('class'));
         $data = $repo->getDefaultValues();
         if ($formConfig->getOption('multiple')) {
-            $event->setData($data ? : []);
+            $event->setData($data ?: []);
         } else {
             $event->setData($data ? array_shift($data) : '');
         }

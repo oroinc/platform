@@ -19,7 +19,7 @@ class ChainExclusionProvider implements ExclusionProviderInterface
      */
     public function __construct(iterable $providers = [])
     {
-        $this->providers = $providers instanceof \Traversable ? iterator_to_array($providers): $providers;
+        $this->providers = $providers instanceof \Traversable ? iterator_to_array($providers) : $providers;
     }
 
     /**

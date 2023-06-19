@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;

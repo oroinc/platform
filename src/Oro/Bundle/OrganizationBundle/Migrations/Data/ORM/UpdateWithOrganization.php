@@ -1,9 +1,13 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 
+/**
+ * Updates given table with default organization
+ */
 abstract class UpdateWithOrganization extends AbstractFixture
 {
     /**

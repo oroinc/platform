@@ -66,7 +66,7 @@ class UniversalCacheKeyGenerator
      * @param string $cacheKey
      * @return string
      */
-    public static function normalizeCacheKey(string $cacheKey) : string
+    public static function normalizeCacheKey(string $cacheKey): string
     {
         return false !== strpbrk($cacheKey, ItemInterface::RESERVED_CHARACTERS)
             ? rawurlencode($cacheKey)

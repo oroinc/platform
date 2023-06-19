@@ -50,7 +50,7 @@ class CmsUser
 
     public function __construct()
     {
-        $this->articles = new ArrayCollection;
+        $this->articles = new ArrayCollection();
     }
 
     public function getId()

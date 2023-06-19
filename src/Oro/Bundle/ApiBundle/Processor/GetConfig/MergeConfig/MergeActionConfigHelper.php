@@ -11,6 +11,10 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class MergeActionConfigHelper
 {
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     public function mergeActionConfig(array $config, array $actionConfig, bool $withStatusCodes): array
     {
         if ($withStatusCodes && !empty($actionConfig[ConfigUtil::STATUS_CODES])) {
@@ -21,6 +25,11 @@ class MergeActionConfigHelper
         }
         unset($actionConfig[ConfigUtil::STATUS_CODES], $actionConfig[ConfigUtil::EXCLUDE]);
 
+        $actionDisabledMetaProperties = null;
+        if (\array_key_exists(ConfigUtil::DISABLED_META_PROPERTIES, $actionConfig)) {
+            $actionDisabledMetaProperties = $actionConfig[ConfigUtil::DISABLED_META_PROPERTIES];
+            unset($actionConfig[ConfigUtil::DISABLED_META_PROPERTIES]);
+        }
         $actionFields = null;
         if (\array_key_exists(ConfigUtil::FIELDS, $actionConfig)) {
             $actionFields = $actionConfig[ConfigUtil::FIELDS];
@@ -28,6 +37,14 @@ class MergeActionConfigHelper
         }
         if (!empty($actionConfig)) {
             $config = $this->mergeActionConfigValues($config, $actionConfig);
+        }
+        if (!empty($actionDisabledMetaProperties)) {
+            $config[ConfigUtil::DISABLED_META_PROPERTIES] = !empty($config[ConfigUtil::DISABLED_META_PROPERTIES])
+                ? $this->mergeActionDisabledMetaProperties(
+                    $config[ConfigUtil::DISABLED_META_PROPERTIES],
+                    $actionDisabledMetaProperties
+                )
+                : $actionDisabledMetaProperties;
         }
         if (!empty($actionFields)) {
             $config[ConfigUtil::FIELDS] = !empty($config[ConfigUtil::FIELDS])
@@ -52,6 +69,13 @@ class MergeActionConfigHelper
         }
 
         return array_merge($config, $actionConfig);
+    }
+
+    protected function mergeActionDisabledMetaProperties(
+        array $disabledMetaProperties,
+        array $actionDisabledMetaProperties
+    ): array {
+        return array_values(array_unique(array_merge($disabledMetaProperties, $actionDisabledMetaProperties)));
     }
 
     protected function mergeActionFields(array $fields, array $actionFields): array

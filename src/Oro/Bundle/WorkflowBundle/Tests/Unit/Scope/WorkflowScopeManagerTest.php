@@ -186,7 +186,7 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
     {
         $class = self::ENTITY_CLASS;
 
-        $obj = new $class;
+        $obj = new $class();
         $obj->id = $id;
 
         return $obj;

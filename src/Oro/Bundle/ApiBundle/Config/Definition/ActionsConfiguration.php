@@ -26,7 +26,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function configure(NodeBuilder $node): void
     {
@@ -66,7 +66,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isApplicable(string $section): bool
     {
@@ -113,7 +113,11 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->booleanNode(ConfigUtil::DISABLE_SORTING)->end()
             ->booleanNode(ConfigUtil::DISABLE_INCLUSION)->end()
             ->booleanNode(ConfigUtil::DISABLE_FIELDSET)->end()
-            ->booleanNode(ConfigUtil::DISABLE_META_PROPERTIES)->end()
+            ->arrayNode(ConfigUtil::DISABLE_META_PROPERTIES)
+                ->treatFalseLike([false])
+                ->treatTrueLike([true])
+                ->prototype('scalar')->end()
+            ->end()
             ->scalarNode(ConfigUtil::FORM_TYPE)->end()
             ->arrayNode(ConfigUtil::FORM_OPTIONS)
                 ->useAttributeAsKey('')
@@ -169,6 +173,9 @@ class ActionsConfiguration extends AbstractConfigurationSection
         }
         if (empty($config[ConfigUtil::FORM_EVENT_SUBSCRIBER])) {
             unset($config[ConfigUtil::FORM_EVENT_SUBSCRIBER]);
+        }
+        if (empty($config[ConfigUtil::DISABLE_META_PROPERTIES])) {
+            unset($config[ConfigUtil::DISABLE_META_PROPERTIES]);
         }
         if (empty($config[ConfigUtil::FIELDS])) {
             unset($config[ConfigUtil::FIELDS]);

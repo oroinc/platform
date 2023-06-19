@@ -82,9 +82,9 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit\Framework\Test
 
     public function filterDataProvider(): array
     {
-        $wd1 = (new WorkflowDefinition)->setName('wd1')->setConfiguration(['scopes' => ['a' => 1]]);
-        $wd2 = (new WorkflowDefinition)->setName('wd2')->setConfiguration(['scopes' => ['a' => 1]]);
-        $wd3 = (new WorkflowDefinition)->setName('wd3');
+        $wd1 = (new WorkflowDefinition())->setName('wd1')->setConfiguration(['scopes' => ['a' => 1]]);
+        $wd2 = (new WorkflowDefinition())->setName('wd2')->setConfiguration(['scopes' => ['a' => 1]]);
+        $wd3 = (new WorkflowDefinition())->setName('wd3');
 
         return [
             'full case' => [

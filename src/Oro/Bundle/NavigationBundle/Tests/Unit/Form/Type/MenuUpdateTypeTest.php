@@ -98,11 +98,11 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         );
 
         $expected = new MenuUpdate();
-        $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
+        $expectedTitle = (new LocalizedFallbackValue())->setString(self::TEST_TITLE);
         $expected->addTitle($expectedTitle);
         $expected->setIcon('fa-anchor');
 
-        $expectedDescription = (new LocalizedFallbackValue)->setText(self::TEST_DESCRIPTION);
+        $expectedDescription = (new LocalizedFallbackValue())->setText(self::TEST_DESCRIPTION);
         $expected->addDescription($expectedDescription);
 
         $this->assertFormOptionEqual(true, 'disabled', $form->get('uri'));
@@ -132,11 +132,11 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         );
 
         $expected = new MenuUpdate();
-        $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
+        $expectedTitle = (new LocalizedFallbackValue())->setString(self::TEST_TITLE);
         $expected
             ->setCustom(true)
             ->addTitle($expectedTitle)
-            ->addDescription(new LocalizedFallbackValue)
+            ->addDescription(new LocalizedFallbackValue())
             ->setUri(self::TEST_URI);
 
         $this->assertFormIsValid($form);
@@ -152,9 +152,9 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $form->submit([]);
 
         $expected = new MenuUpdate();
-        $expectedTitle = new LocalizedFallbackValue;
+        $expectedTitle = new LocalizedFallbackValue();
         $expected->addTitle($expectedTitle);
-        $expected->addDescription(new LocalizedFallbackValue);
+        $expected->addDescription(new LocalizedFallbackValue());
 
         $this->assertFormIsNotValid($form);
         self::assertEquals($expected, $form->getData());
@@ -219,10 +219,10 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         );
 
         $expected = new MenuUpdate();
-        $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
+        $expectedTitle = (new LocalizedFallbackValue())->setString(self::TEST_TITLE);
         $expected
             ->setCustom(true)
-            ->addDescription(new LocalizedFallbackValue)
+            ->addDescription(new LocalizedFallbackValue())
             ->addTitle($expectedTitle);
 
         $this->assertFormIsNotValid($form);
@@ -239,9 +239,9 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem, 'menu' => $menu]);
 
         $expected = new MenuUpdate();
-        $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
+        $expectedTitle = (new LocalizedFallbackValue())->setString(self::TEST_TITLE);
         $expected->addTitle($expectedTitle);
-        $expected->addDescription(new LocalizedFallbackValue);
+        $expected->addDescription(new LocalizedFallbackValue());
 
         $this->assertFormContainsField('aclResourceId', $form);
         $this->assertFormOptionEqual(true, 'disabled', $form->get('aclResourceId'));
@@ -269,10 +269,10 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         );
 
         $expected = new MenuUpdate();
-        $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
+        $expectedTitle = (new LocalizedFallbackValue())->setString(self::TEST_TITLE);
         $expected
             ->setCustom(true)
-            ->addDescription(new LocalizedFallbackValue)
+            ->addDescription(new LocalizedFallbackValue())
             ->addTitle($expectedTitle)
             ->setUri($uri);
 

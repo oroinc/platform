@@ -104,7 +104,7 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->context->hasError());
         $this->assertEquals(TransitionContext::STATE_OK, $this->context->get(TransitionContext::STATE));
 
-        $error = new \Exception;
+        $error = new \Exception();
         $this->context->setError($error);
 
         $this->assertEquals(TransitionContext::STATE_FAILURE, $this->context->get(TransitionContext::STATE));
@@ -140,7 +140,7 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
             ['setForm', 'getForm', $this->createMock(FormInterface::class)],
             ['setFormData', 'getFormData', (object)['id' => 42]],
             ['setFormOptions', 'getFormOptions', ['option1' => 'val1']],
-            ['setError', 'getError', new \Exception]
+            ['setError', 'getError', new \Exception()]
         ];
     }
 

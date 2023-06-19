@@ -487,7 +487,7 @@ class ExtendConfigDumper
                 $parentClassName = $aliases[$entityName];
             }
             $schema['parent']  = $parentClassName;
-            $schema['inherit'] = class_exists($parentClassName) ? get_parent_class($parentClassName): false;
+            $schema['inherit'] = class_exists($parentClassName) ? get_parent_class($parentClassName) : false;
         } elseif ($extendConfig->has('inherit')) {
             $schema['inherit'] = $extendConfig->get('inherit');
         }

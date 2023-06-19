@@ -146,6 +146,7 @@ dynamic-imports:
         - oroui/js/standart-confirmation
         - oroui/js/tools/api-accessor
         - oroui/js/tools/search-api-accessor
+        - oroui/js/widget-manager
         - underscore
     jstree:
         - oroui/js/app/views/jstree/base-tree-view

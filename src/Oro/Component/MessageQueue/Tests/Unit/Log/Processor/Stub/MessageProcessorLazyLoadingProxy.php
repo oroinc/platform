@@ -28,7 +28,7 @@ class MessageProcessorLazyLoadingProxy extends MessageProcessorProxy implements 
     /**
      * {@inheritdoc}
      */
-    public function getWrappedValueHolderValue() : ?object
+    public function getWrappedValueHolderValue(): ?object
     {
         return $this->isProxyInitialized ? parent::getWrappedValueHolderValue() : null;
     }

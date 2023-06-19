@@ -76,13 +76,13 @@ abstract class AbstractProperty implements PropertyInterface
         switch ($this->getOr(self::FRONTEND_TYPE_KEY)) {
             case self::TYPE_DATETIME:
             case self::TYPE_DATE:
-                if ($value instanceof \DateTime) {
-                    $value = $value->format(\DateTime::ISO8601);
+                if ($value instanceof \DateTimeInterface) {
+                    $value = $value->format(\DateTimeInterface::ISO8601);
                 }
                 $result = (string)$value;
                 break;
             case self::TYPE_TIME:
-                if ($value instanceof \DateTime) {
+                if ($value instanceof \DateTimeInterface) {
                     $value = $value->format('H:i:s');
                 }
                 $result = (string)$value;

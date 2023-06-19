@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;

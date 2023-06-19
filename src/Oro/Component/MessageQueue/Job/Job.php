@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Job;
 
 /**

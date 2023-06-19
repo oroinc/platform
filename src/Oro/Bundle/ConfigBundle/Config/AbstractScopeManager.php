@@ -401,11 +401,11 @@ abstract class AbstractScopeManager
     {
         switch ($dataType) {
             case 'integer':
-                return (integer) $value;
+                return (int) $value;
             case 'decimal':
                 return (float) $value;
             case 'boolean':
-                return (boolean) $value;
+                return (bool) $value;
             default:
                 return null;
         }

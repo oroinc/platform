@@ -1,6 +1,10 @@
 <?php
+
 namespace Oro\Bundle\EmbeddedFormBundle\Form\Type;
 
+/**
+ * Interface for embedded form type
+ */
 interface EmbeddedFormInterface
 {
     /**

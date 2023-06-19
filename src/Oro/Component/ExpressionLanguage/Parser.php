@@ -72,7 +72,7 @@ class Parser
             '%' => ['precedence' => 60, 'associativity' => self::OPERATOR_LEFT],
             '**' => ['precedence' => 200, 'associativity' => self::OPERATOR_RIGHT],
         ];
-        
+
         // [CUSTOM LINES]
         $this->binaryOperators['='] = ['precedence' => 20, 'associativity' => self::OPERATOR_LEFT];
         unset($this->binaryOperators['==='], $this->binaryOperators['!==']);

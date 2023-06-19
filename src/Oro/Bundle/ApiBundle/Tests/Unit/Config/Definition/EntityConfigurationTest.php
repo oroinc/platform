@@ -50,12 +50,42 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function loadConfigurationDataProvider(): array
     {
+        return $this->loadData('Fixtures');
+    }
+
+    /**
+     * @dataProvider loadConfigurationMergeDataProvider
+     */
+    public function testMergeConfiguration(array $configs, array $expected)
+    {
+        $configExtensionRegistry = $this->createConfigExtensionRegistry();
+        $configuration = new EntityConfiguration(
+            ApiConfiguration::ENTITIES_SECTION,
+            new EntityDefinitionConfiguration(),
+            $configExtensionRegistry->getConfigurationSettings(),
+            1
+        );
+        $configBuilder = new TreeBuilder('entity');
+        $configuration->configure($configBuilder->getRootNode()->children());
+
+        $processor = new Processor();
+        $result = $processor->process($configBuilder->buildTree(), $configs);
+        self::assertEquals($expected, $result);
+    }
+
+    public function loadConfigurationMergeDataProvider(): array
+    {
+        return $this->loadData('MergeFixtures');
+    }
+
+    public function loadData(string $dataType): array
+    {
         $result = [];
 
         $finder = new Finder();
         $finder
             ->files()
-            ->in(__DIR__ . DIRECTORY_SEPARATOR . 'Fixtures')
+            ->in(__DIR__ . DIRECTORY_SEPARATOR . $dataType)
             ->name('*.yml');
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {

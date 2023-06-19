@@ -206,7 +206,7 @@ class Acl
         ];
     }
 
-    public function __unserialize(array $serialized):void
+    public function __unserialize(array $serialized): void
     {
         [
             $this->id,

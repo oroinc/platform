@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\AssetBundle\VersionStrategy;
 
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;

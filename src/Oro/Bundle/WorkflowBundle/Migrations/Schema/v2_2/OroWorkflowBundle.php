@@ -11,9 +11,8 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
 {
-    const TABLE_NAME = 'oro_workflow_definition';
-
     use DatabasePlatformAwareTrait;
+    const TABLE_NAME = 'oro_workflow_definition';
 
     /**
      * {@inheritdoc}

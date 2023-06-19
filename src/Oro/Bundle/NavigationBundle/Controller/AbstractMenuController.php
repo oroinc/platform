@@ -294,7 +294,7 @@ abstract class AbstractMenuController extends AbstractController
         );
     }
 
-    protected function getCurrentOrganization():? Organization
+    protected function getCurrentOrganization(): ?Organization
     {
         if (null === $token = $this->container->get('security.token_storage')->getToken()) {
             return null;

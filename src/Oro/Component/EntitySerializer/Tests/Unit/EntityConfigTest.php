@@ -257,7 +257,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $entityConfig = new EntityConfig();
         $this->assertNull($entityConfig->getPostSerializeHandler());
 
-        $handler = function (array $item, array $context) : array {
+        $handler = function (array $item, array $context): array {
         };
         $entityConfig->setPostSerializeHandler($handler);
         $this->assertSame($handler, $entityConfig->getPostSerializeHandler());
@@ -273,7 +273,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $entityConfig = new EntityConfig();
         $this->assertNull($entityConfig->getPostSerializeCollectionHandler());
 
-        $handler = function (array $items, array $context) : array {
+        $handler = function (array $items, array $context): array {
         };
         $entityConfig->setPostSerializeCollectionHandler($handler);
         $this->assertSame($handler, $entityConfig->getPostSerializeCollectionHandler());

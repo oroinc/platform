@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\MessageQueueBundle\Entity\Job;

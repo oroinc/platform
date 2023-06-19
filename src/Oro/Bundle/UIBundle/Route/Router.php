@@ -81,7 +81,7 @@ class Router
      *
      * @return string|null JSON string representing raw route data taken from request.
      */
-    private function getRawRouteData(Request $request):? string
+    private function getRawRouteData(Request $request): ?string
     {
         $result = $request->get(self::ACTION_PARAMETER);
 

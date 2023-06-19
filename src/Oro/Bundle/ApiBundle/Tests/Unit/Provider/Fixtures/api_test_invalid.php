@@ -1,1 +1,3 @@
-<?php return null;
+<?php
+
+return null;

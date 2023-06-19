@@ -22,10 +22,9 @@ use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
 {
+    use MessageQueueExtension;
     private const CHUNK_SIZE = 500;
     private const JOB_NAME = 'oro.email.recalculate_email_visibility';
-
-    use MessageQueueExtension;
 
     /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
     private $jobRunner;

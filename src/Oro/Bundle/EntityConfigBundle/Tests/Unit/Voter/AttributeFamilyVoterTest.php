@@ -13,10 +13,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
 {
+    use EntityTrait;
     private const ENTITY_CLASS_NAME = 'stdClass';
     private const FAMILY_ID = 777;
-
-    use EntityTrait;
 
     /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $token;
@@ -48,7 +47,7 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals(
             VoterInterface::ACCESS_ABSTAIN,
-            $this->voter->vote($this->token, new \stdClass, ['delete'])
+            $this->voter->vote($this->token, new \stdClass(), ['delete'])
         );
     }
 
@@ -56,7 +55,7 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals(
             VoterInterface::ACCESS_ABSTAIN,
-            $this->voter->vote($this->token, new \stdClass, ['view'])
+            $this->voter->vote($this->token, new \stdClass(), ['view'])
         );
     }
 

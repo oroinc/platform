@@ -61,6 +61,6 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
             ExpressionInterface::class
         ));
 
-        $this->condition->initialize([new \stdClass]);
+        $this->condition->initialize([new \stdClass()]);
     }
 }

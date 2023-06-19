@@ -57,6 +57,13 @@ class OroMainContext extends MinkContext implements
     SessionAliasProviderAwareInterface,
     AppKernelAwareInterface
 {
+    use AssertTrait;
+    use PageObjectDictionary;
+    use SessionAliasProviderAwareTrait;
+    use SpinTrait;
+    use AppKernelAwareTrait;
+    use ScreenshotTrait;
+
     const SKIP_WAIT_PATTERN = '/'.
         '^(?:|I )should see .+ flash message$|'.
         '^(?:|I )should see .+ flash message and I close it$|'.
@@ -64,13 +71,6 @@ class OroMainContext extends MinkContext implements
         '^(?:|I )should see success message with number of records were deleted$|'.
         '^(?:|I )should see Schema updated flash message$'.
     '/';
-
-    use AssertTrait,
-        PageObjectDictionary,
-        SessionAliasProviderAwareTrait,
-        SpinTrait,
-        AppKernelAwareTrait,
-        ScreenshotTrait;
 
     private ?Stopwatch $stopwatch = null;
     private bool $debug = false;

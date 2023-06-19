@@ -19,7 +19,7 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
+    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $valueNormalizer;
 
     /** @var HandleMetaPropertyFilter */
@@ -107,11 +107,11 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
         $this->context->getFilters()->set('meta', $filter);
         $this->processor->process($this->context);
 
-        $expectedErrors = [];
-        $expectedErrors[] =
+        $expectedErrors = [
             Error::createValidationError(Constraint::FILTER)
                 ->setInnerException($exception)
-                ->setSource(ErrorSource::createByParameter('meta'));
+                ->setSource(ErrorSource::createByParameter('meta'))
+        ];
 
         self::assertNull($this->context->getConfigExtra(MetaPropertiesConfigExtra::NAME));
         self::assertEquals($expectedErrors, $this->context->getErrors());
@@ -136,18 +136,49 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
         $expectedConfigExtra = new MetaPropertiesConfigExtra();
         $expectedConfigExtra->addMetaProperty('test2', 'string');
 
-        $expectedErrors = [];
-        $expectedErrors[] =
+        $expectedErrors = [
             Error::createValidationError(
                 Constraint::FILTER,
-                'The "test1" value is not allowed. Allowed values: test2, test3'
-            )
-            ->setSource(ErrorSource::createByParameter('meta'));
+                'The "test1" is not known meta property. Known properties: test2, test3.'
+            )->setSource(ErrorSource::createByParameter('meta'))
+        ];
 
         self::assertEquals(
             $expectedConfigExtra,
             $this->context->getConfigExtra(MetaPropertiesConfigExtra::NAME)
         );
+        self::assertEquals($expectedErrors, $this->context->getErrors());
+    }
+
+    public function testProcessWhenFilterAllowedMetaPropertiesAreEmpty()
+    {
+        $filterValue = FilterValue::createFromSource('meta', 'meta', 'test1,test2');
+        $filter = new MetaPropertyFilter('string');
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('test1,test2', DataType::STRING, $this->context->getRequestType(), true)
+            ->willReturn(['test1', 'test2']);
+
+        $this->context->getFilterValues()->set('meta', $filterValue);
+        $this->context->getFilters()->set('meta', $filter);
+        $this->processor->process($this->context);
+
+        $expectedConfigExtra = new MetaPropertiesConfigExtra();
+        $expectedConfigExtra->addMetaProperty('test2', 'string');
+
+        $expectedErrors = [
+            Error::createValidationError(
+                Constraint::FILTER,
+                'The "test1" is not known meta property. Known properties: .'
+            )->setSource(ErrorSource::createByParameter('meta')),
+            Error::createValidationError(
+                Constraint::FILTER,
+                'The "test2" is not known meta property. Known properties: .'
+            )->setSource(ErrorSource::createByParameter('meta'))
+        ];
+
+        self::assertFalse($this->context->hasConfigExtra(MetaPropertiesConfigExtra::NAME));
         self::assertEquals($expectedErrors, $this->context->getErrors());
     }
 }

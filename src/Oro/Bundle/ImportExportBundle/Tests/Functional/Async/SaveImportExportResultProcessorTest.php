@@ -62,7 +62,7 @@ class SaveImportExportResultProcessorTest extends WebTestCase
         self::assertEquals(ImportExportResult::class, $rootJobResult->getEntity());
     }
 
-    public function testProcessSaveJobWithInvalidData():void
+    public function testProcessSaveJobWithInvalidData(): void
     {
         $message = new Message();
         $message->setMessageId('abc');

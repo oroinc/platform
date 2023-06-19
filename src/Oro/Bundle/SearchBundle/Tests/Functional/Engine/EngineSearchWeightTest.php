@@ -84,7 +84,7 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
         $actualIds = [];
         /** @var \Oro\Bundle\SearchBundle\Query\Result\Item $resultItem */
         foreach ($actualItems as $resultItem) {
-            $actualIds[] = (integer)$resultItem->getRecordId();
+            $actualIds[] = (int)$resultItem->getRecordId();
         }
 
         $this->assertEquals($expectedIds, $actualIds);

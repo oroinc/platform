@@ -1,4 +1,6 @@
-<?php return [
+<?php
+
+return [
     'with_parts_from_file' => [
         'entity' => 'Some\\Entity',
         'steps' => [

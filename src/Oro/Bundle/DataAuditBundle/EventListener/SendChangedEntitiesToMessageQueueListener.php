@@ -105,11 +105,11 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->auditMessageBodyProvider = $auditMessageBodyProvider;
         $this->applicationState = $applicationState;
 
-        $this->allInsertions = new \SplObjectStorage;
-        $this->allUpdates = new \SplObjectStorage;
-        $this->allDeletions = new \SplObjectStorage;
-        $this->allCollectionUpdates = new \SplObjectStorage;
-        $this->allTokens = new \SplObjectStorage;
+        $this->allInsertions = new \SplObjectStorage();
+        $this->allUpdates = new \SplObjectStorage();
+        $this->allDeletions = new \SplObjectStorage();
+        $this->allCollectionUpdates = new \SplObjectStorage();
+        $this->allTokens = new \SplObjectStorage();
     }
 
     private function isEnabled(): bool

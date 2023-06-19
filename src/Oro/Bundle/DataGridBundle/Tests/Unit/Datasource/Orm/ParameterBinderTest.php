@@ -176,7 +176,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'datagridParameters' => [
-                    'foo' => new \stdClass,
+                    'foo' => new \stdClass(),
                 ],
                 'oldQueryParameters' => [],
                 'expectedQueryParameters' => [
@@ -254,7 +254,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
             'Cannot bind datasource parameter "bar", there is no datagrid parameter with path "foo.bar".'
         );
 
-        $datagridParameters = ['foo' => new \stdClass];
+        $datagridParameters = ['foo' => new \stdClass()];
         $queryParameters = new ArrayCollection();
 
         $this->datagrid->expects($this->once())

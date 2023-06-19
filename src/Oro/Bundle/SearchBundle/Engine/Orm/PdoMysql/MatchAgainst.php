@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;

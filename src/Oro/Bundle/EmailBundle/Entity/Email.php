@@ -501,7 +501,7 @@ class Email implements ActivityInterface, ExtendEntityInterface
      */
     public function setMultiMessageId($multiMessageId)
     {
-        $this->multiMessageId = $multiMessageId ? serialize($multiMessageId): null;
+        $this->multiMessageId = $multiMessageId ? serialize($multiMessageId) : null;
 
         return $this;
     }

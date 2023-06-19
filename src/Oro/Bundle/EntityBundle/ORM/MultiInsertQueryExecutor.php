@@ -40,7 +40,7 @@ class MultiInsertQueryExecutor implements InsertQueryExecutorInterface
     /**
      *{@inheritDoc}
      */
-    public function execute(string $className, array $fields, QueryBuilder $selectQueryBuilder):int
+    public function execute(string $className, array $fields, QueryBuilder $selectQueryBuilder): int
     {
         $connection = $this->helper->getManager($className)->getConnection();
         $insertToTableName = $this->helper->getTableName($className);
