@@ -67,8 +67,6 @@
     }
 
     &[type='number'] {
-        appearance: textfield;
-
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
             margin: 0;
@@ -93,6 +91,10 @@
     @include element-state('error') {
         border-color: $input-border-color-error-state;
         box-shadow: $input-box-shadow-error-state;
+
+        @include element-state('focus') {
+            border-color: $input-border-color-error-state;
+        }
     }
 
     @include element-state('disabled') {
@@ -104,6 +106,18 @@
 
         @include element-state('hover') {
             border-color: $input-border-color-disabled-hover-border-color;
+        }
+    }
+
+    @include element-state('readonly') {
+        background: $input-border-color-readonly-background;
+        box-shadow: none;
+        border: $input-border;
+
+        @include base-disabled-style();
+
+        @include element-state('hover') {
+            border-color: $input-border-color-readonly-hover-border-color;
         }
     }
 }

@@ -40,5 +40,9 @@
         &:disabled {
             @content;
         }
+    } @else if $state == 'readonly' {
+        &[readonly] {
+            @content;
+        }
     }
 }

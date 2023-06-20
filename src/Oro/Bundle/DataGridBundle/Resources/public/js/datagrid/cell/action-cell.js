@@ -280,7 +280,11 @@ define(function(require, exports, module) {
         render: function() {
             // don't render anything if list of launchers is empty
             if (_.isEmpty(this.actions)) {
-                this.$el.empty();
+                this.$el.attr({
+                    'aria-label': null,
+                    'data-blank-content': null,
+                    'aria-colindex': null
+                }).empty();
 
                 return this;
             }

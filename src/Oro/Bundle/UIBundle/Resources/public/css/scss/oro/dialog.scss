@@ -126,6 +126,12 @@
         }
     }
 
+    .ui-dialog-extra-header-content {
+        &:empty {
+            display: none;
+        }
+    }
+
     .ui-widget-content {
         border: $dialog-widget-content-border;
         color: $dialog-widget-content-color;

@@ -1375,7 +1375,7 @@ define(function(require) {
 
             if (collection) {
                 const fetchKeys = ['mode', 'parse', 'reset', 'wait', 'uniqueOnly',
-                    'add', 'remove', 'merge', 'toggleLoading'];
+                    'add', 'remove', 'merge', 'toggleLoading', 'global'];
                 let fetchOptions = {
                     reset: true,
                     alreadySynced: true // prevents recursion update

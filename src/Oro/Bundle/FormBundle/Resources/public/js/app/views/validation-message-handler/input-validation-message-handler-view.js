@@ -4,6 +4,7 @@ define(function(require) {
     const $ = require('jquery');
     const AbstractValidationMessageHandlerView =
         require('oroform/js/app/views/validation-message-handler/abstract-validation-message-handler-view');
+    const Popper = require('popper').default;
 
     const InputValidationMessageHandlerView = AbstractValidationMessageHandlerView.extend({
         useMessageLabelWidth: false,
@@ -56,6 +57,22 @@ define(function(require) {
             this.label.removeClass('hide');
 
             InputValidationMessageHandlerView.__super__.dispose.call(this);
+        },
+
+        hideModifier: function(data, options) {
+            const scrollRect = this.scrollParent.getBoundingClientRect();
+
+            if (data.offsets.reference.top < scrollRect.top ||
+                data.offsets.reference.top > scrollRect.bottom || data.offsets.left > scrollRect.right ||
+                data.offsets.left > scrollRect.left
+            ) {
+                data.hide = true;
+                data.attributes['x-out-of-boundaries'] = '';
+            } else {
+                Popper.Defaults.modifiers.hide.fn(data, options);
+            }
+
+            return data;
         }
     }, {
         test(element) {

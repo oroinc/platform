@@ -2,12 +2,14 @@ api:
     entities:
         Oro\Bundle\AttachmentBundle\Entity\Attachment:
             documentation_resource: '@OroAttachmentBundle/Resources/doc/api/attachment.md'
+            disable_meta_properties: [ title ]
             fields:
                 target:
                     data_type: association:manyToOne
 
         Oro\Bundle\AttachmentBundle\Entity\File:
             documentation_resource: '@OroAttachmentBundle/Resources/doc/api/file.md'
+            disable_meta_properties: [ title ]
             fields:
                 uuid:
                     form_options:

@@ -2,25 +2,29 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 
+/**
+ * Provides a text representation of EmailUser entity.
+ */
 class EmailUserEntityNameProvider implements EntityNameProviderInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getName($format, $locale, $entity)
     {
-        if (!in_array($format, [self::SHORT, self::FULL])) {
+        if (!$entity instanceof EmailUser) {
             return false;
         }
 
-        return is_a($entity, EmailUser::class, true) ? $entity->getEmail()->getSubject() : false;
+        return $entity->getEmail()->getSubject();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getNameDQL($format, $locale, $className, $alias)
     {
@@ -29,11 +33,9 @@ class EmailUserEntityNameProvider implements EntityNameProviderInterface
         }
 
         return sprintf(
-            'CAST((' .
-            'SELECT %1$s_base.subject FROM %2$s %1$s_base WHERE %1$s_base = %1$s' .
-            ') AS string)',
+            '(SELECT %1$s_e.subject FROM %2$s %1$s_e WHERE %1$s_e = %1$s.email)',
             $alias,
-            $className
+            Email::class
         );
     }
 }

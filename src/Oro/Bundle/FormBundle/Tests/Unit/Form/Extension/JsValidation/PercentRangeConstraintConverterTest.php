@@ -2,54 +2,59 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension\JsValidation;
 
-use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface;
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\PercentRangeConstraintConverter;
 use Oro\Bundle\FormBundle\Validator\Constraints\PercentRange;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Range;
 
-class PercentRangeConstraintConverterTest extends \PHPUnit\Framework\TestCase
+class PercentRangeConstraintConverterTest extends TestCase
 {
-    /** @var ConstraintConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerConverter;
-
-    /** @var PercentRangeConstraintConverter */
-    private $converter;
+    private PercentRangeConstraintConverter $converter;
 
     protected function setUp(): void
     {
-        $this->innerConverter = $this->createMock(ConstraintConverterInterface::class);
-
-        $this->converter = new PercentRangeConstraintConverter($this->innerConverter);
+        $this->converter = new PercentRangeConstraintConverter();
     }
 
-    public function testNotPercentRangeConstraint(): void
+    /**
+     * @dataProvider supportsDataProvider
+     */
+    public function testSupports(bool $expected, Constraint $constraint): void
     {
-        $constraint = new NotBlank();
+        self::assertSame($expected, $this->converter->supports($constraint));
+    }
 
-        $this->innerConverter->expects(self::once())
-            ->method('convertConstraint')
-            ->with(self::identicalTo($constraint))
-            ->willReturn($constraint);
+    public function supportsDataProvider(): \Generator
+    {
+        yield [
+            'expected' => true,
+            'constraint' => new PercentRange([
+                'min' => -100,
+                'minMessage' => 'min msg',
+                'invalidMessage' => 'invalid msg',
+            ]),
+        ];
 
-        self::assertSame($constraint, $this->converter->convertConstraint($constraint));
+        yield [
+            'expected' => false,
+            'constraint' => new NotBlank(),
+        ];
     }
 
     public function testPercentRangeConstraintWithMinLimit(): void
     {
         $constraint = new PercentRange([
-            'min'            => -100,
-            'minMessage'     => 'min msg',
-            'invalidMessage' => 'invalid msg'
+            'min' => -100,
+            'minMessage' => 'min msg',
+            'invalidMessage' => 'invalid msg',
         ]);
 
-        $this->innerConverter->expects(self::never())
-            ->method('convertConstraint');
-
         $expectedConstraint = new Range([
-            'min'            => $constraint->min,
-            'minMessage'     => $constraint->minMessage,
-            'invalidMessage' => $constraint->invalidMessage
+            'min' => $constraint->min,
+            'minMessage' => $constraint->minMessage,
+            'invalidMessage' => $constraint->invalidMessage,
         ]);
         self::assertEquals($expectedConstraint, $this->converter->convertConstraint($constraint));
     }
@@ -57,18 +62,15 @@ class PercentRangeConstraintConverterTest extends \PHPUnit\Framework\TestCase
     public function testPercentRangeConstraintWithMaxLimit(): void
     {
         $constraint = new PercentRange([
-            'max'            => 100,
-            'maxMessage'     => 'max msg',
-            'invalidMessage' => 'invalid msg'
+            'max' => 100,
+            'maxMessage' => 'max msg',
+            'invalidMessage' => 'invalid msg',
         ]);
 
-        $this->innerConverter->expects(self::never())
-            ->method('convertConstraint');
-
         $expectedConstraint = new Range([
-            'max'            => $constraint->max,
-            'maxMessage'     => $constraint->maxMessage,
-            'invalidMessage' => $constraint->invalidMessage
+            'max' => $constraint->max,
+            'maxMessage' => $constraint->maxMessage,
+            'invalidMessage' => $constraint->invalidMessage,
         ]);
         self::assertEquals($expectedConstraint, $this->converter->convertConstraint($constraint));
     }
@@ -76,20 +78,17 @@ class PercentRangeConstraintConverterTest extends \PHPUnit\Framework\TestCase
     public function testPercentRangeConstraintWithRange(): void
     {
         $constraint = new PercentRange([
-            'min'               => -100,
-            'max'               => 100,
+            'min' => -100,
+            'max' => 100,
             'notInRangeMessage' => 'not in range msg',
-            'invalidMessage'    => 'invalid msg'
+            'invalidMessage' => 'invalid msg',
         ]);
 
-        $this->innerConverter->expects(self::never())
-            ->method('convertConstraint');
-
         $expectedConstraint = new Range([
-            'min'               => $constraint->min,
-            'max'               => $constraint->max,
+            'min' => $constraint->min,
+            'max' => $constraint->max,
             'notInRangeMessage' => $constraint->notInRangeMessage,
-            'invalidMessage'    => $constraint->invalidMessage
+            'invalidMessage' => $constraint->invalidMessage,
         ]);
         self::assertEquals($expectedConstraint, $this->converter->convertConstraint($constraint));
     }

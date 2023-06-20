@@ -123,11 +123,11 @@ oro:
                 aria_label: 'Show all added items with pagination'
                 label: 'Show Less'
             group_similar:
-                aria_label: 'Group similar items'
-                label: 'Group Similar'
+                aria_label: 'Group product variants'
+                label: 'Group Product Variants'
             ungroup_similar:
-                aria_label: 'Show similar items separately'
-                label: 'Ungroup Similar'
+                aria_label: 'Show product variants separately'
+                label: 'Ungroup Product Variants'
         not_number: Not a number
         inline_editing:
             message:

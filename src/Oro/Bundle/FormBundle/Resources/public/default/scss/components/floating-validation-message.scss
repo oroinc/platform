@@ -9,7 +9,7 @@
     position: absolute;
     top: $floating-validation-message-top;
     bottom: $floating-validation-message-bottom;
-    z-index: 2;
+    z-index: z('base') + 1;
     width: auto;
     height: 0;
     margin: 0;
@@ -41,5 +41,45 @@
 
     @at-root #{selector.append(&, '__icon')} {
         display: $floating-validation-message-icon-display;
+    }
+}
+
+.floating-error-message {
+    $arrow-height: 6px;
+
+    margin-bottom: $arrow-height;
+    padding: $floating-validation-message-label-inner-offset;
+    z-index: z('base') + 1;
+
+    background-color: $floating-validation-message-label-background-color;
+    border-radius: $floating-validation-message-label-border-radius;
+    color: $floating-validation-message-label-color;
+    text-align: $floating-validation-message-label-text-align;
+
+    .arrow {
+        display: block;
+        position: absolute;
+        top: 100%;
+        width: 0;
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 10px;
+
+            border-style: solid;
+            border-color: $floating-validation-message-after-color transparent;
+            border-width: $arrow-height ($arrow-height - 1) 0;
+        }
+    }
+
+    &[x-out-of-boundaries] {
+        // Avoid 'display: none' to ability getting real size of popper element before showing
+
+        position: fixed;
+
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
     }
 }

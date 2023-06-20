@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -12,6 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class MailboxEntityNameProvider implements EntityNameProviderInterface
 {
+    private const TRANSLATION_KEY = 'oro.email.mailbox.entity_label';
+
     private TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
@@ -20,7 +23,7 @@ class MailboxEntityNameProvider implements EntityNameProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getName($format, $locale, $entity)
     {
@@ -32,18 +35,15 @@ class MailboxEntityNameProvider implements EntityNameProviderInterface
             return $entity->getLabel();
         }
 
-        return
-            $entity->getLabel()
-            . ' '
-            . $this->translator->trans('oro.email.mailbox.entity_label', [], null, $locale);
+        return $entity->getLabel() . ' ' . $this->trans(self::TRANSLATION_KEY, $locale);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getNameDQL($format, $locale, $className, $alias)
     {
-        if (Mailbox::class !== $className) {
+        if (!is_a($className, Mailbox::class, true)) {
             return false;
         }
 
@@ -54,9 +54,16 @@ class MailboxEntityNameProvider implements EntityNameProviderInterface
         return sprintf(
             'CONCAT(%s.label, \' \', %s)',
             $alias,
-            (string)(new Expr())->literal(
-                $this->translator->trans('oro.email.mailbox.entity_label', [], null, $locale)
-            )
+            (string)(new Expr())->literal($this->trans(self::TRANSLATION_KEY, $locale))
         );
+    }
+
+    private function trans(string $key, string|Localization|null $locale): string
+    {
+        if ($locale instanceof Localization) {
+            $locale = $locale->getLanguageCode();
+        }
+
+        return $this->translator->trans($key, [], null, $locale);
     }
 }

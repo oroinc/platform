@@ -20,5 +20,9 @@ class OroAddressExtension extends Extension
         $loader->load('services_api.yml');
         $loader->load('form_types.yml');
         $loader->load('importexport.yml');
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
     }
 }

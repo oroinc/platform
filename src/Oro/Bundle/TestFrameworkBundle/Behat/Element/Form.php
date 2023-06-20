@@ -451,6 +451,9 @@ class Form extends Element
         } else {
             $field = $this->findFieldByLabel($fieldName);
         }
+
+        self::assertNotNull($field, sprintf('Field `%s` not found', $fieldName));
+
         $fieldId = $field->getAttribute('id');
 
         // This element doesn't count server side validation errors without "for" attribute
@@ -507,7 +510,15 @@ class Form extends Element
 
         self::assertNotNull($errorSpan, "Field $fieldName has no validation errors");
 
-        return $errorSpan->getText();
+        $errorMessage = $errorSpan->getText();
+        if (!$errorMessage) {
+            // Get floating validation error element
+            $floatingErrorDiv = $errorSpan->getParent()->find('css', 'div.floating-error-message');
+
+            $errorMessage = $floatingErrorDiv ? $floatingErrorDiv->getText() : $errorMessage;
+        }
+
+        return $errorMessage;
     }
 
     /**

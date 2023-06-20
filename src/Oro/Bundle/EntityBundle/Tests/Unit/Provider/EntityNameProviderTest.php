@@ -8,6 +8,8 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntityWithHiddenField;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntityWithMagicHiddenField;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 
@@ -33,18 +35,12 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $manager = $this->createMock(ObjectManager::class);
         $doctrine->expects(self::any())
             ->method('getManagerForClass')
-            ->willReturnMap([
-                [TestEntity::class, $manager]
-            ]);
+            ->willReturn($manager);
         $manager->expects(self::any())
             ->method('getClassMetadata')
-            ->willReturnMap([
-                [TestEntity::class, $this->metadata]
-            ]);
+            ->willReturn($this->metadata);
 
-        $configManager = $this->createMock(ConfigManager::class);
-
-        $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
+        $this->extendConfigProvider = new ConfigProviderMock($this->createMock(ConfigManager::class), 'extend');
         $this->entityNameProvider = new EntityNameProvider(
             ['firstName', 'name', 'title', 'subject'],
             $doctrine,
@@ -64,7 +60,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $entity = new TestEntity();
         $entity->setName('test');
 
-        $this->metadata->expects(self::once())
+        $this->metadata->expects(self::atLeastOnce())
             ->method('getName')
             ->willReturn(TestEntity::class);
         $this->metadata->expects(self::atLeastOnce())
@@ -156,6 +152,66 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame('123', $result);
     }
 
+    public function testGetNameForEntityWithHiddenField()
+    {
+        $entity = new TestEntityWithHiddenField(1, 'hidden');
+        $entity->setName('test');
+
+        $this->metadata->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn(TestEntityWithHiddenField::class);
+        $this->metadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'name', 'hidden']);
+        $this->metadata->expects(self::exactly(3))
+            ->method('hasField')
+            ->willReturnMap([
+                ['id', true],
+                ['name', true],
+                ['hidden', true]
+            ]);
+        $this->metadata->expects(self::exactly(3))
+            ->method('getTypeOfField')
+            ->willReturnMap([
+                ['id', 'integer'],
+                ['name', 'string'],
+                ['hidden', 'string']
+            ]);
+
+        $result = $this->entityNameProvider->getName('full', null, $entity);
+        self::assertEquals('test', $result);
+    }
+
+    public function testGetNameForEntityWithHiddenFieldThanHasAccessViaMagicMethods()
+    {
+        $entity = new TestEntityWithMagicHiddenField(1, 'hidden');
+        $entity->setName('test');
+
+        $this->metadata->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn(TestEntityWithMagicHiddenField::class);
+        $this->metadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'name', 'hidden']);
+        $this->metadata->expects(self::exactly(3))
+            ->method('hasField')
+            ->willReturnMap([
+                ['id', true],
+                ['name', true],
+                ['hidden', true]
+            ]);
+        $this->metadata->expects(self::exactly(3))
+            ->method('getTypeOfField')
+            ->willReturnMap([
+                ['id', 'integer'],
+                ['name', 'string'],
+                ['hidden', 'string']
+            ]);
+
+        $result = $this->entityNameProvider->getName('full', null, $entity);
+        self::assertEquals('test hidden', $result);
+    }
+
     public function testGetNameFullEmptyNameButNoIdentifier()
     {
         $entity = new TestEntity(123);
@@ -173,7 +229,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetNameDQLShortNoIdentifier()
     {
-        $this->metadata->expects(self::once())
+        $this->metadata->expects(self::atLeastOnce())
             ->method('getName')
             ->willReturn(TestEntity::class);
         $this->metadata->expects(self::atLeastOnce())
@@ -250,6 +306,9 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetNameDQLFullNoAppropriateFields()
     {
+        $this->metadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([]);
         $result = $this->entityNameProvider->getNameDQL('full', null, TestEntity::class, 'alias');
         self::assertFalse($result);
     }
@@ -300,6 +359,72 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->entityNameProvider->getNameDQL('full', null, TestEntity::class, 'alias');
         self::assertEquals('alias.description', $result);
+    }
+
+    public function testGetNameDQLForEntityWithHiddenField()
+    {
+        $this->metadata->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn(TestEntityWithHiddenField::class);
+        $this->metadata->expects(self::once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $this->metadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'name', 'hidden']);
+        $this->metadata->expects(self::exactly(3))
+            ->method('hasField')
+            ->willReturnMap([
+                ['id', true],
+                ['name', true],
+                ['hidden', true]
+            ]);
+        $this->metadata->expects(self::exactly(3))
+            ->method('getTypeOfField')
+            ->willReturnMap([
+                ['id', 'integer'],
+                ['name', 'string'],
+                ['hidden', 'string']
+            ]);
+
+        $result = $this->entityNameProvider->getNameDQL('full', null, TestEntityWithHiddenField::class, 'alias');
+        self::assertEquals(
+            'COALESCE(CAST(CONCAT_WS(\' \', alias.name, alias.hidden) AS string), CAST(alias.id AS string))',
+            $result
+        );
+    }
+
+    public function testGetNameDQLForEntityWithHiddenFieldThanHasAccessViaMagicMethods()
+    {
+        $this->metadata->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn(TestEntityWithMagicHiddenField::class);
+        $this->metadata->expects(self::once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $this->metadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'name', 'hidden']);
+        $this->metadata->expects(self::exactly(3))
+            ->method('hasField')
+            ->willReturnMap([
+                ['id', true],
+                ['name', true],
+                ['hidden', true]
+            ]);
+        $this->metadata->expects(self::exactly(3))
+            ->method('getTypeOfField')
+            ->willReturnMap([
+                ['id', 'integer'],
+                ['name', 'string'],
+                ['hidden', 'string']
+            ]);
+
+        $result = $this->entityNameProvider->getNameDQL('full', null, TestEntityWithMagicHiddenField::class, 'alias');
+        self::assertEquals(
+            'COALESCE(CAST(CONCAT_WS(\' \', alias.name, alias.hidden) AS string), CAST(alias.id AS string))',
+            $result
+        );
     }
 
     private function initEntityFieldsMetadata(bool $initIdentityField, array $extendedFieldConfig = []): void
