@@ -107,7 +107,7 @@ class JobStatusSubscriber implements EventSubscriberInterface
             sprintf(
                 'The application has not been able to finish processing jobs within the last 900 seconds. ' .
                 'Unprocessed jobs: %s',
-                implode(', ', $activeJobs)
+                implode(', ', (array)$activeJobs)
             )
         );
     }

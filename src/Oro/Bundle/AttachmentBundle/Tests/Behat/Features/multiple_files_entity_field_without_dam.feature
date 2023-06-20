@@ -57,7 +57,7 @@ Feature: Multiple Files entity field without DAM
   Scenario: Validate sort order of files
     When I fill "User Form With Multiple Files" with:
       | Custom File Sort Order 1 | 9999999999 |
-    Then I should see validation errors:
+    Then I should see "User Form With Multiple Files" validation errors:
       | Custom File Sort Order 1 | This value should be between 0 and 2,147,483,647. |
     And I fill "User Form With Multiple Files" with:
       | Custom File Sort Order 1 | 1 |
