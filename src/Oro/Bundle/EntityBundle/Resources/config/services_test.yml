@@ -11,3 +11,29 @@ services:
         class: Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestEntitiesMigrationListener
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }
+
+    oro_entity.tests.entity_name_resolver.classes_provider:
+        class: Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestEntityNameResolverClassesProvider
+        public: true
+
+    oro_entity.tests.entity_name_resolver.data_loader:
+        class: Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestEntityNameResolverDataLoader
+        public: true
+
+    oro_entity.tests.entity_name_resolver.classes_provider.test_entity:
+        class: Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestEntityNameResolverConfigurableClassesProvider
+        decorates: oro_entity.tests.entity_name_resolver.classes_provider
+        arguments:
+            - '@.inner'
+            -
+                - 'Oro\Bundle\TestFrameworkBundle\Entity\Item'
+
+    oro_entity.tests.entity_name_resolver.data_loader.dictionary:
+        class: Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestDictionaryEntityNameResolverDataLoader
+        decorates: oro_entity.tests.entity_name_resolver.data_loader
+        decoration_priority: 100
+        arguments:
+            - '@.inner'
+            - '@oro_entity_config.config_manager'
+            - '@doctrine'
+            - '@property_accessor'

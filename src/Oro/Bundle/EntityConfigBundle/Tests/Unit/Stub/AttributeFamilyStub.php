@@ -3,31 +3,55 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
-use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
+use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\LocalizedEntityTrait;
 
 class AttributeFamilyStub extends AttributeFamily
 {
-    use FallbackTrait;
+    use LocalizedEntityTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    private array $localizedFields = [
+        'label' => 'labels'
+    ];
+
     public function setImage($image)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getImage()
     {
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDefaultLabel()
+    public function __call($name, $arguments)
     {
-        return $this->getDefaultFallbackValue($this->labels);
+        return $this->localizedMethodCall($this->localizedFields, $name, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __get(string $name)
+    {
+        if (\array_key_exists($name, $this->localizedFields)) {
+            return $this->localizedFieldGet($this->localizedFields, $name);
+        }
+
+        throw new \RuntimeException(sprintf('It is not expected to get non-existing property "%s".', $name));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __set(string $name, $value): void
+    {
+        if (\array_key_exists($name, $this->localizedFields)) {
+            $this->localizedFieldSet($this->localizedFields, $name, $value);
+
+            return;
+        }
+
+        throw new \RuntimeException(sprintf('It is not expected to set non-existing property "%s".', $name));
     }
 }

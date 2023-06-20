@@ -74,7 +74,7 @@ class SearchIterableResultTest extends SearchBundleWebTestCase
         $this->assertAllRecordNames($result);
     }
 
-    private function assertAllRecordNames(SearchIterableResult $result)
+    private function assertAllRecordNames(SearchIterableResult $result): void
     {
         $items = iterator_to_array($result);
         $recordNames = array_map(function (\Oro\Bundle\SearchBundle\Query\Result\Item $item) {

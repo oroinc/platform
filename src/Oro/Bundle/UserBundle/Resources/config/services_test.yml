@@ -2,3 +2,10 @@ services:
     oro_user.tests.security.provider:
         alias: oro_user.security.provider
         public: true
+
+    oro_user.tests.entity_name_resolver.data_loader:
+        class: Oro\Bundle\UserBundle\Tests\Functional\Environment\TestEntityNameResolverDataLoader
+        decorates: oro_entity.tests.entity_name_resolver.data_loader
+        arguments:
+            - '@.inner'
+            - '@oro_user.manager'
