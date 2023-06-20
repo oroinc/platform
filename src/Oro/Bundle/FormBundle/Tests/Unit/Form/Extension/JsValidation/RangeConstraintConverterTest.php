@@ -100,7 +100,7 @@ class RangeConstraintConverterTest extends TestCase
             'maxPropertyPath' => 'propertyMax',
         ]);
 
-        $formData = new \stdClass;
+        $formData = new \stdClass();
         $parentForm = $this->createMock(FormInterface::class);
         $parentForm
             ->expects(self::once())
@@ -117,7 +117,7 @@ class RangeConstraintConverterTest extends TestCase
             ->method('getValue')
             ->willReturnMap([
                 [$formData, 'propertyMin', 1],
-                [$formData, 'propertyMax', 2]
+                [$formData, 'propertyMax', 2],
             ]);
 
         self::assertEquals(
