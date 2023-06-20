@@ -15,6 +15,9 @@ $.widget('ui.dialog', $.ui.dialog, {
     },
 
     _title: function(title) {
+        if (!this.options.title) {
+            title.hide();
+        }
         title.html(
             $('<span/>', {'class': 'ui-dialog-title__inner'}).text(this.options.title)
         );

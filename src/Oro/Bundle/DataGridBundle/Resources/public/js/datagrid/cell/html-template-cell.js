@@ -43,7 +43,9 @@ const HtmlTemplateCell = StringCell.extend({
 
     render: function() {
         const template = this.getTemplateFunction();
-        this.$el.html(template(this.getTemplateData()));
+        const content = template(this.getTemplateData()).trim();
+
+        this.$el.html(content);
         return this;
     }
 });

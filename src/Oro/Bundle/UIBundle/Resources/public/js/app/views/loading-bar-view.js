@@ -57,25 +57,23 @@ define(function(require) {
          * Bind ajaxStart, ajaxComplete, ready and load listeners
          */
         bindEvents: function() {
-            const self = this;
-
             if (this.pageLoading) {
-                $(document).on('ready' + this.eventNamespace(), function() {
-                    self.showLoader();
+                $(document).on('ready' + this.eventNamespace(), () => {
+                    this.showLoader();
                 });
 
-                $(window).on('load' + this.eventNamespace(), function() {
-                    self.hideLoader();
+                $(window).on('load' + this.eventNamespace(), () => {
+                    this.hideLoader();
                 });
             }
 
             if (this.ajaxLoading) {
-                $(document).on('ajaxStart' + this.eventNamespace(), function() {
-                    self.showLoader();
+                $(document).on('ajaxStart' + this.eventNamespace(), () => {
+                    this.showLoader();
                 });
 
-                $(document).on('ajaxComplete' + this.eventNamespace(), function() {
-                    self.hideLoader();
+                $(document).on('ajaxStop' + this.eventNamespace(), () => {
+                    this.hideLoader();
                 });
             }
         },
@@ -85,7 +83,7 @@ define(function(require) {
                 return;
             }
 
-            this.$el.show();
+            this.$el.addClass('show');
             this.active = true;
         },
 
@@ -101,10 +99,9 @@ define(function(require) {
                 if (this.disposed) {
                     return;
                 }
-                this.$el.css({
-                    width: '',
-                    animation: ''
-                });
+                this.$el
+                    .removeAttr('style')
+                    .removeClass('show');
                 if (callback) {
                     callback();
                 }

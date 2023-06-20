@@ -210,12 +210,36 @@ services:
         class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverter
         arguments:
             - '@oro_form.validator.constraint_factory'
+        calls:
+            - ['setProcessors', [!tagged_iterator { tag: oro_form.extension.js_validation.constraint_converter }]]
+
+    Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverter:
+        alias: oro_form.extension.js_validation.constraint_converter
+
+    Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface:
+        alias: oro_form.extension.js_validation.constraint_converter
+
+    oro_form.extension.js_validation.constraint_converter.generic:
+        class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\GenericConstraintConverter
+        arguments:
+            - '@oro_form.validator.constraint_factory'
+            - '@oro_form.extension.js_validation.constraint_converter'
+        tags:
+            - { name: oro_form.extension.js_validation.constraint_converter, priority: -512 } # Should be the last
+
+    oro_form.extension.js_validation.constraint_converter.range:
+        class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\RangeConstraintConverter
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: oro_form.extension.js_validation.constraint_converter }
 
     oro_form.extension.js_validation.percent_range_constraint_converter:
         class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\PercentRangeConstraintConverter
-        decorates: oro_form.extension.js_validation.constraint_converter
         arguments:
-            - '@.inner'
+            - '@oro_form.extension.js_validation.constraint_converter'
+        tags:
+            - { name: oro_form.extension.js_validation.constraint_converter }
 
     oro_form.extension.js_validation.repeated:
         class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\RepeatedTypeExtension

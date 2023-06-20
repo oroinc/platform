@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation;
 
 use Oro\Bundle\FormBundle\Validator\Constraints\PercentRange;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Range;
 
@@ -22,17 +23,29 @@ class PercentRangeConstraintConverter implements ConstraintConverterInterface
     /**
      * {@inheritDoc}
      */
-    public function convertConstraint(Constraint $constraint): ?Constraint
+    public function supports(Constraint $constraint, ?FormInterface $form = null): bool
     {
-        return $constraint instanceof PercentRange
+        return $constraint instanceof PercentRange;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param PercentRange $constraint
+     */
+    public function convertConstraint(Constraint $constraint/*, ?FormInterface $form = null*/): ?Constraint
+    {
+        // BC fallback.
+        $form = func_get_args()[1] ?? null;
+        return $this->supports($constraint)
             ? $this->convertPercentRangeToRange($constraint)
-            : $this->innerConverter->convertConstraint($constraint);
+            : $this->innerConverter->convertConstraint($constraint, $form);
     }
 
     private function convertPercentRangeToRange(PercentRange $constraint): Range
     {
         $options = [
-            'invalidMessage' => $constraint->invalidMessage
+            'invalidMessage' => $constraint->invalidMessage,
         ];
         if (null !== $constraint->min && null !== $constraint->max) {
             $options['min'] = $constraint->min;
