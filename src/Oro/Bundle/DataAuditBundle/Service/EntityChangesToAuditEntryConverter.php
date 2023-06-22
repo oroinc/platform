@@ -284,6 +284,7 @@ class EntityChangesToAuditEntryConverter
             ->setParameter('objectClass', $entityClass)
             ->setParameter('objectId', (string) $entityId)
             ->orderBy('a.version', Criteria::DESC)
+            ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
 
