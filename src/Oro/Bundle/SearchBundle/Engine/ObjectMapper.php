@@ -46,9 +46,7 @@ class ObjectMapper extends AbstractMapper
     /**
      * Get array with entity aliases
      *
-     * @return array
-     *  key - entity class name
-     *  value - entity search alias
+     * @return array [entity class => entity search alias, ...]
      */
     public function getEntitiesListAliases()
     {
@@ -60,7 +58,7 @@ class ObjectMapper extends AbstractMapper
      *
      * @param string[] $classNames The list of entity FQCN
      *
-     * @return array [entity class name => entity search alias, ...]
+     * @return array [entity class => entity search alias, ...]
      *
      * @throws \InvalidArgumentException if some of requested entities is not registered in the search index
      *                                   or has no the search alias
