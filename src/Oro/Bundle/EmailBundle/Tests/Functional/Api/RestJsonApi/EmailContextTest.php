@@ -121,6 +121,9 @@ class EmailContextTest extends RestJsonApiTestCase
                 $this->getUserData('user_5', false)
             ]
         ];
+        usort($filteredResponseContent['data'], static function (array $a, array $b) {
+            return $a['id'] <=> $b['id'];
+        });
         self::assertResponseContent($expectedContent, $filteredResponseContent, true);
     }
 
