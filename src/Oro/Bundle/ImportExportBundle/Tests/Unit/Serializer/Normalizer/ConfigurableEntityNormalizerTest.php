@@ -23,11 +23,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    private FieldHelper|\PHPUnit\Framework\MockObject\MockObject $fieldHelper;
+    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldHelper;
 
-    private ConfigurableEntityNormalizer $normalizer;
+    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    private EventDispatcher|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
+    /** @var ConfigurableEntityNormalizer */
+    private $normalizer;
 
     protected function setUp(): void
     {
@@ -113,13 +116,11 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     public function testSetSerializerException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            \sprintf(
-                'Serializer must implement "%s" and "%s"',
-                ContextAwareNormalizerInterface::class,
-                ContextAwareDenormalizerInterface::class
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'Serializer must implement "%s" and "%s"',
+            ContextAwareNormalizerInterface::class,
+            ContextAwareDenormalizerInterface::class
+        ));
 
         $serializer = $this->createMock(SerializerInterface::class);
         $this->normalizer->setSerializer($serializer);

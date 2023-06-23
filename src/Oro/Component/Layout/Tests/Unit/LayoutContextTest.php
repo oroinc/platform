@@ -12,8 +12,7 @@ use Oro\Component\Layout\LayoutContext;
  */
 class LayoutContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutContext */
-    private $context;
+    private LayoutContext $context;
 
     protected function setUp(): void
     {
@@ -92,7 +91,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
     public function testResolveShouldThrowExceptionIfInvalidObjectTypeAdded()
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectExceptionMessage(sprintf(
             'Failed to resolve the context variables.'
             . ' Reason: The option "test" has invalid type. Expected "%s", but "stdClass" given.',
             ContextItemInterface::class

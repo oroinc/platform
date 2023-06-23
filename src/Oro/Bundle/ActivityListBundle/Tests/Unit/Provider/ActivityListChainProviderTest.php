@@ -44,11 +44,11 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
+    /** @var ActivityListFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $activityListFactory;
+
     /** @var TestActivityProvider */
     private $testActivityProvider;
-
-    /** @var ActivityListFactory|\PHPUnit\Framework\MockObject\MockObject  */
-    private $activityListFactory;
 
     protected function setUp(): void
     {
@@ -57,6 +57,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->routeHelper = $this->createMock(EntityRoutingHelper::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+
         $this->activityListFactory = $this->getMockBuilder(ActivityListFactory::class)
             ->onlyMethods(['createActivityList'])
             ->getMock();

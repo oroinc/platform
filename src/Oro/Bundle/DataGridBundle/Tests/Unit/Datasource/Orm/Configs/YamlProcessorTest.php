@@ -12,14 +12,14 @@ use Oro\Bundle\DataGridBundle\Exception\DatasourceException;
 
 class YamlProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var YamlProcessor */
-    private $processor;
-
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
+
+    /** @var YamlProcessor */
+    private $processor;
 
     protected function setUp(): void
     {
@@ -83,7 +83,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
     public function testNoQueryAndRepositoryConfigsShouldThrowException()
     {
         $this->expectException(DatasourceException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectExceptionMessage(sprintf(
             '%s expects to be configured with query or repository method',
             YamlProcessor::class
         ));
