@@ -10,8 +10,7 @@ class WidgetTest extends WebTestCase
         'position' => 0,
         'widgetName' => 'hello_world',
         'settings' => [
-            'content' => 'Welcome to OroCRM!<br/>OroCRM is an easy-to-use, open source CRM with built-in marketing tools
- for your ecommerce business. learn more at <a href=\"http://orocrm.com\">orocrm.com</a>'
+            'content' => 'Click “Configure“ to update this note.'
         ]
     ];
 
