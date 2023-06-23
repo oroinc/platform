@@ -189,11 +189,11 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
             . ' FROM ('
             . '(SELECT \'' . Entity\Product::class . '\' AS sclr_0, p0_.name AS name_1, p0_.id AS id_2'
             . ' FROM product_table p0_'
-            . ' WHERE p0_.id IN (123))'
+            . ' WHERE p0_.id IN (?))'
             . ' UNION ALL '
             . '(SELECT \'' . Entity\User::class . '\' AS sclr_0, COALESCE(u0_.name, \'\') AS sclr_1, u0_.id AS id_2'
             . ' FROM user_table u0_'
-            . ' WHERE u0_.id IN (456))'
+            . ' WHERE u0_.id IN (?))'
             . ') entity',
             [
                 [
@@ -206,7 +206,9 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                     'entity' => Entity\User::class,
                     'title'  => 'user title 1'
                 ]
-            ]
+            ],
+            [1 => 123, 2 => 456],
+            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
 
         self::assertEquals(
@@ -247,11 +249,11 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
             . ' FROM ('
             . '(SELECT \'' . Entity\Product::class . '\' AS sclr_0, p0_.name AS name_1, p0_.id AS id_2'
             . ' FROM product_table p0_'
-            . ' WHERE p0_.id IN (123))'
+            . ' WHERE p0_.id IN (?))'
             . ' UNION ALL '
             . '(SELECT \'' . Entity\User::class . '\' AS sclr_0, COALESCE(u0_.name, \'\') AS sclr_1, u0_.id AS id_2'
             . ' FROM user_table u0_'
-            . ' WHERE u0_.id IN (456))'
+            . ' WHERE u0_.id IN (?))'
             . ') entity',
             [
                 [
@@ -264,7 +266,9 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                     'entity' => Entity\User::class,
                     'title'  => 'user title 1'
                 ]
-            ]
+            ],
+            [1 => 123, 2 => 456],
+            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
         $this->addQueryExpectation(
             'SELECT \'' . Entity\Category::class . '\' AS sclr_0, c0_.label AS label_1, c0_.name AS name_2'
