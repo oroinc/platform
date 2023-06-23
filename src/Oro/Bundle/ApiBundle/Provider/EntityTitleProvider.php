@@ -156,7 +156,8 @@ class EntityTitleProvider
             }
         } else {
             $qb->addSelect(QueryBuilderUtil::sprintf('e.%s AS id', $idFieldName));
-            $qb->andWhere($qb->expr()->in(QueryBuilderUtil::getField('e', $idFieldName), $ids));
+            $qb->andWhere($qb->expr()->in(QueryBuilderUtil::getField('e', $idFieldName), ':ids'))
+                ->setParameter('ids', $ids);
         }
 
         return $qb->getQuery();
