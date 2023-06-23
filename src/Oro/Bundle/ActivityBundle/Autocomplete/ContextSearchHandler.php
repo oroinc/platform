@@ -297,7 +297,8 @@ class ContextSearchHandler implements ConverterInterface
                     (string)$subQb->expr()->literal($entityClass) . ' AS entityClass',
                     $nameDql . ' AS entityName'
                 );
-            $subQb->where($subQb->expr()->in('e.id', $ids));
+            $subQb->where($subQb->expr()->in('e.id', ':ids'))
+                ->setParameter('ids', $ids);
             $qb->addSubQuery($subQb->getQuery());
         }
 

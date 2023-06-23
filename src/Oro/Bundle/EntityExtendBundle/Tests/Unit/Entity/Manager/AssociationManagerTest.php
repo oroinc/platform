@@ -76,7 +76,7 @@ class AssociationManagerTest extends OrmTestCase
         );
     }
 
-    public function testGetSingleOwnerManyToOneAssociationTargets()
+    public function testGetSingleOwnerManyToOneAssociationTargets(): void
     {
         $associationOwnerClass = 'TestAssociationOwnerClass';
         $associationKind = 'TestAssociationKind';
@@ -163,7 +163,7 @@ class AssociationManagerTest extends OrmTestCase
         );
     }
 
-    public function testGetSingleOwnerMultipleManyToOneAssociationTargets()
+    public function testGetSingleOwnerMultipleManyToOneAssociationTargets(): void
     {
         $associationOwnerClass = 'TestAssociationOwnerClass';
         $associationKind = 'TestAssociationKind';
@@ -250,7 +250,7 @@ class AssociationManagerTest extends OrmTestCase
         );
     }
 
-    public function testGetMultiOwnerManyToManyAssociationTargets()
+    public function testGetMultiOwnerManyToManyAssociationTargets(): void
     {
         $associationOwnerClass = 'TestAssociationOwnerClass';
         $associationKind = 'TestAssociationKind';
@@ -337,7 +337,7 @@ class AssociationManagerTest extends OrmTestCase
         );
     }
 
-    public function testGetMultiAssociationsQueryBuilder()
+    public function testGetMultiAssociationsQueryBuilder(): void
     {
         $ownerClass = TestOwner1::class;
         $targetClass1 = TestTarget1::class;
@@ -395,7 +395,7 @@ class AssociationManagerTest extends OrmTestCase
             . 'INNER JOIN test_owner1_to_target1 t2_ ON t0_.id = t2_.owner_id '
             . 'INNER JOIN test_target1 t1_ ON t1_.id = t2_.target_id '
             . 'LEFT JOIN test_phone t3_ ON t0_.id = t3_.owner_id '
-            . 'WHERE (t0_.name = \'test\' AND t3_.phone = \'123-456\') AND t1_.age = 10)'
+            . 'WHERE (t0_.name = :q0__name AND t3_.phone = :q0__phones_phone) AND t1_.age = 10)'
             . ' UNION ALL '
             . '(SELECT DISTINCT t0_.id AS id_0, t1_.id AS id_1, '
             . '\'' . $targetClass2 . '\' AS sclr_2, '
@@ -404,13 +404,19 @@ class AssociationManagerTest extends OrmTestCase
             . 'INNER JOIN test_owner1_to_target2 t2_ ON t0_.id = t2_.owner_id '
             . 'INNER JOIN test_target2 t1_ ON t1_.id = t2_.target_id '
             . 'LEFT JOIN test_phone t3_ ON t0_.id = t3_.owner_id '
-            . 'WHERE (t0_.name = \'test\' AND t3_.phone = \'123-456\') AND t1_.age = 100)'
+            . 'WHERE (t0_.name = :q1__name AND t3_.phone = :q1__phones_phone) AND t1_.age = 100)'
             . ') entity ORDER BY title ASC LIMIT 5 OFFSET 5',
             $result->getSQL()
         );
+        $parameters = $result->getParameters();
+        self::assertCount(4, $parameters);
+        self::assertEquals('test', $parameters['q0__name']);
+        self::assertEquals('123-456', $parameters['q0__phones_phone']);
+        self::assertEquals('test', $parameters['q1__name']);
+        self::assertEquals('123-456', $parameters['q1__phones_phone']);
     }
 
-    public function testGetMultiAssociationOwnersQueryBuilder()
+    public function testGetMultiAssociationOwnersQueryBuilder(): void
     {
         $targetClass = TestTarget1::class;
         $ownerClass1 = TestOwner1::class;
@@ -467,7 +473,7 @@ class AssociationManagerTest extends OrmTestCase
             . 'FROM test_owner1 t1_ '
             . 'INNER JOIN test_owner1_to_target1 t2_ ON t1_.id = t2_.owner_id '
             . 'INNER JOIN test_target1 t0_ ON t0_.id = t2_.target_id '
-            . 'WHERE t1_.name = \'test\' AND t0_.age = 10)'
+            . 'WHERE t1_.name = :q0__name AND t0_.age = 10)'
             . ' UNION ALL '
             . '(SELECT t0_.id AS id_0, t1_.id AS id_1, '
             . '\'' . $ownerClass2 . '\' AS sclr_2, '
@@ -475,9 +481,13 @@ class AssociationManagerTest extends OrmTestCase
             . 'FROM test_owner2 t1_ '
             . 'INNER JOIN test_owner2_to_target1 t2_ ON t1_.id = t2_.owner_id '
             . 'INNER JOIN test_target1 t0_ ON t0_.id = t2_.target_id '
-            . 'WHERE t1_.name = \'test\' AND t0_.age = 100)'
+            . 'WHERE t1_.name = :q1__name AND t0_.age = 100)'
             . ') entity ORDER BY title ASC LIMIT 5 OFFSET 5',
             $result->getSQL()
         );
+        $parameters = $result->getParameters();
+        self::assertCount(2, $parameters);
+        self::assertEquals('test', $parameters['q0__name']);
+        self::assertEquals('test', $parameters['q1__name']);
     }
 }
