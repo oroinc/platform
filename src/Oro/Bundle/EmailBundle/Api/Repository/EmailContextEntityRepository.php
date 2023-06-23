@@ -1,33 +1,33 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Api\Repository;
+namespace Oro\Bundle\EmailBundle\Api\Repository;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Bundle\EmailBundle\Api\Model\EmailContextEntity;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SearchBundle\Api\Model\SearchEntity;
 use Oro\Bundle\SearchBundle\Api\SearchEntityClassProviderInterface;
 use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * The repository to get entities available for the search API resource.
+ * The repository to get entities available for the email context API resources.
  */
-class SearchEntityRepository
+class EmailContextEntityRepository
 {
-    private SearchEntityClassProviderInterface $searchEntityClassProvider;
+    private SearchEntityClassProviderInterface $entityClassProvider;
     private ValueNormalizer $valueNormalizer;
     private ConfigManager $configManager;
     private TranslatorInterface $translator;
 
     public function __construct(
-        SearchEntityClassProviderInterface $searchEntityClassProvider,
+        SearchEntityClassProviderInterface $entityClassProvider,
         ValueNormalizer $valueNormalizer,
         ConfigManager $configManager,
         TranslatorInterface $translator
     ) {
-        $this->searchEntityClassProvider = $searchEntityClassProvider;
+        $this->entityClassProvider = $entityClassProvider;
         $this->valueNormalizer = $valueNormalizer;
         $this->configManager = $configManager;
         $this->translator = $translator;
@@ -36,24 +36,24 @@ class SearchEntityRepository
     /**
      * @param string      $version
      * @param RequestType $requestType
-     * @param bool|null   $searchable
+     * @param bool|null   $allowed
      *
-     * @return SearchEntity[]
+     * @return EmailContextEntity[]
      */
-    public function getSearchEntities(string $version, RequestType $requestType, ?bool $searchable = null): array
+    public function getEntities(string $version, RequestType $requestType, ?bool $allowed = null): array
     {
         $result = [];
-        $accessibleEntityClasses = $this->searchEntityClassProvider->getAccessibleEntityClasses($version, $requestType);
-        $allowedEntityClasses = $this->searchEntityClassProvider->getAllowedEntityClasses($version, $requestType);
+        $accessibleEntityClasses = $this->entityClassProvider->getAccessibleEntityClasses($version, $requestType);
+        $allowedEntityClasses = $this->entityClassProvider->getAllowedEntityClasses($version, $requestType);
         foreach ($accessibleEntityClasses as $entityClass => $searchAlias) {
-            $isSearchableEntity = isset($allowedEntityClasses[$entityClass]);
-            if (null !== $searchable && $searchable !== $isSearchableEntity) {
+            $isAllowedEntity = isset($allowedEntityClasses[$entityClass]);
+            if (null !== $allowed && $allowed !== $isAllowedEntity) {
                 continue;
             }
-            $result[] = new SearchEntity(
+            $result[] = new EmailContextEntity(
                 ValueNormalizerUtil::convertToEntityType($this->valueNormalizer, $entityClass, $requestType),
                 $this->translator->trans($this->getEntityLabel($entityClass)),
-                $isSearchableEntity
+                $isAllowedEntity
             );
         }
 

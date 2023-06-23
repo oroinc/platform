@@ -7,42 +7,34 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    use ContainerAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function getDependencies(): array
     {
-        $this->container = $container;
+        return [LoadBusinessUnit::class, LoadOrganization::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function load(ObjectManager $manager): void
     {
-        return [LoadBusinessUnit::class];
-    }
+        $userManager = $this->getUserManager();
 
-    /**
-     * {@inheritdoc}
-     */
-    public function load(ObjectManager $manager)
-    {
-        $userManager = $this->container->get('oro_user.manager');
-        $organization = $manager->getRepository(Organization::class)->getFirst();
+        $organization = $this->getReference(LoadOrganization::ORGANIZATION);
+
         $role = $manager->getRepository(Role::class)->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
 
         $user = $userManager->createUser();
@@ -95,5 +87,10 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
 
         $this->setReference($user->getUsername(), $user);
         $this->setReference($user2->getUsername(), $user2);
+    }
+
+    private function getUserManager(): UserManager
+    {
+        return $this->container->get('oro_user.manager');
     }
 }

@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Api\Processor;
+namespace Oro\Bundle\EmailBundle\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Bundle\SearchBundle\Api\Model\SearchItem;
+use Oro\Bundle\EmailBundle\Api\Model\EmailContextSearchItem;
 use Oro\Bundle\SearchBundle\Api\SearchEntityListFilterHelper;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
@@ -17,9 +17,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Loads entities for the search API resource.
+ * Loads data for the email context search API resource.
  */
-class LoadEntitiesBySearchText implements ProcessorInterface
+class LoadEmailContextSearchItems implements ProcessorInterface
 {
     private SearchIndexer $searchIndexer;
     private SearchEntityListFilterHelper $searchEntityListFilterHelper;
@@ -58,41 +58,39 @@ class LoadEntitiesBySearchText implements ProcessorInterface
 
         $entities = $this->searchEntityListFilterHelper->getEntities($context, 'entities');
         if ($context->hasErrors()) {
-            // the "entities" filter has some invalid data
             return;
         }
 
         if (!$entities) {
-            // the "entities" filter does not have any entities allowed for the current logged in user
-            $context->setResult([]);
-            $context->setTotalCountCallback(function () {
-                return 0;
-            });
+            $this->setEmptyResult($context);
 
             return;
         }
 
         $maxResults = $criteria->getMaxResults();
-        $searchResult = $this->searchIndexer->simpleSearch(
+        $searchQuery = $this->searchIndexer->getSimpleSearchQuery(
             $context->getFilterValues()->get('searchText')?->getValue(),
             $criteria->getFirstResult(),
             (null !== $maxResults && $context->getConfig()->getHasMore()) ? $maxResults + 1 : $maxResults,
             array_values($entities)
         );
-
-        $context->setResult($this->buildResult($searchResult->toArray(), $maxResults, $context->getRequestType()));
+        $searchResult = $this->searchIndexer->query($searchQuery);
+        $context->setResult(
+            $this->buildResult($searchResult->toArray(), $maxResults, $context->getRequestType())
+        );
         $context->setTotalCountCallback(function () use ($searchResult) {
             return $searchResult->getRecordsCount();
         });
     }
 
-    /**
-     * @param SearchResultItem[] $records
-     * @param int|null           $maxResults
-     * @param RequestType        $requestType
-     *
-     * @return SearchItem[]
-     */
+    private function setEmptyResult(ListContext $context): void
+    {
+        $context->setResult([]);
+        $context->setTotalCountCallback(function () {
+            return 0;
+        });
+    }
+
     private function buildResult(array $records, ?int $maxResults, RequestType $requestType): array
     {
         $hasMore = false;
@@ -102,11 +100,12 @@ class LoadEntitiesBySearchText implements ProcessorInterface
         }
 
         $result = [];
+        /** @var SearchResultItem $record */
         foreach ($records as $record) {
             $this->eventDispatcher->dispatch(new PrepareResultItemEvent($record), PrepareResultItemEvent::EVENT_NAME);
             $entityClass = $record->getEntityName();
             $entityId = $record->getRecordId();
-            $result[] = new SearchItem(
+            $result[] = new EmailContextSearchItem(
                 sprintf(
                     '%s-%s',
                     ValueNormalizerUtil::convertToEntityType($this->valueNormalizer, $entityClass, $requestType),

@@ -1,69 +1,62 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Api\Model;
+namespace Oro\Bundle\EmailBundle\Api\Model;
 
 /**
- * Represents the search result.
+ * Represents the email context item.
  */
-class SearchItem
+class EmailContextItem
 {
     private string $id;
     private string $entityClass;
     private mixed $entityId;
     private ?string $entityName;
     private ?string $entityUrl;
+    private bool $isContext;
 
     public function __construct(
         string $id,
         string $entityClass,
         mixed $entityId,
         ?string $entityName,
-        ?string $entityUrl
+        ?string $entityUrl,
+        bool $isContext
     ) {
         $this->id = $id;
         $this->entityClass = $entityClass;
         $this->entityId = $entityId;
         $this->entityName = $entityName;
         $this->entityUrl = $entityUrl;
+        $this->isContext = $isContext;
     }
 
-    /**
-     * Gets an identifier of a search record.
-     */
     public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * Gets FQCN of an entity associated with a search record.
-     */
     public function getEntityClass(): string
     {
         return $this->entityClass;
     }
 
-    /**
-     * Gets an identifier of an entity associated with a search record.
-     */
     public function getEntityId(): mixed
     {
         return $this->entityId;
     }
 
-    /**
-     * Gets a name of an entity associated with a search record.
-     */
     public function getEntityName(): ?string
     {
         return $this->entityName;
     }
 
-    /**
-     * Gets URL of an entity associated with a search record.
-     */
     public function getEntityUrl(): ?string
     {
         return $this->entityUrl;
+    }
+
+    public function isContext(): bool
+    {
+        return $this->isContext;
     }
 }

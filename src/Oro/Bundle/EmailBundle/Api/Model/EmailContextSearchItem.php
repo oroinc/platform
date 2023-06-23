@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Api\Model;
+namespace Oro\Bundle\EmailBundle\Api\Model;
 
 /**
- * Represents the search result.
+ * Represents the email context search result item.
  */
-class SearchItem
+class EmailContextSearchItem
 {
     private string $id;
     private string $entityClass;
@@ -27,41 +27,26 @@ class SearchItem
         $this->entityUrl = $entityUrl;
     }
 
-    /**
-     * Gets an identifier of a search record.
-     */
     public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * Gets FQCN of an entity associated with a search record.
-     */
     public function getEntityClass(): string
     {
         return $this->entityClass;
     }
 
-    /**
-     * Gets an identifier of an entity associated with a search record.
-     */
     public function getEntityId(): mixed
     {
         return $this->entityId;
     }
 
-    /**
-     * Gets a name of an entity associated with a search record.
-     */
     public function getEntityName(): ?string
     {
         return $this->entityName;
     }
 
-    /**
-     * Gets URL of an entity associated with a search record.
-     */
     public function getEntityUrl(): ?string
     {
         return $this->entityUrl;
