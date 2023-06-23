@@ -64,14 +64,16 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
             $this->getDriverConnectionMock($this->em),
             'SELECT \'' . Entity\Product::class . '\' AS sclr_0, \'\' AS sclr_1, p0_.id AS id_2'
             . ' FROM product_table p0_'
-            . ' WHERE p0_.id IN (1)',
+            . ' WHERE p0_.id IN (?)',
             [
                 [
                     'sclr_0' => Entity\Product::class,
                     'sclr_1' => '',
                     'id_2'   => 1
                 ]
-            ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
         );
 
         self::assertEquals(
@@ -101,14 +103,16 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
             $this->getDriverConnectionMock($this->em),
             'SELECT \'' . Entity\Product::class . '\' AS sclr_0, p0_.name AS name_1, p0_.id AS id_2'
             . ' FROM product_table p0_'
-            . ' WHERE p0_.id IN (1)',
+            . ' WHERE p0_.id IN (?)',
             [
                 [
                     'sclr_0' => Entity\Product::class,
                     'name_1' => 'title 1',
                     'id_2'   => 1
                 ]
-            ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
         );
 
         self::assertEquals(
@@ -141,14 +145,16 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
             $this->getDriverConnectionMock($this->em),
             'SELECT \'' . Entity\Product::class . '\' AS sclr_0, p0_.name AS name_1, p0_.id AS id_2'
             . ' FROM product_table p0_'
-            . ' WHERE p0_.id IN (456)',
+            . ' WHERE p0_.id IN (?)',
             [
                 [
                     'sclr_0' => Entity\Product::class,
                     'name_1' => 'title 1',
                     'id_2'   => 456
                 ]
-            ]
+            ],
+            [1 => 456],
+            [1 => \PDO::PARAM_INT]
         );
 
         self::assertEquals(
@@ -263,14 +269,16 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
         $this->addQueryExpectation(
             'SELECT \'' . Entity\Category::class . '\' AS sclr_0, c0_.label AS label_1, c0_.name AS name_2'
             . ' FROM category_table c0_'
-            . ' WHERE c0_.name IN (\'category1\')',
+            . ' WHERE c0_.name IN (?)',
             [
                 [
                     'sclr_0'  => Entity\Category::class,
                     'label_1' => 'category title 1',
                     'name_2'  => 'category1'
                 ]
-            ]
+            ],
+            [1 => 'category1'],
+            [1 => \PDO::PARAM_STR]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
