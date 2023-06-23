@@ -36,7 +36,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateEmailNotificationAdapter */
     private $adapter;
 
-    /** @var WebsiteAwareEntityHelper|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var WebsiteAwareEntityHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $websiteAware;
 
     protected function setUp(): void

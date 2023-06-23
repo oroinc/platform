@@ -6,26 +6,21 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\Specifi
 
 class SpecificationDividerTest extends \PHPUnit\Framework\TestCase
 {
-    const BASE_NAME = 'SuiteStub';
+    private const BASE_NAME = 'SuiteStub';
 
     /**
      * @dataProvider divideSuiteProvider
-     *
-     * @param array $array
-     * @param int   $divider
-     * @param array $expectedResult
      */
-    public function testDivide($array, $divider, array $expectedResult)
+    public function testDivide(array $array, int $divider, array $expectedResult)
     {
         $suiteDivider = new SpecificationCountDivider();
         $actualResult = $suiteDivider->divide(self::BASE_NAME, $array, $divider);
 
-        $this->assertTrue(is_array($actualResult));
         $this->assertCount(count($expectedResult), $actualResult);
         $this->assertSame($expectedResult, $actualResult);
     }
 
-    public function divideSuiteProvider()
+    public function divideSuiteProvider(): array
     {
         return [
             [

@@ -21,23 +21,24 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
 
         $result = $expression->getValue();
         $this->assertFalse($expression->isModifier());
-        $this->assertInstanceOf('\DateTime', $result);
+        $this->assertInstanceOf(\DateTime::class, $result);
 
         $this->assertSame($expected, $result->format('Y-m-d'));
     }
 
-    public function dateProvider(): \Generator
+    public function dateProvider(): array
     {
-        yield 'UTC' => [
-            'date' => '1990-02-02',
-            'timeZone' => 'UTC',
-            'expected' => '1990-02-02'
-        ];
-
-        yield '(UTC -11:00) Pacific/Niue' => [
-            'date' => '1990-02-02',
-            'timeZone' => 'Pacific/Niue',
-            'expected' => '1990-02-02' // Ignore the time zone, as there is no time.
+        return [
+            'UTC' => [
+                'date' => '1990-02-02',
+                'timeZone' => 'UTC',
+                'expected' => '1990-02-02'
+            ],
+            '(UTC -11:00) Pacific/Niue' => [
+                'date' => '1990-02-02',
+                'timeZone' => 'Pacific/Niue',
+                'expected' => '1990-02-02' // Ignore the time zone, as there is no time.
+            ]
         ];
     }
 
@@ -50,23 +51,24 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
 
         $result = $expression->getValue();
         $this->assertFalse($expression->isModifier());
-        $this->assertInstanceOf('\DateTime', $result);
+        $this->assertInstanceOf(\DateTime::class, $result);
 
         $this->assertSame($expected, $result->format('H:i:s'));
     }
 
-    public function timeProvider(): \Generator
+    public function timeProvider(): array
     {
-        yield 'UTC' => [
-            'time' => '23:00:00',
-            'timeZone' => 'UTC',
-            'expected' => '23:00:00'
-        ];
-
-        yield '(UTC -11:00) Pacific/Niue' => [
-            'time' => '23:00:00',
-            'timeZone' => 'Pacific/Niue',
-            'expected' => '23:00:00' // Ignore the time zone, as there is no date.
+        return [
+            'UTC' => [
+                'time' => '23:00:00',
+                'timeZone' => 'UTC',
+                'expected' => '23:00:00'
+            ],
+            '(UTC -11:00) Pacific/Niue' => [
+                'time' => '23:00:00',
+                'timeZone' => 'Pacific/Niue',
+                'expected' => '23:00:00' // Ignore the time zone, as there is no date.
+            ]
         ];
     }
 
@@ -85,8 +87,6 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider thisDayModifyProvider
-     *
-     * @throws \Exception
      */
     public function testThisDayModify(string $timeZone, int $modifier)
     {
@@ -94,7 +94,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $expression = new ExpressionResult($token, $timeZone);
         $result = $expression->getValue();
 
-        $this->assertInstanceOf('\DateTime', $result);
+        $this->assertInstanceOf(\DateTime::class, $result);
 
         $dateTime = new \DateTime('now', new \DateTimeZone($timeZone));
         $expectedResult = $dateTime->format('d');
@@ -115,51 +115,45 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, (int)$result->minute);
     }
 
-    public function thisDayModifyProvider(): \Generator
+    public function thisDayModifyProvider(): array
     {
-        yield 'UTC and this day' => [
-            'timeZone' => 'UTC',
-            'modifier' => DateModifierInterface::VAR_THIS_DAY
-        ];
-
-        yield 'UTC and today' => [
-            'timeZone' => 'UTC',
-            'modifier' => DateModifierInterface::VAR_TODAY
-        ];
-
-        yield 'UTC and this day(wy)' => [
-            'timeZone' => 'UTC',
-            'modifier' => DateModifierInterface::VAR_THIS_DAY_W_Y
-        ];
-
-        yield '(UTC -11:00) Pacific/Niue and this day' => [
-            'timeZone' => 'Pacific/Niue',
-            'modifier' => DateModifierInterface::VAR_THIS_DAY
-        ];
-
-        yield '(UTC -11:00) Pacific/Niue and today' => [
-            'timeZone' => 'Pacific/Niue',
-            'modifier' => DateModifierInterface::VAR_TODAY
-        ];
-
-        yield '(UTC -11:00) Pacific/Niue and this day(wy)' => [
-            'timeZone' => 'Pacific/Niue',
-            'modifier' => DateModifierInterface::VAR_THIS_DAY_W_Y
-        ];
-
-        yield '(UTC +14:00) Pacific/Kiritimati and this day' => [
-            'timeZone' => 'Pacific/Kiritimati',
-            'modifier' => DateModifierInterface::VAR_THIS_DAY
-        ];
-
-        yield '(UTC +14:00) Pacific/Kiritimati and today' => [
-            'timeZone' => 'Pacific/Kiritimati',
-            'modifier' => DateModifierInterface::VAR_TODAY
-        ];
-
-        yield '(UTC +14:00) Pacific/Kiritimati and this day(wy)' => [
-            'timeZone' => 'Pacific/Kiritimati',
-            'modifier' => DateModifierInterface::VAR_THIS_DAY_W_Y
+        return [
+            'UTC and this day' => [
+                'timeZone' => 'UTC',
+                'modifier' => DateModifierInterface::VAR_THIS_DAY
+            ],
+            'UTC and today' => [
+                'timeZone' => 'UTC',
+                'modifier' => DateModifierInterface::VAR_TODAY
+            ],
+            'UTC and this day(wy)' => [
+                'timeZone' => 'UTC',
+                'modifier' => DateModifierInterface::VAR_THIS_DAY_W_Y
+            ],
+            '(UTC -11:00) Pacific/Niue and this day' => [
+                'timeZone' => 'Pacific/Niue',
+                'modifier' => DateModifierInterface::VAR_THIS_DAY
+            ],
+            '(UTC -11:00) Pacific/Niue and today' => [
+                'timeZone' => 'Pacific/Niue',
+                'modifier' => DateModifierInterface::VAR_TODAY
+            ],
+            '(UTC -11:00) Pacific/Niue and this day(wy)' => [
+                'timeZone' => 'Pacific/Niue',
+                'modifier' => DateModifierInterface::VAR_THIS_DAY_W_Y
+            ],
+            '(UTC +14:00) Pacific/Kiritimati and this day' => [
+                'timeZone' => 'Pacific/Kiritimati',
+                'modifier' => DateModifierInterface::VAR_THIS_DAY
+            ],
+            '(UTC +14:00) Pacific/Kiritimati and today' => [
+                'timeZone' => 'Pacific/Kiritimati',
+                'modifier' => DateModifierInterface::VAR_TODAY
+            ],
+            '(UTC +14:00) Pacific/Kiritimati and this day(wy)' => [
+                'timeZone' => 'Pacific/Kiritimati',
+                'modifier' => DateModifierInterface::VAR_THIS_DAY_W_Y
+            ]
         ];
     }
 
@@ -170,34 +164,31 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
     {
         /** @var Carbon $exprValue */
         $exprValue = $expression->getValue();
-        $this->assertTrue($exprValue->eq($expected), \sprintf(
+        $this->assertTrue($exprValue->eq($expected), sprintf(
             'Expected date: %s, actual date: %s',
             $expected->format('c'),
             $exprValue->toIso8601String()
         ));
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function getThisWeekModifications(): \Generator
+    public function getThisWeekModifications(): array
     {
-        yield 'this week with UTC timezone' => [
-            $this->createVariableExpressionResult(DateModifierInterface::VAR_THIS_WEEK),
-            (new \DateTimeImmutable('this week', new \DateTimeZone('UTC')))->setTime(0, 0),
-        ];
-
-        yield 'this week + 3 weeks and Pacific/Niue timezone' => [
-            $this->createVariableExpressionResult(DateModifierInterface::VAR_THIS_WEEK, 'Pacific/Niue')
-                ->add(new ExpressionResult(3)),
-            (new \DateTimeImmutable('this week +3 weeks', new \DateTimeZone('Pacific/Niue')))->setTime(0, 0),
-        ];
-
-        yield 'this week + 3 weeks - 8 weeks and Pacific/Kiritimati timezone' => [
-            $this->createVariableExpressionResult(DateModifierInterface::VAR_THIS_WEEK, 'Pacific/Kiritimati')
-                ->add(new ExpressionResult(3))
-                ->subtract(new ExpressionResult(8)),
-            (new \DateTimeImmutable('this week -5 weeks', new \DateTimeZone('Pacific/Kiritimati')))->setTime(0, 0),
+        return [
+            'this week with UTC timezone' => [
+                $this->createVariableExpressionResult(DateModifierInterface::VAR_THIS_WEEK),
+                (new \DateTimeImmutable('this week', new \DateTimeZone('UTC')))->setTime(0, 0),
+            ],
+            'this week + 3 weeks and Pacific/Niue timezone' => [
+                $this->createVariableExpressionResult(DateModifierInterface::VAR_THIS_WEEK, 'Pacific/Niue')
+                    ->add(new ExpressionResult(3)),
+                (new \DateTimeImmutable('this week +3 weeks', new \DateTimeZone('Pacific/Niue')))->setTime(0, 0),
+            ],
+            'this week + 3 weeks - 8 weeks and Pacific/Kiritimati timezone' => [
+                $this->createVariableExpressionResult(DateModifierInterface::VAR_THIS_WEEK, 'Pacific/Kiritimati')
+                    ->add(new ExpressionResult(3))
+                    ->subtract(new ExpressionResult(8)),
+                (new \DateTimeImmutable('this week -5 weeks', new \DateTimeZone('Pacific/Kiritimati')))->setTime(0, 0),
+            ]
         ];
     }
 
@@ -210,7 +201,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedQuarter, (int)$result->quarter);
 
         $expression->add(new ExpressionResult(1));
-        $expectedQuarter += 1;
+        $expectedQuarter++;
         if ($expectedQuarter > 4) {
             $expectedQuarter -= 4;
         }
@@ -356,74 +347,74 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
     {
         /** @var Carbon $exprValue */
         $exprValue = $expression->getValue();
-        $this->assertTrue($exprValue->eq($expected), \sprintf(
+        $this->assertTrue($exprValue->eq($expected), sprintf(
             'Expected date: %s, actual date: %s',
             $expected->format('c'),
             $exprValue->toIso8601String()
         ));
     }
 
-    public function getStartOfOperations()
+    public function getStartOfOperations(): array
     {
         $utc = new \DateTimeZone('UTC');
+
         return [
             'start of week' => [
                 $this->createVariableExpressionResult(DateModifierInterface::VAR_SOW),
-                (new \DateTimeImmutable('monday this week', $utc))->setTime(0, 0, 0),
+                (new \DateTimeImmutable('monday this week', $utc))->setTime(0, 0),
             ],
             'start of week +3 days' => [
                 $this->createVariableExpressionResult(DateModifierInterface::VAR_SOW)
                     ->add(new ExpressionResult(3)),
-                (new \DateTimeImmutable('monday this week +72 hours', $utc))->setTime(0, 0, 0),
+                (new \DateTimeImmutable('monday this week +72 hours', $utc))->setTime(0, 0),
             ],
             'start of week +3 days -5 days' => [
                 $this->createVariableExpressionResult(DateModifierInterface::VAR_SOW)
                     ->add(new ExpressionResult(3))
                     ->subtract(new ExpressionResult(5)),
-                (new \DateTimeImmutable('monday this week -48 hours', $utc))->setTime(0, 0, 0),
+                (new \DateTimeImmutable('monday this week -48 hours', $utc))->setTime(0, 0),
             ],
             'start of month' => [
                 $this->createVariableExpressionResult(DateModifierInterface::VAR_SOM),
-                (new \DateTimeImmutable('first day of this month', $utc))->setTime(0, 0, 0),
+                (new \DateTimeImmutable('first day of this month', $utc))->setTime(0, 0),
             ],
             'start of month +3 days' => [
                 $this->createVariableExpressionResult(DateModifierInterface::VAR_SOM)
                     ->add(new ExpressionResult(3)),
-                (new \DateTimeImmutable('first day of this month +72 hours', $utc))->setTime(0, 0, 0),
+                (new \DateTimeImmutable('first day of this month +72 hours', $utc))->setTime(0, 0),
             ],
             'start of month +3 days -5 days' => [
                 $this->createVariableExpressionResult(DateModifierInterface::VAR_SOM)
                     ->add(new ExpressionResult(3))
                     ->subtract(new ExpressionResult(5)),
-                (new \DateTimeImmutable('first day of this month -48 hours', $utc))->setTime(0, 0, 0),
+                (new \DateTimeImmutable('first day of this month -48 hours', $utc))->setTime(0, 0),
             ],
             'start of year' => [
                 $this->createVariableExpressionResult(DateModifierInterface::VAR_SOY),
-                (new \DateTimeImmutable('first day of january ' . date('Y'), $utc))->setTime(0, 0, 0),
+                (new \DateTimeImmutable('first day of january ' . date('Y'), $utc))->setTime(0, 0),
             ],
             'start of year +3 days' => [
                 $this->createVariableExpressionResult(DateModifierInterface::VAR_SOY)
                     ->add(new ExpressionResult(3)),
-                (new \DateTimeImmutable('first day of january ' . date('Y') . ' +72 hours', $utc))->setTime(0, 0, 0),
+                (new \DateTimeImmutable('first day of january ' . date('Y') . ' +72 hours', $utc))->setTime(0, 0),
             ],
             'start of year +3 days -5 days' => [
                 $this->createVariableExpressionResult(DateModifierInterface::VAR_SOY)
                     ->add(new ExpressionResult(3))
                     ->subtract(new ExpressionResult(5)),
-                (new \DateTimeImmutable('first day of january ' . date('Y') . ' -48 hours', $utc))->setTime(0, 0, 0),
+                (new \DateTimeImmutable('first day of january ' . date('Y') . ' -48 hours', $utc))->setTime(0, 0),
             ],
         ];
     }
 
     /**
-     * @param string $operation
-     * @param ExpressionResult $expression
-     * @param int|ExpressionResult $expected
-     *
      * @dataProvider getStartOfReverseOperations
      */
-    public function testStartOfReverseOperations($operation, ExpressionResult $expression, $expected)
-    {
+    public function testStartOfReverseOperations(
+        string $operation,
+        ExpressionResult $expression,
+        int|\DateTimeImmutable $expected
+    ) {
         // expression result operations are designed so that the result of (int - expression) is int
         // and (int + expression) is expression
         if ('subtract' === $operation) {
@@ -432,7 +423,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
             /** @var \DateTimeInterface $expected */
             /** @var Carbon $exprValue */
             $exprValue = $expression->getValue();
-            $this->assertTrue($exprValue->eq($expected), \sprintf(
+            $this->assertTrue($exprValue->eq($expected), sprintf(
                 'Expected date: %s, actual date: %s',
                 $expected->format('c'),
                 $exprValue->toIso8601String()
@@ -440,58 +431,55 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function getStartOfReverseOperations()
+    public function getStartOfReverseOperations(): array
     {
         $utc = new \DateTimeZone('UTC');
+
         return [
             '33 days - start of week' => [
                 'subtract',
                 $this->createNumericExpressionResult(33)
                     ->subtract($this->createVariableExpressionResult(DateModifierInterface::VAR_SOW)),
-                33 - intval((new \DateTimeImmutable('monday this week', $utc))->setTime(0, 0, 0)->format('d'))
+                33 - (int)(new \DateTimeImmutable('monday this week', $utc))->setTime(0, 0)->format('d')
             ],
             '3 days + start of week' => [
                 'add',
                 $this->createNumericExpressionResult(3)
                     ->add($this->createVariableExpressionResult(DateModifierInterface::VAR_SOW)),
-                (new \DateTimeImmutable('monday this week', $utc))->setTime(0, 0, 0)->modify('+3 days')
+                (new \DateTimeImmutable('monday this week', $utc))->setTime(0, 0)->modify('+3 days')
             ],
             '33 days - start of month' => [
                 'subtract',
                 $this->createNumericExpressionResult(33)
                     ->subtract($this->createVariableExpressionResult(DateModifierInterface::VAR_SOM)),
-                33 - intval((new \DateTimeImmutable('first day of this month', $utc))->setTime(0, 0, 0)->format('d'))
+                33 - (int)(new \DateTimeImmutable('first day of this month', $utc))->setTime(0, 0)->format('d')
             ],
             '3 days + start of month' => [
                 'add',
                 $this->createNumericExpressionResult(3)
                     ->add($this->createVariableExpressionResult(DateModifierInterface::VAR_SOM)),
-                (new \DateTimeImmutable('first day of this month', $utc))->setTime(0, 0, 0)->modify('+3 days')
+                (new \DateTimeImmutable('first day of this month', $utc))->setTime(0, 0)->modify('+3 days')
             ],
             '33 days - start of year' => [
                 'subtract',
                 $this->createNumericExpressionResult(33)
                     ->subtract($this->createVariableExpressionResult(DateModifierInterface::VAR_SOY)),
-                33 - intval(
-                    (new \DateTimeImmutable('first day of january ' . date('Y'), $utc))->setTime(0, 0, 0)->format('d')
-                )
+                33 - (int)(new \DateTimeImmutable('first day of january ' . date('Y'), $utc))
+                    ->setTime(0, 0)
+                    ->format('d')
             ],
             '3 days + start of year' => [
                 'add',
                 $this->createNumericExpressionResult(3)
                     ->add($this->createVariableExpressionResult(DateModifierInterface::VAR_SOY)),
                 (new \DateTimeImmutable('first day of january ' . date('Y'), $utc))
-                    ->setTime(0, 0, 0)
+                    ->setTime(0, 0)
                     ->modify(' +3  days')
             ],
         ];
     }
 
-    /**
-     * @param int $days
-     * @param ExpressionResult $expression
-     */
-    protected function assertExpressionModifierSame($days, ExpressionResult $expression)
+    private function assertExpressionModifierSame(int $days, ExpressionResult $expression): void
     {
         $this->assertTrue($expression->isModifier(), 'Expression result should be an integer value.');
 
@@ -506,23 +494,12 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param int $value
-     *
-     * @return ExpressionResult
-     */
-    protected function createNumericExpressionResult($value)
+    private function createNumericExpressionResult(int $value): ExpressionResult
     {
         return new ExpressionResult($value);
     }
 
-    /**
-     * @param int $value One of DateModifierInterface constants
-     * @param string $timeZone
-     *
-     * @return ExpressionResult
-     */
-    protected function createVariableExpressionResult(int $value, string $timeZone = 'UTC')
+    private function createVariableExpressionResult(int $value, string $timeZone = 'UTC'): ExpressionResult
     {
         return new ExpressionResult(new Token(Token::TYPE_VARIABLE, $value), $timeZone);
     }

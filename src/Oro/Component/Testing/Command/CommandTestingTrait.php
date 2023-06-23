@@ -33,7 +33,7 @@ trait CommandTestingTrait
     {
         if (\is_string($command)) {
             if (!$this instanceof KernelTestCase) {
-                throw new Exception(\sprintf(
+                throw new Exception(sprintf(
                     '%s accepts command name (string) as the first parameter' .
                     ' only in functional tests (or other tests based on KernelTestCase)',
                     __METHOD__

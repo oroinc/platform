@@ -120,9 +120,9 @@ class EntityReferenceTest extends \PHPUnit\Framework\TestCase
     public function testShouldSetEntityThrowExceptionIfInvalidEntityTypePassed()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectExceptionMessage(sprintf(
             'Expected argument of type "null or instance of stdClass", "%s" given.',
-            \Oro\Bundle\DataAuditBundle\Model\EntityReference::class
+            EntityReference::class
         ));
 
         $reference = new EntityReference(get_class(new \stdClass()), 'testId');

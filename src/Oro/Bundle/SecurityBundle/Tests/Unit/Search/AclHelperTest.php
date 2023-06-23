@@ -35,7 +35,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
     /** @var OwnershipMetadataInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ownershipMetadata;
 
-    /** @var SearchAclHelperConditionProvider|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var SearchAclHelperConditionProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $searchAclHelperConditionProvider;
 
     /** @var array */

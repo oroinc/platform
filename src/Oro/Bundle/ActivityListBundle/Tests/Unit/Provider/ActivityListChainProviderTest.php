@@ -47,7 +47,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TestActivityProvider */
     private $testActivityProvider;
 
-    /** @var ActivityListFactory|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var ActivityListFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $activityListFactory;
 
     protected function setUp(): void
