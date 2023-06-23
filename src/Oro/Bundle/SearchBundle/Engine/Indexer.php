@@ -9,6 +9,8 @@ use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
+use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
@@ -62,7 +64,7 @@ class Indexer
     /**
      * Get array with mapped entities
      *
-     * @return array
+     * @return array [entity class => entity search alias, ...]
      */
     public function getEntitiesListAliases()
     {
@@ -74,7 +76,7 @@ class Indexer
      *
      * @param string[] $classNames The list of entity FQCN
      *
-     * @return array [entity class name => entity search alias, ...]
+     * @return array [entity class => entity search alias, ...]
      *
      * @throws \InvalidArgumentException if some of requested entities is not registered in the search index
      *                                   or has no the search alias
@@ -100,7 +102,7 @@ class Indexer
     /**
      * Get list of entities allowed to user
      *
-     * @return array
+     * @return array [entity class => entity search alias, ...]
      */
     public function getAllowedEntitiesListAliases()
     {
@@ -319,17 +321,19 @@ class Indexer
     /**
      * Filter array of entities. Return array of allowed entities
      *
-     * @param  string   $attribute Permission
-     * @param  string[] $entities  The list of entity class names to be checked
-     * @return string[]
+     * @param string $permission
+     * @param array  $entities [entity class => entity search alias, ...]
+     *
+     * @return array [entity class => entity search alias, ...]
      */
-    protected function filterAllowedEntities($attribute, $entities)
+    protected function filterAllowedEntities($permission, $entities)
     {
         foreach (array_keys($entities) as $entityClass) {
-            $objectString = 'Entity:' . $entityClass;
-
             if ($this->securityProvider->isProtectedEntity($entityClass)
-                && !$this->securityProvider->isGranted($attribute, $objectString)
+                && !$this->securityProvider->isGranted(
+                    $permission,
+                    ObjectIdentityHelper::encodeIdentityString(EntityAclExtension::NAME, $entityClass)
+                )
             ) {
                 unset($entities[$entityClass]);
             }

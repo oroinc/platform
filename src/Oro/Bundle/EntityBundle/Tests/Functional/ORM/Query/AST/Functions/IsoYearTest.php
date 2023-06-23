@@ -33,7 +33,7 @@ class IsoYearTest extends WebTestCase
         $query = new Query($this->entityManager);
         $query->setDQL($dql);
 
-        self::assertEquals($sql, $query->getSQL(), \sprintf('Unexpected SQL for "%s"', $dql));
+        self::assertEquals($sql, $query->getSQL(), sprintf('Unexpected SQL for "%s"', $dql));
     }
 
     public function getDqlFunctionDataProvider(): array

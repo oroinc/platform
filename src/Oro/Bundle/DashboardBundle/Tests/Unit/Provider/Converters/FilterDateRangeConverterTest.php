@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
 {
-    private static $valueTypesStartVarsMap = [
+    private static array $valueTypesStartVarsMap = [
         AbstractDateFilterType::TYPE_TODAY => [
             'var_start' => DateModifierInterface::VAR_TODAY,
             'modify_end' => null,
@@ -40,11 +40,14 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    private DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject $formatter;
+    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formatter;
 
-    private Compiler|\PHPUnit\Framework\MockObject\MockObject $dateCompiler;
+    /** @var Compiler|\PHPUnit\Framework\MockObject\MockObject */
+    private $dateCompiler;
 
-    private FilterDateRangeConverter $converter;
+    /** @var FilterDateRangeConverter */
+    private $converter;
 
     protected function setUp(): void
     {
@@ -386,7 +389,7 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
         \DateTimeInterface $expectedEndDate
     ): void {
         $today = new \DateTime(FilterDateRangeConverter::TODAY, new \DateTimeZone('UTC'));
-        if (array_key_exists($value['type'], static::$valueTypesStartVarsMap)) {
+        if (array_key_exists($value['type'], self::$valueTypesStartVarsMap)) {
             $this->dateCompiler->expects($this->once())
                 ->method('compile')
                 ->with('{{' . self::$valueTypesStartVarsMap[$value['type']]['var_start'] . '}}')

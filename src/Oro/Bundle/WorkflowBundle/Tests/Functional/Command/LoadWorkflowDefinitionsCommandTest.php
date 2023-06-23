@@ -85,7 +85,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             [
                 'expectedMessages' => [
                     'Loading workflow definitions...',
-                    \sprintf(
+                    sprintf(
                         "Please run command '%s' to load translations.",
                         OroTranslationLoadCommand::getDefaultName()
                     )
@@ -146,19 +146,19 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             '/Tests/Functional/Command/DataFixtures/ValidDefinitionsVerbosityNormal'
         );
 
-        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), []);
+        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName());
 
-        static::assertStringContainsString('Loading workflow definitions...', $output);
-        static::assertStringContainsString('Done.', $output);
-        static::assertStringNotContainsString(
+        self::assertStringContainsString('Loading workflow definitions...', $output);
+        self::assertStringContainsString('Done.', $output);
+        self::assertStringNotContainsString(
             'Processed 1 workflow definitions: updated 0 existing workflows, created 1 new workflows',
             $output
         );
-        static::assertStringNotContainsString('> workflow_verbosity_normal', $output);
-        static::assertStringNotContainsString(
+        self::assertStringNotContainsString('> workflow_verbosity_normal', $output);
+        self::assertStringNotContainsString(
             $this->getWorkflowConfigurationDump('workflow_verbosity_normal'),
             $output,
-            \sprintf(
+            sprintf(
                 '"%s -v" should not dump workflow configuration to output.',
                 LoadWorkflowDefinitionsCommand::getDefaultName()
             )
@@ -171,17 +171,17 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
         $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), ['-v']);
 
-        static::assertStringContainsString('Loading workflow definitions...', $output);
-        static::assertStringContainsString('Done.', $output);
-        static::assertStringContainsString(
+        self::assertStringContainsString('Loading workflow definitions...', $output);
+        self::assertStringContainsString('Done.', $output);
+        self::assertStringContainsString(
             'Processed 1 workflow definitions: updated 0 existing workflows, created 1 new workflows',
             $output
         );
-        static::assertStringNotContainsString('> workflow_verbose', $output);
-        static::assertStringNotContainsString(
+        self::assertStringNotContainsString('> workflow_verbose', $output);
+        self::assertStringNotContainsString(
             $this->getWorkflowConfigurationDump('workflow_verbose'),
             $output,
-            \sprintf(
+            sprintf(
                 '"%s -v" should not dump workflow configuration to output.',
                 LoadWorkflowDefinitionsCommand::getDefaultName()
             )
@@ -196,17 +196,17 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
         $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), ['-vv']);
 
-        static::assertStringContainsString('Loading workflow definitions...', $output);
-        static::assertStringContainsString('Done.', $output);
-        static::assertStringContainsString(
+        self::assertStringContainsString('Loading workflow definitions...', $output);
+        self::assertStringContainsString('Done.', $output);
+        self::assertStringContainsString(
             'Processed 1 workflow definitions: updated 0 existing workflows, created 1 new workflows',
             $output
         );
-        static::assertStringContainsString('> workflow_very_verbose', $output);
-        static::assertStringNotContainsString(
+        self::assertStringContainsString('> workflow_very_verbose', $output);
+        self::assertStringNotContainsString(
             $this->getWorkflowConfigurationDump('workflow_very_verbose'),
             $output,
-            \sprintf(
+            sprintf(
                 '"%s -vv" should not dump workflow configuration to output.',
                 LoadWorkflowDefinitionsCommand::getDefaultName()
             )
@@ -219,17 +219,17 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
         $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), ['-vvv']);
 
-        static::assertStringContainsString('Loading workflow definitions...', $output);
-        static::assertStringContainsString('Done.', $output);
-        static::assertStringContainsString(
+        self::assertStringContainsString('Loading workflow definitions...', $output);
+        self::assertStringContainsString('Done.', $output);
+        self::assertStringContainsString(
             'Processed 1 workflow definitions: updated 0 existing workflows, created 1 new workflows',
             $output
         );
-        static::assertStringContainsString('> workflow_debug', $output);
-        static::assertStringContainsString(
+        self::assertStringContainsString('> workflow_debug', $output);
+        self::assertStringContainsString(
             $this->getWorkflowConfigurationDump('workflow_debug'),
             $output,
-            \sprintf(
+            sprintf(
                 '"%s -vvv" should output workflow configuration dump.',
                 LoadWorkflowDefinitionsCommand::getDefaultName()
             )
@@ -238,7 +238,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
     public function getWorkflowConfigurationDump(string $workflow): string
     {
-        return \str_replace(
+        return str_replace(
             '%WORKFLOW%',
             $workflow,
             CommandOutputNormalizer::toSingleLine(
@@ -247,7 +247,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         );
     }
 
-    private function assertCommandExecuted(array $messages): string
+    private function assertCommandExecuted(array $messages): void
     {
         $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName());
 
@@ -255,13 +255,11 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         foreach ($messages as $message) {
             self::assertStringContainsString($message, $output);
         }
-
-        return $output;
     }
 
     /**
      * @param WorkflowDefinition[] $definitions
-     * @param string $name
+     * @param string               $name
      */
     private function assertDefinitionLoaded(array $definitions, string $name): void
     {
@@ -278,8 +276,8 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
     /**
      * @param TransitionEventTrigger[] $triggers
-     * @param string $event
-     * @param string|null $field
+     * @param string                   $event
+     * @param string|null              $field
      */
     private function assertTransitionEventTriggerLoaded(array $triggers, string $event, ?string $field): void
     {
@@ -299,7 +297,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
     /**
      * @param TransitionCronTrigger[] $triggers
-     * @param string $cron
+     * @param string                  $cron
      */
     private function assertTransitionCronTriggerLoaded(array $triggers, string $cron): void
     {

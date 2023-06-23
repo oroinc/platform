@@ -9,14 +9,14 @@ class SearchItem
 {
     private string $id;
     private string $entityClass;
-    private string $entityId;
+    private mixed $entityId;
     private ?string $entityName;
     private ?string $entityUrl;
 
     public function __construct(
         string $id,
         string $entityClass,
-        string $entityId,
+        mixed $entityId,
         ?string $entityName,
         ?string $entityUrl
     ) {
@@ -46,7 +46,7 @@ class SearchItem
     /**
      * Gets an identifier of an entity associated with a search record.
      */
-    public function getEntityId(): string
+    public function getEntityId(): mixed
     {
         return $this->entityId;
     }

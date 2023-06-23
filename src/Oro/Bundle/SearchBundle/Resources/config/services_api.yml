@@ -15,20 +15,22 @@ services:
         arguments:
             - '@oro_search.api.search_field_resolver_factory'
 
+    oro_search.api.search_entity_class_provider:
+        class: Oro\Bundle\SearchBundle\Api\SearchEntityClassProvider
+        arguments:
+            - '@oro_search.index'
+            - '@oro_api.resources_provider'
+
     oro_search.api.search_entity_list_filter_helper:
         class: Oro\Bundle\SearchBundle\Api\SearchEntityListFilterHelper
         arguments:
-            - '@oro_search.provider.search_mapping'
-            - '@oro_search.index'
-            - '@oro_api.resources_provider'
+            - '@oro_search.api.search_entity_class_provider'
             - '@oro_api.value_normalizer'
 
     oro_search.api.search_entity_repository:
         class: Oro\Bundle\SearchBundle\Api\Repository\SearchEntityRepository
         arguments:
-            - '@oro_search.provider.search_mapping'
-            - '@oro_search.index'
-            - '@oro_api.resources_provider'
+            - '@oro_search.api.search_entity_class_provider'
             - '@oro_api.value_normalizer'
             - '@oro_entity_config.config_manager'
             - '@translator'

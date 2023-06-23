@@ -68,7 +68,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessException()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectExceptionMessage(sprintf(
             'Cron trigger should be an instance of %s, %s instance given',
             TransitionCronTrigger::class,
             TransitionEventTrigger::class
@@ -105,7 +105,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         $trigger = new TransitionCronTrigger();
         $trigger->setWorkflowDefinition($this->getEntity(WorkflowDefinition::class, ['name' => self::WORKFLOW_NAME]));
 
-        $workflow = $this->getWorkflowMock();
+        $workflow = $this->getWorkflow();
 
         $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
@@ -130,7 +130,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         $trigger->setTransitionName(self::TRANSITION_NAME)
             ->setWorkflowDefinition($this->getEntity(WorkflowDefinition::class, ['name' => self::WORKFLOW_NAME]));
 
-        $workflow = $this->getWorkflowMock($this->getTransition(true));
+        $workflow = $this->getWorkflow($this->getTransition(true));
 
         $entityClass = self::ENTITY_CLASS;
         $entity = new $entityClass();
@@ -162,7 +162,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         $trigger->setTransitionName(self::TRANSITION_NAME)
             ->setWorkflowDefinition($this->getEntity(WorkflowDefinition::class, ['name' => self::WORKFLOW_NAME]));
 
-        $workflow = $this->getWorkflowMock($this->getTransition(false));
+        $workflow = $this->getWorkflow($this->getTransition());
         $workflowItem = new WorkflowItem();
 
         $this->featureChecker->expects($this->once())
@@ -206,11 +206,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($trigger, TransitionTriggerMessage::create($trigger)));
     }
 
-    /**
-     * @param Transition $transition
-     * @return Workflow
-     */
-    private function getWorkflowMock(Transition $transition = null)
+    private function getWorkflow(Transition $transition = null): Workflow
     {
         $transitions = [];
 
@@ -229,11 +225,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         return $workflow;
     }
 
-    /**
-     * @param bool $isStart
-     * @return Transition
-     */
-    private function getTransition($isStart = false)
+    private function getTransition(bool $isStart = false): Transition
     {
         $transition = new Transition($this->createMock(TransitionOptionsResolver::class));
 

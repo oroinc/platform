@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Api\Repository;
 
-use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SearchBundle\Api\Model\SearchEntity;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use Oro\Bundle\SearchBundle\Api\SearchEntityClassProviderInterface;
 use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -18,24 +16,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class SearchEntityRepository
 {
-    private SearchMappingProvider $searchMappingProvider;
-    private Indexer $searchIndexer;
-    private ResourcesProvider $resourcesProvider;
+    private SearchEntityClassProviderInterface $searchEntityClassProvider;
     private ValueNormalizer $valueNormalizer;
     private ConfigManager $configManager;
     private TranslatorInterface $translator;
 
     public function __construct(
-        SearchMappingProvider $searchMappingProvider,
-        Indexer $searchIndexer,
-        ResourcesProvider $resourcesProvider,
+        SearchEntityClassProviderInterface $searchEntityClassProvider,
         ValueNormalizer $valueNormalizer,
         ConfigManager $configManager,
         TranslatorInterface $translator
     ) {
-        $this->searchMappingProvider = $searchMappingProvider;
-        $this->searchIndexer = $searchIndexer;
-        $this->resourcesProvider = $resourcesProvider;
+        $this->searchEntityClassProvider = $searchEntityClassProvider;
         $this->valueNormalizer = $valueNormalizer;
         $this->configManager = $configManager;
         $this->translator = $translator;
@@ -51,13 +43,10 @@ class SearchEntityRepository
     public function getSearchEntities(string $version, RequestType $requestType, ?bool $searchable = null): array
     {
         $result = [];
-        $searchAliases = $this->searchMappingProvider->getEntitiesListAliases();
-        $allowedSearchAliases = $this->searchIndexer->getAllowedEntitiesListAliases();
-        foreach ($searchAliases as $entityClass => $searchAlias) {
-            if (!$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)) {
-                continue;
-            }
-            $isSearchableEntity = isset($allowedSearchAliases[$entityClass]);
+        $accessibleEntityClasses = $this->searchEntityClassProvider->getAccessibleEntityClasses($version, $requestType);
+        $allowedEntityClasses = $this->searchEntityClassProvider->getAllowedEntityClasses($version, $requestType);
+        foreach ($accessibleEntityClasses as $entityClass => $searchAlias) {
+            $isSearchableEntity = isset($allowedEntityClasses[$entityClass]);
             if (null !== $searchable && $searchable !== $isSearchableEntity) {
                 continue;
             }

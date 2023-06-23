@@ -35,11 +35,10 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
     /** @var OwnershipMetadataInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ownershipMetadata;
 
-    /** @var SearchAclHelperConditionProvider|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var SearchAclHelperConditionProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $searchAclHelperConditionProvider;
 
-    /** @var array */
-    private $mappings = [
+    private array $mappings = [
         'Oro\Test\Entity\Organization'      => [
             'alias'        => 'testOrganization',
             'aclCondition' => [null, null, 'organization', 1, false] // no access
