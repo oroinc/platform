@@ -6,7 +6,9 @@ use Oro\Bundle\DraftBundle\Doctrine\DraftableFilter;
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Helper\DraftHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * Disable Draftable Filter for Draft actions based on kernel event
@@ -22,26 +24,44 @@ class DraftableFilterListener
 
     public function onKernelController(ControllerEvent $event): void
     {
-        $request = $event->getRequest();
-        $entityId = $request->get('entityId');
-        $className = null;
+        $this->handleRequest($event->getRequest(), $event->getController());
+    }
 
-        if ($entityId) {
-            $id = is_array($entityId) && isset($entityId['id']) ? $entityId['id'] : $entityId;
-            $className = $request->get('entityClass');
-        } else {
-            $id = $event->getRequest()->get('id');
-            if ($id) {
-                $className = $this->getClassName($event);
-            }
-        }
+    public function onKernelRequest(RequestEvent $event): void
+    {
+        $this->handleRequest($event->getRequest());
+    }
+
+    private function handleRequest(Request $request, callable $controller = null): void
+    {
+        $entityId = $request->get('entityId');
+
+        [$id, $className] = $entityId
+            ? $this->getClassFromRequest($request, $entityId)
+            : $this->getClassFromController($request, $controller);
 
         $this->allowDraftAction($id, $className);
     }
 
-    private function getClassName(ControllerEvent $event): ?string
+    private function getClassFromRequest(Request $request, $entityId): array
     {
-        $r = $this->getReflectionFunctionByController($event->getController());
+        $id = is_array($entityId) && isset($entityId['id']) ? $entityId['id'] : $entityId;
+        $className = $request->get('entityClass');
+
+        return [$id, $className];
+    }
+
+    private function getClassFromController(Request $request, callable $controller = null): array
+    {
+        $id = $request->get('id');
+        $className = $id && $controller ? $this->getClassName($controller) : null;
+
+        return [$id, $className];
+    }
+
+    private function getClassName(callable $controller): ?string
+    {
+        $r = $this->getReflectionFunctionByController($controller);
         $parameters = $r->getParameters();
         if (isset($parameters[0])) {
             $idParam = $parameters[0];
