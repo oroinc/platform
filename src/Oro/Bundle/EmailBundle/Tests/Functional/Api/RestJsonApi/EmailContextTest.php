@@ -121,7 +121,7 @@ class EmailContextTest extends RestJsonApiTestCase
                 $this->getUserData('user_5', false)
             ]
         ];
-        self::assertResponseContent($expectedContent, $filteredResponseContent, true);
+        self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
     public function testSearchWithMessageIdForNotExistingEmail(): void
