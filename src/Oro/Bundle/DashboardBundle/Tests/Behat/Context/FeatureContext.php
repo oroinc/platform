@@ -2,15 +2,28 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Behat\Context;
 
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
 class FeatureContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
+
+    private ?OroMainContext $mainContext = null;
+
+    /**
+     * @BeforeScenario
+     */
+    public function gatherContexts(BeforeScenarioScope $scope)
+    {
+        $environment = $scope->getEnvironment();
+        $this->mainContext = $environment->getContext(OroMainContext::class);
+    }
 
     /**
      * Example: I should see "Leads list" widget on dashboard
@@ -106,5 +119,29 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
         $widget = $this->createElement($widgetName);
         self::assertTrue($widget->isValid());
         $widget->clickLink($needle);
+    }
+
+    /**
+     * Example: And I add "Quick Launchpad" dashboard widget
+     *
+     * @Given /^(?:|I )add "(?P<widgetName>[^"]*)" dashboard widget$/
+     */
+    public function clickAdddashboardWidget($widgetName)
+    {
+        $this->mainContext->pressButton('Add widget');
+
+        $xpath = sprintf(
+            '//em[contains(translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"),"%s")]' .
+            '//ancestor::*[contains(@class, "widget-picker__item")]' .
+            '//button[contains(text(), "Add")]',
+            strtolower($widgetName),
+        );
+
+        $label = $this->getPage()->find('xpath', $xpath);
+        if ($label) {
+            $label->click();
+        } else {
+            self::fail(sprintf('There is no "Add" action for this "%s" dashboard widget', $widgetName));
+        }
     }
 }
