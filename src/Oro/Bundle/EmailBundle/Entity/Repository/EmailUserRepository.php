@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -141,10 +142,38 @@ class EmailUserRepository extends EntityRepository
     /**
      * @param array $ids
      * @param bool  $seen
-     *
-     * @return mixed
      */
     public function setEmailUsersSeen(array $ids, $seen)
+    {
+        $counter = 0;
+        $batchIds = [];
+        $em = $this->getEntityManager();
+
+        $em->beginTransaction();
+        try {
+            foreach ($ids as $id) {
+                $counter++;
+                $batchIds[] = $id;
+                if ($counter >= 100) {
+                    $this->getSetEmailUsersSeenQuery($batchIds, $seen)->execute();
+                    $counter = 0;
+                    $batchIds = [];
+                }
+            }
+
+            if (count($batchIds)) {
+                $this->getSetEmailUsersSeenQuery($batchIds, $seen)->execute();
+            }
+
+            $em->commit();
+        } catch (\Exception $e) {
+            $em->rollback();
+
+            throw $e;
+        }
+    }
+
+    private function getSetEmailUsersSeenQuery(array $ids, bool $seen): Query
     {
         $qb = $this->createQueryBuilder('email_user');
 
@@ -153,7 +182,7 @@ class EmailUserRepository extends EntityRepository
             ->andWhere('email_user.unsyncedFlagCount = 0')
             ->setParameter('seen', $seen)
             ->setParameter('ids', $ids)
-            ->getQuery()->execute();
+            ->getQuery();
     }
 
     /**

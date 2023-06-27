@@ -75,7 +75,7 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
             /* @var $staleImapEmails ImapEmail[] */
             foreach ($staleImapEmails as $imapEmail) {
                 if (in_array($imapEmail->getUid(), $existingUids)) {
-                    return;
+                    continue;
                 }
 
                 $email = $imapEmail->getEmail();

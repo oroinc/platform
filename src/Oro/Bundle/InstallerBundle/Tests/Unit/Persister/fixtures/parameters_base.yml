@@ -15,9 +15,11 @@ parameters:
     websocket_frontend_host: null
     websocket_frontend_port: 8080
     websocket_frontend_path: 'ws'
+    websocket_frontend_user_agent: null
     websocket_backend_host: null
     websocket_backend_port: 8080
     websocket_backend_path: 'ws'
+    websocket_backend_user_agent: null
     search_engine_name: orm
     search_engine_host: 127.0.0.1
     search_engine_port: null

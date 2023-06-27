@@ -3,6 +3,7 @@
 namespace Oro\Component\DoctrineUtils\ORM;
 
 use Doctrine\DBAL\Query\QueryException;
+use Doctrine\DBAL\SQLParserUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
@@ -83,6 +84,16 @@ class UnionQueryBuilder
         if (!empty($this->orderBy)) {
             foreach ($this->orderBy as $sort => $direction) {
                 $qb->addOrderBy($sort, $direction);
+            }
+        }
+
+        // move parameters from sub queries to the main query
+        foreach ($this->subQueries as $index => $subQuery) {
+            foreach ($subQuery->getParameters() as $parameter) {
+                $qb->setParameter(
+                    $this->getSubqueryParameterName($index, $parameter->getName()),
+                    $parameter->getValue()
+                );
             }
         }
 
@@ -311,10 +322,45 @@ class UnionQueryBuilder
     private function getFromStatement()
     {
         $subQueries = [];
-        foreach ($this->subQueries as $subQuery) {
-            $subQueries[] = '(' . QueryUtil::getExecutableSql($subQuery) . ')';
+        foreach ($this->subQueries as $index => $subQuery) {
+            $subQueries[] = '(' . $this->getExecutableSql($index, $subQuery) . ')';
         }
 
         return '(' . implode($this->unionAll ? ' UNION ALL ' : ' UNION ', $subQueries) . ')';
+    }
+
+    private function getExecutableSql(int $index, Query $query): string
+    {
+        $parsedQuery = QueryUtil::parseQuery($query);
+        $sql = $parsedQuery->getSqlExecutor()->getSqlStatements();
+
+        $parameters = $parsedQuery->getParameterMappings();
+        $paramPos = SQLParserUtils::getPlaceholderPositions($sql);
+
+        $parameterPositions = [];
+        foreach ($parameters as $parameterName => $positions) {
+            foreach ($positions as $position) {
+                $parameterPositions[$paramPos[$position]] = $parameterName;
+            }
+        }
+
+        $parameterPositions = array_reverse($parameterPositions, true);
+        foreach ($parameterPositions as $position => $parameterName) {
+            // return parameters with query index prefix instead of parameters data.
+            // parameters will be set to the main query.
+            $sql = substr_replace(
+                $sql,
+                ':' . $this->getSubqueryParameterName($index, $parameterName),
+                $position,
+                1
+            );
+        }
+
+        return $sql;
+    }
+
+    private function getSubqueryParameterName(int $index, string $parameterName): string
+    {
+        return 'q' . $index . '__' . $parameterName;
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -383,12 +384,19 @@ class UnionQueryBuilderTest extends OrmTestCase
             ->setParameter('id', 123);
         $qb->addSubQuery($subQb->getQuery());
 
+        $query = $qb->getQueryBuilder()->getQuery();
         self::assertEquals(
             'SELECT entity.id_0 AS id FROM ('
-            . '(SELECT g0_.id AS id_0 FROM Group g0_ WHERE g0_.id = 123)'
+            . '(SELECT g0_.id AS id_0 FROM Group g0_ WHERE g0_.id = :q0__id)'
             . ') entity',
-            $qb->getQueryBuilder()->getQuery()->getSQL()
+            $query->getSQL()
         );
+        /** @var ArrayCollection $parameters */
+        $parameters = $query->getParameters();
+        self::assertEquals(1, $parameters->count());
+        $parameter = $parameters->first();
+        self::assertEquals('q0__id', $parameter->getName());
+        self::assertEquals(123, $parameter->getValue());
     }
 
     public function testSubQueryWithSortingAndPaging()
@@ -410,5 +418,48 @@ class UnionQueryBuilderTest extends OrmTestCase
             . ') entity',
             $qb->getQueryBuilder()->getQuery()->getSQL()
         );
+    }
+
+    public function testSubQueryWithSeveralSubQueriesAndParameters(): void
+    {
+        $qb = new UnionQueryBuilder($this->em);
+        $qb->addSelect('id', 'id', Types::INTEGER);
+
+        $subQb = $this->em->getRepository(Entity\Group::class)
+            ->createQueryBuilder('e')
+            ->select('e.id')
+            ->where('e.id = :id')
+            ->setParameter('id', 123);
+        $qb->addSubQuery($subQb->getQuery());
+
+        $subQb = $this->em->getRepository(Entity\Group::class)
+            ->createQueryBuilder('e')
+            ->select('e.id')
+            ->where('e.id >= :id')
+            ->andWhere('e.id <> :notId')
+            ->setParameter('id', 456)
+            ->setParameter('notId', 85);
+        $qb->addSubQuery($subQb->getQuery());
+
+        $query = $qb->getQueryBuilder()->getQuery();
+        self::assertEquals(
+            'SELECT entity.id_0 AS id FROM ('
+            . '(SELECT g0_.id AS id_0 FROM Group g0_ WHERE g0_.id = :q0__id)'
+            . ' UNION ALL'
+            . ' (SELECT g0_.id AS id_0 FROM Group g0_ WHERE g0_.id >= :q1__id AND g0_.id <> :q1__notId)) entity',
+            $query->getSQL()
+        );
+        /** @var ArrayCollection $parameters */
+        $parameters = $query->getParameters();
+        self::assertEquals(3, $parameters->count());
+        $parameter = $parameters->first();
+        self::assertEquals('q0__id', $parameter->getName());
+        self::assertEquals(123, $parameter->getValue());
+        $parameter = $parameters->get(1);
+        self::assertEquals('q1__id', $parameter->getName());
+        self::assertEquals(456, $parameter->getValue());
+        $parameter = $parameters->get(2);
+        self::assertEquals('q1__notId', $parameter->getName());
+        self::assertEquals(85, $parameter->getValue());
     }
 }
