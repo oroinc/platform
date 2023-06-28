@@ -45,7 +45,34 @@ define(function(require, exports, module) {
          */
         initialize: function(options) {
             this.defaults = $.extend(true, {}, $.fn[NAME].defaults, allowedConfig, options || {});
+
+            this.init();
+            $(window).on(`beforeprint${this.eventNamespace()}`, () => this.destroy());
+            $(window).on(`afterprint${this.eventNamespace()}`, () => this.init());
+        },
+
+        eventNamespace: function() {
+            return '.delegateEvents' + this.cid;
+        },
+
+        /**
+         * Initialize scroll bar
+         */
+        init() {
+            if (this.scrollBar) {
+                this.destroy();
+            }
             this.scrollBar = new OverlayScrollBars(this.element, this.defaults);
+        },
+
+        /**
+         * destroy scroll bar
+         */
+        destroy() {
+            if (this.scrollBar) {
+                this.scrollBar.destroy();
+                delete this.scrollBar;
+            }
         },
 
         /**
@@ -56,12 +83,9 @@ define(function(require, exports, module) {
                 return;
             }
 
-            if (this.scrollBar) {
-                this.scrollBar.destroy();
-                delete this.scrollBar;
-            }
-
+            this.destroy();
             $.removeData(this.element, DATA_KEY);
+            $(window).off(this.eventNamespace());
 
             delete this.defaults;
             ScrollBar.__super__.dispose.call(this);
@@ -79,7 +103,7 @@ define(function(require, exports, module) {
          * Proxy for OverlayScrollBars.update method
          */
         update: function(...args) {
-            if (this.disposed) {
+            if (!this.scrollBar || this.disposed) {
                 return;
             }
             this.scrollBar.update(...args);
