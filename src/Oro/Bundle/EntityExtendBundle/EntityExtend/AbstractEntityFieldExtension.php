@@ -84,7 +84,7 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
         $propertyName = $propertyName ?? $transport->getName();
         $defaultValue = null;
         if (!$transport->getStorage()->offsetExists($propertyName)) {
-            if ($transport->getObjectVar($propertyName)) {
+            if (null !== $transport->getObjectVar($propertyName)) {
                 $defaultValue = $transport->getObjectVar($propertyName);
             } elseif (array_key_exists($propertyName, $this->getCollectionFields($transport))) {
                 $defaultValue = new ArrayCollection();
