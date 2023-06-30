@@ -332,21 +332,23 @@ define(function(require, exports, module) {
              * @param {string=} path
              */
             (function parseBackendErrors(obj, path) {
-                _.each(obj, function(item, name) {
-                    let _path;
+                for (const [name, item] of Object.entries(obj)) {
+                    const _path = path ? `${path}[${name}]` : namePrefix ? `${namePrefix}[${name}]` : name;
+
                     if (name === 'children') {
                         // skip 'children' level
                         parseBackendErrors(item, path);
                     } else {
-                        _path = path ? `${path}[${name}]` : namePrefix ? `${namePrefix}[${name}]` : name;
-                        if ('errors' in item && _.isArray(item.errors)) {
-                            // only first error to show
-                            result[_path] = item.errors[0];
-                        } else if (_.isObject(item)) {
-                            parseBackendErrors(item, _path);
+                        if (typeof item === 'object' && item !== null) {
+                            if ('errors' in item && Array.isArray(item.errors)) {
+                                // only first error to show
+                                result[_path] = item.errors[0];
+                            } else {
+                                parseBackendErrors(item, _path);
+                            }
                         }
                     }
-                });
+                }
             })(errors);
 
             result = _.omit(result, function(message, name) {
