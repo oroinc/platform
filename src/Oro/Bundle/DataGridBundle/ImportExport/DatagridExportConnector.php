@@ -194,6 +194,13 @@ class DatagridExportConnector implements
         return $this->getContext()->getReadCount() < $this->totalCount;
     }
 
+    protected function incrementPage(): void
+    {
+        if (!$this->getExactPage()) {
+            ++$this->page;
+        }
+    }
+
     /**
      * @return ResultsObject
      */
@@ -209,6 +216,7 @@ class DatagridExportConnector implements
             PagerInterface::PAGE_PARAM     => $this->getPage(),
             PagerInterface::PER_PAGE_PARAM => $this->getPageSize()
         ];
+        $this->incrementPage();
         if (null !== $this->totalCount) {
             $pagerParameters[PagerInterface::ADJUSTED_COUNT] = $this->totalCount;
         }
