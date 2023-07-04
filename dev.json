@@ -102,7 +102,7 @@
         "dragonmantank/cron-expression": "~3.1.0",
         "gos/web-socket-bundle": "3.6.*",
         "guzzlehttp/guzzle": "~7.4.5",
-        "guzzlehttp/psr7": "~1.9.0",
+        "guzzlehttp/psr7": "~1.9.1",
         "lexik/maintenance-bundle": "2.1.5",
         "composer/composer": "~1.10.26 || ~2.2.12",
         "akeneo/batch-bundle": "0.4.14",
