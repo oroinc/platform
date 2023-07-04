@@ -7,6 +7,8 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier as TestEntity;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,7 +54,9 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                                 'data' => null
                             ],
                             'children' => [
-                                'data' => []
+                                'data' => [
+                                    ['type' => $entityType, 'id' => $this->getEntityId('item 3')]
+                                ]
                             ]
                         ]
                     ],
@@ -65,7 +69,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         ],
                         'relationships' => [
                             'parent'   => [
-                                'data' => null
+                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 3')]
                             ],
                             'children' => [
                                 'data' => []
@@ -264,7 +268,9 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                                 'data' => null
                             ],
                             'children' => [
-                                'data' => []
+                                'data' => [
+                                    ['type' => $entityType, 'id' => $this->getEntityId('item 3')]
+                                ]
                             ]
                         ]
                     ],
@@ -358,6 +364,69 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                             ]
                         ]
                     ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListFilterByChildId()
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[children]' => $this->getEntityId('item 3')]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'          => $entityType,
+                        'id'            => $this->getEntityId('item 1'),
+                        'attributes'    => [
+                            'databaseId' => '@test_custom_id1->id',
+                            'name'       => 'Item 1'
+                        ],
+                        'relationships' => [
+                            'parent'   => [
+                                'data' => null
+                            ],
+                            'children' => [
+                                'data' => [
+                                    ['type' => $entityType, 'id' => $this->getEntityId('item 3')]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListFilterByAssociationThatNameEqualsToDatabaseKeyword()
+    {
+        $this->appendEntityConfig(
+            TestOrder::class,
+            [
+                'identifier_field_names' => ['poNumber']
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestOrderLineItem::class);
+        $lineItemId = $this->getReference('order_line_item1')->getId();
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[order]' => 'PO1']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => (string)$lineItemId]
                 ]
             ],
             $response
@@ -667,22 +736,12 @@ class CustomIdentifierTest extends RestJsonApiTestCase
     {
         $entityType = $this->getEntityType(TestEntity::class);
 
-        $data = [
-            'data' => [
-                'type'       => $entityType,
-                'id'         => $this->getEntityId('item 3'),
-                'attributes' => [
-                    'name' => 'Updated Name'
-                ]
-            ]
-        ];
-
-        $this->delete(['entity' => $entityType, 'id' => $this->getEntityId('item 3')], $data);
+        $this->delete(['entity' => $entityType, 'id' => $this->getEntityId('item 2')]);
 
         $this->getEntityManager()->clear();
         $deletedEntity = $this->getEntityManager()
             ->getRepository(TestEntity::class)
-            ->findOneBy(['key' => 'item 3']);
+            ->findOneBy(['key' => 'item 2']);
         self::assertNull($deletedEntity);
     }
 
@@ -708,7 +767,9 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                             'data' => null
                         ],
                         'children' => [
-                            'data' => []
+                            'data' => [
+                                ['type' => $entityType, 'id' => $this->getEntityId('item 3')]
+                            ]
                         ]
                     ]
                 ]
@@ -760,7 +821,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         ],
                         'relationships' => [
                             'parent'   => [
-                                'data' => null
+                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 3')]
                             ],
                             'children' => [
                                 'data' => []

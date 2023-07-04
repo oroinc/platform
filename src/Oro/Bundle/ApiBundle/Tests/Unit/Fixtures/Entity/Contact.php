@@ -30,6 +30,12 @@ class Contact
      */
     protected $accounts;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Group")
+     * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable=false)
+     */
+    protected $group;
+
     public function __construct()
     {
         $this->accounts = new ArrayCollection();
@@ -89,5 +95,21 @@ class Contact
             $this->getAccounts()->removeElement($account);
             $account->removeContact($this);
         }
+    }
+
+    /**
+     * @return Group|null
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
+
+    /**
+     * @param Group|null $group
+     */
+    public function setGroup($group): void
+    {
+        $this->group = $group;
     }
 }
