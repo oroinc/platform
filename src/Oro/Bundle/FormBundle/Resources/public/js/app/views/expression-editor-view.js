@@ -1,6 +1,12 @@
 import $ from 'jquery';
 import _ from 'underscore';
 import BaseView from 'oroui/js/app/views/base/view';
+
+import {EditorState} from '@codemirror/state';
+import {EditorView} from '@codemirror/view';
+
+import expressionEditorExtensions from 'oroform/js/app/views/expression-editor-extensions';
+
 import 'bootstrap-typeahead';
 
 const Typeahead = $.fn.typeahead.Constructor;
@@ -100,6 +106,18 @@ const ExpressionEditorView = BaseView.extend({
             updater: this._typeaheadUpdater.bind(this)
         });
 
+        const startState = EditorState.create({
+            doc: this.el.value,
+            extensions: expressionEditorExtensions({
+                util: this.util
+            })
+        });
+
+        this.editorView = new EditorView({
+            state: startState,
+            parent: this.el.parentNode
+        });
+
         this.typeahead = this.$el.data('typeahead');
         this.typeahead.$menu.addClass('expression-editor-autocomplete');
     },
@@ -156,6 +174,11 @@ const ExpressionEditorView = BaseView.extend({
      */
     setValue(value) {
         this.$el.val(value);
+
+        const transaction = this.editorView.state.replaceSelection(value);
+        const update = this.editorView.state.update(transaction);
+        this.editorView.update([update]);
+
         const isValid = this.isValid();
         this._toggleErrorState(isValid);
         this.trigger('change', value, isValid);
