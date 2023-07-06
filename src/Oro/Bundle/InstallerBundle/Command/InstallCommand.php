@@ -589,6 +589,7 @@ HELP
             $cacheClearOptions['--env'] = $input->getOption('env');
         }
         $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
+        $commandExecutor->runCommand('router:cache:clear', ['--process-isolation' => true]);
     }
 
     protected function processInstallerScripts(OutputInterface $output, CommandExecutor $commandExecutor): void
