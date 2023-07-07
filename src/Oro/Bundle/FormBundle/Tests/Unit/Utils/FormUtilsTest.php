@@ -12,6 +12,9 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\Test\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FormUtilsTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -244,6 +247,64 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
                 ['attr' => ['readonly' => true]],
                 ['attr' => ['readonly' => true]],
             ]
+        ];
+    }
+
+    /**
+     * @dataProvider mergeOptionsDataProvider
+     */
+    public function testMergeFieldOptionsRecursive(
+        array $fieldOptions = [],
+        array $mergeOptions = [],
+        array $expectedOptions = []
+    ): void {
+        $testFieldName = 'testField';
+
+        $typeStub = new EntityTypeStub();
+        $rootForm = $this->createMock(FormInterface::class);
+        $childForm = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formType = $this->createMock(ResolvedFormTypeInterface::class);
+        $formType->expects(self::any())
+            ->method('getInnerType')
+            ->willReturn($typeStub);
+
+        $rootForm->expects(self::once())
+            ->method('get')
+            ->with($testFieldName)
+            ->willReturn($childForm);
+
+        $childForm->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
+
+        $formConfig->expects(self::once())
+            ->method('getType')
+            ->willReturn($formType);
+        $formConfig->expects(self::once())
+            ->method('getOptions')
+            ->willReturn($fieldOptions);
+
+        $rootForm->expects(self::once())
+            ->method('add')
+            ->with($testFieldName, EntityTypeStub::class, $expectedOptions);
+
+        FormUtils::mergeFieldOptionsRecursive($rootForm, $testFieldName, $mergeOptions);
+    }
+
+    public function mergeOptionsDataProvider(): array
+    {
+        return [
+            'Merge scalar values' => [
+                ['option' => 'first_value'],
+                ['option' => 'second_value'],
+                ['option' => ['first_value', 'second_value']],
+            ],
+            'Merge array values' => [
+                ['attr' => ['constraint' => ['first_constraint']]],
+                ['attr' => ['constraint' => ['second_constraint']]],
+                ['attr' => ['constraint' => ['first_constraint', 'second_constraint']]]
+            ],
         ];
     }
 }

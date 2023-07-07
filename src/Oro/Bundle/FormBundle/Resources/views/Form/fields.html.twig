@@ -406,7 +406,7 @@
             {% set allow_delete = allow_delete and widget.vars.allow_delete %}
         {% endif %}
     {% endif %}
-    <div class="oro-collection-item"
+    <div class="oro-collection-item {% if not form.vars.valid and form.vars.errors|length %}error{% endif %}"
         data-content="{{ name }}"
         {% if not skip_optional_validation_group %}
             data-validation-optional-group
