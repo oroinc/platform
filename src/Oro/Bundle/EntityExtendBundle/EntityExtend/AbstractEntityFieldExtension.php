@@ -232,4 +232,17 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
             $this->addItemToCollection($collection, $item, $transport, $transport->getName());
         }
     }
+
+    public function getMethodInfo(EntityFieldProcessTransport $transport): void
+    {
+        $methods = $this->getMethods($transport);
+        $fieldsMetadata = $transport->getFieldsMetadata();
+        if (!isset($methods[$transport->getName()])
+            || is_array($methods[$transport->getName()])
+            || empty($fieldsMetadata)) {
+            return;
+        }
+        $transport->setResult($fieldsMetadata[$methods[$transport->getName()]] ?? []);
+        $transport->setProcessed(true);
+    }
 }

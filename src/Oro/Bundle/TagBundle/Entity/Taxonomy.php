@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TagBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroTagBundle_Entity_Taxonomy;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -65,6 +66,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          },
  *      }
  * )
+ * @mixin OroTagBundle_Entity_Taxonomy
  */
 class Taxonomy implements ExtendEntityInterface
 {

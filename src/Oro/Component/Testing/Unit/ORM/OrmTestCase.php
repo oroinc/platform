@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Testing\Unit\ORM;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Driver\Connection;
 use Oro\Component\Testing\TempDirExtension;
@@ -39,6 +40,14 @@ abstract class OrmTestCase extends TestCase
     protected function getProxyDir(bool $shouldBeCreated = true): string
     {
         return $this->getTempDir('test_orm_proxies', $shouldBeCreated);
+    }
+
+    /**
+     * @before
+     */
+    protected function addSkipAnnotationMixinValidation(): void
+    {
+        AnnotationReader::addGlobalIgnoredName('mixin');
     }
 
     /**

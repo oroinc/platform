@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NoteBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroNoteBundle_Entity_Note;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
@@ -48,6 +49,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *          }
  *      }
  * )
+ * @mixin OroNoteBundle_Entity_Note
  */
 class Note implements
     DatesAwareInterface,

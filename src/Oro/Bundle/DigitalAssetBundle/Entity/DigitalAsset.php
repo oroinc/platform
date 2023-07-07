@@ -5,6 +5,7 @@ namespace Oro\Bundle\DigitalAssetBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroDigitalAssetBundle_Entity_DigitalAsset;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
@@ -70,6 +71,7 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  * @method LocalizedFallbackValue getTitle(Localization $localization = null)
  * @method LocalizedFallbackValue getDefaultTitle()
  * @method Collection getChildFiles()
+ * @mixin OroDigitalAssetBundle_Entity_DigitalAsset
  */
 class DigitalAsset implements DatesAwareInterface, OrganizationAwareInterface, ExtendEntityInterface
 {

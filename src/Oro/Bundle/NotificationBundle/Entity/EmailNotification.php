@@ -4,6 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroNotificationBundle_Entity_EmailNotification;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -33,6 +34,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
  *          }
  *      }
  * )
+ * @mixin OroNotificationBundle_Entity_EmailNotification
  */
 class EmailNotification implements ExtendEntityInterface
 {

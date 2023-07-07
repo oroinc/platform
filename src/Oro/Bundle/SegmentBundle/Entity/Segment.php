@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroSegmentBundle_Entity_Segment;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -41,6 +42,7 @@ use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
  *          }
  *      }
  * )
+ * @mixin OroSegmentBundle_Entity_Segment
  */
 class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterface, ExtendEntityInterface
 {

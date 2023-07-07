@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroAttachmentBundle_Entity_FileItem;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -15,6 +16,7 @@ use Oro\Bundle\FormBundle\Entity\EmptyItem;
  * @ORM\Table(name="oro_attachment_file_item")
  * @ORM\Entity()
  * @Config
+ * @mixin OroAttachmentBundle_Entity_FileItem
  */
 class FileItem implements EmptyItem, ExtendEntityInterface
 {

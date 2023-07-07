@@ -22,4 +22,5 @@ interface EntityFieldExtensionInterface
     public function methodExists(EntityFieldProcessTransport $transport): void;
 
     public function getMethods(EntityFieldProcessTransport $transport): array;
+    public function getMethodInfo(EntityFieldProcessTransport $transport): void;
 }

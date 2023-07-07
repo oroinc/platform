@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroUserBundle_Entity_Role;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
@@ -35,6 +36,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  *      }
  * )
  * @property OrganizationInterface $organization
+ * @mixin OroUserBundle_Entity_Role
  */
 class Role extends AbstractRole implements ExtendEntityInterface
 {

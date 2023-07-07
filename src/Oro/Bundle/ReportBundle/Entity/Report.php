@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ReportBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroReportBundle_Entity_Report;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -40,6 +41,7 @@ use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
  *          }
  *      }
  * )
+ * @mixin OroReportBundle_Entity_Report
  */
 class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface, ExtendEntityInterface
 {

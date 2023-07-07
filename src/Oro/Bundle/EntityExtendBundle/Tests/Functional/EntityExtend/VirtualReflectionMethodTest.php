@@ -110,8 +110,8 @@ class VirtualReflectionMethodTest extends WebTestCase
                 'expectedResult' => 0
             ],
             'extended method set' => [
-                'class' => User::class,
-                'name' => 'setPhone',
+                'class' => AttributeFamily::class,
+                'name' => 'setDefaultLabel',
                 'expectedResult' => 1
             ],
             'extended method get' => [
