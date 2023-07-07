@@ -42,19 +42,11 @@ class ExtendClassLoadingUtils
     }
 
     /**
-     * Returns a path of a configuration file contains class aliases for extended entities.
+     * Checks if a configuration file contains generated classes for enums and custom exists.
      */
-    public static function getAliasesPath(string $cacheDir): string
+    public static function classesExist(string $cacheDir): bool
     {
-        return self::getEntityCacheDir($cacheDir) . DIRECTORY_SEPARATOR . 'aliases.php';
-    }
-
-    /**
-     * Checks if a configuration file contains class aliases for extended entities exists.
-     */
-    public static function aliasesExist(string $cacheDir): bool
-    {
-        return file_exists(self::getAliasesPath($cacheDir));
+        return file_exists(self::getEntityClassesPath($cacheDir));
     }
 
     /**
@@ -67,19 +59,11 @@ class ExtendClassLoadingUtils
             self::getEntityClassesPath($cacheDir)
         );
         $loader->register();
-    }
-
-    /**
-     * Gets class aliases for extended entities.
-     */
-    public static function getAliases(string $cacheDir): array
-    {
-        $aliases = @include self::getAliasesPath($cacheDir);
-        if (false === $aliases || !\is_array($aliases)) {
-            $aliases = [];
-        }
-
-        return $aliases;
+        $autocompleteLoader = new OneFileClassLoader(
+            self::getAutocompleteNamespace() . '\\',
+            self::getAutocompleteClassesPath($cacheDir)
+        );
+        $autocompleteLoader->register();
     }
 
     /**
@@ -92,5 +76,37 @@ class ExtendClassLoadingUtils
         if (!is_dir($dir) && false === @mkdir($dir, 0777, true)) {
             throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $dir));
         }
+    }
+
+    public static function getAutocompleteNamespace(): string
+    {
+        return 'Extend\Entity\Autocomplete';
+    }
+
+    public static function getAutocompleteClassesPath(string $cacheDir): string
+    {
+        return self::getEntityCacheDir($cacheDir) . DIRECTORY_SEPARATOR . 'autocomplete.php';
+    }
+
+    public static function getAutocompleteClassName(string $className): string
+    {
+        $parts = explode('\\', $className);
+        $shortClassName = array_pop($parts);
+        if (str_starts_with($shortClassName, 'Extend')) {
+            $shortClassName = substr($shortClassName, 6);
+        }
+        $autocompleteShortClassName = array_shift($parts);
+        $nameParts = [];
+        foreach ($parts as $item) {
+            if ($item === 'Bundle' || $item === 'Model') {
+                continue;
+            }
+            if (!isset($nameParts[$item])) {
+                $nameParts[$item] = true;
+                $autocompleteShortClassName .= $item . '_';
+            }
+        }
+
+        return $autocompleteShortClassName . $shortClassName;
     }
 }

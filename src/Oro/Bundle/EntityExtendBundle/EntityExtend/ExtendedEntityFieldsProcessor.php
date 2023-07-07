@@ -120,6 +120,19 @@ class ExtendedEntityFieldsProcessor
         return $methods;
     }
 
+    public static function getMethodInfo(EntityFieldProcessTransport $transport): array
+    {
+        self::extendTransportWithMetadataProvider($transport);
+        foreach (self::$iterator->getExtensions() as $extension) {
+            $extension->getMethodInfo($transport);
+            if ($transport->isProcessed()) {
+                return $transport->getResult();
+            }
+        }
+
+        return [];
+    }
+
     public static function getEntityMetadata(object|string $objectOrClass): ?ConfigInterface
     {
         if (is_object($objectOrClass)) {
@@ -127,5 +140,14 @@ class ExtendedEntityFieldsProcessor
         }
 
         return self::$metadataProvider->getExtendEntityMetadata($objectOrClass);
+    }
+
+    public static function getEntityFieldsMetadata(object|string $objectOrClass): array
+    {
+        if (is_object($objectOrClass)) {
+            $objectOrClass = CachedClassUtils::getClass($objectOrClass);
+        }
+
+        return self::$metadataProvider->getExtendEntityFieldsMetadata($objectOrClass);
     }
 }

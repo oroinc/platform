@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroActivityListBundle_Entity_ActivityList;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -55,6 +56,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @method ActivityList hasActivityListTarget($target)
  * @method ActivityList getActivityListTargets($targetClass = null)
  * @method ActivityList addActivityListTarget($target)
+ * @mixin OroActivityListBundle_Entity_ActivityList
  */
 class ActivityList implements
     DatesAwareInterface,

@@ -1,0 +1,18 @@
+oro:
+  testframework:
+    testextendedentity:
+      entity_label: Test Extended Entity
+      entity_plural_label: Test Extended Entities
+      entity_grid_all_view_label: All Test Extended Entities
+      id:
+        label: ID
+      regular_field:
+        label: Regular Field
+      name:
+        label: Name
+      bi_m2_o_owners:
+        label: Bi M2O Owners
+      bi_m2_m_owners:
+        label: Bi M2M Owners
+      bi_o2_m_owner:
+        label: Bi O2M Owner

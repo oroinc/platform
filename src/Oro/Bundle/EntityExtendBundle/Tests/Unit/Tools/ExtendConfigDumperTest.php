@@ -84,11 +84,11 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             $extensions
         );
     }
-    public function testCheckConfigWhenAliasesExists()
+    public function testCheckConfigWhenClassesExists()
     {
         $fs = new Filesystem();
         $fs->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
-        $fs->touch(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir));
+        $fs->touch(ExtendClassLoadingUtils::getEntityClassesPath($this->cacheDir));
 
         $this->configProvider->addEntityConfig(
             self::CLASS_NAMESPACE . '\Entity\TestEntity1',
@@ -302,14 +302,14 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testClearWithEntityEliasExists()
+    public function testClearWithEntityClassesExists()
     {
         $fs = new Filesystem();
         $entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir);
         $fs->mkdir($entityCacheDir);
-        $aliasDataFile = ExtendClassLoadingUtils::getAliasesPath($this->cacheDir);
-        $fs->touch($aliasDataFile);
-        self::assertTrue($fs->exists($aliasDataFile));
+        $classesDataFile = ExtendClassLoadingUtils::getEntityClassesPath($this->cacheDir);
+        $fs->touch($classesDataFile);
+        self::assertTrue($fs->exists($classesDataFile));
 
         $this->entityManagerBag->expects($this->once())
             ->method('getEntityManagers')
@@ -318,7 +318,7 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
         $dumper = $this->getExtendConfigDumper();
         $dumper->clear();
 
-        self::assertFalse($fs->exists($aliasDataFile));
+        self::assertFalse($fs->exists($classesDataFile));
         self::assertTrue($fs->exists($entityCacheDir));
 
         $fs->remove($entityCacheDir);

@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroUserBundle_Entity_User;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
@@ -82,6 +83,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  * )
  * @method setAuthStatus(AbstractEnumValue $enum)
  * @method AbstractEnumValue getAuthStatus()
+ * @mixin OroUserBundle_Entity_User
  */
 class User extends AbstractUser implements
     EmailOwnerInterface,
@@ -465,7 +467,7 @@ class User extends AbstractUser implements
     /**
      * {@inheritdoc}
      */
-    public function setUsername($username): self
+    public function setUsername($username): static
     {
         parent::setUsername($username);
         $this->usernameLowercase = $username

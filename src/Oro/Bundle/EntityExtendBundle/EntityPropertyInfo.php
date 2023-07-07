@@ -94,6 +94,26 @@ class EntityPropertyInfo
         return ExtendedEntityFieldsProcessor::getMethods(self::createTransport($objectOrClass));
     }
 
+    /**
+     * @return array<array{
+     *     fieldName: string,
+     *     fieldType: string,
+     *     is_extend: bool,
+     *     is_nullable: bool,
+     *     is_serialized: bool
+     * }>
+     */
+    public static function getExtendedMethodInfo(object|string $objectOrClass, string $method): array
+    {
+        if (!is_subclass_of($objectOrClass, ExtendEntityInterface::class)) {
+            return [];
+        }
+        $transport = self::createTransport($objectOrClass);
+        $transport->setName($method);
+
+        return ExtendedEntityFieldsProcessor::getMethodInfo($transport);
+    }
+
     private static function createTransport(object|string $objectOrClass): EntityFieldProcessTransport
     {
         $transport = new EntityFieldProcessTransport();

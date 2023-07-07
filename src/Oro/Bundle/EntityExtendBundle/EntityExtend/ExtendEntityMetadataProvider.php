@@ -50,6 +50,7 @@ class ExtendEntityMetadataProvider implements ExtendEntityMetadataProviderInterf
                 'fieldName' => $fieldName,
                 'fieldType' => $config->getId()->getFieldType(),
                 'is_extend' => $configValues['is_extend'],
+                'is_nullable' => $configValues['nullable'] ?? false,
                 'is_serialized' => $configValues['is_serialized'],
             ];
             if (isset($configValues['default'])) {
