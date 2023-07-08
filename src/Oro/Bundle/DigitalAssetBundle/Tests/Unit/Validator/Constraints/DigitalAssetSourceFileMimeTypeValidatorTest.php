@@ -4,7 +4,7 @@ namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Validator\Constraints;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
@@ -142,7 +142,7 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
 
     public function testValidateWhenPersistentCollection(): void
     {
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $childFiles = new PersistentCollection(
             $entityManager,
             $this->createMock(ClassMetadata::class),

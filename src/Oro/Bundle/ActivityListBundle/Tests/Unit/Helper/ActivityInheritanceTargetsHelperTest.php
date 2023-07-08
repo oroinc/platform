@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Helper;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -166,11 +166,10 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
 
     private function prepareMock(): QueryBuilder
     {
-        $em = $this->createMock(EntityManager::class);
-        $expr = new Expr();
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())
             ->method('getExpressionBuilder')
-            ->willReturn($expr);
+            ->willReturn(new Expr());
 
         $mainQb = new QueryBuilder($em);
         $inheritedQb = clone $mainQb;

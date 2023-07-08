@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -23,7 +23,7 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var FileListener */
@@ -33,7 +33,7 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->fileManager = $this->createMock(FileManager::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
 
         $this->listener = new FileListener($this->fileManager, $this->tokenAccessor);
     }

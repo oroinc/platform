@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
@@ -20,7 +20,7 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
     /** @var TagGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tagGenerator;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
@@ -36,7 +36,7 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->tagGenerator = $this->createMock(TagGeneratorInterface::class);
         $this->dataUpdateTopicSender = $this->createMock(DataUpdateTopicSender::class);
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->uow = $this->createMock(UnitOfWork::class);
         $applicationState = $this->createMock(ApplicationState::class);
         $applicationState->expects(self::any())

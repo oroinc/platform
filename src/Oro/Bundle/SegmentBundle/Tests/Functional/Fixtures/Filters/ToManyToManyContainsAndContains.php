@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Fixtures\Filters;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
@@ -21,18 +21,18 @@ use Oro\Bundle\UserBundle\Entity\User;
 class ToManyToManyContainsAndContains implements FixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function assert(\PHPUnit\Framework\Assert $assertions, array $actualData)
+    public function assert(\PHPUnit\Framework\Assert $assertions, array $actualData): void
     {
         $assertions->assertCount(1, $actualData);
         $assertions->assertEquals('a', $actualData[0]['c1']);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function createData(EntityManager $em)
+    public function createData(EntityManagerInterface $em): void
     {
         $organization = $em
             ->getRepository(Organization::class)
@@ -86,9 +86,9 @@ class ToManyToManyContainsAndContains implements FixtureInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function createSegment(EntityManager $em)
+    public function createSegment(EntityManagerInterface $em): Segment
     {
         $organization = $em
             ->getRepository(Organization::class)
@@ -100,7 +100,7 @@ class ToManyToManyContainsAndContains implements FixtureInterface
             ->setType(
                 $em
                     ->getRepository(SegmentType::class)
-                    ->findOneByName(SegmentType::TYPE_DYNAMIC)
+                    ->findOneBy(['name' => SegmentType::TYPE_DYNAMIC])
             )
             ->setEntity(BusinessUnit::class)
             ->setDefinition(QueryDefinitionUtil::encodeDefinition([

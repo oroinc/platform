@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Async;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
@@ -22,10 +22,8 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
     private const RECIPIENT_USER_ID = 7;
 
     private EmailTemplateManager|\PHPUnit\Framework\MockObject\MockObject $emailTemplateManager;
-
+    private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager;
     private SendEmailNotificationTemplateProcessor $processor;
-
-    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     protected function setUp(): void
     {
@@ -39,7 +37,7 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
         );
         $this->setUpLoggerMock($this->processor);
 
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $managerRegistry->expects(self::any())
             ->method('getManagerForClass')
             ->with(User::class)

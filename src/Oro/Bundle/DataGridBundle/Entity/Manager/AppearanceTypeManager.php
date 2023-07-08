@@ -2,39 +2,40 @@
 
 namespace Oro\Bundle\DataGridBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 
+/**
+ * Provides datagrid appearance types.
+ */
 class AppearanceTypeManager
 {
-    /** @var EntityManager */
-    protected $em;
+    private ManagerRegistry $doctrine;
+    private ?array $appearanceTypes = null;
 
-    /** @var  array */
-    protected $appearanceTypes;
-
-    public function __construct(EntityManager $em)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
     }
 
     /**
-     * Get appearance types
+     * Gets appearance types.
      *
-     * @return array
+     * @return array [name => ['label' => label, 'icon' => icon], ...]
      */
-    public function getAppearanceTypes()
+    public function getAppearanceTypes(): array
     {
         if (null === $this->appearanceTypes) {
-            $this->appearanceTypes = [];
-            $types = $this->em->getRepository('OroDataGridBundle:AppearanceType')->findAll();
-            /** @var  $type AppearanceType */
+            $appearanceTypes = [];
+            $types = $this->doctrine->getRepository(AppearanceType::class)->findAll();
+            /** @var AppearanceType $type */
             foreach ($types as $type) {
-                $this->appearanceTypes[$type->getName()] = [
+                $appearanceTypes[$type->getName()] = [
                     'label' => $type->getLabel(),
                     'icon'  => $type->getIcon()
                 ];
             }
+            $this->appearanceTypes = $appearanceTypes;
         }
 
         return $this->appearanceTypes;

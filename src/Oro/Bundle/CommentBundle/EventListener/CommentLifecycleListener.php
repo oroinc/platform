@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CommentBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\CommentBundle\Entity\Comment;
@@ -27,13 +27,11 @@ class CommentLifecycleListener
         $this->setUpdatedProperties($entity, $args->getEntityManager(), true);
     }
 
-    /**
-     * @param Comment       $comment
-     * @param EntityManager $entityManager
-     * @param bool          $update
-     */
-    protected function setUpdatedProperties(Comment $comment, EntityManager $entityManager, $update = false)
-    {
+    protected function setUpdatedProperties(
+        Comment $comment,
+        EntityManagerInterface $entityManager,
+        bool $update = false
+    ): void {
         $newUpdatedBy = $this->getUser($entityManager);
         $unitOfWork   = $entityManager->getUnitOfWork();
 
@@ -44,12 +42,7 @@ class CommentLifecycleListener
         $comment->setUpdatedBy($newUpdatedBy);
     }
 
-    /**
-     * @param EntityManager $entityManager
-     *
-     * @return UserInterface|null
-     */
-    protected function getUser(EntityManager $entityManager)
+    protected function getUser(EntityManagerInterface $entityManager): ?UserInterface
     {
         $user = $this->tokenAccessor->getUser();
 

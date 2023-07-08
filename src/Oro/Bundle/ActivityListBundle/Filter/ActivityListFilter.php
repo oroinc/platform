@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Filter;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -125,18 +125,11 @@ class ActivityListFilter extends EntityFilter
         $this->copyParameters($activityQb, $qb);
     }
 
-    /**
-     * @param EntityManager $em
-     * @param array $data
-     * @param string $entityIdField
-     *
-     * @return QueryBuilder
-     */
     protected function createActivityQueryBuilder(
-        EntityManager $em,
+        EntityManagerInterface $em,
         array $data,
-        $entityIdField
-    ) {
+        string $entityIdField
+    ): QueryBuilder {
         QueryBuilderUtil::checkIdentifier($entityIdField);
         $entityClass = $data['entityClassName'];
 

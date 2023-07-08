@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
@@ -29,7 +29,7 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($class);
 
         if (!$objectManager) {
-            $objectManager = $this->createMock(EntityManager::class);
+            $objectManager = $this->createMock(EntityManagerInterface::class);
         }
         $objectManager->expects($this->any())
             ->method('getClassMetadata')
@@ -74,7 +74,7 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $objectManager = $this->createMock(EntityManager::class);
+        $objectManager = $this->createMock(EntityManagerInterface::class);
 
         $criteria = ['gender' => 'male'];
         $repository = $this->createMock(EntityRepository::class);
@@ -116,7 +116,7 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $objectManager = $this->createMock(EntityManager::class);
+        $objectManager = $this->createMock(EntityManagerInterface::class);
 
         $criteria = new Criteria();
         $repository = $this->createMock(EntityRepository::class);

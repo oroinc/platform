@@ -3,7 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\NotificationAlert;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
@@ -22,7 +22,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
     private const SOURCE_TYPE = 'test_integration';
     private const RESOURCE_TYPE = 'test_resource';
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
@@ -39,7 +39,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->connection = $this->createMock(Connection::class);
         $this->tokenAccessor = $this->createMock(TokenAccessor::class);
         $this->logger = $this->createMock(LoggerInterface::class);

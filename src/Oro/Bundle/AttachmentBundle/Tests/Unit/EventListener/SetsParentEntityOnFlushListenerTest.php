@@ -4,7 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\EventArgs;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
@@ -667,15 +667,17 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
 
     private function mockEntityManager(EventArgs|\PHPUnit\Framework\MockObject\MockObject $event): array
     {
+        $em = $this->createMock(EntityManagerInterface::class);
+        $uow = $this->createMock(UnitOfWork::class);
+
         $event->expects(self::any())
             ->method('getObjectManager')
-            ->willReturn($entityManager = $this->createMock(EntityManager::class));
-
-        $entityManager->expects(self::any())
+            ->willReturn($em);
+        $em->expects(self::any())
             ->method('getUnitOfWork')
-            ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
+            ->willReturn($uow);
 
-        return [$entityManager, $unitOfWork];
+        return [$em, $uow];
     }
 
     private function mockLifecycleEvent(object $entity): LifecycleEventArgs&\PHPUnit\Framework\MockObject\MockObject

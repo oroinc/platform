@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\AbstractScopeManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
@@ -27,7 +27,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
     /** @var AbstractScopeManager */
     protected $manager;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
     /** @var ConfigRepository|\PHPUnit\Framework\MockObject\MockObject */
@@ -46,7 +46,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
     {
         $this->repo = $this->createMock(ConfigRepository::class);
 
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->em->expects($this->any())
             ->method('getRepository')
             ->with(Config::class)
