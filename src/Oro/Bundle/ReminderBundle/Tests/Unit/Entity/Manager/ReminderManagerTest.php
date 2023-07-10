@@ -5,7 +5,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Entity\Manager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection;
@@ -19,7 +19,7 @@ use Oro\Bundle\ReminderBundle\Tests\Unit\Fixtures\RemindableEntity;
 
 class ReminderManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
@@ -30,7 +30,7 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->doctrineHelper->expects(self::any())

@@ -2,21 +2,17 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Strategy\Processor;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Strategy\Processor\DefaultEntityAuditStrategyProcessor;
 use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\CustomFieldStub;
-use Oro\Component\Testing\Unit\EntityTrait;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Oro\Component\Testing\ReflectionUtil;
 
-class DefaultEntityAuditStrategyProcessorTest extends TestCase
+class DefaultEntityAuditStrategyProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
-    private ManagerRegistry|MockObject $doctrine;
+    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
 
     private EntityAuditStrategyProcessorInterface $strategyProcessor;
 
@@ -30,7 +26,8 @@ class DefaultEntityAuditStrategyProcessorTest extends TestCase
     public function testProcessWithCustomLocalizedFieldStub(): void
     {
         $customFieldId = 123;
-        $customField = $this->getEntity(CustomFieldStub::class, ['id' => $customFieldId]);
+        $customField = new CustomFieldStub();
+        ReflectionUtil::setId($customField, $customFieldId);
 
         $sourceEntityData = [
             'entity_class' => CustomFieldStub::class,
@@ -46,10 +43,10 @@ class DefaultEntityAuditStrategyProcessorTest extends TestCase
 
     private function getSourceEntity(array $sourceEntityData, CustomFieldStub $entity)
     {
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityMetaData = $this->createMock(ClassMetadata::class);
         $entityMetaData->associationMappings = [
-            "customFields" => ['targetEntity' => CustomFieldStub::class]
+            'customFields' => ['targetEntity' => CustomFieldStub::class]
         ];
 
         $this->doctrine->expects($this->atLeastOnce())

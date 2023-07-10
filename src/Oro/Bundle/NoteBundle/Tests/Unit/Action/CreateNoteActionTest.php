@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Action;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CreateNoteActionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
     /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
@@ -31,7 +31,7 @@ class CreateNoteActionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->activityManager = $this->createMock(ActivityManager::class);
         $this->contextAccessor = $this->createMock(ContextAccessor::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

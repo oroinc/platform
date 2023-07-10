@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\Update;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItem;
@@ -262,7 +261,7 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
             ->method('getAdditionalEntityCollection')
             ->willReturn($additionalEntityCollection);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityManager')
@@ -317,7 +316,7 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
             ->method('getAdditionalEntityCollection')
             ->willReturn($additionalEntityCollection);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityManager')

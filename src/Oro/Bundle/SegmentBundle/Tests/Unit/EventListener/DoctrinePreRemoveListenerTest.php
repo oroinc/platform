@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
@@ -14,7 +14,7 @@ use Oro\Bundle\SegmentBundle\Tests\Unit\Fixtures\StubEntity;
 
 class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
@@ -25,7 +25,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->listener = new DoctrinePreRemoveListener($this->configManager);

@@ -3,9 +3,10 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
@@ -17,7 +18,7 @@ use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 
 class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $em;
+    private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em;
 
     private AttachmentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject $attachmentAssociationHelper;
 
@@ -29,7 +30,7 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->attachmentAssociationHelper = $this->createMock(AttachmentAssociationHelper::class);
         $this->attachmentManager = $this->createMock(AttachmentManager::class);
         $this->pictureSourcesProvider = $this->createMock(PictureSourcesProviderInterface::class);
@@ -55,7 +56,7 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->em->expects($this->once())
             ->method('getRepository')
-            ->with('OroAttachmentBundle:Attachment')
+            ->with(Attachment::class)
             ->willReturn($repo);
 
         $qb = $this->createMock(QueryBuilder::class);

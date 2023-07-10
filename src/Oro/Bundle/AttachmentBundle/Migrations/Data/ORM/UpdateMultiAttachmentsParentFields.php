@@ -4,7 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
@@ -25,7 +25,7 @@ class UpdateMultiAttachmentsParentFields extends AbstractFixture implements Cont
      */
     public function load(ObjectManager $manager): void
     {
-        if (!$manager instanceof EntityManager) {
+        if (!$manager instanceof EntityManagerInterface) {
             return;
         }
 
@@ -37,7 +37,7 @@ class UpdateMultiAttachmentsParentFields extends AbstractFixture implements Cont
         }
     }
 
-    private function getQueries(EntityManager $manager, bool $isMySql): array
+    private function getQueries(EntityManagerInterface $manager, bool $isMySql): array
     {
         $metadataFactory = $manager->getMetadataFactory();
         $metadata = $metadataFactory->getMetadataFor(FileItem::class);

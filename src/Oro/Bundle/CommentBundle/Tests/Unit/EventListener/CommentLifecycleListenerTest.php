@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\CommentBundle\Entity\Comment;
@@ -97,11 +97,11 @@ class CommentLifecycleListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
+     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEntityManagerMock(bool $reloadUser = false, User $newUser = null)
     {
-        $result = $this->createMock(EntityManager::class);
+        $result = $this->createMock(EntityManagerInterface::class);
 
         if ($reloadUser) {
             $result->expects($this->once())

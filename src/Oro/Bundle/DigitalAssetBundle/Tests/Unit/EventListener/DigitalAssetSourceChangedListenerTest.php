@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
@@ -15,7 +15,7 @@ class DigitalAssetSourceChangedListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var FileReflector|\PHPUnit\Framework\MockObject\MockObject */
@@ -26,7 +26,7 @@ class DigitalAssetSourceChangedListenerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->fileReflector = $this->createMock(FileReflector::class);
 
         $this->listener = new DigitalAssetSourceChangedListener($this->fileReflector);
@@ -36,7 +36,8 @@ class DigitalAssetSourceChangedListenerTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new File();
 
-        $this->em->expects($this->never())->method('flush');
+        $this->em->expects($this->never())
+            ->method('flush');
         $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));
     }
 
@@ -68,8 +69,7 @@ class DigitalAssetSourceChangedListenerTest extends \PHPUnit\Framework\TestCase
             ->with($digitalAssetId)
             ->willReturn([$childFile1, $childFile2]);
 
-        $this->fileReflector
-            ->expects($this->exactly(2))
+        $this->fileReflector->expects($this->exactly(2))
             ->method('reflectFromFile')
             ->withConsecutive(
                 [$childFile1, $sourceFile],

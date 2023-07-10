@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
@@ -74,7 +74,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     /**
      * Finish processed batch
      */
-    protected function finishBatch(EntityManager $manager)
+    protected function finishBatch(EntityManagerInterface $manager): void
     {
         $manager->flush();
         $manager->clear();
@@ -139,7 +139,6 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      * @param MassActionHandlerArgs $args
      *
      * @return string
-     * @throws LogicException
      */
     protected function getEntityName(MassActionHandlerArgs $args)
     {
@@ -155,7 +154,6 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     /**
      * @param MassActionHandlerArgs $args
      *
-     * @throws LogicException
      * @return string
      */
     protected function getEntityIdentifierField(MassActionHandlerArgs $args)
@@ -180,23 +178,22 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      * @param MassActionHandlerArgs $args
      *
      * @return MassActionResponse
-     * @throws \Exception
      */
     protected function doDelete(MassActionHandlerArgs $args)
     {
-        $iteration    = 0;
-        $entityName   = $this->getEntityName($args);
+        $iteration = 0;
+        $entityName = $this->getEntityName($args);
         $queryBuilder = $args->getResults()->getSource();
-        $results      = new DeletionIterableResult($queryBuilder);
+        $results = new DeletionIterableResult($queryBuilder);
         $results->setBufferSize(self::FLUSH_BATCH_SIZE);
         // if huge amount data must be deleted
         set_time_limit(0);
         $entityIdentifiedField = $this->getEntityIdentifierField($args);
-        /** @var EntityManager $manager */
+        /** @var EntityManagerInterface $manager */
         $manager = $this->registry->getManagerForClass($entityName);
+        /** @var ResultRecordInterface $result */
         foreach ($results as $result) {
-            /** @var $result ResultRecordInterface */
-            $entity          = $result->getRootEntity();
+            $entity = $result->getRootEntity();
             $identifierValue = $result->getValue($entityIdentifiedField);
             if (!$entity) {
                 // no entity in result record, it should be extracted from DB
@@ -223,25 +220,13 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         return $this->getDeleteResponse($args, $iteration);
     }
 
-    /**
-     * @param object $entity
-     * @return bool
-     */
-    protected function isDeleteAllowed($entity)
+    protected function isDeleteAllowed(object $entity): bool
     {
         return $this->authorizationChecker->isGranted('DELETE', $entity);
     }
 
-    /**
-     * @param object $entity
-     * @param EntityManager $manager
-     *
-     * @return DeleteMassActionHandler
-     */
-    protected function processDelete($entity, EntityManager $manager)
+    protected function processDelete(object $entity, EntityManagerInterface $manager): void
     {
         $manager->remove($entity);
-
-        return $this;
     }
 }

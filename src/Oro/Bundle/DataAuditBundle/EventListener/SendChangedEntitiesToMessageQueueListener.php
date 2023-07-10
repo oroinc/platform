@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
@@ -177,19 +177,14 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         }
     }
 
-    /**
-     * @param EntityManager $em
-     *
-     * @return TokenInterface|null
-     */
-    private function getSecurityToken(EntityManager $em)
+    private function getSecurityToken(EntityManagerInterface $em): ?TokenInterface
     {
         return $this->allTokens->contains($em)
             ? $this->allTokens[$em]
             : $this->tokenStorage->getToken();
     }
 
-    private function findAuditableInsertions(EntityManager $em)
+    private function findAuditableInsertions(EntityManagerInterface $em): void
     {
         $uow = $em->getUnitOfWork();
 
@@ -206,7 +201,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->saveChanges($this->allInsertions, $em, $insertions);
     }
 
-    private function findAuditableUpdates(EntityManager $em)
+    private function findAuditableUpdates(EntityManagerInterface $em): void
     {
         $uow = $em->getUnitOfWork();
 
@@ -226,7 +221,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->saveChanges($this->allUpdates, $em, $updates);
     }
 
-    private function hasAssociationUpdates(EntityManager $em, object $entity): bool
+    private function hasAssociationUpdates(EntityManagerInterface $em, object $entity): bool
     {
         $uow = $em->getUnitOfWork();
         $ownerSplHash = spl_object_hash($entity);
@@ -250,7 +245,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         return false;
     }
 
-    private function findAuditableDeletions(EntityManager $em)
+    private function findAuditableDeletions(EntityManagerInterface $em): void
     {
         $uow = $em->getUnitOfWork();
 
@@ -291,7 +286,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->saveChanges($this->allDeletions, $em, $deletions);
     }
 
-    private function findAuditableCollectionUpdates(EntityManager $em): void
+    private function findAuditableCollectionUpdates(EntityManagerInterface $em): void
     {
         $uow = $em->getUnitOfWork();
         $collectionUpdates = new \SplObjectStorage();
@@ -328,7 +323,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->saveChanges($this->allCollectionUpdates, $em, $collectionDeletions);
     }
 
-    private function findAuditableCollectionDeletions(EntityManager $em): \SplObjectStorage
+    private function findAuditableCollectionDeletions(EntityManagerInterface $em): \SplObjectStorage
     {
         $uow = $em->getUnitOfWork();
         $collectionDeletions = new \SplObjectStorage();
@@ -364,8 +359,11 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         return $collectionDeletions;
     }
 
-    private function saveChanges(\SplObjectStorage $storage, EntityManager $em, \SplObjectStorage $changes)
-    {
+    private function saveChanges(
+        \SplObjectStorage $storage,
+        EntityManagerInterface $em,
+        \SplObjectStorage $changes
+    ): void {
         if ($changes->count() > 0) {
             if (!$storage->contains($em)) {
                 $storage[$em] = $changes;
@@ -377,12 +375,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         }
     }
 
-    /**
-     * @param EntityManager $em
-     *
-     * @return array
-     */
-    private function processInsertions(EntityManager $em)
+    private function processInsertions(EntityManagerInterface $em): array
     {
         if (!$this->allInsertions->contains($em)) {
             return [];
@@ -397,12 +390,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         return $insertions;
     }
 
-    /**
-     * @param EntityManager $em
-     *
-     * @return array
-     */
-    private function processUpdates(EntityManager $em)
+    private function processUpdates(EntityManagerInterface $em): array
     {
         $updates = $this->getUpdates($em);
 
@@ -433,7 +421,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         return $updates;
     }
 
-    private function getUpdates(EntityManager $em): array
+    private function getUpdates(EntityManagerInterface $em): array
     {
         $updates = [];
         if ($this->allUpdates->contains($em)) {
@@ -451,14 +439,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         return $updates;
     }
 
-    /**
-     * @param EntityManager $entityManager
-     * @param object        $entity
-     * @param array         $changeSet
-     *
-     * @return array|null
-     */
-    private function processUpdate(EntityManager $entityManager, $entity, array $changeSet)
+    private function processUpdate(EntityManagerInterface $entityManager, object $entity, array $changeSet): ?array
     {
         $update = $this->convertEntityToArray($entityManager, $entity, $changeSet);
         if (null !== $update['entity_id']) {
@@ -473,12 +454,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         return null;
     }
 
-    /**
-     * @param EntityManager $em
-     *
-     * @return array
-     */
-    private function processDeletions(EntityManager $em)
+    private function processDeletions(EntityManagerInterface $em): array
     {
         if (!$this->allDeletions->contains($em)) {
             return [];
@@ -494,19 +470,13 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
 
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     *
-     * @param EntityManager $em
-     * @param array $insertions
-     * @param array $updates
-     * @param array $deletions
-     * @return array
      */
     private function processCollectionUpdates(
-        EntityManager $em,
+        EntityManagerInterface $em,
         array $insertions = [],
         array $updates = [],
         array $deletions = []
-    ) {
+    ): array {
         if (!$this->allCollectionUpdates->contains($em)) {
             return [];
         }
@@ -551,21 +521,18 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         return $collectionUpdates;
     }
 
-    /**
-     * @param EntityManager $em
-     * @param object $entity
-     * @param array $changeSet
-     * @param string|null $entityName
-     * @return array
-     */
-    private function convertEntityToArray(EntityManager $em, $entity, array $changeSet, $entityName = null)
-    {
+    private function convertEntityToArray(
+        EntityManagerInterface $em,
+        object $entity,
+        array $changeSet,
+        ?string $entityName = null
+    ): array {
         return $this->entityToArrayConverter->convertNamedEntityToArray($em, $entity, $changeSet, $entityName);
     }
 
     public function setAdditionalEntityChangesStorage(
         AdditionalEntityChangesToAuditStorage $additionalEntityChangesStorage
-    ) {
+    ): void {
         $this->additionalEntityChangesStorage = $additionalEntityChangesStorage;
     }
 
@@ -574,21 +541,17 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->entityNameResolver = $entityNameResolver;
     }
 
-    public function setAuditMessageBodyProvider(AuditMessageBodyProvider $auditMessageBodyProvider)
+    public function setAuditMessageBodyProvider(AuditMessageBodyProvider $auditMessageBodyProvider): void
     {
         $this->auditMessageBodyProvider = $auditMessageBodyProvider;
     }
 
-    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor): void
     {
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * @param object $entity
-     * @return string
-     */
-    private function getEntityHash($entity): string
+    private function getEntityHash(object $entity): string
     {
         return spl_object_hash($entity);
     }

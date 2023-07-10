@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
@@ -172,7 +172,7 @@ abstract class AbstractMenuController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var EntityManager $entityManager */
+            /** @var EntityManagerInterface $entityManager */
             $entityManager = $this->getDoctrine()->getManagerForClass($this->getEntityClass());
             $scope = $this->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context);
             $updates = $this->getMenuUpdateMoveManager()->moveMenuItems(

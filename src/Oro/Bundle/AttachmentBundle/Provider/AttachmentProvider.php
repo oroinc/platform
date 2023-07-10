@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
@@ -17,7 +17,7 @@ use Oro\Component\PhpUtils\Formatter\BytesFormatter;
  */
 class AttachmentProvider
 {
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     protected $em;
 
     /** @var AttachmentAssociationHelper */
@@ -30,15 +30,15 @@ class AttachmentProvider
     private $pictureSourcesProvider;
 
     public function __construct(
-        EntityManager $entityManager,
+        EntityManagerInterface $em,
         AttachmentAssociationHelper $attachmentAssociationHelper,
         AttachmentManager $attachmentManager,
         PictureSourcesProviderInterface $pictureSourcesProvider
     ) {
-        $this->em                          = $entityManager;
+        $this->em = $em;
         $this->attachmentAssociationHelper = $attachmentAssociationHelper;
-        $this->attachmentManager           = $attachmentManager;
-        $this->pictureSourcesProvider      = $pictureSourcesProvider;
+        $this->attachmentManager = $attachmentManager;
+        $this->pictureSourcesProvider = $pictureSourcesProvider;
     }
 
     /**
@@ -51,7 +51,7 @@ class AttachmentProvider
         $entityClass = ClassUtils::getClass($entity);
         if ($this->attachmentAssociationHelper->isAttachmentAssociationEnabled($entityClass)) {
             $fieldName = ExtendHelper::buildAssociationName($entityClass);
-            $repo = $this->em->getRepository('OroAttachmentBundle:Attachment');
+            $repo = $this->em->getRepository(Attachment::class);
 
             $qb = $repo->createQueryBuilder('a');
             $qb->leftJoin('a.' . $fieldName, 'entity')

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\ActionBundle\Exception\AttributeException;
@@ -416,7 +416,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
             $valueMap[] = [$entity, $metadata];
         }
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->with($this->isType('string'))

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DraftBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\FilterCollection;
 use Oro\Bundle\DraftBundle\Doctrine\DraftableFilter;
@@ -33,7 +33,7 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnKernelControllerWithoutId(): void
     {
-        $request = Request::create('/entity/draftable/index', 'GET', []);
+        $request = Request::create('/entity/draftable/index');
 
         $event = new ControllerEvent(
             $this->createMock(HttpKernelInterface::class),
@@ -142,7 +142,7 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnKernelRequestWithoutId(): void
     {
-        $request = Request::create('/entity/draftable/index', 'GET', []);
+        $request = Request::create('/entity/draftable/index');
 
         $event = new RequestEvent(
             $this->createMock(HttpKernelInterface::class),
@@ -252,7 +252,7 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
             ->with($id)
             ->willReturn($expectedEntity);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())
             ->method('getFilters')
             ->willReturn($filters);

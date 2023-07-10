@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\PersistEntity;
 use Oro\Bundle\ApiBundle\Processor\Create\SaveEntity;
@@ -74,7 +74,7 @@ class PersistEntityTest extends FormProcessorTestCase
     {
         $entity = new \stdClass();
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
@@ -94,7 +94,7 @@ class PersistEntityTest extends FormProcessorTestCase
     {
         $entity = new \stdClass();
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
