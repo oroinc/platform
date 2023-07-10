@@ -69,7 +69,7 @@
         "symfony/translation": "5.4.22",
         "symfony/twig-bridge": "~5.4.17",
         "symfony/twig-bundle": "~5.4.17",
-        "symfony/validator": "~5.4.17",
+        "symfony/validator": ">=5.4.17 <5.4.25",
         "symfony/web-link": "~5.4.3",
         "symfony/yaml": "~5.4.17",
         "symfony/mailer": "~5.4.17",
