@@ -162,10 +162,6 @@ class TargetType extends AbstractType
 
     /**
      * Returns a list of choice attributes for the given entity
-     *
-     * @param string $entityClass
-     *
-     * @return array
      */
     private function getChoiceAttributes(string $entityClass): array
     {
@@ -178,11 +174,6 @@ class TargetType extends AbstractType
 
     /**
      * Checks if entity is suitable as target for relation
-     *
-     * @param ConfigInterface $config
-     * @param string|null     $targetEntityClass
-     *
-     * @return bool
      */
     private function isSuitableAsTarget(ConfigInterface $config, ?string $targetEntityClass): bool
     {

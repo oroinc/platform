@@ -19,9 +19,9 @@ trait EntityTrait
      * Helps to create entity object with specified set of properties.
      * Uses reflection to set not accessible properties like private/protected
      *
-     * @param string $className
-     * @param array  $properties Like ['id' => 1]
-     * @param array  $constructorArgs Like ['id' => 1]
+     * @param string     $className
+     * @param array      $properties Like ['id' => 1]
+     * @param array|null $constructorArgs Like ['id' => 1]
      *
      * @return object
      *

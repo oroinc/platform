@@ -11,9 +11,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class SearchEngineIndexerFactory
 {
     /**
-     * @param ServiceLocator $locator
-     * @param EngineParameters $engineParameters
-     * @return IndexerInterface
      * @throws UnexpectedTypeException
      */
     public static function create(

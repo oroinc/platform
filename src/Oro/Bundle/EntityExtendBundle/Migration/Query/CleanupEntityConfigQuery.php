@@ -92,10 +92,6 @@ class CleanupEntityConfigQuery extends AbstractEntityConfigQuery
         }
     }
 
-    /**
-     * @param array $row
-     * @param LoggerInterface $logger
-     */
     private function processFieldRow(array $row, LoggerInterface $logger)
     {
         $fieldConfigData = $this->connection->convertToPHPValue($row['data'], 'array');

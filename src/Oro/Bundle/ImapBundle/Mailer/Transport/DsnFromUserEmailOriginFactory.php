@@ -24,9 +24,6 @@ class DsnFromUserEmailOriginFactory
 
     /**
      * Creates SMTP DSN from UserEmailOrigin.
-     *
-     * @param UserEmailOrigin $userEmailOrigin
-     * @return Dsn
      */
     public function create(UserEmailOrigin $userEmailOrigin): Dsn
     {

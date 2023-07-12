@@ -11,8 +11,6 @@ interface ConnectorInterface
 
     /**
      * Returns label for UI
-     *
-     * @return string
      */
     public function getLabel(): string;
 

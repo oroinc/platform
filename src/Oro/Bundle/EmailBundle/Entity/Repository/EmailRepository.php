@@ -47,8 +47,6 @@ class EmailRepository extends EntityRepository
     /**
      * Finds messageId of the Email specified by id.
      *
-     * @param int $id
-     * @return string|null
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function findMessageIdByEmailId(int $id): ?string
@@ -329,7 +327,6 @@ class EmailRepository extends EntityRepository
 
         return !empty($rows);
     }
-
 
     /**
      * @param User         $user

@@ -78,9 +78,6 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
 
     /**
      * @dataProvider processSendsEmailDataProvider
-     *
-     * @param int $sentCount
-     * @param string $expectedStatus
      */
     public function testProcessSendsEmail(int $sentCount, string $expectedStatus): void
     {

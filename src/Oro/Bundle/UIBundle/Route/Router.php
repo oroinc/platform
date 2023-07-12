@@ -35,7 +35,7 @@ class Router
     }
 
     /**
-     * @param array|object|null $context
+     * @param array|object $context
      */
     public function redirect(mixed $context): RedirectResponse
     {
@@ -181,7 +181,7 @@ class Router
      * Parses value of route parameters.
      *
      * @param array $arrayData
-     * @param array|object|null $context
+     * @param array|object $context
      *
      * @return mixed
      */

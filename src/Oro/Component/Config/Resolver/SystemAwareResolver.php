@@ -27,9 +27,6 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
     /** @var PropertyAccessorInterface|null */
     protected $propertyAccessor;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container = null)
     {
         $this->setContainer($container);

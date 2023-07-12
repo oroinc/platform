@@ -6,7 +6,6 @@ use Symfony\Component\ExpressionLanguage\Compiler;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 
 /**
- *
  * Copy of {@see \Symfony\Component\ExpressionLanguage\Node\BinaryNode} with following changes:
  * 1 Aliases "=", "!=" operators to "===" and "!==" correspondingly before compiling or evaluating.
  * 2 Enables strict comparison for "in", "not in" operators.

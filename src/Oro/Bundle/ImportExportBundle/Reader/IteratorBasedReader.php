@@ -43,8 +43,6 @@ abstract class IteratorBasedReader extends AbstractReader
 
     /**
      * Setter for iterator
-     *
-     * @param \Iterator $sourceIterator
      */
     public function setSourceIterator(\Iterator $sourceIterator = null)
     {

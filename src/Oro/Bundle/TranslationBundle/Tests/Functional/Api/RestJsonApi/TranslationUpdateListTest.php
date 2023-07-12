@@ -151,7 +151,6 @@ class TranslationUpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
-
     public function testUpdateEntitiesByIdAndByDomainKeyAndLanguageCode(): void
     {
         $existingTranslationId = $this->resolveTranslationId('<@tk-test_trans1-test_domain->id>-<@en_CA->code>');

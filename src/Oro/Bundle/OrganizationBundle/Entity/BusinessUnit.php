@@ -441,7 +441,7 @@ class BusinessUnit implements
     }
 
     /**
-     * @param BusinessUnit $value
+     * @param BusinessUnit|null $value
      *
      * @return BusinessUnit
      */

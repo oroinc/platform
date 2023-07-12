@@ -15,11 +15,6 @@ trait IntegrationTokenAwareTrait
 {
     private TokenStorageInterface $tokenStorage;
 
-    /**
-     * @param Integration $integration
-     * @param User $user
-     * @return void
-     */
     private function setTemporaryIntegrationToken(Integration $integration): void
     {
         $token = $this->tokenStorage->getToken();

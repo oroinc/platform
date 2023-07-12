@@ -81,9 +81,6 @@ HELP
             ->addUsage('--skip-enum-sync');
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;

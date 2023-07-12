@@ -56,41 +56,26 @@ class EngineParameters
         $this->engineNameAliases[$alias] = $engineName;
     }
 
-    /**
-     * @return string
-     */
     public function getEngineName(): string
     {
         return $this->engineNameAliases[$this->engineName] ?? $this->engineName;
     }
 
-    /**
-     * @return string|null
-     */
     public function getHost(): ?string
     {
         return $this->host;
     }
 
-    /**
-     * @return string|null
-     */
     public function getUser(): ?string
     {
         return $this->user;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPort(): ?string
     {
         return $this->port;
@@ -105,9 +90,6 @@ class EngineParameters
         return $this->parameters[$key] ?? null;
     }
 
-    /**
-     * @return array
-     */
     public function getParameters(): array
     {
         return $this->parameters;

@@ -83,7 +83,7 @@ class MailboxProcessStorage
     /**
      * Returns choice list for process type choice field.
      *
-     * @param Mailbox $mailbox
+     * @param Mailbox|null $mailbox
      *
      * @return array('type' => 'Process Type Label (translate id)')
      */

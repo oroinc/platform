@@ -12,8 +12,6 @@ class AbstractLocalizedAuditStrategyProcessor extends DefaultEntityAuditStrategy
 {
     /**
      * Skip AbstractLocalizedFallbackValue when auditing...
-     * @param array $sourceEntityData
-     * @return array
      */
     public function processChangedEntities(array $sourceEntityData): array
     {
@@ -22,8 +20,6 @@ class AbstractLocalizedAuditStrategyProcessor extends DefaultEntityAuditStrategy
 
     /**
      * Skip AbstractLocalizedFallbackValue when auditing...
-     * @param array $sourceEntityData
-     * @return array
      */
     public function processInverseRelations(array $sourceEntityData): array
     {

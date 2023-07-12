@@ -26,17 +26,11 @@ class PostProcessItemStep extends ItemStep
      */
     protected $jobExecutor;
 
-    /**
-     * @param string $jobName
-     */
     public function setPostProcessingJobs(string $jobName)
     {
         $this->postProcessingJobs = $this->scalarToArray($jobName);
     }
 
-    /**
-     * @param string $contextSharedKeys
-     */
     public function setContextSharedKeys(string $contextSharedKeys)
     {
         $this->contextSharedKeys = $this->scalarToArray($contextSharedKeys);

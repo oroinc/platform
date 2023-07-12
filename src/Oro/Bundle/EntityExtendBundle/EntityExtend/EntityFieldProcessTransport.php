@@ -62,9 +62,6 @@ class EntityFieldProcessTransport
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getFieldsMetadata(): array
     {
         return $this->metadataProvider->getExtendEntityFieldsMetadata($this->class);

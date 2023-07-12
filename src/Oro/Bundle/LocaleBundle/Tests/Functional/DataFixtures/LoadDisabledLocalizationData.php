@@ -67,9 +67,6 @@ class LoadDisabledLocalizationData extends AbstractFixture implements ContainerA
         $manager->clear();
     }
 
-    /**
-     * @return array
-     */
     public static function getLocalizations(): array
     {
         return self::$localizations;

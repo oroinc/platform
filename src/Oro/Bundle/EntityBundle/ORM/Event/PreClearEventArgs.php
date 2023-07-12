@@ -16,10 +16,6 @@ class PreClearEventArgs extends EventArgs
     /** @var string|null */
     private $entityName;
 
-    /**
-     * @param EntityManager $em
-     * @param string $entityName
-     */
     public function __construct(EntityManager $em, ?string $entityName)
     {
         $this->em = $em;

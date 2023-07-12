@@ -61,7 +61,7 @@ class OroElementFactory implements SuiteAwareInterface
 
     /**
      * @param string $name Element name
-     * @param NodeElement $context
+     * @param NodeElement|null $context
      *
      * @return Element
      */

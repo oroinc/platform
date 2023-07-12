@@ -37,9 +37,6 @@ class DsnBasedParameters
         parse_str($parsedDsn['query'] ?? '', $this->parameters);
     }
 
-    /**
-     * @return string
-     */
     public function getScheme(): string
     {
         return $this->schema;

@@ -280,7 +280,7 @@ class Taxonomy implements ExtendEntityInterface
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return Taxonomy
      */
     public function setOrganization(Organization $organization = null)

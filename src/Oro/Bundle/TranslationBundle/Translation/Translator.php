@@ -318,7 +318,6 @@ class Translator extends BaseTranslator
         $this->moveCatalogueFiles($options['cache_dir'], $cacheDir);
     }
 
-
     private function newTranslator(string $locale, array $options): static
     {
         $translator = new static($this->container, $this->messageFormatter, $locale, $this->loaderIds, $options);

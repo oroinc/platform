@@ -57,7 +57,7 @@ abstract class AbstractUpdatePermissions extends AbstractFixture implements Cont
 
     /**
      * @param SecurityIdentityInterface $sid
-     * @param string                    $aclGroup
+     * @param string|null $aclGroup
      *
      * @return ArrayCollection|AclPrivilege[]
      */

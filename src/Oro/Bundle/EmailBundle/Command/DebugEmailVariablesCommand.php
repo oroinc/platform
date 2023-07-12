@@ -77,9 +77,6 @@ class DebugEmailVariablesCommand extends Command
         return 0;
     }
 
-    /**
-     * @param OutputInterface $output
-     */
     private function processSystemVariables(OutputInterface $output)
     {
         $table = new Table($output);

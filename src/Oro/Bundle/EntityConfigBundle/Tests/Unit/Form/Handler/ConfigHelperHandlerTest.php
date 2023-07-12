@@ -38,7 +38,6 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 
     private Request|\PHPUnit\Framework\MockObject\MockObject $request;
 
-
     private ConfigHelperHandler $handler;
 
     protected function setUp(): void

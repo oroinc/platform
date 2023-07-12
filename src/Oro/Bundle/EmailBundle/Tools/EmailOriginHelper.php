@@ -89,7 +89,7 @@ class EmailOriginHelper
      * Find existing email origin entity by email string or create and persist new one.
      *
      * @param string                $email
-     * @param OrganizationInterface $organization
+     * @param OrganizationInterface|null $organization
      * @param string                $originName
      * @param boolean               $enableUseUserEmailOrigin
      * @param boolean               $secured Check origin can be used by current user
@@ -239,7 +239,7 @@ class EmailOriginHelper
     }
 
     /**
-     * @param OrganizationInterface $organization
+     * @param OrganizationInterface|null $organization
      *
      * @return \Closure
      */
@@ -252,7 +252,7 @@ class EmailOriginHelper
     }
 
     /**
-     * @param OrganizationInterface $organization
+     * @param OrganizationInterface|null $organization
      *
      * @return \Closure
      */
@@ -266,7 +266,7 @@ class EmailOriginHelper
 
     /**
      * @param User                  $user
-     * @param OrganizationInterface $organization
+     * @param OrganizationInterface|null $organization
      *
      * @return InternalEmailOrigin
      */

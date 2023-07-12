@@ -490,11 +490,6 @@ class File implements FileExtensionInterface, ExtendEntityInterface
         ] = $serialized;
     }
 
-    /**
-     * @param string $parentEntityClass
-     *
-     * @return File
-     */
     public function setParentEntityClass(?string $parentEntityClass): File
     {
         $this->parentEntityClass = $parentEntityClass;
@@ -507,11 +502,6 @@ class File implements FileExtensionInterface, ExtendEntityInterface
         return $this->parentEntityClass;
     }
 
-    /**
-     * @param int $parentEntityId
-     *
-     * @return File
-     */
     public function setParentEntityId(?int $parentEntityId): File
     {
         $this->parentEntityId = $parentEntityId;

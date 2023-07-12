@@ -20,10 +20,6 @@ class WorkflowVariableDataTransformer implements DataTransformerInterface
     /** @var Variable|null */
     protected $variable;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param Variable $variable
-     */
     public function __construct(ManagerRegistry $managerRegistry, Variable $variable = null)
     {
         $this->managerRegistry = $managerRegistry;

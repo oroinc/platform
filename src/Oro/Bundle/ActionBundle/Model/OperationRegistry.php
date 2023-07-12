@@ -104,7 +104,7 @@ class OperationRegistry
 
     /**
      * @param string $name
-     * @param OperationFindCriteria $criteria
+     * @param OperationFindCriteria|null $criteria
      *
      * @return null|Operation
      */

@@ -41,9 +41,6 @@ class GetAttrNodeFactoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider collectionMethodCallNodeDataProvider
-     *
-     * @param string $methodName
-     * @param string $expected
      */
     public function testCreateNodeReturnsCollectionMethodCallNodeWhenTypeMethodCall(
         string $methodName,
@@ -63,9 +60,6 @@ class GetAttrNodeFactoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider collectionMethodCallNodeDataProvider
-     *
-     * @param string $methodName
-     * @param string $expected
      */
     public function testCreateNodeReturnsCollectionMethodCallNodeWhenTypeMethodCallUppercase(
         string $methodName,

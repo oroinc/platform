@@ -49,7 +49,7 @@ interface EmailSynchronizerInterface
      * Performs a synchronization of emails for the given email origins.
      *
      * @param int[] $originIds
-     * @param SynchronizationProcessorSettings $settings
+     * @param SynchronizationProcessorSettings|null $settings
      *
      * @throws \Exception
      */

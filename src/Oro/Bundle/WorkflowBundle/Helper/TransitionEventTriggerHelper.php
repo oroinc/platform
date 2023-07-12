@@ -99,10 +99,10 @@ class TransitionEventTriggerHelper
     }
 
     /**
-     * @param WorkflowDefinition $workflowDefinition
+     * @param WorkflowDefinition|null $workflowDefinition
      * @param object $entity
      * @param object $mainEntity
-     * @param WorkflowItem $item
+     * @param WorkflowItem|null $item
      * @param object $prevEntity
      * @return array
      */

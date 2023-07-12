@@ -299,7 +299,7 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
     /**
      * This method should be called only from WorkflowItemListener.
      *
-     * @param string $entityId
+     * @param string|null $entityId
      * @return WorkflowItem
      * @throws WorkflowException
      */

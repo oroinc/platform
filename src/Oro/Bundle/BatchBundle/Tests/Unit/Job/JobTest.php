@@ -30,7 +30,6 @@ class JobTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /** @var Job */
     private Job $job;
 
     protected function setUp(): void

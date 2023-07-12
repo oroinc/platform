@@ -65,7 +65,7 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $data
+     * @param array|null $data
      *
      * @return array
      */

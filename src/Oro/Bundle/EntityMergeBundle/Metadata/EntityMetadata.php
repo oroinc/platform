@@ -18,10 +18,6 @@ class EntityMetadata extends Metadata implements MetadataInterface
      */
     protected $fieldsMetadata = array();
 
-    /**
-     * @param array $options
-     * @param DoctrineMetadata $doctrineMetadata
-     */
     public function __construct(array $options = array(), DoctrineMetadata $doctrineMetadata = null)
     {
         parent::__construct($options);

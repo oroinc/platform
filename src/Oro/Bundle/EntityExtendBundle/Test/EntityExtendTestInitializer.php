@@ -12,9 +12,6 @@ use Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendEntityMetadataProviderInter
  */
 class EntityExtendTestInitializer
 {
-    /**
-     * @return void
-     */
     public static function initialize(): void
     {
         $entityMetadataProvider = new class() implements ExtendEntityMetadataProviderInterface {

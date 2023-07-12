@@ -96,9 +96,6 @@ class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareIn
      */
     protected $expired = false;
 
-    /**
-     * @return int
-     */
     public function getId(): ?int
     {
         return $this->id;
@@ -127,7 +124,7 @@ class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareIn
     }
 
     /**
-     * @param string $filename
+     * @param string|null $filename
      *
      * @return $this
      */
@@ -138,9 +135,6 @@ class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareIn
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getJobId(): ?int
     {
         return $this->jobId;
@@ -158,9 +152,6 @@ class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareIn
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isExpired(): ?bool
     {
         return $this->expired;

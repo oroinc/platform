@@ -177,10 +177,6 @@ HELP
         parent::configure();
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         if ($this->isTestEnvironment()) {
@@ -657,10 +653,6 @@ HELP
         );
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     private function presetTestEnvironmentOptions(InputInterface $input, OutputInterface $output): void
     {
         $testEnvDefaultOptionValuesMap = [

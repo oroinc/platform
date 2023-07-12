@@ -77,7 +77,7 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
      *
      * @param mixed  $data Data to denormalize from.
      * @param string $type Field type
-     * @param string $format The format being deserialized from.
+     * @param string|null $format The format being deserialized from.
      * @param array  $context options available to the denormalizer
      *
      * @return bool

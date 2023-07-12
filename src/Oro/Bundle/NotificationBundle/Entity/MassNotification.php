@@ -168,9 +168,6 @@ class MassNotification
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getScheduledAt(): ?\DateTimeInterface
     {
         return $this->scheduledAt;
@@ -187,9 +184,6 @@ class MassNotification
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getProcessedAt(): ?\DateTimeInterface
     {
         return $this->processedAt;

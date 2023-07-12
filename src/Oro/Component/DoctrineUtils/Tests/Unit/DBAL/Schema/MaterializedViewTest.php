@@ -14,7 +14,6 @@ class MaterializedViewTest extends \PHPUnit\Framework\TestCase
         $withData = true;
         $materializedView = new MaterializedView($name, $definition, $withData);
 
-
         self::assertEquals($name, $materializedView->getName());
         self::assertEquals('default.' . $name, $materializedView->getFullQualifiedName('default'));
         self::assertEquals($definition, $materializedView->getDefinition());

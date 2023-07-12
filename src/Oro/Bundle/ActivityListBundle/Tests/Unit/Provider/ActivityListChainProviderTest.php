@@ -62,7 +62,6 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['createActivityList'])
             ->getMock();
 
-
         $this->testActivityProvider = new TestActivityProvider();
     }
 
@@ -366,7 +365,6 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('update', $result->getVerb());
         $this->assertEquals('testSubject', $result->getSubject());
     }
-
 
     public function testGetNewActivityList()
     {

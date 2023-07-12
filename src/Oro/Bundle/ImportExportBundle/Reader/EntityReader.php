@@ -85,7 +85,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
 
     /**
      * @param string $entityName
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @param array $ids
      */
     public function setSourceEntityName($entityName, Organization $organization = null, array $ids = [])
@@ -222,7 +222,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
      *
      * @param QueryBuilder $queryBuilder
      * @param string       $entityName
-     * @param Organization $organization
+     * @param Organization|null $organization
      */
     protected function addOrganizationLimits(QueryBuilder $queryBuilder, $entityName, Organization $organization = null)
     {

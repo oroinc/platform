@@ -15,9 +15,6 @@ class RequestListener
     private bool $debug;
     private ApplicationState $applicationState;
 
-    /**
-     * @param bool $debug
-     */
     public function __construct(ApplicationState $applicationState, bool $debug = false)
     {
         $this->applicationState = $applicationState;

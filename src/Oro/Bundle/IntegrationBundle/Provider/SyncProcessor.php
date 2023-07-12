@@ -22,14 +22,6 @@ class SyncProcessor extends AbstractSyncProcessor
     /** @var ManagerRegistry */
     protected $doctrineRegistry;
 
-    /**
-     * @param ManagerRegistry          $doctrineRegistry
-     * @param ProcessorRegistry        $processorRegistry
-     * @param Executor                 $jobExecutor
-     * @param TypesRegistry            $registry
-     * @param LoggerStrategy           $logger
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         ManagerRegistry $doctrineRegistry,
         ProcessorRegistry $processorRegistry,
@@ -82,7 +74,7 @@ class SyncProcessor extends AbstractSyncProcessor
      *
      * @param Integration $integration Integration object
      * @param array       $parameters  Connector additional parameters
-     * @param callable    $callback    Callback to filter connectors
+     * @param callable|null $callback Callback to filter connectors
      *
      * @return boolean
      */
@@ -126,7 +118,7 @@ class SyncProcessor extends AbstractSyncProcessor
 
     /**
      * @param Integration $integration
-     * @param callable    $callback
+     * @param callable|null $callback
      *
      * @return ConnectorInterface[]
      */
@@ -144,7 +136,7 @@ class SyncProcessor extends AbstractSyncProcessor
 
     /**
      * @param Integration $integration
-     * @param callable    $callback
+     * @param callable|null $callback
      *
      * @return string[]
      */

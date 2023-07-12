@@ -9,9 +9,6 @@ class WorkflowAttributeTemplate extends WorkflowTemplate
 {
     const NAME = 'workflow_attribute';
 
-    /**
-     * @return string
-     */
     public function getTemplate(): string
     {
         return parent::getTemplate() . '.attribute.{{ attribute_name }}';
