@@ -16,7 +16,7 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
     /**
      * @param string              $dataType
      * @param string|null         $description
-     * @param mixed|callable|null $defaultValue
+     * @param mixed $defaultValue
      * @param callable|null       $defaultValueToStringConverter
      */
     public function __construct(
@@ -53,7 +53,7 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
     /**
      * Sets the filter default value.
      *
-     * @param mixed|callable|null $defaultValue
+     * @param mixed|callable $defaultValue
      */
     public function setDefaultValue(mixed $defaultValue): void
     {

@@ -63,7 +63,7 @@ abstract class AbstractSyncProcessor implements
     /**
      * Format result statistic message based on statistic if context were fetched
      *
-     * @param ContextInterface $context
+     * @param ContextInterface|null $context
      *
      * @return string
      */
@@ -89,7 +89,7 @@ abstract class AbstractSyncProcessor implements
     /**
      * Fetch job execution result statistic from context
      *
-     * @param ContextInterface $context
+     * @param ContextInterface|null $context
      *
      * @return array
      */
@@ -135,7 +135,7 @@ abstract class AbstractSyncProcessor implements
      * @param string    $jobName
      * @param array     $configuration
      *
-     * @param JobResult $jobResult
+     * @param JobResult|null $jobResult
      *
      * @return SyncEvent
      */

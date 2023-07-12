@@ -112,7 +112,7 @@ class ImapEmailManager
     /**
      * Retrieve emails by the given criteria
      *
-     * @param SearchQuery $query
+     * @param SearchQuery|null $query
      *
      * @return ImapEmailIterator
      */

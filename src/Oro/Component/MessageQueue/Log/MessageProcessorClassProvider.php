@@ -22,10 +22,6 @@ class MessageProcessorClassProvider
 
     /**
      * Gets the class name of the message processor by its name.
-     *
-     * @param string $messageProcessorName
-     *
-     * @return string
      */
     public function getMessageProcessorClassByName(string $messageProcessorName): string
     {

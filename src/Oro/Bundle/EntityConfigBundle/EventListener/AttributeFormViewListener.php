@@ -94,7 +94,6 @@ class AttributeFormViewListener
             return;
         }
 
-
         $scrollData = $event->getScrollData();
         $formView = $event->getFormView();
 

@@ -599,7 +599,7 @@ class User extends AbstractUser implements
     }
 
     /**
-     * @param \DateTime $birthday [optional] New birthday value. Null by default.
+     * @param \DateTime|null $birthday [optional] New birthday value. Null by default.
      *
      * @return User
      */

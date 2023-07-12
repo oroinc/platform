@@ -422,7 +422,7 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return Segment
      */
     public function setOrganization(Organization $organization = null)

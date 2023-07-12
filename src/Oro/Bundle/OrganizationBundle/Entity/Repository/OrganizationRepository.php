@@ -183,7 +183,7 @@ class OrganizationRepository extends EntityRepository
     }
 
     /**
-     * @param array|null $orgIds
+     * @param array $orgIds
      *
      * @return Organization[]
      */

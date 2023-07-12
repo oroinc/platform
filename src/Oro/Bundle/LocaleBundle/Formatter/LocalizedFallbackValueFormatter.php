@@ -49,7 +49,6 @@ class LocalizedFallbackValueFormatter implements FormatterInterface
             }
         }
 
-
         return $this->getDefaultValue();
     }
 

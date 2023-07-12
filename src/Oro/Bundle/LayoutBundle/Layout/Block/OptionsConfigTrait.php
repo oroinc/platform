@@ -62,9 +62,6 @@ trait OptionsConfigTrait
         $this->optionsConfig = $options;
     }
 
-    /**
-     * @param array $optionSettings
-     */
     protected function validateOptionConfig(array $optionSettings = null)
     {
         if ($optionSettings === null) {

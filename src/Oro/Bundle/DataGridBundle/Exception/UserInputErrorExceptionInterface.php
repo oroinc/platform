@@ -11,15 +11,11 @@ interface UserInputErrorExceptionInterface extends DatagridException
 
     /**
      * Get error message translation key
-     *
-     * @return string
      */
     public function getMessageTemplate(): string;
 
     /**
      * Get error  message translation params
-     *
-     * @return array
      */
     public function getMessageParams(): array;
 }

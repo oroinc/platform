@@ -70,7 +70,6 @@ class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
             ->willReturn(42);
     }
 
-
     /**
      * @dataProvider initializeExceptionDataProvider
      */

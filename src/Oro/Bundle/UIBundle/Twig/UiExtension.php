@@ -406,8 +406,8 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     }
 
     /**
-     * @param array $additionalContent
-     * @param array $keys
+     * @param array|null $additionalContent
+     * @param array|null $keys
      *
      * @return array
      */

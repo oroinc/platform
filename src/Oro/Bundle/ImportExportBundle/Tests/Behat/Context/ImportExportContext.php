@@ -328,8 +328,6 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
     /**
      * @Given /^exported file contains at least the following columns:$/
      * @Then /^(?:|I )download export file$/
-     *
-     * @param TableNode $expectedEntities
      */
     public function exportedFileContainsAtLeastFollowingColumns(?TableNode $expectedEntities = null)
     {

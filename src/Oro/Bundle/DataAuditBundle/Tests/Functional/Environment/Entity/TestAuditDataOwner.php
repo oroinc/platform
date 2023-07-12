@@ -651,9 +651,6 @@ class TestAuditDataOwner implements
         return $this->configObjectProperty;
     }
 
-    /**
-     * @param ConfigObject $configObjectProperty
-     */
     public function setConfigObjectProperty(ConfigObject $configObjectProperty = null)
     {
         $this->configObjectProperty = $configObjectProperty;
@@ -699,9 +696,6 @@ class TestAuditDataOwner implements
         return $this->dateProperty;
     }
 
-    /**
-     * @param \DateTime $dateProperty
-     */
     public function setDateProperty(\DateTime $dateProperty = null)
     {
         $this->dateProperty = $dateProperty;
@@ -715,9 +709,6 @@ class TestAuditDataOwner implements
         return $this->dateTimeProperty;
     }
 
-    /**
-     * @param \DateTime $dateTimeProperty
-     */
     public function setDateTimeProperty(\DateTime $dateTimeProperty = null)
     {
         $this->dateTimeProperty = $dateTimeProperty;
@@ -731,9 +722,6 @@ class TestAuditDataOwner implements
         return $this->dateTimeTzProperty;
     }
 
-    /**
-     * @param \DateTime $dateTimeTzProperty
-     */
     public function setDateTimeTzProperty(\DateTime $dateTimeTzProperty = null)
     {
         $this->dateTimeTzProperty = $dateTimeTzProperty;
@@ -914,9 +902,6 @@ class TestAuditDataOwner implements
         return $this->childUnidirectional;
     }
 
-    /**
-     * @param TestAuditDataChild $childUnidirectional
-     */
     public function setChildUnidirectional(TestAuditDataChild $childUnidirectional = null)
     {
         $this->childUnidirectional = $childUnidirectional;
@@ -962,9 +947,6 @@ class TestAuditDataOwner implements
         return $this->timeProperty;
     }
 
-    /**
-     * @param \DateTime $timeProperty
-     */
     public function setTimeProperty(\DateTime $timeProperty = null)
     {
         $this->timeProperty = $timeProperty;
@@ -978,9 +960,6 @@ class TestAuditDataOwner implements
         return $this->childCascade;
     }
 
-    /**
-     * @param TestAuditDataChild $childCascade
-     */
     public function setChildCascade(TestAuditDataChild $childCascade = null)
     {
         $this->childCascade = $childCascade;
@@ -994,9 +973,6 @@ class TestAuditDataOwner implements
         return $this->childOrphanRemoval;
     }
 
-    /**
-     * @param TestAuditDataChild $childOrphanRemoval
-     */
     public function setChildOrphanRemoval(TestAuditDataChild $childOrphanRemoval = null)
     {
         $this->childOrphanRemoval = $childOrphanRemoval;
@@ -1010,9 +986,6 @@ class TestAuditDataOwner implements
         return $this->dateImmutable;
     }
 
-    /**
-     * @param \DateTimeImmutable $dateImmutable
-     */
     public function setDateImmutable(\DateTimeImmutable $dateImmutable = null)
     {
         $this->dateImmutable = $dateImmutable;
@@ -1026,9 +999,6 @@ class TestAuditDataOwner implements
         return $this->dateInterval;
     }
 
-    /**
-     * @param \DateInterval $dateInterval
-     */
     public function setDateInterval(\DateInterval $dateInterval = null)
     {
         $this->dateInterval = $dateInterval;
@@ -1042,9 +1012,6 @@ class TestAuditDataOwner implements
         return $this->datetimeImmutable;
     }
 
-    /**
-     * @param \DateTimeImmutable $datetimeImmutable
-     */
     public function setDatetimeImmutable(\DateTimeImmutable $datetimeImmutable = null)
     {
         $this->datetimeImmutable = $datetimeImmutable;
@@ -1058,9 +1025,6 @@ class TestAuditDataOwner implements
         return $this->datetimetzImmutable;
     }
 
-    /**
-     * @param \DateTimeImmutable $datetimetzImmutable
-     */
     public function setDatetimetzImmutable(\DateTimeImmutable $datetimetzImmutable = null)
     {
         $this->datetimetzImmutable = $datetimetzImmutable;
@@ -1087,9 +1051,6 @@ class TestAuditDataOwner implements
         return $this->timeImmutable;
     }
 
-    /**
-     * @param \DateTimeImmutable $timeImmutable
-     */
     public function setTimeImmutable(\DateTimeImmutable $timeImmutable = null)
     {
         $this->timeImmutable = $timeImmutable;

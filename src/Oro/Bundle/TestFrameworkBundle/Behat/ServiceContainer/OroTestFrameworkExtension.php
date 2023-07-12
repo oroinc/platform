@@ -454,11 +454,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         return array_merge($suiteContexts, $commonContexts);
     }
 
-    /**
-     * @param SymfonyBundleSuite $bundleSuite
-     *
-     * @return bool
-     */
     protected function hasValidPaths(SymfonyBundleSuite $bundleSuite): bool
     {
         if (!$bundleSuite->hasSetting('paths')) {

@@ -408,7 +408,6 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturn([\stdClass::class => $entitySecurityMetadata]);
 
-
         $this->assertEquals([$entitySecurityMetadata], $this->provider->getEntities());
         // test local cache
         $this->assertEquals([$entitySecurityMetadata], $this->provider->getEntities());

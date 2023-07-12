@@ -268,7 +268,7 @@ class AsyncOperation
     /**
      * Sets a user who created the asynchronous operation.
      *
-     * @param User $owningUser
+     * @param User|null $owningUser
      *
      * @return $this
      */
@@ -292,7 +292,7 @@ class AsyncOperation
     /**
      * Sets an organization the asynchronous operation belongs to.
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      *
      * @return $this
      */

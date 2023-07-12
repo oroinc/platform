@@ -429,7 +429,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         self::assertGreaterThan(0, $this->getGridPaginator($grid)->getTotalRecordsCount());
     }
 
-
     /**
      * Example: Then number of pages should be 3
      * Example: Then number of pages should be 15
@@ -473,9 +472,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )check records in grid:$/
      * @When /^(?:|I )check records in "(?P<gridName>[^"]+)":$/
      * @When /^(?:|I )check records in "(?P<gridName>[^"]+)" grid:$/
-     *
-     * @param TableNode $table
-     * @param string $gridName
      */
     public function iCheckRecordsInGrid(TableNode $table, ?string $gridName = null)
     {

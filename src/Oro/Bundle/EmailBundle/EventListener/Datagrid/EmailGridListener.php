@@ -122,7 +122,7 @@ class EmailGridListener
      *
      * @param array $filtersState
      * @param QueryBuilder $queryBuilder
-     * @param QueryBuilder $countQb
+     * @param QueryBuilder|null $countQb
      */
     protected function prepareQueryToFilter($filtersState, QueryBuilder $queryBuilder, QueryBuilder $countQb = null)
     {

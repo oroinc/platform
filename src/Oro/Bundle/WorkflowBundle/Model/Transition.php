@@ -174,7 +174,7 @@ class Transition
     /**
      * Set condition.
      *
-     * @param ExpressionInterface $condition
+     * @param ExpressionInterface|null $condition
      * @return Transition
      */
     public function setCondition(ExpressionInterface $condition = null)
@@ -238,7 +238,7 @@ class Transition
     }
 
     /**
-     * @param ActionInterface $preAction
+     * @param ActionInterface|null $preAction
      * @return Transition
      */
     public function setPreAction(ActionInterface $preAction = null)
@@ -256,7 +256,7 @@ class Transition
     }
 
     /**
-     * @param ActionInterface $action
+     * @param ActionInterface|null $action
      * @return Transition
      */
     public function setAction(ActionInterface $action = null)
@@ -335,7 +335,7 @@ class Transition
      * Check is transition allowed for current workflow item.
      *
      * @param WorkflowItem $workflowItem
-     * @param Collection $errors
+     * @param Collection|null $errors
      * @return bool
      */
     public function isAllowed(WorkflowItem $workflowItem, Collection $errors = null)
@@ -348,7 +348,7 @@ class Transition
      * Check that transition is available to show.
      *
      * @param WorkflowItem $workflowItem
-     * @param Collection $errors
+     * @param Collection|null $errors
      * @return bool
      */
     public function isAvailable(WorkflowItem $workflowItem, Collection $errors = null)

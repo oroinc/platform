@@ -10,9 +10,6 @@ class LexerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getTokenizeData
-     *
-     * @param array $tokens
-     * @param string $expression
      */
     public function testTokenize(array $tokens, string $expression): void
     {

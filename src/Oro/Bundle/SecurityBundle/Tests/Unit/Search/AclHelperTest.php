@@ -202,7 +202,6 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         $query->from(['testProduct', 'businessUnit']);
         $query->getCriteria()->andWhere(new Comparison('all_text', Comparison::EQ, new Value('some_value')));
 
-
         $this->searchAclHelperConditionProvider->expects(self::exactly(2))
             ->method('isApplicable')
             ->willReturnMap([

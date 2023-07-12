@@ -129,9 +129,6 @@ class RedisLockingSessionHandler extends AbstractSessionHandler
         $this->ttl = $ttl;
     }
 
-    /**
-     * @return bool
-     */
     public function close(): bool
     {
         if ($this->locking && $this->locked) {

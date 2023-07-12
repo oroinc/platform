@@ -79,7 +79,6 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         $this->assertPreExportActionExecuted($configuration);
         $this->assertMessageProcessorExecuted();
 
-
         self::assertMessageSent(ExportTopic::getName());
         $exportMessageData = $this->getOneSentMessageWithTopic(ExportTopic::getName());
         $jobId = $exportMessageData['jobId'];
@@ -289,14 +288,6 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         self::clearProcessedMessages();
         self::flushMessagesBuffer();
     }
-
-    /**
-     * @param int $jobId
-     * @param string $expectedCsvFilePath
-     * @param string $exportedFilename
-     * @param array $skippedColumns
-     * @return void
-     */
 
     protected function assertExportFileData(
         int    $jobId,

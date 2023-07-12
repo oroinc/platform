@@ -20,11 +20,6 @@ class MessageBufferManager
     /** @var string|null */
     private $connectionName;
 
-    /**
-     * @param BufferedMessageProducer $bufferedProducer
-     * @param ManagerRegistry         $doctrine
-     * @param string                  $connectionName
-     */
     public function __construct(
         BufferedMessageProducer $bufferedProducer,
         ManagerRegistry $doctrine,

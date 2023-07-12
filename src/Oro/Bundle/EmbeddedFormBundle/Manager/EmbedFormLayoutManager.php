@@ -36,7 +36,7 @@ class EmbedFormLayoutManager
 
     /**
      * @param EmbeddedForm  $formEntity
-     * @param FormInterface $form
+     * @param FormInterface|null $form
      *
      * @return Layout
      */

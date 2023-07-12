@@ -78,8 +78,6 @@ final class CompiledPropertyPath implements \IteratorAggregate, PropertyPathInte
 
     /**
      * Returns a new iterator for this path.
-     *
-     * @return PropertyPathIteratorInterface
      */
     public function getIterator(): PropertyPathIteratorInterface
     {

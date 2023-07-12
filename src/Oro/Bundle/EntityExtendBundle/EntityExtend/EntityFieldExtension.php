@@ -321,7 +321,6 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         }
     }
 
-
     /**
      * @inheritDoc
      */

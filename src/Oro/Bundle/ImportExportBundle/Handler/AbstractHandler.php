@@ -85,7 +85,7 @@ abstract class AbstractHandler
      * @param $processorType
      * @param $processorAlias
      *
-     * @return string
+     * @return string|null
      */
     public function getEntityName($processorType, $processorAlias): ?string
     {

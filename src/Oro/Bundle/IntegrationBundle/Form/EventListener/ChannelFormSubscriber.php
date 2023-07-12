@@ -282,9 +282,6 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
     /**
      * Disable fields that are not allowed to be modified since integration has at least one sync completed
-     *
-     * @param FormInterface $form
-     * @param Integration       $integration
      */
     protected function muteFields(FormInterface $form, Integration $integration = null)
     {

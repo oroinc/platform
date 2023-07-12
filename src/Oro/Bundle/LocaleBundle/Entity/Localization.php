@@ -240,7 +240,7 @@ class Localization implements DatesAwareInterface, ExtendEntityInterface
     }
 
     /**
-     * @param Localization $parentLocalization
+     * @param Localization|null $parentLocalization
      *
      * @return $this
      */

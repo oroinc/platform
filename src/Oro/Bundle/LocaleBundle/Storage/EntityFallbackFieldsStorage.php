@@ -18,9 +18,6 @@ class EntityFallbackFieldsStorage
         $this->fieldMap = $fieldMap;
     }
 
-    /**
-     * @return array
-     */
     public function getFieldMap(): array
     {
         return $this->fieldMap;

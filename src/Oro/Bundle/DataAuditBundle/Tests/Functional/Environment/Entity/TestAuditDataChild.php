@@ -158,9 +158,6 @@ class TestAuditDataChild implements
         return $this->owners;
     }
 
-    /**
-     * @param Collection $owners
-     */
     public function setOwners(Collection $owners = null)
     {
         $this->owners = $owners;
@@ -174,9 +171,6 @@ class TestAuditDataChild implements
         return $this->owner;
     }
 
-    /**
-     * @param TestAuditDataOwner $owner
-     */
     public function setOwner(TestAuditDataOwner $owner = null)
     {
         $this->owner = $owner;

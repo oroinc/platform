@@ -8,9 +8,6 @@ class ConfigurationHandlerMock extends ConfigurationHandler
 {
     private static ConfigurationHandler $instance;
 
-    /**
-     * @return ConfigurationHandler
-     */
     public static function getInstance(): ConfigurationHandler
     {
         if (!isset(self::$instance)) {

@@ -20,9 +20,6 @@ interface ConnectionCheckerInterface
 
     /**
      * Checks if connection can be checked for the specified DSN.
-     *
-     * @param Dsn $dsn
-     * @return bool
      */
     public function supports(Dsn $dsn): bool;
 }

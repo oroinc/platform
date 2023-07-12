@@ -151,7 +151,6 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
             ->with($arguments)
             ->willReturn($returnVal);
 
-
         //during initialize
         $this->actionGroupRegistry->expects(self::once())
             ->method('getNames')

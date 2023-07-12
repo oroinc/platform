@@ -79,7 +79,7 @@ interface ConfigInterface
      * Returns configuration attributes is filtered using the given callback function.
      * Returns all configuration attributes if $filter argument is not specified.
      *
-     * @param callable|null $filter The callback function to be used to filter attributes
+     * @param \Closure|null $filter The callback function to be used to filter attributes
      * @return array
      */
     public function all(\Closure $filter = null);

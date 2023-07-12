@@ -41,7 +41,6 @@ class AddressTypeController extends RestGetController
         return $this->handleGetRequest($name);
     }
 
-
     /**
      * {@inheritdoc}
      */

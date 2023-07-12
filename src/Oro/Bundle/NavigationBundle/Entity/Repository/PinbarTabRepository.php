@@ -94,7 +94,7 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
 
     /**
      * @param AbstractUser|integer $user
-     * @param OrganizationInterface $organization|null
+     * @param OrganizationInterface|null $organization
      * @param string|null $type
      *
      * @return QueryBuilder

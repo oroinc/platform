@@ -47,9 +47,6 @@ class OroDateTimeTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param array $expectedKeys
-     * @param array $expectedValues
      */
     public function testFinishView(array $options, array $expectedKeys, array $expectedValues): void
     {
@@ -86,8 +83,6 @@ class OroDateTimeTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider valuesDataProvider
-     * @param string $value
-     * @param \DateTime $expectedValue
      */
     public function testSubmitValidData(string $value, \DateTime $expectedValue): void
     {

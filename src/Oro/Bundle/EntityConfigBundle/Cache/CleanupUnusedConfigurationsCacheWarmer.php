@@ -58,9 +58,6 @@ class CleanupUnusedConfigurationsCacheWarmer implements CacheWarmerInterface
         $query->execute($this->logger);
     }
 
-    /**
-     * @return array
-     */
     private function getUnusedEntityConfigurations(): array
     {
         return [
@@ -69,9 +66,6 @@ class CleanupUnusedConfigurationsCacheWarmer implements CacheWarmerInterface
         ];
     }
 
-    /**
-     * @return array
-     */
     private function getUnusedFieldConfigurations(): array
     {
         return [

@@ -30,7 +30,7 @@ interface MailboxProcessProviderInterface
     /**
      * Returns true if process is enabled for given mailbox.
      *
-     * @param Mailbox $mailbox
+     * @param Mailbox|null $mailbox
      *
      * @return bool
      */

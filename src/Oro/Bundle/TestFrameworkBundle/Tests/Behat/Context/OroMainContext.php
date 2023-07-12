@@ -776,11 +776,10 @@ class OroMainContext extends MinkContext implements
      * @param string $session
      * @param string $alias
      * @param string $credential
-     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::switchToActorWindowSession
+     * @see OroMainContext::switchToActorWindowSession
      *
      * @Given /^(?:|I )login as "(?P<credential>(?:[^"]|\\")*)" and use in (?P<session>\w+) as (?P<alias>\w+)$/
      * @Given /^(?:|I )login as administrator and use in "(?P<session>[^"]*)" as "(?P<alias>[^"]*)"$/
-     *
      */
     public function loginAsUserWithPasswordInSession($session, $alias, $credential = 'admin')
     {
@@ -859,7 +858,6 @@ class OroMainContext extends MinkContext implements
         } else {
             $element = $this->findElementContains($selector, $title);
         }
-
 
         self::assertTrue(
             $element->isValid(),
@@ -1916,8 +1914,8 @@ JS;
     /**
      * Switch to named session window (aliases must be initialized earlier)
      * @param string $sessionAlias
-     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::sessionsInit
-     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::loginAsUserWithPasswordInSession
+     * @see OroMainContext::sessionsInit
+     * @see OroMainContext::loginAsUserWithPasswordInSession
      * To define session aliases
      *
      * Example1: I operate as the Manager
@@ -1932,7 +1930,7 @@ JS;
      * @Then /^I proceed as the ([^"]*)$/
      * @Then /^I switch to the "([^"]*)" session$/
      *
-     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::iOperateAsActorUnderSession
+     * @see OroMainContext::iOperateAsActorUnderSession
      */
     public function switchToActorWindowSession($sessionAlias)
     {
@@ -2393,8 +2391,6 @@ JS;
      * Example: And I press "Esc" key on "Default Addresses" element
      *
      * @When /^(?:|I )press "(?P<key>[^"]*)" key on "(?P<elementName>[\w\s]*)" element$/
-     * @param string $key
-     * @param string $elementName
      */
     public function pressKeyboardKey(string $key, string $elementName)
     {
@@ -2445,8 +2441,6 @@ JS;
      * Example: Then I should see "Some" element focused
      *
      * @Then /^(?:|I )should see "(?P<elementName>[\w\s]*)" element focused$/
-     *
-     * @param string $elementName
      */
     public function iShouldSeeElementFocused(string $elementName)
     {
@@ -2462,8 +2456,6 @@ JS;
      * Example: Then I should not see "Some" element focused
      *
      * @Then /^(?:|I )should not see "(?P<elementName>[\w\s]*)" element focused$/
-     *
-     * @param string $elementName
      */
     public function iShouldNotSeeElementFocused(string $elementName)
     {
@@ -2479,8 +2471,6 @@ JS;
      * Example: Then I should see focus within "Some" element
      *
      * @Then /^(?:|I )should see focus within "(?P<elementName>[\w\s]*)" element$/
-     *
-     * @param string $elementName
      */
     public function iShouldSeeFocusWithinElement(string $elementName)
     {
@@ -2495,8 +2485,6 @@ JS;
      * Example: Then I should not see focus within "Some" element
      *
      * @Then /^(?:|I )should not see focus within "(?P<elementName>[\w\s]*)" element$/
-     *
-     * @param string $elementName
      */
     public function iShouldNotSeeFocusWithinElement(string $elementName)
     {
@@ -3180,7 +3168,7 @@ JS;
      * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" if present$/
      *
      * @param string $button
-     * @throws \Behat\Mink\Exception\ElementNotFoundException
+     * @throws ElementNotFoundException
      */
     public function pressButtonIfPresent($button)
     {

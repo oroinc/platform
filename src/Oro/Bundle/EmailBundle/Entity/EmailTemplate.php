@@ -458,7 +458,7 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      *
      * @return EmailTemplate
      */

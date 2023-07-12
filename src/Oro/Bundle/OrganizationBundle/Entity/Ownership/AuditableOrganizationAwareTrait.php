@@ -31,7 +31,7 @@ trait AuditableOrganizationAwareTrait
     }
 
     /**
-     * @param OrganizationInterface|null $organization
+     * @param OrganizationInterface $organization
      * @return $this
      */
     public function setOrganization(OrganizationInterface $organization)

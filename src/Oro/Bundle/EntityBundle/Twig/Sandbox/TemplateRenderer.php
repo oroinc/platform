@@ -105,9 +105,6 @@ abstract class TemplateRenderer
         $this->environment->parse($stream);
     }
 
-    /**
-     * @return string
-     */
     abstract protected function getVariableNotFoundMessage(): ?string;
 
     protected function ensureSandboxConfigured(): void

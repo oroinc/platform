@@ -17,7 +17,7 @@ class MemoryCache implements ResetInterface
      * Fetches an entry from the cache.
      *
      * @param string $key
-     * @param mixed  $default
+     * @param mixed $default
      *
      * @return mixed The value of the item from the cache,
      *               or the given default value in case an entry does not exists in the cache

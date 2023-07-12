@@ -38,8 +38,6 @@ class Acl
     private $category;
 
     /**
-     * @param array $data
-     *
      * @throws \InvalidArgumentException
      */
     public function __construct(array $data = null)

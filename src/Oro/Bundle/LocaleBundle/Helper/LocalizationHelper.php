@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Helper;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
@@ -53,7 +54,7 @@ class LocalizationHelper
     /**
      * @param Collection|LocalizedFallbackValue[] $values
      * @param Localization|null $localization
-     * @return LocalizedFallbackValue
+     * @return AbstractLocalizedFallbackValue|null
      */
     public function getLocalizedValue(Collection $values, Localization $localization = null)
     {

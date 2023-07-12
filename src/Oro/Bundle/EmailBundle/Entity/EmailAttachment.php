@@ -186,7 +186,7 @@ class EmailAttachment implements FileExtensionInterface
     /**
      * Set email attachment
      *
-     * @param File $file
+     * @param File|null $file
      *
      * @return $this
      */
@@ -207,9 +207,6 @@ class EmailAttachment implements FileExtensionInterface
         return pathinfo($this->fileName, PATHINFO_EXTENSION);
     }
 
-    /**
-     * @return string|null
-     */
     public function getEmbeddedContentId(): ?string
     {
         return $this->embeddedContentId;

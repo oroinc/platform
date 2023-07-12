@@ -313,7 +313,7 @@ class Dashboard implements ExtendEntityInterface
     }
 
     /**
-     * @param Dashboard $dashboard
+     * @param Dashboard|null $dashboard
      * @return Dashboard
      */
     public function setStartDashboard(Dashboard $dashboard = null)
@@ -350,7 +350,7 @@ class Dashboard implements ExtendEntityInterface
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return Dashboard
      */
     public function setOrganization(Organization $organization = null)

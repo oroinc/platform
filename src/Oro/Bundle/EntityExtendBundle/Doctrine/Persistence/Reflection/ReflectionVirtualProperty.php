@@ -51,7 +51,7 @@ class ReflectionVirtualProperty extends \ReflectionProperty
 
     /**
      * @param mixed|ExtendEntityInterface $object
-     * @param mixed|null $value
+     * @param mixed $value
      * @return void
      */
     #[ReturnTypeWillChange]

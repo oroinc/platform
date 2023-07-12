@@ -18,7 +18,7 @@ interface ButtonProviderExtensionInterface
     /**
      * @param ButtonInterface $button
      * @param ButtonSearchContext $buttonSearchContext
-     * @param Collection $errors
+     * @param Collection|null $errors
      * @return bool
      * @throws UnsupportedButtonException
      */

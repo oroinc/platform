@@ -40,10 +40,6 @@ class LocalizedFallbackValueAuditStrategyProcessor implements EntityAuditStrateg
         return $fieldData;
     }
 
-    /**
-     * @param LocalizedFallbackValue $sourceEntity
-     * @return array|null
-     */
     private function processLocalizedFallbackValueTargetField(LocalizedFallbackValue $sourceEntity): ?array
     {
         $fieldMap = $this->storage->getFieldMap();

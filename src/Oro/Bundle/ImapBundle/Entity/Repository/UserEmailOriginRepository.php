@@ -16,7 +16,7 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 class UserEmailOriginRepository extends EntityRepository
 {
     /**
-     * @param string $type
+     * @param string|null $type
      * @return \Doctrine\ORM\QueryBuilder
      */
     public function getAllOriginsWithAccessTokens(string $type = null)
@@ -33,7 +33,7 @@ class UserEmailOriginRepository extends EntityRepository
     }
 
     /**
-     * @param string $type
+     * @param string|null $type
      * @return \Doctrine\ORM\QueryBuilder
      */
     public function getAllOriginsWithRefreshTokens(string $type = null)

@@ -34,7 +34,7 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
      * @param array      $requestData
      * @param bool       $allowIncludedResources
      * @param string     $primaryResourceClass
-     * @param mixed|null $primaryResourceId
+     * @param mixed $primaryResourceId
      *
      * @return Error[]
      */

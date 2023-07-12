@@ -48,7 +48,7 @@ class ActionGroup
 
     /**
      * @param ActionData $data
-     * @param Collection $errors
+     * @param Collection|null $errors
      * @return ActionData
      * @throws ForbiddenActionGroupException
      */

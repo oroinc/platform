@@ -286,7 +286,7 @@ class Group implements ExtendEntityInterface
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return Group
      */
     public function setOrganization(Organization $organization = null)

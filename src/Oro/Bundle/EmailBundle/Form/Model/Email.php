@@ -394,8 +394,6 @@ class Email implements OrganizationAwareInterface
 
     /**
      * Get email body
-     *
-     * @return string|null
      */
     public function getBody(): ?string
     {

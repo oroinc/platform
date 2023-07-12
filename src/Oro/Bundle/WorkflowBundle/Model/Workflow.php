@@ -200,7 +200,7 @@ class Workflow
      *
      * @param WorkflowItem $workflowItem
      * @param string|Transition $transition
-     * @param Collection $errors
+     * @param Collection|null $errors
      * @param bool $fireExceptions
      *
      * @return bool
@@ -460,7 +460,7 @@ class Workflow
      * @param string|Transition $transition
      * @param object $entity
      * @param array $data
-     * @param Collection $errors
+     * @param Collection|null $errors
      *
      * @return bool
      */
@@ -476,7 +476,7 @@ class Workflow
      *
      * @param WorkflowItem $workflowItem
      * @param string|Transition $transition
-     * @param Collection $errors
+     * @param Collection|null $errors
      *
      * @return bool
      */

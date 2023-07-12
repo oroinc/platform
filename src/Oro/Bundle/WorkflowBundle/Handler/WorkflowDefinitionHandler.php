@@ -27,8 +27,6 @@ class WorkflowDefinitionHandler
     }
 
     /**
-     * @param WorkflowDefinition $existingDefinition
-     * @param WorkflowDefinition|null $newDefinition
      * @throws \Exception
      */
     public function updateWorkflowDefinition(WorkflowDefinition $existingDefinition, WorkflowDefinition $newDefinition)

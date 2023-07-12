@@ -170,7 +170,6 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
     }
 
     /**
-     * @param  Impersonation $impersonation
      * @throws AuthenticationCredentialsNotFoundException when token is not found
      * @throws CustomUserMessageAuthenticationException when token is already used
      * @throws CustomUserMessageAuthenticationException when token is expired

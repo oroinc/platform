@@ -24,9 +24,6 @@ class UniqueJobHandlerTest extends WebTestCase
         $this->loadFixtures([LoadJobData::class]);
     }
 
-    /**
-     * @return Connection
-     */
     private function getConnection(): ?Connection
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class)->getConnection();

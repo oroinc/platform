@@ -122,7 +122,6 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
             false
         );
 
-
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
