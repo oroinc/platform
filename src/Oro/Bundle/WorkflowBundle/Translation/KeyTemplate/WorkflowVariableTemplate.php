@@ -9,9 +9,6 @@ class WorkflowVariableTemplate extends WorkflowTemplate
 {
     const NAME = 'workflow_variable';
 
-    /**
-     * @return string
-     */
     public function getTemplate(): string
     {
         return parent::getTemplate() . '.variable.{{ variable_name }}';

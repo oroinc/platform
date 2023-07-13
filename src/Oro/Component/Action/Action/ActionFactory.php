@@ -29,7 +29,7 @@ class ActionFactory implements ActionFactoryInterface
     /**
      * @param string $type
      * @param array $options
-     * @param ExpressionInterface $condition
+     * @param ExpressionInterface|null $condition
      * @throws \RunTimeException
      * @return ActionInterface
      */

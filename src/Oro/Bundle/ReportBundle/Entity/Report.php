@@ -376,7 +376,7 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return Report
      */
     public function setOrganization(Organization $organization = null)

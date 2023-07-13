@@ -68,10 +68,6 @@ class CommandArgsTokenizer
     }
 
     /**
-     * @param AbstractPlatform $platform
-     *
-     * @return CommandArgsNormalizer
-     *
      * @throws \InvalidArgumentException if there is no normalizer for the given database platform
      */
     private function getNormalizer(AbstractPlatform $platform): CommandArgsNormalizer

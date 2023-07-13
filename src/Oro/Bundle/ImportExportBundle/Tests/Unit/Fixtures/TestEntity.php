@@ -52,9 +52,6 @@ class TestEntity
         $this->organization = $organization;
     }
 
-    /**
-     * @return User
-     */
     public function getUserOwner(): ?User
     {
         return $this->userOwner;
@@ -65,9 +62,6 @@ class TestEntity
         $this->userOwner = $userOwner;
     }
 
-    /**
-     * @return BusinessUnit
-     */
     public function getBusinessUnitOwner(): ?BusinessUnit
     {
         return $this->businessUnitOwner;

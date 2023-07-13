@@ -108,8 +108,6 @@ class ImapMessageIterator implements \Iterator, \Countable
 
     /**
      * The number of messages in this iterator
-     *
-     * @return int
      */
     public function count(): int
     {

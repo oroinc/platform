@@ -424,7 +424,7 @@ class Reminder implements ExtendEntityInterface
     }
 
     /**
-     * @param User $sender
+     * @param User|null $sender
      *
      * @return Reminder
      */

@@ -61,7 +61,7 @@ trait FallbackTrait
 
     /**
      * @param Collection|AbstractLocalizedFallbackValue[] $values
-     * @param Localization                                $localization
+     * @param Localization|null $localization
      *
      * @return AbstractLocalizedFallbackValue|null
      *

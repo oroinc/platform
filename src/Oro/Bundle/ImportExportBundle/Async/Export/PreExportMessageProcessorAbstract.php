@@ -98,7 +98,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
     }
 
     /**
-     * @param string $jobUniqueName
      * @param array $body
      *
      * @return \Closure

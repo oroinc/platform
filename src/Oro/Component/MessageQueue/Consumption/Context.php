@@ -23,9 +23,6 @@ class Context
      */
     private $messageConsumer;
 
-    /**
-     * @var string
-     */
     private string $messageProcessorName = '';
 
     /**

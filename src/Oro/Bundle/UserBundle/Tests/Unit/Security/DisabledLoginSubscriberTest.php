@@ -20,7 +20,6 @@ class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /** @var User */
     private User $user;
 
     protected function setUp(): void

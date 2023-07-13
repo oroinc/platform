@@ -43,10 +43,6 @@ class EmailModelSender
      * Sends email using data from {@see EmailModel}.
      * Creates {@see EmailUser} entity.
      *
-     * @param EmailModel $emailModel
-     * @param EmailOrigin|null $emailOrigin
-     * @param bool $persist
-     * @return EmailUser
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
     public function send(EmailModel $emailModel, EmailOrigin $emailOrigin = null, bool $persist = true): EmailUser

@@ -35,14 +35,6 @@ class LocaleListener implements EventSubscriberInterface
 
     private ?string $currentLanguage = null;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param LocalizationProviderInterface $currentLocalizationProvider
-     * @param TranslatableListener $translatableListener
-     * @param TranslatorInterface $translator
-     * @param RequestContextAwareInterface|null $router
-     * @param ApplicationState $applicationState
-     */
     public function __construct(
         LocaleSettings $localeSettings,
         LocalizationProviderInterface $currentLocalizationProvider,
@@ -79,9 +71,6 @@ class LocaleListener implements EventSubscriberInterface
         $this->translator->setLocale($language);
     }
 
-    /**
-     * @param string $locale
-     */
     public function setPhpDefaultLocale(string $locale)
     {
         \Locale::setDefault($locale);

@@ -41,11 +41,6 @@ class PlaceholderProvider
 
     /**
      * Gets items by placeholder name.
-     *
-     * @param string $placeholderName
-     * @param array  $variables
-     *
-     * @return array
      */
     public function getPlaceholderItems(string $placeholderName, array $variables): ?array
     {

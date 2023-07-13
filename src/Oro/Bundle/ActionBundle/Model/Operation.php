@@ -86,8 +86,6 @@ class Operation
     }
 
     /**
-     * @param ActionData $data
-     * @param Collection $errors
      * @throws ForbiddenOperationException
      */
     public function execute(ActionData $data, Collection $errors = null)
@@ -105,7 +103,7 @@ class Operation
      * Check that operation is available to show
      *
      * @param ActionData $data
-     * @param Collection $errors
+     * @param Collection|null $errors
      * @return bool
      */
     public function isAvailable(ActionData $data, Collection $errors = null)
@@ -132,7 +130,7 @@ class Operation
 
     /**
      * @param ActionData $data
-     * @param Collection $errors
+     * @param Collection|null $errors
      * @return bool
      */
     protected function isPreConditionAllowed(ActionData $data, Collection $errors = null)
@@ -205,7 +203,7 @@ class Operation
     /**
      * @param ActionData $data
      * @param string $name
-     * @param Collection $errors
+     * @param Collection|null $errors
      * @return boolean
      */
     protected function evaluateConditions(ActionData $data, $name, Collection $errors = null)

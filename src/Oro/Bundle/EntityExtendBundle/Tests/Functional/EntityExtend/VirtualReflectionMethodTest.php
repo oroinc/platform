@@ -22,7 +22,6 @@ class VirtualReflectionMethodTest extends WebTestCase
         self::assertSame($virtualReflMethod->getName(), 'getPhone');
     }
 
-
     public function testGetName(): void
     {
         $virtualReflMethod = VirtualReflectionMethod::create(User::class, 'getUsername');
@@ -76,7 +75,6 @@ class VirtualReflectionMethodTest extends WebTestCase
         self::assertSame($virtualReflMethod::class, VirtualReflectionMethod::class);
         self::assertSame($virtualReflMethod->getName(), 'getEmail');
     }
-
 
     public function testCreateWithoutMethod(): void
     {

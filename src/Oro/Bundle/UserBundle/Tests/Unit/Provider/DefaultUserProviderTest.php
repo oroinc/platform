@@ -115,7 +115,6 @@ class DefaultUserProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($user, $this->provider->getDefaultUser('alias.key'));
     }
 
-
     public function testGetDefaultUserWhenItIsSetInConfigAndDoesNotExistInDatabaseAndAnotherDefaultUserNotFound(): void
     {
         $this->configManager->expects(self::once())

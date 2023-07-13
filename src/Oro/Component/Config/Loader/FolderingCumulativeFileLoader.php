@@ -317,13 +317,6 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
     }
 
     /**
-     * @param CumulativeFileLoader $loader
-     * @param string $bundleClass
-     * @param string $bundleDir
-     * @param string $bundleAppDir
-     * @param CumulativeResource $resource
-     * @param int $timestamp
-     * @return bool
      * @throws \Exception
      */
     private function isLoaderResourceFresh(

@@ -263,9 +263,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /**
      * Performs a synchronization of emails for the given email origin.
      *
-     * @param EmailOrigin $origin
-     * @param SynchronizationProcessorSettings $settings
-     *
      * @throws \Exception
      */
     protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null)

@@ -56,10 +56,6 @@ class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider logMassNotificationDataProvider
-     *
-     * @param SymfonyEmail $symfonyEmail
-     * @param int $sentCount
-     * @param MassNotification $massNotification
      */
     public function testLogMassNotification(
         SymfonyEmail $symfonyEmail,

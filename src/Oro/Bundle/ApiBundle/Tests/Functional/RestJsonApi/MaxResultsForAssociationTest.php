@@ -130,7 +130,6 @@ class MaxResultsForAssociationTest extends RestJsonApiTestCase
         self::assertCount(105, $data['included']);
     }
 
-
     public function testAssociationCustomMaxResultsLimitAndOrderBy()
     {
         $this->appendEntityConfig(

@@ -152,9 +152,6 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
 
     /**
      * Moves parent business unit before child business unit, of needs.
-     *
-     * @param array $businessUnitRelations
-     * @return array
      */
     private function rearrangeBusinessUnitRelations(array $businessUnitRelations): array
     {

@@ -97,9 +97,6 @@ class EntityGenerator
         }
     }
 
-    /**
-     * @return array
-     */
     private function getClearableFileExtensions(): array
     {
         return ['yml'];

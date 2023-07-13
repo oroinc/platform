@@ -98,7 +98,7 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
     }
 
     /**
-     * @param \DateTime $installedBuildDate
+     * @param \DateTime|null $installedBuildDate
      *
      * @return $this
      */

@@ -29,10 +29,6 @@ class ChoiceAccountType extends AbstractType
     /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param OAuthManagerRegistry $oauthManagerRegistry
-     */
     public function __construct(
         TranslatorInterface $translator,
         OAuthManagerRegistry $oauthManagerRegistry

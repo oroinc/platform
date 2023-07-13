@@ -334,7 +334,7 @@ abstract class EmailOrigin
     }
 
     /**
-     * @param OrganizationInterface $organization
+     * @param OrganizationInterface|null $organization
      *
      * @return $this
      */
@@ -396,7 +396,7 @@ abstract class EmailOrigin
     }
 
     /**
-     * @param Mailbox $mailbox
+     * @param Mailbox|null $mailbox
      *
      * @return $this
      */
@@ -407,17 +407,11 @@ abstract class EmailOrigin
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isSyncEnabled(): bool
     {
         return $this->isSyncEnabled ?? true;
     }
 
-    /**
-     * @param bool $isSyncEnabled
-     */
     public function setIsSyncEnabled(bool $isSyncEnabled): void
     {
         $this->isSyncEnabled = $isSyncEnabled;

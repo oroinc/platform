@@ -14,7 +14,7 @@ class ConfigCache extends ResourceCheckerConfigCache
 {
     private bool $debug;
 
-    /** @var ConfigCacheStateInterface[] */
+    /** @var ConfigCacheStateInterface[]|null */
     private ?array $dependencies = [];
 
     /**

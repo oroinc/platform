@@ -155,11 +155,6 @@ class EmailTemplateContentProvider
         );
     }
 
-    /**
-     * @param array $templateIndex
-     * @param Localization $localization
-     * @return EmailTemplateTranslation|null
-     */
     private function findTemplate(array &$templateIndex, ?Localization $localization): ?EmailTemplateTranslation
     {
         while ($localization) {

@@ -10,8 +10,5 @@ use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
  */
 interface ConfigurationHandlerAwareInterface
 {
-    /**
-     * @param ConfigurationHandler $configurationHandler
-     */
     public function setConfigurationHandler(ConfigurationHandler $configurationHandler): void;
 }

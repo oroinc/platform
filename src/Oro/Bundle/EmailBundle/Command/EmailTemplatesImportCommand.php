@@ -149,10 +149,6 @@ class EmailTemplatesImportCommand extends Command
         $this->doctrineHelper->getEntityManagerForClass(EmailTemplate::class)->persist($emailTemplate);
     }
 
-    /**
-     * @param EmailTemplate $emailTemplate
-     * @param array $template
-     */
     protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template)
     {
         $emailTemplate->setContent($template['content']);

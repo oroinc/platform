@@ -24,7 +24,7 @@ class TreeExecutor extends AbstractAction
     protected $logLevel;
 
     /**
-     * @param LoggerInterface $logger
+     * @param LoggerInterface|null $logger
      * @param string $logLevel
      */
     public function __construct(LoggerInterface $logger = null, $logLevel = 'ALERT')

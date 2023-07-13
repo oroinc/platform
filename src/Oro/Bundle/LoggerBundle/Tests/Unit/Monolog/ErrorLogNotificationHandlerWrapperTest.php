@@ -67,8 +67,6 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider throwableDataProvider
-     *
-     * @param \Throwable $throwable
      */
     public function testHandleBatchLogsWarningWhenCannotSendEmail(\Throwable $throwable): void
     {
@@ -144,8 +142,6 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider throwableDataProvider
-     *
-     * @param \Throwable $throwable
      */
     public function testHandleLogsWarningWhenCannotSendEmail(\Throwable $throwable): void
     {

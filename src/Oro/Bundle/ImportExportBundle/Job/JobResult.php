@@ -80,7 +80,7 @@ class JobResult
     }
 
     /**
-     * @param $needRedelivery
+     * @param bool $needRedelivery
      *
      * @return JobResult
      */

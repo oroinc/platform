@@ -227,7 +227,7 @@ abstract class OroKernel extends Kernel
     }
 
     /**
-     * @param $bundles
+     * @param array $bundles
      *
      * @return array
      */

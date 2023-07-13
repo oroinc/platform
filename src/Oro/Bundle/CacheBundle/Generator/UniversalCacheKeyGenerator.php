@@ -63,8 +63,6 @@ class UniversalCacheKeyGenerator
 
     /**
      * Adopt cache key to be valid for Symfony Cache adapters
-     * @param string $cacheKey
-     * @return string
      */
     public static function normalizeCacheKey(string $cacheKey): string
     {

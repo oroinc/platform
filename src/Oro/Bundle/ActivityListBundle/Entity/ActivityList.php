@@ -361,7 +361,7 @@ class ActivityList implements
     /**
      * Set owning organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      *
      * @return self
      */
@@ -373,7 +373,7 @@ class ActivityList implements
     }
 
     /**
-     * @param User $owner
+     * @param User|null $owner
      *
      * @return self
      */

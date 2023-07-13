@@ -29,13 +29,6 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
     /** @var EventDispatcherInterface|null */
     private $eventDispatcher;
 
-    /**
-     * @param array                         $providers
-     * @param ContainerInterface            $providerContainer
-     * @param LabelProviderInterface|null   $groupNameProvider
-     * @param EventDispatcherInterface|null $eventDispatcher
-     * @param int                           $pageType
-     */
     public function __construct(
         array $providers,
         ContainerInterface $providerContainer,

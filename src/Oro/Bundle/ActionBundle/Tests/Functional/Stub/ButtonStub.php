@@ -82,9 +82,6 @@ class ButtonStub implements ButtonInterface
         return $this->buttonOptions['name'];
     }
 
-    /**
-     * @return string
-     */
     public function getLabel(): string
     {
         return (string) $this->buttonOptions['label'];

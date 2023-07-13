@@ -28,10 +28,6 @@ class UnderlyingAclCache
      */
     protected int $batchSize = 1000;
 
-    /**
-     * @param CacheItemPoolInterface $cacheProvider
-     * @param int           $batchSize
-     */
     public function __construct(CacheItemPoolInterface $cacheProvider, int $batchSize = 1000)
     {
         $this->cache = $cacheProvider;

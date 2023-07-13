@@ -81,12 +81,6 @@ class JobProcessor
         return $this->createRootJob($ownerId, $jobName, $unique);
     }
 
-    /**
-     * @param string $jobName
-     * @param Job $rootJob
-     *
-     * @return Job
-     */
     public function findOrCreateChildJob(string $jobName, Job $rootJob): ?Job
     {
         if (!$jobName) {
@@ -297,12 +291,6 @@ class JobProcessor
         return $this->doctrine->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
     }
 
-    /**
-     * @param string $ownerId
-     * @param string $jobName
-     * @param bool $unique
-     * @return Job|null
-     */
     public function createRootJob(string $ownerId, string $jobName, bool $unique): ?Job
     {
         $job = $this->getJobRepository()->createJob();

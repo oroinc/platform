@@ -93,8 +93,8 @@ class QueryExpressionVisitor extends ExpressionVisitor
      * Binds a new parameter.
      *
      * @param Parameter|string $parameter An instance of Parameter object or the name of a parameter
-     * @param mixed            $value     The value of a parameter
-     * @param mixed            $type      The data type of a parameter
+     * @param mixed $value The value of a parameter
+     * @param mixed $type The data type of a parameter
      */
     public function addParameter(Parameter|string $parameter, mixed $value = null, mixed $type = null): void
     {

@@ -165,7 +165,7 @@ abstract class AbstractAudit
     /**
      * Set user
      *
-     * @param  AbstractUser $user
+     * @param AbstractUser|null $user
      * @return AbstractAudit
      */
     abstract public function setUser(AbstractUser $user = null);
@@ -242,7 +242,7 @@ abstract class AbstractAudit
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return AbstractAudit
      */
     public function setOrganization(Organization $organization = null)
@@ -263,7 +263,7 @@ abstract class AbstractAudit
     }
 
     /**
-     * @param Impersonation $impersonation
+     * @param Impersonation|null $impersonation
      * @return $this
      */
     public function setImpersonation(Impersonation $impersonation = null)

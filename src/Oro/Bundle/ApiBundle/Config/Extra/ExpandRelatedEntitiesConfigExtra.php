@@ -15,7 +15,7 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
 
     /** @var string[] */
     private array $expandedEntities;
-    /** @var array|null */
+
     private ?array $map = null;
 
     /**

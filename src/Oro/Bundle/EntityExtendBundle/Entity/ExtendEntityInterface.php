@@ -11,9 +11,6 @@ interface ExtendEntityInterface
 {
     /**
      * Gets extended property value
-     *
-     * @param string $name
-     * @return mixed
      */
     public function get(string $name): mixed;
 

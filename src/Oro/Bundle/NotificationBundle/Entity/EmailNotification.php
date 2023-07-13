@@ -145,7 +145,7 @@ class EmailNotification implements ExtendEntityInterface
     /**
      * Set template
      *
-     * @param EmailTemplate $template
+     * @param EmailTemplate|null $template
      *
      * @return EmailNotification
      */
@@ -169,7 +169,7 @@ class EmailNotification implements ExtendEntityInterface
     /**
      * Set recipient
      *
-     * @param RecipientList $recipientList
+     * @param RecipientList|null $recipientList
      *
      * @return EmailNotification
      */

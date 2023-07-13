@@ -20,11 +20,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider implements Configurat
 
     private Container $container;
 
-    /**
-     * @param string $cacheFile
-     * @param bool $debug
-     * @param Container $container
-     */
     public function __construct(string $cacheFile, bool $debug, Container $container)
     {
         parent::__construct($cacheFile, $debug);

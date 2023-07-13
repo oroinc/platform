@@ -19,8 +19,6 @@ class LoggerStrategy implements LoggerInterface
 
     /**
      * Constructor allows us to pass logger when strategy is instantiating or whenever you want
-     *
-     * @param LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger = null)
     {

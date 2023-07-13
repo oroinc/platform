@@ -445,10 +445,6 @@ class JobExecutor
      * In most cases this occurs in a race condition issue when couple of consumers try to process data
      * in which we have a UNIQUE constraint. workaround is to requeue a message with this job
      * or exception is a RetryableException
-     *
-     * @param string $exceptionClass
-     *
-     * @return bool
      */
     private function isRedeliveryException(string $exceptionClass): bool
     {

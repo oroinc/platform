@@ -165,7 +165,6 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
             ->with($object, $organization)
             ->willReturn(true);
 
-
         $this->authorizationChecker->expects(self::exactly($permissionsChecksNumberOfCalls))
             ->method('isGranted')
             ->with('VIEW', $object)

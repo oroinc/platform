@@ -12,7 +12,7 @@ interface ActionFactoryInterface extends FactoryWithTypesInterface
      *
      * @param string $type
      * @param array $options
-     * @param ExpressionInterface $condition
+     * @param ExpressionInterface|null $condition
      * @throws \RunTimeException
      * @return ActionInterface
      */

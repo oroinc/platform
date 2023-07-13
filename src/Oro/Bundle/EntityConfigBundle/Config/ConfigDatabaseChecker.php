@@ -11,7 +11,6 @@ use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
  */
 class ConfigDatabaseChecker extends DatabaseChecker
 {
-    /** @var LockObject */
     private LockObject $lockObject;
 
     /**

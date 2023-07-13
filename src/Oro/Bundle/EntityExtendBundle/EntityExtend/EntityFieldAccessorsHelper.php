@@ -45,9 +45,6 @@ class EntityFieldAccessorsHelper
         return 'remove'.\ucfirst(self::getSingular($fieldName));
     }
 
-    /**
-     * @return Inflector
-     */
     public static function getInflector(): Inflector
     {
         if (!self::$inflector) {

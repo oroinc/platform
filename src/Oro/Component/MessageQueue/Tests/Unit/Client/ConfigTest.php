@@ -29,8 +29,6 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider queueNameDataProvider
-     *
-     * @param string $queueName
      */
     public function testAddTransportPrefix(string $transportPrefix, string $queueName): void
     {

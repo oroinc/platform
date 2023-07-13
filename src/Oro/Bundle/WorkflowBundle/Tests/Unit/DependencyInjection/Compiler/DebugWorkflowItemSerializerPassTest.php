@@ -34,7 +34,6 @@ class DebugWorkflowItemSerializerPassTest extends \PHPUnit\Framework\TestCase
 
         $this->compiler->process($container);
 
-
         $expectedService = new Definition(DebugWorkflowItemSerializer::class);
         $expectedService->setDecoratedService('oro_workflow.workflow_item_serializer', null, -255);
         $expectedService->setArguments([

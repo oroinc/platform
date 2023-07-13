@@ -173,8 +173,6 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider lintDataProvider
-     *
-     * @param string $expression
      */
     public function testLint(string $expression): void
     {
@@ -185,8 +183,6 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider lintDataProvider
-     *
-     * @param string $expression
      */
     public function testLintWhenExpressionObject(string $expression): void
     {
@@ -220,10 +216,6 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider evaluateDataProvider
-     *
-     * @param string $expression
-     * @param array $values
-     * @param mixed $expected
      */
     public function testEvaluate(string $expression, array $values, mixed $expected): void
     {
@@ -234,10 +226,6 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider evaluateDataProvider
-     *
-     * @param string $expression
-     * @param array $values
-     * @param mixed $expected
      */
     public function testEvaluateWhenExpressionObject(string $expression, array $values, mixed $expected): void
     {

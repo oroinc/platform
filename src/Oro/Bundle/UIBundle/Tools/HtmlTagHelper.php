@@ -247,8 +247,6 @@ class HtmlTagHelper implements TranslatorAwareInterface
 
     /**
      * Create cache dir if it is needed
-     *
-     * @param string $cacheDir
      */
     private function touchCacheDir(string $cacheDir): void
     {

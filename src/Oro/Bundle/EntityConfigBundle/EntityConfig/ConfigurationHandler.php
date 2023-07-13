@@ -184,7 +184,6 @@ class ConfigurationHandler
         return $this->providerBag->getProvider($scope)->getPropertyConfig();
     }
 
-
     /**
      * @param FieldMetadata|EntityMetadata|null $metadata
      * @param array                             $providers

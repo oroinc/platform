@@ -26,7 +26,7 @@ class SyncEvent extends Event
     /**
      * @param string    $jobName
      * @param array     $configuration
-     * @param JobResult $jobResult
+     * @param JobResult|null $jobResult
      */
     public function __construct($jobName, array $configuration, JobResult $jobResult = null)
     {

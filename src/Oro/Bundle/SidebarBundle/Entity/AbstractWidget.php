@@ -204,7 +204,7 @@ class AbstractWidget
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return Widget
      */
     public function setOrganization(Organization $organization = null)

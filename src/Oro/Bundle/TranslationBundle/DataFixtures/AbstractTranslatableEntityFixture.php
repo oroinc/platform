@@ -40,9 +40,6 @@ abstract class AbstractTranslatableEntityFixture extends AbstractFixture impleme
         $this->loadEntities($manager);
     }
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;

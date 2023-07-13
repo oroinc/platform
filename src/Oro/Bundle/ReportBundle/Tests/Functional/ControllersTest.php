@@ -86,11 +86,6 @@ class ControllersTest extends WebTestCase
         return self::getContainer()->get('oro_datagrid.tests.datagrid_orm_query_collector');
     }
 
-    /**
-     * @param Crawler $crawler
-     *
-     * @return Form
-     */
     private function getReportForm(Crawler $crawler): Form
     {
         return $crawler->selectButton('Save and Close')->form();

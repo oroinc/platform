@@ -159,9 +159,6 @@ class QueueConsumer
     }
 
     /**
-     * @param ExtensionInterface $extension
-     * @param Context $context
-     *
      * @throws ConsumptionInterruptedException
      */
     protected function doConsume(ExtensionInterface $extension, Context $context): void

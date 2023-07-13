@@ -39,11 +39,6 @@ class SimpleTagGeneratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider generateDataProvider
-     *
-     * @param mixed $data
-     * @param bool  $includeCollectionTag
-     * @param bool  $processNestedData
-     * @param int   $expectedCount
      */
     public function testGenerate(mixed $data, bool $includeCollectionTag, bool $processNestedData, int $expectedCount)
     {

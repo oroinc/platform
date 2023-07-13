@@ -242,7 +242,6 @@ abstract class OrmTestCase extends TestCase
         return $this->metadataCacheImpl;
     }
 
-
     protected function getQueryCacheImpl(): CacheItemPoolInterface
     {
         // do not cache anything to avoid influence between tests

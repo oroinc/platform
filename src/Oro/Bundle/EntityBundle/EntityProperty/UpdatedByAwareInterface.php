@@ -12,7 +12,7 @@ interface UpdatedByAwareInterface
     public function getUpdatedBy();
 
     /**
-     * @param User $updatedBy
+     * @param User|null $updatedBy
      * @return mixed
      */
     public function setUpdatedBy(User $updatedBy = null);
