@@ -81,7 +81,7 @@ const ExpressionEditorView = BaseView.extend({
             throw new Error('Option `util` is required for `ExpressionEditorView`');
         }
 
-        _.extend(this, _.pick(options, 'util'));
+        _.extend(this, _.pick(options, 'util', 'operationButtons'));
 
         this.autocompleteData = {};
         this.dataSource = this.dataSource || {};
@@ -109,7 +109,8 @@ const ExpressionEditorView = BaseView.extend({
         const startState = EditorState.create({
             doc: this.el.value,
             extensions: expressionEditorExtensions({
-                util: this.util
+                util: this.util,
+                operationButtons: this.operationButtons
             })
         });
 
