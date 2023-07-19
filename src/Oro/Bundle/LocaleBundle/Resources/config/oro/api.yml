@@ -1,7 +1,25 @@
 api:
     entities:
+        Oro\Bundle\TranslationBundle\Entity\Language:
+            documentation_resource: '@OroLocaleBundle/Resources/doc/api/supported_language.md'
+            fields:
+                name:
+                    data_type: string
+                    property_path: _
+
         Oro\Bundle\LocaleBundle\Entity\Localization:
             documentation_resource: '@OroLocaleBundle/Resources/doc/api/localization.md'
+            fields:
+                languageCode:
+                    property_path: language.code
+                language:
+                    exclude: true
+            filters:
+                fields:
+                    languageCode:
+                        data_type: string
+                        type: languageCode
+                        allow_array: true
             actions:
                 create: false
                 update: false
@@ -9,7 +27,7 @@ api:
                 delete: false
 
         Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
-            documentation_resource: '@OroLocaleBundle/Resources/doc/api/localization.md'
+            documentation_resource: '@OroLocaleBundle/Resources/doc/api/localized_fallback_value.md'
             actions:
                 delete_list: false
                 delete: false

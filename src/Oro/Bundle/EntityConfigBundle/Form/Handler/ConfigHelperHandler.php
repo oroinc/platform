@@ -12,9 +12,7 @@ use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Encapsulate a logic for config form handlers
@@ -23,38 +21,12 @@ class ConfigHelperHandler
 {
     use RequestHandlerTrait;
 
-    /** @var FormFactoryInterface */
-    private $formFactory;
-
-    /** @var Session */
-    private $session;
-
-    /** @var Router */
-    private $router;
-
-    /** @var ConfigHelper */
-    private $configHelper;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /** @var UrlGeneratorInterface */
-    protected $urlGenerator;
-
     public function __construct(
-        FormFactoryInterface $formFactory,
-        Session $session,
-        Router $router,
-        ConfigHelper $configHelper,
-        TranslatorInterface $translator,
-        UrlGeneratorInterface $urlGenerator
+        private FormFactoryInterface $formFactory,
+        private RequestStack $requestStack,
+        private Router $router,
+        private ConfigHelper $configHelper,
     ) {
-        $this->formFactory = $formFactory;
-        $this->session = $session;
-        $this->router = $router;
-        $this->configHelper = $configHelper;
-        $this->translator = $translator;
-        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -116,7 +88,7 @@ class ConfigHelperHandler
      */
     public function showSuccessMessageAndRedirect(FieldConfigModel $fieldConfigModel, $successMessage)
     {
-        $this->session->getFlashBag()->add('success', $successMessage);
+        $this->requestStack->getSession()->getFlashBag()->add('success', $successMessage);
 
         return $this->redirect($fieldConfigModel);
     }

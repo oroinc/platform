@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import {where} from 'underscore';
 import AbstractFilterTranslatorFromExpression from './abstract-filter-translator';
 import NumberFilterTranslatorToExpression
     from 'oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator';
@@ -43,7 +43,7 @@ class NumberFilterTranslatorFromExpression extends AbstractFilterTranslatorFromE
             return null;
         }
 
-        const matchedParams = _.where(this.constructor.OPERATOR_MAP, {operator: node.attrs.operator})
+        const matchedParams = where(this.constructor.OPERATOR_MAP, {operator: node.attrs.operator})
             // clone nested params objects to preserve originals untouched
             .map(params => ({...params}));
 

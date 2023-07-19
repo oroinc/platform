@@ -27,7 +27,7 @@ class SaveEntity implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -44,21 +44,15 @@ class SaveEntity implements ProcessorInterface
             return;
         }
 
-        $em = $this->doctrineHelper->getEntityManager($entity, false);
-        if (null === $em) {
-            // only manageable entities are supported
-            return;
-        }
-
-        $metadata = $context->getMetadata();
-        if (null === $metadata) {
-            // the metadata does not exist
+        $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
+        if (!$entityClass) {
+            // only manageable entities or resources based on manageable entities are supported
             return;
         }
 
         try {
             $this->flushDataHandler->flushData(
-                $em,
+                $this->doctrineHelper->getEntityManagerForClass($entityClass),
                 new FlushDataHandlerContext([$context], $context->getSharedData())
             );
         } catch (UniqueConstraintViolationException $e) {
@@ -66,14 +60,6 @@ class SaveEntity implements ProcessorInterface
                 Error::createConflictValidationError('The entity already exists')
                     ->setInnerException($e)
             );
-        }
-
-        // save entity id into the context
-        if (!$context->hasErrors()) {
-            $id = $metadata->getIdentifierValue($entity);
-            if (null !== $id) {
-                $context->setId($id);
-            }
         }
 
         $context->setProcessed(self::OPERATION_NAME);

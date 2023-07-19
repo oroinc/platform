@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import AbstractFilterTranslatorToExpression from './abstract-filter-translator';
 import {BinaryNode, ConstantNode} from 'oroexpressionlanguage/js/expression-language-library';
 
@@ -51,7 +50,7 @@ class BooleanFilterTranslatorToExpression extends AbstractFilterTranslatorToExpr
      * @inheritDoc
      */
     testToConfig(filterValue) {
-        return _.any(this.filterConfig.choices, {value: filterValue.value});
+        return this.filterConfig.choices.some(option => option.value === filterValue.value);
     }
 
     /**

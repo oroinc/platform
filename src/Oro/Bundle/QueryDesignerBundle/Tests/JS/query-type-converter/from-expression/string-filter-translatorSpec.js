@@ -2,10 +2,10 @@ import StringFilterTranslatorFromExpression
     from 'oroquerydesigner/js/query-type-converter/from-expression/string-filter-translator';
 import FieldIdTranslatorFromExpression
     from 'oroquerydesigner/js/query-type-converter/from-expression/field-id-translator';
-import {BinaryNode, ConstantNode, NameNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {BinaryNode, ConstantNode, NameNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {createArrayNode, createFunctionNode, createGetAttrNode}
+    from 'oroexpressionlanguage/js/expression-language-tools';
 import 'lib/jasmine-oro';
-
-const {createArrayNode, createFunctionNode, createGetAttrNode} = tools;
 
 describe('oroquerydesigner/js/query-type-converter/from-expression/string-filter-translator', () => {
     let translator;

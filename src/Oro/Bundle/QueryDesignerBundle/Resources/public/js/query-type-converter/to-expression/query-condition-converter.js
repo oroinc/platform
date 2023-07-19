@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import {isEmpty, isObject} from 'underscore';
 import ToExpressionCompiler from 'oroexpressionlanguage/js/to-expression-compiler';
 import {BinaryNode} from 'oroexpressionlanguage/js/expression-language-library';
 
@@ -13,21 +13,21 @@ class QueryConditionConverterToExpression {
     }
 
     /**
-     * Converts expression to expression string
+     * Converts conditions array to expression string
      *
      * @param {Array<Object|Array|string>} condition
      * @return {string|undefined}
      */
     convert(condition) {
         if (!this.test(condition)) {
-            return void 0;
+            return null;
         } else if (condition.length === 0) {
             return '';
         }
 
         const ast = this.convertToAST(condition);
 
-        return ast ? this.compiler.compile(ast) : void 0;
+        return ast ? this.compiler.compile(ast) : null;
     }
 
     /**
@@ -37,7 +37,7 @@ class QueryConditionConverterToExpression {
      * @return {boolean}
      */
     test(condition) {
-        return _.isArray(condition) &&
+        return Array.isArray(condition) &&
             // empty or has odd length
             (condition.length === 0 || condition.length % 2 === 1) &&
             condition.every((item, index) => {
@@ -45,11 +45,11 @@ class QueryConditionConverterToExpression {
                 // every element with odd index has to be string 'AND' or 'OR'
                 return isOdd && (item === 'AND' || item === 'OR') ||
                     // every element with even index has to be not empty
-                    !isOdd && !_.isEmpty(item) && (
+                    !isOdd && !isEmpty(item) && (
                         // array with valid structure
-                        _.isArray(item) && this.test(item) ||
+                        Array.isArray(item) && this.test(item) ||
                         // or plain object
-                        _.isObject(item) && !_.isArray(item)
+                        isObject(item) && !Array.isArray(item)
                     );
             });
     }
@@ -62,32 +62,42 @@ class QueryConditionConverterToExpression {
      */
     convertToAST(condition) {
         const mapped = condition.map(item => {
-            let ast;
-            if (_.isArray(item)) {
+            let node;
+            if (Array.isArray(item)) {
                 return this.convertToAST(item);
-            } else if (_.isObject(item)) {
+            } else if (isObject(item)) {
                 for (let i = 0; i < this.translators.length; i++) {
-                    ast = this.translators[i].tryToTranslate(item);
-                    if (ast) {
+                    node = this.translators[i].tryToTranslate(item);
+                    if (node) {
                         break;
                     }
                 }
-                return ast;
+                return node;
             } else {
                 return item.toLowerCase();
             }
         });
 
-        if (!_.every(mapped)) {
+        if (mapped.some(item => isEmpty(item))) {
             return null;
         }
 
-        let ast = mapped[0];
-        for (let i = 1; i < mapped.length; i += 2) {
-            ast = new BinaryNode(mapped[i], ast, mapped[i + 1]);
+        let index;
+        // first process all AND operations, since it has precedence over OR operation
+        while ((index = mapped.indexOf('and')) !== -1) {
+            const [leftNode, operation, rightNode] = mapped.slice(index - 1, index + 2);
+            const node = new BinaryNode(operation, leftNode, rightNode);
+            mapped.splice(index - 1, 3, node);
         }
 
-        return ast;
+        // combine remaining operations, which are all OR operations
+        while (mapped.length > 1) {
+            const [leftNode, operation, rightNode] = mapped.slice(0, 3);
+            const node = new BinaryNode(operation, leftNode, rightNode);
+            mapped.splice(0, 3, node);
+        }
+
+        return mapped[0];
     }
 }
 

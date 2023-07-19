@@ -44,7 +44,6 @@ services:
         public: true
         arguments:
             - '@request_stack'
-            - '@session'
             - '@oro_ui.router'
             - '@oro_entity.doctrine_helper'
             - '@oro_form.update_factory'

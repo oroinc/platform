@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional\EntityExtend;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityExtendBundle\Doctrine\Persistence\Reflection\ReflectionVirtualProperty;
 use Oro\Bundle\EntityExtendBundle\Doctrine\Persistence\Reflection\VirtualReflectionMethod;
 use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
@@ -38,13 +39,13 @@ class EntityReflectionClassTest extends WebTestCase
                 'exists' => true
             ],
             'attribute field exists' => [
-                'class' => User::class,
-                'property' => 'avatar',
+                'class' => AttributeFamily::class,
+                'property' => 'image',
                 'exists' => true
             ],
-            'multi enum field exists' => [
+            'enum field exists' => [
                 'class' => User::class,
-                'property' => 'title',
+                'property' => 'auth_status',
                 'exists' => true
             ],
             'serialized_data field exists' => [
@@ -184,14 +185,14 @@ class EntityReflectionClassTest extends WebTestCase
                 'method' => 'setAvatar',
                 'exists' => true
             ],
-            'method get multi enum field exists' => [
+            'method get enum field exists' => [
                 'class' => User::class,
-                'method' => 'getTitle',
+                'method' => 'getAuthStatus',
                 'exists' => true
             ],
-            'method set multi enum field exists' => [
+            'method set enum field exists' => [
                 'class' => User::class,
-                'method' => 'setTitle',
+                'method' => 'setAuthStatus',
                 'exists' => true
             ],
             'get serialized_data method exists' => [

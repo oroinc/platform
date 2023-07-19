@@ -1,0 +1,154 @@
+api:
+    entity_aliases:
+        Oro\Bundle\TranslationBundle\Entity\TranslationKey:
+            alias: translation
+            plural_alias: translations
+        # redefine aliases for Translation entity to avoid "the alias already used by TranslationKey entity" exception
+        Oro\Bundle\TranslationBundle\Entity\Translation:
+            alias: translation_not_used
+            plural_alias: translations_not_used
+        Oro\Bundle\TranslationBundle\Api\Model\TranslationDomain:
+            alias: translationdomain
+            plural_alias: translationdomains
+        Oro\Bundle\TranslationBundle\Entity\Language:
+            alias: supportedlanguage
+            plural_alias: supportedlanguages
+
+    entities:
+        Oro\Bundle\TranslationBundle\Entity\TranslationKey:
+            documentation_resource: '@OroTranslationBundle/Resources/doc/api/translation.md'
+            fields:
+                id:
+                    data_type: string
+                    depends_on: [languageCode]
+                languageCode:
+                    data_type: string
+                hasTranslation:
+                    data_type: boolean
+                    depends_on: [translationId]
+                value:
+                    data_type: string
+                    property_path: _
+                    depends_on: [key,domain,languageCode]
+                englishValue:
+                    data_type: string
+                    property_path: _
+                    depends_on: [key,domain]
+                translatedValue:
+                    data_type: string
+                translationId:
+                    exclude: true
+                    data_type: integer
+            filters:
+                fields:
+                    id:
+                        type: translationId
+                        allow_array: true
+                    domain:
+                        allow_array: true
+                        operators: [ '=', '!=' ]
+                    key:
+                        allow_array: true
+                        operators: [ '=', '!=', '~', '!~', '^', '!^', '$', '!$' ]
+                    languageCode:
+                        data_type: string
+                        type: languageCode
+                        property_path: '{language}.code'
+                        allow_array: true
+                    hasTranslation:
+                        data_type: boolean
+                        property_path: '{hasTranslation}'
+                    translatedValue:
+                        data_type: string
+                        property_path: '{translation}.value'
+                        operators: [ '=', '!=', '*', '~', '!~', '^', '!^', '$', '!$' ]
+            sorters:
+                fields:
+                    domain: ~
+                    key: ~
+                    languageCode:
+                        property_path: '{language}.code'
+                    hasTranslation:
+                        property_path: '{hasTranslation}'
+            actions:
+                get_list:
+                    description: Get Translations
+                    max_results: 1000
+                get:
+                    description: Get Translation
+                update_list:
+                    description: Create or update a list of Translations
+                create:
+                    description: Update Translation
+                    acl_resource: oro_translation_language_translate
+                    form_options:
+                        data_class: Oro\Bundle\TranslationBundle\Api\Model\TranslationCreate
+                    fields:
+                        domain:
+                            form_options:
+                                constraints:
+                                    - NotBlank: ~
+                        key:
+                            form_options:
+                                constraints:
+                                    - NotBlank: ~
+                        languageCode:
+                            form_options:
+                                constraints:
+                                    - NotBlank: ~
+                update:
+                    description: Update Translation
+                    acl_resource: oro_translation_language_translate
+                    form_options:
+                        data_class: Oro\Bundle\TranslationBundle\Api\Model\TranslationUpdate
+                delete: false
+                delete_list: false
+
+        Oro\Bundle\TranslationBundle\Api\Model\TranslationDomain:
+            documentation_resource: '@OroTranslationBundle/Resources/doc/api/translation_domain.md'
+            disable_meta_properties: true
+            disable_fieldset: true
+            identifier_field_names: [name]
+            fields:
+                name:
+                    data_type: string
+                description:
+                    data_type: string
+            actions:
+                get_list:
+                    page_size: -1 # disable paging
+                    disable_sorting: true
+                get: false
+                create: false
+                update: false
+                delete: false
+                delete_list: false
+
+        Oro\Bundle\TranslationBundle\Entity\Language:
+            documentation_resource: '@OroTranslationBundle/Resources/doc/api/supported_language.md'
+            disable_meta_properties: true
+            identifier_field_names: [code]
+            fields:
+                id:
+                    exclude: true
+                enabled:
+                    exclude: true
+                installedBuildDate:
+                    exclude: true
+                localFilesLanguage:
+                    exclude: true
+                createdAt:
+                    exclude: true
+                updatedAt:
+                    exclude: true
+                organization:
+                    exclude: true
+            actions:
+                get_list:
+                    description: Get Supported Languages
+                get:
+                    description: Get Supported Language
+                create: false
+                update: false
+                delete: false
+                delete_list: false

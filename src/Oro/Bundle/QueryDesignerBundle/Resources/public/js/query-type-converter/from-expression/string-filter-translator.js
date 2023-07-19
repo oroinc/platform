@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import {findWhere, where} from 'underscore';
 import AbstractFilterTranslatorFromExpression from './abstract-filter-translator';
 import StringFilterTranslatorToExpression from '../to-expression/string-filter-translator';
 import {BinaryNode, ConstantNode, GetAttrNode, FunctionNode}
@@ -46,25 +46,25 @@ class StringFilterTranslatorFromExpression extends AbstractFilterTranslatorFromE
 
         let params;
         const valueNode = node.nodes[1];
-        let matchedParams = _.where(this.constructor.OPERATOR_MAP, {operator: node.attrs.operator});
+        let matchedParams = where(this.constructor.OPERATOR_MAP, {operator: node.attrs.operator});
 
         if (matchedParams.length === 0) {
             return null;
         }
 
         if (this.checkValueAST(valueNode)) {
-            matchedParams = _.where(matchedParams, {hasArrayValue: false, valueModifier: void 0});
+            matchedParams = where(matchedParams, {hasArrayValue: false, valueModifier: void 0});
             if (matchedParams.length > 0) {
-                params = _.findWhere(matchedParams, {value: valueNode.attrs.value}) || _.first(matchedParams);
+                params = findWhere(matchedParams, {value: valueNode.attrs.value}) || matchedParams[0];
             }
         } else if (this.checkListOperandAST(valueNode, this.checkValueAST)) {
-            params = _.findWhere(matchedParams, {hasArrayValue: true});
+            params = findWhere(matchedParams, {hasArrayValue: true});
         } else if (
             valueNode instanceof FunctionNode &&
             valueNode.nodes[0].nodes.length === 1 &&
             this.checkValueAST(valueNode.nodes[0].nodes[0])
         ) {
-            params = _.findWhere(matchedParams, {valueModifier: valueNode.attrs.name});
+            params = findWhere(matchedParams, {valueModifier: valueNode.attrs.name});
         }
 
         return params || null;

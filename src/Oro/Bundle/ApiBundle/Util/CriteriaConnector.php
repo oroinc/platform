@@ -100,14 +100,7 @@ class CriteriaConnector
     {
         /** @var Expr\Join $join */
         foreach ($joins as $join) {
-            $method = strtolower($join->getJoinType()) . 'Join';
-            $qb->{$method}(
-                $join->getJoin(),
-                $join->getAlias(),
-                $join->getConditionType(),
-                $join->getCondition(),
-                $join->getIndexBy()
-            );
+            QueryBuilderUtil::addJoin($qb, $join);
         }
     }
 

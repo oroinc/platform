@@ -13,20 +13,20 @@ class AbstractConditionTranslatorToExpression {
     constructor(fieldIdTranslator, filterConfigProvider, filterTranslatorProvider) {
         if (!fieldIdTranslator) {
             throw new TypeError(
-                'Instance of `FieldIdTranslator` is required for `AbstractConditionTranslatorToExpression`');
+                'Instance of `FieldIdTranslator` is required for `ConditionTranslatorToExpression`');
         }
         if (!filterConfigProvider) {
             throw new TypeError(
-                'Instance of `FilterConfigProvider` is required for `AbstractConditionTranslatorToExpression`');
+                'Instance of `FilterConfigProvider` is required for `ConditionTranslatorToExpression`');
         }
         if (!filterTranslatorProvider) {
             throw new TypeError(
-                'Instance of `TranslatorProvider` is required for `AbstractConditionTranslatorToExpression`');
+                'Instance of `TranslatorProvider` is required for `ConditionTranslatorToExpression`');
         }
 
-        this.filterTranslatorProvider = filterTranslatorProvider;
-        this.filterConfigProvider = filterConfigProvider;
         this.fieldIdTranslator = fieldIdTranslator;
+        this.filterConfigProvider = filterConfigProvider;
+        this.filterTranslatorProvider = filterTranslatorProvider;
     }
 
     /**

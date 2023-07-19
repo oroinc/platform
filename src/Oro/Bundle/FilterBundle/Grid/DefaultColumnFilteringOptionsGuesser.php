@@ -21,6 +21,7 @@ class DefaultColumnFilteringOptionsGuesser extends AbstractColumnOptionsGuesser
             case 'integer':
             case 'smallint':
             case 'bigint':
+            case 'number':
                 $options = [
                     'type'    => 'number-range',
                     'options' => [

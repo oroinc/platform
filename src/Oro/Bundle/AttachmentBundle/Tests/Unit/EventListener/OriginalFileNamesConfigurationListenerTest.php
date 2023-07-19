@@ -4,6 +4,8 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\AttachmentBundle\EventListener\OriginalFileNamesConfigurationListener;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -11,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class OriginalFileNamesConfigurationListenerTest extends \PHPUnit\Framework\TestCase
 {
     private Session|\PHPUnit\Framework\MockObject\MockObject $session;
-
+    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
     private OriginalFileNamesConfigurationListener $listener;
 
     protected function setUp(): void
@@ -22,9 +24,12 @@ class OriginalFileNamesConfigurationListenerTest extends \PHPUnit\Framework\Test
             ->willReturnCallback(fn ($id) => $id . '_translated');
 
         $this->session = $this->createMock(Session::class);
-
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack->expects($this->any())
+            ->method('getSession')
+            ->willReturn($this->session);
         $this->listener = new OriginalFileNamesConfigurationListener(
-            $this->session,
+            $this->requestStack,
             $translator
         );
     }
@@ -53,6 +58,16 @@ class OriginalFileNamesConfigurationListenerTest extends \PHPUnit\Framework\Test
         $this->session->expects(self::once())
             ->method('getFlashBag')
             ->willReturn($flashBag);
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->expects(self::once())
+            ->method('getSession')
+            ->willReturn($this->session);
+        $requestMock->expects(self::once())
+            ->method('hasSession')
+            ->willReturn(true);
+        $this->requestStack->expects(self::once())
+            ->method('getCurrentRequest')
+            ->willReturn($requestMock);
 
         $configUpdateEvent = new ConfigUpdateEvent([
             'oro_test.test' => ['old' => 'Foo', 'new' => 'Bar'],

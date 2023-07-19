@@ -1,21 +1,30 @@
-import AbstractFilterTranslator from './abstract-filter-translator';
-import BooleanFilterTranslator from './boolean-filter-translator';
-import DateFilterTranslator from './date-filter-translator';
-import DatetimeFilterTranslator from './datetime-filter-translator';
-import DictionaryFilterTranslator from './dictionary-filter-translator';
-import NumberFilterTranslator from './number-filter-translator';
-import StringFilterTranslator from './string-filter-translator';
+import AbstractFilterTranslatorFromExpression from './abstract-filter-translator';
+import BooleanFilterTranslatorFromExpression from './boolean-filter-translator';
+import DateFilterTranslatorFromExpression from './date-filter-translator';
+import DatetimeFilterTranslatorFromExpression from './datetime-filter-translator';
+import DictionaryFilterTranslatorFromExpression from './dictionary-filter-translator';
+import NumberFilterTranslatorFromExpression from './number-filter-translator';
+import StringFilterTranslatorFromExpression from './string-filter-translator';
+
+import AbstractConditionTranslatorFromExpression from './abstract-condition-translator';
+import FieldConditionTranslatorFromExpression from './field-condition-translator';
 
 const filterFromExpression = [
-    AbstractFilterTranslator,
-    BooleanFilterTranslator,
-    DateFilterTranslator,
-    DatetimeFilterTranslator,
-    DictionaryFilterTranslator,
-    NumberFilterTranslator,
-    StringFilterTranslator
+    AbstractFilterTranslatorFromExpression,
+    BooleanFilterTranslatorFromExpression,
+    DateFilterTranslatorFromExpression,
+    DatetimeFilterTranslatorFromExpression,
+    DictionaryFilterTranslatorFromExpression,
+    NumberFilterTranslatorFromExpression,
+    StringFilterTranslatorFromExpression
+];
+
+const conditionFromExpression = [
+    AbstractConditionTranslatorFromExpression,
+    FieldConditionTranslatorFromExpression
 ];
 
 export {
-    filterFromExpression
+    filterFromExpression,
+    conditionFromExpression
 };

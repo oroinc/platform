@@ -39,6 +39,13 @@ services:
         tags:
             - { name: 'cli.controller', priority: 200 }
 
+    cli.controller.run_multiple_consumers:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\RunMultipleConsumersController
+        arguments:
+            - '@oro_test.listener.job_status_subcriber'
+        tags:
+            - { name: 'cli.controller', priority: 200 }
+
     cli.controller.health_check_controller:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\HealthCheckController
         arguments:

@@ -1,0 +1,102 @@
+/* @theme: admin.oro; */
+
+.grid {
+    // Ignore tables
+    &:not(table) {
+        display: grid;
+        grid-template-columns: $grid-template-columns;
+        gap: $grid-gap;
+    }
+
+    &-columns {
+        @for $i from 1 through 12 {
+            &-#{$i} {
+                grid-template-columns: repeat(var(--grid-column-count, #{$i}), minmax(0, 1fr));
+            }
+        }
+    }
+
+    &-col {
+        --grid-column-span: auto;
+
+        grid-column-end: span var(--grid-column-span);
+
+        @for $i from 1 through $grid-column-count {
+            &-#{$i} {
+                grid-column-end: span $i;
+            }
+        }
+    }
+
+    &-start {
+        @for $i from 1 through $grid-column-count {
+            &-#{$i} {
+                grid-column-start: $i;
+            }
+        }
+    }
+
+    &-place {
+        @each $place in (content, items, self) {
+            &-#{$place} {
+                @each $align in $grid-aligns {
+                    &-#{$align} {
+                        place-#{$place}: $align;
+
+                        @each $justify in $grid-aligns {
+                            @if $align != $justify {
+                                &-#{$justify} {
+                                    place-#{$place}: $align $justify;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@each $_breakpoint in get-breakpoints-list() {
+    @include container-query(#{$_breakpoint}) {
+        .grid {
+            &-col {
+                @for $i from 1 through $grid-column-count {
+                    &-#{$i}-container-#{$_breakpoint} {
+                        grid-column-end: span $i;
+                    }
+                }
+            }
+
+            &-start {
+                @for $i from 1 through $grid-column-count {
+                    &-#{$i}-container-#{$_breakpoint} {
+                        grid-column-start: $i;
+                    }
+                }
+            }
+
+            &-place {
+                @each $place in (content, items, self) {
+                    &-#{$place} {
+                        @each $align in $grid-aligns {
+                            &-#{$align} {
+                                &-container-#{$_breakpoint} {
+                                    place-#{$place}: $align;
+                                }
+
+                                @each $justify in $grid-aligns {
+                                    @if $align != $justify {
+                                        &-#{$justify}-container-#{$_breakpoint} {
+                                            place-#{$place}: $align $justify;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

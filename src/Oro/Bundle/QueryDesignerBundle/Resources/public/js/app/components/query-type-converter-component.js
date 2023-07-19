@@ -1,13 +1,15 @@
 import $ from 'jquery';
-import _ from 'underscore';
+import {isEmpty, isObject, pick} from 'underscore';
 import BaseComponent from 'oroui/js/app/components/base/component';
 import BaseModel from 'oroui/js/app/models/base/model';
 import QueryTypeSwitcherView from 'oroquerydesigner/js/app/views/query-type-switcher-view';
 import FilterConfigProvider from 'oroquerydesigner/js/query-type-converter/filter-config-provider';
 import TranslatorProvider from 'oroquerydesigner/js/query-type-converter/translator-provider';
-import QueryConditionConverterToExpression
-    from 'oroquerydesigner/js/query-type-converter/to-expression/query-condition-converter';
-import FieldIdTranslatorToExpression from 'oroquerydesigner/js/query-type-converter/to-expression/field-id-translator';
+import QueryConditionConverterToExpression from '../../query-type-converter/to-expression/query-condition-converter';
+import FieldIdTranslatorToExpression from '../../query-type-converter/to-expression/field-id-translator';
+import QueryConditionConverterFromExpression
+    from '../../query-type-converter/from-expression/query-condition-converter';
+import FieldIdTranslatorFromExpression from '../../query-type-converter/from-expression/field-id-translator';
 
 const QueryTypeConverterComponent = BaseComponent.extend({
     relatedSiblingComponents: {
@@ -94,7 +96,7 @@ const QueryTypeConverterComponent = BaseComponent.extend({
         const fieldConditionOptions = this.conditionBuilderComponent
             .view.getCriteriaOrigin('condition-item').data('options');
 
-        const data = _.pick(fieldConditionOptions, 'filters', 'hierarchy');
+        const data = pick(fieldConditionOptions, 'filters', 'hierarchy');
         const filterConfigProvider = new FilterConfigProvider(data);
         return filterConfigProvider.loadInitModules()
             .then(() => filterConfigProvider);
@@ -104,7 +106,7 @@ const QueryTypeConverterComponent = BaseComponent.extend({
      * Initializes translator for conversion condition to expression
      */
     initTranslatorsToExpression() {
-        const entityStructureDataProvider = this.expressionEditorComponent.entityStructureDataProvider;
+        const {entityStructureDataProvider} = this.expressionEditorComponent;
         const filterIdTranslator = new FieldIdTranslatorToExpression(entityStructureDataProvider);
         const filterConfigProvider = this.filterConfigProvider;
         const filterTranslatorProvider = TranslatorProvider.getProvider('filterToExpression');
@@ -112,6 +114,7 @@ const QueryTypeConverterComponent = BaseComponent.extend({
             .getTranslatorConstructors()
             .map(ConditionTranslator =>
                 new ConditionTranslator(filterIdTranslator, filterConfigProvider, filterTranslatorProvider));
+
         this.toExpression = new QueryConditionConverterToExpression(conditionTranslators);
     },
 
@@ -119,7 +122,16 @@ const QueryTypeConverterComponent = BaseComponent.extend({
      * Initializes translator for conversion expression to condition
      */
     initTranslatorsFromExpression() {
-        // this.fromExpression = new QueryConditionTranslatorFromExpression();
+        const {entityStructureDataProvider} = this.expressionEditorComponent;
+        const filterIdTranslator = new FieldIdTranslatorFromExpression(entityStructureDataProvider);
+        const filterConfigProvider = this.filterConfigProvider;
+        const filterTranslatorProvider = TranslatorProvider.getProvider('filterFromExpression');
+        const conditionTranslators = TranslatorProvider.getProvider('conditionFromExpression')
+            .getTranslatorConstructors()
+            .map(ConditionTranslator =>
+                new ConditionTranslator(filterIdTranslator, filterConfigProvider, filterTranslatorProvider));
+
+        this.fromExpression = new QueryConditionConverterFromExpression(conditionTranslators);
     },
 
     /**
@@ -162,8 +174,9 @@ const QueryTypeConverterComponent = BaseComponent.extend({
             conditionsView.setValue([]);
 
             // check if it's transition from opposite mode and not setting initial state
-            if (model.previous('mode') === 'simple' && !_.isEmpty(conditionsValue)) {
-                expressionView.setValue(this._convertToExpression(conditionsValue) || '');
+            if (model.previous('mode') === 'simple' && !isEmpty(conditionsValue)) {
+                const expressionValue = this._convertToExpression(conditionsValue) || '';
+                expressionView.setValue(expressionValue);
             }
             expressionView.$el.show();
             this.listenTo(expressionView, 'change', this.onExpressionEditorChange);
@@ -179,12 +192,13 @@ const QueryTypeConverterComponent = BaseComponent.extend({
 
             // update views visibility and listening
             expressionView.$el.hide();
-            this.stopListening(conditionsView, 'change');
+            this.stopListening(expressionView, 'change');
             expressionView.setValue('');
 
             // check if it's transition from opposite mode and not setting initial state
-            if (model.previous('mode') === 'advanced' && _.trim(expressionValue) !== '') {
-                conditionsView.setValue(this._convertToConditions(expressionValue));
+            if (model.previous('mode') === 'advanced' && expressionValue.trim() !== '') {
+                const conditionsValue = this._convertToConditions(expressionValue) || [];
+                conditionsView.setValue(conditionsValue);
             }
             conditionsView.$el.show();
             this.listenTo(conditionsView, 'change', this.onConditionBuilderChange);
@@ -221,13 +235,13 @@ const QueryTypeConverterComponent = BaseComponent.extend({
      */
     _isConvertibleToAdvanced(condition) {
         const notEmpty = item => {
-            if (_.isArray(item)) {
-                return _.all(item, notEmpty);
+            if (Array.isArray(item)) {
+                return item.every(notEmpty);
             }
-            return item === 'AND' || item === 'OR' || _.isObject(item) && !_.isEmpty(item);
+            return item === 'AND' || item === 'OR' || isObject(item) && !isEmpty(item);
         };
-        return _.isEmpty(condition) ||
-            _.all(condition, notEmpty) && this._convertToExpression(condition) !== void 0;
+        return isEmpty(condition) ||
+            condition.every(notEmpty) && this._convertToExpression(condition) !== null;
     },
 
     /**
@@ -249,8 +263,7 @@ const QueryTypeConverterComponent = BaseComponent.extend({
      * @protected
      */
     _isConvertibleToSimple(expression) {
-        // @todo: use real converter to check convert possibility
-        return expression.indexOf('+') === -1;
+        return isEmpty(expression) || this._convertToConditions(expression) !== null;
     },
 
     /**
@@ -261,8 +274,10 @@ const QueryTypeConverterComponent = BaseComponent.extend({
      * @protected
      */
     _convertToConditions(expression) {
-        // @todo: use real converter
-        return [];
+        const {expressionEditorUtil} = this.expressionEditorComponent;
+        const supportedNames = expressionEditorUtil._getSupportedNames();
+        const parsedExpression = expressionEditorUtil.expressionLanguage.parse(expression, supportedNames);
+        return this.fromExpression.convert(parsedExpression);
     }
 });
 

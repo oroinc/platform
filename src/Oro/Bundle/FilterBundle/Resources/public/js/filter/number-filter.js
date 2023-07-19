@@ -37,7 +37,9 @@ define(function(require) {
                 arraySeparator: ',',
                 arrayOperators: [],
                 dataType: 'data_integer',
-                limitDecimals: false
+                limitDecimals: false,
+                min: null,
+                max: null
             });
 
             this._filterArrayChoices();
@@ -173,9 +175,18 @@ define(function(require) {
 
             if (!validValue) {
                 return false;
-            } else {
-                return NumberFilter.__super__._isValid.call(this);
             }
+
+            if (_.isNumber(this.min) && this.min > rawValue) {
+                this._showMinWarning();
+                return false;
+            }
+            if (_.isNumber(this.max) && this.max < rawValue) {
+                this._showMaxWarning();
+                return false;
+            }
+
+            return NumberFilter.__super__._isValid.call(this);
         },
 
         /**
@@ -219,6 +230,28 @@ define(function(require) {
             }, this);
 
             this.$el.inputWidget('seekAndCreate');
+        },
+
+        /**
+         * @private
+         */
+        _showMinWarning: function() {
+            mediator.execute(
+                'showFlashMessage',
+                'warning',
+                __('The entered value must be bigger or equal to {{ min }}', {min: this.min})
+            );
+        },
+
+        /**
+         * @private
+         */
+        _showMaxWarning: function() {
+            mediator.execute(
+                'showFlashMessage',
+                'warning',
+                __('The entered value must be less or equal to {{ max }}', {max: this.max})
+            );
         }
     });
 

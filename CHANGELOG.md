@@ -7,16 +7,19 @@ The current file describes significant changes in the code that may affect the u
 ### Changed
 
 #### EntityBundle
-* Refactored JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/3.2.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](https://github.com/oroinc/platform/tree/3.2.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md))
+* Refactored JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider/))
   - method `getPropertyPathByPath` renamed to `getRelativePropertyPathByPath`
   - method `getPathByPropertyPath` renamed to `getPathByRelativePropertyPath`
   - method `getPathByPropertyPathSafely` renamed to `getPathByRelativePropertyPathSafely`
 
 #### FormBundle
-* Refactored `ExpressionEditorView` [[?]](https://github.com/oroinc/platform/tree/3.2.0/src/Oro/Bundle/FormBundle/Resources/public/js/app/views/expression-editor-view.js) (see [documentation](https://github.com/oroinc/platform/blob/3.2.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#view))
-* Refactored [[?]](https://github.com/oroinc/platform/tree/3.2.0/src/Oro/Bundle/FormBundle/Resources/public/js/expression-editor-util.js) (see [documentation](https://github.com/oroinc/platform/blob/3.2.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#util))
+* Refactored `ExpressionEditorView` [[?]](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/FormBundle/Resources/public/js/app/views/expression-editor-view.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor/#expressioneditorview))
+* Refactored `ExpressionEditorUtil` [[?]](https://github.com/oroinc/platform/tree/master/src/Oro/Bundle/FormBundle/Resources/public/js/expression-editor-util.js) (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor/#expressioneditorutil))
   * made it descendant of `BaseClass`
   * changed options format
+
+#### QueryDesignerBundle
+* JS `*-filter-initialized` modules, defined over `init_module` option in filter configuration, now expected to export a sync callback function
 
 ### Added
 

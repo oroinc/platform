@@ -1,9 +1,10 @@
 import TranslatorProvider from '../../query-type-converter/translator-provider';
-import {filterFromExpression} from '../../query-type-converter/from-expression';
+import {filterFromExpression, conditionFromExpression} from '../../query-type-converter/from-expression';
 import {filterToExpression, conditionToExpression} from '../../query-type-converter/to-expression';
 
 Object.entries({
     filterFromExpression,
+    conditionFromExpression,
     filterToExpression,
     conditionToExpression
 }).forEach(([groupName, translators]) => {

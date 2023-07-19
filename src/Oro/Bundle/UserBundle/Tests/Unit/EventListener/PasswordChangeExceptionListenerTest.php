@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 use Oro\Bundle\UserBundle\EventListener\PasswordChangeExceptionListener;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -16,6 +17,8 @@ class PasswordChangeExceptionListenerTest extends \PHPUnit\Framework\TestCase
 {
     private SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session;
 
+    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
+
     private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
     private PasswordChangeExceptionListener $listener;
@@ -24,9 +27,12 @@ class PasswordChangeExceptionListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->session = $this->createMock(Session::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack->expects($this->any())
+            ->method('getSession')
+            ->willReturn($this->session);
         $this->listener = new PasswordChangeExceptionListener(
-            $this->session,
+            $this->requestStack,
             $this->translator
         );
     }

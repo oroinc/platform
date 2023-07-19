@@ -6,23 +6,19 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * REST API Sandbox controller.
  */
 class RestApiDocController
 {
-    private ApiDocExtractor $extractor;
-    private FormatterInterface $formatter;
-    private SessionInterface $session;
-
-    public function __construct(ApiDocExtractor $extractor, FormatterInterface $formatter, SessionInterface $session)
-    {
-        $this->extractor = $extractor;
-        $this->formatter = $formatter;
-        $this->session = $session;
+    public function __construct(
+        private ApiDocExtractor $extractor,
+        private FormatterInterface $formatter,
+        private RequestStack $requestStack
+    ) {
     }
 
     public function indexAction(Request $request, string $view = ApiDoc::DEFAULT_VIEW): Response
@@ -107,8 +103,9 @@ class RestApiDocController
          * and a cookie with the session identifier must be sent to a browser.
          * To achieve this we just add some value to the session if the session does not contain it yet.
          */
-        if (!$this->session->get('api_sandbox')) {
-            $this->session->set('api_sandbox', true);
+        $session = $this->requestStack->getSession();
+        if (!$session->get('api_sandbox')) {
+            $session->set('api_sandbox', true);
         }
     }
 }

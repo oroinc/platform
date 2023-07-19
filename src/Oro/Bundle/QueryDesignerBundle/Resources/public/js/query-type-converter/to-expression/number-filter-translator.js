@@ -1,6 +1,7 @@
-import _ from 'underscore';
+import {has, isNumber} from 'underscore';
 import AbstractFilterTranslatorToExpression from './abstract-filter-translator';
-import {BinaryNode, ConstantNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {BinaryNode, ConstantNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {cloneAST, createArrayNode} from 'oroexpressionlanguage/js/expression-language-tools';
 
 /**
  * @inheritDoc
@@ -133,7 +134,7 @@ class NumberFilterTranslatorToExpression extends AbstractFilterTranslatorToExpre
             result = new BinaryNode(
                 operatorParams.operator,
                 this.translateSingleValue(leftOperand, filterValue, operatorParams.left),
-                this.translateSingleValue(tools.cloneAST(leftOperand), filterValue, operatorParams.right)
+                this.translateSingleValue(cloneAST(leftOperand), filterValue, operatorParams.right)
             );
         } else {
             result = this.translateSingleValue(leftOperand, filterValue, operatorParams);
@@ -156,9 +157,9 @@ class NumberFilterTranslatorToExpression extends AbstractFilterTranslatorToExpre
         let value = filterValue[operatorParams.valueProp || 'value'];
 
         if (operatorParams.hasArrayValue) {
-            rightOperand = tools.createArrayNode(value);
+            rightOperand = createArrayNode(value);
         } else {
-            if (_.has(operatorParams, 'value')) {
+            if (has(operatorParams, 'value')) {
                 value = operatorParams.value;
             }
 
@@ -179,7 +180,7 @@ class NumberFilterTranslatorToExpression extends AbstractFilterTranslatorToExpre
         const FILTER_CRITERION = this.constructor.FILTER_CRITERION;
         const operatorParams = this.constructor.OPERATOR_MAP[type];
         let [value, valueEnd] = [filterValue.value, filterValue.value_end].map(value => {
-            if (!_.isUndefined(value)) {
+            if (value !== void 0) {
                 if (operatorParams.hasArrayValue) {
                     return this.splitValues(value);
                 // skip empty value
@@ -193,7 +194,7 @@ class NumberFilterTranslatorToExpression extends AbstractFilterTranslatorToExpre
 
         if (
             [FILTER_CRITERION.between, FILTER_CRITERION.notBetween].indexOf(type) === -1 ||
-            _.isNumber(value) && _.isNumber(valueEnd)
+            isNumber(value) && isNumber(valueEnd)
         ) {
             // when valueEnd is lower than value
             if (valueEnd < value) {
@@ -202,7 +203,7 @@ class NumberFilterTranslatorToExpression extends AbstractFilterTranslatorToExpre
                 valueEnd = value;
                 value = _valueEnd;
             } else {
-                if (!_.isUndefined(filterValue.value)) {
+                if (filterValue.value !== void 0) {
                     filterValue = {
                         ...filterValue,
                         value
@@ -211,7 +212,7 @@ class NumberFilterTranslatorToExpression extends AbstractFilterTranslatorToExpre
 
                 return filterValue;
             }
-        } else if (!_.isUndefined(value) && !_.isUndefined(valueEnd)) {
+        } else if (value !== void 0 && valueEnd !== void 0) {
             if (valueEnd) {
                 type = type === FILTER_CRITERION.between ? FILTER_CRITERION.moreThan : FILTER_CRITERION.lessThan;
 

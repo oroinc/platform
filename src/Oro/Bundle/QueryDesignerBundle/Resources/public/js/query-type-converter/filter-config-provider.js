@@ -58,11 +58,11 @@ define(function(require) {
             }
 
             const matchApplicable = (applicable, fieldSignature) => {
-                const hierarchy = this.hierarchy[fieldSignature.entity];
-                return _.find(applicable, item => {
-                    return _.every(item, (value, key) => {
+                const hierarchy = this.hierarchy[fieldSignature.entity] || [];
+                return applicable.find(item => {
+                    return Object.entries(item).every(([key, value]) => {
                         if (key === 'entity' && hierarchy.length) {
-                            return _.indexOf(hierarchy, fieldSignature[key]);
+                            return hierarchy.indexOf(fieldSignature[key]) !== -1;
                         }
                         return fieldSignature[key] === value;
                     });
@@ -73,9 +73,10 @@ define(function(require) {
             let filterId = null;
 
             this.filters.forEach((filterConfig, id) => {
-                if (!_.isEmpty(filterConfig.applicable)) {
+                const {applicable} = filterConfig;
+                if (applicable && applicable.length) {
                     // check if a filter conforms the given criteria
-                    const matched = matchApplicable(filterConfig.applicable, fieldSignature);
+                    const matched = matchApplicable(applicable, fieldSignature);
 
                     if (matched && (
                         // new rule is more exact
@@ -88,7 +89,7 @@ define(function(require) {
                         filterId = id;
                     }
                 }
-            }, this);
+            });
 
             if (!_.isNumber(filterId) ||
                 fieldSignature.entity === 'Oro\\Bundle\\AccountBundle\\Entity\\Account' &&

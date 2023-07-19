@@ -10,31 +10,20 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Handle remove and unremove of extend fields
  */
 class RemoveRestoreConfigFieldHandler
 {
-    private ConfigManager $configManager;
-    private FieldNameValidationHelper $validationHelper;
-    private ConfigHelper $configHelper;
-    private Session $session;
-    private ManagerRegistry $registry;
-
     public function __construct(
-        ConfigManager $configManager,
-        FieldNameValidationHelper $validationHelper,
-        ConfigHelper $configHelper,
-        Session $session,
-        ManagerRegistry $registry
+        private ConfigManager $configManager,
+        private FieldNameValidationHelper $validationHelper,
+        private ConfigHelper $configHelper,
+        private RequestStack $requestStack,
+        private ManagerRegistry $registry
     ) {
-        $this->configManager = $configManager;
-        $this->validationHelper = $validationHelper;
-        $this->configHelper = $configHelper;
-        $this->session = $session;
-        $this->registry = $registry;
     }
 
     public function handleRemove(FieldConfigModel $field, string $successMessage): JsonResponse
@@ -42,7 +31,7 @@ class RemoveRestoreConfigFieldHandler
         $validationMessages = $this->validationHelper->getRemoveFieldValidationErrors($field);
         if ($validationMessages) {
             foreach ($validationMessages as $message) {
-                $this->session->getFlashBag()->add('error', $message);
+                $this->requestStack->getSession()->getFlashBag()->add('error', $message);
             }
 
             return new JsonResponse(
@@ -95,7 +84,7 @@ class RemoveRestoreConfigFieldHandler
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
 
-        $this->session->getFlashBag()->add('success', $successMessage);
+        $this->requestStack->getSession()->getFlashBag()->add('success', $successMessage);
 
         return new JsonResponse(['message' => $successMessage, 'successful' => true], JsonResponse::HTTP_OK);
     }
@@ -103,7 +92,7 @@ class RemoveRestoreConfigFieldHandler
     public function handleRestore(FieldConfigModel $field, string $errorMessage, string $successMessage): JsonResponse
     {
         if (!$this->validationHelper->canFieldBeRestored($field)) {
-            $this->session->getFlashBag()->add('error', $errorMessage);
+            $this->requestStack->getSession()->getFlashBag()->add('error', $errorMessage);
 
             return new JsonResponse(
                 [
@@ -138,7 +127,7 @@ class RemoveRestoreConfigFieldHandler
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
 
-        $this->session->getFlashBag()->add('success', $successMessage);
+        $this->requestStack->getSession()->getFlashBag()->add('success', $successMessage);
 
         return new JsonResponse(['message' => $successMessage, 'successful' => true], JsonResponse::HTTP_OK);
     }

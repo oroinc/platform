@@ -1,5 +1,6 @@
 import AbstractFilterTranslatorToExpression from './abstract-filter-translator';
-import {BinaryNode, ConstantNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {BinaryNode, ConstantNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {createArrayNode, createFunctionNode} from 'oroexpressionlanguage/js/expression-language-tools';
 
 class StringFilterTranslatorToExpression extends AbstractFilterTranslatorToExpression {
     /**
@@ -71,9 +72,9 @@ class StringFilterTranslatorToExpression extends AbstractFilterTranslatorToExpre
         const operatorParams = this.constructor.OPERATOR_MAP[filterValue.type];
 
         if (operatorParams.hasArrayValue) {
-            rightOperand = tools.createArrayNode(this.splitValues(value));
+            rightOperand = createArrayNode(this.splitValues(value));
         } else if (operatorParams.valueModifier) {
-            rightOperand = tools.createFunctionNode(operatorParams.valueModifier, [value]);
+            rightOperand = createFunctionNode(operatorParams.valueModifier, [value]);
         } else if ('value' in operatorParams) {
             rightOperand = new ConstantNode(operatorParams.value);
         } else {

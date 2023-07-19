@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
 use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -18,27 +18,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class NotificationAlertsListener
 {
-    private RouterInterface $router;
-    private Session $session;
-    private TranslatorInterface $translator;
-    private NotificationAlertManager $notificationAlertManager;
-    private MailboxManager $mailboxManager;
-    private TokenAccessorInterface $tokenAccessor;
-
     public function __construct(
-        RouterInterface          $router,
-        Session                  $session,
-        TranslatorInterface      $translator,
-        NotificationAlertManager $notificationAlertManager,
-        MailboxManager           $mailboxManager,
-        TokenAccessorInterface   $tokenAccessor
+        private RouterInterface          $router,
+        private RequestStack             $requestStack,
+        private TranslatorInterface      $translator,
+        private NotificationAlertManager $notificationAlertManager,
+        private MailboxManager           $mailboxManager,
+        private TokenAccessorInterface   $tokenAccessor
     ) {
-        $this->router = $router;
-        $this->session = $session;
-        $this->translator = $translator;
-        $this->notificationAlertManager = $notificationAlertManager;
-        $this->mailboxManager = $mailboxManager;
-        $this->tokenAccessor = $tokenAccessor;
     }
 
     public function onRequest(RequestEvent $event): void
@@ -153,7 +140,7 @@ class NotificationAlertsListener
             if (\array_key_exists(0, $alertsByOrigin)) {
                 $messages[] = $this->translator->trans('oro.email.sync_alert.system_origin.common', [
                     '%settings_url%' => $this->router->generate('oro_config_configuration_system', [
-                        'activeGroup'    => 'platform',
+                        'activeGroup' => 'platform',
                         'activeSubGroup' => 'email_configuration'
                     ])
                 ]);
@@ -182,7 +169,7 @@ class NotificationAlertsListener
         ) {
             $messages[] = $this->translator->trans('oro.email.sync_alert.auth.full', [
                 '%settings_url%' => $this->router->generate('oro_user_profile_configuration', [
-                    'activeGroup'    => 'platform',
+                    'activeGroup' => 'platform',
                     'activeSubGroup' => 'user_email_configuration'
                 ])
             ]);
@@ -190,7 +177,7 @@ class NotificationAlertsListener
         if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_SWITCH_FOLDER])) {
             $messages[] = $this->translator->trans('oro.email.sync_alert.switch_folder.full', [
                 '%settings_url%' => $this->router->generate('oro_user_profile_configuration', [
-                    'activeGroup'    => 'platform',
+                    'activeGroup' => 'platform',
                     'activeSubGroup' => 'user_email_configuration'
                 ])
             ]);
@@ -204,7 +191,7 @@ class NotificationAlertsListener
      */
     private function showNotificationMessages(array $messages): void
     {
-        $flashBag = $this->session->getFlashBag();
+        $flashBag = $this->requestStack->getSession()->getFlashBag();
         foreach ($messages as $message) {
             $flashBag->add('warning', $message);
         }

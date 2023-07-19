@@ -214,7 +214,28 @@ define(function(require) {
             });
         })
         // expand a collapse to show validation message within
-        .on('validate-element', '.collapse:hidden', event => $(event.currentTarget).collapse('show'));
+        .on('validate-element', '.collapse', event => {
+            if (!event.invalid) {
+                return;
+            }
+
+            const eventNamespace = _.uniqueId('.collapse-');
+            const selector = '.collapse:not(".show")';
+            let $closedCollapses = $(event.target).parents(selector);
+            $closedCollapses.collapse('show').on(`${Event.SHOWN}${eventNamespace}`, event => {
+                // Skip if event fires from nested collapse
+                if (event.target !== event.currentTarget) {
+                    return;
+                }
+
+                $(event.target).off(eventNamespace);
+                $closedCollapses = $closedCollapses.filter((i, el) => !el.isSameNode(event.target));
+                // All nested collapses are opened
+                if ($closedCollapses.length === 0) {
+                    $(event.currentTarget).trigger('invalid-content:shown');
+                }
+            });
+        });
 
     mediator.on('layout:reposition', _.debounce(() => {
         $(document).find('[data-toggle="collapse"]').each(function(index, el) {

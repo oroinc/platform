@@ -1,9 +1,8 @@
 import DictionaryFilterTranslatorToExpression
     from 'oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator';
-import {BinaryNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import {BinaryNode} from 'oroexpressionlanguage/js/expression-language-library';
+import {createArrayNode, createGetAttrNode} from 'oroexpressionlanguage/js/expression-language-tools';
 import 'lib/jasmine-oro';
-
-const {createArrayNode, createGetAttrNode} = tools;
 
 describe('oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator', () => {
     const filterConfigs = {

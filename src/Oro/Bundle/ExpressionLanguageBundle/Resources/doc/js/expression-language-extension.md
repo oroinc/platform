@@ -27,4 +27,4 @@ Source: [`oroexpressionlanguage/js/extend/parser.js`](../../public/js/extend/par
 
 Source: [`oroexpressionlanguage/js/extend/expression-language.js`](../../public/js/extend/expression-language.js)
 
-- Overriden the `getLexer` and `getParser` methods to use the extended lexer and parser.
+- Overridden the `getLexer` and `getParser` methods to use the extended lexer and parser.

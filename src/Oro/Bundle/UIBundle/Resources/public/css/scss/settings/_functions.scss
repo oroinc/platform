@@ -4,8 +4,9 @@
 @use 'sass:list';
 @use 'sass:map';
 
-// @return the value in a $font-weights map associated with a given key;
-// Use: font-weight: font-weight('bold') => font-weight: 700;
+/** @return the value in a $font-weights map associated with a given key;
+    Use: font-weight: font-weight('bold') => font-weight: 700;
+*/
 
 @function font-weight($key) {
     $font-weight-key: map.get($font-weights, $key);
@@ -17,8 +18,9 @@
     }
 }
 
-// @return modified selector
-// Use: modify-selector($selector: 'a', $part-before: '~ ') =>  '~ a';
+/** @return modified selector
+    Use: modify-selector($selector: 'a', $part-before: '~ ') =>  '~ a';
+*/
 @function modify-selector($selector, $part-before: null, $part-after: null) {
     @if ($part-before) {
         $selector: $part-before + $selector;
@@ -31,8 +33,9 @@
     @return $selector;
 }
 
-// @return modified list of selectors
-// Use: modify-selector(selectors: 'a , button', $part-before: '~ ') => '~ a, ~ button';
+/** @return modified list of selectors
+    Use: modify-selector(selectors: 'a , button', $part-before: '~ ') => '~ a, ~ button';
+*/
 @function modify-selectors($selectors, $part-before: null, $part-after: null) {
     @if (meta.type-of($selectors) != 'list') {
         @warn '$selectors: #{$selectors} must be a list type';
@@ -52,8 +55,9 @@
     @return $modified-selectors;
 }
 
-// @return the list of CSS selectors for HTML elements that can receive focus
-// Use: font-get-focusable-selector() => 'a[href]:not([tabindex="-1"]), input:not([disabled]):not([tabindex="-1"])'
+/** @return the list of CSS selectors for HTML elements that can receive focus
+    Use: font-get-focusable-selector() => 'a[href]:not([tabindex="-1"]), input:not([disabled]):not([tabindex="-1"])'
+*/
 @function get-focusable-selectors($whole-list: false, $part-before: null, $part-after: null) {
     $base: (
         'a[href]',
@@ -75,4 +79,57 @@
     } @else {
         @return modify-selectors($base, $part-before, $part-after);
     }
+}
+
+/** Extended default map-merge
+    Merge two maps together into new map, w/o null keys
+*/
+
+@function map-merge-wo-null($map1, $map2) {
+    $result: map.merge($map1, $map2);
+
+    @each $key in map-keys($result) {
+        @if not map.get($result, $key) {
+            $result: map.remove($result, $key);
+        }
+    }
+
+    @return $result;
+}
+
+/** Merge breakpoints
+    $old-breakpoints: (
+        'desktop': '(min-width: 1100px)',
+        'tablet': '(max-width: 1099px )'
+    );
+    $new-breakpoints: (
+        'desktop': '(min-width: 1200px)',
+        'tablet': null,
+        'mobile': '(max-width: 640px)'
+    );
+    @return the value with a merged breakpoints;
+    $breakpoints: (
+        'desktop''(min-width: 1200px)',
+        'mobile': '(max-width: 640px)'
+    );
+    Use: merge-breakpoints($old-breakpoints, $new-breakpoints);
+*/
+
+@function merge-breakpoints($breakpoints1, $news-breakpoint2) {
+    @return map-merge-wo-null($breakpoints1, $news-breakpoint2);
+}
+
+/** Get base breakpoint list
+    @return the list of base breakpoints;
+*/
+@function get-breakpoints-list() {
+    $breakpoints-list: ();
+
+    @each $name, $value in $breakpoints {
+        @if $name != 'print' {
+            $breakpoints-list: list.append($breakpoints-list, $name);
+        }
+    }
+
+    @return $breakpoints-list;
 }

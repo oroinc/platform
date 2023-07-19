@@ -282,4 +282,4 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage
         public: false
         arguments:
-            - '@session'
+            - '@request_stack'

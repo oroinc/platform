@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
@@ -51,11 +52,8 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider getPageOffsetProvider
-     * @param int $expectedOffset
-     * @param null|int|string $page
-     * @param null|int|string $limit
      */
-    public function testGetPageOffset($expectedOffset, $page, $limit)
+    public function testGetPageOffset(int $expectedOffset, int|string|null $page, int|string|null $limit)
     {
         $this->assertSame($expectedOffset, QueryBuilderUtil::getPageOffset($page, $limit));
     }
@@ -492,6 +490,30 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertEquals('g', QueryBuilderUtil::findJoinByAlias($qb, 'g')->getAlias());
         $this->assertEquals('i', QueryBuilderUtil::findJoinByAlias($qb, 'i')->getAlias());
         $this->assertNull(QueryBuilderUtil::findJoinByAlias($qb, 'w'));
+    }
+
+    public function testAddJoin()
+    {
+        $srcQb = $this->em->createQueryBuilder()
+            ->select('p')
+            ->from(Person::class, 'p')
+            ->innerJoin(Group::class, 'g', Join::WITH, 'g MEMBER OF p.groups')
+            ->leftJoin(Item::class, 'i', Join::WITH, 'i MEMBER OF p.items');
+
+        $qb = $this->em->createQueryBuilder()
+            ->select('p')
+            ->from(Person::class, 'p');
+
+        QueryBuilderUtil::addJoin($qb, QueryBuilderUtil::findJoinByAlias($srcQb, 'g'));
+        QueryBuilderUtil::addJoin($qb, QueryBuilderUtil::findJoinByAlias($srcQb, 'i'));
+
+        $this->assertEquals(
+            'SELECT p'
+            . ' FROM Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person p'
+            . ' INNER JOIN Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group g WITH g MEMBER OF p.groups'
+            . ' LEFT JOIN Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item i WITH i MEMBER OF p.items',
+            $qb->getDQL()
+        );
     }
 
     public function testIsToOne()

@@ -1,0 +1,14 @@
+/* @theme: admin.oro; */
+
+.tiles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $tiles-row-gap $tiles-column-gap;
+    justify-content: $tiles-justify-content;
+
+    &-item {
+        width: $tiles-item-width;
+        flex-shrink: 0;
+        flex-grow: 0;
+    }
+}
