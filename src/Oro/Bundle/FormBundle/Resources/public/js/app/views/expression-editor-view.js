@@ -7,24 +7,15 @@ import {EditorView} from '@codemirror/view';
 
 import expressionEditorExtensions from 'oroform/js/app/views/expression-editor-extensions';
 
-import 'bootstrap-typeahead';
-
-const Typeahead = $.fn.typeahead.Constructor;
-
 const ExpressionEditorView = BaseView.extend({
     optionNames: BaseView.prototype.optionNames.concat([
-        'dataSource', 'delay'
+        'dataSource', 'delay', 'util', 'operationButtons'
     ]),
 
     /**
      * @type {ExpressionEditorUtil}
      */
     util: null,
-
-    /**
-     * {Object} Typeahead
-     */
-    typeahead: null,
 
     /**
      * @type {AutocompleteData} Autocomplete data provided by ExpressionEditorUtil.getAutocompleteData
@@ -47,29 +38,14 @@ const ExpressionEditorView = BaseView.extend({
     delay: 50,
 
     events: {
-        focus: 'debouncedAutocomplete',
-        click: 'debouncedAutocomplete',
-        input: 'debouncedAutocomplete',
-        blur: 'debouncedOnChange',
-        keyup: 'debouncedOnChange',
-        paste: 'debouncedOnChange',
-        change: 'debouncedOnChange'
+        focus: 'onFocus',
+        change: 'onChange'
     },
 
     /**
      * @inheritdoc
      */
     constructor: function ExpressionEditorView(options) {
-        this.debouncedAutocomplete = _.debounce(e => {
-            if (!this.disposed) {
-                this.autocomplete(e);
-            }
-        }, this.delay);
-        this.debouncedOnChange = _.debounce(e => {
-            if (!this.disposed) {
-                this.onChange(e);
-            }
-        }, this.delay);
         ExpressionEditorView.__super__.constructor.call(this, options);
     },
 
@@ -80,8 +56,6 @@ const ExpressionEditorView = BaseView.extend({
         if (!options.util) {
             throw new Error('Option `util` is required for `ExpressionEditorView`');
         }
-
-        _.extend(this, _.pick(options, 'util', 'operationButtons'));
 
         this.autocompleteData = {};
         this.dataSource = this.dataSource || {};
@@ -96,21 +70,14 @@ const ExpressionEditorView = BaseView.extend({
 
     render() {
         this._toggleErrorState(this.isValid());
-        this.$el.typeahead({
-            minLength: 0,
-            items: 20,
-            select: this._typeaheadSelect.bind(this),
-            source: this._typeaheadSource.bind(this),
-            lookup: this._typeaheadLookup.bind(this),
-            highlighter: this._typeaheadHighlighter.bind(this),
-            updater: this._typeaheadUpdater.bind(this)
-        });
 
         const startState = EditorState.create({
             doc: this.el.value,
             extensions: expressionEditorExtensions({
                 util: this.util,
-                operationButtons: this.operationButtons
+                rootEl: this.el,
+                operationButtons: this.operationButtons,
+                setValue: this.setValue.bind(this)
             })
         });
 
@@ -119,8 +86,20 @@ const ExpressionEditorView = BaseView.extend({
             parent: this.el.parentNode
         });
 
-        this.typeahead = this.$el.data('typeahead');
-        this.typeahead.$menu.addClass('expression-editor-autocomplete');
+        this.$el.addClass('hidden-textarea');
+        this.$el.after(this.editorView.dom);
+    },
+
+    hide() {
+        this.editorView.dom.classList.add('hide');
+    },
+
+    show() {
+        this.editorView.dom.classList.remove('hide');
+    },
+
+    onFocus() {
+        this.editorView.focus();
     },
 
     /**
@@ -136,7 +115,6 @@ const ExpressionEditorView = BaseView.extend({
         });
 
         delete this.util;
-        delete this.typeahead;
         delete this.autocompleteData;
         delete this.dataSource;
         delete this.dataSourceInstances;
@@ -148,6 +126,32 @@ const ExpressionEditorView = BaseView.extend({
         const isValid = this.isValid();
         this._toggleErrorState(isValid);
         this.trigger('change', e.currentTarget.value, isValid);
+
+        this.updateAllContent(e.currentTarget.value);
+    },
+
+    /**
+     * Update all content in editor view
+     * @param {string} content
+     */
+    updateAllContent(content) {
+        const {editorView} = this;
+
+        if (content === editorView.state.doc.toString()) {
+            return;
+        }
+
+        editorView.dispatch(
+            editorView.state.update(
+                {
+                    changes: {
+                        from: 0,
+                        to: editorView.state.doc.length,
+                        insert: content
+                    }
+                }
+            )
+        );
     },
 
     isValid() {
@@ -161,14 +165,6 @@ const ExpressionEditorView = BaseView.extend({
     },
 
     /**
-     * Show autocomplete list
-     */
-    autocomplete() {
-        this.typeahead.lookup();
-    },
-
-
-    /**
      * Sets value to view DOM element
      *
      * @param {string} value
@@ -176,9 +172,7 @@ const ExpressionEditorView = BaseView.extend({
     setValue(value) {
         this.$el.val(value);
 
-        const transaction = this.editorView.state.replaceSelection(value);
-        const update = this.editorView.state.update(transaction);
-        this.editorView.update([update]);
+        this.updateAllContent(value);
 
         const isValid = this.isValid();
         this._toggleErrorState(isValid);
@@ -192,77 +186,6 @@ const ExpressionEditorView = BaseView.extend({
      */
     getValue() {
         return this.$el.val();
-    },
-
-    /**
-     * Override Typeahead.source function
-     *
-     * @return {Array}
-     * @private
-     */
-    _typeaheadSource() {
-        const expression = this.el.value;
-        const position = this.el.selectionStart;
-
-        this.autocompleteData = this.util.getAutocompleteData(expression, position);
-        this._toggleDataSource();
-        this.typeahead.query = this.autocompleteData.query;
-
-        return _.sortBy(_.keys(this.autocompleteData.items));
-    },
-
-    /**
-     * Override Typeahead.lookup function
-     *
-     * @return {Typeahead}
-     * @private
-     */
-    _typeaheadLookup() {
-        return this.typeahead.process(this.typeahead.source());
-    },
-
-    /**
-     * Override Typeahead.select function
-     *
-     * @return {Typeahead}
-     * @private
-     */
-    _typeaheadSelect() {
-        const original = Typeahead.prototype.select;
-        const result = original.call(this.typeahead);
-        this.typeahead.lookup();
-        return result;
-    },
-
-    /**
-     * Override Typeahead.highlighter function
-     *
-     * @param {String} item
-     * @return {String}
-     * @private
-     */
-    _typeaheadHighlighter(item) {
-        const original = Typeahead.prototype.highlighter;
-        const suffix = this.autocompleteData.items[item].hasChildren ? '&hellip;' : '';
-        return original.call(this.typeahead, item) + suffix;
-    },
-
-    /**
-     * Override Typeahead.updater function
-     *
-     * @param {String} item
-     * @return {String}
-     * @private
-     */
-    _typeaheadUpdater(item) {
-        this.util.updateAutocompleteItem(this.autocompleteData, item);
-        const position = this.autocompleteData.position;
-        this.$el.one('change', () => {
-            // set correct position after typeahead call change event
-            this.el.selectionStart = this.el.selectionEnd = position;
-        });
-
-        return this.autocompleteData.expression;
     },
 
     /**

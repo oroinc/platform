@@ -1,18 +1,173 @@
 /* @theme: admin.oro; */
 
+:root {
+    --exp-editor-highlight-common: #585858;
+    --exp-editor-highlight-string: #519808;
+    --exp-editor-highlight-number: #7b87b8;
+    --exp-editor-highlight-literal: #7b87b8;
+    --exp-editor-highlight-name: #949bd8;
+    --exp-editor-highlight-property-name: #5dc377;
+    --exp-editor-highlight-punctuation: #585858;
+    --exp-editor-highlight-operator: #b3641e;
+}
+
+.hidden-textarea {
+    position: absolute;
+    width: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+    border: none;
+    opacity: 0;
+}
+
 .expression-editor {
-    &-autocomplete {
-        &.typeahead {
-            &.dropdown-menu {
-                max-height: 152px;
-                overflow-y: auto;
-            }
+    border: 1px solid $input-border-color;
+    color: $input-color;
+    background-color: $input-background-color;
+    height: 300px;
+    flex-direction: row;
+
+    .cm-scroller {
+        margin: 8px;
+        height: auto;
+        width: 100%;
+        border: $input-border-width solid $input-border-color;
+    }
+
+    .cm-selectionBackground,
+    .cm-content ::selection,
+    &.cm-focused .cm-selectionBackground {
+        background-color: $additional-extra-light;
+    }
+
+    &.cm-focused {
+        outline: none;
+
+        .cm-scroller {
+            border-color: $input-focus-border-color;
         }
     }
 
-    &-data-source {
-        .input-append {
-            margin-top: 10px;
+    .cm-content {
+        caret-color: $primary;
+    }
+
+    .cm-tooltip {
+        color: $dropdown-color;
+        background-color: $dropdown-bg;
+        padding: $dropdown-padding-y 0;
+        margin: $dropdown-spacer 0 0;
+        border: none;
+        box-shadow: $dropdown-menu-box-shadow;
+
+        @include border-radius($dropdown-border-radius);
+        @include box-shadow($dropdown-box-shadow);
+
+        .cm-tooltip-arrow {
+            &::before,
+            &::after {
+                border-top-color: transparent;
+                border-bottom-color: transparent;
+            }
+        }
+
+        &.cm-tooltip-autocomplete > ul > li {
+            padding: 6px 16px;
+            color: $primary-200;
+
+            &[aria-selected] {
+                color: $primary-200;
+                background-color: $primary-900;
+            }
+        }
+
+        .cm-completionDetail {
+            font-style: normal;
+        }
+    }
+
+    .cm-panels {
+        background-color: $primary-900;
+        color: $primary-200;
+    }
+
+    .cm-panels-top {
+        position: static;
+        width: 170px;
+        min-width: 170px;
+        padding: 8px;
+        border-top-width: 0;
+        border-bottom-width: 0;
+        border-right: 1px solid $input-border-color;
+    }
+
+    .cm-panel-title {
+        font-size: 12px;
+        color: $primary-200;
+        text-transform: uppercase;
+        text-align: center;
+        padding-bottom: 6px;
+    }
+
+    .cm-panel-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .cm-btn {
+        min-width: 48px;
+        height: 28px;
+        padding: 0;
+        border-radius: 3px;
+        border: 1px solid $primary-800;
+        background-color: $primary-860;
+        color: $primary-200;
+        text-align: center;
+        font-size: 13px;
+
+        &:focus {
+            outline: none;
+        }
+
+        &:hover {
+            background-color: $primary-750;
+        }
+    }
+
+    .cm-tag {
+        &-name {
+            color: var(--exp-editor-highlight-name);
+        }
+
+        &-string {
+            color: var(--exp-editor-highlight-string);
+        }
+
+        &-property-name {
+            color: var(--exp-editor-highlight-property-name);
+        }
+
+        &-literal {
+            color: var(--exp-editor-highlight-literal);
+        }
+
+        &-punctuation {
+            color: var(--exp-editor-highlight-punctuation);
+        }
+
+        &-operator {
+            color: var(--exp-editor-highlight-operator);
+            font-weight: bold;
+        }
+
+        &-number {
+            color: var(--exp-editor-highlight-number);
+        }
+
+        &-common {
+            color: var(--exp-editor-highlight-common);
         }
     }
 }

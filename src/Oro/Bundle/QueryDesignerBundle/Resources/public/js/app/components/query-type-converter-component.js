@@ -178,7 +178,7 @@ const QueryTypeConverterComponent = BaseComponent.extend({
                 const expressionValue = this._convertToExpression(conditionsValue) || '';
                 expressionView.setValue(expressionValue);
             }
-            expressionView.$el.show();
+            expressionView.show();
             this.listenTo(expressionView, 'change', this.onExpressionEditorChange);
 
             // check possibility to convert in opposite mode
@@ -191,8 +191,8 @@ const QueryTypeConverterComponent = BaseComponent.extend({
             const expressionValue = expressionView.getValue();
 
             // update views visibility and listening
-            expressionView.$el.hide();
-            this.stopListening(expressionView, 'change');
+            expressionView.hide();
+            this.stopListening(conditionsView, 'change');
             expressionView.setValue('');
 
             // check if it's transition from opposite mode and not setting initial state

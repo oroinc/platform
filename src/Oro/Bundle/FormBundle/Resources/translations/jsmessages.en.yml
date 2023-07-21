@@ -32,3 +32,16 @@ oro:
         expression_editor:
             side_panel:
                 title: 'Click to Insert'
+            operators:
+                detail:
+                    equal: 'Equal'
+                    not_equal: 'Not Equal'
+                    greater_than_or_equal: 'Greater Than or Equal'
+                    greater_than: 'Greater Than'
+                    less_than_or_equal: 'Less Than or Equal'
+                    less_than: 'Less Than'
+                    multiplication: 'Multiplication'
+                    division: 'Division'
+                    remainder: 'Remainder'
+                    addition: 'Addition'
+                    subtraction: 'Subtraction'

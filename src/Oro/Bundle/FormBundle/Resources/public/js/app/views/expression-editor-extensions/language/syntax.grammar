@@ -1,0 +1,113 @@
+@precedence {
+  and @left,
+  or @left
+  matches @left
+  compare @left
+  member
+  comma @left
+}
+
+@top SymfonyExpression { groups* }
+
+@skip { spaces | newline }
+
+kw<term, name> { @specialize[@name={name}]<identifier, term> }
+
+groups {
+  GroupNode |
+  GroupOperator |
+  BracketGroup
+}
+
+GroupNode {
+  expression | operators
+}
+
+GroupOperator[@name=GroupNode] {
+  kw<'or', 'GroupOperator'> | kw<'and', 'GroupOperator'>
+}
+
+expression {
+  EmptyGroup |
+  Function |
+  Entity |
+  String |
+  Number |
+  Array
+}
+
+operators {
+  Operator |
+  LiteralOperator
+}
+
+EmptyGroup {
+  '()'
+}
+
+BracketGroup {
+  BracketOpen groups* BracketClose
+}
+
+EntityName { identifier }
+
+PropertyName { word }
+
+Entity {
+  EntityName (Dot PropertyName)+
+}
+
+ArgList {
+  commaSep<"..."? expression>
+}
+
+FunctionName {
+  identifier
+}
+
+Function {
+  FunctionName BracketOpen ArgList BracketClose |
+  FunctionName '()'
+}
+
+commaSep<content> {
+  "" | content ("," content?)*
+}
+
+LiteralOperator {
+  kw<'in', 'LiteralOperator'> | kw<'not', 'LiteralOperator'> | kw<'matches', 'LiteralOperator'>
+}
+
+Array { "[" commaSep<expression*> "]" }
+
+@tokens {
+    spaces[@export] { $[\u0009 \u000b\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\ufeff]+ }
+
+    newline[@export] { $[\r\n\u2028\u2029] }
+
+    identifierChar { @asciiLetter | '_' | '\\' | ':' }
+
+    word { identifierChar (identifierChar | @digit)* }
+
+    identifier { word }
+
+    Number { (@digit)+ }
+
+    Operator { '>=' | '<=' | '!=' | '=' | '>' | '<' | '+' | '*' | '%' | '-' | '/' }
+
+    String {
+      '"' (![\\\n"] | "\\" _)* '"'? |
+      "'" (![\\\n'] | "\\" _)* "'"?
+    }
+
+    Boolean { "#t" | "#f" }
+
+    Dot { "." }
+
+    BracketOpen { '(' }
+
+    BracketClose { ')' }
+
+}
+
+@detectDelim
