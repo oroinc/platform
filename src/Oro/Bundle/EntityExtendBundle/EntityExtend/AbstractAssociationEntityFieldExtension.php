@@ -24,7 +24,7 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
 
     abstract protected function getRelationType(): string;
 
-    public function getMethods(EntityFieldProcessTransport $transport): array
+    protected function getMethodsData(EntityFieldProcessTransport $transport): array
     {
         if (!$this->isApplicable($transport)) {
             return [];
@@ -83,6 +83,11 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
         }
 
         return $methods;
+    }
+
+    public function getMethods(EntityFieldProcessTransport $transport): array
+    {
+        return array_keys($this->getMethodsData($transport));
     }
 
     protected function callGetRelationType(EntityFieldProcessTransport $transport): void
@@ -182,7 +187,7 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
             return;
         }
 
-        $methods = $this->getMethods($transport);
+        $methods = $this->getMethodsData($transport);
         if (isset($methods[$transport->getName()])) {
             call_user_func(
                 [
@@ -223,8 +228,7 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
             return;
         }
         // get a list of associated methods
-        $methods = array_keys($this->getMethods($transport));
-        if (EntityPropertyInfo::isMethodMatchExists($methods, $transport->getName())) {
+        if (EntityPropertyInfo::isMethodMatchExists($this->getMethods($transport), $transport->getName())) {
             $transport->setResult(true);
             $transport->setProcessed(true);
             ExtendEntityStaticCache::setMethodExistsCache($transport, true);
@@ -233,11 +237,20 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
 
     public function getMethodInfo(EntityFieldProcessTransport $transport): void
     {
-        $methods = $this->getMethods($transport);
+        $methods = $this->getMethodsData($transport);
         if (!isset($methods[$transport->getName()])) {
             return;
         }
-        $transport->setResult([]);
+        $transport->setResult([
+            ExtendEntityMetadataProvider::FIELD_NAME => $this->getRelationKind(),
+            ExtendEntityMetadataProvider::FIELD_TYPE => $methods[$transport->getName()][self::TYPE_INDEX],
+            ExtendEntityMetadataProvider::IS_EXTEND => true,
+            ExtendEntityMetadataProvider::IS_NULLABLE => str_starts_with(
+                $methods[$transport->getName()][self::TYPE_INDEX],
+                '?'
+            ),
+            ExtendEntityMetadataProvider::IS_SERIALIZED => false,
+        ]);
         $transport->setProcessed(true);
     }
 }

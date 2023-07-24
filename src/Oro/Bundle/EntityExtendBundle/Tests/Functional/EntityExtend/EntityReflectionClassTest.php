@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityExtendBundle\Doctrine\Persistence\Reflection\ReflectionVirtualProperty;
 use Oro\Bundle\EntityExtendBundle\Doctrine\Persistence\Reflection\VirtualReflectionMethod;
 use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestExtendedEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -258,5 +259,53 @@ class EntityReflectionClassTest extends WebTestCase
             )
         );
         $reflClass->getMethod('getUndefinedMethodName');
+    }
+
+    /**
+     * @dataProvider getMethodsDataProvider
+     */
+    public function testGetMethods(string $class, object $expectedMethod)
+    {
+        $reflMethods = [];
+        $reflClass = new EntityReflectionClass($class);
+        foreach ($reflClass->getMethods() as $reflectionMethod) {
+            $reflMethods[$reflectionMethod->getName()] = $reflectionMethod;
+        }
+        self::assertArrayHasKey($expectedMethod->getName(), $reflMethods);
+        self::assertInstanceOf(VirtualReflectionMethod::class, $reflMethods[$expectedMethod->getName()]);
+    }
+
+    public function getMethodsDataProvider(): array
+    {
+        return [
+            'get extend enum attribute method exist' => [
+                'class' => TestExtendedEntity::class,
+                'expectedMethod' => VirtualReflectionMethod::create(
+                    TestExtendedEntity::class,
+                    'getTestExtendedEntityEnumAttribute'
+                ),
+            ],
+            'remove extend method exist' => [
+                'class' => TestExtendedEntity::class,
+                'expectedMethod' => VirtualReflectionMethod::create(
+                    TestExtendedEntity::class,
+                    'removeBiM2OOwner'
+                ),
+            ],
+            'add extend method exist' => [
+                'class' => TestExtendedEntity::class,
+                'expectedMethod' => VirtualReflectionMethod::create(
+                    TestExtendedEntity::class,
+                    'addBiM2OOwner'
+                ),
+            ],
+            'set extend method exist' => [
+                'class' => TestExtendedEntity::class,
+                'expectedMethod' => VirtualReflectionMethod::create(
+                    TestExtendedEntity::class,
+                    'setTestentity5UniO2MTargets'
+                ),
+            ],
+        ];
     }
 }

@@ -64,16 +64,15 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
         return $this->extensionCache[$transport->getClass()][$extensionClass][$key];
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isset(EntityFieldProcessTransport $transport): void
     {
     }
 
-    /**
-     * @inheritDoc
-     */
+    protected function getMethodsData(EntityFieldProcessTransport $transport): array
+    {
+        return [];
+    }
+
     public function getMethods(EntityFieldProcessTransport $transport): array
     {
         return [];
@@ -235,14 +234,18 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
 
     public function getMethodInfo(EntityFieldProcessTransport $transport): void
     {
-        $methods = $this->getMethods($transport);
+        $methods = $this->getMethodsData($transport);
         $fieldsMetadata = $transport->getFieldsMetadata();
-        if (!isset($methods[$transport->getName()])
-            || is_array($methods[$transport->getName()])
-            || empty($fieldsMetadata)) {
+        if (!isset($methods[$transport->getName()]) || empty($fieldsMetadata)) {
             return;
         }
-        $transport->setResult($fieldsMetadata[$methods[$transport->getName()]] ?? []);
+        if (is_array($methods[$transport->getName()]) && !isset($methods[$transport->getName()]['argument'])) {
+            return;
+        }
+        $fieldName = is_array($methods[$transport->getName()])
+            ? $methods[$transport->getName()]['argument']
+            : $methods[$transport->getName()];
+        $transport->setResult($fieldsMetadata[$fieldName] ?? []);
         $transport->setProcessed(true);
     }
 }
