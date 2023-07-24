@@ -80,10 +80,14 @@ class ExtendAutocompleteGenerator
             $arguments = [$type, $propertyName];
             $result .= sprintf($format, ...$arguments) . "\n";
         }
-        foreach ($extendMethods as $methodName => $fieldConfig) {
+        foreach ($extendMethods as $methodName) {
             $arguments = [$schema['entity'], $methodName];
             $format = ' * @method \%s %s';
-            $format .= $this->getTypedFormat($methodName, $fieldConfig, $entityMetadata);
+            $format .= $this->getTypedFormat(
+                $methodName,
+                EntityPropertyInfo::getExtendedMethodInfo($schema['entity'], $methodName),
+                $entityMetadata
+            );
             $result .= sprintf($format, ...$arguments) . "\n";
         }
         $result .= ' */' . "\n";
@@ -134,19 +138,25 @@ class ExtendAutocompleteGenerator
 
     protected function getTypedFormat(
         string $methodName,
-        string|array $fieldConfig,
+        array $fieldConfig,
         ConfigInterface $entityMetadata
     ): string {
-        if (is_array($fieldConfig)) {
-            $format = $this->isMethodHasArgument($methodName) ? '($value)' : '()';
-
-            return isset($fieldConfig[2]) ? $format . ': ' . $fieldConfig[2] : $format;
+        if (empty($fieldConfig) || !isset($fieldConfig[ExtendEntityMetadataProvider::FIELD_NAME])) {
+            return $this->isMethodHasArgument($methodName) ? '($value)' : '()';
         }
-        $formatFromRelation = $this->getFormatFromRelation($methodName, $fieldConfig, $entityMetadata);
+        $formatFromRelation = $this->getFormatFromRelation(
+            $methodName,
+            $fieldConfig[ExtendEntityMetadataProvider::FIELD_NAME],
+            $entityMetadata
+        );
         if (null !== $formatFromRelation) {
             return $formatFromRelation;
         }
-        $formatFromMeta = $this->getFormatFromMeta($methodName, $fieldConfig, $entityMetadata);
+        $formatFromMeta = $this->getFormatFromMeta(
+            $methodName,
+            $fieldConfig[ExtendEntityMetadataProvider::FIELD_NAME],
+            $entityMetadata
+        );
         if (null !== $formatFromMeta) {
             return $formatFromMeta;
         }

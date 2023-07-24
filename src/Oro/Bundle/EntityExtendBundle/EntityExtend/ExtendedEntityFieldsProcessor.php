@@ -114,7 +114,7 @@ class ExtendedEntityFieldsProcessor
         self::extendTransportWithMetadataProvider($transport);
         $methods = [];
         foreach (self::$iterator->getExtensions() as $extension) {
-            $methods += $extension->getMethods($transport);
+            $methods = array_merge($methods, $extension->getMethods($transport));
         }
 
         return $methods;
