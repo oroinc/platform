@@ -61,7 +61,6 @@ class EmbeddedImagesInEmailModelHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($emailModel->getAttachments());
     }
 
-
     public function testHandleEmbeddedImages(): void
     {
         $emailModel = (new EmailModel())

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\EventListener;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
@@ -137,17 +137,12 @@ class SetsParentEntityOnFlushListener
         }
     }
 
-    /**
-     * @param object $entity
-     * @param EntityManager $entityManager
-     * @param callable $callback
-     */
-    private function processEntity($entity, EntityManager $entityManager, callable $callback): void
+    private function processEntity(object $entity, EntityManagerInterface $entityManager, callable $callback): void
     {
         $realClass = ClassUtils::getRealClass($entity);
         $classMetadata = $entityManager->getClassMetadata($realClass);
 
-        if (count($classMetadata->getIdentifier()) !== 1) {
+        if (\count($classMetadata->getIdentifier()) !== 1) {
             // Entity does not have id field or it is composite.
             return;
         }
@@ -275,18 +270,12 @@ class SetsParentEntityOnFlushListener
         return $value;
     }
 
-    /**
-     * @param EntityManager $entityManager
-     * @param object $entity
-     *
-     * @return mixed|null
-     */
-    private function getEntityId(EntityManager $entityManager, $entity)
+    private function getEntityId(EntityManagerInterface $entityManager, object $entity): mixed
     {
         $classMetadata = $entityManager->getClassMetadata(ClassUtils::getRealClass($entity));
         $identifierFields = $classMetadata->getIdentifier();
 
-        if (count($identifierFields) !== 1) {
+        if (\count($identifierFields) !== 1) {
             // Entity does not have id field or it is composite.
             return null;
         }
@@ -299,8 +288,11 @@ class SetsParentEntityOnFlushListener
         }
     }
 
-    private function applyExtraUpdates(EntityManager $entityManager, File $file, array $extraUpdateChangeSet): void
-    {
+    private function applyExtraUpdates(
+        EntityManagerInterface $entityManager,
+        File $file,
+        array $extraUpdateChangeSet
+    ): void {
         $unitOfWork = $entityManager->getUnitOfWork();
 
         foreach ($extraUpdateChangeSet as $changedFieldName => $change) {

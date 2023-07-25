@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
@@ -31,14 +31,14 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
         $entityId = 1;
         $entity = new \stdClass();
 
-        $manager = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(EntityRepository::class);
 
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->willReturn($manager);
-        $manager->expects(self::once())
+            ->willReturn($em);
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($repo);
@@ -68,18 +68,18 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $manager = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(EntityRepository::class);
 
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->willReturn($manager);
-        $manager->expects(self::once())
+            ->willReturn($em);
+        $em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClass)
             ->willReturn($classMetadata);
-        $manager->expects(self::once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($repo);
@@ -109,18 +109,18 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $manager = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(EntityRepository::class);
 
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->willReturn($manager);
-        $manager->expects(self::once())
+            ->willReturn($em);
+        $em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClass)
             ->willReturn($classMetadata);
-        $manager->expects(self::once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($repo);
@@ -152,18 +152,18 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $manager = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(EntityRepository::class);
 
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->willReturn($manager);
-        $manager->expects(self::once())
+            ->willReturn($em);
+        $em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClass)
             ->willReturn($classMetadata);
-        $manager->expects(self::once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($repo);
@@ -194,18 +194,18 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $manager = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(EntityRepository::class);
 
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->willReturn($manager);
-        $manager->expects(self::once())
+            ->willReturn($em);
+        $em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClass)
             ->willReturn($classMetadata);
-        $manager->expects(self::once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($repo);
@@ -236,18 +236,18 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $manager = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(EntityRepository::class);
 
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->willReturn($manager);
-        $manager->expects(self::once())
+            ->willReturn($em);
+        $em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClass)
             ->willReturn($classMetadata);
-        $manager->expects(self::once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($repo);
@@ -278,18 +278,18 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id1', 'id2']);
 
-        $manager = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(EntityRepository::class);
 
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->willReturn($manager);
-        $manager->expects(self::once())
+            ->willReturn($em);
+        $em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClass)
             ->willReturn($classMetadata);
-        $manager->expects(self::once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($repo);
@@ -320,18 +320,18 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id1', 'id2']);
 
-        $manager = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(EntityRepository::class);
 
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->willReturn($manager);
-        $manager->expects(self::once())
+            ->willReturn($em);
+        $em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClass)
             ->willReturn($classMetadata);
-        $manager->expects(self::once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($repo);
@@ -362,18 +362,18 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $manager = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(EntityRepository::class);
 
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->willReturn($manager);
-        $manager->expects(self::once())
+            ->willReturn($em);
+        $em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClass)
             ->willReturn($classMetadata);
-        $manager->expects(self::once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($repo);
@@ -406,18 +406,18 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['field1', 'field3']);
 
-        $manager = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(EntityRepository::class);
 
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityClass)
-            ->willReturn($manager);
-        $manager->expects(self::once())
+            ->willReturn($em);
+        $em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClass)
             ->willReturn($classMetadata);
-        $manager->expects(self::once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($entityClass)
             ->willReturn($repo);

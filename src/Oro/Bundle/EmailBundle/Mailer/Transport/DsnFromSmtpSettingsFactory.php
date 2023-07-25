@@ -12,9 +12,6 @@ class DsnFromSmtpSettingsFactory
 {
     /**
      * Creates SMTP DSN from SmtpSettings.
-     *
-     * @param SmtpSettings $smtpSettings
-     * @return Dsn
      */
     public function create(SmtpSettings $smtpSettings): Dsn
     {

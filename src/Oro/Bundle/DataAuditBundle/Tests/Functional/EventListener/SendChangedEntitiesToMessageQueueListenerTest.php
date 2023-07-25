@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesTopic;
 use Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener;
@@ -43,7 +43,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         return $this->getContainer()->get('oro_dataaudit.listener.send_changed_entities_to_message_queue');
     }
 
-    private function getEntityManager(): EntityManager
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->getContainer()->get('doctrine.orm.entity_manager');
     }

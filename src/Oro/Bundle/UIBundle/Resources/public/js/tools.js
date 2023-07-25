@@ -264,6 +264,16 @@ define(function(require) {
         },
 
         /**
+         * Detect if software keyboard is enabled probably
+         *
+         * @returns {boolean}
+         */
+        isSoftwareKeyboardEnabled() {
+            return visualViewport.height * visualViewport.scale / screen.height < 0.8 &&
+                ['input', 'textarea', 'select'].includes(document.activeElement.tagName.toLowerCase());
+        },
+
+        /**
          * Check if current page is an error page (404, 503, 504, etc.)
          * @returns {boolean}
          */

@@ -102,7 +102,6 @@ class EventTriggerCache
     }
 
     /**
-     * @return EventTriggerRepositoryInterface
      * @throws \LogicException
      */
     protected function getRepository(): EventTriggerRepositoryInterface

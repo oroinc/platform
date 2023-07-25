@@ -180,7 +180,7 @@ services:
     oro_datagrid.appearance_type.manager:
         class: Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
 
     oro_datagrid.grid_view.manager.link:
         tags:

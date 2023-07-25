@@ -2,7 +2,7 @@
 
 $finder = PhpCsFixer\Finder::create()
     ->in([__DIR__.'/../..'])
-    ->notPath('doctrine-extensions')
+    ->notPath(['doctrine-extensions', 'upgrade'])
     ->files()
     ->name('*.php')
     ->notName('*.php.twig')

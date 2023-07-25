@@ -56,9 +56,6 @@ abstract class AbstractContextModeAwareNormalizer implements
     }
 
     /**
-     * @param array $context
-     *
-     * @return string|null
      * @throws RuntimeException
      */
     protected function getMode(array $context): ?string

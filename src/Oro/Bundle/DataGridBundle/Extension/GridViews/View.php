@@ -96,8 +96,6 @@ class View implements ViewInterface
 
     /**
      * Getter for label
-     *
-     * @return string
      */
     public function getLabel(): string
     {

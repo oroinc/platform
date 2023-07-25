@@ -176,8 +176,6 @@ class MigrationsLoader
 
     /**
      * Gets a list of all directories contain migration scripts for app
-     *
-     * @return array
      */
     protected function getAppMigrationDirectoryList(): array
     {
@@ -205,10 +203,6 @@ class MigrationsLoader
 
     /**
      * Get migration directory structure for migration path
-     *
-     * @param string $migrationPath
-     *
-     * @return array
      */
     protected function getMigrationDirectoryStructure(string $migrationPath): array
     {

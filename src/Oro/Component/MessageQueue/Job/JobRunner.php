@@ -142,7 +142,7 @@ class JobRunner
      * See {@link https://doc.oroinc.com/backend/mq/message-queue-jobs/#jobs-statuses} for the details.
      *
      * To reuse the existing processor logic in the scope of job, it may be decorated with
-     * {@see \Oro\Component\MessageQueue\Job\DelayedJobRunnerDecoratingProcessor} which will execute runDelayed(),
+     * {@see DelayedJobRunnerDecoratingProcessor} which will execute runDelayed(),
      * pass the control to the given processor and then handle the result in the format applicable for runDelayed().
      *
      * @param string $jobId
@@ -260,10 +260,6 @@ class JobRunner
         return $this->runUnique($ownerId, $jobName, $runCallback);
     }
 
-    /**
-     * @param MessageInterface $message
-     * @return string
-     */
     public function getJobNameByMessage(MessageInterface $message): string
     {
         $jobName = $message->getProperty(JobAwareTopicInterface::UNIQUE_JOB_NAME);

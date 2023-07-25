@@ -3,7 +3,7 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
@@ -207,7 +207,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifierValues')
             ->with($entity)
             ->willReturn([1]);
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->once())
             ->method('getClassMetadata')
             ->with($entityClass)

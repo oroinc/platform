@@ -23,10 +23,8 @@ class TagHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
-    /** @var TagHandler */
     private TagHandler $handler;
 
-    /** @var Tag */
     private Tag $entity;
 
     protected function setUp(): void

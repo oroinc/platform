@@ -32,7 +32,7 @@ class BusinessUnitRepository extends EntityRepository
     /**
      * Build business units tree for user page
      *
-     * @param User     $user
+     * @param User|null $user
      * @param int|null $organizationId
      * @return array
      *

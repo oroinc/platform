@@ -153,7 +153,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
 
     /**
      * @param object $entity
-     * @param array $changeSet
+     * @param array|null $changeSet
      *
      * @return object
      */

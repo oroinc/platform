@@ -75,9 +75,6 @@ class TagsExtension extends AbstractTagsExtension
             && $this->authorizationChecker->isGranted('oro_tag_view');
     }
 
-    /**
-     * @return bool
-     */
     protected function isDisabled(): bool
     {
         $tagParameters = $this->getParameters()->get(self::TAGS_ROOT_PARAM);
@@ -85,11 +82,6 @@ class TagsExtension extends AbstractTagsExtension
         return !empty($tagParameters[self::DISABLED_PARAM]);
     }
 
-    /**
-     * @param DatagridConfiguration $configuration
-     *
-     * @return bool
-     */
     protected function isGridRootEntityTaggable(DatagridConfiguration $configuration): bool
     {
         $className = $this->getEntity($configuration);
@@ -128,10 +120,6 @@ class TagsExtension extends AbstractTagsExtension
 
     /**
      * Gets definition for tag column.
-     *
-     * @param DatagridConfiguration $config
-     *
-     * @return array
      */
     protected function getColumnDefinition(DatagridConfiguration $config): array
     {
@@ -156,10 +144,6 @@ class TagsExtension extends AbstractTagsExtension
 
     /**
      * Gets definition for tag column filter.
-     *
-     * @param DatagridConfiguration $config
-     *
-     * @return array
      */
     protected function getColumnFilterDefinition(DatagridConfiguration $config): array
     {

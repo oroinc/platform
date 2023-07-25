@@ -290,9 +290,6 @@ class EmailEntityBuilder
     /**
      * Adds an attachment to EmailBody entity.
      * If an attachment already belongs to another EmailBody entity, then adds a clone of it.
-     *
-     * @param EmailBody $emailBody
-     * @param EmailAttachment $emailAttachment
      */
     public function addEmailAttachmentEntity(EmailBody $emailBody, EmailAttachment $emailAttachment): void
     {

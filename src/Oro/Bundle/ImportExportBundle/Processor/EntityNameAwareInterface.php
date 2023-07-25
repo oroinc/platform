@@ -9,8 +9,6 @@ interface EntityNameAwareInterface
 {
     /**
      * Set entity name that this processor is used for
-     *
-     * @param string $entityName
      */
     public function setEntityName(string $entityName): void;
 }

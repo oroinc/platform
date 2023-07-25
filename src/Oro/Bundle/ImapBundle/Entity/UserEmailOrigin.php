@@ -443,7 +443,7 @@ class UserEmailOrigin extends EmailOrigin
     }
 
     /**
-     * @param \DateTime $datetime
+     * @param \DateTime|null $datetime
      *
      * @return UserEmailOrigin
      */

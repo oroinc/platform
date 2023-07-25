@@ -14,12 +14,6 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var ThemeResourceProvider */
-    private $provider;
-
-    /** @var string */
-    private $cacheFile;
-
     /** @var LastModificationDateProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $lastModificationDateProvider;
 
@@ -29,12 +23,17 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
     /** @var BlockViewCache|\PHPUnit\Framework\MockObject\MockObject */
     private $blockViewCache;
 
+    /** @var string */
+    private $cacheFile;
+
+    /** @var ThemeResourceProvider */
+    private $provider;
+
     protected function setUp(): void
     {
         $this->lastModificationDateProvider = $this->createMock(LastModificationDateProvider::class);
         $this->loader = $this->createMock(LayoutUpdateLoaderInterface::class);
         $this->blockViewCache = $this->createMock(BlockViewCache::class);
-
         $this->cacheFile = $this->getTempFile('ThemeResourceProvider');
 
         $this->provider = new ThemeResourceProvider(
@@ -50,12 +49,7 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    private function getPath($path)
+    private function getPath(string $path): string
     {
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
@@ -148,7 +142,7 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
                 '/Resources/views/layouts/oro-default/resource1.yml'
             ]
         ];
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedResources, true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', \var_export($cachedResources, true)));
 
         $this->assertEquals($cachedResources, $this->provider->getResources());
     }

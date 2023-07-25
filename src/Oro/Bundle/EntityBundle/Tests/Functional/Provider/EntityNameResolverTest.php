@@ -62,7 +62,6 @@ class EntityNameResolverTest extends WebTestCase
             ->setParameter('id', $id);
     }
 
-
     private function getLocalization(string $locale): Localization
     {
         /** @var EntityManagerInterface $em */

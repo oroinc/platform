@@ -6,7 +6,7 @@ abstract class AbstractConfiguration
 {
     /**
      * @param array $fields
-     * @param array $config
+     * @param array|null $config
      * @return array
      */
     protected function mergeConfigs(array $fields, array $config = null)

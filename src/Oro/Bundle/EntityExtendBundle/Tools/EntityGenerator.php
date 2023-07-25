@@ -47,22 +47,12 @@ class EntityGenerator
     {
         $this->ensureEntityCacheDirExistsAndEmpty();
 
-        $aliases = [];
         $classes = '';
         foreach ($schemas as $schema) {
-            if ('Extend' === $schema['type']) {
-                $aliases[$schema['entity']] = $schema['parent'];
-            }
             $classes .= $this->buildPhpClass($schema);
         }
         // writes PHP classes for extended entity proxy to PHP file contains all such classes
         $this->writePhpFile($this->entityClassesPath, $this->buildPhpFileHeader() . $classes);
-
-        // write PHP class aliases to the file
-        $this->writePhpFile(
-            ExtendClassLoadingUtils::getAliasesPath($this->cacheDir),
-            sprintf('<?php return %s;', var_export($aliases, true))
-        );
     }
 
     /**
@@ -97,9 +87,6 @@ class EntityGenerator
         }
     }
 
-    /**
-     * @return array
-     */
     private function getClearableFileExtensions(): array
     {
         return ['yml'];

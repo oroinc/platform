@@ -52,9 +52,6 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validMessageDataProvider
-     *
-     * @param mixed $message
-     * @param Message $expectedMessage
      */
     public function testSend(mixed $message, Message $expectedMessage): void
     {
@@ -162,10 +159,6 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidMessageDataProvider
-     *
-     * @param mixed $message
-     * @param string $expectException
-     * @param string $expectExceptionMessage
      */
     public function testSendWInvalidMessage(
         mixed $message,

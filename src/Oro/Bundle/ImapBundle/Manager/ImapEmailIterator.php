@@ -93,10 +93,10 @@ class ImapEmailIterator implements \Iterator, \Countable
 
     /**
      * Sets a callback function that will handle message convert error. If this callback set then iterator will work
-     * in fail safe mode invalid messages will just skipped
+     * in fail-safe mode invalid messages will just skipped
      *
-     * @param callable $callback The callback function.
-     *                           function (\Exception)
+     * @param \Closure|null $callback The callback function.
+     *                                function (\Exception)
      */
     public function setConvertErrorCallback(\Closure $callback = null)
     {

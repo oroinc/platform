@@ -14,9 +14,6 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContextAccessor */
-    private $contextAccessor;
-
     /** @var DefaultOwnerHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $defaultOwnerHelper;
 
@@ -25,10 +22,9 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->contextAccessor = new ContextAccessor();
         $this->defaultOwnerHelper = $this->createMock(DefaultOwnerHelper::class);
 
-        $this->action = new PopulateIntegrationOwner($this->contextAccessor, $this->defaultOwnerHelper);
+        $this->action = new PopulateIntegrationOwner(new ContextAccessor(), $this->defaultOwnerHelper);
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
@@ -85,7 +81,7 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
     public function testExecuteIncorrectIntegration()
     {
         $this->expectException(InvalidParameterException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectExceptionMessage(sprintf(
             'Action "populate_channel_owner" expects %s in parameter "integration", stdClass is given.',
             Channel::class
         ));

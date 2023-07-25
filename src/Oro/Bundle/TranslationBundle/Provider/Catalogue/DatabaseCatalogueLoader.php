@@ -27,7 +27,6 @@ class DatabaseCatalogueLoader implements CatalogueLoaderInterface
     }
 
     /**
-     *
      * {@inheritDoc}
      */
     public function getCatalogue(string $locale): MessageCatalogue

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroEmailBundle_Entity_EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -44,6 +45,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
+ * @mixin OroEmailBundle_Entity_EmailTemplate
  */
 class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
 {
@@ -456,7 +458,7 @@ class EmailTemplate implements EmailTemplateInterface, ExtendEntityInterface
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      *
      * @return EmailTemplate
      */

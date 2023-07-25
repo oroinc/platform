@@ -45,7 +45,7 @@ trait PageObjectDictionary
 
     /**
      * @param string $name
-     * @param NodeElement $context
+     * @param NodeElement|null $context
      * @return Element
      */
     public function createElement($name, NodeElement $context = null)
@@ -66,7 +66,7 @@ trait PageObjectDictionary
     /**
      * @param string $name Element name
      * @param string $text Text that contains in element node
-     * @param OroElement $context
+     * @param OroElement|null $context
      *
      * @return OroElement
      */
@@ -89,7 +89,7 @@ trait PageObjectDictionary
 
     /**
      * @param string $elementName
-     * @param NodeElement $context
+     * @param NodeElement|null $context
      *
      * @return bool
      */

@@ -14,11 +14,6 @@ interface ConstraintConverterInterface
 {
     /**
      * Checks if the given validation constraint can be converted to a form suitable for JS validation.
-     *
-     * @param Constraint $constraint
-     * @param FormInterface|null $form
-     *
-     * @return bool
      */
     public function supports(Constraint $constraint, ?FormInterface $form = null): bool;
 

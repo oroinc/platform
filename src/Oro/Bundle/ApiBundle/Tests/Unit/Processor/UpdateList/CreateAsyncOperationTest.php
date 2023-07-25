@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\UpdateList;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\CreateAsyncOperation;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -111,7 +111,7 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
             )
             ->willReturnOnConsecutiveCalls(true, true);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
             ->willReturn($em);

@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroUserBundle_Entity_Group;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -43,6 +44,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  *          }
  *      }
  * )
+ * @mixin OroUserBundle_Entity_Group
  */
 class Group implements ExtendEntityInterface
 {
@@ -284,7 +286,7 @@ class Group implements ExtendEntityInterface
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return Group
      */
     public function setOrganization(Organization $organization = null)

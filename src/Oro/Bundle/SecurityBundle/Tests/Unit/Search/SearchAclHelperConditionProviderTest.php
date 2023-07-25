@@ -76,7 +76,6 @@ class SearchAclHelperConditionProviderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($conditionProvider->addRestriction($query, \stdClass::class, 'VIEW', 'std'));
     }
 
-
     public function testAddRestriction(): void
     {
         $query = new Query();

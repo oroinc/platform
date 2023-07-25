@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroEmbeddedFormBundle_Entity_EmbeddedForm;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -35,6 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          }
  *      }
  * )
+ * @mixin OroEmbeddedFormBundle_Entity_EmbeddedForm
  */
 class EmbeddedForm implements ExtendEntityInterface
 {

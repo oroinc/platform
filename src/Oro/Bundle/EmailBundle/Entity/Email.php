@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroEmailBundle_Entity_Email;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -50,6 +51,7 @@ use Symfony\Component\HttpFoundation\AcceptHeader;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyFields)
+ * @mixin OroEmailBundle_Entity_Email
  */
 class Email implements ActivityInterface, ExtendEntityInterface
 {

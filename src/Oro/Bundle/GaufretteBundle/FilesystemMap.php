@@ -39,8 +39,6 @@ class FilesystemMap implements \IteratorAggregate, FilesystemMapInterface
 
     /**
      * Instantiates a new filesystem map.
-     *
-     * @param array $maps
      */
     public function __construct(array $maps)
     {

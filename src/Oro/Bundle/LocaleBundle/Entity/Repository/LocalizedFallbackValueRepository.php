@@ -44,7 +44,6 @@ class LocalizedFallbackValueRepository extends EntityRepository
             $this->unusedLocalizedFallbackValuesSql = $this->getUnusedLocalizedFallbackValuesSqlQuery($classesMetadata);
         }
 
-
         return $this->getEntityManager()
             ->getConnection()
             ->fetchFirstColumn(

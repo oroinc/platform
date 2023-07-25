@@ -99,7 +99,7 @@ class WorkflowManager implements LoggerAwareInterface
     /**
      * @param string|Transition $transition
      * @param WorkflowItem      $workflowItem
-     * @param Collection        $errors
+     * @param Collection|null $errors
      * @return bool
      */
     public function isTransitionAvailable(WorkflowItem $workflowItem, $transition, Collection $errors = null)
@@ -114,7 +114,7 @@ class WorkflowManager implements LoggerAwareInterface
      * @param string|Transition $transition
      * @param object            $entity
      * @param array             $data
-     * @param Collection        $errors
+     * @param Collection|null $errors
      * @return bool
      */
     public function isStartTransitionAvailable(

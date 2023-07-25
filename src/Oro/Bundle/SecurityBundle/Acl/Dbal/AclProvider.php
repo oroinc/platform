@@ -64,12 +64,6 @@ class AclProvider implements AclProviderInterface
     /** @var array [oid key => [sid key => bool, ...], ...] */
     protected $notFoundAcls = [];
 
-    /**
-     * @param Connection                          $connection
-     * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
-     * @param array                               $options
-     * @param AclCache                            $cache
-     */
     public function __construct(
         Connection $connection,
         PermissionGrantingStrategyInterface $permissionGrantingStrategy,

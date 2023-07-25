@@ -22,9 +22,6 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     /** @var BlockOptionsManipulatorInterface */
     protected $optionsManipulator;
 
-    /**
-     * @param BlockOptionsManipulatorInterface $optionsManipulator
-     */
     public function __construct(BlockOptionsManipulatorInterface $optionsManipulator = null)
     {
         $this->rawLayout          = new RawLayout();

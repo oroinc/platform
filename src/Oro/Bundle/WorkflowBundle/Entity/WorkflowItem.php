@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroWorkflowBundle_Entity_WorkflowItem;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -47,6 +48,7 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @mixin OroWorkflowBundle_Entity_WorkflowItem
  */
 class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
 {
@@ -297,7 +299,7 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
     /**
      * This method should be called only from WorkflowItemListener.
      *
-     * @param string $entityId
+     * @param string|null $entityId
      * @return WorkflowItem
      * @throws WorkflowException
      */

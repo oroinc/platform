@@ -35,7 +35,7 @@ class WebSocketSendProcessor
      * Get user topic
      *
      * @param User|int $user
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return string
      */
     public static function getUserTopic($user, Organization $organization = null)

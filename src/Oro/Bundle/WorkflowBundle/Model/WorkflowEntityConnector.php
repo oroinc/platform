@@ -29,10 +29,6 @@ class WorkflowEntityConnector
     ];
     protected CacheInterface $cache;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param CacheInterface $cache
-     */
     public function __construct(ManagerRegistry $managerRegistry, ?CacheInterface $cache = null)
     {
         $this->registry = $managerRegistry;

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroNotificationBundle_Entity_NotificationAlert;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareTrait;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedAtAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -38,6 +39,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
+ * @mixin OroNotificationBundle_Entity_NotificationAlert
  */
 class NotificationAlert implements ExtendEntityInterface
 {

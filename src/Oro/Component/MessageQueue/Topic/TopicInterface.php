@@ -29,8 +29,6 @@ interface TopicInterface
     /**
      * Configures {@see OptionsResolver} for a message body.
      * Used for validating body of a message before it is sent to message queue.
-     *
-     * @param OptionsResolver $resolver
      */
     public function configureMessageBody(OptionsResolver $resolver): void;
 }

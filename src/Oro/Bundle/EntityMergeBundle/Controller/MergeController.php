@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
@@ -104,7 +103,7 @@ class MergeController extends AbstractController
                 $merger = $this->getEntityMerger();
 
                 try {
-                    $this->getEntityManager()->transactional(
+                    $this->get('doctrine')->getManager()->transactional(
                         function () use ($merger, $entityData) {
                             $merger->merge($entityData);
                         }
@@ -196,14 +195,6 @@ class MergeController extends AbstractController
     protected function getEntityMerger()
     {
         return $this->get(EntityMergerInterface::class);
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->get('doctrine')->getManager();
     }
 
     /**

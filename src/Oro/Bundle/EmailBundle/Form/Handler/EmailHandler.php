@@ -40,7 +40,7 @@ class EmailHandler
     /**
      * Process form
      *
-     * @param  Email $model
+     * @param Email $emailModel
      * @return bool True on successful processing, false otherwise
      */
     public function process(Email $emailModel)

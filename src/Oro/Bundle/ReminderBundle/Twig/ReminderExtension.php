@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Twig;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
@@ -44,7 +44,7 @@ class ReminderExtension extends AbstractExtension implements ServiceSubscriberIn
     }
 
     /**
-     * @return EntityManager
+     * @return EntityManagerInterface
      */
     protected function getEntityManager()
     {

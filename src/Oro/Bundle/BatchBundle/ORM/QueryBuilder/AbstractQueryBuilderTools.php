@@ -23,10 +23,6 @@ abstract class AbstractQueryBuilderTools
      */
     abstract public function prepareJoinTablePaths(array $joins);
 
-    /**
-     * @param array $selects
-     * @param array  $joins
-     */
     public function __construct(array $selects = null, array $joins = null)
     {
         if (null !== $selects) {

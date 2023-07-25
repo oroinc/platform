@@ -12,9 +12,6 @@ interface TranslationKeyTemplateInterface
      */
     public function getName();
 
-    /**
-     * @return string
-     */
     public function getTemplate(): string;
 
     /**

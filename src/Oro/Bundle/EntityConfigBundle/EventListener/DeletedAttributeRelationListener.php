@@ -119,10 +119,6 @@ class DeletedAttributeRelationListener
         return true;
     }
 
-    /**
-     * @param FieldConfigModel $attribute
-     * @return string
-     */
     protected function getAttributeName(FieldConfigModel $attribute): string
     {
         return $attribute->getFieldName();

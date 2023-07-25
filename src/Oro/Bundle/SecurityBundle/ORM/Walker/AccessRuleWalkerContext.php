@@ -58,8 +58,6 @@ class AccessRuleWalkerContext
 
     /**
      * Returns the permission the object should be checked.
-     *
-     * @return string
      */
     public function getPermission(): ?string
     {
@@ -68,8 +66,6 @@ class AccessRuleWalkerContext
 
     /**
      * Returns current logged user class name.
-     *
-     * @return string
      */
     public function getUserClass(): ?string
     {

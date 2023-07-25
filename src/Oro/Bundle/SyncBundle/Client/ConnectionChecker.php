@@ -35,9 +35,6 @@ class ConnectionChecker implements LoggerAwareInterface, ResettableInterface
         $this->logger = new NullLogger();
     }
 
-    /**
-     * @return bool
-     */
     public function checkConnection(): bool
     {
         if ($this->isConfigured() === false) {

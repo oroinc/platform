@@ -16,5 +16,7 @@
         <type>error</type>
     </rule>
     <exclude-pattern>*/Acme/*</exclude-pattern>
+    <exclude-pattern>*/Rector/*</exclude-pattern>
+    <exclude-pattern>*/sets/*</exclude-pattern>
     <exclude-pattern>*/doctrine-em-loader.php</exclude-pattern>
 </ruleset>

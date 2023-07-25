@@ -31,13 +31,6 @@ class CloneEntity extends CloneObject
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param ManagerRegistry $registry
-     * @param TranslatorInterface $translator
-     * @param FlashBagInterface $flashBag
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         ManagerRegistry $registry,

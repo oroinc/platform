@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroAttachmentBundle_Entity_Attachment;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -45,6 +46,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @method bool supportTarget($targetClass)
  * @method object|null getTarget()
  * @method Attachment setTarget($target)
+ * @mixin OroAttachmentBundle_Entity_Attachment
  */
 class Attachment implements ExtendEntityInterface
 {

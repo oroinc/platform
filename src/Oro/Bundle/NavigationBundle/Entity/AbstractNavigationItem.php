@@ -57,9 +57,6 @@ abstract class AbstractNavigationItem implements
      */
     protected $position;
 
-    /**
-     * @param array $values
-     */
     public function __construct(array $values = null)
     {
         if (!empty($values)) {
@@ -133,7 +130,7 @@ abstract class AbstractNavigationItem implements
     }
 
     /**
-     * @param AbstractUser $user
+     * @param AbstractUser|null $user
      * @return AbstractNavigationItem
      */
     public function setUser(AbstractUser $user = null)

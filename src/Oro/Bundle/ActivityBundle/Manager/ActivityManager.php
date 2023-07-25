@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Manager;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
@@ -278,7 +279,7 @@ class ActivityManager
      *
      * @param string $activityClassName The FQCN of the activity entity
      *
-     * @return array [target_entity_class => field_name]
+     * @return array [target entity class => field name]
      */
     public function getActivityTargets($activityClassName)
     {
@@ -333,11 +334,64 @@ class ActivityManager
     }
 
     /**
+     * Returns a query builder that could be used for fetching the list of entities
+     * associated with the given activity and limited by the given target classes.
+     *
+     * @param string         $activityClassName The FQCN of the activity entity
+     * @param string[]       $targetClassNames  The list of FQCNs for target classes
+     * @param Criteria|array $filters           Criteria is used to filter activity entities
+     *                                          e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null     $joins             Additional associations required to filter activity entities
+     * @param int|null       $limit             The maximum number of items per page
+     * @param int|null       $page              The page number
+     * @param string|null    $orderBy           The ordering expression for the result
+     * @param callable|null  $callback          A callback function which can be used to modify child queries
+     *                                          function (QueryBuilder $qb, $targetEntityClass)
+     *
+     * @return SqlQueryBuilder|null SqlQueryBuilder object or NULL if the given entity type has no activity associations
+     */
+    public function getLimitedActivityTargetsQueryBuilder(
+        string $activityClassName,
+        array $targetClassNames,
+        Criteria|array $filters,
+        ?array $joins = null,
+        ?int $limit = null,
+        ?int $page = null,
+        ?string $orderBy = null,
+        ?callable $callback = null
+    ): ?SqlQueryBuilder {
+        $targets = $this->getActivityTargets($activityClassName);
+        if (empty($targets)) {
+            return null;
+        }
+        $filteredTargets = [];
+        foreach ($targetClassNames as $className) {
+            if (isset($targets[$className])) {
+                $filteredTargets[$className] = $targets[$className];
+            }
+        }
+        if (empty($filteredTargets)) {
+            return null;
+        }
+
+        return $this->associationManager->getMultiAssociationsQueryBuilder(
+            $activityClassName,
+            $filters,
+            $joins,
+            $filteredTargets,
+            $limit,
+            $page,
+            $orderBy,
+            $callback
+        );
+    }
+
+    /**
      * Returns the list of fields responsible to store activity associations for the given target entity type
      *
      * @param string $targetClassName The FQCN of the target entity
      *
-     * @return array [activity_entity_class => field_name]
+     * @return array [activity entity class => field name]
      */
     public function getActivities($targetClassName)
     {

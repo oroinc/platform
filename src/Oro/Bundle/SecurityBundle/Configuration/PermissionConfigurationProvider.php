@@ -17,20 +17,11 @@ class PermissionConfigurationProvider extends PhpArrayConfigProvider
 {
     private const CONFIG_FILE = 'Resources/config/oro/permissions.yml';
 
-    /**
-     * @param string   $cacheFile
-     * @param bool     $debug
-     */
     public function __construct(string $cacheFile, bool $debug)
     {
         parent::__construct($cacheFile, $debug);
     }
 
-    /**
-     * @param array $acceptedPermissions
-     *
-     * @return array
-     */
     public function getPermissionConfiguration(array $acceptedPermissions = null): array
     {
         $permissions = $this->doGetConfig();

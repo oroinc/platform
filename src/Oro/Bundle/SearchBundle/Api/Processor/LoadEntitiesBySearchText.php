@@ -72,16 +72,15 @@ class LoadEntitiesBySearchText implements ProcessorInterface
             return;
         }
 
-        $criteria = $context->getCriteria();
-        $limit = $criteria->getMaxResults();
+        $maxResults = $criteria->getMaxResults();
         $searchResult = $this->searchIndexer->simpleSearch(
             $context->getFilterValues()->get('searchText')?->getValue(),
             $criteria->getFirstResult(),
-            (null !== $limit && $context->getConfig()->getHasMore()) ? $limit + 1 : $limit,
-            $entities
+            (null !== $maxResults && $context->getConfig()->getHasMore()) ? $maxResults + 1 : $maxResults,
+            array_values($entities)
         );
 
-        $context->setResult($this->buildSearchResult($searchResult->toArray(), $limit, $context->getRequestType()));
+        $context->setResult($this->buildResult($searchResult->toArray(), $maxResults, $context->getRequestType()));
         $context->setTotalCountCallback(function () use ($searchResult) {
             return $searchResult->getRecordsCount();
         });
@@ -89,16 +88,16 @@ class LoadEntitiesBySearchText implements ProcessorInterface
 
     /**
      * @param SearchResultItem[] $records
-     * @param int|null           $limit
+     * @param int|null           $maxResults
      * @param RequestType        $requestType
      *
      * @return SearchItem[]
      */
-    private function buildSearchResult(array $records, ?int $limit, RequestType $requestType): array
+    private function buildResult(array $records, ?int $maxResults, RequestType $requestType): array
     {
         $hasMore = false;
-        if (null !== $limit && \count($records) > $limit) {
-            $records = \array_slice($records, 0, $limit);
+        if (null !== $maxResults && \count($records) > $maxResults) {
+            $records = \array_slice($records, 0, $maxResults);
             $hasMore = true;
         }
 
@@ -106,14 +105,13 @@ class LoadEntitiesBySearchText implements ProcessorInterface
         foreach ($records as $record) {
             $this->eventDispatcher->dispatch(new PrepareResultItemEvent($record), PrepareResultItemEvent::EVENT_NAME);
             $entityClass = $record->getEntityName();
-            $entityType = ValueNormalizerUtil::tryConvertToEntityType(
-                $this->valueNormalizer,
-                $entityClass,
-                $requestType
-            );
             $entityId = $record->getRecordId();
             $result[] = new SearchItem(
-                sprintf('%s-%s', $entityType, $entityId),
+                sprintf(
+                    '%s-%s',
+                    ValueNormalizerUtil::convertToEntityType($this->valueNormalizer, $entityClass, $requestType),
+                    $entityId
+                ),
                 $entityClass,
                 $entityId,
                 $record->getSelectedData()['name'],

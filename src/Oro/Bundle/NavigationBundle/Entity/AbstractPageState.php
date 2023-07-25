@@ -84,7 +84,7 @@ class AbstractPageState
     /**
      * Set user
      *
-     * @param  AbstractUser $user
+     * @param AbstractUser|null $user
      * @return NavigationHistoryItem
      */
     public function setUser(AbstractUser $user = null)

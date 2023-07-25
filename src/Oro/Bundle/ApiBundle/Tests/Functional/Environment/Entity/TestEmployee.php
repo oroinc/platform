@@ -79,7 +79,7 @@ class TestEmployee extends TestPerson
     }
 
     /**
-     * @param Organization $organization
+     * @param Organization|null $organization
      *
      * @return self
      */

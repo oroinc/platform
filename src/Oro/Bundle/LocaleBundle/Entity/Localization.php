@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroLocaleBundle_Entity_Localization;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -40,6 +41,7 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
  * @method LocalizedFallbackValue getTitle(Localization $localization = null)
  * @method LocalizedFallbackValue getDefaultTitle()
  * @method LocalizedFallbackValue setDefaultTitle($string)
+ * @mixin OroLocaleBundle_Entity_Localization
  */
 class Localization implements DatesAwareInterface, ExtendEntityInterface
 {
@@ -238,7 +240,7 @@ class Localization implements DatesAwareInterface, ExtendEntityInterface
     }
 
     /**
-     * @param Localization $parentLocalization
+     * @param Localization|null $parentLocalization
      *
      * @return $this
      */

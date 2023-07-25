@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DistributionBundle;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendReflectionErrorHandler;
@@ -227,7 +228,7 @@ abstract class OroKernel extends Kernel
     }
 
     /**
-     * @param $bundles
+     * @param array $bundles
      *
      * @return array
      */
@@ -292,6 +293,7 @@ abstract class OroKernel extends Kernel
                 $phpVersion
             ));
         }
+        AnnotationReader::addGlobalIgnoredName('mixin');
 
         parent::boot();
     }

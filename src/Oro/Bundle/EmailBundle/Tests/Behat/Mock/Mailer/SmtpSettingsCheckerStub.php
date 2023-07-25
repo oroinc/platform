@@ -10,8 +10,6 @@ class SmtpSettingsCheckerStub extends SmtpSettingsChecker
     private SmtpSettingsChecker $smtpSettingsChecker;
 
     /**
-     * @param SmtpSettingsChecker $smtpSettingsChecker
-     *
      * @noinspection PhpMissingParentConstructorInspection
      */
     public function __construct(SmtpSettingsChecker $smtpSettingsChecker)

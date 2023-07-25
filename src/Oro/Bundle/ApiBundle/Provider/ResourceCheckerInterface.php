@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 interface ResourceCheckerInterface
 {
     /**
-     * Checks whether a given entity is enabled for API.
+     * Checks whether the given API action is enabled for the given entity.
      *
      * @param string      $entityClass The FQCN of an entity
      * @param string      $action      The API action, {@see \Oro\Bundle\ApiBundle\Request\ApiAction}

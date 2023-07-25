@@ -37,7 +37,6 @@ class ReflectionVirtualPropertyTest extends WebTestCase
     {
         $virtualReflProperty = ReflectionVirtualProperty::create($property);
 
-
         self::assertSame($virtualReflProperty->getValue($object), $expectedResult);
     }
 

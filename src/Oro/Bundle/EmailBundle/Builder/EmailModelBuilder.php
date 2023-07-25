@@ -101,7 +101,7 @@ class EmailModelBuilder
     }
 
     /**
-     * @param EmailModel $emailModel
+     * @param EmailModel|null $emailModel
      *
      * @return EmailModel
      */
@@ -235,9 +235,6 @@ class EmailModelBuilder
         return $this->createEmailModel($emailModel);
     }
 
-    /**
-     * @param Request $request
-     */
     public function setRequest(Request $request = null)
     {
         $this->request = $request;

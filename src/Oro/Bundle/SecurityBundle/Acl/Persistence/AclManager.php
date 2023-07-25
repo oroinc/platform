@@ -51,11 +51,6 @@ class AclManager extends AbstractAclManager
 
     /**
      * Constructor
-     *
-     * @param ObjectIdentityFactory $objectIdentityFactory
-     * @param AclExtensionSelector  $extensionSelector
-     * @param MutableAclProvider    $aclProvider
-     * @param AceManipulationHelper $aceProvider
      */
     public function __construct(
         ObjectIdentityFactory $objectIdentityFactory,
@@ -490,7 +485,7 @@ class AclManager extends AbstractAclManager
      * @param SID $sid
      * @param OID $oid
      *
-     * @return \Symfony\Component\Security\Acl\Model\EntryInterface[]
+     * @return EntryInterface[]
      */
     public function getAces(SID $sid, OID $oid)
     {

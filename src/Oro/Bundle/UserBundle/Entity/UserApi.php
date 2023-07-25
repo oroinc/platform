@@ -125,7 +125,7 @@ class UserApi implements UserApiKeyInterface
     /**
      * Sets an organization this API key belongs to.
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      *
      * @return UserApi
      */

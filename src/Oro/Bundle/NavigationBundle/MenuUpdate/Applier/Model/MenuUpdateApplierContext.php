@@ -63,9 +63,6 @@ class MenuUpdateApplierContext
         $this->menu = $menu;
     }
 
-    /**
-     * @return ItemInterface
-     */
     public function getMenu(): ItemInterface
     {
         return $this->menu;
@@ -195,7 +192,6 @@ class MenuUpdateApplierContext
             $this->orphanedItemsByParentName[$parentMenuItemName],
             $this->orphanedItemsMenuUpdatesByParentName[$parentMenuItemName]
         );
-
 
         return $this;
     }

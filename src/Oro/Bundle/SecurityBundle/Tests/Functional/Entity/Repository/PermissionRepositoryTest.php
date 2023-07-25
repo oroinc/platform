@@ -171,7 +171,7 @@ class PermissionRepositoryTest extends WebTestCase
     }
 
     /**
-     * @param string[] $names
+     * @param string[]|null $names
      *
      * @return int[]|null
      */

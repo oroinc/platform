@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -27,7 +27,7 @@ class OwnerDeletionManagerTest extends \PHPUnit\Framework\TestCase
     /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ownershipMetadata;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var OwnerDeletionManager */
@@ -38,7 +38,7 @@ class OwnerDeletionManagerTest extends \PHPUnit\Framework\TestCase
         $this->checkerContainer = $this->createMock(ContainerInterface::class);
         $this->ownershipProvider = $this->createMock(ConfigProvider::class);
         $this->ownershipMetadata = $this->createMock(OwnershipMetadataProviderInterface::class);
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
 
         $this->ownershipMetadata->expects($this->any())
             ->method('getUserClass')

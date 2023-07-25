@@ -1,7 +1,68 @@
 services:
-    oro_email.api.get_subresource.load_email_suggestions:
-        class: Oro\Bundle\EmailBundle\Api\Processor\GetSubresource\LoadEmailSuggestions
+    oro_email.api.email_context_entity_class_provider:
+        class: Oro\Bundle\ActivityBundle\Api\ActivityContextEntityClassProvider
         arguments:
-            - '@oro_email.manager.email_activity_suggestion.api'
+            - '@oro_search.index'
+            - '@oro_api.resources_provider'
+            - '@oro_activity.manager'
+            - 'Oro\Bundle\EmailBundle\Entity\Email'
+
+    oro_email.api.email_context_entity_list_filter_helper:
+        class: Oro\Bundle\SearchBundle\Api\SearchEntityListFilterHelper
+        arguments:
+            - '@oro_email.api.email_context_entity_class_provider'
+            - '@oro_api.value_normalizer'
+
+    oro_email.api.email_context_entity_repository:
+        class: Oro\Bundle\EmailBundle\Api\Repository\EmailContextEntityRepository
+        arguments:
+            - '@oro_email.api.email_context_entity_class_provider'
+            - '@oro_api.value_normalizer'
+            - '@oro_entity_config.config_manager'
+            - '@translator'
+
+    oro_email.api.add_email_context_search_entity_url_link:
+        class: Oro\Bundle\SearchBundle\Api\Processor\AddSearchEntityUrlLink
         tags:
-            - { name: oro.api.processor, action: get_subresource, group: load_data, association: suggestions, parentClass: Oro\Bundle\EmailBundle\Entity\Email }
+            - { name: oro.api.processor, action: get_metadata, class: Oro\Bundle\EmailBundle\Api\Model\EmailContextSearchItem, priority: -200 }
+            - { name: oro.api.processor, action: get_metadata, class: Oro\Bundle\EmailBundle\Api\Model\EmailContextItem, priority: -200 }
+
+    oro_email.api.validate_email_context_search_capability:
+        class: Oro\Bundle\SearchBundle\Api\Processor\ValidateSearchCapability
+        arguments:
+            - '@security.authorization_checker'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: security_check, class: Oro\Bundle\EmailBundle\Api\Model\EmailContextEntity }
+            - { name: oro.api.processor, action: get_list, group: security_check, class: Oro\Bundle\EmailBundle\Api\Model\EmailContextSearchItem }
+            - { name: oro.api.processor, action: get_list, group: security_check, class: Oro\Bundle\EmailBundle\Api\Model\EmailContextItem }
+
+    oro_email.api.load_email_context_entities:
+        class: Oro\Bundle\EmailBundle\Api\Processor\LoadEmailContextEntities
+        arguments:
+            - '@oro_email.api.email_context_entity_repository'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\EmailBundle\Api\Model\EmailContextEntity }
+
+    oro_email.api.load_email_context_search_items:
+        class: Oro\Bundle\EmailBundle\Api\Processor\LoadEmailContextSearchItems
+        arguments:
+            - '@oro_search.index'
+            - '@oro_email.api.email_context_entity_list_filter_helper'
+            - '@oro_api.value_normalizer'
+            - '@event_dispatcher'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\EmailBundle\Api\Model\EmailContextSearchItem }
+
+    oro_email.api.load_email_context_items:
+        class: Oro\Bundle\EmailBundle\Api\Processor\LoadEmailContextItems
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_search.index'
+            - '@oro_email.api.email_context_entity_list_filter_helper'
+            - '@oro_activity.manager'
+            - '@oro_api.value_normalizer'
+            - '@event_dispatcher'
+            - '@oro_email.email.address.helper'
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\EmailBundle\Api\Model\EmailContextItem }

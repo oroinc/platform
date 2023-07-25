@@ -34,7 +34,11 @@ class AssociationExtendEntity
         $kind = static::getRelationKind($object);
 
         $associations = [];
-        foreach ($entity->get('relation') as $relation) {
+        $entityRelations = $entity->get('relation');
+        if (null === $entityRelations) {
+            return $associations;
+        }
+        foreach ($entityRelations as $relation) {
             $fieldConfigId = $relation['field_id'];
             $isSupported   = $fieldConfigId instanceof FieldConfigId
                 && ($fieldConfigId->getFieldType() === $type

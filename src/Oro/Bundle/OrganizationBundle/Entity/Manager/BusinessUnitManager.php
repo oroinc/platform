@@ -40,7 +40,7 @@ class BusinessUnitManager
     /**
      * Get Business Units tree
      *
-     * @param User     $entity
+     * @param User|null $entity
      * @param int|null $organizationId
      *
      * @return array
@@ -83,7 +83,7 @@ class BusinessUnitManager
 
     /**
      * @param array $criteria
-     * @param array $orderBy
+     * @param array|null $orderBy
      *
      * @return BusinessUnit
      */

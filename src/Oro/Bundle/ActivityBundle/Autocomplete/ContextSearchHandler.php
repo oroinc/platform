@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActivityBundle\Autocomplete;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
@@ -277,7 +277,7 @@ class ContextSearchHandler implements ConverterInterface
      */
     protected function getAssociatedTargetEntitiesQueryBuilder(array $groupedTargets)
     {
-        /** @var EntityManager $em */
+        /** @var EntityManagerInterface $em */
         $em = $this->objectManager;
 
         $qb = new UnionQueryBuilder($em);
@@ -297,7 +297,8 @@ class ContextSearchHandler implements ConverterInterface
                     (string)$subQb->expr()->literal($entityClass) . ' AS entityClass',
                     $nameDql . ' AS entityName'
                 );
-            $subQb->where($subQb->expr()->in('e.id', $ids));
+            $subQb->where($subQb->expr()->in('e.id', ':ids'))
+                ->setParameter('ids', $ids);
             $qb->addSubQuery($subQb->getQuery());
         }
 
