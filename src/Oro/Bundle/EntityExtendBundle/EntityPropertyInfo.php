@@ -40,23 +40,21 @@ class EntityPropertyInfo
 
     public static function getExtendedProperties(object|string $objectOrClass): array
     {
-        if (is_subclass_of($objectOrClass, ExtendEntityInterface::class)) {
-            if (is_object($objectOrClass)) {
-                $objectOrClass = $objectOrClass::class;
-            }
-            $entityMetadata = ExtendedEntityFieldsProcessor::getEntityMetadata($objectOrClass);
-            if (null === $entityMetadata) {
-                return [];
-            }
-            $result = array_merge(
-                array_keys($entityMetadata->get('schema')['property']),
-                array_keys($entityMetadata->get('schema')['relation']),
-            );
-
-            return $result;
+        if (!is_subclass_of($objectOrClass, ExtendEntityInterface::class)) {
+            return [];
+        }
+        if (is_object($objectOrClass)) {
+            $objectOrClass = $objectOrClass::class;
+        }
+        $entityMetadata = ExtendedEntityFieldsProcessor::getEntityMetadata($objectOrClass);
+        if (null === $entityMetadata) {
+            return [];
         }
 
-        return [];
+        return array_merge(
+            array_keys($entityMetadata->get('schema')['property']),
+            array_keys($entityMetadata->get('schema')['relation']),
+        );
     }
 
     public static function methodExists(string|object $objectOrClass, string $method): bool
@@ -115,8 +113,7 @@ class EntityPropertyInfo
 
     public static function getMatchedMethod(string $class, string $originalMethod): string
     {
-        $extendMethods = array_keys(self::getExtendedMethods($class));
-        foreach ($extendMethods as $method) {
+        foreach (self::getExtendedMethods($class) as $method) {
             if (strtolower($method) === strtolower($originalMethod)) {
                 return $method;
             }

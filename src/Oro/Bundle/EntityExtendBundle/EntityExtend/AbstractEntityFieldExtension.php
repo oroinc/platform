@@ -64,16 +64,15 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
         return $this->extensionCache[$transport->getClass()][$extensionClass][$key];
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isset(EntityFieldProcessTransport $transport): void
     {
     }
 
-    /**
-     * @inheritDoc
-     */
+    protected function getMethodsData(EntityFieldProcessTransport $transport): array
+    {
+        return [];
+    }
+
     public function getMethods(EntityFieldProcessTransport $transport): array
     {
         return [];

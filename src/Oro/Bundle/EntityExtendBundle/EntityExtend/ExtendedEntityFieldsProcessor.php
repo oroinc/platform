@@ -114,7 +114,7 @@ class ExtendedEntityFieldsProcessor
         self::extendTransportWithMetadataProvider($transport);
         $methods = [];
         foreach (self::$iterator->getExtensions() as $extension) {
-            $methods += $extension->getMethods($transport);
+            $methods = array_merge($methods, $extension->getMethods($transport));
         }
 
         return $methods;
@@ -127,5 +127,14 @@ class ExtendedEntityFieldsProcessor
         }
 
         return self::$metadataProvider->getExtendEntityMetadata($objectOrClass);
+    }
+
+    public static function getEntityFieldsMetadata(object|string $objectOrClass): array
+    {
+        if (is_object($objectOrClass)) {
+            $objectOrClass = CachedClassUtils::getClass($objectOrClass);
+        }
+
+        return self::$metadataProvider->getExtendEntityFieldsMetadata($objectOrClass);
     }
 }
