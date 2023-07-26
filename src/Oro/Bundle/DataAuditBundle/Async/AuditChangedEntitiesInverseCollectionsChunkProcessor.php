@@ -4,7 +4,9 @@ namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollectionsChunkTopic;
 use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
+use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
+use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Job\Job;
@@ -23,6 +25,7 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
 
     private EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter;
     private JobRunner $jobRunner;
+    private AuditConfigProvider $auditConfigProvider;
 
     public function __construct(
         EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter,
@@ -30,6 +33,14 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
     ) {
         $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
         $this->jobRunner = $jobRunner;
+    }
+
+    /**
+     * @param AuditConfigProvider $auditConfigProvider
+     */
+    public function setAuditConfigProvider(AuditConfigProvider $auditConfigProvider): void
+    {
+        $this->auditConfigProvider = $auditConfigProvider;
     }
 
     public function process(MessageInterface $message, SessionInterface $session): string
@@ -61,7 +72,13 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
                 $entityChangeSet = $sourceEntityData['change_set'];
                 $sourceKey = $entityClass . $entityId;
 
-                foreach ($sourceEntityData['fields'] as $fieldData) {
+                foreach ($sourceEntityData['fields'] as $relatedField => $fieldData) {
+                    if (!is_a($entityClass, AbstractLocalizedFallbackValue::class, true)
+                        && !$this->auditConfigProvider->isPropagateField($entityClass, $relatedField)) {
+                        // If its dynamic relationship between LocalizedFallbackValue, keep ordinary behaviour.
+                        continue;
+                    }
+
                     $fieldName = $fieldData['field_name'];
                     foreach ($fieldData['entity_ids'] as $id) {
                         $key = $fieldData['entity_class'] . $id;
