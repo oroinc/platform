@@ -235,9 +235,24 @@ class ScriptHandler
 
     protected static function saveParametersFile(string $parametersFile, array $values): void
     {
+        $data = self::quoteParameter(Yaml::dump($values, 99), 'assets_version');
+
         file_put_contents(
             $parametersFile,
-            "# This file is auto-generated during the composer install\n" . Yaml::dump($values, 99)
+            "# This file is auto-generated during the composer install\n" . $data
+        );
+    }
+
+    protected static function quoteParameter(string $data, string $parameter): string
+    {
+        $pattern = "/$parameter:\s+(?<value>\w+)/";
+
+        return preg_replace_callback(
+            $pattern,
+            function ($matches) use ($parameter) {
+                return sprintf("%s: '%s'", $parameter, $matches['value']);
+            },
+            $data
         );
     }
 
