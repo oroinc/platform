@@ -9,12 +9,12 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class LoadRoleData extends AbstractFixture implements DependentFixtureInterface
+class LoadUserRoleData extends AbstractFixture implements DependentFixtureInterface
 {
     /**
      * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [LoadUser::class];
     }
@@ -22,7 +22,7 @@ class LoadRoleData extends AbstractFixture implements DependentFixtureInterface
     /**
      * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         for ($i = 1; $i <= 3; $i++) {
             $role = new Role();

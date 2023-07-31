@@ -4,18 +4,19 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadRoleData;
+use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserRoleData;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RoleTest extends RestJsonApiTestCase
+class UserRoleTest extends RestJsonApiTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-        $this->loadFixtures([LoadRoleData::class]);
+        $this->loadFixtures([LoadUserRoleData::class]);
     }
 
     public function testGetList(): void
@@ -127,16 +128,90 @@ class RoleTest extends RestJsonApiTestCase
                 ]
             ]
         ];
-        $response = $this->post(
-            ['entity' => 'userroles'],
-            $data
-        );
+        $response = $this->post(['entity' => 'userroles'], $data);
 
         $this->assertResponseContains($data, $response);
 
         $role = $this->getEntityManager()->find(Role::class, $this->getResourceId($response));
         self::assertNotNull($role);
         self::assertEquals('New Role', $role->getLabel());
+    }
+
+    public function testCreateWithCode(): void
+    {
+        $data = [
+            'data' => [
+                'type'       => 'userroles',
+                'attributes' => [
+                    'role'  => 'new 1',
+                    'label' => 'New Role'
+                ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'userroles'], $data);
+
+        $responseContext = self::jsonToArray($response->getContent());
+        $roleCode = $responseContext['data']['attributes']['role'];
+        self::assertStringStartsWith(Role::PREFIX_ROLE . 'NEW_1_', $roleCode);
+
+        $expectedData = $data;
+        $expectedData['data']['attributes']['role'] = $roleCode;
+        $this->assertResponseContains($expectedData, $response);
+
+        $role = $this->getEntityManager()->find(Role::class, $this->getResourceId($response));
+        self::assertNotNull($role);
+        self::assertEquals($roleCode, $role->getRole());
+        self::assertEquals('New Role', $role->getLabel());
+    }
+
+    public function testCreateWithPrefixedCode(): void
+    {
+        $data = [
+            'data' => [
+                'type'       => 'userroles',
+                'attributes' => [
+                    'role'  => Role::PREFIX_ROLE . 'NEW_1',
+                    'label' => 'New Role'
+                ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'userroles'], $data);
+
+        $responseContext = self::jsonToArray($response->getContent());
+        $roleCode = $responseContext['data']['attributes']['role'];
+        self::assertStringStartsWith(Role::PREFIX_ROLE . 'NEW_1_', $roleCode);
+
+        $expectedData = $data;
+        $expectedData['data']['attributes']['role'] = $roleCode;
+        $this->assertResponseContains($expectedData, $response);
+
+        $role = $this->getEntityManager()->find(Role::class, $this->getResourceId($response));
+        self::assertNotNull($role);
+        self::assertEquals($roleCode, $role->getRole());
+        self::assertEquals('New Role', $role->getLabel());
+    }
+
+    public function testTryToCreateWithTooLongCode(): void
+    {
+        $data = [
+            'data' => [
+                'type'       => 'userroles',
+                'attributes' => [
+                    'role'  => 'ROLE_678901234567890',
+                    'label' => 'New Role'
+                ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'userroles'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'length constraint',
+                'detail' => 'This value is too long. It should have 30 characters or less.',
+                'source' => ['pointer' => '/data/attributes/role']
+            ],
+            $response
+        );
     }
 
     public function testUpdate(): void
@@ -152,29 +227,21 @@ class RoleTest extends RestJsonApiTestCase
                 ]
             ]
         ];
-        $response = $this->patch(
-            ['entity' => 'userroles', 'id' => (string)$roleId],
-            $data
-        );
+        $response = $this->patch(['entity' => 'userroles', 'id' => (string)$roleId], $data);
 
         $role = $this->getEntityManager()->find(Role::class, $this->getResourceId($response));
         self::assertNotNull($role);
         self::assertEquals('Updated Role', $role->getLabel());
     }
 
-    public function testTryToCreateRoleWithoutLabel(): void
+    public function testTryToCreateWithoutLabel(): void
     {
         $data = [
             'data' => [
                 'type' => 'userroles'
             ]
         ];
-        $response = $this->post(
-            ['entity' => 'userroles'],
-            $data,
-            [],
-            false
-        );
+        $response = $this->post(['entity' => 'userroles'], $data, [], false);
 
         $this->assertResponseValidationError(
             [
@@ -186,7 +253,7 @@ class RoleTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTryToSetRoleLabelToNull(): void
+    public function testTryToSetLabelToNull(): void
     {
         $roleId = $this->getReference('role1')->getId();
 
@@ -199,12 +266,7 @@ class RoleTest extends RestJsonApiTestCase
                 ]
             ]
         ];
-        $response = $this->patch(
-            ['entity' => 'userroles', 'id' => (string)$roleId],
-            $data,
-            [],
-            false
-        );
+        $response = $this->patch(['entity' => 'userroles', 'id' => (string)$roleId], $data, [], false);
 
         $this->assertResponseValidationError(
             [
@@ -214,5 +276,50 @@ class RoleTest extends RestJsonApiTestCase
             ],
             $response
         );
+    }
+
+    public function testTryToSetCodeToNull(): void
+    {
+        $roleId = $this->getReference('role1')->getId();
+
+        $data = [
+            'data' => [
+                'type'       => 'userroles',
+                'id'         => (string)$roleId,
+                'attributes' => [
+                    'role' => null
+                ]
+            ]
+        ];
+        $response = $this->patch(['entity' => 'userroles', 'id' => (string)$roleId], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/role']
+            ],
+            $response
+        );
+    }
+
+    public function testChangeCode(): void
+    {
+        $roleId = $this->getReference('role1')->getId();
+
+        $data = [
+            'data' => [
+                'type'       => 'userroles',
+                'id'         => (string)$roleId,
+                'attributes' => [
+                    'role' => 'UPDATED1'
+                ]
+            ]
+        ];
+        $response = $this->patch(['entity' => 'userroles', 'id' => (string)$roleId], $data);
+
+        $role = $this->getEntityManager()->find(Role::class, $this->getResourceId($response));
+        self::assertNotNull($role);
+        self::assertStringStartsWith(Role::PREFIX_ROLE . 'UPDATED1_', $role->getRole());
     }
 }
