@@ -77,7 +77,15 @@ const ExpressionEditorComponent = BaseComponent.extend({
         const viewOptions = _.extend({
             el: options._sourceElement,
             autoRender: true,
-            util: this.expressionEditorUtil
+            util: this.expressionEditorUtil,
+            operationButtons: [{
+                name: 'field',
+                type: 'selectField',
+                viewOptions: {
+                    supportedNames: options.supportedNames,
+                    entityStructureDataProvider
+                }
+            }]
         }, _.pick(options, 'dataSource'));
         this.view = new ExpressionEditorView(viewOptions);
     },

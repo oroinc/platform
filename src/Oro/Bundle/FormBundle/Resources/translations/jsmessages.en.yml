@@ -32,6 +32,10 @@ oro:
         expression_editor:
             side_panel:
                 title: 'Click to Insert'
+            fields:
+                entity: 'Entity'
+                select_placeholder: 'Field'
+                breadcrumbs_placeholder: 'Choose a Field'
             operators:
                 detail:
                     equal: 'Equal'

@@ -19,14 +19,21 @@ export const OPERATORS_SNIPPET_TEMPLATES = {
     'in': 'in [#{1}]',
     'not in': 'not in [#{1}]',
     'matches': 'matches containsRegExp(#{1})',
-    '()': '(#{1})'
+    '()': '(${1})'
 };
 
-export const getOperatorSnippet = name => {
-    const tpl = OPERATORS_SNIPPET_TEMPLATES[name];
+/**
+ * Resolve snippet by key
+ *
+ * @param {string} name
+ * @param {boolean} spaceBefore
+ * @returns {function}
+ */
+export const getResolvedSnippetByName = (name, spaceBefore = false) => {
+    let tpl = OPERATORS_SNIPPET_TEMPLATES[name.trim()] || name + '#{1}';
 
-    if (!tpl) {
-        return name;
+    if (spaceBefore) {
+        tpl = ` ${tpl}`;
     }
 
     return snippet(tpl);

@@ -2,23 +2,32 @@ import ButtonsCollectionView from './buttons-collection-view';
 import defaultOperations from './default-operations';
 
 export default function(operationButtons = [], codeMirror) {
-    const operations = [...defaultOperations];
+    const operations = [
+        ...defaultOperations,
+        ...operationButtons
+    ].reduce((operations, {handler, name, ...props}) => {
+        const operation = {
+            ...props,
+            name,
+            codeMirror
+        };
 
-    operationButtons.forEach(operation => {
-        const definedOperation = operations.find(item => item.name === operation.name);
+        if (handler) {
+            operation.handler = handler.bind(operation, codeMirror);
+        }
 
-        if (definedOperation) {
-            Object.assign(definedOperation, operation);
+        const foundDefaultIndex = operations.findIndex(({name: dName}) => dName === name);
+        if (foundDefaultIndex !== -1) {
+            operations.splice(foundDefaultIndex, 1, {
+                ...operations[foundDefaultIndex],
+                ...operation
+            });
         } else {
             operations.push(operation);
         }
-    });
 
-    operations.forEach(operation => {
-        if (operation.handler) {
-            operation.handler = operation.handler.bind(operation, codeMirror);
-        }
-    });
+        return operations;
+    }, []);
 
     const buttonsCollectionView = new ButtonsCollectionView({operationButtons: operations});
 

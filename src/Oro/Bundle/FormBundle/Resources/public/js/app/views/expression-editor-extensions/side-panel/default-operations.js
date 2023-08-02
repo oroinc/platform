@@ -1,24 +1,17 @@
-import {getOperatorSnippet} from '../utils/operators';
+import {getResolvedSnippetByName} from '../utils/operators';
 
-const updateState = (cm, phrase) => {
+export const isNeedSpace = cm => {
+    const {state} = cm;
+    const {from, to} = state.selection.ranges[0];
+    const char = state.sliceDoc(from - 1, to);
+    return ![1, 2].includes(state.charCategorizer(from)(char)) || char === ')';
+};
+
+export const updateState = (cm, phrase) => {
     const {dispatch, state} = cm;
     const {to, from} = state.selection.ranges[0];
 
-    if (typeof phrase === 'function') {
-        return phrase({dispatch, state}, null, from, to);
-    }
-
-    return dispatch({
-        changes: {
-            from,
-            to,
-            insert: phrase
-        },
-        selection: {
-            anchor: to + phrase.length,
-            head: to + phrase.length
-        }
-    });
+    return getResolvedSnippetByName(phrase, isNeedSpace(cm))({dispatch, state}, null, from, to);
 };
 
 export default [{
@@ -28,7 +21,7 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('=='));
+        updateState(cm, '==');
     }
 }, {
     name: 'more_than',
@@ -37,7 +30,7 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('>'));
+        updateState(cm, '>');
     }
 }, {
     name: 'equals_greater_than',
@@ -46,7 +39,7 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('>='));
+        updateState(cm, '>=');
     }
 }, {
     name: 'no_equals',
@@ -55,7 +48,7 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('!='));
+        updateState(cm, '!=');
     }
 }, {
     name: 'less_than',
@@ -64,7 +57,7 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('<'));
+        updateState(cm, '<');
     }
 }, {
     name: 'less_greater_than',
@@ -73,7 +66,7 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('<='));
+        updateState(cm, '<=');
     }
 }, {
     name: 'addition',
@@ -82,7 +75,7 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('+'));
+        updateState(cm, '+');
     }
 }, {
     name: 'multiplication',
@@ -91,7 +84,7 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('*'));
+        updateState(cm, '*');
     }
 }, {
     name: 'precedence',
@@ -100,7 +93,7 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('%'));
+        updateState(cm, '%');
     }
 }, {
     name: 'subtraction',
@@ -109,16 +102,16 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('-'));
+        updateState(cm, '-');
     }
 }, {
     name: 'division',
     label: '÷',
     order: 110,
     enabled: true,
-    handler(cm, e) {
+    handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('/'));
+        updateState(cm, '/');
     }
 }, {
     name: 'rarentheses',
@@ -127,34 +120,34 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('()'));
+        updateState(cm, '()');
     }
 }, {
     name: 'in',
     label: 'In',
     order: 130,
     enabled: true,
-    handler(cm, e) {
+    handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('in'));
+        updateState(cm, 'in');
     }
 }, {
     name: 'and',
     label: 'And',
     order: 140,
     enabled: true,
-    handler(cm, e) {
+    handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('and'));
+        updateState(cm, 'and');
     }
 }, {
     name: 'match',
     label: 'Match',
     order: 150,
     enabled: true,
-    handler(cm, e) {
+    handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('matches'));
+        updateState(cm, 'matches');
     }
 }, {
     name: 'not_in',
@@ -163,7 +156,7 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('not in'));
+        updateState(cm, 'not in');
     }
 }, {
     name: 'or',
@@ -172,6 +165,6 @@ export default [{
     enabled: true,
     handler(cm) {
         cm.focus();
-        updateState(cm, getOperatorSnippet('or'));
+        updateState(cm, 'or');
     }
 }];

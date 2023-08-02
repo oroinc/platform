@@ -75,7 +75,6 @@ const ExpressionEditorView = BaseView.extend({
             doc: this.el.value,
             extensions: expressionEditorExtensions({
                 util: this.util,
-                rootEl: this.el,
                 operationButtons: this.operationButtons,
                 setValue: this.setValue.bind(this)
             })
@@ -114,7 +113,10 @@ const ExpressionEditorView = BaseView.extend({
             dataSource.$widget.remove();
         });
 
+        this.editorView.destroy();
+
         delete this.util;
+        delete this.editorView;
         delete this.autocompleteData;
         delete this.dataSource;
         delete this.dataSourceInstances;

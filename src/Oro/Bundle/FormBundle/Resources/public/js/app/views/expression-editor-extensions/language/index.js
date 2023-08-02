@@ -1,13 +1,13 @@
 import {LRLanguage, LanguageSupport, syntaxTree} from '@codemirror/language';
 import parser from './syntax.grammar';
 import {symfonyExpressionLanguageHighlighting} from './highlight';
-import {operatorsDetailMap, getOperatorSnippet} from '../utils/operators';
+import {operatorsDetailMap, getResolvedSnippetByName} from '../utils/operators';
 
 const resolveAutocompleteData = ({items}) => {
-    return Object.keys(items).sort().map(item => {
+    return Object.entries(items).sort().map(([item, {hasChildren}]) => {
         return {
             label: item,
-            apply: getOperatorSnippet(item),
+            apply: getResolvedSnippetByName(item + (hasChildren ? '.' : ' ')),
             detail: operatorsDetailMap[item]
         };
     });

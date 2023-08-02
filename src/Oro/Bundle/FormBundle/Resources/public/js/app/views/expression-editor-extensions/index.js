@@ -23,7 +23,13 @@ export const editorExtensions = ({util, operationButtons, setValue}) => {
             'class': 'expression-editor'
         }),
         syntaxHighlighting(symfonyExpressionLanguageHighlightStyle),
-        EditorView.updateListener.of(event => setValue(event.state.doc.toString())),
+        EditorView.updateListener.of(event => {
+            if (event.flags === 4) {
+                setTimeout(() => startCompletion(event.view));
+            }
+
+            setValue(event.state.doc.toString());
+        }),
         EditorView.domEventHandlers({
             focusin(event, view) {
                 setTimeout(() => startCompletion(view));

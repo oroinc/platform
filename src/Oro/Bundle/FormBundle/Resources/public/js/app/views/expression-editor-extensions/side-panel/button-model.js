@@ -11,7 +11,9 @@ const SidePanelButtonModel = BaseModel.extend({
         enabled: true,
         handler: null,
         title: '',
-        className: 'cm-btn'
+        className: 'cm-btn',
+        viewOptions: null,
+        type: 'button'
     },
 
     /**
