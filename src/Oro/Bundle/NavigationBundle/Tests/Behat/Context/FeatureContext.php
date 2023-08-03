@@ -513,6 +513,20 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Checks that menu item (not) exists at side bar menu
+     *
+     * Example: And I should see commerce_main_menu in sidebar menu tree
+     *
+     * @Given /^(?:|I )should(?P<neg>(\s| not ))see (?P<link>[\w\s]+) in sidebar menu tree$/
+     */
+    public function iShouldSeeOrNotItemInSidebarMenuTree(string $link, string $neg = ''): void
+    {
+        $menuTree = $this->createElement('Sidebar Menu Tree');
+        self::assertTrue($menuTree->isValid());
+        self::assertSame(empty(trim($neg)), $menuTree->hasLink($link));
+    }
+
+    /**
      * @return MainMenu
      */
     private function getMainMenu()

@@ -11,6 +11,19 @@ use Behat\Mink\Selector\Xpath\Manipulator;
 class SelectorManipulator extends Manipulator
 {
     /**
+     * The logic for searching text in Behat tests is the following:
+     * Take a piece of text as the input.
+     * Replace certain specified characters (', ", `, \) with spaces.
+     * Trim any spaces from the beginning and end of the text.
+     * Replace consecutive duplicate spaces with a single space.
+     *
+     * The resulting text is split into individual words based on spaces
+     * and a selector is constructed using the groups of words obtained from the split.
+     *
+     * Example, looking for the text " Product2Localization1`\"'&reg@;> ",
+     * it is broken into "Product2Localization1" and "&reg@;>",
+     * then builds a selector that looks for the occurrence of "Product2Localization1" and "&reg@;>" in the string
+     *
      * @param array|string $cssSelector
      * @param string $text
      * @return string
@@ -22,8 +35,8 @@ class SelectorManipulator extends Manipulator
         if ($selectorType !== 'css') {
             throw new \InvalidArgumentException('Method "addContainsSuffix" support only css selectors');
         }
-
-        $text = trim(preg_replace('/\W/i', ' ', $text));
+        $text = trim(str_replace(["'", '"', "`", "\\"], ' ', $text));
+        $text = preg_replace('/\s{2,}/', ' ', $text);
 
         $selector = implode(',', array_map(function ($variant) use ($locator) {
             $containsSuffix = implode(':', array_map([$this, 'getContainsFromString'], explode(' ', $variant)));

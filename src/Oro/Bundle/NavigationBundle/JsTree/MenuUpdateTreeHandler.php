@@ -15,6 +15,11 @@ class MenuUpdateTreeHandler
     const ROOT_PARENT_VALUE = '#';
 
     /**
+     * Used to hide inaccessible menu items for back-office menu tree
+     */
+    public const EXTRA_IS_ALLOWED_FOR_BACKOFFICE = 'isAllowedForBackOffice';
+
+    /**
      * @var TranslatorInterface
      */
     protected $translator;
@@ -48,17 +53,20 @@ class MenuUpdateTreeHandler
     protected function getNodes(ItemInterface $root, $includeRoot)
     {
         $nodes = [];
-        if ($includeRoot) {
-            $nodes[] = $root;
+        if ($includeRoot && $root->getExtra(self::EXTRA_IS_ALLOWED_FOR_BACKOFFICE, true) !== false) {
+            $nodes[] = [$root];
         }
 
-        /** @var ItemInterface $child */
         foreach ($root->getChildren() as $child) {
-            $nodes[] = $child;
-            $nodes = array_merge($nodes, $this->getNodes($child, false));
+            if ($child->getExtra(self::EXTRA_IS_ALLOWED_FOR_BACKOFFICE) === false) {
+                continue;
+            }
+
+            $nodes[] = [$child];
+            $nodes[] = $this->getNodes($child, false);
         }
 
-        return $nodes;
+        return array_merge(...$nodes);
     }
 
     /**

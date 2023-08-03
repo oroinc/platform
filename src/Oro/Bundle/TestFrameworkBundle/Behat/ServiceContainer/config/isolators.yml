@@ -54,26 +54,13 @@ services:
     tags:
       - { name: 'oro_behat.isolator', priority: 100 }
 
-  oro_behat_extension.isolation.unix_pgsql_isolator:
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixPgsqlIsolator'
+  oro_behat_extension.isolation.pgsql_isolator:
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\PgsqlIsolator'
     arguments:
       - '@fob_symfony.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 110 }
 
-  oro_behat_extension.isolation.docker_pgsql_isolator:
-    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerPgsqlIsolator
-    arguments:
-      - '@fob_symfony.kernel'
-    tags:
-      - { name: 'oro_behat.isolator', priority: 110 }
-
-  oro_behat_extension.isolation.docker_compose_pgsql_isolator:
-    class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DockerComposePgsqlIsolator
-    arguments:
-      - '@fob_symfony.kernel'
-    tags:
-      - { name: 'oro_behat.isolator', priority: 110 }
 
   oro_behat_extension.isolation.kernel_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\KernelIsolator'
