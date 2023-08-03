@@ -130,8 +130,8 @@ class EmailContext extends OroFeatureContext
             return $found;
         });
 
-        self::assertNotFalse(
-            $found,
+        self::assertTrue(
+            $found !== null && $found !== false,
             sprintf(
                 'Sent emails bodies don\'t contain "%s" in "%s". The following messages have been sent: %s',
                 $expectedContent['pattern'],
