@@ -315,3 +315,12 @@ services:
         class: 'Oro\Bundle\LayoutBundle\Layout\ExpressionLanguageProvider\InstanceofExpressionFunctionProvider'
         tags:
             - { name: layout.expression_language_provider }
+
+    oro_layout.cache_warmer.pages_cache_warmer:
+        class: Oro\Bundle\LayoutBundle\Cache\PageCacheWarmer
+        arguments:
+            - !tagged_iterator warmup_page_request_provider
+            - '@http_kernel'
+            - '@logger'
+        tags:
+            - { name: kernel.cache_warmer, priority: -2000 } # Warming caches for pages should be called at the end
