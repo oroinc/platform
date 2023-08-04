@@ -1,4 +1,5 @@
-<button type="button" class="<%- className %>"
+<% var classes = [className, extraClassName].join(' ').trim() %>
+<button type="button" class="<%- classes %>"
 <% if (title)  { %>
     title="<%- title %>"
 <% } %>

@@ -1,3 +1,4 @@
+import __ from 'orotranslation/js/translator';
 import ASTNodeWrapper from 'oroexpressionlanguage/js/ast-node-wrapper';
 import {ConditionalNode, GetAttrNode, NameNode} from 'oroexpressionlanguage/js/expression-language-library';
 
@@ -53,7 +54,7 @@ class ExpressionOperandTypeValidator {
      */
     _expectWithoutConditionals(astNodeWrapper) {
         if (astNodeWrapper.findInstancesOf(ConditionalNode).length !== 0) {
-            throw new TypeError('Forbidden conditional construction is used in expression.');
+            throw new TypeError(__('oro.form.expression_editor.validation.conditional'));
         }
     }
 
@@ -74,9 +75,13 @@ class ExpressionOperandTypeValidator {
                 .map(node => node.attr('operator'))
                 .filter((val, i, arr) => arr.indexOf(val) === i);
             if (operators.length === 1) {
-                message = `Forbidden operator \`${forbiddenOperatorNodes[0].attr('operator')}\` is used in expression.`;
+                message = __('oro.form.expression_editor.validation.forbidden_operator', {
+                    operator: forbiddenOperatorNodes[0].attr('operator')
+                });
             } else {
-                message = `Forbidden operators \`${operators.join('`, `')}\` are used in expression.`;
+                message = __('oro.form.expression_editor.validation.forbidden_operator', {
+                    operators: operators.join('`, `')
+                });
             }
             throw new TypeError(message);
         }
@@ -95,17 +100,25 @@ class ExpressionOperandTypeValidator {
 
             nameNodes.forEach(node => {
                 if (node.parent === null || !node.parent.instanceOf(GetAttrNode)) {
-                    throw new TypeError(`Attempt using \`${entity.name}\` entity like a variable.`);
+                    throw new TypeError(__('oro.form.expression_editor.validation.property_path.like_variable', {
+                        name: entity.name
+                    }));
                 }
                 let source = entity.name;
                 if (entity.isCollection) {
                     if (node.parent.attr('type') !== GetAttrNode.ARRAY_CALL) {
-                        throw new TypeError(`Attempt using \`${entity.name}\` collection like a single entity.`);
+                        throw new TypeError(
+                            __('oro.form.expression_editor.validation.property_path.like_single_entity', {
+                                name: entity.name
+                            })
+                        );
                     }
                     source += '[' + node.parent.child(1).attr('value') + ']';
                     node = node.parent;
                 } else if (node.parent.attr('type') !== GetAttrNode.PROPERTY_CALL) {
-                    throw new TypeError(`Attempt using \`${entity.name}\` entity like a collection.`);
+                    throw new TypeError(__('oro.form.expression_editor.validation.property_path.like_collection', {
+                        name: entity.name
+                    }));
                 }
                 node = node.parent;
                 let fieldName;
@@ -116,16 +129,25 @@ class ExpressionOperandTypeValidator {
                     fieldName = node.child(1).attr('value');
                     field = field[fieldName];
                     if (!field) {
-                        throw new TypeError(`Field \`${fieldName}\` isn\'t presented in \`${source}\`.`);
+                        throw new TypeError(
+                            __('oro.form.expression_editor.validation.property_path.field_not_present', {
+                                fieldName,
+                                source
+                            })
+                        );
                     } else if (level > this.itemLevelLimit) {
-                        throw new TypeError(`Attempt using \`${fieldName}\` field of \`${source}\`` +
-                            ` exceeds the deep level limit.`);
+                        throw new TypeError(__('oro.form.expression_editor.validation.property_path.level_limit', {
+                            fieldName,
+                            source
+                        }));
                     }
                     node = node.parent;
                     source += '.' + fieldName;
                 }
                 if (!field.__isField) {
-                    throw new TypeError(`The \`${source}\` can't be used as field.`);
+                    throw new TypeError(__('oro.form.expression_editor.validation.property_path.not_field', {
+                        source
+                    }));
                 }
             });
         });

@@ -1,11 +1,22 @@
-import {EditorView, keymap, showPanel} from '@codemirror/view';
+import {Facet} from '@codemirror/state';
+import {EditorView, keymap, showPanel, tooltips, showTooltip} from '@codemirror/view';
 import {autocompletion, startCompletion, closeBrackets} from '@codemirror/autocomplete';
-import {indentWithTab, defaultKeymap} from '@codemirror/commands';
+import {indentWithTab, defaultKeymap, history} from '@codemirror/commands';
 import sidePanel from 'oroform/js/app/views/expression-editor-extensions/side-panel';
 import {syntaxHighlighting, bracketMatching} from '@codemirror/language';
+import expressionLinter from 'oroform/js/app/views/expression-editor-extensions/linter';
 
 import {symfonyExpressionLanguageHighlightStyle} from './language/highlight';
 import {symfonyExpression} from './language';
+
+const tooltipOptionsFacet = Facet.define();
+const tooltipOptionsFacetHost = tooltipOptionsFacet.compute([showTooltip], state => {
+    const tooltips = state.facet(showTooltip).filter(t => t) || [];
+
+    tooltips.forEach(tooltip => tooltip.arrow = true);
+
+    return tooltips;
+});
 
 export const editorExtensions = ({util, operationButtons, setValue}) => {
     return [
@@ -35,8 +46,14 @@ export const editorExtensions = ({util, operationButtons, setValue}) => {
                 setTimeout(() => startCompletion(view));
             }
         }),
+        tooltips({
+            position: 'absolute'
+        }),
+        expressionLinter({util}),
         closeBrackets(),
-        bracketMatching()
+        bracketMatching(),
+        history(),
+        tooltipOptionsFacetHost
     ];
 };
 

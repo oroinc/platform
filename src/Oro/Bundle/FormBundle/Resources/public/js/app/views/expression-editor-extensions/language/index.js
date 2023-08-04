@@ -4,10 +4,10 @@ import {symfonyExpressionLanguageHighlighting} from './highlight';
 import {operatorsDetailMap, getResolvedSnippetByName} from '../utils/operators';
 
 const resolveAutocompleteData = ({items}) => {
-    return Object.entries(items).sort().map(([item, {hasChildren}]) => {
+    return Object.entries(items).sort().map(([item, {hasChildren, isCollection}]) => {
         return {
             label: item,
-            apply: getResolvedSnippetByName(item + (hasChildren ? '.' : ' ')),
+            apply: getResolvedSnippetByName(item, false, {hasChildren, isCollection}),
             detail: operatorsDetailMap[item]
         };
     });

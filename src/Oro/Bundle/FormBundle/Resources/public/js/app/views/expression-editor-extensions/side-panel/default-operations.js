@@ -1,3 +1,4 @@
+import __ from 'orotranslation/js/translator';
 import {getResolvedSnippetByName} from '../utils/operators';
 
 export const isNeedSpace = cm => {
@@ -9,14 +10,18 @@ export const isNeedSpace = cm => {
 
 export const updateState = (cm, phrase) => {
     const {dispatch, state} = cm;
-    const {to, from} = state.selection.ranges[0];
+    const {to, from, empty} = state.selection.ranges[0];
 
-    return getResolvedSnippetByName(phrase, isNeedSpace(cm))({dispatch, state}, null, from, to);
+    return getResolvedSnippetByName(
+        phrase,
+        empty && isNeedSpace(cm)
+    )({dispatch, state}, null, from, to);
 };
 
 export default [{
     name: 'equals',
     label: '=',
+    title: __('oro.form.expression_editor.operators.detail.equal'),
     order: 10,
     enabled: true,
     handler(cm) {
@@ -28,6 +33,7 @@ export default [{
     label: '>',
     order: 20,
     enabled: true,
+    title: __('oro.form.expression_editor.operators.detail.greater_than'),
     handler(cm) {
         cm.focus();
         updateState(cm, '>');
@@ -35,6 +41,7 @@ export default [{
 }, {
     name: 'equals_greater_than',
     label: '≥',
+    title: __('oro.form.expression_editor.operators.detail.greater_than_or_equal'),
     order: 30,
     enabled: true,
     handler(cm) {
@@ -45,6 +52,7 @@ export default [{
     name: 'no_equals',
     label: '≠',
     order: 40,
+    title: __('oro.form.expression_editor.operators.detail.not_equal'),
     enabled: true,
     handler(cm) {
         cm.focus();
@@ -53,6 +61,7 @@ export default [{
 }, {
     name: 'less_than',
     label: '<',
+    title: __('oro.form.expression_editor.operators.detail.less_than'),
     order: 50,
     enabled: true,
     handler(cm) {
@@ -62,6 +71,7 @@ export default [{
 }, {
     name: 'less_greater_than',
     label: '≤',
+    title: __('oro.form.expression_editor.operators.detail.less_than_or_equal'),
     order: 60,
     enabled: true,
     handler(cm) {
@@ -71,6 +81,7 @@ export default [{
 }, {
     name: 'addition',
     label: '+',
+    title: __('oro.form.expression_editor.operators.detail.addition'),
     order: 70,
     enabled: true,
     handler(cm) {
@@ -80,6 +91,7 @@ export default [{
 }, {
     name: 'multiplication',
     label: '×',
+    title: __('oro.form.expression_editor.operators.detail.multiplication'),
     order: 80,
     enabled: true,
     handler(cm) {
@@ -89,6 +101,7 @@ export default [{
 }, {
     name: 'precedence',
     label: '%',
+    title: __('oro.form.expression_editor.operators.detail.remainder'),
     order: 90,
     enabled: true,
     handler(cm) {
@@ -98,6 +111,7 @@ export default [{
 }, {
     name: 'subtraction',
     label: '−',
+    title: __('oro.form.expression_editor.operators.detail.subtraction'),
     order: 100,
     enabled: true,
     handler(cm) {
@@ -107,6 +121,7 @@ export default [{
 }, {
     name: 'division',
     label: '÷',
+    title: __('oro.form.expression_editor.operators.detail.division'),
     order: 110,
     enabled: true,
     handler(cm) {
@@ -114,17 +129,23 @@ export default [{
         updateState(cm, '/');
     }
 }, {
-    name: 'rarentheses',
+    name: 'parentheses',
     label: '( )',
+    title: __('oro.form.expression_editor.operators.detail.parentheses'),
     order: 120,
     enabled: true,
     handler(cm) {
+        const {state} = cm;
+        const selection = state.selection.ranges.at(0);
+        const selectedContent = state.doc.sliceString(selection.from, selection.to);
+
         cm.focus();
-        updateState(cm, '()');
+        updateState(cm, selectedContent ? `(${selectedContent})` : '()');
     }
 }, {
     name: 'in',
-    label: 'In',
+    label: __('oro.form.expression_editor.operators.detail.in'),
+    title: __('oro.form.expression_editor.operators.detail.in'),
     order: 130,
     enabled: true,
     handler(cm) {
@@ -132,39 +153,119 @@ export default [{
         updateState(cm, 'in');
     }
 }, {
-    name: 'and',
-    label: 'And',
-    order: 140,
-    enabled: true,
-    handler(cm) {
-        cm.focus();
-        updateState(cm, 'and');
-    }
-}, {
-    name: 'match',
-    label: 'Match',
-    order: 150,
-    enabled: true,
-    handler(cm) {
-        cm.focus();
-        updateState(cm, 'matches');
-    }
-}, {
     name: 'not_in',
-    label: 'Not In',
-    order: 160,
+    label: __('oro.form.expression_editor.operators.detail.not_in'),
+    title: __('oro.form.expression_editor.operators.detail.not_in'),
+    order: 140,
     enabled: true,
     handler(cm) {
         cm.focus();
         updateState(cm, 'not in');
     }
 }, {
+    name: 'and',
+    label: __('oro.form.expression_editor.operators.detail.and'),
+    title: __('oro.form.expression_editor.operators.detail.and'),
+    order: 150,
+    enabled: true,
+    handler(cm) {
+        cm.focus();
+        updateState(cm, 'and');
+    }
+}, {
     name: 'or',
-    label: 'Or',
-    order: 170,
+    label: __('oro.form.expression_editor.operators.detail.or'),
+    title: __('oro.form.expression_editor.operators.detail.or'),
+    order: 160,
     enabled: true,
     handler(cm) {
         cm.focus();
         updateState(cm, 'or');
+    }
+}, {
+    name: 'yes',
+    label: __('oro.form.expression_editor.operators.detail.yes'),
+    title: __('oro.form.expression_editor.operators.detail.no'),
+    order: 170,
+    enabled: true,
+    handler(cm) {
+        cm.focus();
+        updateState(cm, 'yes');
+    }
+}, {
+    name: 'no',
+    label: __('oro.form.expression_editor.operators.detail.no'),
+    title: __('oro.form.expression_editor.operators.detail.no'),
+    order: 180,
+    enabled: true,
+    handler(cm) {
+        cm.focus();
+        updateState(cm, 'no');
+    }
+}, {
+    name: 'match',
+    label: __('oro.form.expression_editor.operators.detail.match'),
+    title: __('oro.form.expression_editor.operators.detail.match'),
+    extraClassName: 'cm-btn-half',
+    order: 190,
+    enabled: true,
+    handler(cm) {
+        cm.focus();
+        updateState(cm, 'matches');
+    }
+}, {
+    name: 'does_not_match',
+    label: __('oro.form.expression_editor.operators.detail.does_not_match'),
+    title: __('oro.form.expression_editor.operators.detail.does_not_match'),
+    extraClassName: 'cm-btn-half',
+    order: 200,
+    enabled: true,
+    handler(cm) {
+        cm.focus();
+        updateState(cm, 'does not match');
+    }
+}, {
+    name: 'is_empty',
+    label: __('oro.form.expression_editor.operators.detail.is_empty'),
+    title: __('oro.form.expression_editor.operators.detail.is_empty'),
+    extraClassName: 'cm-btn-half',
+    order: 210,
+    enabled: true,
+    handler(cm) {
+        cm.focus();
+        updateState(cm, 'is empty');
+    }
+}, {
+    name: 'is_not_empty',
+    label: __('oro.form.expression_editor.operators.detail.is_not_empty'),
+    title: __('oro.form.expression_editor.operators.detail.is_not_empty'),
+    extraClassName: 'cm-btn-half',
+    order: 220,
+    enabled: true,
+    handler(cm) {
+        cm.focus();
+        updateState(cm, 'is not empty');
+    }
+}, {
+    name: 'between',
+    label: __('oro.form.expression_editor.operators.detail.between'),
+    title: __('oro.form.expression_editor.operators.detail.between'),
+    extraClassName: 'cm-btn-full',
+    order: 230,
+    enabled: false,
+    handler(cm) {
+        cm.focus();
+        updateState(cm, 'between');
+    }
+}, {
+    name: 'not_between',
+    label: __('oro.form.expression_editor.operators.detail.not_between'),
+    title: __('oro.form.expression_editor.operators.detail.not_between'),
+    extraClassName: 'cm-btn-full',
+    order: 240,
+    enabled: false,
+    handler(cm) {
+        cm.focus();
+        updateState(cm, 'not between');
     }
 }];

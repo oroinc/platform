@@ -16,7 +16,8 @@ kw<term, name> { @specialize[@name={name}]<identifier, term> }
 groups {
   GroupNode |
   GroupOperator |
-  BracketGroup
+  BracketGroup |
+  BracesGroup
 }
 
 GroupNode {
@@ -28,12 +29,14 @@ GroupOperator[@name=GroupNode] {
 }
 
 expression {
-  EmptyGroup |
-  Function |
+  EmptyBrackets |
   Entity |
+  Function |
   String |
   Number |
-  Array
+  Array |
+  kw<'true', 'Boolean'> |
+  kw<'false', 'Boolean'>
 }
 
 operators {
@@ -41,7 +44,7 @@ operators {
   LiteralOperator
 }
 
-EmptyGroup {
+EmptyBrackets {
   '()'
 }
 
@@ -49,7 +52,11 @@ BracketGroup {
   BracketOpen groups* BracketClose
 }
 
-EntityName { identifier }
+BracesGroup {
+  BraceOpen groups* BraceClose
+}
+
+EntityName { identifier Array? }
 
 PropertyName { word }
 
@@ -67,18 +74,22 @@ FunctionName {
 
 Function {
   FunctionName BracketOpen ArgList BracketClose |
-  FunctionName '()'
+  FunctionName EmptyBrackets
 }
 
 commaSep<content> {
-  "" | content ("," content?)*
+  "" | content (Comma content?)*
 }
 
 LiteralOperator {
   kw<'in', 'LiteralOperator'> | kw<'not', 'LiteralOperator'> | kw<'matches', 'LiteralOperator'>
 }
 
-Array { "[" commaSep<expression*> "]" }
+ArrayItem {
+  expression
+}
+
+Array { SquareBracketOpen commaSep<ArrayItem*> SquareBracketClose }
 
 @tokens {
     spaces[@export] { $[\u0009 \u000b\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\ufeff]+ }
@@ -93,21 +104,28 @@ Array { "[" commaSep<expression*> "]" }
 
     Number { (@digit)+ }
 
-    Operator { '>=' | '<=' | '!=' | '=' | '>' | '<' | '+' | '*' | '%' | '-' | '/' }
+    Operator { '>=' | '<=' | '!=' | '=' | '==' | '===' | '>' | '<' | '+' | '*' | '%' | '-' | '/' }
 
     String {
       '"' (![\\\n"] | "\\" _)* '"'? |
       "'" (![\\\n'] | "\\" _)* "'"?
     }
 
-    Boolean { "#t" | "#f" }
+    Dot { '.' }
 
-    Dot { "." }
+    Comma { ',' }
 
     BracketOpen { '(' }
 
     BracketClose { ')' }
 
+    BraceOpen { '{' }
+
+    BraceClose { '}' }
+
+    SquareBracketOpen { '[' }
+
+    SquareBracketClose { ']' }
 }
 
 @detectDelim

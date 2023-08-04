@@ -13,7 +13,8 @@ export const symfonyExpressionLanguageHighlighting = styleTags({
     'PropertyName': t.propertyName,
     'String': t.string,
     'Number': t.integer,
-    'FunctionName': t.literal
+    'FunctionName': t.literal,
+    'Boolean': t.bool
 });
 
 export const symfonyExpressionLanguageHighlightStyle = HighlightStyle.define([
@@ -68,6 +69,10 @@ export const symfonyExpressionLanguageHighlightStyle = HighlightStyle.define([
     {
         'tag': t.operator,
         'class': 'cm-tag-operator'
+    },
+    {
+        'tag': t.bool,
+        'class': 'cm-tag-boolean'
     }
 ],
 {

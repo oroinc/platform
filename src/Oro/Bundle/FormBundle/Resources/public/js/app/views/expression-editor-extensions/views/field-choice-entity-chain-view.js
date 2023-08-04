@@ -2,7 +2,7 @@ import __ from 'orotranslation/js/translator';
 import FieldChoiceView from 'oroentity/js/app/views/field-choice-view';
 
 const FieldChoiceEntityChainView = FieldChoiceView.extend({
-    optionNames: ['supportedNames', 'entityDataProvider', 'handler'],
+    optionNames: ['supportedNames', 'entityDataProvider', 'handler', 'dataSourceNames'],
 
     rootSelected: false,
 
@@ -28,6 +28,10 @@ const FieldChoiceEntityChainView = FieldChoiceView.extend({
             }
 
             if (entity) {
+                if (this.dataSourceNames.indexOf(entity.alias) !== -1) {
+                    return `${entity.alias}[#{1}]`;
+                }
+
                 return entity.alias;
             }
         }).join('.');

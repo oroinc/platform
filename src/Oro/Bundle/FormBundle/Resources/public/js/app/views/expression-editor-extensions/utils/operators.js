@@ -19,7 +19,14 @@ export const OPERATORS_SNIPPET_TEMPLATES = {
     'in': 'in [#{1}]',
     'not in': 'not in [#{1}]',
     'matches': 'matches containsRegExp(#{1})',
-    '()': '(${1})'
+    'does not match': 'not matches containsRegExp(#{1})',
+    '()': '(#{1})',
+    'is empty': '#{1} == 0',
+    'is not empty': '#{1} != 0',
+    'between': '#{1} >= #{2} and #{3} <= #{4}',
+    'not between': '#{1} < #{2} and #{3} > #{4}',
+    'yes': '#{1} == true',
+    'no': '#{1} == false'
 };
 
 /**
@@ -27,10 +34,25 @@ export const OPERATORS_SNIPPET_TEMPLATES = {
  *
  * @param {string} name
  * @param {boolean} spaceBefore
+ * @param {object} options
  * @returns {function}
  */
-export const getResolvedSnippetByName = (name, spaceBefore = false) => {
-    let tpl = OPERATORS_SNIPPET_TEMPLATES[name.trim()] || name + '#{1}';
+export const getResolvedSnippetByName = (name, spaceBefore = false, options = {}) => {
+    let tpl = OPERATORS_SNIPPET_TEMPLATES[name.trim()];
+
+    if (!tpl) {
+        tpl = name;
+
+        if (options.isCollection) {
+            tpl += '[#{1}]';
+        }
+
+        if (options.hasChildren !== void 0) {
+            tpl += options.hasChildren ? '.' : ' ';
+        }
+
+        tpl += tpl.includes('#{1}') ? '#{2}' : '#{1}';
+    }
 
     if (spaceBefore) {
         tpl = ` ${tpl}`;

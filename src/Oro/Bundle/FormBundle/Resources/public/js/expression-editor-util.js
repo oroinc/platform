@@ -152,15 +152,22 @@ const ExpressionEditorUtil = BaseClass.extend({
      * Validate expression syntax
      *
      * @param {string} expression
-     * @return {boolean}
+     * @param {boolean} returnException
+     * @return {boolean|any}
      */
-    validate(expression) {
+    validate(expression, returnException = false) {
         let isValid = true;
+        let exception = '';
         try {
             const parsedExpression = this.expressionLanguage.parse(expression, this._getSupportedNames());
             this.expressionOperandTypeValidator.expectValid(parsedExpression);
         } catch (ex) {
             isValid = false;
+            exception = ex;
+        }
+
+        if (returnException) {
+            return [isValid, exception];
         }
 
         return isValid;
@@ -248,6 +255,7 @@ const ExpressionEditorUtil = BaseClass.extend({
         this._getSupportedNames().forEach(alias => {
             autocompleteData.items[alias] = {
                 item: alias,
+                isCollection: this.dataSourceNames.indexOf(alias) !== -1,
                 hasChildren: true
             };
         });
