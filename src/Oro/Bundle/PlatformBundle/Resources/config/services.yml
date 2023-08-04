@@ -187,3 +187,11 @@ services:
             - '%oro_platform.xdebug_warning_command_list%'
         tags:
             - { name: kernel.event_listener, event: console.command, method: onCommandExecute}
+
+    oro_platform.cache.provider.page_request_provider.abstract:
+      class: 'Oro\Bundle\PlatformBundle\Provider\AbstractPageRequestProvider'
+      arguments:
+        - '@router'
+        - '@oro_config.manager'
+        - '@logger'
+      abstract: true
