@@ -16,3 +16,5 @@ oro:
         label: Bi M2M Owners
       bi_o2_m_owner:
         label: Bi O2M Owner
+      serialized_attribute:
+        label: Serialized attribute
