@@ -21,7 +21,7 @@ class ContentProviderListener implements ServiceSubscriberInterface
 
     public function onKernelRequest(RequestEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
@@ -33,7 +33,7 @@ class ContentProviderListener implements ServiceSubscriberInterface
         }
 
         /** @var ContentProviderManager $contentProviderManager */
-        $contentProviderManager = $this->container->get('oro_ui.content_provider.manager');
+        $contentProviderManager = $this->container->get(ContentProviderManager::class);
         if ($contentProvidersToEnable) {
             $contentProvidersToEnable = explode(',', $contentProvidersToEnable);
             foreach ($contentProvidersToEnable as $name) {
@@ -52,12 +52,10 @@ class ContentProviderListener implements ServiceSubscriberInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static function getSubscribedServices(): array
     {
-        return [
-            'oro_ui.content_provider.manager' => ContentProviderManager::class
-        ];
+        return [ContentProviderManager::class];
     }
 }
