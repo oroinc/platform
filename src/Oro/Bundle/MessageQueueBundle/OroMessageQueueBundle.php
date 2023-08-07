@@ -13,10 +13,12 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeAnnotationRea
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerServicesPersistentPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
+use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\DoctrineConnectionPingPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Oro\Component\MessageQueue\Event\AfterSaveJobEvent;
 use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -57,5 +59,6 @@ class OroMessageQueueBundle extends Bundle
             BeforeSaveJobEvent::class => BeforeSaveJobEvent::EVENT_ALIAS,
             AfterSaveJobEvent::class => AfterSaveJobEvent::EVENT_ALIAS,
         ]));
+        $container->addCompilerPass(new DoctrineConnectionPingPass('message_queue'), PassConfig::TYPE_BEFORE_REMOVING);
     }
 }

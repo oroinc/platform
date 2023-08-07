@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SyncBundle\Periodic;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\Persistence\ManagerRegistry;
 use Gos\Bundle\WebSocketBundle\Periodic\PeriodicInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -17,11 +16,13 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
 
-    /** @var int */
-    private $timeout;
+    private int $timeout;
+
+    private array $doctrineConnectionNames = [
+        'default',
+    ];
 
     public function __construct(ManagerRegistry $doctrine, int $timeout = 20)
     {
@@ -33,17 +34,21 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
 
     /**
      * {@inheritdoc}
-     * @throws DBALException
+     * @throws \Throwable
      */
     public function tick(): void
     {
         /** @var Connection $connection */
-        foreach ($this->doctrine->getConnections() as $connection) {
+        foreach ($this->doctrine->getConnections() as $name => $connection) {
+            if (!in_array($name, $this->doctrineConnectionNames)) {
+                continue;
+            }
+
             try {
                 $stmt = $connection->prepare('SELECT 1');
                 $stmt->execute();
-            } catch (DBALException $e) {
-                $this->logger->error('Can\'t ping database connection', ['exception' => $e]);
+            } catch (\Throwable $e) {
+                $this->logger->error(sprintf('Can\'t ping database connection: "%s"', $name), ['exception' => $e]);
 
                 throw $e;
             }
@@ -56,5 +61,10 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
     public function getTimeout(): int
     {
         return $this->timeout;
+    }
+
+    public function addDoctrineConnectionName(string $doctrineConnectionName): void
+    {
+        $this->doctrineConnectionNames[] = $doctrineConnectionName;
     }
 }
