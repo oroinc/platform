@@ -9,7 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
 use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Fixtures\NotificationAlert\TestNotificationAlert;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Psr\Log\LoggerInterface;
 
@@ -28,7 +28,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
-    /** @var TokenAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -41,7 +41,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->em = $this->createMock(EntityManagerInterface::class);
         $this->connection = $this->createMock(Connection::class);
-        $this->tokenAccessor = $this->createMock(TokenAccessor::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
@@ -55,7 +55,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         $this->em->expects(self::any())
             ->method('getClassMetadata')
             ->with(NotificationAlert::class)
-            ->willReturn($this->mockMetadata());
+            ->willReturn($this->getMetadata());
         $this->connection->expects(self::any())
             ->method('convertToPHPValue')
             ->willReturnCallback(function ($value, $type) {
@@ -84,7 +84,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function mockMetadata(): ClassMetadata
+    private function getMetadata(): ClassMetadata
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects(self::any())
@@ -405,8 +405,11 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function (string $message, array $context) {
                 self::assertEquals('Notification alert was inserted.', $message);
                 self::assertIsString($context['alertData']['id']);
-                unset($context['alertData']['id']);
-                unset($context['alertData']['createdAt'], $context['alertData']['updatedAt']);
+                unset(
+                    $context['alertData']['id'],
+                    $context['alertData']['createdAt'],
+                    $context['alertData']['updatedAt']
+                );
                 self::assertEquals(
                     [
                         'alertData' => [
@@ -445,12 +448,12 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         $this->connection->expects(self::once())
             ->method('fetchOne')
             ->with(
-                "SELECT COUNT(alert.id) as notificationAlertCount FROM oro_notification_alert AS alert WHERE"
-                . " alert.source_type = :source_type"
-                . " AND alert.resource_type = :resource_type"
-                . " AND alert.organization_id = :organization_id"
-                . " AND alert.is_resolved = :is_resolved"
-                . " AND alert.user_id = :user_id",
+                'SELECT COUNT(alert.id) as notificationAlertCount FROM oro_notification_alert AS alert WHERE'
+                . ' alert.source_type = :source_type'
+                . ' AND alert.resource_type = :resource_type'
+                . ' AND alert.organization_id = :organization_id'
+                . ' AND alert.is_resolved = :is_resolved'
+                . ' AND alert.user_id = :user_id',
                 [
                     'source_type'     => 'test_integration',
                     'resource_type'   => 'test_resource',
@@ -501,13 +504,13 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         $this->connection->expects(self::once())
             ->method('fetchOne')
             ->with(
-                "SELECT COUNT(alert.id) as notificationAlertCount FROM oro_notification_alert AS alert WHERE"
-                . " alert.source_type = :source_type"
-                . " AND alert.resource_type = :resource_type"
-                . " AND alert.organization_id = :organization_id"
-                . " AND alert.is_resolved = :is_resolved"
-                . " AND alert.alert_type = :alert_type"
-                . " AND alert.user_id = :user_id",
+                'SELECT COUNT(alert.id) as notificationAlertCount FROM oro_notification_alert AS alert WHERE'
+                . ' alert.source_type = :source_type'
+                . ' AND alert.resource_type = :resource_type'
+                . ' AND alert.organization_id = :organization_id'
+                . ' AND alert.is_resolved = :is_resolved'
+                . ' AND alert.alert_type = :alert_type'
+                . ' AND alert.user_id = :user_id',
                 [
                     'source_type'     => 'test_integration',
                     'resource_type'   => 'test_resource',
@@ -651,8 +654,11 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function (string $message, array $context) {
                 self::assertEquals('Notification alert was inserted.', $message);
                 self::assertIsString($context['alertData']['id']);
-                unset($context['alertData']['id']);
-                unset($context['alertData']['createdAt'], $context['alertData']['updatedAt']);
+                unset(
+                    $context['alertData']['id'],
+                    $context['alertData']['createdAt'],
+                    $context['alertData']['updatedAt']
+                );
                 self::assertEquals(
                     [
                         'alertData' => [
@@ -778,11 +784,13 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function (string $message, array $context) use ($exception) {
                 self::assertEquals('Failed to insert a new notification alert.', $message);
                 self::assertIsString($context['alertData']['id']);
-                unset($context['alertData']['id']);
                 self::assertInstanceOf(\DateTime::class, $context['alertData']['createdAt']);
-                unset($context['alertData']['createdAt']);
                 self::assertInstanceOf(\DateTime::class, $context['alertData']['updatedAt']);
-                unset($context['alertData']['updatedAt']);
+                unset(
+                    $context['alertData']['id'],
+                    $context['alertData']['createdAt'],
+                    $context['alertData']['updatedAt']
+                );
                 self::assertEquals(
                     [
                         'exception' => $exception,

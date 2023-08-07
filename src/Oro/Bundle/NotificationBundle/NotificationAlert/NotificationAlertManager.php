@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Psr\Log\LoggerInterface;
 
@@ -37,14 +37,14 @@ class NotificationAlertManager
     private string $sourceType;
     private string $resourceType;
     private ManagerRegistry $doctrine;
-    private TokenAccessor $tokenAccessor;
+    protected TokenAccessorInterface $tokenAccessor;
     protected LoggerInterface $logger;
 
     public function __construct(
         string $sourceType,
         string $resourceType,
         ManagerRegistry $doctrine,
-        TokenAccessor $tokenAccessor,
+        TokenAccessorInterface $tokenAccessor,
         LoggerInterface $logger
     ) {
         $this->sourceType = $sourceType;

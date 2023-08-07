@@ -9,6 +9,8 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
+use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtension;
+use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareInterface;
@@ -26,7 +28,8 @@ class OroTestFrameworkBundleInstaller implements
     Installation,
     ActivityExtensionAwareInterface,
     ExtendExtensionAwareInterface,
-    ScopeExtensionAwareInterface
+    ScopeExtensionAwareInterface,
+    SerializedFieldsExtensionAwareInterface
 {
     use ScopeExtensionAwareTrait;
 
@@ -40,6 +43,17 @@ class OroTestFrameworkBundleInstaller implements
 
     /** @var ExtendExtension */
     protected $extendExtension;
+
+    /** @var SerializedFieldsExtension */
+    private $serializedFieldsExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setSerializedFieldsExtension(SerializedFieldsExtension $serializedFieldsExtension)
+    {
+        $this->serializedFieldsExtension = $serializedFieldsExtension;
+    }
 
     /**
      * {@inheritdoc}
@@ -899,6 +913,20 @@ class OroTestFrameworkBundleInstaller implements
             'biO2MOwner',
             'name',
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM, 'cascade' => ['all']]]
+        );
+        $this->serializedFieldsExtension->addSerializedField(
+            $table,
+            'serialized_attribute',
+            'string',
+            [
+                'extend' => [
+                    'is_extend' => true,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                ],
+                'attribute' => [
+                    'is_attribute' => true
+                ]
+            ]
         );
     }
 }
