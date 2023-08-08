@@ -3,12 +3,12 @@
 namespace Oro\Bundle\MaintenanceBundle\EventListener;
 
 use Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory;
+use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceRestrictionsChecker;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Listener to decide if user can access to the site.
@@ -46,6 +46,8 @@ class MaintenanceListener
     protected bool $handleResponse = false;
 
     protected bool $debug;
+
+    private ?MaintenanceRestrictionsChecker $restrictionsChecker = null;
 
     /**
      * Constructor Listener
@@ -102,73 +104,28 @@ class MaintenanceListener
         $this->debug = $debug;
     }
 
+    public function setMaintenanceRestrictionsChecker(MaintenanceRestrictionsChecker $restrictionsChecker): void
+    {
+        $this->restrictionsChecker = $restrictionsChecker;
+    }
+
     /**
      * @throws ServiceUnavailableHttpException
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function onKernelRequest(RequestEvent $event): void
     {
         $isMaintenanceOn = false;
         $driver = $this->driverFactory->getDriver();
-        if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType() && $driver->decide()) {
+        if ($event->isMainRequest() && $driver->decide()) {
             $isMaintenanceOn = true;
             $this->routerListener->onKernelRequest($event);
         }
 
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
-        $request = $event->getRequest();
-
-        if (is_array($this->query)) {
-            foreach ($this->query as $key => $pattern) {
-                if (!empty($pattern) && preg_match('{'.$pattern.'}', $request->get($key))) {
-                    return;
-                }
-            }
-        }
-
-        if (is_array($this->cookie)) {
-            foreach ($this->cookie as $key => $pattern) {
-                if (!empty($pattern) && preg_match('{'.$pattern.'}', $request->cookies->get($key))) {
-                    return;
-                }
-            }
-        }
-
-        if (is_array($this->attributes)) {
-            foreach ($this->attributes as $key => $pattern) {
-                if (!empty($pattern) && preg_match('{'.$pattern.'}', $request->attributes->get($key))) {
-                    return;
-                }
-            }
-        }
-
-        if (null !== $this->path &&
-            !empty($this->path) &&
-            preg_match('{' . $this->path . '}', rawurldecode($request->getPathInfo()))
-        ) {
-            return;
-        }
-
-        if (null !== $this->host && !empty($this->host) && preg_match('{' . $this->host . '}i', $request->getHost())) {
-            return;
-        }
-
-        if (count($this->ips) !== 0 && $this->checkIps($request->getClientIp(), $this->ips)) {
-            return;
-        }
-
-        $route = $request->get('_route');
-        if ($route
-            && (
-                (null !== $this->route && preg_match('{' . $this->route . '}', $route))
-                || (true === $this->debug && '_' === $route[0])
-            )
-        ) {
+        if ($this->restrictionsChecker?->isAllowed()) {
             return;
         }
 
