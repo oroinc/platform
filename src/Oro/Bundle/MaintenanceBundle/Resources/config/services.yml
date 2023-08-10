@@ -20,6 +20,8 @@ services:
             - '%oro_maintenance.response.http_status%'
             - '%oro_maintenance.response.exception_message%'
             - '%kernel.debug%'
+        calls:
+            - ['setMaintenanceRestrictionsChecker', ['@oro_maintenance.maintenance_restrictions_checker']]
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 512 }
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
@@ -34,6 +36,19 @@ services:
         class: Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState
         arguments:
             - "@oro_maintenance.driver.factory"
+
+    oro_maintenance.maintenance_restrictions_checker:
+        class: Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceRestrictionsChecker
+        arguments:
+            - '@request_stack'
+            - '%oro_maintenance.authorized.path%'
+            - '%oro_maintenance.authorized.host%'
+            - '%oro_maintenance.authorized.route%'
+            - '%oro_maintenance.authorized.ips%'
+            - '%oro_maintenance.authorized.query%'
+            - '%oro_maintenance.authorized.cookie%'
+            - '%oro_maintenance.authorized.attributes%'
+            - '%kernel.debug%'
 
     Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState:
         alias: oro_maintenance.maintenance_state
