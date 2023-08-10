@@ -69,6 +69,16 @@ class EntityPropertyInfoTest extends WebTestCase
                 'class' => fn () => new EV_Test_Extended_Entity_Enum_Attribute(1, 'test'),
                 'expectedResult' => true
             ],
+            'serialized attribute get method not exists' => [
+                'name' => 'getSerializedAttribute',
+                'class' => TestExtendedEntity::class,
+                'expectedResult' => false
+            ],
+            'serialized attribute set method not exists' => [
+                'name' => 'setSerializedAttribute',
+                'class' => TestExtendedEntity::class,
+                'expectedResult' => false
+            ]
         ];
     }
 
@@ -286,10 +296,10 @@ class EntityPropertyInfoTest extends WebTestCase
             'method match exists with first uppercase' => [
                 'methodCandidate' => 'DefaultValue',
                 'methods' => [
-                  'name',
-                  'priority',
-                  'action',
-                  'defaultValue'
+                    'name',
+                    'priority',
+                    'action',
+                    'defaultValue'
                 ],
                 'expectedResult' => true
             ],

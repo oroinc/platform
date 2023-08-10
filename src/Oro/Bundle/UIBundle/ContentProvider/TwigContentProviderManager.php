@@ -10,8 +10,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class TwigContentProviderManager implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
     {
@@ -28,18 +27,16 @@ class TwigContentProviderManager implements ServiceSubscriberInterface
     public function getContent(array $names = null): array
     {
         /** @var ContentProviderManager $contentProviderManager */
-        $contentProviderManager = $this->container->get('oro_ui.content_provider.manager');
+        $contentProviderManager = $this->container->get(ContentProviderManager::class);
 
         return $contentProviderManager->getContent($names);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
-        return [
-            'oro_ui.content_provider.manager' => ContentProviderManager::class
-        ];
+        return [ContentProviderManager::class];
     }
 }

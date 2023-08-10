@@ -128,7 +128,8 @@
         "symfony/requirements-checker": "^2.0.0",
         "gedmo/doctrine-extensions": "~3.10.0",
         "predis/predis": "~1.1.6",
-        "psr/log": "1.1.*"
+        "psr/log": "1.1.*",
+        "oro/platform-serialised-fields": "5.1.*"
     },
     "require-dev": {
         "behat/behat": "~3.12.0",

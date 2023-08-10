@@ -7,16 +7,11 @@ namespace Oro\Bundle\EntityExtendBundle\Extend;
  */
 final class EntityExtendUpdateResult
 {
-    /** @var bool */
-    private $successful;
-
-    /** @var string|null */
-    private $failureMessage;
-
-    public function __construct(bool $successful, string $failureMessage = null)
-    {
-        $this->successful = $successful;
-        $this->failureMessage = $failureMessage;
+    public function __construct(
+        private bool $successful,
+        private ?string $failureMessage = null,
+        private array $resultData = [],
+    ) {
     }
 
     /**
@@ -33,5 +28,10 @@ final class EntityExtendUpdateResult
     public function getFailureMessage(): ?string
     {
         return $this->failureMessage;
+    }
+
+    public function getResultData(): array
+    {
+        return $this->resultData;
     }
 }
