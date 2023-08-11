@@ -27,6 +27,7 @@
     color: $input-color;
     background-color: $input-background-color;
     min-height: 300px;
+    min-width: 500px;
     flex-direction: row;
 
     .cm-scroller {
@@ -268,6 +269,10 @@
         .cm-scroller {
             border-color: $input-error-border-color;
         }
+    }
+
+    .expression-editor-data-source.active + & {
+        margin-top: $offset-block / 2;
     }
 
     .cm-linter-bottom-panel {

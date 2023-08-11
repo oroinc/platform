@@ -18,7 +18,23 @@ const tooltipOptionsFacetHost = tooltipOptionsFacet.compute([showTooltip], state
     return tooltips;
 });
 
-export const editorExtensions = ({util, operationButtons, setValue}) => {
+/**
+ * Combine extensions for expression editor
+ *
+ * @param {object} params
+ * @param {array} params.operationButtons
+ * @param {number} params.interactionDelay
+ * @param {number} params.linterDelay
+ * @param {number} params.maxRenderedOptions
+ * @returns [...extension]
+ */
+export const editorExtensions = ({
+    util,
+    operationButtons,
+    interactionDelay = 75,
+    linterDelay = 750,
+    maxRenderedOptions = 20
+}) => {
     return [
         symfonyExpression(util),
         keymap.of([indentWithTab, defaultKeymap, {
@@ -26,7 +42,12 @@ export const editorExtensions = ({util, operationButtons, setValue}) => {
             run: startCompletion
         }]),
         autocompletion({
-            icons: false
+            icons: false,
+            interactionDelay,
+            maxRenderedOptions,
+            compareCompletions(a, b) {
+                return a - b;
+            }
         }),
         showPanel.of(sidePanel.bind(showPanel, operationButtons)),
         EditorView.lineWrapping,
@@ -35,11 +56,9 @@ export const editorExtensions = ({util, operationButtons, setValue}) => {
         }),
         syntaxHighlighting(symfonyExpressionLanguageHighlightStyle),
         EditorView.updateListener.of(event => {
-            if (event.flags === 4) {
+            if ([2, 4, 6].includes(event.flags)) {
                 setTimeout(() => startCompletion(event.view));
             }
-
-            setValue(event.state.doc.toString());
         }),
         EditorView.domEventHandlers({
             focusin(event, view) {
@@ -49,7 +68,7 @@ export const editorExtensions = ({util, operationButtons, setValue}) => {
         tooltips({
             position: 'absolute'
         }),
-        expressionLinter({util}),
+        expressionLinter({util, linterDelay}),
         closeBrackets(),
         bracketMatching(),
         history(),

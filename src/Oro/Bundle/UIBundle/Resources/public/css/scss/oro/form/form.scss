@@ -396,6 +396,10 @@ select[multiple] {
                 margin-top: 0;
             }
         }
+
+        &.control-group-full-width {
+            max-width: none;
+        }
     }
 }
 

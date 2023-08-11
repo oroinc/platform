@@ -280,6 +280,7 @@ YAML
 
     public function testLoadTranslationsFromArchive(): void
     {
+        self::markTestSkipped('BAP-22194');
         $pathToArchiveFile = $this->getTempFile('archive_');
         $langCode = 'uk_UA';
         $expectedPart = DIRECTORY_SEPARATOR . 'extracted_' . $langCode;

@@ -40,7 +40,7 @@ class TypeaheadContext extends OroFeatureContext implements OroPageObjectAware
         $suggestions = $this->getSuggestionsElement($field);
         $link = $suggestions->find(
             'css',
-            sprintf('li a:contains("%s")', $suggestion)
+            sprintf('li span:contains("%s")', $suggestion)
         );
         self::assertTrue(
             $link && $link->isValid(),

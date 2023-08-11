@@ -248,6 +248,11 @@ class Form extends Element
                 if ($wysiwyg) {
                     return $this->elementFactory->wrapElement('WysiwygField', $field);
                 }
+
+                $codemirror = $field->getParent()->find('css', '.cm-editor');
+                if ($codemirror) {
+                    return $this->elementFactory->wrapElement('CodeMirrorField', $field);
+                }
             }
 
             if ('orodigitalasset/js/app/views/digital-asset-choose-form-view'

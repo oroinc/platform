@@ -6,7 +6,7 @@ import {operatorsDetailMap, getResolvedSnippetByName} from '../utils/operators';
 const resolveAutocompleteData = ({items}) => {
     return Object.entries(items).sort().map(([item, {hasChildren, isCollection}]) => {
         return {
-            label: item,
+            label: item + (hasChildren ? '…' : ''),
             apply: getResolvedSnippetByName(item, false, {hasChildren, isCollection}),
             detail: operatorsDetailMap[item]
         };
@@ -22,11 +22,13 @@ const symfonyExpressionAutocomplete = (util, context) => {
 
     const {text: space} = context.matchBefore(/\s*/);
 
+    const inside = nodeBefore.from < context.pos && nodeBefore.to > context.pos;
     const from = nodeBefore.name === 'Dot' || space === ' ' ? context.pos : nodeBefore.from;
 
     if (autocompleteData.length) {
         return {
             from,
+            to: inside ? nodeBefore.to : null,
             options: autocompleteData
         };
     }

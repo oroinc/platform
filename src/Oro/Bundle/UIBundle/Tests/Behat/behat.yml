@@ -123,7 +123,7 @@ oro_behat_extension:
       selector: '.alert .notification-flash__text'
 
     TypeaheadSuggestionsDropdown:
-      selector: '.typeahead.dropdown-menu'
+      selector: '.cm-tooltip-autocomplete'
 
     Tooltip:
       selector: '.tooltip'

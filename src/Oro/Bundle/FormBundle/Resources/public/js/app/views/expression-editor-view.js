@@ -9,7 +9,8 @@ import expressionEditorExtensions from 'oroform/js/app/views/expression-editor-e
 
 const ExpressionEditorView = BaseView.extend({
     optionNames: BaseView.prototype.optionNames.concat([
-        'dataSource', 'delay', 'util', 'operationButtons'
+        'dataSource', 'interactionDelay', 'util', 'operationButtons',
+        'linterDelay'
     ]),
 
     /**
@@ -35,7 +36,7 @@ const ExpressionEditorView = BaseView.extend({
     /**
      * @type {number} Validation and autocomplete delay in milliseconds
      */
-    delay: 50,
+    delay: 0,
 
     events: {
         focus: 'onFocus',
@@ -76,8 +77,14 @@ const ExpressionEditorView = BaseView.extend({
             extensions: expressionEditorExtensions({
                 util: this.util,
                 operationButtons: this.operationButtons,
-                setValue: this.setValue.bind(this)
-            })
+                interactionDelay: this.interactionDelay,
+                linterDelay: this.linterDelay
+            }).concat([
+                EditorView.updateListener.of(this.editorUpdateListener.bind(this)),
+                EditorView.editorAttributes.of({
+                    'data-name': this.$el.attr('name')
+                })
+            ])
         });
 
         this.editorView = new EditorView({
@@ -87,6 +94,16 @@ const ExpressionEditorView = BaseView.extend({
 
         this.$el.addClass('hidden-textarea');
         this.$el.after(this.editorView.dom);
+    },
+
+    editorUpdateListener(event) {
+        const {state} = event;
+        const {to} = state.selection.ranges[0];
+        const content = state.doc.toString();
+        this.setValue(content);
+
+        this.autocompleteData = this.util.getAutocompleteData(content, to);
+        this._toggleDataSource();
     },
 
     hide() {

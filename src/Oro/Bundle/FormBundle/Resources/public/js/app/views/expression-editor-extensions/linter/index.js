@@ -26,9 +26,11 @@ export function expressionLinterWalker({util}) {
     };
 }
 
-export default function expressionLinter({util} = {}) {
+export default function expressionLinter({util, linterDelay = 0} = {}) {
     return [
-        linter(expressionLinterWalker({util})),
+        linter(expressionLinterWalker({util}), {
+            delay: linterDelay
+        }),
         linterPanel()
     ];
 }
