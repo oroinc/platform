@@ -8,6 +8,7 @@ use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\AuditFieldTypeProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
+use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 use Psr\Log\LoggerAwareTrait;
 
 /**
@@ -103,9 +104,11 @@ class ChangeSetToAuditFieldsConverter implements ChangeSetToAuditFieldsConverter
                 $old
             );
         } elseif ($this->auditFieldTypeProvider->isAssociation($entityMetadata, $fieldName)) {
+            $auditFieldName = UnidirectionalFieldHelper::isFieldUnidirectional($fieldName)
+                ? UnidirectionalFieldHelper::getRealFieldName($fieldName) : $fieldName;
             $field = $this->createAuditFieldEntity(
                 $auditFieldClass,
-                $fieldName,
+                $auditFieldName,
                 AuditFieldTypeRegistry::COLLECTION_TYPE
             );
             $fields[$fieldName] = $field;

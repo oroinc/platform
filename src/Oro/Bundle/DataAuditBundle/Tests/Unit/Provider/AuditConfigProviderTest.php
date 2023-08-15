@@ -3,6 +3,8 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
+use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
+use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -172,5 +174,21 @@ class AuditConfigProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$auditableConfig, $notAuditableConfig]);
 
         $this->assertEquals([$className], $this->provider->getAllAuditableEntities());
+    }
+
+    public function testIsAuditableFieldWhenUnidirectionalField(): void
+    {
+        $entityClass = \stdClass::class;
+        $fieldName = UnidirectionalFieldHelper::createUnidirectionalField(
+            TestEntity1::class,
+            'oneField'
+        );
+        $this->configManager->expects(self::never())
+            ->method('hasConfig');
+
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        $this->assertTrue($this->provider->isAuditableField($entityClass, $fieldName));
     }
 }
