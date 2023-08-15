@@ -50,7 +50,8 @@ services:
     oro_cron.engine.command_runner:
         class: Oro\Bundle\CronBundle\Engine\CommandRunner
         arguments:
-            - '@kernel'
+            - "@=service('kernel').getProjectDir()"
+            - "@=service('kernel').getEnvironment()"
 
     oro_cron.async.command_runner_processor:
         class: Oro\Bundle\CronBundle\Async\CommandRunnerProcessor

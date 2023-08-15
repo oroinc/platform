@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataAuditBundle\Provider;
 
+use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -13,7 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
  */
 class AuditConfigProvider
 {
-    const DATA_AUDIT_SCOPE = 'dataaudit';
+    public const DATA_AUDIT_SCOPE = 'dataaudit';
 
     /** @var ConfigManager */
     private $configManager;
@@ -53,6 +54,10 @@ class AuditConfigProvider
      */
     public function isAuditableField($entityClass, $fieldName)
     {
+        if (UnidirectionalFieldHelper::isFieldUnidirectional($fieldName)) {
+            return true;
+        }
+
         if (!$this->isAuditableEntity($entityClass) || !$this->configManager->hasConfig($entityClass, $fieldName)) {
             return false;
         }
