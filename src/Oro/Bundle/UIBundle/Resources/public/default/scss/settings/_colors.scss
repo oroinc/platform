@@ -1,6 +1,7 @@
 /* @theme: default; */
 
 $color-palette: (
+    // TODO: Remove old colors start
     'primary': (
         'main': #2d333b,
         'base': #cc5c28,
@@ -31,5 +32,70 @@ $color-palette: (
         'warning-dark': #634c17,
         'normal': #4597ca,
         'focus': #348fc6
+    ),
+    // TODO: Remove old colors end
+    'accent-primary': (
+        'main': #0a7f8f,
+        'hover': #075963,
+        'active': #05444d,
+        'disable': #7d999e,
+        'light': #e8fcff
+    ),
+    'accent-alternative': (
+        'main': #c45420,
+        'hover': #ad4524,
+        'active': #993d20,
+        'disable': #c78465,
+        'light': #ffefe8
+    ),
+    'accent-secondary': (
+        'c1': #ffc221,
+        'c2': #f7941d,
+        'c3': #6e98dc,
+        'c4': #7ea6a4,
+        'c5': #197b30,
+        'c6': #9c0067
+    ),
+    'neutral': (
+        'c1': #fff,
+        'c1-50': rgb(255 255 255 / .5),
+        'c1-30': rgb(255 255 255 / .3),
+        'c1-15': rgb(255 255 255 / .15),
+        'c2': #f0f3f5,
+        'c3': #d4dcdd,
+        'c4': #c3cfcf,
+        'c5': #002434
+    ),
+    'text': (
+        'primary': #002434,
+        'secondary': #45606e,
+        'disabled': #819299,
+        'inversed': #fff,
+        'inversed-70': rgb(255 255 255 / .7),
+        'link': #1642e4,
+        'link-hover': #0d77d6,
+        'link-hover-dark': #4cb4fe
+    ),
+    'destructive': (
+        'light': #ffebed,
+        'light-on-dark': rgb(255 107 107 / .3),
+        'base': #de0b07,
+        'main': #b50400,
+        'main-dark': #ff6b6b,
+        'dark': #9c0000,
+        'disabled': #d17573
+    ),
+    'success': (
+        'light': #e2fbe9,
+        'dark': #005e1f
+    ),
+    'warning': (
+        'light': #fff7d1,
+        'base': #f19500,
+        'dark': #8f3700
+    ),
+    'info': (
+        'light': #edf5ff,
+        'dark': #143dd4
     )
 ) !default;
