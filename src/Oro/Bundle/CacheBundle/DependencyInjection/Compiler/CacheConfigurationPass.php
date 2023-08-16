@@ -38,6 +38,7 @@ class CacheConfigurationPass implements CompilerPassInterface
         $this->ensureAbstractDataCacheExists($container);
         $this->configureDataCacheManagerAndStaticConfigCache($container);
         $this->configureClassForChainAdapter($container);
+        $this->ensureCacheNamespaceIsCorrect($container);
     }
 
     /**
@@ -140,5 +141,33 @@ class CacheConfigurationPass implements CompilerPassInterface
         $definition->setAbstract(true);
 
         return $definition;
+    }
+
+    private function ensureCacheNamespaceIsCorrect(ContainerBuilder $container): void
+    {
+        $services = $container->findTaggedServiceIds('cache.pool');
+        foreach ($services as $serviceId => $tags) {
+            if (!isset($tags[0]['namespace'])) {
+                continue;
+            }
+
+            $namespace = $tags[0]['namespace'];
+            $definition = $container->getDefinition($serviceId);
+            if ($definition instanceof ChildDefinition &&
+                $definition->getParent() === CacheConfigurationPass::DATA_CACHE_POOL
+            ) {
+                $adapters = $definition->getArgument(0);
+                foreach ($adapters as &$adapter) {
+                    if ($adapter instanceof ChildDefinition && $adapter->getArguments()) {
+                        $adapter = clone $adapter;
+                        $argumentIndex = count($adapter->getArguments()) - 1;
+                        $adapter->replaceArgument($argumentIndex, $namespace);
+                    }
+                }
+
+                $definition->replaceArgument(0, $adapters);
+                $container->setDefinition($serviceId, $definition);
+            }
+        }
     }
 }
