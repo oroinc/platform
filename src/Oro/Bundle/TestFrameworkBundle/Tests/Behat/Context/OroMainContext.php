@@ -64,16 +64,17 @@ class OroMainContext extends MinkContext implements
     use AppKernelAwareTrait;
     use ScreenshotTrait;
 
-    const SKIP_WAIT_PATTERN = '/'.
-        '^(?:|I )should see .+ flash message$|'.
-        '^(?:|I )should see .+ flash message and I close it$|'.
-        '^(?:|I )should see .+ error message$|'.
-        '^(?:|I )should see success message with number of records were deleted$|'.
-        '^(?:|I )should see Schema updated flash message$'.
+    const SKIP_WAIT_PATTERN = '/' .
+        '^(?:|I )should see .+ flash message$|' .
+        '^(?:|I )should see .+ flash message and I close it$|' .
+        '^(?:|I )should see .+ error message$|' .
+        '^(?:|I )should see success message with number of records were deleted$|' .
+        '^(?:|I )should see Schema updated flash message$' .
     '/';
 
     private ?Stopwatch $stopwatch = null;
     private bool $debug = false;
+    private string $rememberedURL = '';
 
     /**
      * @BeforeScenario
@@ -3175,6 +3176,27 @@ JS;
         if ($this->isElementVisible($button)) {
             $this->pressButton($button);
         }
+    }
+
+    /**
+     * And I remember current URL
+     *
+     * @Then /^(?:|I )remember current URL$/
+     */
+    public function rememberURL(): void
+    {
+        $session = $this->getMink()->getSession();
+        $this->rememberedURL = $session->getCurrentUrl();
+    }
+
+    /**
+     * And I follow remembered URL
+     *
+     * @Then /^(?:|I )follow remembered URL$/
+     */
+    public function followRememberedUrl(): void
+    {
+        $this->visitPath($this->rememberedURL);
     }
 
     /**
