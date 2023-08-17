@@ -68,6 +68,9 @@ class OroMainContext extends MinkContext implements
     /** @var bool */
     private $debug = false;
 
+    /** @var string */
+    private $rememberedURL = '';
+
     /**
      * @BeforeScenario
      */
@@ -2813,5 +2816,26 @@ JS;
     public function assertFieldContains($field, $value)
     {
         parent::assertFieldContains($field, $value);
+    }
+
+    /**
+     * And I remember current URL
+     *
+     * @Then /^(?:|I )remember current URL$/
+     */
+    public function rememberURL()
+    {
+        $session = $this->getMink()->getSession();
+        $this->rememberedURL = $session->getCurrentUrl();
+    }
+
+    /**
+     * And I follow remembered URL
+     *
+     * @Then /^(?:|I )follow remembered URL$/
+     */
+    public function followRememberedUrl()
+    {
+        $this->visitPath($this->rememberedURL);
     }
 }
