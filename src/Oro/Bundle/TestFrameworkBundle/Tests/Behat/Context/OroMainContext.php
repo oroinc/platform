@@ -3103,6 +3103,58 @@ JS;
         $this->assertSession()->pageTextMatches($this->fixStepArgument($pattern));
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should not see "Product 1" and continue checking the condition is met for maximum 10 seconds
+     *
+     * @Then /^(?:|I )should not see "(?P<text>.*)" and continue checking the condition is met for maximum (?P<number>\d+) seconds$/
+     */
+    public function assertPageNotContainsTextWithWait($number, $text)
+    {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            try {
+                $context->assertSession()->pageTextNotContains($this->fixStepArgument($text));
+
+                return true;
+            } catch (\Exception $e) {
+                $this->getSession()->reload();
+
+                return false;
+            }
+        }, $number, 2000000);
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was found in the text of the current page.', $text)
+        );
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should see "Product 1" and continue checking the condition is met for maximum 10 seconds
+     *
+     * @Then /^(?:|I )should see "(?P<text>.*)" and continue checking the condition is met for maximum (?P<number>\d+) seconds$/
+     */
+    public function assertPageContainsTextWithWait($number, $text)
+    {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            try {
+                $context->assertSession()->pageTextContains($this->fixStepArgument($text));
+
+                return true;
+            } catch (\Exception $e) {
+                $this->getSession()->reload();
+
+                return false;
+            }
+        }, $number, 2000000);
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was not found in the text of the current page.', $text)
+        );
+    }
+
     /**
      * Checks, that all resources of a given type are versioned
      * Example: I should be sure that all "json" are versioned
