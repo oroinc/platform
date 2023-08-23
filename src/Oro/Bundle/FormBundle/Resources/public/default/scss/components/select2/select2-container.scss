@@ -188,8 +188,8 @@
     display: inline-block;
     width: 100%;
     min-height: 26px;
-    margin-bottom: $offset-y-m * .5;
-    padding: $offset-x-m  $offset-y-m * .5;
+    margin-bottom: spacing('sm') * .5;
+    padding: spacing('sm')  spacing('sm') * .5;
 
     border-bottom: $select2-search-border;
 

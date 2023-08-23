@@ -1,5 +1,5 @@
 /* @theme: default; */
 
-$form-row-offset-x: $offset-x;
-$form-row-label-offset-x: $offset-x-s;
+$form-row-offset-x: spacing('base');
+$form-row-label-offset-x: spacing('xs');
 $form-row-content-offset-x: 0;

@@ -82,7 +82,7 @@
     }
 
     &__currency {
-        margin-right: $offset-y-m * .5;
+        margin-right: spacing('sm') * .5;
     }
 
     // toolbar open

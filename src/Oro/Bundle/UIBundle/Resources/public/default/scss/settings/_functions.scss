@@ -68,6 +68,23 @@
     }
 }
 
+/** Calculates the spacing sizes based on specified multipliers and a base value.
+    @param {String} $name - The name of the spacing size (e.g., xs, md, lg).
+    @return {Number|null} The calculated spacing size in pixels, based on the provided multipliers
+                          and the base spacing value. Returns null if multiplier is not found.
+*/
+@function spacing($name) {
+    $multiplier: map.get($spacing-multipliers, $name);
+
+    @if not $multiplier {
+        @warn "No multiplier found for '#{$name}'.";
+
+        @return null;
+    }
+
+    @return $base-spacing * $multiplier;
+}
+
 /** @return: the value in a map associated with a given key
     Use: z-index: z('base');
 */

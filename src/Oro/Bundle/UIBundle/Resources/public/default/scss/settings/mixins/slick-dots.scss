@@ -3,8 +3,8 @@
 // mixin for Slick slider dots navigation
 @mixin slick-dots(
     $slick-dots-class:                    '.slick-dots',
-    $slick-dots-bottom-pos:               $offset-y,
-    $slick-dots-item-offset:              0 $offset-x-s,
+    $slick-dots-bottom-pos:               spacing('base'),
+    $slick-dots-item-offset:              0 spacing('xs'),
     $slick-dots-button-size:              10px,
     $slick-dots-button-bg:                get-color('additional', 'light'),
     $slick-dots-button-border:            1px solid get-color('additional', 'middle'),

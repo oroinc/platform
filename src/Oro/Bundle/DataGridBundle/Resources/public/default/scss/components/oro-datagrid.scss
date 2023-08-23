@@ -1,7 +1,7 @@
 /* @theme: default; */
 
 .oro-datagrid {
-    margin-bottom: $offset-x * 2;
+    margin-bottom: spacing('base') * 2;
 
     &.no-data-visible {
         .no-data {

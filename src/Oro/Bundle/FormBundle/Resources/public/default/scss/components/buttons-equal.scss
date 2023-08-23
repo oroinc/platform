@@ -3,7 +3,7 @@
 .buttons-equal {
     display: flex;
 
-    padding-top: $offset-y;
+    padding-top: spacing('base');
 
     &--no-offset {
         padding-top: 0;
@@ -14,7 +14,7 @@
         flex-basis: 50%;
 
         &:first-child {
-            margin-right: $offset-x-m;
+            margin-right: spacing('sm');
         }
     }
 }

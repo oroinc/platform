@@ -1,7 +1,7 @@
 /* @theme: default; */
 $datagrid-header-cell-border-width: 1px 0 !default;
 
-$datagrid-header-cell-mass-action-offset-inner: 0 ($offset-y-m + 2px) 0 !default;
+$datagrid-header-cell-mass-action-offset-inner: 0 (spacing('sm') + 2px) 0 !default;
 
 $datagrid-header-cell-action-column-width: 50px !default;
 $datagrid-header-cell-action-column-text-align: right !default;
@@ -19,4 +19,4 @@ $datagrid-header-cell-link-hover-text-decoration: none !default;
 $datagrid-header-cell-sortable-icon-color: get-color('additional', 'dark') !default;
 $datagrid-header-cell-sortable-icon-size: 4px !default;
 
-$datagrid-header-cell-sortable-icon-left: $offset-y-s !default;
+$datagrid-header-cell-sortable-icon-left: spacing('xs') !default;

@@ -95,7 +95,7 @@
     .with-floating-header {
         .grid-header-cell {
             .caret {
-                margin-top: $offset-y-s;
+                margin-top: spacing('xs');
             }
         }
     }

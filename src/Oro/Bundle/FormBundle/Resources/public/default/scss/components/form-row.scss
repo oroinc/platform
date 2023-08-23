@@ -11,7 +11,7 @@
 
     &--offset {
         &-s {
-            margin-bottom: $offset-y-s;
+            margin-bottom: spacing('xs');
         }
 
         &-none {

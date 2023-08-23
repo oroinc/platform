@@ -14,10 +14,22 @@ $breakpoint-mobile-landscape: 640px !default;
 // iPhone 4s (320*480), iPhone 5s (320*568), iPhone 6s (375*667), iPhone 6s Plus (414*763)
 $breakpoint-mobile: 414px !default;
 
-// Offsets
-$offset-y: 16px !default;
-$offset-y-m: 8px !default;
-$offset-y-s: 4px !default;
-$offset-x: 16px !default;
-$offset-x-m: 8px !default;
-$offset-x-s: 4px !default;
+// Spacing System
+$base-spacing: 16px !default;
+
+$spacing-multipliers: (
+    xs: .25,
+    sm: .5,
+    md: .75,
+    base: 1,
+    lg: 1.5,
+    xl: 2,
+    xxl: 2.5,
+    xxxl: 3,
+    huge: 3.5,
+    massive: 4,
+    gigantic: 5,
+    enormous: 5.5,
+    colossal: 6,
+    immense: 7.5
+) !default;

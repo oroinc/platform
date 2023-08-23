@@ -3,7 +3,7 @@
 $oro-toolbar-content-min-width: 45px !default;
 $oro-toolbar-toolbar-min-width: 95px !default;
 $oro-toolbar-icon-offset: 3px !default;
-$oro-toolbar-content-inner-offset: 0 $offset-y-m !default;
+$oro-toolbar-content-inner-offset: 0 spacing('sm') !default;
 $oro-toolbar-content-line-height: ($base-font-size - .1) * 2 !default;
 $oro-toolbar-content-font-family: $base-font-minor !default;
 $oro-toolbar-content-text-align: center !default;

@@ -37,6 +37,15 @@ The current file describes significant changes in the code that may affect the u
 #### PlatformBundle
 * Added `\Oro\Bundle\PlatformBundle\Validator\Constraints\ValidEmbeddable` that allows to apply `Valid` constraint with explicit validation groups specified in `embeddedGroups` option. 
 
+### Changed
+
+#### UIBundle
+* Removed `$offset-*` scss variables
+* Added `spacing` scss function.
+`$offset-x\$offset-y` => `spacing('base')`
+`$offset-x-m\$offset-y-m` => `spacing('sm')`
+`$offset-x-s\$offset-y-s` => `spacing('xs')`
+
 ## 5.1.0 (2023-03-31)
 
 [Show detailed list of changes](incompatibilities-5-1.md)
