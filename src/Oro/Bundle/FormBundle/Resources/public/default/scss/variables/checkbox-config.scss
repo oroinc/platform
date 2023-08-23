@@ -1,14 +1,14 @@
 /* @theme: default; */
 
 // Variables for both checkbox and radio
-$checkbox-background: get-color('additional', 'ultra') !default;
+$checkbox-background: get-color('additional-old', 'ultra') !default;
 $checkbox-size: 16px !default;
 $checkbox-size-var: var(--checkbox-size, #{$checkbox-size}) !default;
 $checkbox-appearance: none !default;
 $checkbox-vertical-align: middle !default;
 $checkbox-margin: 0 !default;
-$checkbox-border: 1px solid get-color('additional', 'middle') !default;
-$checkbox-color: get-color('additional', 'ultra') !default;
+$checkbox-border: 1px solid get-color('additional-old', 'middle') !default;
+$checkbox-color: get-color('additional-old', 'ultra') !default;
 $checkbox-display: inline-grid !default;
 $checkbox-border-radius: 3px !default;
 $checkbox-flex: none !default;
@@ -31,7 +31,7 @@ $checkbox-background-indeterminate: get-color('ui', 'normal') !default;
 $checkbox-border-color-indeterminate: $base-ui-element-border-color-focus !default;
 
 // Hover
-$checkbox-border-color-hover: get-color('additional', 'dark') !default;
+$checkbox-border-color-hover: get-color('additional-old', 'dark') !default;
 
 // Focus
 $checkbox-border-width-focus: 2px !default;
@@ -39,10 +39,10 @@ $checkbox-border-color-focus: get-color('ui', 'focus') !default;
 $checkbox-box-shadow-focus: 0 0 6px get-color('ui', 'normal') !default;
 
 // Disable
-$checkbox-background-disabled: get-color('additional', 'base') !default;
-$checkbox-border-color-disabled: get-color('additional', 'light') !default;
-$checkbox-background-checked-disabled: get-color('additional', 'base') !default;
-$checkbox-border-color-checked-disabled: get-color('additional', 'light') !default;
+$checkbox-background-disabled: get-color('additional-old', 'base') !default;
+$checkbox-border-color-disabled: get-color('additional-old', 'light') !default;
+$checkbox-background-checked-disabled: get-color('additional-old', 'base') !default;
+$checkbox-border-color-checked-disabled: get-color('additional-old', 'light') !default;
 $checkbox-color-disabled: #{rgba(get-color('ui', 'focus'), .5)} !default;
 $checkbox-opacity-disabled: null !default;
 

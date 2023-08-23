@@ -15,7 +15,7 @@ $select-padding--m: 8px 22px 8px 9px !default;
 $select-padding--s: 5px 22px 4px 8px !default;
 $select-height--s: 32px !default;
 
-$select-placeholder-color: get-color('additional', 'middle');
+$select-placeholder-color: get-color('additional-old', 'middle');
 
 $select-firefox-height: null !default;
 $select-firefox-line-height: null !default;
@@ -25,13 +25,13 @@ $select-firefox-inner-offset-bottom: null !default;
 $select-border: $base-ui-element-border !default;
 $select-border-radius: $base-ui-element-border-radius !default;
 $select-background-color: $base-ui-element-bg-color !default;
-$select-color: get-color('additional', 'dark') !default;
+$select-color: get-color('additional-old', 'dark') !default;
 $select-disable-platform-style: true !default;
 $select-arrow-color: $base-ui-element-arrow-color !default;
-$select-bg: url('data:image/svg+xml;utf8,<svg width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M0 .027l4.99 5.954L9.98.027z" fill="#{str-replace(string.unquote('#{$select-arrow-color}'), '#', '%23')}" fill-rule="evenodd"/></svg>') no-repeat right 8px center get-color('additional', 'ultra') !default;
+$select-bg: url('data:image/svg+xml;utf8,<svg width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M0 .027l4.99 5.954L9.98.027z" fill="#{str-replace(string.unquote('#{$select-arrow-color}'), '#', '%23')}" fill-rule="evenodd"/></svg>') no-repeat right 8px center get-color('additional-old', 'ultra') !default;
 
-$select-border-color-hover-state: get-color('additional', 'dark') !default;
-$select-box-shadow-hover-state: inset 0 1px 1px color.scale(get-color('additional', 'ultra'), $alpha: -75%),
+$select-border-color-hover-state: get-color('additional-old', 'dark') !default;
+$select-box-shadow-hover-state: inset 0 1px 1px color.scale(get-color('additional-old', 'ultra'), $alpha: -75%),
                                       0 0 8px color.scale(get-color('ui', 'focus'), $alpha: -60%) !default;
 
 // Focus State
@@ -44,4 +44,4 @@ $select-box-shadow-error-state: 0 1px 7px 0 color.scale(get-color('ui', 'error-d
 
 // Disabled
 
-$select-disabled-background-color: get-color('additional', 'base');
+$select-disabled-background-color: get-color('additional-old', 'base');

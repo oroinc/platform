@@ -6,38 +6,41 @@
 @use 'sass:string';
 @use 'sass:map';
 
-/** @return the value with a nested map;
-    $map: (
-        'main': (
-            'foo': 'bar',
-        )
-    );
-    Use: get-nested-map-value($map, 'main', 'foo') => bar;
+/** @return the value from a $color-palette map associated with a given key;
+    Use: color: get-color('primary-old', 'base') => color: #000;
 */
+@function get-color($palette, $keys...) {
+    $color-key: map.get($color-palette, $palette, $keys...);
 
-@function get-nested-map-value($map: null, $key: 'main', $value: 'main') {
-    @if (type-of($map) == 'map') {
-        @return map.get(map.get($map,  $key), $value);
+    @if not $color-key or type-of($color-key) == 'map' or type-of($color-key) == 'list' {
+        @warn 'Color not found';
+
+        @return null;
     }
+
+    @return $color-key;
 }
 
-/** @return the value from a $color-palette map associated with a given key;
-    Use: color: get-color('primary', 'base') => color: #000;
-    Use: color: get-color('primary', 'base', 10%) => color: rgba(0 0 0 / 10%);
+/** @return the value from a $color-palette map associated with a given key and with css var;
+    Use: color: get-var-color('primary', 'base') => color: var(--primary-base, #000);
 */
 
-@function get-color($palette: 'primary', $key: 'main', $opacity: null) {
-    $color-key: get-nested-map-value($color-palette, $palette, $key);
+@function get-var-color($palette, $keys...) {
+    $color-key: map.get($color-palette, $palette, $keys...);
 
-    @if ($color-key) {
-        @if ($opacity) {
-            @return rgba($color-key, $opacity);
-        }
+    @if not $color-key or type-of($color-key) == 'map' or type-of($color-key) == 'list' {
+        @warn 'Color not found';
 
-        @return $color-key;
-    } @else {
-        @warn 'Color not found:' $palette $key;
+        @return null;
     }
+
+    $var-key: '--#{$palette}';
+
+    @each $key in $keys {
+        $var-key: #{$var-key}-#{$key};
+    }
+
+    @return var(#{$var-key}, $color-key);
 }
 
 /** @return the value in a $theme-fonts map associated with a given key;
@@ -45,13 +48,13 @@
 */
 
 @function get-font-name($key) {
-    $font: get-nested-map-value($theme-fonts, $key, 'family');
+    $font: map.get($theme-fonts, $key, 'family');
 
-    @if ($font) {
-        @return $font;
-    } @else {
+    @if not $font {
         @warn 'Font not found:' $key;
     }
+
+    @return $font;
 }
 
 /** @return the value in a $font-weights map associated with a given key;

@@ -3,9 +3,9 @@
 @mixin badge(
     $badge-size:        26px,
     $badge-f-size:      14px,
-    $badge-bg:          get-color('primary', 'base'),
+    $badge-bg:          get-color('primary-old', 'base'),
     $badge-radius:      50%,
-    $badge-color:       get-color('additional', 'ultra'),
+    $badge-color:       get-color('additional-old', 'ultra'),
     $badge-icon-align:  baseline,
     $badge-icon-offset: 0,
     $badge-icon-line-height: inherit

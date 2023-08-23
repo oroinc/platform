@@ -8,53 +8,71 @@ $charset: 'UTF-8' !default;
 // List with theme fonts
 $theme-fonts: (
     'main': (
-        'family': 'Lato',
+        'family': 'Poppins',
         'variants': (
             (
-                'path': '#{$global-url}/orofrontend/default/fonts/lato/lato-regular-webfont',
+                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-Light-subset',
+                'weight': 300,
+                'style': normal
+            ),
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-LightItalic-subset',
+                'weight': 300,
+                'style': italic
+            ),
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-Regular-subset',
                 'weight': 400,
                 'style': normal
             ),
             (
-                'path': '#{$global-url}/orofrontend/default/fonts/lato/lato-bold-webfont',
+                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-Italic-subset',
+                'weight': 400,
+                'style': italic
+            ),
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-Medium-subset',
+                'weight': 500,
+                'style': normal
+            ),
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-MediumItalic-subset',
+                'weight': 500,
+                'style': italic
+            ),
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-SemiBold-subset',
+                'weight': 600,
+                'style': normal
+            ),
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-SemiBoldItalic-subset',
+                'weight': 600,
+                'style': italic
+            ),
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-Bold-subset',
                 'weight': 700,
                 'style': normal
+            ),
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-BoldItalic-subset',
+                'weight': 700,
+                'style': italic
             )
         ),
         'formats': ('woff2', 'woff')
     ),
     'font-awesome': (
-            'family': 'FontAwesome',
-            'variants': (
-                    (
-                            'path': '~@oroinc/font-awesome/fonts/fontawesome-webfont',
-                            'weight': normal,
-                            'style': normal
-                    )
-            ),
-            'formats': ('woff2', 'woff')
-    ),
-    'secondary': (
-        'family': 'Roboto',
+        'family': 'FontAwesome',
         'variants': (
             (
-                'path': '#{$global-url}/orofrontend/default/fonts/roboto/roboto-regular-webfont',
-                'weight': 700,
-                'style': normal
-            )
-        ),
-        'formats': ('woff2', 'woff')
-    ),
-    'icon': (
-        'family': 'custom-icon-font',
-        'variants': (
-            (
-                'path': '#{$global-url}/orofrontend/default/fonts/custom-font-icon/custom-font-icon',
+                'path': '~@oroinc/font-awesome/fonts/fontawesome-webfont',
                 'weight': normal,
                 'style': normal
             )
         ),
-        'formats': ('woff')
+        'formats': ('woff2', 'woff')
     ),
     'only-bullets': (
         'family': 'only-bullets',
@@ -73,29 +91,27 @@ $theme-fonts: (
 // Fonts weights
 $font-weights: (
     // Thin (Hairline)
-        'thin': 100,
+    'thin': 100,
     // Extra Light (Ultra Light)
-        'extra': 200,
+    'extra': 200,
     // Light
-        'light': 300,
+    'light': 300,
     // Normal
-        'normal': 400,
+    'normal': 400,
     // Medium
-        'medium': 500,
+    'medium': 500,
     // Semi Bold (Demi Bold)
-        'semi-bold': 600,
+    'semi-bold': 600,
     // Bold
-        'bold': 700,
+    'bold': 700,
     // Extra Bold (Ultra Bold)
-        'extra-bold': 800,
+    'extra-bold': 800,
     // Black (Heavy)
-        'black': 900
+    'black': 900
 ) !default;
 
 // Fonts families
 $base-font: get-font-name('main'),'helvetica', arial, sans-serif !default;
-$base-font-minor: get-font-name('secondary'),'helvetica', arial, sans-serif !default;
-$base-font-icon: get-font-name('icon') !default;
 $base-font-masked: get-font-name('only-bullets'), 'helvetica', arial, sans-serif !default;
 
 // include in assets

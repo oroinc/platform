@@ -2,20 +2,20 @@
 
 $color-palette: (
     // TODO: Remove old colors start
-    'primary': (
+    'primary-old': (
         'main': #2d333b,
         'base': #cc5c28,
         'light': #f2994b,
         'dark': #b84926
     ),
-    'secondary': (
+    'secondary-old': (
         'main': #fcb91d,
         'base': #6e98dc,
         'light': #7ea6a4,
         'lighten': #197b30,
         'dark': #f7941d
     ),
-    'additional': (
+    'additional-old': (
         'ultra': #fff,
         'base': #f5f5f5,
         'light': #ebebeb,
@@ -34,21 +34,21 @@ $color-palette: (
         'focus': #348fc6
     ),
     // TODO: Remove old colors end
-    'accent-primary': (
+    'primary': (
         'main': #0a7f8f,
         'hover': #075963,
         'active': #05444d,
         'disable': #7d999e,
         'light': #e8fcff
     ),
-    'accent-alternative': (
+    'alternative': (
         'main': #c45420,
         'hover': #ad4524,
         'active': #993d20,
         'disable': #c78465,
         'light': #ffefe8
     ),
-    'accent-secondary': (
+    'secondary': (
         'c1': #ffc221,
         'c2': #f7941d,
         'c3': #6e98dc,
@@ -57,31 +57,31 @@ $color-palette: (
         'c6': #9c0067
     ),
     'neutral': (
-        'c1': #fff,
-        'c1-50': rgb(255 255 255 / .5),
-        'c1-30': rgb(255 255 255 / .3),
-        'c1-15': rgb(255 255 255 / .15),
-        'c2': #f0f3f5,
-        'c3': #d4dcdd,
-        'c4': #c3cfcf,
-        'c5': #002434
+        'white-100': #fff,
+        'white-50': rgb(255 255 255 / .5),
+        'white-30': rgb(255 255 255 / .3),
+        'white-15': rgb(255 255 255 / .15),
+        'grey1': #f0f3f5,
+        'grey2': #d4dcdd,
+        'grey3': #c3cfcf,
+        'dark': #002434
     ),
     'text': (
         'primary': #002434,
         'secondary': #45606e,
-        'disabled': #819299,
-        'inversed': #fff,
-        'inversed-70': rgb(255 255 255 / .7),
+        'disable': #819299,
+        'inverse': #fff,
+        'inverse-70': rgb(255 255 255 / .7),
         'link': #1642e4,
         'link-hover': #0d77d6,
-        'link-hover-dark': #4cb4fe
+        'link-hover-on-dark': #4cb4fe
     ),
     'destructive': (
         'light': #ffebed,
         'light-on-dark': rgb(255 107 107 / .3),
         'base': #de0b07,
         'main': #b50400,
-        'main-dark': #ff6b6b,
+        'main-on-dark': #ff6b6b,
         'dark': #9c0000,
         'disabled': #d17573
     ),

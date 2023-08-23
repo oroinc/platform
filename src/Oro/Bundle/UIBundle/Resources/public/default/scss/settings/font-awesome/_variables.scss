@@ -828,10 +828,9 @@
 
 $fa-font-family: 'FontAwesome';
 
-$fa-color-gray: color.adjust(get-color('additional', 'dark'), $lightness: 21%);
-$fa-color-dark-gray: get-color('additional', 'dark');
+$fa-color-gray: color.adjust(get-color('additional-old', 'dark'), $lightness: 21%);
+$fa-color-dark-gray: get-color('additional-old', 'dark');
 
 $font-icon-offset-end: 3px !default;
 $font-icon-button-s: 11px;
 $font-icon-button-m: 16px;
-$base-font-icon-button: 18px;

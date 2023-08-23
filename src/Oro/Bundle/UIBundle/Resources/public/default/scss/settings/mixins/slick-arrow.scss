@@ -31,9 +31,9 @@
     $slick-arrow-prev-left: 0,
 
     $slick-arrow-icon-size: $base-font-size,
-    $slick-arrow-icon-color: get-color('additional', 'middle'),
-    $slick-arrow-icon-hover-color: get-color('additional', 'dark'),
-    $slick-arrow-icon-focus-color: get-color('additional', 'dark'),
+    $slick-arrow-icon-color: get-color('additional-old', 'middle'),
+    $slick-arrow-icon-hover-color: get-color('additional-old', 'dark'),
+    $slick-arrow-icon-focus-color: get-color('additional-old', 'dark'),
     $slick-arrow-icon-display: block,
 
     $slick-arrow-prev-icon: var(--fa-var-angle-left),
