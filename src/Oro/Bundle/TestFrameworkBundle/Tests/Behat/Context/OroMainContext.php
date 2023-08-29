@@ -66,6 +66,9 @@ class OroMainContext extends MinkContext implements
     /** @var bool */
     private $debug = false;
 
+    /** @var string */
+    private $rememberedURL = '';
+
     /**
      * @BeforeScenario
      */
@@ -2879,5 +2882,26 @@ JS;
         if ($this->isElementVisible($button)) {
             $this->pressButton($button);
         }
+    }
+
+    /**
+     * And I remember current URL
+     *
+     * @Then /^(?:|I )remember current URL$/
+     */
+    public function rememberURL(): void
+    {
+        $session = $this->getMink()->getSession();
+        $this->rememberedURL = $session->getCurrentUrl();
+    }
+
+    /**
+     * And I follow remembered URL
+     *
+     * @Then /^(?:|I )follow remembered URL$/
+     */
+    public function followRememberedUrl(): void
+    {
+        $this->visitPath($this->rememberedURL);
     }
 }

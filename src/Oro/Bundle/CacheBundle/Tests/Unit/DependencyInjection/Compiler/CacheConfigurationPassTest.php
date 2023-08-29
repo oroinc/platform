@@ -193,6 +193,31 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testEnsureCacheNamespaceIsCorrect()
+    {
+        $container = new ContainerBuilder();
+        $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
+
+        $myCacheNamespace = 'my_test_namespace';
+        $serviceCacheDef = new ChildDefinition(CacheConfigurationPass::DATA_CACHE_POOL);
+        $serviceCacheDef->addTag('cache.pool', ['namespace' => $myCacheNamespace]);
+        $persistentCacheService = new ChildDefinition('oro_cache.data.adapter');
+        $childDefinitions = [
+            new ChildDefinition('oro.cache.provider.memory_cache.cache'),
+            $persistentCacheService->addArgument($myCacheNamespace)
+        ];
+        $serviceCacheDef->addArgument($childDefinitions);
+        $container->setDefinition('my_cache_service', $serviceCacheDef);
+
+        $compiler = new CacheConfigurationPass();
+        $compiler->process($container);
+
+        $resultCacheDef = $container->getDefinition('my_cache_service');
+        $resultPersistentCacheService = $resultCacheDef->getArgument(0)[1];
+
+        $this->assertEquals($myCacheNamespace, $resultPersistentCacheService->getArgument(0));
+    }
+
     /**
      * @param string $path
      *

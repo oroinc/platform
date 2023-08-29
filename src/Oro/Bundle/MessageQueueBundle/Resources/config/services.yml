@@ -194,6 +194,6 @@ services:
             - !tagged_locator { tag: oro_message_queue.topic, index_by: topicName, default_index_method: getName }
 
     oro_message_queue.interrupt_consumption.cache:
-        parent: oro.data.cache
+        parent: oro.data.cache.without_memory_cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_message_queue_interrupt_consumption' }

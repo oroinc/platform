@@ -82,7 +82,7 @@ class DatagridExportConnectorTest extends \PHPUnit\Framework\TestCase
         $this->connector->count();
 
         self::assertEquals($batchSize, $this->connector->xgetPageSize());
-        self::assertEquals(1, $this->connector->xgetPage());
+        self::assertEquals(2, $this->connector->xgetPage());
         self::assertEquals(['id'], $context->getValue('columns'));
     }
 

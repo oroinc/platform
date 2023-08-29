@@ -117,7 +117,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
     {
         $searchFields = $this->getSearchFields($this->getMetadata());
 
-        $qb = $this->getListQueryBuilder(10, 1, [], null, []);
+        $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
         if (!empty($searchQuery)) {
             foreach ($searchFields as $searchField) {
                 QueryBuilderUtil::checkIdentifier($searchField);
