@@ -101,6 +101,7 @@ class OroAssetsBuildCommand extends Command
             ->addOption('with-babel', null, InputOption::VALUE_NONE, 'Transpile code with Babel')
             ->addOption('skip-sourcemap', null, InputOption::VALUE_NONE, 'Skip building source maps')
             ->addOption('skip-rtl', null, InputOption::VALUE_NONE, 'Skip building RTL styles')
+            ->addOption('skip-svg', null, InputOption::VALUE_NONE, 'Skip building SVG sprite')
             ->addOption('analyze', null, InputOption::VALUE_NONE, 'Run BundleAnalyzerPlugin')
         ;
         $this
@@ -155,14 +156,15 @@ in <comment>vendor/oro/platform/build</comment> folder. It may be required when
 
   <info>php %command.full_name% --npm-install</info>
 
-The <info>--skip-css</info>, <info>--skip-js</info>, <info>--with-babel</info>, <info>--skip-sourcemap</info> and <info>--skip-rtl</info> options allow to
+The <info>--skip-css</info>, <info>--skip-js</info>, <info>--with-babel</info>, <info>--skip-sourcemap</info> and <info>--skip-rtl</info> <info>--skip-svg</info> options allow to
 skip building CSS and JavaScript files, and transpiling Javascript with Babel,
-skip building sourcemaps and skip building RTL styles respectively:
+skip building sourcemaps, and skip building RTL styles and skip building SVG sprite respectively:
 
   <info>php %command.full_name% --skip-css</info>
   <info>php %command.full_name% --skip-js</info>
   <info>php %command.full_name% --skip-sourcemap</info>
   <info>php %command.full_name% --skip-rtl</info>
+  <info>php %command.full_name% --skip-svg</info>
   <info>php %command.full_name% --with-babel</info>
 
 The <info>--analyze</info> option can be used to run BundleAnalyzerPlugin:
@@ -192,6 +194,7 @@ HELP
             ->addUsage('--skip-js')
             ->addUsage('--skip-sourcemap')
             ->addUsage('--skip-rtl')
+            ->addUsage('--skip-svg')
             ->addUsage('--with-babel')
             ->addUsage('--analyze')
         ;
@@ -308,6 +311,9 @@ HELP
         }
         if ($input->getOption('skip-rtl')) {
             $command[] = 'skipRTL';
+        }
+        if ($input->getOption('skip-svg')) {
+            $command[] = 'skipSVG';
         }
         if ($input->getOption('analyze')) {
             $command[] = 'analyze';

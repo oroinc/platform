@@ -64,16 +64,17 @@ class OroMainContext extends MinkContext implements
     use AppKernelAwareTrait;
     use ScreenshotTrait;
 
-    const SKIP_WAIT_PATTERN = '/'.
-        '^(?:|I )should see .+ flash message$|'.
-        '^(?:|I )should see .+ flash message and I close it$|'.
-        '^(?:|I )should see .+ error message$|'.
-        '^(?:|I )should see success message with number of records were deleted$|'.
-        '^(?:|I )should see Schema updated flash message$'.
+    const SKIP_WAIT_PATTERN = '/' .
+        '^(?:|I )should see .+ flash message$|' .
+        '^(?:|I )should see .+ flash message and I close it$|' .
+        '^(?:|I )should see .+ error message$|' .
+        '^(?:|I )should see success message with number of records were deleted$|' .
+        '^(?:|I )should see Schema updated flash message$' .
     '/';
 
     private ?Stopwatch $stopwatch = null;
     private bool $debug = false;
+    private string $rememberedURL = '';
 
     /**
      * @BeforeScenario
@@ -3102,6 +3103,58 @@ JS;
         $this->assertSession()->pageTextMatches($this->fixStepArgument($pattern));
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should not see "Product 1" and continue checking the condition is met for maximum 10 seconds
+     *
+     * @Then /^(?:|I )should not see "(?P<text>.*)" and continue checking the condition is met for maximum (?P<number>\d+) seconds$/
+     */
+    public function assertPageNotContainsTextWithWait($number, $text)
+    {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            try {
+                $context->assertSession()->pageTextNotContains($this->fixStepArgument($text));
+
+                return true;
+            } catch (\Exception $e) {
+                $this->getSession()->reload();
+
+                return false;
+            }
+        }, $number, 2000000);
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was found in the text of the current page.', $text)
+        );
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should see "Product 1" and continue checking the condition is met for maximum 10 seconds
+     *
+     * @Then /^(?:|I )should see "(?P<text>.*)" and continue checking the condition is met for maximum (?P<number>\d+) seconds$/
+     */
+    public function assertPageContainsTextWithWait($number, $text)
+    {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            try {
+                $context->assertSession()->pageTextContains($this->fixStepArgument($text));
+
+                return true;
+            } catch (\Exception $e) {
+                $this->getSession()->reload();
+
+                return false;
+            }
+        }, $number, 2000000);
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was not found in the text of the current page.', $text)
+        );
+    }
+
     /**
      * Checks, that all resources of a given type are versioned
      * Example: I should be sure that all "json" are versioned
@@ -3175,6 +3228,27 @@ JS;
         if ($this->isElementVisible($button)) {
             $this->pressButton($button);
         }
+    }
+
+    /**
+     * And I remember current URL
+     *
+     * @Then /^(?:|I )remember current URL$/
+     */
+    public function rememberURL(): void
+    {
+        $session = $this->getMink()->getSession();
+        $this->rememberedURL = $session->getCurrentUrl();
+    }
+
+    /**
+     * And I follow remembered URL
+     *
+     * @Then /^(?:|I )follow remembered URL$/
+     */
+    public function followRememberedUrl(): void
+    {
+        $this->visitPath($this->rememberedURL);
     }
 
     /**
