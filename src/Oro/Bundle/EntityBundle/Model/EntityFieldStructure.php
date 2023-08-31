@@ -11,6 +11,9 @@ class EntityFieldStructure
     private $name;
 
     /** @var string */
+    private $normalizedName;
+
+    /** @var string */
     private $type;
 
     /** @var string */
@@ -39,6 +42,22 @@ class EntityFieldStructure
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNormalizedName()
+    {
+        return $this->normalizedName;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setNormalizedName($normalizedName)
+    {
+        $this->normalizedName = $normalizedName;
     }
 
     /**
@@ -150,6 +169,7 @@ class EntityFieldStructure
     {
         return [
             $this->name,
+            $this->normalizedName,
             $this->type,
             $this->label,
             $this->relationType,
@@ -162,6 +182,7 @@ class EntityFieldStructure
     {
         [
             $this->name,
+            $this->normalizedName,
             $this->type,
             $this->label,
             $this->relationType,

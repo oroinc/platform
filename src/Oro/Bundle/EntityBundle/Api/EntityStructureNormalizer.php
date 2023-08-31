@@ -42,6 +42,7 @@ class EntityStructureNormalizer
         foreach ($fields as $field) {
             $result[] = [
                 'name'              => $field->getName(),
+                'normalizedName'    => $field->getNormalizedName(),
                 'label'             => $field->getLabel(),
                 'type'              => $field->getType(),
                 'relationType'      => $field->getRelationType(),
