@@ -419,6 +419,18 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_input, requestType: json_api, priority: 90 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_input, requestType: json_api, priority: 90 }
 
+    oro_api.json_api.set_operation_flags:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetOperationFlags
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: 50 }
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 50 }
+
+    oro_api.json_api.disable_update_operation:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\DisableUpdateOperation
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api&!batch, priority: 47 }
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api&!batch, priority: 47 }
+
     oro_api.json_api.validate_included_data_dependencies:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateIncludedDataDependencies
         tags:
@@ -432,11 +444,13 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_instantiator'
-            - '@oro_api.entity_loader'
+            - '@oro_api.acl_protected_entity_loader'
             - '@oro_api.value_normalizer'
             - '@oro_api.entity_id_transformer_registry'
             - '@oro_api.config_provider'
             - '@oro_api.metadata_provider'
+            - '@oro_api.upsert_criteria_builder'
+            - '@oro_api.entity_id_helper'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -45 }
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -45 }
@@ -785,8 +799,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntity
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.entity_id_helper'
-            - '@oro_api.query_acl_helper'
+            - '@oro_api.acl_protected_entity_loader'
         tags:
             - { name: oro.api.processor, action: delete, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: update, group: load_data, priority: -10 }
@@ -795,8 +808,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadParentEntity
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.entity_id_helper'
-            - '@oro_api.query_acl_helper'
+            - '@oro_api.acl_protected_entity_loader'
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: load_data, priority: -10 }
@@ -1293,6 +1305,14 @@ services:
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: options, group: normalize_result, priority: -20 }
+
+    oro_api.rest.set_http_response_status_code_for_form_action:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCodeForFormAction
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, priority: -29 }
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, priority: -29 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest, priority: -29 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_result, requestType: rest, priority: -29 }
 
     oro_api.rest.set_http_response_status_code:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode

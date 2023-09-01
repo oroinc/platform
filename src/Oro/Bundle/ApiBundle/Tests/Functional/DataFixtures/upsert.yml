@@ -1,0 +1,115 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+
+Oro\Bundle\OrganizationBundle\Entity\Organization:
+    another_organization:
+        name: 'Another Organization'
+        enabled: true
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
+    test_custom_id1:
+        key: 'item 1'
+        name: 'Item 1'
+    test_custom_id2:
+        key: 'item 2'
+        name: 'Item 2'
+    test_custom_id3:
+        key: 'item 3'
+        name: 'Item 3'
+        parent: '@test_custom_id1'
+        children: ['@test_custom_id2']
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIntIdentifier:
+    test_custom_int_id1:
+        key: 10
+        name: 'Item 1'
+        organization: '@organization'
+    test_custom_int_id2:
+        key: 20
+        name: 'Item 2'
+        organization: '@organization'
+    test_custom_int_id3:
+        key: 30
+        name: 'Item 3'
+        parent: '@test_custom_int_id1'
+        children: ['@test_custom_int_id2']
+        organization: '@organization'
+    test_custom_int_id4:
+        key: 40
+        name: 'Item 4'
+        organization: '@another_organization'
+    test_custom_int_id5:
+        key: 50
+        name: 'Item 5'
+        children: ['@test_custom_int_id4']
+        organization: '@organization'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomCompositeIdentifier:
+    test_custom_composite_id1:
+        key1: 'item 1'
+        key2: 10
+        name: 'Item 1'
+    test_custom_composite_id2:
+        key1: 'item 2'
+        key2: 20
+        name: 'Item 2'
+    test_custom_composite_id3:
+        key1: 'item 3'
+        key2: 30
+        name: 'Item 3'
+        parent: '@test_custom_composite_id1'
+        children: ['@test_custom_composite_id2']
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestUniqueKeyIdentifier:
+    test_unique_key_id1:
+        key1: 'item 1'
+        key2: 10
+        key3: 'item 1'
+        key4: 10
+        key5: 'item 1'
+        key6: 'item 1'
+        key7: 'item 1'
+        name: 'Item 1'
+        organization: '@organization'
+    test_unique_key_id2:
+        key1: 'item 2'
+        key2: 20
+        key3: 'item 2'
+        key4: 20
+        key5: 'item 2'
+        key6: 'item 2'
+        key7: 'item 1'
+        name: 'Item 2'
+        organization: '@organization'
+    test_unique_key_id3:
+        key1: 'item 3'
+        key2: 30
+        key3: 'item 3'
+        key4: 30
+        key5: 'item 3'
+        key6: 'item 3'
+        name: 'Item 3'
+        parent: '@test_unique_key_id1'
+        children: ['@test_unique_key_id2']
+        organization: '@organization'
+    test_unique_key_id4:
+        key1: 'item 4'
+        key2: 40
+        key3: 'item 4'
+        key4: 40
+        key5: 'item 4'
+        key6: 'item 4'
+        key7: 'item 4'
+        name: 'Item 4'
+        organization: '@another_organization'
+    test_unique_key_id5:
+        key1: 'item 5'
+        key2: 50
+        key3: 'item 5'
+        key4: 50
+        key5: 'item 5'
+        key6: 'item 5'
+        key7: 'item 5'
+        name: 'Item 5'
+        children: ['@test_unique_key_id4']
+        organization: '@organization'

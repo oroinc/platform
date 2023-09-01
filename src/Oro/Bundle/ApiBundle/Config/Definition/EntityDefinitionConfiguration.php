@@ -10,6 +10,12 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
 {
+    private const UPSERT = 'upsert';
+    private const UPSERT_DISABLE = 'disable';
+    private const UPSERT_ADD = 'add';
+    private const UPSERT_REMOVE = 'remove';
+    private const UPSERT_REPLACE = 'replace';
+
     /**
      * {@inheritDoc}
      */
@@ -41,6 +47,17 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
                 ->end()
                 ->prototype('scalar')->cannotBeEmpty()->end()
             ->end();
+
+        /** @var NodeBuilder $upsertNode */
+        $upsertNode = $node
+            ->arrayNode(self::UPSERT)
+                ->treatFalseLike([self::UPSERT_DISABLE => true])
+                ->treatTrueLike([self::UPSERT_DISABLE => false])
+                ->children()
+                    ->booleanNode(self::UPSERT_DISABLE)->end();
+        $this->appendArrayOfNotEmptyStrings($upsertNode, self::UPSERT_ADD);
+        $this->appendArrayOfNotEmptyStrings($upsertNode, self::UPSERT_REMOVE);
+        $this->appendArrayOfNotEmptyStrings($upsertNode, self::UPSERT_REPLACE);
     }
 
     /**
@@ -61,6 +78,17 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         if (empty($config[ConfigUtil::DISABLE_META_PROPERTIES])) {
             unset($config[ConfigUtil::DISABLE_META_PROPERTIES]);
         }
+        if (\array_key_exists(self::UPSERT, $config)) {
+            if (empty($config[self::UPSERT][self::UPSERT_ADD])) {
+                unset($config[self::UPSERT][self::UPSERT_ADD]);
+            }
+            if (empty($config[self::UPSERT][self::UPSERT_REMOVE])) {
+                unset($config[self::UPSERT][self::UPSERT_REMOVE]);
+            }
+            if (empty($config[self::UPSERT][self::UPSERT_REPLACE])) {
+                unset($config[self::UPSERT][self::UPSERT_REPLACE]);
+            }
+        }
 
         return $config;
     }
@@ -73,5 +101,27 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         parent::configureFieldNode($node);
         $node
             ->booleanNode(ConfigUtil::META_PROPERTY)->end();
+    }
+
+    private function appendArrayOfNotEmptyStrings(NodeBuilder $node, string $name): void
+    {
+        $node->arrayNode($name)
+            ->variablePrototype()
+                ->validate()
+                    ->always(function (mixed $value) {
+                        if (!\is_array($value)) {
+                            throw new \InvalidArgumentException(sprintf(
+                                'Expected "array", but got "%s"',
+                                get_debug_type($value)
+                            ));
+                        }
+                        foreach ($value as $val) {
+                            if (!\is_string($val) || '' === $val) {
+                                throw new \InvalidArgumentException('Expected array of not empty strings');
+                            }
+                        }
+
+                        return $value;
+                    });
     }
 }

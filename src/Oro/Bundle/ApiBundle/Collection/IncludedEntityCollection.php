@@ -79,7 +79,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      */
     public function add(object $entity, string $entityClass, mixed $entityId, IncludedEntityData $data): void
     {
-        $key = $this->buildKey($entityClass, $entityId);
+        $key = self::buildKey($entityClass, $entityId);
         $this->collection->add($entity, $key, $data);
         $this->keys[$key] = [$entityClass, $entityId];
     }
@@ -89,7 +89,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      */
     public function remove(string $entityClass, mixed $entityId): void
     {
-        $key = $this->buildKey($entityClass, $entityId);
+        $key = self::buildKey($entityClass, $entityId);
         $this->collection->removeKey($key);
         unset($this->keys[$key]);
     }
@@ -124,7 +124,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      */
     public function contains(string $entityClass, mixed $entityId): bool
     {
-        return $this->collection->containsKey($this->buildKey($entityClass, $entityId));
+        return $this->collection->containsKey(self::buildKey($entityClass, $entityId));
     }
 
     /**
@@ -132,7 +132,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      */
     public function get(string $entityClass, mixed $entityId): ?object
     {
-        return $this->collection->get($this->buildKey($entityClass, $entityId));
+        return $this->collection->get(self::buildKey($entityClass, $entityId));
     }
 
     /**
@@ -185,8 +185,17 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
         return new \ArrayIterator(array_values($this->collection->getAll()));
     }
 
-    private function buildKey(string $entityClass, mixed $entityId): string
+    private static function buildKey(string $entityClass, mixed $entityId): string
     {
-        return $entityClass . ':' . (string)$entityId;
+        return $entityClass . ':' . self::convertEntityIdToString($entityId);
+    }
+
+    private static function convertEntityIdToString(mixed $entityId): string
+    {
+        if (\is_array($entityId)) {
+            return json_encode($entityId, JSON_THROW_ON_ERROR);
+        }
+
+        return (string)$entityId;
     }
 }

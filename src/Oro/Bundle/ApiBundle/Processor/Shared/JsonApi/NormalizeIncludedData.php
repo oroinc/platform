@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
+use Doctrine\ORM\NonUniqueResultException;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
@@ -14,43 +16,55 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\AclProtectedEntityLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
-use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Oro\Bundle\ApiBundle\Util\MetaOperationParser;
+use Oro\Bundle\ApiBundle\Util\UpsertCriteriaBuilder;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Loads data from "included" section of the request data to the context.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class NormalizeIncludedData implements ProcessorInterface
 {
     private DoctrineHelper $doctrineHelper;
     private EntityInstantiator $entityInstantiator;
-    private EntityLoader $entityLoader;
+    private AclProtectedEntityLoader $entityLoader;
     private ValueNormalizer $valueNormalizer;
     private EntityIdTransformerRegistry $entityIdTransformerRegistry;
     private ConfigProvider $configProvider;
     private MetadataProvider $metadataProvider;
+    private UpsertCriteriaBuilder $upsertCriteriaBuilder;
+    private EntityIdHelper $entityIdHelper;
     private ?FormContext $context = null;
-    /** @var EntityMetadata[]|null */
-    private ?array $entityMetadata = null;
+    /** @var EntityDefinitionConfig[] */
+    private array $entityConfig = [];
+    /** @var EntityMetadata[] */
+    private array $entityMetadata = [];
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityInstantiator $entityInstantiator,
-        EntityLoader $entityLoader,
+        AclProtectedEntityLoader $entityLoader,
         ValueNormalizer $valueNormalizer,
         EntityIdTransformerRegistry $entityIdTransformerRegistry,
         ConfigProvider $configProvider,
-        MetadataProvider $metadataProvider
+        MetadataProvider $metadataProvider,
+        UpsertCriteriaBuilder $upsertCriteriaBuilder,
+        EntityIdHelper $entityIdHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityInstantiator = $entityInstantiator;
@@ -59,10 +73,12 @@ class NormalizeIncludedData implements ProcessorInterface
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
         $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
+        $this->upsertCriteriaBuilder = $upsertCriteriaBuilder;
+        $this->entityIdHelper = $entityIdHelper;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -83,7 +99,6 @@ class NormalizeIncludedData implements ProcessorInterface
         }
 
         $this->context = $context;
-        $this->entityMetadata = [];
         try {
             $includedEntities = $this->loadIncludedEntities($includedData);
             if (null !== $includedEntities) {
@@ -92,7 +107,8 @@ class NormalizeIncludedData implements ProcessorInterface
             }
         } finally {
             $this->context = null;
-            $this->entityMetadata = null;
+            $this->entityConfig = [];
+            $this->entityMetadata = [];
         }
     }
 
@@ -113,40 +129,172 @@ class NormalizeIncludedData implements ProcessorInterface
     private function loadIncludedEntities(array $includedData): ?IncludedEntityCollection
     {
         $includedEntities = new IncludedEntityCollection();
-
         $includedPointer = $this->buildPointer('', JsonApiDoc::INCLUDED);
         foreach ($includedData as $index => $data) {
             $pointer = $this->buildPointer($includedPointer, $index);
             $data = $this->getDataProperty($data, $pointer);
-            $entityClass = $this->getEntityClass(
-                $this->buildPointer($pointer, JsonApiDoc::TYPE),
-                $data[JsonApiDoc::TYPE]
+            $entityClass = $this->getEntityClass($data[JsonApiDoc::TYPE], $pointer);
+            if (null === $entityClass) {
+                continue;
+            }
+            $operationFlags = $this->getOperationFlags($data, $pointer);
+            if (null === $operationFlags) {
+                continue;
+            }
+            [$updateFlag, $upsertFlag] = $operationFlags;
+            $entityId = $data[JsonApiDoc::ID] ?? null;
+            if (null !== $entityId) {
+                $entityId = $this->resolveEntityId($entityClass, $entityId, $pointer, $updateFlag, $upsertFlag);
+            }
+
+            $this->loadIncludedEntity(
+                $includedEntities,
+                $entityClass,
+                $entityId,
+                $updateFlag,
+                $upsertFlag,
+                $data,
+                $index,
+                $pointer
             );
-            if (null !== $entityClass) {
-                $updateFlag = $this->getUpdateFlag($pointer, $data);
-                if (null !== $updateFlag) {
-                    $entityId = $this->getEntityId(
-                        $this->buildPointer($pointer, JsonApiDoc::ID),
-                        $entityClass,
-                        $data[JsonApiDoc::ID],
-                        $updateFlag
-                    );
-                    if (null !== $entityId) {
-                        $entity = $this->getEntity($pointer, $entityClass, $entityId, $updateFlag);
-                        if (null !== $entity) {
-                            $includedEntities->add(
-                                $entity,
-                                $entityClass,
-                                $entityId,
-                                new IncludedEntityData($pointer, $index, $updateFlag)
-                            );
+        }
+
+        return !$this->context->hasErrors()
+            ? $includedEntities
+            : null;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    private function loadIncludedEntity(
+        IncludedEntityCollection $includedEntities,
+        string $entityClass,
+        mixed $entityId,
+        ?bool $updateFlag,
+        bool|array|null $upsertFlag,
+        array $data,
+        int $index,
+        string $pointer
+    ): void {
+        $entity = null;
+        $isExistingEntity = false;
+        $targetAction = null;
+        if (\is_array($upsertFlag)) {
+            $config = $this->getEntityConfig($entityClass, true);
+            $upsertConfig = $config->getUpsertConfig();
+            if (!$upsertConfig->isEnabled()) {
+                $this->addUpsertFlagValidationError($pointer, 'The upsert operation is not allowed.');
+            } else {
+                $hasErrors = false;
+                $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
+                if ($resolvedEntityClass) {
+                    if ($upsertConfig->isAllowedFields($upsertFlag)) {
+                        $metadata = $this->getEntityMetadata($entityClass, true);
+                        $criteria = $this->getUpsertFindEntityCriteria($metadata, $upsertFlag, $data, $pointer);
+                        if (null === $criteria) {
+                            $hasErrors = true;
+                        } else {
+                            try {
+                                $entity = $this->entityLoader->findEntityBy(
+                                    $resolvedEntityClass,
+                                    $criteria,
+                                    $config,
+                                    $metadata,
+                                    $this->context->getRequestType()
+                                );
+                            } catch (AccessDeniedException $e) {
+                                $hasErrors = true;
+                                $this->addAccessDeniedValidationError($e, $pointer);
+                            } catch (NonUniqueResultException) {
+                                $hasErrors = true;
+                                $this->addNonUniqueResultValidationError($pointer);
+                            }
+                            if (null !== $entity) {
+                                $isExistingEntity = true;
+                                $targetAction = ApiAction::CREATE;
+                                if (null === $entityId) {
+                                    $entityId = $this->entityIdHelper->getEntityIdentifier($entity, $metadata);
+                                }
+                            }
                         }
+                    } else {
+                        $hasErrors = true;
+                        $this->addUpsertFlagValidationError(
+                            $pointer,
+                            $this->getUpsertByFieldsIsNotAllowedErrorMessage($upsertFlag)
+                        );
+                    }
+                } else {
+                    $hasErrors = true;
+                    $this->addValueValidationError($pointer, 'Only manageable entity can be updated.');
+                }
+                if (null === $entity && !$hasErrors) {
+                    $entity = $this->createNewEntity($entityClass);
+                }
+            }
+        } elseif (null !== $entityId) {
+            $hasErrors = false;
+            if ($updateFlag || $upsertFlag) {
+                if ($upsertFlag) {
+                    $upsertConfig = $this->getEntityConfig($entityClass, true)->getUpsertConfig();
+                    if (!$upsertConfig->isEnabled()) {
+                        $hasErrors = true;
+                        $this->addUpsertFlagValidationError($pointer, 'The upsert operation is not allowed.');
+                    } elseif (!$upsertConfig->isAllowedById()) {
+                        $hasErrors = true;
+                        $this->addUpsertFlagValidationError(
+                            $pointer,
+                            'The upsert operation cannot use the entity identifier to find an entity.'
+                        );
+                    }
+                }
+                if (!$hasErrors) {
+                    $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
+                    if ($resolvedEntityClass) {
+                        try {
+                            $entity = $this->entityLoader->findEntity(
+                                $resolvedEntityClass,
+                                $entityId,
+                                $this->getEntityConfig($entityClass),
+                                $this->getEntityMetadata($resolvedEntityClass),
+                                $this->context->getRequestType()
+                            );
+                        } catch (AccessDeniedException $e) {
+                            $hasErrors = true;
+                            $this->addAccessDeniedValidationError($e, $pointer);
+                        } catch (NonUniqueResultException) {
+                            $hasErrors = true;
+                            $this->addNonUniqueResultValidationError($pointer);
+                        }
+                        if (!$hasErrors) {
+                            if (null !== $entity) {
+                                $isExistingEntity = true;
+                            } elseif ($updateFlag) {
+                                $hasErrors = true;
+                                $this->addValidationError(Constraint::ENTITY, $pointer, 'The entity does not exist.');
+                            }
+                        }
+                    } else {
+                        $hasErrors = true;
+                        $this->addValueValidationError($pointer, 'Only manageable entity can be updated.');
                     }
                 }
             }
+            if (null === $entity && !$updateFlag && !$hasErrors) {
+                $entity = $this->createNewEntity($entityClass);
+            }
         }
-
-        return !$this->context->hasErrors() ? $includedEntities : null;
+        if (null !== $entity) {
+            $includedEntities->add(
+                $entity,
+                $entityClass,
+                $entityId,
+                new IncludedEntityData($pointer, $index, $isExistingEntity, $targetAction)
+            );
+        }
     }
 
     private function getDataProperty(mixed $data, string $pointer): array
@@ -173,26 +321,22 @@ class NormalizeIncludedData implements ProcessorInterface
         return $data;
     }
 
-    private function getUpdateFlag(string $pointer, array $data): ?bool
+    private function getOperationFlags(array $data, string $pointer): ?array
     {
-        if (empty($data[JsonApiDoc::META]) || !\array_key_exists(JsonApiDoc::META_UPDATE, $data[JsonApiDoc::META])) {
-            return false;
-        }
+        $meta = !empty($data[JsonApiDoc::META]) && \is_array($data[JsonApiDoc::META])
+            ? $data[JsonApiDoc::META]
+            : [];
 
-        $flag = $data[JsonApiDoc::META][JsonApiDoc::META_UPDATE];
-        if (true !== $flag && false !== $flag) {
-            $this->addValidationError(
-                Constraint::VALUE,
-                $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), JsonApiDoc::META_UPDATE),
-                'This value should be boolean.'
-            );
-            $flag = null;
-        }
-
-        return $flag;
+        return MetaOperationParser::getOperationFlags(
+            $meta,
+            JsonApiDoc::META_UPDATE,
+            JsonApiDoc::META_UPSERT,
+            $this->buildPointer($pointer, JsonApiDoc::META),
+            $this->context
+        );
     }
 
-    private function getEntityClass(string $pointer, string $entityType): ?string
+    private function getEntityClass(string $entityType, string $pointer): ?string
     {
         $entityClass = ValueNormalizerUtil::tryConvertToEntityClass(
             $this->valueNormalizer,
@@ -203,22 +347,38 @@ class NormalizeIncludedData implements ProcessorInterface
             return $entityClass;
         }
 
-        $this->addValidationError(Constraint::ENTITY_TYPE, $pointer, sprintf('Unknown entity type: %s.', $entityType));
+        $this->addValidationError(
+            Constraint::ENTITY_TYPE,
+            $this->buildPointer($pointer, JsonApiDoc::TYPE),
+            sprintf('Unknown entity type: %s.', $entityType)
+        );
 
         return null;
     }
 
-    private function getEntityId(string $pointer, string $entityClass, mixed $entityId, bool $updateFlag): mixed
-    {
-        if (!$updateFlag) {
-            return $entityId;
+    private function resolveEntityId(
+        string $entityClass,
+        mixed $entityId,
+        string $pointer,
+        ?bool $updateFlag,
+        bool|array|null $upsertFlag
+    ): mixed {
+        if ($updateFlag) {
+            $entityId = $this->normalizeEntityId($entityClass, $entityId, $pointer);
+        } elseif (true === $upsertFlag && !$this->getEntityMetadata($entityClass)->hasIdentifierGenerator()) {
+            $entityId = $this->normalizeEntityId($entityClass, $entityId, $pointer);
         }
 
+        return $entityId;
+    }
+
+    private function normalizeEntityId(string $entityClass, mixed $entityId, string $pointer): mixed
+    {
         try {
             return $this->getEntityIdTransformer($this->context->getRequestType())
                 ->reverseTransform($entityId, $this->getEntityMetadata($entityClass));
         } catch (\Exception $e) {
-            $this->addValidationError(Constraint::ENTITY_ID, $pointer)
+            $this->addValidationError(Constraint::ENTITY_ID, $this->buildPointer($pointer, JsonApiDoc::ID))
                 ->setInnerException($e);
         }
 
@@ -230,56 +390,99 @@ class NormalizeIncludedData implements ProcessorInterface
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
-    private function getEntity(string $pointer, string $entityClass, mixed $entityId, bool $updateFlag): ?object
-    {
-        $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
-
-        if ($updateFlag) {
-            if ($resolvedEntityClass) {
-                return $this->getExistingEntity($pointer, $resolvedEntityClass, $entityId);
+    private function getUpsertFindEntityCriteria(
+        EntityMetadata $metadata,
+        array $identityFieldNames,
+        array $data,
+        string $pointer
+    ): ?array {
+        $entityData = [];
+        $attributes = $data[JsonApiDoc::ATTRIBUTES] ?? [];
+        $relationships = $data[JsonApiDoc::RELATIONSHIPS] ?? [];
+        foreach ($identityFieldNames as $fieldName) {
+            if (\array_key_exists($fieldName, $attributes)) {
+                $entityData[$fieldName] = $attributes[$fieldName];
+            } elseif (\array_key_exists($fieldName, $relationships)) {
+                $entityData[$fieldName] = $relationships[$fieldName];
             }
+        }
 
-            $this->addValidationError(Constraint::VALUE, $pointer, 'Only manageable entity can be updated.');
+        return $this->upsertCriteriaBuilder->getUpsertFindEntityCriteria(
+            $metadata,
+            $identityFieldNames,
+            $entityData,
+            $this->buildUpsertFlagPointer($pointer),
+            $this->context
+        );
+    }
 
+    private function createNewEntity(string $entityClass): object
+    {
+        $resolvedEntityClass = $this->resolveNewEntityClass($entityClass)
+            ?? $this->doctrineHelper->resolveManageableEntityClass($entityClass)
+            ?? $entityClass;
+
+        return $this->entityInstantiator->instantiate($resolvedEntityClass);
+    }
+
+    private function resolveNewEntityClass(string $entityClass): ?string
+    {
+        $formOptions = $this->getEntityConfig($entityClass, false, ApiAction::CREATE)->getFormOptions();
+        $formDataClass = $formOptions['data_class'] ?? null;
+        if (!$formDataClass || $formDataClass === $entityClass) {
             return null;
         }
 
-        return $this->entityInstantiator->instantiate($resolvedEntityClass ?? $entityClass);
+        return $formDataClass;
     }
 
-    private function getExistingEntity(string $pointer, string $entityClass, mixed $entityId): ?object
-    {
-        $entity = $this->entityLoader->findEntity($entityClass, $entityId, $this->getEntityMetadata($entityClass));
-        if (null === $entity) {
-            $this->addValidationError(Constraint::ENTITY, $pointer, 'The entity does not exist.');
+    private function getEntityConfig(
+        string $entityClass,
+        bool $full = false,
+        string $action = null
+    ): EntityDefinitionConfig {
+        $cacheKey = $entityClass . ($action ? ':' . $action : '') . ($full ? ':full' : '');
+        if (isset($this->entityConfig[$cacheKey])) {
+            return $this->entityConfig[$cacheKey];
         }
 
-        return $entity;
-    }
-
-    private function getEntityMetadata(string $entityClass): EntityMetadata
-    {
-        if (isset($this->entityMetadata[$entityClass])) {
-            return $this->entityMetadata[$entityClass];
+        $configExtras = [new EntityDefinitionConfigExtra($action)];
+        if (!$full) {
+            $configExtras[] = new FilterIdentifierFieldsConfigExtra();
         }
-
-        $version = $this->context->getVersion();
-        $requestType = $this->context->getRequestType();
         $config = $this->configProvider->getConfig(
             $entityClass,
-            $version,
-            $requestType,
-            [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
-        );
+            $this->context->getVersion(),
+            $this->context->getRequestType(),
+            $configExtras
+        )->getDefinition();
+        if (null === $config) {
+            throw new \RuntimeException(sprintf(
+                'The entity config for the "%s" entity was not found.',
+                $entityClass
+            ));
+        }
+
+        $this->entityConfig[$cacheKey] = $config;
+
+        return $config;
+    }
+
+    private function getEntityMetadata(string $entityClass, bool $full = false): EntityMetadata
+    {
+        $cacheKey = $entityClass . ($full ? ':full' : '');
+        if (isset($this->entityMetadata[$cacheKey])) {
+            return $this->entityMetadata[$cacheKey];
+        }
 
         $metadata = $this->metadataProvider->getMetadata(
             $entityClass,
-            $version,
-            $requestType,
-            $config->getDefinition()
+            $this->context->getVersion(),
+            $this->context->getRequestType(),
+            $this->getEntityConfig($entityClass, $full)
         );
 
-        $this->entityMetadata[$entityClass] = $metadata;
+        $this->entityMetadata[$cacheKey] = $metadata;
 
         return $metadata;
     }
@@ -289,17 +492,51 @@ class NormalizeIncludedData implements ProcessorInterface
         return $parentPointer . '/' . $property;
     }
 
-    private function addValidationError(string $title, ?string $pointer = null, ?string $detail = null): Error
+    private function buildUpsertFlagPointer(string $parentPointer): string
     {
-        $error = Error::createValidationError($title);
-        if (null !== $pointer) {
-            $error->setSource(ErrorSource::createByPointer($pointer));
-        }
-        if (null !== $detail) {
-            $error->setDetail($detail);
-        }
+        return $this->buildPointer($this->buildPointer($parentPointer, JsonApiDoc::META), JsonApiDoc::META_UPSERT);
+    }
+
+    private function addValidationError(string $title, string $pointer, ?string $detail = null): Error
+    {
+        $error = Error::createValidationError($title, $detail)
+            ->setSource(ErrorSource::createByPointer($pointer));
         $this->context->addError($error);
 
         return $error;
+    }
+
+    private function addValueValidationError(string $pointer, string $detail): void
+    {
+        $this->addValidationError(Constraint::VALUE, $pointer, $detail);
+    }
+
+    private function addUpsertFlagValidationError(string $pointer, string $detail): void
+    {
+        $this->addValueValidationError($this->buildUpsertFlagPointer($pointer), $detail);
+    }
+
+    private function addNonUniqueResultValidationError(string $pointer): void
+    {
+        $this->context->addError(
+            Error::createConflictValidationError(
+                'The upsert operation founds more than one entity.'
+            )->setSource(ErrorSource::createByPointer($pointer))
+        );
+    }
+
+    private function addAccessDeniedValidationError(AccessDeniedException $e, string $pointer): void
+    {
+        $this->context->addError(
+            Error::createByException($e)->setSource(ErrorSource::createByPointer($pointer))
+        );
+    }
+
+    private function getUpsertByFieldsIsNotAllowedErrorMessage(array $fieldNames): string
+    {
+        return
+            'The upsert operation cannot use '
+            . (\count($fieldNames) > 1 ? 'these fields' : 'this field')
+            . ' to find an entity.';
     }
 }

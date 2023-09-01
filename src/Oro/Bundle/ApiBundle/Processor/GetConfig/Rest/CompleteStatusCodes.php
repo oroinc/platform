@@ -127,6 +127,11 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
         );
         $this->addStatusCode(
             $statusCodes,
+            Response::HTTP_CREATED,
+            'Returned when the entity was successfully created'
+        );
+        $this->addStatusCode(
+            $statusCodes,
             Response::HTTP_BAD_REQUEST,
             'Returned when the request data is not valid'
         );
@@ -159,6 +164,11 @@ class CompleteStatusCodes extends AbstractCompleteStatusCodes
      */
     protected function addStatusCodesForCreate(StatusCodesConfig $statusCodes): void
     {
+        $this->addStatusCode(
+            $statusCodes,
+            Response::HTTP_OK,
+            'Returned when the entity was successfully updated'
+        );
         $this->addStatusCode(
             $statusCodes,
             Response::HTTP_CREATED,

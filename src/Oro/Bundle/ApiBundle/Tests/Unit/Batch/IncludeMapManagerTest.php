@@ -1185,7 +1185,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
 
         $expectedChunk1UpdatedData = '{"included":[null,{"type":"accounts","id":"a2","attributes":{"name":"a2"}}]}';
         $expectedChunk2UpdatedData = '{"included":[{"type":"accounts","id":"a3","attributes":{"name":"a3"}},null]}';
-        $expectedProcessedData = '{"accounts|a1":268,"accounts|a4":777}';
+        $expectedProcessedData = '{"accounts|a1":"268","accounts|a4":"777"}';
         $expectedIndexData = '{'
             . '"files":[["file1","included",0],["file2","included",2]],'
             . '"items":{"accounts|a2":[0,1],"accounts|a3":[1,0]}'
@@ -1207,8 +1207,8 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
             $this->fileManager,
             123,
             [
-                ['accounts', 'a1', 268],
-                ['accounts', 'a4', 777]
+                ['accounts', 'a1', '268'],
+                ['accounts', 'a4', '777']
             ]
         );
     }
@@ -1252,7 +1252,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $expectedChunk2UpdatedData = '{"included":[{"type":"accounts","id":"a3","attributes":{"name":"a3"}},null]}';
-        $expectedProcessedData = '{"accounts|a1":268,"accounts|a2":269,"accounts|a4":777}';
+        $expectedProcessedData = '{"accounts|a1":"268","accounts|a2":"269","accounts|a4":"777"}';
         $expectedIndexData = '{'
             . '"files":[["","included",0],["file2","included",2]],'
             . '"items":{"accounts|a3":[1,0]}'
@@ -1276,9 +1276,9 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
             $this->fileManager,
             123,
             [
-                ['accounts', 'a1', 268],
-                ['accounts', 'a2', 269],
-                ['accounts', 'a4', 777]
+                ['accounts', 'a1', '268'],
+                ['accounts', 'a2', '269'],
+                ['accounts', 'a4', '777']
             ]
         );
     }
@@ -1315,8 +1315,8 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
             $this->fileManager,
             123,
             [
-                ['accounts', 'a1', 268],
-                ['accounts', 'a4', 777]
+                ['accounts', 'a1', '268'],
+                ['accounts', 'a4', '777']
             ]
         );
     }

@@ -166,7 +166,7 @@ class CreateEntityTest extends FormProcessorTestCase
 
         self::assertNull($this->context->getResult());
         self::assertEquals(
-            [Error::createConflictValidationError('The entity already exists')],
+            [Error::createConflictValidationError('The entity already exists.')],
             $this->context->getErrors()
         );
     }
