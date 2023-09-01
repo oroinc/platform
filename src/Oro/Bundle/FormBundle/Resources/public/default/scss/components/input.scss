@@ -80,12 +80,7 @@
     }
 
     @include element-state('focus') {
-        border-color: $input-border-color-focus-state;
         box-shadow: $input-box-shadow-focus-state;
-    }
-
-    &.focus-visible:focus {
-        border-color: $input-border-color-focus-state;
     }
 
     @include element-state('error') {

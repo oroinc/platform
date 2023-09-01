@@ -30,7 +30,7 @@
         box-shadow: $select-box-shadow-focus-state;
     }
 
-    &.focus-visible {
+    &:focus-visible {
         border-color: $select-border-color-focus-state;
     }
 

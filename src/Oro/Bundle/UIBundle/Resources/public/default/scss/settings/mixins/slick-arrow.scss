@@ -23,7 +23,7 @@
     $slick-arrow-border: none,
     $slick-arrow-border-radius: null,
 
-    $slick-arrow-focus-visible: $base-ui-bth-focus-style,
+    $slick-arrow-focus-visible: $base-ui-element-focus-style,
 
     $slick-arrow-focus-background: null,
 
@@ -68,7 +68,7 @@
 
         cursor: pointer;
 
-        &.focus-visible {
+        &:focus-visible {
             box-shadow: $slick-arrow-focus-visible;
         }
 

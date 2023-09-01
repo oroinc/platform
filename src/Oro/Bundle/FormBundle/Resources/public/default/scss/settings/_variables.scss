@@ -20,11 +20,8 @@ $base-ui-element-height-size-m: 38px !default;
 $base-ui-element-arrow-color: get-color('additional-old', 'dark') !default;
 
 $base-ui-element-border-color-focus: transparent !default;
-$base-ui-element-focus-style: 0 0 0 2px get-color('ui', 'focus'),
-                              0 0 6px color.adjust(get-color('ui', 'normal'), $lightness: 1%) !default;
-$base-ui-bth-focus-style: 0 0 0 1px get-color('additional-old', 'ultra'),
-                          0 0 0 3px get-color('ui', 'focus'),
-                          0 0 6px color.adjust(get-color('ui', 'normal'), $lightness: 1%) !default;
+$base-ui-element-focus-style: 0 0 0 1px get-color('neutral', 'white-100'),
+                              0 0 0 3px get-color('neutral', 'focus') !default;
 $base-ui-popup-border-radius: $base-ui-element-border-radius !default;
 
 $base-ui-popup-background: get-color('additional-old', 'ultra') !default;

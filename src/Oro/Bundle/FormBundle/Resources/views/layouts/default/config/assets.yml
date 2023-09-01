@@ -13,7 +13,6 @@ styles:
         - 'bundles/oroform/default/scss/variables/textarea-config.scss'
         - 'bundles/oroform/default/scss/variables/label-config.scss'
         - 'bundles/oroform/default/scss/variables/form-row-config.scss'
-        - 'bundles/oroform/default/scss/variables/focus-visible-config.scss'
         - 'bundles/oroform/default/scss/variables/floating-validation-message-config.scss'
         - 'bundles/oroform/default/scss/variables/validation-config.scss'
 
@@ -27,7 +26,6 @@ styles:
         - 'bundles/oroform/default/scss/components/checkbox-label.scss'
         - 'bundles/oroform/default/scss/components/label.scss'
         - 'bundles/oroform/default/scss/components/form-row.scss'
-        - 'bundles/oroform/default/scss/components/focus-visible.scss'
         - 'bundles/oroform/default/scss/components/floating-validation-message.scss'
         - 'bundles/oroform/default/scss/components/input.scss'
         - 'bundles/oroform/default/scss/components/fake-masked-input.scss'

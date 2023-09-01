@@ -54,7 +54,6 @@
     &:focus {
         border-width: $checkbox-border-width-focus;
         border-color: $checkbox-border-color-focus;
-        box-shadow: $checkbox-box-shadow-focus;
     }
 
     &:disabled {

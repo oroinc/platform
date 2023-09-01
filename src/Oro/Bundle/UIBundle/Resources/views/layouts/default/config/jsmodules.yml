@@ -43,7 +43,6 @@ aliases:
 app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/component-shortcuts-module
-    - oroui/js/app/modules/focus-visible
     - oroui/js/app/modules/ignore-tabbable
     - oroui/js/app/modules/init-layout
     - oroui/js/app/modules/input-widgets

@@ -29,7 +29,7 @@
         box-shadow: $textarea-box-shadow-focus-state;
     }
 
-    &.focus-visible {
+    &:focus-visible {
         border-color: $textarea-border-color-focus-state;
     }
 
