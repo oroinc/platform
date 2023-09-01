@@ -13,6 +13,7 @@ api:
 
         Oro\Bundle\UserBundle\Entity\Role:
             documentation_resource: '@OroUserBundle/Resources/doc/api/role.md'
+            upsert: false
             actions:
                 update:
                     fields:

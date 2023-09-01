@@ -6,15 +6,14 @@ use Oro\Bundle\ApiBundle\Batch\ItemKeyBuilder;
 
 class ItemKeyBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ItemKeyBuilder */
-    private $itemKeyBuilder;
+    private ItemKeyBuilder $itemKeyBuilder;
 
     protected function setUp(): void
     {
         $this->itemKeyBuilder = new ItemKeyBuilder();
     }
 
-    public function testBuildItemKey()
+    public function testBuildItemKey(): void
     {
         self::assertEquals('type|id', $this->itemKeyBuilder->buildItemKey('type', 'id'));
     }

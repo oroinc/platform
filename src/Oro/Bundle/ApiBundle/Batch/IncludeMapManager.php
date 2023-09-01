@@ -232,7 +232,7 @@ class IncludeMapManager
      *
      * @param FileManager $fileManager
      * @param int         $operationId
-     * @param array       $dataToMove [[type, id, new id], ...]
+     * @param array       $dataToMove [[type, string representation of id, string representation of new id], ...]
      */
     public function moveToProcessed(FileManager $fileManager, int $operationId, array $dataToMove): void
     {

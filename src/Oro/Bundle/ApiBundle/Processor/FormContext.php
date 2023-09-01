@@ -25,6 +25,16 @@ interface FormContext extends ContextInterface, ChangeContextInterface
     public function setRequestData(array $requestData): void;
 
     /**
+     * Gets a value indicates whether an existing entity should be updated or new one should be created.
+     */
+    public function isExisting(): bool;
+
+    /**
+     * Sets a value indicates whether an existing entity should be updated or new one should be created.
+     */
+    public function setExisting(bool $existing): void;
+
+    /**
      * Returns additional data included into the request.
      */
     public function getIncludedData(): ?array;

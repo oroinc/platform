@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Form\Type\EntityType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -28,7 +29,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions([
                 new PreloadedExtension(
-                    [new EntityType($this->doctrineHelper, new EntityLoader($this->doctrine))],
+                    [new EntityType($this->doctrineHelper, new EntityLoader(new DoctrineHelper($this->doctrine)))],
                     []
                 )
             ])

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\JsonApi;
 use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\BatchUpdateItemContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Bundle\ApiBundle\Util\MetaOperationParser;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -14,7 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class SetTargetAction implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -22,15 +23,29 @@ class SetTargetAction implements ProcessorInterface
 
         $requestData = $context->getRequestData();
         if (\is_array($requestData) && \array_key_exists(JsonApiDoc::DATA, $requestData)) {
-            $action = ApiAction::CREATE;
             $data = $requestData[JsonApiDoc::DATA];
-            if (\is_array($data) && !empty($data[JsonApiDoc::META])) {
-                $meta = $data[JsonApiDoc::META];
-                if (\is_array($meta) && true === ($meta[JsonApiDoc::META_UPDATE] ?? null)) {
-                    $action = ApiAction::UPDATE;
-                }
-            }
-            $context->setTargetAction($action);
+            $context->setTargetAction(
+                \is_array($data) && !empty($data[JsonApiDoc::META]) && \is_array($data[JsonApiDoc::META])
+                    ? $this->getTargetAction($data[JsonApiDoc::META])
+                    : ApiAction::CREATE
+            );
         }
+    }
+
+    private function getTargetAction(array $meta): string
+    {
+        $operationFlags = MetaOperationParser::getOperationFlags(
+            $meta,
+            JsonApiDoc::META_UPDATE,
+            JsonApiDoc::META_UPSERT
+        );
+
+        if (null === $operationFlags) {
+            return ApiAction::CREATE;
+        }
+
+        return $operationFlags[0] || true === $operationFlags[1]
+            ? ApiAction::UPDATE
+            : ApiAction::CREATE;
     }
 }

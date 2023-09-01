@@ -24,6 +24,11 @@ class SetEntityIdToContext implements ProcessorInterface
             return;
         }
 
+        if ($context->isExisting()) {
+            // the setting of an entity identifier to the context is needed only for a new entity
+            return;
+        }
+
         $entity = $context->getResult();
         if (null === $entity) {
             // the entity does not exist

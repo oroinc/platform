@@ -62,7 +62,7 @@ class CreateEntity implements ProcessorInterface
             && $this->doctrineHelper->isManageableEntityClass($entityClass)
             && $this->isEntityExist($entityClass, $entityId, $context->getMetadata())
         ) {
-            $context->addError(Error::createConflictValidationError('The entity already exists'));
+            $context->addError(Error::createConflictValidationError('The entity already exists.'));
         } else {
             $context->setResult($this->entityInstantiator->instantiate($entityClass));
         }

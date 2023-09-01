@@ -118,13 +118,25 @@ services:
     oro_api.entity_loader:
         class: Oro\Bundle\ApiBundle\Util\EntityLoader
         arguments:
-            - '@doctrine'
+            - '@oro_api.doctrine_helper'
+
+    oro_api.acl_protected_entity_loader:
+        class: Oro\Bundle\ApiBundle\Util\AclProtectedEntityLoader
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.query_acl_helper'
 
     oro_api.entity_accessor:
         class: Oro\Bundle\ApiBundle\Util\EntityDataAccessor
 
     oro_api.entity_id_helper:
         class: Oro\Bundle\ApiBundle\Util\EntityIdHelper
+
+    oro_api.upsert_criteria_builder:
+        class: Oro\Bundle\ApiBundle\Util\UpsertCriteriaBuilder
+        arguments:
+            - '@oro_api.value_normalizer'
 
     oro_api.entity_metadata_factory:
         class: Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory

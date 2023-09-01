@@ -28,6 +28,7 @@ services:
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
             - '@oro_entity.entity_class_provider.orm'
+            - '@oro_api.config_provider'
         tags:
             - { name: console.command }
 

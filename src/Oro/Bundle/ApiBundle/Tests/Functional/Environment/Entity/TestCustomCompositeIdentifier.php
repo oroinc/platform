@@ -8,7 +8,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
- * @ORM\Table(name="test_api_custom_composite_id")
+ * @ORM\Table(
+ *     name="test_api_custom_composite_id",
+ *     uniqueConstraints={
+ *          @ORM\UniqueConstraint(name="test_api_custom_composite_idx", columns={"key1", "key2"})
+ *     }
+ * )
  * @ORM\Entity
  */
 class TestCustomCompositeIdentifier implements TestFrameworkEntityInterface

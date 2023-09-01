@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormInterface;
 trait FormContextTrait
 {
     private array $requestData = [];
+    private bool $existing = false;
     private ?array $includedData = null;
     private ?IncludedEntityCollection $includedEntities = null;
     private ?AdditionalEntityCollection $additionalEntities = null;
@@ -37,6 +38,22 @@ trait FormContextTrait
     public function setRequestData(array $requestData): void
     {
         $this->requestData = $requestData;
+    }
+
+    /**
+     * Gets a value indicates whether an existing entity should be updated or new one should be created.
+     */
+    public function isExisting(): bool
+    {
+        return $this->existing;
+    }
+
+    /**
+     * Sets a value indicates whether an existing entity should be updated or new one should be created.
+     */
+    public function setExisting(bool $existing): void
+    {
+        $this->existing = $existing;
     }
 
     /**

@@ -5,7 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiDocumentation;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Functional\DocumentationTestTrait;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestUniqueKeyIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
@@ -163,6 +165,50 @@ class DocumentationTest extends RestJsonApiTestCase
     public function testOptionsDocumentation()
     {
         $this->checkOptionsDocumentationForEntity($this->getEntityType(User::class));
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
+    public function testUpsertNoteForResourceThatSupportsUpsertOperationById()
+    {
+        $entityType = $this->getEntityType(TestCustomIdentifier::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::CREATE);
+
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        self::assertStringContainsString(
+            '<p><strong>Note:</strong>'
+            . ' This resource supports '
+            . '<a href="https://doc.oroinc.com/api/upsert-operation/" target="_blank">the upsert operation</a>'
+            . ' by the resource identifier.</p>',
+            $resourceData['documentation']
+        );
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
+    public function testUpsertNoteForResourceThatSupportsUpsertOperationByGroupsOfFields()
+    {
+        $entityType = $this->getEntityType(TestUniqueKeyIdentifier::class);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::CREATE);
+
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        self::assertStringContainsString(
+            '<p><strong>Note:</strong>'
+            . ' This resource supports '
+            . '<a href="https://doc.oroinc.com/api/upsert-operation/" target="_blank">the upsert operation</a>'
+            . ' by the following groups of fields:</p>'
+            . "\n<ul>"
+            . "\n  <li>\"key7\"</li>"
+            . "\n  <li>\"key6\", \"parent\"</li>"
+            . "\n  <li>\"children\", \"key6\"</li>"
+            . "\n  <li>\"key3\"</li>"
+            . "\n  <li>\"key4\"</li>"
+            . "\n  <li>\"key1\", \"key2\"</li>"
+            . "\n</ul>",
+            $resourceData['documentation']
+        );
     }
 
     /**
