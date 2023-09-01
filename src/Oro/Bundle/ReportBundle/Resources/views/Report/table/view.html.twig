@@ -8,13 +8,13 @@
 {% block navButtons %}
     {% import '@OroUI/macros.html.twig' as UI %}
 
-    {% if isDesktopVersion() and is_granted('EDIT', entity) %}
+    {% if isDesktopVersion() and is_granted('EDIT', entity) and feature_resource_enabled('oro_report_update', 'routes') %}
         {{ UI.editButton({
             'path': path('oro_report_update', {'id': entity.id}),
             'entity_label': 'oro.report.entity_label'|trans
         }) }}
     {% endif %}
-    {% if isDesktopVersion() and is_granted('CREATE', entity) %}
+    {% if isDesktopVersion() and is_granted('CREATE', entity)and feature_resource_enabled('oro_report_clone', 'routes') %}
         {{ UI.button({
             'path' : path('oro_report_clone', {'id': entity.id}),
             'iCss': 'fa-files-o',
@@ -22,7 +22,7 @@
             'label': 'oro.report.action.clone.button.label'|trans,
         }) }}
     {% endif %}
-    {% if isDesktopVersion() and is_granted('DELETE', entity) %}
+    {% if isDesktopVersion() and is_granted('DELETE', entity) and feature_resource_enabled('oro_api_delete_report', 'routes') %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_report', {'id': entity.id}),
             'dataRedirect': path('oro_report_index'),
