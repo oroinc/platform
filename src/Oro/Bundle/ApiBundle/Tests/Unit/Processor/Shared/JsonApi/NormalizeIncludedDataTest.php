@@ -2,48 +2,60 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
+use Doctrine\ORM\NonUniqueResultException;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludedData;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\AclProtectedEntityLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
-use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Oro\Bundle\ApiBundle\Util\UpsertCriteriaBuilder;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class NormalizeIncludedDataTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityInstantiator */
+    /** @var EntityInstantiator|\PHPUnit\Framework\MockObject\MockObject */
     private $entityInstantiator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityLoader */
+    /** @var AclProtectedEntityLoader|\PHPUnit\Framework\MockObject\MockObject */
     private $entityLoader;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
+    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $valueNormalizer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
+    /** @var EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityIdTransformer;
+
+    /** @var EntityIdHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityIdHelper;
 
     /** @var NormalizeIncludedData */
     private $processor;
@@ -54,11 +66,12 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->entityInstantiator = $this->createMock(EntityInstantiator::class);
-        $this->entityLoader = $this->createMock(EntityLoader::class);
+        $this->entityLoader = $this->createMock(AclProtectedEntityLoader::class);
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
         $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
+        $this->entityIdHelper = $this->createMock(EntityIdHelper::class);
 
         $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
         $entityIdTransformerRegistry->expects(self::any())
@@ -75,6 +88,8 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             $this->configProvider,
             $this->metadataProvider
         );
+        $this->processor->setUpsertCriteriaBuilder(new UpsertCriteriaBuilder($this->valueNormalizer));
+        $this->processor->setEntityIdHelper($this->entityIdHelper);
     }
 
     private function getConfig(EntityDefinitionConfig $definition): Config
@@ -84,7 +99,20 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         return $config;
     }
-    public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidElement()
+
+    private function getIncludedEntityData(
+        string $path,
+        int $index,
+        bool $existing,
+        string $targetAction
+    ): IncludedEntityData {
+        $data = new IncludedEntityData($path, $index, $existing);
+        $data->setTargetAction($targetAction);
+
+        return $data;
+    }
+
+    public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidElement(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "/included/0" element should be an array.');
@@ -97,7 +125,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidSchema()
+    public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidSchema(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "/included/0" element should have "data" property.');
@@ -110,7 +138,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidDataElement()
+    public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidDataElement(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "data" property of "/included/0" element should be an array.');
@@ -123,7 +151,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForAlreadyNormalizedIncludedData()
+    public function testProcessForAlreadyNormalizedIncludedData(): void
     {
         $includedData = [
             ['data' => ['type' => 'testType', 'id' => 'testId']]
@@ -135,6 +163,15 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->method('normalizeValue')
             ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra(ApiAction::CREATE), new FilterIdentifierFieldsConfigExtra()]
+            )
+            ->willReturn($this->getConfig(new EntityDefinitionConfig()));
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
         $this->entityInstantiator->expects(self::once())
@@ -149,13 +186,15 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertSame($includedData, $this->context->getIncludedData());
         self::assertNotNull($this->context->getIncludedEntities());
-        self::assertSame(
-            $includedEntity,
-            $this->context->getIncludedEntities()->get($normalizedType, 'testId')
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, 'testId');
+        self::assertSame($includedEntity, $addedIncludedEntity);
+        self::assertEquals(
+            $this->getIncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
+            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
         );
     }
 
-    public function testProcessWhenIncludedEntitiesAlreadyLoaded()
+    public function testProcessWhenIncludedEntitiesAlreadyLoaded(): void
     {
         $requestData = [
             'included' => [
@@ -176,7 +215,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         self::assertCount(0, $this->context->getIncludedEntities());
     }
 
-    public function testProcessIncludedSectionDoesNotExistInRequestData()
+    public function testProcessIncludedSectionDoesNotExistInRequestData(): void
     {
         $requestData = [];
 
@@ -187,7 +226,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         self::assertNull($this->context->getIncludedEntities());
     }
 
-    public function testProcessIncludedSectionExistInRequestData()
+    public function testProcessIncludedSectionExistInRequestData(): void
     {
         $requestData = [
             'included' => [
@@ -201,6 +240,15 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->method('normalizeValue')
             ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra(ApiAction::CREATE), new FilterIdentifierFieldsConfigExtra()]
+            )
+            ->willReturn($this->getConfig(new EntityDefinitionConfig()));
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
         $this->entityInstantiator->expects(self::once())
@@ -220,16 +268,17 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             $this->context->getIncludedData()
         );
         self::assertNotNull($this->context->getIncludedEntities());
-        self::assertSame(
-            $includedEntity,
-            $this->context->getIncludedEntities()->get($normalizedType, 'testId')
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, 'testId');
+        self::assertSame($includedEntity, $addedIncludedEntity);
+        self::assertEquals(
+            $this->getIncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
+            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
         );
 
-        $includedEntityCollection = $this->context->getIncludedEntities();
-        self::assertTrue($includedEntityCollection->isPrimaryEntity('Test\PrimaryClass', 'primaryId'));
+        self::assertTrue($this->context->getIncludedEntities()->isPrimaryEntity('Test\PrimaryClass', 'primaryId'));
     }
 
-    public function testProcessForNewIncludedEntityOrObject()
+    public function testProcessForNewIncludedEntityOrObject(): void
     {
         $requestData = [
             'included' => [
@@ -248,6 +297,15 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->method('normalizeValue')
             ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra(ApiAction::CREATE), new FilterIdentifierFieldsConfigExtra()]
+            )
+            ->willReturn($this->getConfig(new EntityDefinitionConfig()));
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
         $this->entityInstantiator->expects(self::once())
@@ -262,13 +320,47 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertFalse($this->context->hasErrors());
         self::assertNotNull($this->context->getIncludedEntities());
-        self::assertSame(
-            $includedEntity,
-            $this->context->getIncludedEntities()->get($normalizedType, 'testId')
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, 'testId');
+        self::assertSame($includedEntity, $addedIncludedEntity);
+        self::assertEquals(
+            $this->getIncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
+            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
         );
     }
 
-    public function testProcessForExistingIncludedObject()
+    public function testProcessForInvalidUpdateFlag(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => null]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+
+        $this->doctrineHelper->expects(self::never())
+            ->method('resolveManageableEntityClass');
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+        $this->entityIdTransformer->expects(self::never())
+            ->method('reverseTransform');
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createValidationError(Constraint::VALUE, 'This value should be a boolean.')
+                    ->setSource(ErrorSource::createByPointer('/included/0/meta/update'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithUpdateFlagForExistingIncludedObject(): void
     {
         $requestData = [
             'included' => [
@@ -277,19 +369,15 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         ];
         $normalizedType = 'Test\Class';
         $normalizedId = 123;
-        $metadata = new EntityMetadata('Test\Entity');
 
-        $error = Error::createValidationError(
-            Constraint::VALUE,
-            'Only manageable entity can be updated.'
-        )->setSource(ErrorSource::createByPointer('/included/0'));
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
             ->with($normalizedType)
             ->willReturn(null);
 
-        $config = new EntityDefinitionConfig();
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
@@ -322,10 +410,16 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getIncludedEntities());
-        self::assertEquals([$error], $this->context->getErrors());
+        self::assertEquals(
+            [
+                Error::createValidationError(Constraint::VALUE, 'Only manageable entity can be updated.')
+                    ->setSource(ErrorSource::createByPointer('/included/0'))
+            ],
+            $this->context->getErrors()
+        );
     }
 
-    public function testProcessForExistingIncludedEntity()
+    public function testProcessWithUpdateFlagForExistingIncludedEntity(): void
     {
         $requestData = [
             'included' => [
@@ -335,6 +429,8 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $normalizedType = 'Test\Class';
         $normalizedId = 123;
         $includedEntity = new \stdClass();
+
+        $config = new EntityDefinitionConfig();
         $metadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
@@ -343,10 +439,15 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->willReturn($normalizedType);
         $this->entityLoader->expects(self::once())
             ->method('findEntity')
-            ->with($normalizedType, $normalizedId, self::isInstanceOf(EntityMetadata::class))
+            ->with(
+                $normalizedType,
+                self::identicalTo($normalizedId),
+                self::identicalTo($config),
+                self::identicalTo($metadata),
+                self::identicalTo($this->context->getRequestType())
+            )
             ->willReturn($includedEntity);
 
-        $config = new EntityDefinitionConfig();
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
@@ -382,13 +483,87 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
         self::assertFalse($this->context->hasErrors());
         self::assertNotNull($this->context->getIncludedEntities());
-        self::assertSame(
-            $includedEntity,
-            $this->context->getIncludedEntities()->get($normalizedType, $normalizedId)
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $normalizedId);
+        self::assertSame($includedEntity, $addedIncludedEntity);
+        self::assertEquals(
+            $this->getIncludedEntityData('/included/0', 0, true, ApiAction::UPDATE),
+            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
         );
     }
 
-    public function testProcessForExistingIncludedEntityWhichDoesNotExistInDatabase()
+    public function testProcessWithUpdateFlagForExistingIncludedEntityWithCompositeId(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $normalizedId = ['id1' => 'test', 'id2' => 1];
+        $includedEntity = new \stdClass();
+
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with(
+                $normalizedType,
+                self::identicalTo($normalizedId),
+                self::identicalTo($config),
+                self::identicalTo($metadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willReturn($includedEntity);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+            )
+            ->willReturn($this->getConfig($config));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($config)
+            )
+            ->willReturn($metadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with('testId', self::identicalTo($metadata))
+            ->willReturn($normalizedId);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+        self::assertNotNull($this->context->getIncludedEntities());
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $normalizedId);
+        self::assertSame($includedEntity, $addedIncludedEntity);
+        self::assertEquals(
+            $this->getIncludedEntityData('/included/0', 0, true, ApiAction::UPDATE),
+            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
+        );
+    }
+
+    public function testProcessWithUpdateFlagForExistingIncludedEntityWhichDoesNotExistInDatabase(): void
     {
         $requestData = [
             'included' => [
@@ -397,11 +572,9 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         ];
         $normalizedType = 'Test\Class';
         $normalizedId = 123;
+
+        $config = new EntityDefinitionConfig();
         $metadata = new EntityMetadata('Test\Entity');
-        $error = Error::createValidationError(
-            Constraint::ENTITY,
-            'The entity does not exist.'
-        )->setSource(ErrorSource::createByPointer('/included/0'));
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
@@ -409,10 +582,15 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->willReturn($normalizedType);
         $this->entityLoader->expects(self::once())
             ->method('findEntity')
-            ->with($normalizedType, $normalizedId, self::isInstanceOf(EntityMetadata::class))
+            ->with(
+                $normalizedType,
+                self::identicalTo($normalizedId),
+                self::identicalTo($config),
+                self::identicalTo($metadata),
+                self::identicalTo($this->context->getRequestType())
+            )
             ->willReturn(null);
 
-        $config = new EntityDefinitionConfig();
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
@@ -445,18 +623,165 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getIncludedEntities());
-        self::assertEquals([$error], $this->context->getErrors());
+        self::assertEquals(
+            [
+                Error::createValidationError(Constraint::ENTITY, 'The entity does not exist.')
+                    ->setSource(ErrorSource::createByPointer('/included/0'))
+            ],
+            $this->context->getErrors()
+        );
     }
 
-    public function testProcessWhenIncludedEntityTypeIsUnknown()
+    public function testProcessWithUpdateFlagWhenAccessToEntityDenied(): void
     {
         $requestData = [
             'included' => [
                 ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
             ]
         ];
-        $error = Error::createValidationError(Constraint::ENTITY_TYPE, 'Unknown entity type: testType.')
-            ->setSource(ErrorSource::createByPointer('/included/0/type'));
+        $normalizedType = 'Test\Class';
+        $normalizedId = 123;
+        $accessDeniedException = new AccessDeniedException('No access to the entity.');
+
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with(
+                $normalizedType,
+                self::identicalTo($normalizedId),
+                self::identicalTo($config),
+                self::identicalTo($metadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willThrowException($accessDeniedException);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+            )
+            ->willReturn($this->getConfig($config));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($config)
+            )
+            ->willReturn($metadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with('testId', self::identicalTo($metadata))
+            ->willReturn($normalizedId);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createByException($accessDeniedException)
+                    ->setSource(ErrorSource::createByPointer('/included/0'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithUpdateFlagWhenSeveralEntitiesFound(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $normalizedId = 123;
+
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with(
+                $normalizedType,
+                self::identicalTo($normalizedId),
+                self::identicalTo($config),
+                self::identicalTo($metadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willThrowException(new NonUniqueResultException());
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+            )
+            ->willReturn($this->getConfig($config));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($config)
+            )
+            ->willReturn($metadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with('testId', self::identicalTo($metadata))
+            ->willReturn($normalizedId);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createConflictValidationError('The upsert operation founds more than one entity.')
+                    ->setSource(ErrorSource::createByPointer('/included/0'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithUpdateFlagWhenIncludedEntityTypeIsUnknown(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
+            ]
+        ];
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
@@ -469,40 +794,16 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getIncludedEntities());
-        self::assertEquals([$error], $this->context->getErrors());
+        self::assertEquals(
+            [
+                Error::createValidationError(Constraint::ENTITY_TYPE, 'Unknown entity type: testType.')
+                    ->setSource(ErrorSource::createByPointer('/included/0/type'))
+            ],
+            $this->context->getErrors()
+        );
     }
 
-    public function testProcessForInvalidUpdateFlag()
-    {
-        $requestData = [
-            'included' => [
-                ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => null]]
-            ]
-        ];
-        $normalizedType = 'Test\Class';
-        $error = Error::createValidationError(
-            Constraint::VALUE,
-            'This value should be boolean.'
-        )->setSource(ErrorSource::createByPointer('/included/0/meta/update'));
-
-        $this->doctrineHelper->expects(self::never())
-            ->method('resolveManageableEntityClass');
-
-        $this->valueNormalizer->expects(self::once())
-            ->method('normalizeValue')
-            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
-            ->willReturn($normalizedType);
-        $this->entityIdTransformer->expects(self::never())
-            ->method('reverseTransform');
-
-        $this->context->setRequestData($requestData);
-        $this->processor->process($this->context);
-
-        self::assertNull($this->context->getIncludedEntities());
-        self::assertEquals([$error], $this->context->getErrors());
-    }
-
-    public function testProcessWhenNormalizationOfIncludedEntityIdFailed()
+    public function testProcessWithUpdateFlagWhenNormalizationOfIncludedEntityIdFailed(): void
     {
         $requestData = [
             'included' => [
@@ -510,16 +811,14 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ]
         ];
         $normalizedType = 'Test\Class';
-        $metadata = new EntityMetadata('Test\Entity');
         $exception = new \Exception('some error');
-        $error = Error::createValidationError(Constraint::ENTITY_ID)
-            ->setSource(ErrorSource::createByPointer('/included/0/id'))
-            ->setInnerException($exception);
+
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::never())
             ->method('resolveManageableEntityClass');
 
-        $config = new EntityDefinitionConfig();
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
@@ -552,6 +851,970 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getIncludedEntities());
-        self::assertEquals([$error], $this->context->getErrors());
+        self::assertEquals(
+            [
+                Error::createValidationError(Constraint::ENTITY_ID)
+                    ->setSource(ErrorSource::createByPointer('/included/0/id'))
+                    ->setInnerException($exception)
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessForInvalidUpsertFlag(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => null]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+
+        $this->doctrineHelper->expects(self::never())
+            ->method('resolveManageableEntityClass');
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+        $this->entityIdTransformer->expects(self::never())
+            ->method('reverseTransform');
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    Constraint::VALUE,
+                    'This value should be a boolean or an array of strings.'
+                )->setSource(ErrorSource::createByPointer('/included/0/meta/upsert'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithUpsertFlagAndUpsertOperationIsDisabled(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => true]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $normalizedId = 123;
+
+        $config = new EntityDefinitionConfig();
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->setEnabled(false);
+
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $this->doctrineHelper->expects(self::never())
+            ->method('resolveManageableEntityClass');
+        $this->entityLoader->expects(self::never())
+            ->method('findEntity');
+
+        $this->configProvider->expects(self::exactly(2))
+            ->method('getConfig')
+            ->with($normalizedType, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturnCallback(function ($className, $version, $requestType, $extras) use ($config, $fullConfig) {
+                return \count($extras) === 1
+                    ? $this->getConfig($fullConfig)
+                    : $this->getConfig($config);
+            });
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($config)
+            )
+            ->willReturn($metadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with('testId', self::identicalTo($metadata))
+            ->willReturn($normalizedId);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createValidationError(Constraint::VALUE, 'The upsert operation is not allowed.')
+                    ->setSource(ErrorSource::createByPointer('/included/0/meta/upsert'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithUpsertFlagByIdWhenItIsNotAllowed(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => true]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $normalizedId = 123;
+
+        $config = new EntityDefinitionConfig();
+        $fullConfig = new EntityDefinitionConfig();
+
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $this->doctrineHelper->expects(self::never())
+            ->method('resolveManageableEntityClass');
+        $this->entityLoader->expects(self::never())
+            ->method('findEntity');
+
+        $this->configProvider->expects(self::exactly(2))
+            ->method('getConfig')
+            ->with($normalizedType, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturnCallback(function ($className, $version, $requestType, $extras) use ($config, $fullConfig) {
+                return \count($extras) === 1
+                    ? $this->getConfig($fullConfig)
+                    : $this->getConfig($config);
+            });
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($config)
+            )
+            ->willReturn($metadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with('testId', self::identicalTo($metadata))
+            ->willReturn($normalizedId);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    Constraint::VALUE,
+                    'The upsert operation cannot use the entity identifier to find an entity.'
+                )->setSource(ErrorSource::createByPointer('/included/0/meta/upsert'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithUpsertFlagForExistingIncludedObject(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => true]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $normalizedId = 123;
+
+        $config = new EntityDefinitionConfig();
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->setAllowedById(true);
+
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn(null);
+
+        $this->configProvider->expects(self::exactly(2))
+            ->method('getConfig')
+            ->with($normalizedType, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturnCallback(function ($className, $version, $requestType, $extras) use ($config, $fullConfig) {
+                return \count($extras) === 1
+                    ? $this->getConfig($fullConfig)
+                    : $this->getConfig($config);
+            });
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($config)
+            )
+            ->willReturn($metadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with('testId', self::identicalTo($metadata))
+            ->willReturn($normalizedId);
+
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createValidationError(Constraint::VALUE, 'Only manageable entity can be updated.')
+                    ->setSource(ErrorSource::createByPointer('/included/0'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithUpsertFlagForExistingIncludedEntity(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => true]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $normalizedId = 123;
+        $includedEntity = new \stdClass();
+
+        $config = new EntityDefinitionConfig();
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->setAllowedById(true);
+
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with(
+                $normalizedType,
+                self::identicalTo($normalizedId),
+                self::identicalTo($config),
+                self::identicalTo($metadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willReturn($includedEntity);
+
+        $this->configProvider->expects(self::exactly(2))
+            ->method('getConfig')
+            ->with($normalizedType, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturnCallback(function ($className, $version, $requestType, $extras) use ($config, $fullConfig) {
+                return \count($extras) === 1
+                    ? $this->getConfig($fullConfig)
+                    : $this->getConfig($config);
+            });
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($config)
+            )
+            ->willReturn($metadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with('testId', self::identicalTo($metadata))
+            ->willReturn($normalizedId);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+        self::assertNotNull($this->context->getIncludedEntities());
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $normalizedId);
+        self::assertSame($includedEntity, $addedIncludedEntity);
+        self::assertEquals(
+            $this->getIncludedEntityData('/included/0', 0, true, ApiAction::UPDATE),
+            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
+        );
+    }
+
+    public function testProcessWithUpsertFlagForExistingIncludedEntityWhichDoesNotExistInDatabase(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => true]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $normalizedId = 123;
+        $includedEntity = new \stdClass();
+
+        $config = new EntityDefinitionConfig();
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->setAllowedById(true);
+
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with(
+                $normalizedType,
+                self::identicalTo($normalizedId),
+                self::identicalTo($config),
+                self::identicalTo($metadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willReturn(null);
+
+        $this->configProvider->expects(self::exactly(3))
+            ->method('getConfig')
+            ->with($normalizedType, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturnCallback(function ($className, $version, $requestType, $extras) use ($config, $fullConfig) {
+                if (\count($extras) === 1) {
+                    return $this->getConfig($fullConfig);
+                }
+
+                return $extras[0]->getAction() === ApiAction::CREATE
+                    ? $this->getConfig(new EntityDefinitionConfig())
+                    : $this->getConfig($config);
+            });
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($config)
+            )
+            ->willReturn($metadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with('testId', self::identicalTo($metadata))
+            ->willReturn($normalizedId);
+
+        $this->entityInstantiator->expects(self::once())
+            ->method('instantiate')
+            ->with($normalizedType)
+            ->willReturn($includedEntity);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+        self::assertNotNull($this->context->getIncludedEntities());
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $normalizedId);
+        self::assertSame($includedEntity, $addedIncludedEntity);
+        self::assertEquals(
+            $this->getIncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
+            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
+        );
+    }
+
+    public function testProcessWithUpsertFlagBySpecifiedFieldWhenThisFieldCannotBeUsedToIdentifyEntity(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => ['field3']]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->addFields(['field1']);
+        $fullConfig->getUpsertConfig()->addFields(['field2']);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::never())
+            ->method(self::anything());
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($this->getConfig($fullConfig));
+        $this->metadataProvider->expects(self::never())
+            ->method('getMetadata');
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    Constraint::VALUE,
+                    'The upsert operation cannot use this field to find an entity.'
+                )->setSource(ErrorSource::createByPointer('/included/0/meta/upsert'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithUpsertFlagBySpecifiedFieldsWhenTheseFieldsCannotBeUsedToIdentifyEntity(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => ['field2', 'field3']]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->addFields(['field1']);
+        $fullConfig->getUpsertConfig()->addFields(['field2']);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::never())
+            ->method(self::anything());
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($this->getConfig($fullConfig));
+        $this->metadataProvider->expects(self::never())
+            ->method('getMetadata');
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    Constraint::VALUE,
+                    'The upsert operation cannot use these fields to find an entity.'
+                )->setSource(ErrorSource::createByPointer('/included/0/meta/upsert'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithUpsertFlagBySpecifiedFieldsWhenFindCriteriaCannotBeBuilt(): void
+    {
+        $requestData = [
+            'included' => [
+                ['type' => 'testType', 'id' => 'testId', 'meta' => ['upsert' => ['field1']]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->addFields(['field1']);
+        $fullConfig->getUpsertConfig()->addFields(['field2']);
+
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::never())
+            ->method(self::anything());
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($this->getConfig($fullConfig));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($fullConfig)
+            )
+            ->willReturn($metadata);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    Constraint::VALUE,
+                    'The "field1" field does not exist in the request data.'
+                )->setSource(ErrorSource::createByPointer('/included/0/meta/upsert'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithUpsertFlagBySpecifiedFieldsWhenEntityNotFound(): void
+    {
+        $requestData = [
+            'included' => [
+                [
+                    'type'       => 'testType',
+                    'id'         => 'testId',
+                    'meta'       => ['upsert' => ['field1']],
+                    'attributes' => ['field1' => 'val1', 'field2' => 'val2']
+                ]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $includedEntity = new \stdClass();
+
+        $config = new EntityDefinitionConfig();
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->addFields(['field1']);
+        $fullConfig->getUpsertConfig()->addFields(['field2']);
+
+        $fullMetadata = new EntityMetadata('Test\Entity');
+        $fullMetadata->addField(new FieldMetadata('field1'))->setDataType('string');
+        $fullMetadata->addField(new FieldMetadata('field2'))->setDataType('string');
+
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntityBy')
+            ->with(
+                $normalizedType,
+                ['field1' => 'normalizedVal1'],
+                self::identicalTo($fullConfig),
+                self::identicalTo($fullMetadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willReturn(null);
+
+        $this->configProvider->expects(self::exactly(2))
+            ->method('getConfig')
+            ->with($normalizedType, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturnCallback(function ($className, $version, $requestType, $extras) use ($config, $fullConfig) {
+                return \count($extras) === 1
+                    ? $this->getConfig($fullConfig)
+                    : $this->getConfig($config);
+            });
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($fullConfig)
+            )
+            ->willReturn($fullMetadata);
+
+        $this->valueNormalizer->expects(self::exactly(2))
+            ->method('normalizeValue')
+            ->willReturnMap([
+                ['testType', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, $normalizedType],
+                ['val1', 'string', $this->context->getRequestType(), false, false, 'normalizedVal1']
+            ]);
+
+        $this->entityInstantiator->expects(self::once())
+            ->method('instantiate')
+            ->with($normalizedType)
+            ->willReturn($includedEntity);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+        self::assertNotNull($this->context->getIncludedEntities());
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, 'testId');
+        self::assertSame($includedEntity, $addedIncludedEntity);
+        self::assertEquals(
+            $this->getIncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
+            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
+        );
+    }
+
+    public function testProcessWithUpsertFlagBySpecifiedFieldsWhenEntityFound(): void
+    {
+        $requestData = [
+            'included' => [
+                [
+                    'type'       => 'testType',
+                    'id'         => 'testId',
+                    'meta'       => ['upsert' => ['field1']],
+                    'attributes' => ['field1' => 'val1', 'field2' => 'val2']
+                ]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $includedEntity = new \stdClass();
+
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->addFields(['field1']);
+        $fullConfig->getUpsertConfig()->addFields(['field2']);
+
+        $fullMetadata = new EntityMetadata('Test\Entity');
+        $fullMetadata->addField(new FieldMetadata('field1'))->setDataType('string');
+        $fullMetadata->addField(new FieldMetadata('field2'))->setDataType('string');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntityBy')
+            ->with(
+                $normalizedType,
+                ['field1' => 'normalizedVal1'],
+                self::identicalTo($fullConfig),
+                self::identicalTo($fullMetadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willReturn($includedEntity);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($this->getConfig($fullConfig));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($fullConfig)
+            )
+            ->willReturn($fullMetadata);
+
+        $this->valueNormalizer->expects(self::exactly(2))
+            ->method('normalizeValue')
+            ->willReturnMap([
+                ['testType', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, $normalizedType],
+                ['val1', 'string', $this->context->getRequestType(), false, false, 'normalizedVal1']
+            ]);
+
+        $this->entityIdHelper->expects(self::never())
+            ->method('getEntityIdentifier');
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+        self::assertNotNull($this->context->getIncludedEntities());
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, 'testId');
+        self::assertSame($includedEntity, $addedIncludedEntity);
+        self::assertEquals(
+            $this->getIncludedEntityData('/included/0', 0, true, ApiAction::CREATE),
+            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
+        );
+    }
+
+    public function testProcessWithUpsertFlagBySpecifiedFieldsWhenEntityFoundAndNoEntityIdInRequestData(): void
+    {
+        $requestData = [
+            'included' => [
+                [
+                    'type'       => 'testType',
+                    'meta'       => ['upsert' => ['field1']],
+                    'attributes' => ['field1' => 'val1', 'field2' => 'val2']
+                ]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $includedEntity = new \stdClass();
+        $includedEntityId = 123;
+
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->addFields(['field1']);
+        $fullConfig->getUpsertConfig()->addFields(['field2']);
+
+        $fullMetadata = new EntityMetadata('Test\Entity');
+        $fullMetadata->addField(new FieldMetadata('field1'))->setDataType('string');
+        $fullMetadata->addField(new FieldMetadata('field2'))->setDataType('string');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntityBy')
+            ->with(
+                $normalizedType,
+                ['field1' => 'normalizedVal1'],
+                self::identicalTo($fullConfig),
+                self::identicalTo($fullMetadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willReturn($includedEntity);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($this->getConfig($fullConfig));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($fullConfig)
+            )
+            ->willReturn($fullMetadata);
+
+        $this->valueNormalizer->expects(self::exactly(2))
+            ->method('normalizeValue')
+            ->willReturnMap([
+                ['testType', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, $normalizedType],
+                ['val1', 'string', $this->context->getRequestType(), false, false, 'normalizedVal1']
+            ]);
+
+        $this->entityIdHelper->expects(self::once())
+            ->method('getEntityIdentifier')
+            ->with(self::identicalTo($includedEntity), self::identicalTo($fullMetadata))
+            ->willReturn($includedEntityId);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+        self::assertNotNull($this->context->getIncludedEntities());
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $includedEntityId);
+        self::assertSame($includedEntity, $addedIncludedEntity);
+        self::assertEquals(
+            $this->getIncludedEntityData('/included/0', 0, true, ApiAction::CREATE),
+            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
+        );
+    }
+
+    public function testProcessWithUpsertFlagBySpecifiedFieldsWhenAccessToEntityDenied(): void
+    {
+        $requestData = [
+            'included' => [
+                [
+                    'type'       => 'testType',
+                    'id'         => 'testId',
+                    'meta'       => ['upsert' => ['field1']],
+                    'attributes' => ['field1' => 'val1', 'field2' => 'val2']
+                ]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $accessDeniedException = new AccessDeniedException('No access to the entity.');
+
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->addFields(['field1']);
+        $fullConfig->getUpsertConfig()->addFields(['field2']);
+
+        $fullMetadata = new EntityMetadata('Test\Entity');
+        $fullMetadata->addField(new FieldMetadata('field1'))->setDataType('string');
+        $fullMetadata->addField(new FieldMetadata('field2'))->setDataType('string');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntityBy')
+            ->with(
+                $normalizedType,
+                ['field1' => 'normalizedVal1'],
+                self::identicalTo($fullConfig),
+                self::identicalTo($fullMetadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willThrowException($accessDeniedException);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($this->getConfig($fullConfig));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($fullConfig)
+            )
+            ->willReturn($fullMetadata);
+
+        $this->valueNormalizer->expects(self::exactly(2))
+            ->method('normalizeValue')
+            ->willReturnMap([
+                ['testType', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, $normalizedType],
+                ['val1', 'string', $this->context->getRequestType(), false, false, 'normalizedVal1']
+            ]);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createByException($accessDeniedException)
+                    ->setSource(ErrorSource::createByPointer('/included/0'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithUpsertFlagBySpecifiedFieldsWhenSeveralEntitiesFound(): void
+    {
+        $requestData = [
+            'included' => [
+                [
+                    'type'       => 'testType',
+                    'id'         => 'testId',
+                    'meta'       => ['upsert' => ['field1']],
+                    'attributes' => ['field1' => 'val1', 'field2' => 'val2']
+                ]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+
+        $fullConfig = new EntityDefinitionConfig();
+        $fullConfig->getUpsertConfig()->addFields(['field1']);
+        $fullConfig->getUpsertConfig()->addFields(['field2']);
+
+        $fullMetadata = new EntityMetadata('Test\Entity');
+        $fullMetadata->addField(new FieldMetadata('field1'))->setDataType('string');
+        $fullMetadata->addField(new FieldMetadata('field2'))->setDataType('string');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntityBy')
+            ->with(
+                $normalizedType,
+                ['field1' => 'normalizedVal1'],
+                self::identicalTo($fullConfig),
+                self::identicalTo($fullMetadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willThrowException(new NonUniqueResultException());
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($this->getConfig($fullConfig));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($fullConfig)
+            )
+            ->willReturn($fullMetadata);
+
+        $this->valueNormalizer->expects(self::exactly(2))
+            ->method('normalizeValue')
+            ->willReturnMap([
+                ['testType', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, $normalizedType],
+                ['val1', 'string', $this->context->getRequestType(), false, false, 'normalizedVal1']
+            ]);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals(
+            [
+                Error::createConflictValidationError('The upsert operation founds more than one entity.')
+                    ->setSource(ErrorSource::createByPointer('/included/0'))
+            ],
+            $this->context->getErrors()
+        );
     }
 }

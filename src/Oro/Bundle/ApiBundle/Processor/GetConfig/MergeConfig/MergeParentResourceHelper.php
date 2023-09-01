@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\UpsertConfig;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -53,6 +54,7 @@ class MergeParentResourceHelper
     private function mergeDefinition(EntityDefinitionConfig $config, EntityDefinitionConfig $configToMerge): void
     {
         $config->setKey($configToMerge->getKey());
+        $this->mergeUpsertConfig($config->getUpsertConfig(), $configToMerge->getUpsertConfig());
         $this->mergeEntityConfigAttributes($config, $configToMerge);
         $fieldsToMerge = $configToMerge->getFields();
         foreach ($fieldsToMerge as $fieldName => $fieldToMerge) {
@@ -71,6 +73,26 @@ class MergeParentResourceHelper
                 }
             } else {
                 $config->addField($fieldName, $fieldToMerge);
+            }
+        }
+    }
+
+    private function mergeUpsertConfig(UpsertConfig $config, UpsertConfig $configToMerge): void
+    {
+        if ($configToMerge->hasEnabled()) {
+            $config->setEnabled($configToMerge->isEnabled());
+        }
+        if ($configToMerge->hasAllowedById()) {
+            $config->setAllowedById($configToMerge->isAllowedById());
+        }
+        if ($configToMerge->isReplaceFields()) {
+            $config->replaceFields($configToMerge->getFields());
+        } elseif ($config->isReplaceFields()) {
+            $config->replaceFields(array_merge($config->getFields(), $configToMerge->getFields()));
+        } else {
+            $fieldsTpMerge = $configToMerge->getFields();
+            foreach ($fieldsTpMerge as $fieldNames) {
+                $config->addFields($fieldNames);
             }
         }
     }

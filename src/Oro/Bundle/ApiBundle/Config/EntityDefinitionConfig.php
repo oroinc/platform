@@ -35,6 +35,7 @@ class EntityDefinitionConfig extends EntityConfig
     private array $identifierFieldNames = [];
     /** @var string[] */
     private array $disabledMetaProperties = [];
+    private ?UpsertConfig $upsertConfig = null;
 
     /**
      * Gets a string that unique identify this instance of entity definition config.
@@ -94,6 +95,12 @@ class EntityDefinitionConfig extends EntityConfig
         if (isset($result[ConfigUtil::COLLAPSE]) && false === $result[ConfigUtil::COLLAPSE]) {
             unset($result[ConfigUtil::COLLAPSE]);
         }
+        if (null !== $this->upsertConfig) {
+            $upsertConfig = $this->upsertConfig->toArray();
+            if ($upsertConfig) {
+                $result['upsert'] = $upsertConfig;
+            }
+        }
 
         $keys = array_keys($result);
         foreach ($keys as $key) {
@@ -113,6 +120,17 @@ class EntityDefinitionConfig extends EntityConfig
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __clone()
+    {
+        parent::__clone();
+        if (null !== $this->upsertConfig) {
+            $this->upsertConfig = clone $this->upsertConfig;
+        }
     }
 
     /**
@@ -790,5 +808,17 @@ class EntityDefinitionConfig extends EntityConfig
     public function setStatusCodes(?StatusCodesConfig $statusCodes): void
     {
         $this->set(ConfigUtil::STATUS_CODES, $statusCodes);
+    }
+
+    /**
+     * Gets the configuration of the upsert operation.
+     */
+    public function getUpsertConfig(): UpsertConfig
+    {
+        if (null === $this->upsertConfig) {
+            $this->upsertConfig = new UpsertConfig();
+        }
+
+        return $this->upsertConfig;
     }
 }

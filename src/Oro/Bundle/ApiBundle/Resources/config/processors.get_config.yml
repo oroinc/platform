@@ -239,6 +239,14 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: 'filter_fields&!identifier_fields_only', priority: -110 }
 
+    oro_api.get_config.json_api.complete_upsert_config:
+        class: Oro\Bundle\ApiBundle\Processor\GetConfig\JsonApi\CompleteUpsertConfig
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, requestType: json_api, priority: -120 }
+
     oro_api.get_config.normalize_filters:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\NormalizeFilters
         arguments:

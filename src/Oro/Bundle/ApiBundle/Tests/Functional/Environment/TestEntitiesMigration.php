@@ -18,6 +18,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class TestEntitiesMigration implements
     Migration,
@@ -64,6 +65,7 @@ class TestEntitiesMigration implements
         $this->createTestWithoutIdGeneratorTable($schema);
         $this->createTestCompositeIdentifierTable($schema);
         $this->createTestCustomIdentifierTables($schema);
+        $this->createTestUniqueKeyIdentifierTable($schema);
         $this->createTestNestedObjectsTable($schema);
         $this->createTestAllDataTypesTable($schema);
         $this->createTestCustomEntityTables($schema);
@@ -257,12 +259,13 @@ class TestEntitiesMigration implements
     }
 
     /**
-     * Create test_api_custom_id and test_api_custom_composite_id tables
+     * Create test_api_custom_id, test_api_custom_composite_id and test_api_custom_int_id tables
      */
     private function createTestCustomIdentifierTables(Schema $schema): void
     {
         if ($schema->hasTable('test_api_custom_id')
             || $schema->hasTable('test_api_custom_composite_id')
+            || $schema->hasTable('test_api_custom_int_id')
         ) {
             return;
         }
@@ -272,6 +275,7 @@ class TestEntitiesMigration implements
         $table1->addColumn('key', 'string', ['notnull' => true, 'length' => 255]);
         $table1->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
         $table1->addColumn('parent_id', 'integer', ['notnull' => false]);
+        $table1->addUniqueIndex(['key']);
         $table1->setPrimaryKey(['id']);
         $table1->addIndex(['parent_id']);
         $table1->addForeignKeyConstraint($table1, ['parent_id'], ['id']);
@@ -282,9 +286,28 @@ class TestEntitiesMigration implements
         $table2->addColumn('key2', 'integer', ['notnull' => true]);
         $table2->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
         $table2->addColumn('parent_id', 'integer', ['notnull' => false]);
+        $table2->addUniqueIndex(['key1', 'key2'], 'test_api_custom_composite_idx');
         $table2->setPrimaryKey(['id']);
         $table2->addIndex(['parent_id']);
         $table2->addForeignKeyConstraint($table2, ['parent_id'], ['id']);
+
+        $table3 = $schema->createTable('test_api_custom_int_id');
+        $table3->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table3->addColumn('key', 'integer', ['notnull' => true]);
+        $table3->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $table3->addColumn('parent_id', 'integer', ['notnull' => false]);
+        $table3->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table3->addUniqueIndex(['key']);
+        $table3->setPrimaryKey(['id']);
+        $table3->addIndex(['parent_id']);
+        $table3->addForeignKeyConstraint($table3, ['parent_id'], ['id']);
+        $table3->addIndex(['organization_id']);
+        $table3->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL']
+        );
 
         $table1Children = $schema->createTable('test_api_custom_id_children');
         $table1Children->addColumn('parent_id', 'integer');
@@ -303,10 +326,65 @@ class TestEntitiesMigration implements
         $table2Children->addIndex(['child_id']);
         $table2Children->addForeignKeyConstraint($table2, ['parent_id'], ['id']);
         $table2Children->addForeignKeyConstraint($table2, ['child_id'], ['id']);
+
+        $table3Children = $schema->createTable('test_api_custom_int_id_children');
+        $table3Children->addColumn('parent_id', 'integer');
+        $table3Children->addColumn('child_id', 'integer');
+        $table3Children->setPrimaryKey(['parent_id', 'child_id']);
+        $table3Children->addIndex(['parent_id']);
+        $table3Children->addIndex(['child_id']);
+        $table3Children->addForeignKeyConstraint($table3, ['parent_id'], ['id']);
+        $table3Children->addForeignKeyConstraint($table3, ['child_id'], ['id']);
     }
 
     /**
-     * Create test_api_composite_id table
+     * Create test_api_unique_key_id table
+     */
+    private function createTestUniqueKeyIdentifierTable(Schema $schema): void
+    {
+        if ($schema->hasTable('test_api_unique_key_id')) {
+            return;
+        }
+
+        $table = $schema->createTable('test_api_unique_key_id');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('key1', 'string', ['notnull' => true, 'length' => 255]);
+        $table->addColumn('key2', 'integer', ['notnull' => true]);
+        $table->addColumn('key3', 'string', ['notnull' => true, 'length' => 255]);
+        $table->addColumn('key4', 'integer', ['notnull' => true]);
+        $table->addColumn('key5', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('key6', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('key7', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('parent_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addIndex(['key5'], 'test_api_unique_key5_idx');
+        $table->addUniqueIndex(['key1', 'key2'], 'test_api_unique_key_idx');
+        $table->addUniqueIndex(['key3']);
+        $table->addUniqueIndex(['key4']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['parent_id']);
+        $table->addForeignKeyConstraint($table, ['parent_id'], ['id']);
+        $table->addIndex(['organization_id']);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL']
+        );
+
+        $tableChildren = $schema->createTable('test_api_unique_key_id_children');
+        $tableChildren->addColumn('parent_id', 'integer');
+        $tableChildren->addColumn('child_id', 'integer');
+        $tableChildren->setPrimaryKey(['parent_id', 'child_id']);
+        $tableChildren->addIndex(['parent_id']);
+        $tableChildren->addIndex(['child_id']);
+        $tableChildren->addForeignKeyConstraint($table, ['parent_id'], ['id']);
+        $tableChildren->addForeignKeyConstraint($table, ['child_id'], ['id']);
+    }
+
+    /**
+     * Create test_api_all_data_types table
      */
     private function createTestAllDataTypesTable(Schema $schema): void
     {

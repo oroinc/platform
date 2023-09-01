@@ -31,6 +31,11 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 90 }
 
+    oro_api.update.json_api.disable_upsert_operation:
+        class: Oro\Bundle\ApiBundle\Processor\Update\JsonApi\DisableUpsertOperation
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 45 }
+
     #
     # security_check
     #
@@ -48,6 +53,16 @@ services:
     #
     # load_data
     #
+
+    oro_api.update.load_upsert_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Update\JsonApi\LoadUpsertEntity
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.acl_protected_entity_loader'
+            - '@oro_api.entity_instantiator'
+            - '@oro_api.entity_id_helper'
+        tags:
+            - { name: oro.api.processor, action: update, group: load_data, requestType: json_api, priority: -5 }
 
     #
     # data_security_check
@@ -69,6 +84,13 @@ services:
     # save_data
     #
 
+    oro_api.update.persist_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Update\PersistEntity
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: update, group: save_data, priority: -8 }
+
     oro_api.update.save_entity:
         class: Oro\Bundle\ApiBundle\Processor\Update\SaveEntity
         arguments:
@@ -76,6 +98,11 @@ services:
             - '@oro_api.save_data_handler'
         tags:
             - { name: oro.api.processor, action: update, group: save_data, priority: -10 }
+
+    oro_api.update.set_entity_id_to_context:
+        class: Oro\Bundle\ApiBundle\Processor\Update\SetEntityIdToContext
+        tags:
+            - { name: oro.api.processor, action: update, group: save_data, priority: -20 }
 
     #
     # normalize_data

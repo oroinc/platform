@@ -11,6 +11,9 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FormContextTest extends \PHPUnit\Framework\TestCase
 {
     private FormContext $context;
@@ -28,6 +31,14 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         $requestData = [];
         $this->context->setRequestData($requestData);
         self::assertSame($requestData, $this->context->getRequestData());
+    }
+
+    public function testExisting()
+    {
+        self::assertFalse($this->context->isExisting());
+
+        $this->context->setExisting(true);
+        self::assertTrue($this->context->isExisting());
     }
 
     public function testIncludedData()

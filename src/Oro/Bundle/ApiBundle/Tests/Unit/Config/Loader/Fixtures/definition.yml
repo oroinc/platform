@@ -180,6 +180,42 @@ default_collapse:
         collapse: false
     expected: []
 
+upsert_enable:
+    config:
+        upsert:
+            disable: false
+    expected: []
+
+upsert_disable:
+    config:
+        upsert:
+            disable: true
+    expected: []
+
+upsert_add:
+    config:
+        upsert:
+            add: [[field1], [field2, field3]]
+    expected:
+        upsert: [[field1], [field2, field3]]
+
+upsert_remove:
+    config:
+        upsert:
+            add: [[field1], [field2, field3], [field4]]
+            remove: [[field1], [field2, field3]]
+    expected:
+        upsert: [[field4]]
+
+upsert_replace:
+    config:
+        upsert:
+            add: [[field1], [field2, field3], [field4]]
+            remove: [[field1], [field2, field3]]
+            replace: [[field5]]
+    expected:
+        upsert: [[field5]]
+
 all_attributes:
     config:
         exclusion_policy: all

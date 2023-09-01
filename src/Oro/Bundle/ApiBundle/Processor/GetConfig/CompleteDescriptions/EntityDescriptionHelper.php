@@ -186,6 +186,11 @@ class EntityDescriptionHelper implements ResetInterface
                 $documentation .= $maxResultNote;
             }
 
+            $upsertNote = $this->getUpsertNoteForEntityDocumentation($definition, $targetAction);
+            if ($upsertNote) {
+                $documentation .= $upsertNote;
+            }
+
             $definition->setDocumentation($documentation);
         }
     }
@@ -225,6 +230,84 @@ class EntityDescriptionHelper implements ResetInterface
     private function buildMaxResultNote(string $noteTemplate, int $maxResults): string
     {
         return str_replace('{max_results}', (string)$maxResults, $noteTemplate);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function getUpsertNoteForEntityDocumentation(
+        EntityDefinitionConfig $definition,
+        string $targetAction
+    ): ?string {
+        if (ApiAction::CREATE !== $targetAction && ApiAction::UPDATE !== $targetAction) {
+            return null;
+        }
+
+        $upsertConfig = $definition->getUpsertConfig();
+        if (!$upsertConfig->isEnabled()) {
+            return null;
+        }
+
+        $details = '';
+        if ($upsertConfig->isAllowedById()) {
+            $details .= ' by the resource identifier';
+        }
+        if (ApiAction::CREATE === $targetAction) {
+            $fields = $upsertConfig->getFields();
+            if ($fields) {
+                if ($details) {
+                    $details .= ' and';
+                }
+                $details .= $this->formatUpsertFields($fields);
+            } elseif ($details) {
+                $details .= '.</p>';
+            }
+        } elseif ($details) {
+            $details .= '.</p>';
+        }
+
+        if (!$details) {
+            return null;
+        }
+
+        return
+            '<p><strong>Note:</strong> This resource supports '
+            . '<a href="https://doc.oroinc.com/api/upsert-operation/" target="_blank">the upsert operation</a>'
+            . $details;
+    }
+
+    private function formatUpsertFields(array $fields): string
+    {
+        if (\count($fields) === 1) {
+            $fieldNames = $fields[0];
+            $fieldNamesCount = \count($fieldNames);
+            if ($fieldNamesCount === 1) {
+                return sprintf(' by the "%s" field.</p>', $fieldNames[0]);
+            }
+
+            return sprintf(
+                ' by the combination of "%s" and "%s" fields.</p>',
+                implode('", "', \array_slice($fieldNames, 0, $fieldNamesCount - 1)),
+                $fieldNames[$fieldNamesCount - 1]
+            );
+        }
+
+        $fieldGroups = '';
+        $hasSeveralFieldsInGroup = false;
+        foreach ($fields as $fieldNames) {
+            if (\count($fieldNames) === 1) {
+                $fieldGroup = $fieldNames[0];
+            } else {
+                $fieldGroup = implode('", "', $fieldNames);
+                $hasSeveralFieldsInGroup = true;
+            }
+            $fieldGroups .= "\n  <li>\"" . $fieldGroup . '"</li>';
+        }
+        $fieldGroups = "\n<ul>" . $fieldGroups . "\n</ul>";
+
+        return $hasSeveralFieldsInGroup
+            ? ' by the following groups of fields:</p>' . $fieldGroups
+            : ' by the following fields:</p>' . $fieldGroups;
     }
 
     private function registerDocumentationResources(EntityDefinitionConfig $definition, RequestType $requestType): void

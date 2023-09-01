@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItemStatus;
 use Oro\Bundle\ApiBundle\Batch\IncludeMapManager;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
@@ -21,6 +22,7 @@ class CollectProcessedIncludedEntities implements ProcessorInterface
 
     private IncludeMapManager $includeMapManager;
     private ValueNormalizer $valueNormalizer;
+    private EntityIdTransformerRegistry $entityIdTransformerRegistry;
 
     public function __construct(IncludeMapManager $includeMapManager, ValueNormalizer $valueNormalizer)
     {
@@ -28,8 +30,13 @@ class CollectProcessedIncludedEntities implements ProcessorInterface
         $this->valueNormalizer = $valueNormalizer;
     }
 
+    public function setEntityIdTransformerRegistry(EntityIdTransformerRegistry $entityIdTransformerRegistry): void
+    {
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
+    }
+
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ContextInterface $context): void
@@ -84,7 +91,7 @@ class CollectProcessedIncludedEntities implements ProcessorInterface
      * @param IncludedEntityCollection $includedEntities
      * @param RequestType              $requestType
      *
-     * @return array|null [entity type, entity include id, entity id]
+     * @return array|null [entity type, string representation of entity include id, string representation of entity id]
      */
     private function getProcessedItem(
         object $entity,
@@ -104,14 +111,16 @@ class CollectProcessedIncludedEntities implements ProcessorInterface
             return null;
         }
 
+        $entityIdTransformer = $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
+
         return [
             ValueNormalizerUtil::convertToEntityType(
                 $this->valueNormalizer,
                 $includedEntities->getClass($entity),
                 $requestType
             ),
-            $includedEntities->getId($entity),
-            $entityId
+            $entityIdTransformer->transform($includedEntities->getId($entity), $metadata),
+            $entityIdTransformer->transform($entityId, $metadata)
         ];
     }
 }

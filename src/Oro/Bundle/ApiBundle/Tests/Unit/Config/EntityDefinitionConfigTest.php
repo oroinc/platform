@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Config\UpsertConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -42,6 +43,18 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals($config, $configClone);
         self::assertNotSame($objValue, $configClone->get('test_object'));
+    }
+
+    public function testCloneWithUpsertConfig()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->getUpsertConfig()->setAllowedById(true);
+        $config->getUpsertConfig()->addFields(['field1']);
+
+        $configClone = clone $config;
+
+        self::assertEquals($config, $configClone);
+        self::assertNotSame($config->getUpsertConfig(), $configClone->getUpsertConfig());
     }
 
     public function testCustomAttribute()
@@ -805,5 +818,24 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($config->hasIdentifierDescription());
         self::assertNull($config->getIdentifierDescription());
         self::assertEquals([], $config->toArray());
+    }
+
+    public function testUpsertConfig()
+    {
+        $config = new EntityDefinitionConfig();
+        self::assertInstanceOf(UpsertConfig::class, $config->getUpsertConfig());
+        self::assertSame([], $config->toArray());
+
+        $config->getUpsertConfig()->addFields(['field1']);
+        self::assertSame(['upsert' => [['field1']]], $config->toArray());
+
+        $config->getUpsertConfig()->addFields(['field2', 'field3']);
+        self::assertSame(['upsert' => [['field1'], ['field2', 'field3']]], $config->toArray());
+
+        $config->getUpsertConfig()->setAllowedById(true);
+        self::assertSame(['upsert' => [['id'], ['field1'], ['field2', 'field3']]], $config->toArray());
+
+        $config->getUpsertConfig()->setEnabled(false);
+        self::assertSame([], $config->toArray());
     }
 }

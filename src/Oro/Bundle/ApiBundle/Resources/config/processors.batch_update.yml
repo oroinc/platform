@@ -75,6 +75,8 @@ services:
         arguments:
             - '@oro_api.batch.include_map_manager'
             - '@oro_api.value_normalizer'
+        calls:
+            - [ 'setEntityIdTransformerRegistry', [ '@oro_api.entity_id_transformer_registry' ] ]
         tags:
             - { name: oro.api.processor, action: batch_update, group: save_data, priority: -20 }
 

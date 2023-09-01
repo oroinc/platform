@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Collection;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Symfony\Component\Form\FormInterface;
 
 /**
@@ -14,21 +15,28 @@ class IncludedEntityData
     private string $path;
     private int $index;
     private bool $existing;
+    private string $targetAction;
     private ?array $normalizedData = null;
     private ?EntityMetadata $metadata = null;
     private ?FormInterface $form = null;
 
     /**
-     * @param string $path     A path to the entity in the request data
-     * @param int    $index    An index of the entity in the included data
-     * @param bool   $existing TRUE if an existing entity should be updated;
-     *                         FALSE if a new entity should be created
+     * @param string      $path         A path to the entity in the request data
+     * @param int         $index        An index of the entity in the included data
+     * @param bool        $existing     TRUE if an existing entity should be updated;
+     *                                  FALSE if a new entity should be created
      */
     public function __construct(string $path, int $index, bool $existing = false)
     {
         $this->path = $path;
         $this->index = $index;
         $this->existing = $existing;
+        $this->targetAction = $existing ? ApiAction::UPDATE : ApiAction::CREATE;
+    }
+
+    public function setTargetAction(?string $targetAction): void
+    {
+        $this->targetAction = $targetAction ?? ($this->existing ? ApiAction::UPDATE : ApiAction::CREATE);
     }
 
     /**
@@ -53,6 +61,14 @@ class IncludedEntityData
     public function isExisting(): bool
     {
         return $this->existing;
+    }
+
+    /**
+     * Gets API action that should be used to process the included data.
+     */
+    public function getTargetAction(): string
+    {
+        return $this->targetAction;
     }
 
     /**
