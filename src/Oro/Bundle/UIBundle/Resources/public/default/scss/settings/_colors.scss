@@ -38,14 +38,14 @@ $color-palette: (
         'main': #0a7f8f,
         'hover': #075963,
         'active': #05444d,
-        'disable': #7d999e,
+        'disabled': #7d999e,
         'light': #e8fcff
     ),
     'alternative': (
         'main': #c45420,
         'hover': #ad4524,
         'active': #993d20,
-        'disable': #c78465,
+        'disabled': #c78465,
         'light': #ffefe8
     ),
     'secondary': (
@@ -69,7 +69,7 @@ $color-palette: (
     'text': (
         'primary': #002434,
         'secondary': #45606e,
-        'disable': #819299,
+        'disabled': #819299,
         'inverse': #fff,
         'inverse-70': rgb(255 255 255 / .7),
         'link': #1642e4,

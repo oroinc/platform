@@ -26,21 +26,32 @@
 */
 
 @function get-var-color($palette, $keys...) {
-    $color-key: map.get($color-palette, $palette, $keys...);
+    $color-key: get-color($palette, $keys...);
 
-    @if not $color-key or type-of($color-key) == 'map' or type-of($color-key) == 'list' {
-        @warn 'Color not found';
-
+    @if not $color-key {
         @return null;
     }
 
-    $var-key: '--#{$palette}';
+    @return var(get-var-key($palette, $keys...), $color-key);
+}
 
-    @each $key in $keys {
-        $var-key: #{$var-key}-#{$key};
+/** @return the css-property key based on list of arguments;
+    Use: get-var-key('btn', 'primary', 'hover') => --btn-primary-hover;
+*/
+@function get-var-key($list...) {
+    @if not $list or type-of($list) != 'arglist' or list.length($list) == 0 {
+        @return null;
     }
 
-    @return var(#{$var-key}, $color-key);
+    $var-key: '-';
+
+    @each $key in $list {
+        @if $key {
+            $var-key: #{$var-key}-#{$key};
+        }
+    }
+
+    @return $var-key;
 }
 
 /** @return the value in a $theme-fonts map associated with a given key;
