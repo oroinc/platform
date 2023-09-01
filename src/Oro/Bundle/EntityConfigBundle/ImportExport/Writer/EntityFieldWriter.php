@@ -6,12 +6,14 @@ use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Event\AfterWriteFieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\EntityFieldStateChecker;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Import writer for extend entity attributes
@@ -30,16 +32,23 @@ class EntityFieldWriter implements ItemWriterInterface
     /** @var EntityFieldStateChecker */
     private $stateChecker;
 
+    private EventDispatcherInterface $eventDispatcher;
+
     public function __construct(
         ConfigManager $configManager,
         ConfigTranslationHelper $translationHelper,
         EnumSynchronizer $enumSynchronizer,
-        EntityFieldStateChecker $entityFieldStateChecker
+        EntityFieldStateChecker $entityFieldStateChecker,
     ) {
         $this->configManager = $configManager;
         $this->translationHelper = $translationHelper;
         $this->enumSynchronizer = $enumSynchronizer;
         $this->stateChecker = $entityFieldStateChecker;
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -96,6 +105,11 @@ class EntityFieldWriter implements ItemWriterInterface
         if ($state !== ExtendScope::STATE_NEW && in_array($configModel->getType(), ['enum', 'multiEnum'], true)) {
             $this->setEnumData($configModel->toArray('enum'), $className, $fieldName);
         }
+
+        $this->eventDispatcher->dispatch(
+            new AfterWriteFieldConfigEvent($configModel),
+            AfterWriteFieldConfigEvent::EVENT_NAME
+        );
 
         return $translations;
     }
