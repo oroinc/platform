@@ -166,7 +166,7 @@ class AssociationExtendEntity
                     }
                     return;
                 case RelationType::MULTIPLE_MANY_TO_ONE:
-                    $target = $object->set($associations[$targetClass], $target);
+                    $object->set($associations[$targetClass], $target);
                     return;
             }
         }

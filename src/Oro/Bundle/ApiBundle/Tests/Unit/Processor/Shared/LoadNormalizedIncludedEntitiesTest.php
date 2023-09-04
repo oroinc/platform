@@ -118,6 +118,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->setCorsRequest(true);
         $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
+
         $this->processor->process($this->context);
 
         self::assertSame(

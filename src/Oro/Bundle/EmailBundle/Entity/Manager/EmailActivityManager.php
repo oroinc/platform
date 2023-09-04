@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 /**
  * Provides a set of methods to simplify managing associations between the Email as the activity entity
  * and other entities this activity is related to.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailActivityManager
 {
@@ -53,18 +54,13 @@ class EmailActivityManager
         $this->em                      = $em;
     }
 
+    /**
+     * @param Email[] $createdEmails
+     */
     public function updateActivities(array $createdEmails)
     {
-        foreach ($createdEmails as $email) {
-            $this->copyContexts($email);
-            // prepare the list of association targets
-            $targets = [];
-            if (count($this->emailActivityListProvider->getTargetEntities($email)) === 0) {
-                $this->addRecipientOwners($targets, $email);
-            }
-            $this->addSenderOwner($targets, $email);
-            // add associations
-            $this->addContextsToThread($email, $targets);
+        foreach ($createdEmails as $createdEmail) {
+            $this->updateActivitiesForCreatedEmail($createdEmail);
         }
     }
 
@@ -87,6 +83,36 @@ class EmailActivityManager
         return $this->activityManager->removeActivityTarget($activityEntity, $targetEntity);
     }
 
+    private function updateActivitiesForCreatedEmail(Email $email): void
+    {
+        $contexts = $this->emailActivityListProvider->getTargetEntities($email);
+        if (\count($contexts) > 0) {
+            return;
+        }
+
+        $contextsToAdd = [];
+
+        $this->addSenderOwner($contextsToAdd, $email);
+        $this->addRecipientOwners($contextsToAdd, $email);
+
+        $thread = $email->getThread();
+        if (null !== $thread) {
+            // add contexts that added manually to referenced emails to this email
+            $referencedCustomContexts = $this->getCustomContextsOfReferencedEmails($email);
+            if ($referencedCustomContexts) {
+                $contextsToAdd = $referencedCustomContexts;
+            }
+        }
+
+        $addedContexts = [];
+        foreach ($contextsToAdd as $context) {
+            if (!$this->isInContext($context, $addedContexts)) {
+                $this->addAssociation($email, $context);
+                $addedContexts[] = $context;
+            }
+        }
+    }
+
     /**
      * @param array $targets
      * @param Email $email
@@ -94,27 +120,14 @@ class EmailActivityManager
     protected function addSenderOwner(&$targets, Email $email)
     {
         $from = $email->getFromEmailAddress();
-        if (!$from) {
+        if (null === $from) {
             return;
         }
 
         $owner = $from->getOwner();
-        if (!$owner) {
-            return;
+        if (null !== $owner && $this->isOwnerFromCurrentOrganization($owner)) {
+            $targets[] = $owner;
         }
-
-        $token = $this->tokenStorage->getToken();
-        if ($token) {
-            $ownerOrganization = $this->entityOwnerAccessorLink->getService()->getOrganization($owner);
-            if ($ownerOrganization
-                && $token instanceof OrganizationAwareTokenInterface
-                && $token->getOrganization()->getId() !== $ownerOrganization->getId()
-            ) {
-                return;
-            }
-        }
-
-        $this->addTarget($targets, $owner);
     }
 
     /**
@@ -126,8 +139,8 @@ class EmailActivityManager
         $recipients = $email->getRecipients();
         foreach ($recipients as $recipient) {
             $owner = $recipient->getEmailAddress()->getOwner();
-            if ($owner) {
-                $this->addTarget($targets, $owner);
+            if (null !== $owner && $this->isOwnerFromCurrentOrganization($owner)) {
+                $targets[] = $owner;
             }
         }
     }
@@ -177,26 +190,24 @@ class EmailActivityManager
      * Returns contexts of all referenced emails excluding contexts
      * related to senders and recipients of these emails.
      * It means that only contexts added manually will be returned.
-     *
-     * @param Email $email
-     *
-     * @return array
      */
-    private function getCustomContextsOfReferencedEmails(Email $email)
+    private function getCustomContextsOfReferencedEmails(Email $email): array
     {
-        $referencedContexts = [];
+        $customContextsForAllReferencedEmails = [];
         $referencedEmails = $this->emailThreadProvider->getEmailReferences($this->em, $email);
         foreach ($referencedEmails as $referencedEmail) {
             $sendersAndRecipients = [];
             $this->addRecipientOwners($sendersAndRecipients, $referencedEmail);
             $this->addSenderOwner($sendersAndRecipients, $referencedEmail);
-            $allContexts = $this->emailActivityListProvider->getTargetEntities($referencedEmail);
-            $customContexts = $this->getContextsDiff($allContexts, $sendersAndRecipients);
-
-            $referencedContexts = array_merge($referencedContexts, $customContexts);
+            $referencedEmailContexts = $this->emailActivityListProvider->getTargetEntities($referencedEmail);
+            foreach ($referencedEmailContexts as $context) {
+                if (!$this->isInContext($context, $sendersAndRecipients)) {
+                    $customContextsForAllReferencedEmails[] = $context;
+                }
+            }
         }
 
-        return $referencedContexts;
+        return $customContextsForAllReferencedEmails;
     }
 
     protected function addContextsToThread(Email $email, $contexts)
@@ -246,18 +257,12 @@ class EmailActivityManager
         return $result;
     }
 
-    /**
-     * Checks if $needle exists in $haystack.
-     *
-     * @param mixed $needle
-     * @param array $haystack
-     *
-     * @return bool
-     */
-    private function isInContext($needle, array $haystack)
+    private function isInContext(object $item, array $contexts): bool
     {
-        foreach ($haystack as $haystackItem) {
-            if ($this->areContextsEqual($needle, $haystackItem)) {
+        foreach ($contexts as $context) {
+            if (ClassUtils::getClass($item) === ClassUtils::getClass($context)
+                && $item->getId() === $context->getId()
+            ) {
                 return true;
             }
         }
@@ -265,30 +270,18 @@ class EmailActivityManager
         return false;
     }
 
-    /**
-     * Checks if two context items are equal.
-     *
-     * @param mixed $item1
-     * @param mixed $item2
-     *
-     * @return bool
-     */
-    private function areContextsEqual($item1, $item2)
+    private function isOwnerFromCurrentOrganization(object $owner): bool
     {
-        if (is_object($item1)
-            && is_object($item2)
-            && ClassUtils::getClass($item1) === ClassUtils::getClass($item2)
-            && $item1->getId() === $item2->getId()
-        ) {
-            return true;
-        }
-        if (is_string($item1)
-            && is_string($item2)
-            && $item1 === $item2
-        ) {
+        $token = $this->tokenStorage->getToken();
+        if (!$token instanceof OrganizationAwareTokenInterface) {
             return true;
         }
 
-        return false;
+        $ownerOrganization = $this->entityOwnerAccessorLink->getService()->getOrganization($owner);
+        if (null === $ownerOrganization) {
+            return true;
+        }
+
+        return $ownerOrganization->getId() === $token->getOrganization()->getId();
     }
 }

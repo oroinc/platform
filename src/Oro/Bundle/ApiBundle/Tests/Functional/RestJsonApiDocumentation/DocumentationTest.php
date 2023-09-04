@@ -161,6 +161,96 @@ class DocumentationTest extends RestJsonApiTestCase
 
     /**
      * @depends testWarmUpCache
+     * @dataProvider resourceWithCustomDescriptionOfIdentifierDataProvider
+     */
+    public function testResourceWithCustomDescriptionOfIdentifier(string $action, array $expectedData)
+    {
+        $entityType = $this->getEntityType(TestCustomIdentifier::class);
+        $docs = $this->getEntityDocsForAction($entityType, $action);
+
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        self::assertArrayContains($expectedData, $resourceData);
+    }
+
+    public static function resourceWithCustomDescriptionOfIdentifierDataProvider(): array
+    {
+        return [
+            [
+                ApiAction::GET,
+                [
+                    'response'     => [
+                        'id' => [
+                            'description' => 'The unique identifier of a resource. It is a key.'
+                        ]
+                    ],
+                    'requirements' => [
+                        'id' => [
+                            'description' => 'The unique identifier of a resource. It is a key.'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                ApiAction::GET_LIST,
+                [
+                    'response'   => [
+                        'id' => [
+                            'description' => 'The unique identifier of a resource. It is a key.'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                ApiAction::CREATE,
+                [
+                    'parameters' => [
+                        'id' => [
+                            'description' => 'The unique identifier of a resource. It is a key.'
+                        ]
+                    ],
+                    'response'   => [
+                        'id' => [
+                            'description' => 'The unique identifier of a resource. It is a key.'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                ApiAction::UPDATE,
+                [
+                    'parameters'   => [
+                        'id' => [
+                            'description' => '<p>The unique identifier of a resource. It is a key.</p>'
+                                . '<p><strong>The required field.</strong></p>'
+                        ]
+                    ],
+                    'response'     => [
+                        'id' => [
+                            'description' => 'The unique identifier of a resource. It is a key.'
+                        ]
+                    ],
+                    'requirements' => [
+                        'id' => [
+                            'description' => 'The unique identifier of a resource. It is a key.'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                ApiAction::DELETE,
+                [
+                    'requirements' => [
+                        'id' => [
+                            'description' => 'The unique identifier of a resource. It is a key.'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @depends testWarmUpCache
      */
     public function testOptionsDocumentation()
     {

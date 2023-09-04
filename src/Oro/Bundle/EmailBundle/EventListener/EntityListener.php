@@ -46,11 +46,15 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
     protected $activityManagerEmails = [];
 
     /** @var Email[] */
+    private array $emailsToSkipUpdateActivities = [];
+
+    /** @var Email[] */
     protected $updatedEmails = [];
 
     /** @var EmailAddress[] */
     protected $newEmailAddresses = [];
 
+    /** @var string[] */
     private $processedAddresses = [];
 
     public function __construct(
@@ -76,6 +80,11 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         ];
     }
 
+    public function skipUpdateActivities(Email $email): void
+    {
+        $this->emailsToSkipUpdateActivities[] = $email;
+    }
+
     public function onFlush(OnFlushEventArgs $event)
     {
         if (!$this->enabled) {
@@ -86,14 +95,15 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         $uow = $em->getUnitOfWork();
 
         $emailOwnerManager = $this->getEmailOwnerManager();
-        $emailAddressData = $emailOwnerManager->createEmailAddressData($uow);
-        [$updatedEmailAddresses, $created, $processedAddresses] = $emailOwnerManager->handleChangedAddresses(
-            $emailAddressData
+        [$updatedAddresses, $newAddresses, $processedAddresses] = $emailOwnerManager->handleChangedAddresses(
+            $emailOwnerManager->createEmailAddressData($uow)
         );
-        $this->processedAddresses = array_merge($this->processedAddresses, $processedAddresses);
-        foreach ($updatedEmailAddresses as $emailAddress) {
+        foreach ($updatedAddresses as $emailAddress) {
             $this->computeEntityChangeSet($em, $emailAddress);
         }
+        $this->newEmailAddresses = array_merge($this->newEmailAddresses, $newAddresses);
+        $this->getEmailActivityUpdates()->processUpdatedEmailAddresses($updatedAddresses);
+        $this->processedAddresses = array_merge($this->processedAddresses, $processedAddresses);
 
         $createdEmails = array_filter(
             $uow->getScheduledEntityInsertions(),
@@ -109,9 +119,6 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
                 $this->getEmailFilter()
             )
         );
-
-        $this->getEmailActivityUpdates()->processUpdatedEmailAddresses($updatedEmailAddresses);
-        $this->newEmailAddresses = array_merge($this->newEmailAddresses, $created);
     }
 
     public function postFlush(PostFlushEventArgs $event)
@@ -132,23 +139,19 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
             $em->flush();
         }
         if ($this->activityManagerEmails) {
-            $this->getEmailActivityManager()->updateActivities($this->activityManagerEmails);
+            $this->updateActivities();
             $this->activityManagerEmails = [];
+            $this->emailsToSkipUpdateActivities = [];
             $em->flush();
         }
 
-        if ($this->newEmailAddresses) {
-            $this->saveNewEmailAddresses($em);
-        }
+        $this->saveNewEmailAddresses($em);
         $this->addAssociationWithEmailActivity($event);
 
         if ($this->emailsToRemove) {
-            $em = $event->getEntityManager();
-
             foreach ($this->emailsToRemove as $email) {
                 $em->remove($email);
             }
-
             $this->emailsToRemove = [];
             $em->flush();
         }
@@ -192,7 +195,6 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         $emailUser = $args->getEntity();
         if ($emailUser instanceof EmailUser) {
             $email = $emailUser->getEmail();
-
             if ($email->getEmailUsers()->isEmpty()) {
                 $this->emailsToRemove[] = $email;
             }
@@ -223,29 +225,47 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
 
     protected function saveNewEmailAddresses(EntityManager $em)
     {
-        $flush = false;
+        if (!$this->newEmailAddresses) {
+            return;
+        }
 
+        $flush = false;
         $newEmails = [];
         foreach ($this->newEmailAddresses as $newEmailAddress) {
             $newEmail = $newEmailAddress->getEmail();
-            if (array_key_exists($newEmail, $newEmails)) {
+            if (\array_key_exists($newEmail, $newEmails)) {
                 continue;
             }
+
             $newEmails[$newEmail] = true;
 
-            $emailAddress = $this->getEmailAddressManager()
-                ->getEmailAddressRepository()
+            $emailAddress = $this->getEmailAddressManager()->getEmailAddressRepository()
                 ->findOneBy(['email' => $newEmailAddress->getEmail()]);
             if ($emailAddress === null) {
                 $em->persist($newEmailAddress);
                 $flush = true;
             }
         }
-
         $this->newEmailAddresses = [];
-
         if ($flush) {
             $em->flush();
+        }
+    }
+
+    private function updateActivities(): void
+    {
+        if ($this->emailsToSkipUpdateActivities) {
+            $emailsToUpdateActivities = [];
+            foreach ($this->activityManagerEmails as $email) {
+                if (!\in_array($email, $this->emailsToSkipUpdateActivities, true)) {
+                    $emailsToUpdateActivities[] = $email;
+                }
+            }
+            if ($emailsToUpdateActivities) {
+                $this->getEmailActivityManager()->updateActivities($emailsToUpdateActivities);
+            }
+        } else {
+            $this->getEmailActivityManager()->updateActivities($this->activityManagerEmails);
         }
     }
 

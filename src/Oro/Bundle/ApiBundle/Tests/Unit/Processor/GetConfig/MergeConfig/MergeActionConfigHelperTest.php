@@ -398,4 +398,105 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
             $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
         );
     }
+
+    /**
+     * @dataProvider mergeActionUpsertConfigDataProvider
+     */
+    public function testMergeActionUpsertConfig(array $config, array $actionConfig, array $expectedConfig)
+    {
+        self::assertEquals(
+            $expectedConfig,
+            $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, false)
+        );
+    }
+
+    public static function mergeActionUpsertConfigDataProvider(): array
+    {
+        return [
+            'action only: enabled'              => [
+                'config'         => [],
+                'actionConfig'   => [
+                    'upsert' => ['disable' => false]
+                ],
+                'expectedConfig' => [
+                    'upsert' => ['disable' => false]
+                ]
+            ],
+            'action only: disabled'             => [
+                'config'         => [],
+                'actionConfig'   => [
+                    'upsert' => ['disable' => true]
+                ],
+                'expectedConfig' => [
+                    'upsert' => ['disable' => true]
+                ]
+            ],
+            'action only: add, remove'          => [
+                'config'         => [],
+                'actionConfig'   => [
+                    'upsert' => ['add' => ['field1'], 'remove' => ['field2']]
+                ],
+                'expectedConfig' => [
+                    'upsert' => ['add' => ['field1'], 'remove' => ['field2']]
+                ]
+            ],
+            'action only: add, remove, replace' => [
+                'config'         => [],
+                'actionConfig'   => [
+                    'upsert' => ['add' => ['field1'], 'remove' => ['field2'], 'replace' => ['field3']]
+                ],
+                'expectedConfig' => [
+                    'upsert' => ['add' => ['field1'], 'remove' => ['field2'], 'replace' => ['field3']]
+                ]
+            ],
+            'enabled'                           => [
+                'config'         => [
+                    'upsert' => ['disable' => true, 'add' => ['field1']]
+                ],
+                'actionConfig'   => [
+                    'upsert' => ['disable' => false]
+                ],
+                'expectedConfig' => [
+                    'upsert' => ['disable' => false, 'add' => ['field1']]
+                ]
+            ],
+            'disabled'                          => [
+                'config'         => [
+                    'upsert' => ['disable' => false, 'add' => ['field1']]
+                ],
+                'actionConfig'   => [
+                    'upsert' => ['disable' => true]
+                ],
+                'expectedConfig' => [
+                    'upsert' => ['disable' => true]
+                ]
+            ],
+            'add, remove'                       => [
+                'config'         => [
+                    'upsert' => ['add' => ['field1'], 'remove' => ['field2'], 'replace' => ['field3']]
+                ],
+                'actionConfig'   => [
+                    'upsert' => ['add' => ['field11'], 'remove' => ['field21']]
+                ],
+                'expectedConfig' => [
+                    'upsert' => [
+                        'add'     => ['field1', 'field11'],
+                        'remove'  => ['field2', 'field21'],
+                        'replace' => ['field3']
+                    ]
+                ]
+            ],
+            'add, remove, replace'              => [
+                'config'         => [
+                    'upsert' => ['add' => ['field1'], 'remove' => ['field2'], 'replace' => ['field3']]
+                ],
+                'actionConfig'   => [
+                    'upsert' => ['add' => ['field11'], 'remove' => ['field21'], 'replace' => ['field31']]
+                ],
+                'expectedConfig' => [
+                    'upsert' => ['replace' => ['field31']]
+                ]
+            ]
+        ];
+    }
 }

@@ -17,8 +17,7 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
  */
 class EntityIdHelperTest extends OrmRelatedTestCase
 {
-    /** @var EntityIdHelper */
-    private $entityIdHelper;
+    private EntityIdHelper $entityIdHelper;
 
     protected function setUp(): void
     {
@@ -30,7 +29,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = 123;
         $entity = $this->createMock(Entity\Group::class);
-        $entityMetadata = new EntityMetadata(get_class($entity));
+        $entityMetadata = new EntityMetadata(Entity\Group::class);
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
@@ -45,7 +44,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = 123;
         $entity = new Entity\EntityWithoutGettersAndSetters();
-        $entityMetadata = new EntityMetadata(get_class($entity));
+        $entityMetadata = new EntityMetadata(Entity\EntityWithoutGettersAndSetters::class);
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
@@ -57,7 +56,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['id' => 123, 'title' => 'test'];
         $entity = $this->createMock(Entity\CompositeKeyEntity::class);
-        $entityMetadata = new EntityMetadata(get_class($entity));
+        $entityMetadata = new EntityMetadata(Entity\CompositeKeyEntity::class);
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -76,7 +75,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['renamedId' => 123, 'renamedTitle' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata(get_class($entity));
+        $entityMetadata = new EntityMetadata(Entity\CompositeKeyEntity::class);
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
         $entityMetadata->addField(new FieldMetadata('renamedTitle'))->setPropertyPath('title');
@@ -90,19 +89,17 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = 123;
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata(get_class($entity));
+        $entityMetadata = new EntityMetadata(Entity\CompositeKeyEntity::class);
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'Unexpected identifier value "%s" for composite identifier of the entity "%s".',
-                $entityId,
-                get_class($entity)
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'Unexpected identifier value "%s" for composite identifier of the entity "%s".',
+            $entityId,
+            Entity\CompositeKeyEntity::class
+        ));
 
         $this->entityIdHelper->setEntityIdentifier($entity, $entityId, $entityMetadata);
     }
@@ -111,18 +108,16 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['id' => 123, 'title1' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata(get_class($entity));
+        $entityMetadata = new EntityMetadata(Entity\CompositeKeyEntity::class);
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'The entity "%s" does not have metadata for the "title1" property.',
-                get_class($entity)
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'The entity "%s" does not have metadata for the "title1" property.',
+            Entity\CompositeKeyEntity::class
+        ));
 
         $this->entityIdHelper->setEntityIdentifier($entity, $entityId, $entityMetadata);
     }
@@ -131,18 +126,16 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['id' => 123, 'title1' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata(get_class($entity));
+        $entityMetadata = new EntityMetadata(Entity\CompositeKeyEntity::class);
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title1'));
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'The entity "%s" does not have the "title1" property.',
-                get_class($entity)
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'The entity "%s" does not have the "title1" property.',
+            Entity\CompositeKeyEntity::class
+        ));
 
         $this->entityIdHelper->setEntityIdentifier($entity, $entityId, $entityMetadata);
     }

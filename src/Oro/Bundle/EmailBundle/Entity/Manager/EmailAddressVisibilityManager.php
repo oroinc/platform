@@ -24,8 +24,7 @@ class EmailAddressVisibilityManager
     private ManagerRegistry $doctrine;
     private MessageProducerInterface $producer;
     private PublicEmailOwnerProvider $publicEmailOwnerProvider;
-
-    private string $emailVisibilityTableName = '';
+    private ?string $emailVisibilityTableName = null;
 
     public function __construct(
         EmailOwnerProvider $emailOwnerProvider,
@@ -76,7 +75,7 @@ class EmailAddressVisibilityManager
         $connection = $em->getConnection();
         $sql = sprintf(
             'INSERT INTO %s (email, organization_id, is_visible) VALUES (?, ?, ?) ',
-            $this->getEmailVisibilityTableName()
+            $this->getEmailVisibilityTableName($em)
         );
         if ($connection->getDatabasePlatform() instanceof MySqlPlatform) {
             $sql .= 'ON DUPLICATE KEY UPDATE is_visible = ?';
@@ -100,6 +99,10 @@ class EmailAddressVisibilityManager
             $this->getEntityManager(),
             $organizationId
         );
+        /**
+         * @var string $emailAddress
+         * @var string $emailAddressOwnerClass
+         */
         foreach ($emailAddresses as [$emailAddress, $emailAddressOwnerClass]) {
             $this->updateEmailAddressVisibility(
                 $emailAddress,
@@ -146,7 +149,7 @@ class EmailAddressVisibilityManager
         $result = $em->getConnection()->fetchOne(
             sprintf(
                 'SELECT 1 FROM %s WHERE is_visible = ? AND organization_id = ? AND email IN (?) LIMIT 1',
-                $this->getEmailVisibilityTableName()
+                $this->getEmailVisibilityTableName($em)
             ),
             [true, $organizationId, $lowercaseEmailAddresses],
             [Types::BOOLEAN, Types::INTEGER, Connection::PARAM_STR_ARRAY]
@@ -161,7 +164,7 @@ class EmailAddressVisibilityManager
     ): void {
         $emailAddress = mb_strtolower($emailAddress);
         $em = $this->getEntityManager();
-        $tableName = $this->getEmailVisibilityTableName();
+        $tableName = $this->getEmailVisibilityTableName($em);
         if (!empty($visibilityPerOrganizations)) {
             $em->getConnection()->executeStatement(
                 sprintf('DELETE FROM %s WHERE email = ? AND organization_id NOT IN (?)', $tableName),
@@ -182,11 +185,10 @@ class EmailAddressVisibilityManager
         return $this->doctrine->getManagerForClass(EmailAddressVisibility::class);
     }
 
-    private function getEmailVisibilityTableName(): string
+    private function getEmailVisibilityTableName(EntityManagerInterface $em): string
     {
-        if ('' === $this->emailVisibilityTableName) {
-            $this->emailVisibilityTableName = $this->getEntityManager()
-                ->getClassMetadata(EmailAddressVisibility::class)->getTableName();
+        if (null === $this->emailVisibilityTableName) {
+            $this->emailVisibilityTableName = $em->getClassMetadata(EmailAddressVisibility::class)->getTableName();
         }
 
         return $this->emailVisibilityTableName;

@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Sets an owner and an organization for an entity
- * based on the current security context these associations were not set yet.
+ * based on the current security context if these associations were not set yet.
  */
 class SetOwnershipAssociations implements ProcessorInterface
 {

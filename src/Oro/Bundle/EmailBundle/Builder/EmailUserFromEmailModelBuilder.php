@@ -23,13 +23,9 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 class EmailUserFromEmailModelBuilder
 {
     private ManagerRegistry $managerRegistry;
-
     private EmailEntityBuilder $emailEntityBuilder;
-
     private EmailOriginHelper $emailOriginHelper;
-
     private ParentMessageIdProvider $parentMessageIdProvider;
-
     private EmailActivityManager $emailActivityManager;
 
     public function __construct(

@@ -2,25 +2,29 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Represents the butch processor for Email entity.
+ */
 interface EmailEntityBatchInterface
 {
     /**
-     * Tell the given EntityManager to manage this batch
+     * Tells the given entity manager to manage entities involved into this batch
+     * and returns the list of all persisted entities.
      */
-    public function persist(EntityManager $em);
+    public function persist(EntityManagerInterface $em, bool $dryRun = false): array;
 
     /**
-     * Get the list of all changes made by {@see persist()} method
-     * For example new objects can be replaced by existing ones from a database
+     * Gets the list of all changes made by {@see persist()} method
+     * For example new objects can be replaced by existing ones from a database.
      *
      * @return array [old, new] The list of changes
      */
     public function getChanges();
 
     /**
-     * Clears batch
+     * Clears the batch.
      */
     public function clear();
 }

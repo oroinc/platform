@@ -124,6 +124,18 @@ services:
             - { name: doctrine.event_listener, event: postFlush, priority: 1 }
             - { name: container.service_subscriber, id: oro_email.email_websocket.processor }
 
+    oro_email.delete_handler.email_user:
+        class: Oro\Bundle\EmailBundle\Handler\EmailUserDeleteHandler
+        parent: oro_entity.delete_handler
+        tags:
+            - { name: oro_entity.delete_handler, entity: Oro\Bundle\EmailBundle\Entity\EmailUser }
+
+    oro_email.delete_handler_extension.email_user:
+        class: Oro\Bundle\EmailBundle\Handler\EmailUserDeleteHandlerExtension
+        parent: oro_entity.delete_handler_extension
+        tags:
+            - { name: oro_entity.delete_handler_extension, entity: Oro\Bundle\EmailBundle\Entity\EmailUser }
+
     oro_email.email.entity.batch_processor:
         class: Oro\Bundle\EmailBundle\Builder\EmailEntityBatchProcessor
         shared: false

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Model\EntityHolderInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -26,16 +27,24 @@ class ValidateParentEntityObjectAccess implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */
 
         $isGranted = true;
-        $parentEntity = $context->getParentEntity();
-        if ($parentEntity && $this->isParentEntityShouldBeChecked($context)) {
-            $isGranted = $this->authorizationChecker->isGranted($this->permission, $parentEntity);
+        $parentEntity = $this->getParentEntity($context);
+        if (null !== $parentEntity) {
+            $parentConfig = $context->getParentConfig();
+            if (null !== $parentConfig && $parentConfig->hasAclResource()) {
+                $aclResource = $parentConfig->getAclResource();
+                if ($aclResource) {
+                    $isGranted = $this->authorizationChecker->isGranted($aclResource, $parentEntity);
+                }
+            } else {
+                $isGranted = $this->authorizationChecker->isGranted($this->permission, $parentEntity);
+            }
         }
 
         if (!$isGranted) {
@@ -46,13 +55,13 @@ class ValidateParentEntityObjectAccess implements ProcessorInterface
         }
     }
 
-    private function isParentEntityShouldBeChecked(ChangeRelationshipContext $context): bool
+    private function getParentEntity(ChangeRelationshipContext $context): ?object
     {
-        $parentConfig = $context->getParentConfig();
-        if (null === $parentConfig) {
-            return true;
+        $parentEntity = $context->getParentEntity();
+        if ($parentEntity instanceof EntityHolderInterface) {
+            $parentEntity = $parentEntity->getEntity();
         }
 
-        return false === $parentConfig->hasAclResource() || null !== $parentConfig->getAclResource();
+        return $parentEntity;
     }
 }

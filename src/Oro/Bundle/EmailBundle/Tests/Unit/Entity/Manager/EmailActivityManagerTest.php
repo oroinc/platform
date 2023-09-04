@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
@@ -14,12 +13,16 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\ReflectionUtil;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -32,17 +35,14 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailThreadProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $emailThreadProvider;
 
-    /** @var TokenStorage|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /** @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject */
-    private $serviceLink;
+    /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityOwnerAccessor;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
-
-    /** @var array|null */
-    private $owners;
 
     /** @var EmailActivityManager */
     private $emailActivityManager;
@@ -52,121 +52,31 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
         $this->activityManager = $this->createMock(ActivityManager::class);
         $this->emailActivityListProvider = $this->createMock(EmailActivityListProvider::class);
         $this->emailThreadProvider = $this->createMock(EmailThreadProvider::class);
-        $this->tokenStorage = $this->createMock(TokenStorage::class);
-        $this->serviceLink = $this->createMock(ServiceLink::class);
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->entityOwnerAccessor = $this->createMock(EntityOwnerAccessor::class);
         $this->em = $this->createMock(EntityManager::class);
+
+        $entityOwnerAccessorLink = $this->createMock(ServiceLink::class);
+        $entityOwnerAccessorLink->expects(self::any())
+            ->method('getService')
+            ->willReturn($this->entityOwnerAccessor);
 
         $this->emailActivityManager = new EmailActivityManager(
             $this->activityManager,
             $this->emailActivityListProvider,
             $this->emailThreadProvider,
             $this->tokenStorage,
-            $this->serviceLink,
+            $entityOwnerAccessorLink,
             $this->em
         );
     }
 
-    public function testAddAssociation()
+    private function getEmail(int $id = null, int $threadId = null): Email
     {
-        $email  = $this->getEmailEntity();
-        $target = new TestUser();
-
-        $this->activityManager->expects($this->once())
-            ->method('addActivityTarget')
-            ->with($this->identicalTo($email), $this->identicalTo($target))
-            ->willReturn(true);
-
-        $this->assertTrue(
-            $this->emailActivityManager->addAssociation($email, $target)
-        );
-    }
-
-    /**
-     * @dataProvider dataHandlePostFlushProvider
-     */
-    public function testHandlePostFlushWithoutQueue(Email $email, Email $email2, array $params, array $methods)
-    {
-        $emails = [];
-        if (isset($params['createQueue']) && $params['createQueue'] === 1) {
-            $emails[] = $email;
+        $email = new Email();
+        if (null !== $id) {
+            ReflectionUtil::setId($email, $id);
         }
-
-        $repository = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['findByThread'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository->expects($this->exactly($methods['repository.findByThread']['amountCall']))
-            ->method('findByThread')
-            ->withAnyParameters()
-            ->willReturn([$email2]);
-
-        $this->em->expects($this->exactly($methods['entityManager.getRepository']['amountCall']))
-            ->method('getRepository')
-            ->with(Email::class)
-            ->willReturn($repository);
-
-        $this->emailActivityListProvider->expects($this->exactly($methods['getTargetEntities']['amountCall']))
-            ->method('getTargetEntities')
-            ->willReturn($methods['getTargetEntities']['return']);
-
-        $this->emailThreadProvider->expects($this->exactly($methods['getEmailReferences']['amountCall']))
-            ->method('getEmailReferences')
-            ->willReturn([$email2]);
-
-        $this->emailActivityManager->updateActivities($emails);
-    }
-
-    public function testHandlePostFlushEmptyThread()
-    {
-        $this->emailActivityListProvider->expects($this->any())
-            ->method('getTargetEntities')
-            ->willReturn([]);
-
-        $this->emailActivityManager->updateActivities([$this->getEmailEntity()]);
-    }
-
-    public function testGetContextsDiff()
-    {
-        $user = new TestUser();
-        $user->setId(1);
-
-        $anotherUser = new TestUser();
-        $anotherUser->setId(2);
-
-        $thirdUser = new TestUser();
-        $thirdUser->setId(3);
-
-        $contexts1 = [$user, $anotherUser, $thirdUser];
-        $otherContexts1 = [$user, $thirdUser];
-        $result1 = $this->emailActivityManager->getContextsDiff($contexts1, $otherContexts1);
-        $this->assertEquals([$anotherUser], $result1);
-
-        $contexts2 = ['one', 'two', 'three'];
-        $otherContexts2 = ['two', 'three'];
-        $result2 = $this->emailActivityManager->getContextsDiff($contexts2, $otherContexts2);
-        $this->assertEquals(['one'], $result2);
-    }
-
-    private function getEmailEntity(int $id = null, int $threadId = null): Email
-    {
-        if (!$this->owners) {
-            $this->owners = [
-                new TestUser('1'),
-                new TestUser('2'),
-                new TestUser('3'),
-                new TestUser('4')
-            ];
-        }
-
-        $email = $this->getMockBuilder(Email::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['addActivityTarget', 'getId'])
-            ->getMock();
-
-        $email->expects($this->any())
-            ->method('getId')
-            ->willReturn($id);
 
         if (null !== $threadId) {
             $thread = new EmailThread();
@@ -174,151 +84,431 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
             $email->setThread($thread);
         }
 
-        $senderEmailAddress = new EmailAddress();
-        $senderEmailAddress->setOwner($this->owners[0]);
-        $email->setFromEmailAddress($senderEmailAddress);
-
-        $this->addEmailRecipient($email, $this->owners[1]);
-        $this->addEmailRecipient($email, $this->owners[2]);
-        $this->addEmailRecipient($email, $this->owners[3]);
-        $this->addEmailRecipient($email, $this->owners[0]);
-        $this->addEmailRecipient($email, $this->owners[1]);
-        $this->addEmailRecipient($email, null);
-
         return $email;
+    }
+
+    private function addEmailSender(Email $email, ?EmailOwnerInterface $owner): void
+    {
+        $email->setFromEmailAddress($this->getEmailAddress($owner));
     }
 
     private function addEmailRecipient(Email $email, ?EmailOwnerInterface $owner): void
     {
-        $emailAddress = new EmailAddress();
-        $emailAddress->setOwner($owner);
-
         $recipient = new EmailRecipient();
-        $recipient->setEmailAddress($emailAddress);
-
+        $recipient->setEmailAddress($this->getEmailAddress($owner));
         $email->addRecipient($recipient);
     }
 
-    public function dataHandlePostFlushProvider(): array
+    private function getEmailAddress(?EmailOwnerInterface $owner): EmailAddress
     {
-        return [
-            'empty Queue' => $this->getProviderConfigEmptyQueue(),
-            'with Queue without Thread' =>$this->getProviderConfigEmptyThread(),
-            'with Queue with Thread with getTargetEntities'=> $this->getProviderConfigWithTargetEntities(),
-            'with Queue with Thread without getTargetEntities'=> $this->getProviderConfigWithoutTargetEntities()
-        ];
+        $emailAddress = new EmailAddress();
+        if (null !== $owner) {
+            $emailAddress->setOwner($owner);
+        }
+
+        return $emailAddress;
     }
 
-    private function getProviderConfigEmptyQueue(): array
+    private function getEmailAddressOwner(int $id): TestUser
     {
-        return [
-            'email' => $this->getEmailEntity(1),
-            'email2' => $this->getEmailEntity(2),
-            'params' => [
-                'createQueue' => 0
-            ],
-            'methods' => [
-                'repository.findByThread' => [
-                    'amountCall' => 0
-                ],
-                'entityManager.getRepository' => [
-                    'amountCall' => 0
-                ],
-                'getEmailReferences' => [
-                    'amountCall' => 0
-                ],
-                'getTargetEntities'=>[
-                    'amountCall' => 0,
-                    'return' => []
-                ]
-            ]
-        ];
+        $owner = new TestUser();
+        $owner->setId($id);
+
+        return $owner;
     }
 
-    private function getProviderConfigWithTargetEntities(): array
+    private function getOrganization(int $id): Organization
     {
-        return [
-            'email' => $this->getEmailEntity(1, 1),
-            'email2' => $this->getEmailEntity(2, 1),
-            'params' => [
-                'createQueue' => 1
-            ],
-            'methods' => [
-                'em.flush' => [
-                    'amountCall' => 1
-                ],
-                'repository.findByThread' => [
-                    'amountCall' => 1
-                ],
-                'entityManager.getRepository' => [
-                    'amountCall' => 1
-                ],
-                'getTargetEntities' => [
-                    'amountCall' => 3,
-                    'return' => [$this->owners[2]]
-                ],
-                'getEmailReferences' => [
-                    'amountCall' => 0
-                ]
-            ]
-        ];
+        $organization = new Organization();
+        $organization->setId($id);
+
+        return $organization;
     }
 
-    private function getProviderConfigEmptyThread(): array
+    public function testAddAssociation(): void
     {
-        return [
-            'email' => $this->getEmailEntity(1),
-            'email2' => $this->getEmailEntity(2),
-            'params' => [
-                'createQueue' => 1
-            ],
-            'methods' => [
-                'em.flush' => [
-                    'amountCall' => 1
-                ],
-                'repository.findByThread' => [
-                    'amountCall' => 0
-                ],
-                'entityManager.getRepository' =>[
-                    'amountCall' => 0
-                ],
-                'getTargetEntities'=>[
-                    'amountCall' => 1,
-                    'return' => []
-                ],
-                'getEmailReferences' => [
-                    'amountCall' => 0
-                ]
-            ]
-        ];
+        $email = $this->getEmail();
+        $target = $this->getEmailAddressOwner(1);
+
+        $this->activityManager->expects(self::once())
+            ->method('addActivityTarget')
+            ->with(self::identicalTo($email), self::identicalTo($target))
+            ->willReturn(true);
+
+        self::assertTrue($this->emailActivityManager->addAssociation($email, $target));
     }
 
-    private function getProviderConfigWithoutTargetEntities(): array
+    public function testRemoveAssociation(): void
     {
-        return [
-            'email' => $this->getEmailEntity(1, 1),
-            'email2' => $this->getEmailEntity(2, 1),
-            'params' => [
-                'createQueue' => 1
-            ],
-            'methods' => [
-                'em.flush' => [
-                    'amountCall' => 1
+        $email = $this->getEmail();
+        $target = $this->getEmailAddressOwner(1);
+
+        $this->activityManager->expects(self::once())
+            ->method('removeActivityTarget')
+            ->with(self::identicalTo($email), self::identicalTo($target))
+            ->willReturn(true);
+
+        self::assertTrue($this->emailActivityManager->removeActivityTarget($email, $target));
+    }
+
+    public function testUpdateActivitiesWhenNoCreatedEmails(): void
+    {
+        $this->emailActivityListProvider->expects(self::never())
+            ->method('getTargetEntities');
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getEmailReferences');
+
+        $this->tokenStorage->expects(self::never())
+            ->method('getToken');
+        $this->entityOwnerAccessor->expects(self::never())
+            ->method('getOrganization');
+
+        $this->activityManager->expects(self::never())
+            ->method('addActivityTarget');
+
+        $this->emailActivityManager->updateActivities([]);
+    }
+
+    public function testUpdateActivitiesWhenEmailHasNoRecipients(): void
+    {
+        $email = $this->getEmail(1);
+        $senderOwner = $this->getEmailAddressOwner(1);
+        $this->addEmailSender($email, $senderOwner);
+
+        $this->emailActivityListProvider->expects(self::once())
+            ->method('getTargetEntities')
+            ->with(self::identicalTo($email))
+            ->willReturn([]);
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getEmailReferences');
+
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn(null);
+        $this->entityOwnerAccessor->expects(self::never())
+            ->method('getOrganization');
+
+        $this->activityManager->expects(self::once())
+            ->method('addActivityTarget')
+            ->with(self::identicalTo($email), self::identicalTo($senderOwner))
+            ->willReturn(true);
+
+        $this->emailActivityManager->updateActivities([$email]);
+    }
+
+    public function testUpdateActivitiesWhenEmailHasNoSender(): void
+    {
+        $email = $this->getEmail(1);
+        $recipientOwner = $this->getEmailAddressOwner(1);
+        $this->addEmailRecipient($email, $recipientOwner);
+
+        $this->emailActivityListProvider->expects(self::once())
+            ->method('getTargetEntities')
+            ->with(self::identicalTo($email))
+            ->willReturn([]);
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getEmailReferences');
+
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn(null);
+        $this->entityOwnerAccessor->expects(self::never())
+            ->method('getOrganization');
+
+        $this->activityManager->expects(self::once())
+            ->method('addActivityTarget')
+            ->with(self::identicalTo($email), self::identicalTo($recipientOwner))
+            ->willReturn(true);
+
+        $this->emailActivityManager->updateActivities([$email]);
+    }
+
+    public function testUpdateActivitiesForNonThreadedEmail(): void
+    {
+        $email = $this->getEmail(1);
+        $senderOwner = $this->getEmailAddressOwner(1);
+        $recipientOwner = $this->getEmailAddressOwner(2);
+        $this->addEmailSender($email, $senderOwner);
+        $this->addEmailRecipient($email, $recipientOwner);
+
+        $this->emailActivityListProvider->expects(self::once())
+            ->method('getTargetEntities')
+            ->with(self::identicalTo($email))
+            ->willReturn([]);
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getEmailReferences');
+
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn(null);
+        $this->entityOwnerAccessor->expects(self::never())
+            ->method('getOrganization');
+
+        $this->activityManager->expects(self::exactly(2))
+            ->method('addActivityTarget')
+            ->withConsecutive(
+                [self::identicalTo($email), self::identicalTo($senderOwner)],
+                [self::identicalTo($email), self::identicalTo($recipientOwner)]
+            )
+            ->willReturn(true);
+
+        $this->emailActivityManager->updateActivities([$email]);
+    }
+
+    public function testUpdateActivitiesWhenEmailHasSameOwnerForSenderAndSomeRecipients(): void
+    {
+        $email = $this->getEmail(1);
+        $owner1 = $this->getEmailAddressOwner(1);
+        $owner2 = $this->getEmailAddressOwner(2);
+        $owner3 = $this->getEmailAddressOwner(3);
+        $owner4 = $this->getEmailAddressOwner(4);
+        $this->addEmailSender($email, $owner1);
+        $this->addEmailRecipient($email, $owner2);
+        $this->addEmailRecipient($email, $owner3);
+        $this->addEmailRecipient($email, $owner4);
+        $this->addEmailRecipient($email, $owner1);
+        $this->addEmailRecipient($email, $owner2);
+        $this->addEmailRecipient($email, null);
+
+        $this->emailActivityListProvider->expects(self::once())
+            ->method('getTargetEntities')
+            ->with(self::identicalTo($email))
+            ->willReturn([]);
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getEmailReferences');
+
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn(null);
+        $this->entityOwnerAccessor->expects(self::never())
+            ->method('getOrganization');
+
+        $this->activityManager->expects(self::exactly(4))
+            ->method('addActivityTarget')
+            ->withConsecutive(
+                [self::identicalTo($email), self::identicalTo($owner1)],
+                [self::identicalTo($email), self::identicalTo($owner2)],
+                [self::identicalTo($email), self::identicalTo($owner3)],
+                [self::identicalTo($email), self::identicalTo($owner4)]
+            )
+            ->willReturn(true);
+
+        $this->emailActivityManager->updateActivities([$email]);
+    }
+
+    public function testUpdateActivitiesWhenSenderFromAnotherOrganization(): void
+    {
+        $email = $this->getEmail(1);
+        $senderOwner = $this->getEmailAddressOwner(1);
+        $recipientOwner = $this->getEmailAddressOwner(2);
+        $this->addEmailSender($email, $senderOwner);
+        $this->addEmailRecipient($email, $recipientOwner);
+
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
+        $token->expects(self::atLeastOnce())
+            ->method('getOrganization')
+            ->willReturn($this->getOrganization(1));
+
+        $this->emailActivityListProvider->expects(self::once())
+            ->method('getTargetEntities')
+            ->with(self::identicalTo($email))
+            ->willReturn([]);
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getEmailReferences');
+
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn($token);
+        $this->entityOwnerAccessor->expects(self::exactly(2))
+            ->method('getOrganization')
+            ->willReturnMap([
+                [$senderOwner, $this->getOrganization(2)],
+                [$recipientOwner, $this->getOrganization(1)]
+            ]);
+
+        $this->activityManager->expects(self::once())
+            ->method('addActivityTarget')
+            ->with(self::identicalTo($email), self::identicalTo($recipientOwner))
+            ->willReturn(true);
+
+        $this->emailActivityManager->updateActivities([$email]);
+    }
+
+    public function testUpdateActivitiesWhenRecipientFromAnotherOrganization(): void
+    {
+        $email = $this->getEmail(1);
+        $senderOwner = $this->getEmailAddressOwner(1);
+        $recipientOwner = $this->getEmailAddressOwner(2);
+        $this->addEmailSender($email, $senderOwner);
+        $this->addEmailRecipient($email, $recipientOwner);
+
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
+        $token->expects(self::atLeastOnce())
+            ->method('getOrganization')
+            ->willReturn($this->getOrganization(1));
+
+        $this->emailActivityListProvider->expects(self::once())
+            ->method('getTargetEntities')
+            ->with(self::identicalTo($email))
+            ->willReturn([]);
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getEmailReferences');
+
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn($token);
+        $this->entityOwnerAccessor->expects(self::exactly(2))
+            ->method('getOrganization')
+            ->willReturnMap([
+                [$senderOwner, $this->getOrganization(1)],
+                [$recipientOwner, $this->getOrganization(2)]
+            ]);
+
+        $this->activityManager->expects(self::once())
+            ->method('addActivityTarget')
+            ->with(self::identicalTo($email), self::identicalTo($senderOwner))
+            ->willReturn(true);
+
+        $this->emailActivityManager->updateActivities([$email]);
+    }
+
+    public function testUpdateActivitiesWhenEmailAndReferencedEmailDoesNotHaveContexts(): void
+    {
+        $email = $this->getEmail(1, 1);
+        $senderOwner = $this->getEmailAddressOwner(1);
+        $recipientOwner = $this->getEmailAddressOwner(2);
+        $this->addEmailSender($email, $senderOwner);
+        $this->addEmailRecipient($email, $recipientOwner);
+
+        $referencedEmail = $this->getEmail(2, 1);
+
+        $this->emailActivityListProvider->expects(self::exactly(2))
+            ->method('getTargetEntities')
+            ->withConsecutive(
+                [self::identicalTo($email)],
+                [self::identicalTo($referencedEmail)]
+            )
+            ->willReturn([]);
+        $this->emailThreadProvider->expects(self::once())
+            ->method('getEmailReferences')
+            ->with(self::identicalTo($this->em), self::identicalTo($email))
+            ->willReturn([$referencedEmail]);
+
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn(null);
+        $this->entityOwnerAccessor->expects(self::never())
+            ->method('getOrganization');
+
+        $this->activityManager->expects(self::exactly(2))
+            ->method('addActivityTarget')
+            ->withConsecutive(
+                [self::identicalTo($email), self::identicalTo($senderOwner)],
+                [self::identicalTo($email), self::identicalTo($recipientOwner)]
+            )
+            ->willReturn(true);
+
+        $this->emailActivityManager->updateActivities([$email]);
+    }
+
+    public function testUpdateActivitiesWhenEmailHasContexts(): void
+    {
+        $email = $this->getEmail(1, 1);
+        $senderOwner = $this->getEmailAddressOwner(1);
+        $recipientOwner1 = $this->getEmailAddressOwner(2);
+        $recipientOwner2 = $this->getEmailAddressOwner(3);
+        $this->addEmailSender($email, $senderOwner);
+        $this->addEmailRecipient($email, $recipientOwner1);
+        $this->addEmailRecipient($email, $recipientOwner2);
+
+        $emailContext = $this->getEmailAddressOwner(10);
+
+        $this->emailActivityListProvider->expects(self::once())
+            ->method('getTargetEntities')
+            ->with(self::identicalTo($email))
+            ->willReturn([$emailContext]);
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getEmailReferences');
+
+        $this->tokenStorage->expects(self::never())
+            ->method('getToken');
+        $this->entityOwnerAccessor->expects(self::never())
+            ->method('getOrganization');
+
+        $this->activityManager->expects(self::never())
+            ->method('addActivityTarget');
+
+        $this->emailActivityManager->updateActivities([$email]);
+    }
+
+    public function testUpdateActivitiesWhenEmailDoesNotHaveContextsAndReferencedEmailHasContexts(): void
+    {
+        $email = $this->getEmail(1, 1);
+        $senderOwner = $this->getEmailAddressOwner(1);
+        $recipientOwner = $this->getEmailAddressOwner(2);
+        $this->addEmailSender($email, $senderOwner);
+        $this->addEmailRecipient($email, $recipientOwner);
+
+        $referencedEmail1 = $this->getEmail(2, 1);
+        $referencedEmail1SenderOwner = $this->getEmailAddressOwner(20);
+        $referencedEmail1RecipientOwner = $this->getEmailAddressOwner(21);
+        $this->addEmailSender($referencedEmail1, $referencedEmail1SenderOwner);
+        $this->addEmailRecipient($referencedEmail1, $referencedEmail1RecipientOwner);
+
+        $referencedEmail2 = $this->getEmail(3, 1);
+        $referencedEmail2SenderOwner = $this->getEmailAddressOwner(30);
+        $referencedEmail2RecipientOwner = $this->getEmailAddressOwner(31);
+        $this->addEmailSender($referencedEmail2, $referencedEmail2SenderOwner);
+        $this->addEmailRecipient($referencedEmail2, $referencedEmail2RecipientOwner);
+
+        $referencedEmail1Context = $this->getEmailAddressOwner(100);
+        $referencedEmail2Context = $this->getEmailAddressOwner(110);
+
+        $this->emailActivityListProvider->expects(self::exactly(3))
+            ->method('getTargetEntities')
+            ->withConsecutive(
+                [self::identicalTo($email)],
+                [self::identicalTo($referencedEmail1)],
+                [self::identicalTo($referencedEmail2)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                [],
+                [
+                    $senderOwner,
+                    $recipientOwner,
+                    $referencedEmail1Context,
+                    $referencedEmail1SenderOwner,
+                    $referencedEmail1RecipientOwner
                 ],
-                'repository.findByThread' => [
-                    'amountCall' => 0
-                ],
-                'entityManager.getRepository' => [
-                    'amountCall' => 0
-                ],
-                'getTargetEntities' => [
-                    'amountCall' => 3,
-                    'return' => []
-                ],
-                'getEmailReferences' => [
-                    'amountCall' => 1
+                [
+                    $senderOwner,
+                    $recipientOwner,
+                    $referencedEmail2Context,
+                    $referencedEmail2SenderOwner,
+                    $referencedEmail2RecipientOwner
                 ]
-            ]
-        ];
+            );
+        $this->emailThreadProvider->expects(self::once())
+            ->method('getEmailReferences')
+            ->with(self::identicalTo($this->em), self::identicalTo($email))
+            ->willReturn([$referencedEmail1, $referencedEmail2]);
+
+        $this->tokenStorage->expects(self::atLeastOnce())
+            ->method('getToken')
+            ->willReturn(null);
+        $this->entityOwnerAccessor->expects(self::never())
+            ->method('getOrganization');
+
+        $this->activityManager->expects(self::exactly(4))
+            ->method('addActivityTarget')
+            ->withConsecutive(
+                [self::identicalTo($email), self::identicalTo($senderOwner)],
+                [self::identicalTo($email), self::identicalTo($recipientOwner)],
+                [self::identicalTo($email), self::identicalTo($referencedEmail1Context)],
+                [self::identicalTo($email), self::identicalTo($referencedEmail2Context)]
+            )
+            ->willReturn(true);
+
+        $this->emailActivityManager->updateActivities([$email]);
     }
 }

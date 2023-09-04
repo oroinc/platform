@@ -437,6 +437,71 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testIdentifierFieldWhenIdentifierDescriptionIsSet()
+    {
+        $config = [
+            'identifier_field_names' => ['id'],
+            'identifier_description' => 'identifier field description',
+            'exclusion_policy'       => 'all',
+            'fields'                 => [
+                'id'     => null,
+                'field1' => null
+            ]
+        ];
+
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'exclusion_policy'       => 'all',
+                'identifier_description' => 'identifier field description',
+                'fields'                 => [
+                    'id'     => [
+                        'description' => 'identifier field description'
+                    ],
+                    'field1' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testIdentifierFieldForUpdateActionWhenIdentifierDescriptionIsSet()
+    {
+        $config = [
+            'identifier_field_names' => ['id'],
+            'identifier_description' => 'identifier field description',
+            'exclusion_policy'       => 'all',
+            'fields'                 => [
+                'id'     => null,
+                'field1' => null
+            ]
+        ];
+
+        $this->context->setTargetAction('update');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'exclusion_policy'       => 'all',
+                'identifier_description' => 'identifier field description',
+                'fields'                 => [
+                    'id'     => [
+                        'description' => '<p>identifier field description</p>'
+                            . '<p><strong>The required field.</strong></p>'
+                    ],
+                    'field1' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
     public function testIdentifierFieldWhenItAlreadyHasDescription()
     {
         $config = [

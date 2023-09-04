@@ -30,6 +30,10 @@ class EmailAddressValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, EmailAddress::class);
         }
 
+        if (null === $value) {
+            return;
+        }
+
         if (is_scalar($value)) {
             $value = [$value];
         }

@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 class ContextMetadataAccessor implements MetadataAccessorInterface
 {
     private Context $context;
+    private array $resolvedClassNames = [];
 
     public function __construct(Context $context)
     {
@@ -23,8 +24,27 @@ class ContextMetadataAccessor implements MetadataAccessorInterface
      */
     public function getMetadata(string $className): ?EntityMetadata
     {
-        return is_a($this->context->getClassName(), $className, true)
+        return is_a($this->context->getClassName(), $this->resolveClassName($className), true)
             ? $this->context->getMetadata()
             : null;
+    }
+
+    private function resolveClassName(string $className): string
+    {
+        if (isset($this->resolvedClassNames[$className])) {
+            return $this->resolvedClassNames[$className];
+        }
+
+        $resolvedClassName = $className;
+        $config = $this->context->getConfig();
+        if (null !== $config) {
+            $formDataClass = $config->getFormOption('data_class');
+            if ($formDataClass && $formDataClass === $className) {
+                $resolvedClassName = $this->context->getClassName();
+            }
+        }
+        $this->resolvedClassNames[$className] = $resolvedClassName;
+
+        return $resolvedClassName;
     }
 }

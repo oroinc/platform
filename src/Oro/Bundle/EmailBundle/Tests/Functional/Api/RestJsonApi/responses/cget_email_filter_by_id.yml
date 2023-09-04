@@ -1,0 +1,54 @@
+data:
+    -
+        type: emails
+        id: '<toString(@email_1->id)>'
+        attributes:
+            createdAt: '@email_1->created->format("Y-m-d\TH:i:s\Z")'
+            subject: 'Test First Email'
+            sentAt: '2022-05-01T12:01:00Z'
+            importance: normal
+            internalDate: '2022-05-01T12:05:00Z'
+            head: true
+            messageId: '<id1@email-api.func-test>'
+            messageIds: null
+            xMessageId: null
+            xThreadId: null
+            references: []
+            acceptLanguage: null
+            bodySynced: true
+            from:
+                name: null
+                email: admin@example.com
+            toRecipients:
+                -
+                    name: null
+                    email: user1@example.com
+            ccRecipients:
+                -
+                    name: null
+                    email: cc1@example.com
+            bccRecipients:
+                -
+                    name: null
+                    email: bcc1@example.com
+            shortTextBody: 'Test First Email body'
+            hasEmailAttachments: true
+            body:
+                content: 'Test First Email body'
+                type: text
+        relationships:
+            emailUsers:
+                data:
+                    -
+                        type: emailusers
+                        id: '<toString(@emailUser_1->id)>'
+            activityTargets:
+                data:
+                    -
+                        type: users
+                        id: '<toString(@user->id)>'
+            emailAttachments:
+                data:
+                    -
+                        type: emailattachments
+                        id: '<toString(@emailAttachment_1_1->id)>'

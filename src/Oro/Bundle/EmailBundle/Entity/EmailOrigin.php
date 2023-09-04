@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -39,7 +40,7 @@ abstract class EmailOrigin
     protected $mailboxName;
 
     /**
-     * @var ArrayCollection
+     * @var Collection<int, EmailFolder>
      *
      * @ORM\OneToMany(targetEntity="EmailFolder", mappedBy="origin", cascade={"persist", "remove"}, orphanRemoval=true)
      */
@@ -134,7 +135,7 @@ abstract class EmailOrigin
     }
 
     /**
-     * Get an email folder
+     * Gets an email folder by its type and full name.
      *
      * @param string      $type     Can be 'inbox', 'sent', 'trash', 'drafts' or 'other'
      * @param string|null $fullName
@@ -143,20 +144,19 @@ abstract class EmailOrigin
      */
     public function getFolder($type, $fullName = null)
     {
-        return $this->folders
-            ->filter(
-                function (EmailFolder $folder) use ($type, $fullName) {
-                    return
-                        $folder->getType() === $type
-                        && (empty($fullName) || $folder->getFullName() === $fullName);
-                }
-            )->first();
+        foreach ($this->folders as $folder) {
+            if ($folder->getType() === $type && (!$fullName || $folder->getFullName() === $fullName)) {
+                return $folder;
+            }
+        }
+
+        return null;
     }
 
     /**
-     * Get email folders
+     * Gets all email folders.
      *
-     * @return ArrayCollection|EmailFolder[]
+     * @return Collection<int, EmailFolder>
      */
     public function getFolders()
     {
@@ -164,9 +164,9 @@ abstract class EmailOrigin
     }
 
     /**
-     * Get root folders (where parent_folder_id is null)
+     * Gets root folders (folders without a parent folder).
      *
-     * @return ArrayCollection|EmailFolder[]
+     * @return Collection<int, EmailFolder>
      */
     public function getRootFolders()
     {
@@ -176,16 +176,15 @@ abstract class EmailOrigin
     }
 
     /**
-     * Replace existing folders by new ones
+     * Replaces existing folders by new ones,
      *
-     * @param EmailFolder[]|ArrayCollection $folders
+     * @param Collection<int, EmailFolder> $folders
      *
      * @return $this
      */
     public function setFolders($folders)
     {
         $this->folders->clear();
-
         foreach ($folders as $folder) {
             $this->addFolder($folder);
         }

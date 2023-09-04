@@ -159,6 +159,12 @@ class ConfigUtil extends BaseConfigUtil
     /** the option for a post processor to be applies to the field value */
     public const POST_PROCESSOR_OPTIONS = 'post_processor_options';
 
+    public const UPSERT = 'upsert';
+    public const UPSERT_DISABLE = 'disable';
+    public const UPSERT_ADD = 'add';
+    public const UPSERT_REMOVE = 'remove';
+    public const UPSERT_REPLACE = 'replace';
+
     /**
      * Gets a native PHP array representation of each object in a given array.
      *
