@@ -2,65 +2,41 @@
 
 namespace Oro\Bundle\EmailBundle\Model\Action;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
-use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
 /**
- * Class AddActivityTarget
+ * The action to add an entity to the context of an email entity.
  *
  * @add_email_activity_target:
  *      email: $.emailEntity
  *      target_entity: $.targetEntity
  *      attribute: $.attribute              # status if activity was added is stored in this optional attribute
- *
- * @package Oro\Bundle\ActivityBundle\Model\Action
  */
 class AddActivityTarget extends AbstractAction
 {
-    /** @var ActivityManager */
-    protected $activityManager;
+    private ActivityManager $activityManager;
+    private mixed $activityEntity = null;
+    private mixed $targetEntity = null;
+    private mixed $attribute = null;
 
-    /** @var string */
-    protected $activityEntity;
-
-    /** @var string */
-    protected $targetEntity;
-
-    /** @var string */
-    protected $attribute;
-
-    /** @var ActivityListChainProvider */
-    private $chainProvider;
-
-    /** @var EntityManager */
-    private $entityManager;
-
-    public function __construct(
-        ContextAccessor $contextAccessor,
-        EmailActivityManager $activityManager,
-        ActivityListChainProvider $chainProvider,
-        EntityManager $entityManager
-    ) {
+    public function __construct(ContextAccessor $contextAccessor, ActivityManager $activityManager)
+    {
         parent::__construct($contextAccessor);
         $this->activityManager = $activityManager;
-        $this->chainProvider = $chainProvider;
-        $this->entityManager = $entityManager;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function executeAction($context)
+    protected function executeAction($context): void
     {
         $email = $this->contextAccessor->getValue($context, $this->activityEntity);
         $targetEntity = $this->contextAccessor->getValue($context, $this->targetEntity);
 
-        $result = $this->activityManager->addAssociation($email, $targetEntity);
+        $result = $this->activityManager->addActivityTarget($email, $targetEntity);
 
         if ($this->attribute !== null) {
             $this->contextAccessor->setValue($context, $this->attribute, $result);
@@ -68,11 +44,11 @@ class AddActivityTarget extends AbstractAction
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function initialize(array $options)
+    public function initialize(array $options): void
     {
-        if ((count($options) < 2) || (count($options) > 3)) {
+        if ((\count($options) < 2) || (\count($options) > 3)) {
             throw new InvalidParameterException('Two or three parameters are required.');
         }
 

@@ -17,7 +17,6 @@ use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
 use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
 use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailEntity;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertInterface;
 use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
@@ -98,7 +97,8 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $user->setId(12);
         $organization = new Organization();
         $organization->setId(22);
-        $email = new TestEmailEntity(125);
+        $email = new Email();
+        ReflectionUtil::setId($email, 125);
         $email->setSubject('Test Email');
         $emailBody = new EmailBody();
         $emailUser = new EmailUser();
@@ -159,7 +159,8 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $user->setId(12);
         $organization = new Organization();
         $organization->setId(22);
-        $email = new TestEmailEntity(852);
+        $email = new Email();
+        ReflectionUtil::setId($email, 852);
         $email->setSubject('Test Email');
 
         $origin = new TestEmailOrigin();
@@ -364,7 +365,8 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSyncOneEmailBodyWithSyncWithNotificationAlertException(): void
     {
-        $email = new TestEmailEntity(456);
+        $email = new Email();
+        ReflectionUtil::setId($email, 456);
         $email->setSubject('test2 email');
         $emailUser = new EmailUser();
 
@@ -443,7 +445,8 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSyncOneEmailBodyWithExceptionDuringSave(): void
     {
-        $email = new TestEmailEntity(789);
+        $email = new Email();
+        ReflectionUtil::setId($email, 789);
         $email->setSubject('test email');
         $emailUser = new EmailUser();
         $emailBody = new EmailBody();
@@ -537,7 +540,8 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSync(): void
     {
-        $email = new TestEmailEntity(489);
+        $email = new Email();
+        ReflectionUtil::setId($email, 489);
         $email->setSubject('Test email');
         $emailBody = new EmailBody();
         $emailUser = new EmailUser();
@@ -616,7 +620,8 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSyncOneEmailBodyWithDisabledOrigin(): void
     {
-        $email = new TestEmailEntity(848);
+        $email = new Email();
+        ReflectionUtil::setId($email, 848);
         $email->setSubject('test2 email');
         $emailUser = new EmailUser();
 
@@ -670,7 +675,8 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSyncWithAlreadyDeletedEmail(): void
     {
-        $email = new TestEmailEntity(500);
+        $email = new Email();
+        ReflectionUtil::setId($email, 500);
 
         $repo = $this->createMock(EmailRepository::class);
         $this->doctrine->expects(self::exactly(2))

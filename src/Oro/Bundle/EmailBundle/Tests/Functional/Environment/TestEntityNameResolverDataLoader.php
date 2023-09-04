@@ -33,9 +33,9 @@ class TestEntityNameResolverDataLoader implements TestEntityNameResolverDataLoad
         ReferenceRepository $repository,
         string $entityClass
     ): array {
-        if (EmailUser::class === $entityClass) {
+        if (Email::class === $entityClass) {
             $emailUser = $this->emailEntityBuilder->emailUser(
-                'Test Email',
+                'Test Email 1',
                 'from@example.com',
                 ['to@example.com'],
                 new \DateTime('2023-05-01 02:10:00', new \DateTimeZone('UTC')),
@@ -47,7 +47,31 @@ class TestEntityNameResolverDataLoader implements TestEntityNameResolverDataLoad
                 $repository->getReference('user'),
                 $repository->getReference('organization')
             );
-            $emailUser->getEmail()->setMessageId('<email1@func-test>');
+            $email = $emailUser->getEmail();
+            $email->setMessageId('<email1@func-test>');
+            $email->setEmailBody($this->emailEntityBuilder->body('test body', false));
+            $repository->setReference('email', $email);
+            $this->emailEntityBuilder->getBatch()->persist($em);
+            $em->flush();
+
+            return ['email'];
+        }
+
+        if (EmailUser::class === $entityClass) {
+            $emailUser = $this->emailEntityBuilder->emailUser(
+                'Test Email 2',
+                'from@example.com',
+                ['to@example.com'],
+                new \DateTime('2023-05-01 02:10:00', new \DateTimeZone('UTC')),
+                new \DateTime('2023-05-01 02:20:00', new \DateTimeZone('UTC')),
+                new \DateTime('2023-05-01 02:00:00', new \DateTimeZone('UTC')),
+                Email::HIGH_IMPORTANCE,
+                null,
+                null,
+                $repository->getReference('user'),
+                $repository->getReference('organization')
+            );
+            $emailUser->getEmail()->setMessageId('<email2@func-test>');
             $repository->setReference('emailUser', $emailUser);
             $this->emailEntityBuilder->getBatch()->persist($em);
             $em->flush();
@@ -77,8 +101,11 @@ class TestEntityNameResolverDataLoader implements TestEntityNameResolverDataLoad
         ?string $format,
         ?string $locale
     ): string {
+        if (Email::class === $entityClass) {
+            return 'Test Email 1';
+        }
         if (EmailUser::class === $entityClass) {
-            return 'Test Email';
+            return 'Test Email 2';
         }
         if (Mailbox::class === $entityClass) {
             return EntityNameProviderInterface::SHORT === $format

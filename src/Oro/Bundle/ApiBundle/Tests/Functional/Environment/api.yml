@@ -251,6 +251,7 @@ api:
                     name: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
             identifier_field_names: ['key']
+            identifier_description: 'The unique identifier of a resource. It is a key.'
             fields:
                 databaseId:
                     property_path: id

@@ -200,12 +200,7 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
      */
     public function getPropertyPath(string $propertyName): ?string
     {
-        $property = $this->getProperty($propertyName);
-        if (null === $property) {
-            return null;
-        }
-
-        return $property->getPropertyPath();
+        return $this->getProperty($propertyName)?->getPropertyPath();
     }
 
     /**
@@ -521,11 +516,7 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
      */
     public function get(string $attributeName): mixed
     {
-        if (null === $this->attributes) {
-            return null;
-        }
-
-        return $this->attributes->get($attributeName);
+        return $this->attributes?->get($attributeName);
     }
 
     /**

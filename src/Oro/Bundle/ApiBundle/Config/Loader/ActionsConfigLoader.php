@@ -64,6 +64,8 @@ class ActionsConfigLoader extends AbstractConfigLoader
                 $this->loadFields($action, $value);
             } elseif (ConfigUtil::DISABLE_META_PROPERTIES === $key) {
                 $this->loadDisabledMetaProperties($action, $value);
+            } elseif (ConfigUtil::UPSERT === $key) {
+                $this->loadUpsertConfig($action, $value);
             } else {
                 $this->loadConfigValue($action, $key, $value, self::METHOD_MAP);
             }
@@ -112,6 +114,26 @@ class ActionsConfigLoader extends AbstractConfigLoader
                 $action->enableMetaProperties();
             } else {
                 $action->disableMetaProperty($val);
+            }
+        }
+    }
+
+    private function loadUpsertConfig(ActionConfig $action, array $value): void
+    {
+        if (isset($value[ConfigUtil::UPSERT_DISABLE])) {
+            $action->getUpsertConfig()->setEnabled(!$value[ConfigUtil::UPSERT_DISABLE]);
+        }
+        if (isset($value[ConfigUtil::UPSERT_REPLACE])) {
+            $action->getUpsertConfig()->replaceFields($value[ConfigUtil::UPSERT_REPLACE]);
+        }
+        if (isset($value[ConfigUtil::UPSERT_ADD])) {
+            foreach ($value[ConfigUtil::UPSERT_ADD] as $fieldNames) {
+                $action->getUpsertConfig()->addFields($fieldNames);
+            }
+        }
+        if (isset($value[ConfigUtil::UPSERT_REMOVE])) {
+            foreach ($value[ConfigUtil::UPSERT_REMOVE] as $fieldNames) {
+                $action->getUpsertConfig()->removeFields($fieldNames);
             }
         }
     }

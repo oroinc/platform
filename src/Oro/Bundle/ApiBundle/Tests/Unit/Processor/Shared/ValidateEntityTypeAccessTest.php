@@ -13,13 +13,13 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
+    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $aclGroupProvider;
 
     protected function setUp(): void
@@ -48,7 +48,7 @@ class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenAccessGrantedForManageableEntityWithoutConfigOfAclResource()
+    public function testProcessWhenAccessGrantedForManageableEntityWithoutConfigOfAclResource(): void
     {
         $className = Product::class;
         $config = new EntityDefinitionConfig();
@@ -63,7 +63,7 @@ class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
         $this->getProcessor()->process($this->context);
     }
 
-    public function testProcessWhenAccessDeniedForManageableEntityWithoutConfigOfAclResource()
+    public function testProcessWhenAccessDeniedForManageableEntityWithoutConfigOfAclResource(): void
     {
         $this->expectException(AccessDeniedException::class);
         $className = Product::class;
@@ -79,7 +79,7 @@ class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
         $this->getProcessor()->process($this->context);
     }
 
-    public function testProcessWhenAccessGrantedForEntityWithConfigOfAclResource()
+    public function testProcessWhenAccessGrantedForEntityWithConfigOfAclResource(): void
     {
         $className = Product::class;
         $aclResource = 'acme_product_test';
@@ -96,7 +96,7 @@ class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
         $this->getProcessor()->process($this->context);
     }
 
-    public function testProcessWhenAccessDeniedForEntityWithConfigOfAclResource()
+    public function testProcessWhenAccessDeniedForEntityWithConfigOfAclResource(): void
     {
         $this->expectException(AccessDeniedException::class);
         $className = Product::class;
@@ -114,7 +114,7 @@ class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
         $this->getProcessor()->process($this->context);
     }
 
-    public function testForcePermissionUsage()
+    public function testForcePermissionUsage(): void
     {
         $className = Product::class;
         $config = new EntityDefinitionConfig();
@@ -130,7 +130,7 @@ class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
         $this->getProcessor(true)->process($this->context);
     }
 
-    public function testForcePermissionUsageWhenAclCheckIsDisabled()
+    public function testForcePermissionUsageWhenAclCheckIsDisabled(): void
     {
         $className = Product::class;
         $config = new EntityDefinitionConfig();

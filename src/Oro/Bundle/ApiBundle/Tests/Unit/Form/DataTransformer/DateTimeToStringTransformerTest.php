@@ -43,7 +43,7 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
             ],
             'not zero milliseconds with timezone'     => [
                 '2017-07-21T10:20:30.123+05:00',
-                '2017-07-21T10:20:30.123+05:00'
+                '2017-07-21T10:20:30+05:00'
             ],
             'zero milliseconds with UTC timezone'     => [
                 '2017-07-21T10:20:30.000+00:00',
@@ -51,7 +51,7 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
             ],
             'not zero milliseconds with UTC timezone' => [
                 '2017-07-21T10:20:30.123+00:00',
-                '2017-07-21T10:20:30.123Z'
+                '2017-07-21T10:20:30Z'
             ]
         ];
     }

@@ -10,12 +10,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
 {
-    private const UPSERT = 'upsert';
-    private const UPSERT_DISABLE = 'disable';
-    private const UPSERT_ADD = 'add';
-    private const UPSERT_REMOVE = 'remove';
-    private const UPSERT_REPLACE = 'replace';
-
     /**
      * {@inheritDoc}
      */
@@ -27,6 +21,7 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
                 ->performNoDeepMerging()
                 ->prototype('scalar')->cannotBeEmpty()->end()
             ->end()
+            ->scalarNode(ConfigUtil::IDENTIFIER_DESCRIPTION)->end()
             ->booleanNode(ConfigUtil::DISABLE_INCLUSION)->end()
             ->booleanNode(ConfigUtil::DISABLE_FIELDSET)->end()
             ->arrayNode(ConfigUtil::DISABLE_META_PROPERTIES)
@@ -50,14 +45,14 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
 
         /** @var NodeBuilder $upsertNode */
         $upsertNode = $node
-            ->arrayNode(self::UPSERT)
-                ->treatFalseLike([self::UPSERT_DISABLE => true])
-                ->treatTrueLike([self::UPSERT_DISABLE => false])
+            ->arrayNode(ConfigUtil::UPSERT)
+                ->treatFalseLike([ConfigUtil::UPSERT_DISABLE => true])
+                ->treatTrueLike([ConfigUtil::UPSERT_DISABLE => false])
                 ->children()
-                    ->booleanNode(self::UPSERT_DISABLE)->end();
-        $this->appendArrayOfNotEmptyStrings($upsertNode, self::UPSERT_ADD);
-        $this->appendArrayOfNotEmptyStrings($upsertNode, self::UPSERT_REMOVE);
-        $this->appendArrayOfNotEmptyStrings($upsertNode, self::UPSERT_REPLACE);
+                    ->booleanNode(ConfigUtil::UPSERT_DISABLE)->end();
+        $this->appendArrayOfNotEmptyStrings($upsertNode, ConfigUtil::UPSERT_ADD);
+        $this->appendArrayOfNotEmptyStrings($upsertNode, ConfigUtil::UPSERT_REMOVE);
+        $this->appendArrayOfNotEmptyStrings($upsertNode, ConfigUtil::UPSERT_REPLACE);
     }
 
     /**
@@ -78,15 +73,15 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         if (empty($config[ConfigUtil::DISABLE_META_PROPERTIES])) {
             unset($config[ConfigUtil::DISABLE_META_PROPERTIES]);
         }
-        if (\array_key_exists(self::UPSERT, $config)) {
-            if (empty($config[self::UPSERT][self::UPSERT_ADD])) {
-                unset($config[self::UPSERT][self::UPSERT_ADD]);
+        if (\array_key_exists(ConfigUtil::UPSERT, $config)) {
+            if (empty($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_ADD])) {
+                unset($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_ADD]);
             }
-            if (empty($config[self::UPSERT][self::UPSERT_REMOVE])) {
-                unset($config[self::UPSERT][self::UPSERT_REMOVE]);
+            if (empty($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REMOVE])) {
+                unset($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REMOVE]);
             }
-            if (empty($config[self::UPSERT][self::UPSERT_REPLACE])) {
-                unset($config[self::UPSERT][self::UPSERT_REPLACE]);
+            if (empty($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REPLACE])) {
+                unset($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REPLACE]);
             }
         }
 

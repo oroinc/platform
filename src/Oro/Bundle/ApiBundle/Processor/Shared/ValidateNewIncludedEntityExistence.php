@@ -11,20 +11,20 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Validates that `include` section has no new entities in specified associations
+ * Validates that "included" section has no new entities in specified associations
  * related to the entity this processor is used.
  */
 class ValidateNewIncludedEntityExistence implements ProcessorInterface
 {
     private PropertyAccessorInterface $propertyAccessor;
     private TranslatorInterface $translator;
-    /** @var array [association_name_in_entity => is_collection, ...] */
+    /** @var array [association name => is collection, ...] */
     private array $associations;
 
     /**
      * @param PropertyAccessorInterface $propertyAccessor
      * @param TranslatorInterface       $translator
-     * @param array                     $associations [association_name_in_entity => is_collection, ...]
+     * @param array                     $associations [association name => is collection, ...]
      */
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,

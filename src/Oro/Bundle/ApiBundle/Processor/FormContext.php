@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -134,4 +135,20 @@ interface FormContext extends ContextInterface, ChangeContextInterface
      * Sets a flag indicates whether the validation of the form should be skipped or not.
      */
     public function skipFormValidation(bool $skipFormValidation): void;
+
+    /**
+     * Gets config extras that should be used by {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity}
+     * and {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities} processors.
+     *
+     * @return ConfigExtraInterface[]
+     */
+    public function getNormalizedEntityConfigExtras(): array;
+
+    /**
+     * Sets config extras that should be used by {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity}
+     * and {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities} processors.
+     *
+     * @param ConfigExtraInterface[] $extras
+     */
+    public function setNormalizedEntityConfigExtras(array $extras): void;
 }

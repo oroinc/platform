@@ -40,30 +40,30 @@ class CompleteUpsertConfig extends AbstractAddStatusCodes
             return;
         }
 
-        $definition = $context->getResult();
-        $upsertConfig = $definition->getUpsertConfig();
-        if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
-            $upsertConfig->setEnabled(false);
-            $upsertConfig->setAllowedById(false);
-            $upsertConfig->replaceFields([]);
-        } elseif ($upsertConfig->isEnabled()) {
-            $entityClass = $context->getClassName();
-            if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-                /** @var ClassMetadata $metadata */
-                $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-                $upsertConfig->setAllowedById(
-                    $this->isEntityIdCanBeUsedByUpsertOperationToFindEntity($definition, $metadata)
-                );
-                $this->addFieldsToUpsertConfig($upsertConfig, $definition, $metadata);
+        if (!$context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
+            $definition = $context->getResult();
+            $upsertConfig = $definition->getUpsertConfig();
+            if ($upsertConfig->isEnabled()) {
+                $entityClass = $context->getClassName();
+                if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
+                    /** @var ClassMetadata $metadata */
+                    $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+                    if (!$upsertConfig->hasAllowedById()) {
+                        $upsertConfig->setAllowedById(
+                            $this->isEntityIdCanBeUsedByUpsertOperationToFindEntity($definition, $metadata)
+                        );
+                    }
+                    $this->addFieldsToUpsertConfig($upsertConfig, $definition, $metadata);
+                }
+                if (!$upsertConfig->isAllowedById() && !$upsertConfig->getFields()) {
+                    $upsertConfig->setEnabled(false);
+                } elseif (!$upsertConfig->hasEnabled()) {
+                    $upsertConfig->setEnabled(true);
+                }
+            } else {
+                $upsertConfig->setAllowedById(false);
+                $upsertConfig->replaceFields([]);
             }
-            if (!$upsertConfig->isAllowedById() && !$upsertConfig->getFields()) {
-                $upsertConfig->setEnabled(false);
-            } elseif (!$upsertConfig->hasEnabled()) {
-                $upsertConfig->setEnabled(true);
-            }
-        } else {
-            $upsertConfig->setAllowedById(false);
-            $upsertConfig->replaceFields([]);
         }
 
         $context->setProcessed(self::OPERATION_NAME);

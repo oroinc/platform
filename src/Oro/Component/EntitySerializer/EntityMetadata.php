@@ -17,6 +17,14 @@ class EntityMetadata
     }
 
     /**
+     * Gets FQCN of a manageable entity.
+     */
+    public function getEntityClass(): string
+    {
+        return $this->metadata->name;
+    }
+
+    /**
      * Gets entity field names.
      *
      * @return string[]

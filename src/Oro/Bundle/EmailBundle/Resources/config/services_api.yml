@@ -21,6 +21,11 @@ services:
             - '@oro_entity_config.config_manager'
             - '@translator'
 
+    oro_email.api.email_origin_repository:
+        class: Oro\Bundle\EmailBundle\Api\Repository\EmailOriginRepository
+        arguments:
+            - '@oro_api.doctrine_helper'
+
     oro_email.api.add_email_context_search_entity_url_link:
         class: Oro\Bundle\SearchBundle\Api\Processor\AddSearchEntityUrlLink
         tags:
@@ -66,3 +71,175 @@ services:
             - '@oro_security.token_accessor'
         tags:
             - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\EmailBundle\Api\Model\EmailContextItem }
+
+    oro_email.api.protect_email_query_by_acl:
+        class: Oro\Bundle\EmailBundle\Api\Processor\ProtectEmailQueryByAcl
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, class: Oro\Bundle\EmailBundle\Entity\Email, priority: -200}
+            - { name: oro.api.processor, action: get_list, group: build_query, class: Oro\Bundle\EmailBundle\Entity\Email, priority: -200}
+
+    oro_email.api.build_email_attachments_subresource_query:
+        class: Oro\Bundle\EmailBundle\Api\Processor\BuildEmailAttachmentsSubresourceQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: build_query, association: emailAttachments, parentClass: Oro\Bundle\EmailBundle\Entity\Email, priority: -90 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, association: emailAttachments, parentClass: Oro\Bundle\EmailBundle\Entity\Email, priority: -90 }
+
+    oro_email.api.validate_parent_email_access:
+        class: Oro\Bundle\EmailBundle\Api\Processor\ValidateParentEmailAccess
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
+            - '@oro_api.query_acl_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: load_data, parentClass: Oro\Bundle\EmailBundle\Entity\Email, priority: 105 }
+            - { name: oro.api.processor, action: get_relationship, group: load_data, parentClass: Oro\Bundle\EmailBundle\Entity\Email, priority: 105 }
+
+    oro_email.api.compute_email_fields:
+        class: Oro\Bundle\EmailBundle\Api\Processor\ComputeEmailFields
+        arguments:
+            - '@oro_email.email.address.helper'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\EmailBundle\Entity\Email }
+
+    oro_email.api.create.create_email_entity:
+        class: Oro\Bundle\EmailBundle\Api\Processor\CreateEmailEntity
+        tags:
+            - { name: oro.api.processor, action: create, group: load_data, class: Oro\Bundle\EmailBundle\Entity\Email, priority: -15 }
+
+    oro_email.api.convert_to_email_model:
+        class: Oro\Bundle\EmailBundle\Api\Processor\ConvertToEmailModel
+        tags:
+            - { name: oro.api.processor, action: update, group: load_data, class: Oro\Bundle\EmailBundle\Entity\Email, priority: -15 }
+
+    oro_email.api.validate_email_body_exists:
+        class: Oro\Bundle\EmailBundle\Api\Processor\ValidateEmailBodyExists
+        arguments:
+            - '@translator'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_validate, parentAction: create|update, class: Oro\Bundle\EmailBundle\Api\Model\Email }
+
+    oro_email.api.validate_email_message_id_uniqueness:
+        class: Oro\Bundle\EmailBundle\Api\Processor\ValidateEmailMessageIdUniqueness
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@translator'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_validate, parentAction: create, class: Oro\Bundle\EmailBundle\Api\Model\Email, priority: -50 }
+
+    oro_email.api.load_email_origin:
+        class: Oro\Bundle\EmailBundle\Api\Processor\LoadEmailOrigin
+        arguments:
+            - '@oro_email.api.email_origin_repository'
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_validate, parentAction: create, class: Oro\Bundle\EmailBundle\Api\Model\Email, priority: -220 }
+
+    oro_email.api.prepare_new_email_model_to_save:
+        class: Oro\Bundle\EmailBundle\Api\Processor\PrepareNewEmailModelToSave
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_email.email.entity.builder'
+            - '@oro_email.email.address.helper'
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_flush_data, parentAction: create, class: Oro\Bundle\EmailBundle\Api\Model\Email }
+
+    oro_email.api.prepare_email_model_to_save:
+        class: Oro\Bundle\EmailBundle\Api\Processor\PrepareEmailModelToSave
+        arguments:
+            - '@oro_email.email.entity.builder'
+            - '@translator'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_flush_data, parentAction: update, class: Oro\Bundle\EmailBundle\Api\Model\Email }
+
+    oro_email.api.replace_email_model_in_context:
+        class: Oro\Bundle\EmailBundle\Api\Processor\ReplaceEmailModelInContext
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_flush_data, parentAction: create|update, class: Oro\Bundle\EmailBundle\Api\Model\Email, priority: -2 }
+
+    oro_email.api.update_email_attributes:
+        class: Oro\Bundle\EmailBundle\Api\Processor\UpdateEmailAttributes
+        arguments:
+            - '@oro_api.form_property_accessor'
+            - '@oro_email.listener.entity_listener'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_flush_data, parentAction: create|update, class: Oro\Bundle\EmailBundle\Api\Model\Email, priority: -10 }
+
+    oro_email.api.update_included_email_associations:
+        class: Oro\Bundle\EmailBundle\Api\Processor\UpdateIncludedEmailAssociations
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_flush_data, parentAction: create|update, class: Oro\Bundle\EmailBundle\Api\Model\Email, priority: -30 }
+
+    oro_email.api.set_normalized_entity_config_extras:
+        class: Oro\Bundle\EmailBundle\Api\Processor\SetNormalizedEntityConfigExtras
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_data, class: Oro\Bundle\EmailBundle\Entity\Email }
+
+    oro_email.api.disable_included_email_users_creation:
+        class: Oro\Bundle\EmailBundle\Api\Processor\DisableIncludedEmailUsersCreation
+        arguments:
+            - '@oro_api.error_completer_registry'
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, class: Oro\Bundle\EmailBundle\Entity\Email, priority: -48 }
+
+    oro_email.api.compute_email_user_folders:
+        class: Oro\Bundle\EmailBundle\Api\Processor\ComputeEmailUserFolders
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\EmailBundle\Entity\EmailUser }
+
+    oro_email.api.handle_email_folders:
+        class: Oro\Bundle\EmailBundle\Api\Processor\HandleEmailFolders
+        arguments:
+            - '@oro_email.email.entity.builder'
+            - '@oro_email.api.email_origin_repository'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_validate, parentAction: create|update, class: Oro\Bundle\EmailBundle\Entity\EmailUser }
+
+    oro_email.api.validate_email_user_email_association_exists:
+        class: Oro\Bundle\EmailBundle\Api\Processor\ValidateEmailUserEmailAssociationExists
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_validate, parentAction: create|update, class: Oro\Bundle\EmailBundle\Entity\EmailUser, priority: -10 }
+
+    oro_email.api.update_visibility_for_new_email_user:
+        class: Oro\Bundle\EmailBundle\Api\Processor\UpdateVisibilityForNewEmailUser
+        arguments:
+            - '@event_dispatcher'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_flush_data, parentAction: create, class: Oro\Bundle\EmailBundle\Entity\EmailUser }
+
+    oro_email.api.set_email_association_query:
+        class: Oro\Bundle\EmailBundle\Api\Processor\SetEmailAssociationQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', class: Oro\Bundle\EmailBundle\Entity\EmailAttachment, priority: -35 }
+
+    oro_email.api.protect_email_attachment_query_by_acl:
+        class: Oro\Bundle\EmailBundle\Api\Processor\ProtectEmailAttachmentQueryByAcl
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, class: Oro\Bundle\EmailBundle\Entity\EmailAttachment, priority: -200}
+            - { name: oro.api.processor, action: get_list, group: build_query, class: Oro\Bundle\EmailBundle\Entity\EmailAttachment, priority: -200}
+
+    oro_email.api.disable_email_attachment_creation:
+        class: Oro\Bundle\EmailBundle\Api\Processor\DisableEmailAttachmentCreation
+        tags:
+            - { name: oro.api.processor, action: create, group: resource_check, class: Oro\Bundle\EmailBundle\Entity\EmailAttachment, priority: 250 }
+
+    oro_email.api.compute_email_attachment_email:
+        class: Oro\Bundle\EmailBundle\Api\Processor\ComputeEmailAttachmentEmail
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\EmailBundle\Entity\EmailAttachment }
+
+    oro_email.api.prepare_new_email_attachment_model_to_save:
+        class: Oro\Bundle\EmailBundle\Api\Processor\PrepareNewEmailAttachmentModelToSave
+        arguments:
+            - '@oro_email.email.entity.builder'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_flush_data, parentAction: create, class: Oro\Bundle\EmailBundle\Api\Model\EmailAttachment }

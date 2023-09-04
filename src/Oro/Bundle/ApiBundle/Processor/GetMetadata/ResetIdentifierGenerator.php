@@ -6,7 +6,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Makes a API resource as a resource without auto-generates identifier value.
+ * Makes a API resource as a resource without auto-generated identifier value.
  */
 class ResetIdentifierGenerator implements ProcessorInterface
 {
