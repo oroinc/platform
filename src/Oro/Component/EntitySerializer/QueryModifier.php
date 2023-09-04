@@ -187,9 +187,9 @@ class QueryModifier
         foreach ($associations as $propertyPath) {
             $delimiterPos = strpos($propertyPath, ConfigUtil::PATH_DELIMITER);
             while (false !== $delimiterPos) {
-                $parentPropertyPath = substr($propertyPath, 0, $delimiterPos);
-                if (!isset($associationMap[$parentPropertyPath])) {
-                    $associationMap[$parentPropertyPath] = true;
+                $parentPropertyName = substr($propertyPath, 0, $delimiterPos);
+                if (!isset($associationMap[$parentPropertyName])) {
+                    $associationMap[$parentPropertyName] = true;
                 }
                 $delimiterPos = strpos($propertyPath, ConfigUtil::PATH_DELIMITER, $delimiterPos + 1);
             }

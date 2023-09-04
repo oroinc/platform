@@ -33,7 +33,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -57,6 +57,11 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             return;
         }
 
+        if ($this->isParentEntityIdExistInQuery($query)) {
+            // the restriction by the primary entity identifier was already added
+            return;
+        }
+
         if (ConfigUtil::IGNORE_PROPERTY_PATH !== $associationName) {
             $parentJoinAlias = $this->joinParentEntity(
                 $query,
@@ -73,7 +78,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
                 $parentJoinAlias,
                 self::PARENT_ENTITY_ID_QUERY_PARAM_NAME
             );
-        } elseif (!$this->isParentEntityIdExistInQuery($query)) {
+        } else {
             $this->entityIdHelper->applyEntityIdentifierRestriction(
                 $query,
                 $context->getParentId(),

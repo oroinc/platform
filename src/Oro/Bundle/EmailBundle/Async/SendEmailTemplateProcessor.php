@@ -11,33 +11,38 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Uses {@see AggregatedEmailTemplatesSender} to send localized emails to specified recipients using specified email
  * template and create {@see EmailUser} entities.
  */
-class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubscriberInterface, LoggerAwareInterface
+class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    use LoggerAwareTrait;
-
-    private ManagerRegistry $managerRegistry;
-
+    private ManagerRegistry $doctrine;
     private AggregatedEmailTemplatesSender $aggregatedEmailTemplatesSender;
+    private LoggerInterface $logger;
 
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        AggregatedEmailTemplatesSender $aggregatedEmailTemplatesSender
+        ManagerRegistry $doctrine,
+        AggregatedEmailTemplatesSender $aggregatedEmailTemplatesSender,
+        LoggerInterface $logger
     ) {
-        $this->managerRegistry = $managerRegistry;
+        $this->doctrine = $doctrine;
         $this->aggregatedEmailTemplatesSender = $aggregatedEmailTemplatesSender;
-        $this->logger = new NullLogger();
+        $this->logger = $logger;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     */
+    public static function getSubscribedTopics(): array
+    {
+        return [SendEmailTemplateTopic::getName()];
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function process(MessageInterface $message, SessionInterface $session): string
     {
@@ -82,7 +87,7 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
     private function getEntity(array $messageBody): ?object
     {
         [$entityClass, $entityId] = $messageBody['entity'];
-        $entity = $this->managerRegistry->getManagerForClass($entityClass)->find($entityClass, $entityId);
+        $entity = $this->doctrine->getManagerForClass($entityClass)->find($entityClass, $entityId);
         if (!$entity) {
             $this->logger->error(
                 sprintf('Could not find required entity with class "%s" and id "%s".', $entityClass, $entityId)
@@ -92,13 +97,5 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
         }
 
         return $entity;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedTopics(): array
-    {
-        return [SendEmailTemplateTopic::getName()];
     }
 }

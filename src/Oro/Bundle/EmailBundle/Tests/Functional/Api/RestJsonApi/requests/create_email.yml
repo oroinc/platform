@@ -1,0 +1,67 @@
+data:
+    type: emails
+    attributes:
+        subject: 'Test Email'
+        importance: high
+        from:
+            name: 'John Doo'
+            email: '@user->email'
+        toRecipients:
+            -
+                name: 'User 1'
+                email: '@user1->email'
+        ccRecipients:
+            -
+                name: 'Recipient 2'
+                email: 'email3@example.com'
+            -
+                name: 'User 1'
+                email: '@user1->email'
+        bccRecipients:
+            -
+                name: 'Recipient 2'
+                email: 'email2@example.com'
+            -
+                name: 'User 1'
+                email: '@user1->email'
+        messageId: '<test@email-api.func-test>'
+        messageIds:
+            - '<test@email-api.func-test>'
+            - '<test1@email-api.func-test>'
+        sentAt: '2023-02-01T10:20:30.050Z'
+        internalDate: '2023-02-01T10:10:10+02:00'
+        acceptLanguage: 'en-US'
+        xMessageId: 'test_x_message_id'
+        xThreadId: 'test_x_thread_id'
+        references:
+            - '<id1@email-api.func-test>'
+        body:
+            content: 'Test <b>email</b> body'
+            type: html
+    relationships:
+        emailUsers:
+            data:
+                - { type: emailusers, id: email_user_1 }
+        emailAttachments:
+            data:
+                - { type: emailattachments, id: email_attachment_1 }
+included:
+    -
+        type: emailusers
+        id: email_user_1
+        attributes:
+            receivedAt: '2023-02-01T10:20:31.050Z'
+            seen: false
+            folders:
+                -
+                    type: sent
+                    name: Sent
+                    path: Sent
+    -
+        type: emailattachments
+        id: email_attachment_1
+        attributes:
+            fileName: 'test.jpg'
+            contentType: 'image/jpeg'
+            contentEncoding: 'base64'
+            content: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABHNCSVQICAgIfAhkiAAAAAtJREFUCJlj+A8EAAn7A/3jVfKcAAAAAElFTkSuQmCC'

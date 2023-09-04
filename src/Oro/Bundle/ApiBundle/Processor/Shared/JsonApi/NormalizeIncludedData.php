@@ -441,7 +441,10 @@ class NormalizeIncludedData implements ProcessorInterface
         bool $full = false,
         string $action = null
     ): EntityDefinitionConfig {
-        $cacheKey = $entityClass . ($action ? ':' . $action : '') . ($full ? ':full' : '');
+        if (null === $action) {
+            $action = $this->context->getAction();
+        }
+        $cacheKey = $entityClass . (':' . $action) . ($full ? ':full' : '');
         if (isset($this->entityConfig[$cacheKey])) {
             return $this->entityConfig[$cacheKey];
         }

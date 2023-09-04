@@ -289,14 +289,26 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertNull($config->getFormOptions());
+        self::assertNull($config->getFormOption('key'));
+        self::assertSame('', $config->getFormOption('key', ''));
 
         $config->setFormOptions(['key' => 'val']);
         self::assertEquals(['key' => 'val'], $config->getFormOptions());
         self::assertEquals(['form_options' => ['key' => 'val']], $config->toArray());
+        self::assertSame('val', $config->getFormOption('key'));
+        self::assertSame('val', $config->getFormOption('key', ''));
+
+        $config->setFormOptions([]);
+        self::assertNull($config->getFormOptions());
+        self::assertEquals([], $config->toArray());
+        self::assertNull($config->getFormOption('key'));
+        self::assertSame('', $config->getFormOption('key', ''));
 
         $config->setFormOptions(null);
         self::assertNull($config->getFormOptions());
         self::assertEquals([], $config->toArray());
+        self::assertNull($config->getFormOption('key'));
+        self::assertSame('', $config->getFormOption('key', ''));
     }
 
     public function testSetFormOption()

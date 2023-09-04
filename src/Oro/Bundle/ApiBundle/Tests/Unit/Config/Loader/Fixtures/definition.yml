@@ -225,6 +225,7 @@ all_attributes:
         page_size: 20
         max_results: 50
         identifier_field_names: ['id']
+        identifier_description: 'Test description.'
         hints:
             - hint1
             - {name: hint2, value: hint_val2}
@@ -245,6 +246,7 @@ all_attributes:
         page_size: 20
         max_results: 50
         identifier_field_names: ['id']
+        identifier_description: 'Test description.'
         hints:
             - hint1
             - {name: hint2, value: hint_val2}

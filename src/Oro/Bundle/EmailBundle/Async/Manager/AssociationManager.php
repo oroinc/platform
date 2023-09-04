@@ -4,11 +4,14 @@ namespace Oro\Bundle\EmailBundle\Async\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EmailBundle\Async\Topic\AddEmailAssociationsTopic;
 use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationsTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -25,8 +28,8 @@ class AssociationManager
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var EmailActivityManager */
-    protected $emailActivityManager;
+    /** @var ActivityManager */
+    protected $activityManager;
 
     /** @var EmailOwnersProvider */
     protected $emailOwnersProvider;
@@ -42,13 +45,13 @@ class AssociationManager
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        EmailActivityManager $emailActivityManager,
+        ActivityManager $activityManager,
         EmailOwnersProvider $emailOwnersProvider,
         EmailManager $emailManager,
         MessageProducerInterface $producer
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->emailActivityManager = $emailActivityManager;
+        $this->activityManager = $activityManager;
         $this->emailOwnersProvider = $emailOwnersProvider;
         $this->emailManager = $emailManager;
         $this->producer = $producer;
@@ -77,14 +80,13 @@ class AssociationManager
         $countNewAssociations = 0;
         $emails =$this->emailManager->findEmailsByIds($ids);
         foreach ($emails as $email) {
-            $result = $this->emailActivityManager->addAssociation($email, $target);
-
+            $result = $this->activityManager->addActivityTarget($email, $target);
             if ($result) {
                 $countNewAssociations++;
             }
         }
 
-        $this->doctrineHelper->getEntityManager('Oro\Bundle\EmailBundle\Entity\Email')->flush();
+        $this->getEmailEntityManager()->flush();
 
         return $countNewAssociations;
     }
@@ -94,8 +96,8 @@ class AssociationManager
      */
     public function processUpdateAllEmailOwners()
     {
-        $emailOwnerClasseNames = $this->emailOwnersProvider->getSupportedEmailOwnerClassNames();
-        foreach ($emailOwnerClasseNames as $emailOwnerClassName) {
+        $emailOwnerClassNames = $this->emailOwnersProvider->getSupportedEmailOwnerClassNames();
+        foreach ($emailOwnerClassNames as $emailOwnerClassName) {
             $ownerColumnName = $this->emailOwnersProvider->getOwnerColumnName($emailOwnerClassName);
             if (!$ownerColumnName) {
                 continue;
@@ -193,10 +195,10 @@ class AssociationManager
     protected function clear()
     {
         $clearClass = [
-            'Oro\Bundle\EmailBundle\Entity\Email',
-            'Oro\Bundle\EmailBundle\Entity\EmailBody',
-            'Oro\Bundle\ActivityListBundle\Entity\ActivityList',
-            'Oro\Bundle\EmailBundle\Entity\EmailThread'
+            Email::class,
+            EmailBody::class,
+            ActivityList::class,
+            EmailThread::class
         ];
 
         foreach ($clearClass as $item) {
@@ -243,6 +245,6 @@ class AssociationManager
      */
     protected function getEmailEntityManager()
     {
-        return $this->doctrineHelper->getEntityManagerForClass('OroEmailBundle:Email');
+        return $this->doctrineHelper->getEntityManagerForClass(Email::class);
     }
 }

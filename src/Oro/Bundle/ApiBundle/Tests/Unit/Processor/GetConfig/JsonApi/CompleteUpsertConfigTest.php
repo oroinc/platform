@@ -245,6 +245,39 @@ class CompleteUpsertConfigTest extends ConfigProcessorTestCase
         self::assertTrue($this->context->isProcessed(CompleteUpsertConfig::OPERATION_NAME));
     }
 
+    public function testProcessWhenUpsertByIdIsDisabledInConfig(): void
+    {
+        $definition = new EntityDefinitionConfig();
+        $definition->getUpsertConfig()->removeFields(['id']);
+
+        $metadata = new ClassMetadata(self::TEST_CLASS_NAME);
+        $metadata->identifier = ['id'];
+        $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_IDENTITY);
+        $metadata->fieldMappings = [
+            'id' => ['unique' => true]
+        ];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($metadata);
+        $this->entityIdHelper->expects(self::never())
+            ->method('isEntityIdentifierEqual');
+
+        $this->context->setResult($definition);
+        $this->processor->process($this->context);
+
+        self::assertTrue($definition->getUpsertConfig()->hasEnabled());
+        self::assertFalse($definition->getUpsertConfig()->isEnabled());
+        self::assertFalse($definition->getUpsertConfig()->isAllowedById());
+        self::assertSame([], $definition->getUpsertConfig()->getFields());
+        self::assertTrue($this->context->isProcessed(CompleteUpsertConfig::OPERATION_NAME));
+    }
+
     public function testProcessWhenUpsertIsEnabledForManageableEntityWithUniqueConstraintsAndIdOnlyRequested(): void
     {
         $definition = new EntityDefinitionConfig();
@@ -262,10 +295,10 @@ class CompleteUpsertConfigTest extends ConfigProcessorTestCase
         $this->context->setResult($definition);
         $this->processor->process($this->context);
 
-        self::assertTrue($definition->getUpsertConfig()->hasEnabled());
-        self::assertFalse($definition->getUpsertConfig()->isEnabled());
-        self::assertFalse($definition->getUpsertConfig()->isAllowedById());
-        self::assertSame([], $definition->getUpsertConfig()->getFields());
+        self::assertFalse($definition->getUpsertConfig()->hasEnabled());
+        self::assertTrue($definition->getUpsertConfig()->isEnabled());
+        self::assertTrue($definition->getUpsertConfig()->isAllowedById());
+        self::assertSame([['field1']], $definition->getUpsertConfig()->getFields());
         self::assertTrue($this->context->isProcessed(CompleteUpsertConfig::OPERATION_NAME));
     }
 }

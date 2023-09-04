@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 class ContextConfigAccessor implements ConfigAccessorInterface
 {
     private Context $context;
+    private array $resolvedClassNames = [];
 
     public function __construct(Context $context)
     {
@@ -23,8 +24,28 @@ class ContextConfigAccessor implements ConfigAccessorInterface
      */
     public function getConfig(string $className): ?EntityDefinitionConfig
     {
-        return is_a($this->context->getClassName(), $className, true)
-            ? $this->context->getConfig()
+        $config = $this->context->getConfig();
+
+        return is_a($this->context->getClassName(), $this->resolveClassName($className, $config), true)
+            ? $config
             : null;
+    }
+
+    private function resolveClassName(string $className, ?EntityDefinitionConfig $config): string
+    {
+        if (isset($this->resolvedClassNames[$className])) {
+            return $this->resolvedClassNames[$className];
+        }
+
+        $resolvedClassName = $className;
+        if (null !== $config) {
+            $formDataClass = $config->getFormOption('data_class');
+            if ($formDataClass && $formDataClass === $className) {
+                $resolvedClassName = $this->context->getClassName();
+            }
+        }
+        $this->resolvedClassNames[$className] = $resolvedClassName;
+
+        return $resolvedClassName;
     }
 }

@@ -372,7 +372,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction()), new FilterIdentifierFieldsConfigExtra()]
             )
             ->willReturn($this->getConfig($config));
         $this->metadataProvider->expects(self::once())
@@ -442,7 +442,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction()), new FilterIdentifierFieldsConfigExtra()]
             )
             ->willReturn($this->getConfig($config));
         $this->metadataProvider->expects(self::once())
@@ -514,7 +514,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction()), new FilterIdentifierFieldsConfigExtra()]
             )
             ->willReturn($this->getConfig($config));
         $this->metadataProvider->expects(self::once())
@@ -585,7 +585,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction()), new FilterIdentifierFieldsConfigExtra()]
             )
             ->willReturn($this->getConfig($config));
         $this->metadataProvider->expects(self::once())
@@ -655,7 +655,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction()), new FilterIdentifierFieldsConfigExtra()]
             )
             ->willReturn($this->getConfig($config));
         $this->metadataProvider->expects(self::once())
@@ -726,7 +726,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction()), new FilterIdentifierFieldsConfigExtra()]
             )
             ->willReturn($this->getConfig($config));
         $this->metadataProvider->expects(self::once())
@@ -813,7 +813,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction()), new FilterIdentifierFieldsConfigExtra()]
             )
             ->willReturn($this->getConfig($config));
         $this->metadataProvider->expects(self::once())
@@ -1254,7 +1254,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction())]
             )
             ->willReturn($this->getConfig($fullConfig));
         $this->metadataProvider->expects(self::never())
@@ -1308,7 +1308,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction())]
             )
             ->willReturn($this->getConfig($fullConfig));
         $this->metadataProvider->expects(self::never())
@@ -1364,7 +1364,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction())]
             )
             ->willReturn($this->getConfig($fullConfig));
         $this->metadataProvider->expects(self::once())
@@ -1527,7 +1527,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction())]
             )
             ->willReturn($this->getConfig($fullConfig));
         $this->metadataProvider->expects(self::once())
@@ -1609,7 +1609,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction())]
             )
             ->willReturn($this->getConfig($fullConfig));
         $this->metadataProvider->expects(self::once())
@@ -1693,7 +1693,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction())]
             )
             ->willReturn($this->getConfig($fullConfig));
         $this->metadataProvider->expects(self::once())
@@ -1771,7 +1771,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 $normalizedType,
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra()]
+                [new EntityDefinitionConfigExtra($this->context->getAction())]
             )
             ->willReturn($this->getConfig($fullConfig));
         $this->metadataProvider->expects(self::once())

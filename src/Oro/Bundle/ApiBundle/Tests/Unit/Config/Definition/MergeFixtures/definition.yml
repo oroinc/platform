@@ -25,13 +25,30 @@ upsert:
         -
             upsert:
                 add: [[field1]]
+            actions:
+                create:
+                    upsert:
+                        add: [[field1]]
         -
             upsert:
                 add: [[field2, field3], [field4]]
+            actions:
+                create:
+                    upsert:
+                        add: [[field2, field3], [field4]]
         -
             upsert:
                 remove: [[field4]]
+            actions:
+                create:
+                    upsert:
+                        remove: [[field4]]
     expected:
         upsert:
             add: [[field1], [field2, field3], [field4]]
             remove: [[field4]]
+        actions:
+            create:
+                upsert:
+                    add: [[field1], [field2, field3], [field4]]
+                    remove: [[field4]]

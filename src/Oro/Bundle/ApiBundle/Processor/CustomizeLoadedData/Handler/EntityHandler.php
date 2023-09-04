@@ -64,7 +64,7 @@ class EntityHandler
             $data = \call_user_func($this->previousHandler, $data, $context);
         }
 
-        $customizationContext = $this->createCustomizationContext();
+        $customizationContext = $this->createCustomizationContext($context);
         $this->adjustPropertyPath($customizationContext);
         $customizationContext->setResult($data);
         $customizationContext->setIdentifierOnly(
@@ -82,16 +82,17 @@ class EntityHandler
     }
 
     /**
-     * Creates the customization context based on the state of this handler.
+     * Creates the customization context based on the state of this handler
+     * and the given normalization context.
      */
-    protected function createCustomizationContext(): CustomizeLoadedDataContext
+    protected function createCustomizationContext(array $context): CustomizeLoadedDataContext
     {
         /** @var CustomizeLoadedDataContext $customizationContext */
         $customizationContext = $this->customizationProcessor->createContext();
         $customizationContext->setVersion($this->version);
         $customizationContext->getRequestType()->set($this->requestType);
         $customizationContext->setClassName($this->entityClass);
-        $customizationContext->setConfig($this->config);
+        $customizationContext->setConfig($context['config'][$this->entityClass] ?? $this->config);
         $customizationContext->setConfigExtras($this->configExtras);
 
         return $customizationContext;

@@ -376,7 +376,6 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_input, priority: 200 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_input, priority: 200 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_input, priority: 200 }
-            - { name: oro.api.processor, action: options, group: resource_check, actionType: relationship|subresource, priority: -100 }
 
     oro_api.validate_request_data_exist:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestDataExist
@@ -530,7 +529,6 @@ services:
             - { name: oro.api.processor, action: get, group: normalize_input, priority: -110 }
             - { name: oro.api.processor, action: delete, group: normalize_input, priority: -110 }
             - { name: oro.api.processor, action: update, group: normalize_input, priority: -110 }
-            - { name: oro.api.processor, action: options, group: resource_check, actionType: item, priority: -110 }
 
     #
     # security_check (primary resource)

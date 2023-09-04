@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Config\EntityIdMetadataAdapter;
 use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
 use Oro\Bundle\ApiBundle\Metadata\EntityIdMetadataInterface;
+use Oro\Bundle\ApiBundle\Model\EntityHolderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -52,6 +53,9 @@ class UnidirectionalAssociationHandler
         RequestType $requestType
     ): void {
         $entity = $form->getData();
+        if ($entity instanceof EntityHolderInterface) {
+            $entity = $entity->getEntity();
+        }
         $metadata = new EntityIdMetadataAdapter($this->doctrineHelper->getClass($entity), $config);
         foreach ($unidirectionalAssociations as $fieldName => $targetAssociationName) {
             $fieldForm = $form->get($fieldName);
