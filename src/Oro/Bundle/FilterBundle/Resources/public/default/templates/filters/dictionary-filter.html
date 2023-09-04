@@ -1,6 +1,6 @@
 <div class="choice-filter" data-dictionary-filter-template>
     <div class="filter-select-oro-wrapper">
-        <select name="<%- name %>" class="select select--size-s select--full oro-select2 oro-select2--size-s" data-choice-value-select
+        <select name="<%- name %>" class="select select--full oro-select2" data-choice-value-select
             <% if (_.isMobile()) { %>
                 data-skip-input-widgets
             <% } %>
@@ -21,7 +21,7 @@
     <div class="value-field-frame">
         <input type="hidden"
            name="select-values-autocomplete"
-           class="select-values-autocomplete oro-select2 oro-select2--size-s"
+           class="select-values-autocomplete oro-select2"
            value=""
            aria-label="<%- inputFieldAriaLabel %>"
         >
