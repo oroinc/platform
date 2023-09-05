@@ -73,7 +73,7 @@ const ExpressionEditorView = BaseView.extend({
         this._toggleErrorState(this.isValid());
 
         const startState = EditorState.create({
-            doc: this.el.value,
+            doc: this.util.normalizePropertyNamesExpression(this.el.value),
             extensions: expressionEditorExtensions({
                 util: this.util,
                 operationButtons: this.operationButtons,
@@ -99,8 +99,10 @@ const ExpressionEditorView = BaseView.extend({
     editorUpdateListener(event) {
         const {state} = event;
         const {to} = state.selection.ranges[0];
-        const content = state.doc.toString();
-        this.setValue(content);
+        const content = this.util.unNormalizePropertyNamesExpression(state.doc.toString());
+        if (content !== this.getValue()) {
+            this.setValue(content);
+        }
 
         this.autocompleteData = this.util.getAutocompleteData(content, to);
         this._toggleDataSource();
@@ -160,13 +162,18 @@ const ExpressionEditorView = BaseView.extend({
             return;
         }
 
+        const normalizedContent = this.util.normalizePropertyNamesExpression(content);
+
         editorView.dispatch(
             editorView.state.update(
                 {
                     changes: {
                         from: 0,
                         to: editorView.state.doc.length,
-                        insert: content
+                        insert: normalizedContent
+                    },
+                    selection: {
+                        anchor: normalizedContent.length
                     }
                 }
             )
@@ -188,10 +195,10 @@ const ExpressionEditorView = BaseView.extend({
      *
      * @param {string} value
      */
-    setValue(value) {
-        this.$el.val(value);
+    setValue(value, sync = true) {
+        this.$el.val(value).trigger('change');
 
-        this.updateAllContent(value);
+        sync && this.updateAllContent(value);
 
         const isValid = this.isValid();
         this._toggleErrorState(isValid);

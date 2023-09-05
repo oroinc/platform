@@ -40,6 +40,28 @@ define(function(require) {
                 }
                 return Boolean(scalarField);
             }
+        },
+        __fieldProps: {
+            value(propsName = []) {
+                return propsName.length ? propsName.reduce((field, propName) => {
+                    if (this.__field[propName]) {
+                        field.push(this.__field[propName]);
+                    }
+                    return field;
+                }, []) : this.__field;
+            }
+        },
+        __children: {
+            get() {
+                return Object.fromEntries(Object.entries(this).filter(([name]) => {
+                    return !name.startsWith('__');
+                }));
+            }
+        },
+        __hasChildren: {
+            get() {
+                return !!Object.values(this.__children).length;
+            }
         }
     });
 

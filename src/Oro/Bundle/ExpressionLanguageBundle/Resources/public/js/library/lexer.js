@@ -6,7 +6,7 @@ import stripcslashes from 'oroexpressionlanguage/lib/php-to-js/stripcslashes';
 class Lexer {
     static NUMBER_REGEXP = /^[0-9]+(?:\.[0-9]+)?/;
     static STRING_REGEXP = /^"([^"\\]*(?:\\.[^"\\]*)*)"|^'([^'\\]*(?:\\.[^'\\]*)*)'/;
-    static NAME_REGEXP = /^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/;
+    static NAME_REGEXP = /^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff\\:]*/;
     static OPERATION_REGEXP = /^(not in(?=[\s(])|!==|not(?=[\s(])|and(?=[\s(])|===|>=|or(?=[\s(])|<=|\*\*|\.\.|in(?=[\s(])|&&|\|\||matches|==|!=|\*|~|%|\/|>|\||!|\^|&|\+|<|-)/;
 
     /**

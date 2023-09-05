@@ -276,7 +276,10 @@ const QueryTypeConverterComponent = BaseComponent.extend({
     _convertToConditions(expression) {
         const {expressionEditorUtil} = this.expressionEditorComponent;
         const supportedNames = expressionEditorUtil._getSupportedNames();
-        const parsedExpression = expressionEditorUtil.expressionLanguage.parse(expression, supportedNames);
+        const parsedExpression = expressionEditorUtil.expressionLanguage.parse(
+            expressionEditorUtil.unNormalizePropertyNamesExpression(expression),
+            supportedNames
+        );
         return this.fromExpression.convert(parsedExpression);
     }
 });

@@ -139,6 +139,7 @@ const ExpressionEditorUtil = BaseClass.extend({
             isConditionalNodeAllowed: false
         };
         this.expressionOperandTypeValidator = new ExpressionOperandTypeValidator(validatorOptions);
+        this.normalizedNamesMap = this.generateNormalizedNamesMap();
     },
 
     /**
@@ -146,6 +147,31 @@ const ExpressionEditorUtil = BaseClass.extend({
      */
     onRootEntityChanged() {
         this._createValidator();
+    },
+
+    generateNormalizedNamesMap() {
+        if (!this.entityDataProvider.collection) {
+            return {};
+        }
+
+        const {data} = this.entityDataProvider.collection.toJSON();
+        const queue = data.filter(({attributes}) => this._getSupportedNames().includes(attributes.alias));
+        const results = {};
+
+        while (queue.length) {
+            const {attributes, normalizedName, name} = queue.shift();
+
+            if (attributes && Array.isArray(attributes.fields)) {
+                queue.unshift(...attributes.fields);
+            }
+
+            if (normalizedName && name && normalizedName !== name) {
+                results[normalizedName] = name;
+                results[name] = normalizedName;
+            }
+        }
+
+        return results;
     },
 
     /**
@@ -159,7 +185,10 @@ const ExpressionEditorUtil = BaseClass.extend({
         let isValid = true;
         let exception = '';
         try {
-            const parsedExpression = this.expressionLanguage.parse(expression, this._getSupportedNames());
+            const parsedExpression = this.expressionLanguage.parse(
+                this.unNormalizePropertyNamesExpression(expression),
+                this._getSupportedNames()
+            );
             this.expressionOperandTypeValidator.expectValid(parsedExpression);
         } catch (ex) {
             isValid = false;
@@ -306,7 +335,7 @@ const ExpressionEditorUtil = BaseClass.extend({
             autocompleteData.replaceFrom = fieldChain.lastToken.cursor - 1;
             autocompleteData.replaceTo = autocompleteData.replaceFrom + fieldChain.lastToken.length;
         }
-        const parts = _.pluck(fieldChain.fields, 'value');
+        const parts = _.pluck(fieldChain.fields, 'value').map(value => this.normalizedNamesMap[value] || value);
         parts.unshift(fieldChain.entity.value);
         const omitRelationFields = this.options.itemLevelLimit <= parts.length + 1;
         const levelLimit = this.options.itemLevelLimit - parts.length;
@@ -318,7 +347,7 @@ const ExpressionEditorUtil = BaseClass.extend({
                 if (isEntity && (omitRelationFields || !node.__hasScalarFieldsInSubtree(levelLimit - 1))) {
                     return;
                 }
-                const item = _.extend(_.pick(node.__field, 'label', 'type', 'name'), {
+                const item = _.extend(_.pick(node.__field, 'label', 'type', 'name', 'normalizedName'), {
                     hasChildren: isEntity
                 });
                 autocompleteData.items[item.name] = item;
@@ -485,6 +514,30 @@ const ExpressionEditorUtil = BaseClass.extend({
         }
 
         return chain;
+    },
+
+    /**
+     * Unnormalize entity names in expression
+     *
+     * @param {string} expression
+     * @returns {string}
+     */
+    unNormalizePropertyNamesExpression(expression = '') {
+        return expression.replace(/\.([\w]+)/gi, (match, capture) => {
+            return match.replace(capture, this.normalizedNamesMap[capture] || capture);
+        });
+    },
+
+    /**
+     * Normalize entity names in expression
+     *
+     * @param {string} expression
+     * @returns {string}
+     */
+    normalizePropertyNamesExpression(expression = '') {
+        return expression.replace(/\.([\w\\:]+)/gi, (match, capture) => {
+            return match.replace(capture, this.normalizedNamesMap[capture] || capture);
+        });
     }
 });
 

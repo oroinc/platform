@@ -135,13 +135,17 @@
                 }
             }
 
-            > ul > li {
-                padding: 6px 16px;
-                color: $primary-200;
+            > ul {
+                min-width: 50px;
 
-                &[aria-selected] {
+                > li {
+                    padding: 6px 16px;
                     color: $primary-200;
-                    background-color: $primary-900;
+
+                    &[aria-selected] {
+                        color: $primary-200;
+                        background-color: $primary-900;
+                    }
                 }
             }
         }
