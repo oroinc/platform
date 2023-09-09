@@ -45,6 +45,7 @@ class ValueNormalizer implements ResetInterface
      * @param RequestType $requestType    The request type, for example "rest", "soap", etc.
      * @param bool        $isArrayAllowed Whether a value can be an array.
      * @param bool        $isRangeAllowed Whether a value can be a pair of "from" and "to" values.
+     * @param array       $options        Additional options that should be used during the value conversion.
      *
      * @return mixed
      *
@@ -55,18 +56,33 @@ class ValueNormalizer implements ResetInterface
         string $dataType,
         RequestType $requestType,
         bool $isArrayAllowed = false,
-        bool $isRangeAllowed = false
+        bool $isRangeAllowed = false,
+        array $options = []
     ): mixed {
         if (!isset($this->cachedData[$dataType])) {
-            return $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed, $isRangeAllowed);
+            return $this->getNormalizedValue(
+                $dataType,
+                $requestType,
+                $value,
+                $isArrayAllowed,
+                $isRangeAllowed,
+                $options
+            );
         }
 
-        $cacheKey = (string)$value . '|' . $this->buildCacheKey($requestType, $isArrayAllowed, $isRangeAllowed);
+        $cacheKey = $value . '|' . $this->buildCacheKey($requestType, $isArrayAllowed, $isRangeAllowed, $options);
         if (\array_key_exists($cacheKey, $this->cachedData[$dataType])) {
             return $this->cachedData[$dataType][$cacheKey];
         }
 
-        $result = $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed, $isRangeAllowed);
+        $result = $this->getNormalizedValue(
+            $dataType,
+            $requestType,
+            $value,
+            $isArrayAllowed,
+            $isRangeAllowed,
+            $options
+        );
 
         $this->cachedData[$dataType][$cacheKey] = $result;
 
@@ -80,6 +96,7 @@ class ValueNormalizer implements ResetInterface
      * @param RequestType $requestType    The request type, for example "rest", "soap", etc.
      * @param bool        $isArrayAllowed Whether a value can be an array.
      * @param bool        $isRangeAllowed Whether a value can be a pair of "from" and "to" values.
+     * @param array       $options        Additional options that should be used during the value conversion.
      *
      * @return string
      */
@@ -87,16 +104,24 @@ class ValueNormalizer implements ResetInterface
         string $dataType,
         RequestType $requestType,
         bool $isArrayAllowed = false,
-        bool $isRangeAllowed = false
+        bool $isRangeAllowed = false,
+        array $options = []
     ): string {
-        $requirementKey = $dataType . '|' . $this->buildCacheKey($requestType, $isArrayAllowed, $isRangeAllowed);
-        if (!\array_key_exists($requirementKey, $this->requirements)) {
-            $context = $this->doNormalization($dataType, $requestType, null, $isArrayAllowed, $isRangeAllowed);
+        $cacheKey = $dataType . '|' . $this->buildCacheKey($requestType, $isArrayAllowed, $isRangeAllowed, $options);
+        if (!\array_key_exists($cacheKey, $this->requirements)) {
+            $context = $this->doNormalization(
+                $dataType,
+                $requestType,
+                null,
+                $isArrayAllowed,
+                $isRangeAllowed,
+                $options
+            );
 
-            $this->requirements[$requirementKey] = $context->getRequirement() ?: self::DEFAULT_REQUIREMENT;
+            $this->requirements[$cacheKey] = $context->getRequirement() ?: self::DEFAULT_REQUIREMENT;
         }
 
-        return $this->requirements[$requirementKey];
+        return $this->requirements[$cacheKey];
     }
 
     /**
@@ -118,7 +143,8 @@ class ValueNormalizer implements ResetInterface
         RequestType $requestType,
         mixed $value,
         bool $isArrayAllowed,
-        bool $isRangeAllowed
+        bool $isRangeAllowed,
+        array $options
     ): NormalizeValueContext {
         /** @var NormalizeValueContext $context */
         $context = $this->processor->createContext();
@@ -129,6 +155,9 @@ class ValueNormalizer implements ResetInterface
         $context->setResult($value);
         $context->setArrayAllowed($isArrayAllowed);
         $context->setRangeAllowed($isRangeAllowed);
+        foreach ($options as $name => $val) {
+            $context->addOption($name, $val);
+        }
         try {
             $this->processor->process($context);
         } catch (\Exception $e) {
@@ -146,20 +175,33 @@ class ValueNormalizer implements ResetInterface
         RequestType $requestType,
         mixed $value,
         bool $isArrayAllowed,
-        bool $isRangeAllowed
+        bool $isRangeAllowed,
+        array $options
     ): mixed {
-        return $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed, $isRangeAllowed)
+        return $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed, $isRangeAllowed, $options)
             ->getResult();
     }
 
-    private function buildCacheKey(RequestType $requestType, bool $isArrayAllowed, bool $isRangeAllowed): string
-    {
+    private function buildCacheKey(
+        RequestType $requestType,
+        bool $isArrayAllowed,
+        bool $isRangeAllowed,
+        array $options
+    ): string {
         $result = (string)$requestType;
         if ($isArrayAllowed) {
             $result .= '|[]';
         }
         if ($isRangeAllowed) {
             $result .= '|..';
+        }
+        if ($options) {
+            if (\count($options) > 1) {
+                ksort($options);
+            }
+            foreach ($options as $name => $val) {
+                $result .= sprintf('|%s=%s', $name, $val);
+            }
         }
 
         return $result;

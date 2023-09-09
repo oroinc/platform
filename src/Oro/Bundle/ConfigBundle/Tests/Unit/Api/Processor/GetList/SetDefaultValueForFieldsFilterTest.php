@@ -69,28 +69,21 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
         $entityClass = ConfigurationSection::class;
         $entityType = 'configuration';
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects($this->exactly(2))
             ->method('normalizeValue')
-            ->willReturnMap(
+            ->willReturnMap([
+                [$entityClass, DataType::ENTITY_TYPE, $requestType, false, false, [], $entityType],
                 [
-                    [
-                        $entityClass,
-                        DataType::ENTITY_TYPE,
-                        $this->context->getRequestType(),
-                        false,
-                        false,
-                        $entityType
-                    ],
-                    [
-                        ConfigurationOption::class,
-                        DataType::ENTITY_TYPE,
-                        $this->context->getRequestType(),
-                        false,
-                        false,
-                        'configurationoptions'
-                    ],
+                    ConfigurationOption::class,
+                    DataType::ENTITY_TYPE,
+                    $requestType,
+                    false,
+                    false,
+                    [],
+                    'configurationoptions'
                 ]
-            );
+            ]);
 
         $this->context->setClassName($entityClass);
         $this->processor->process($this->context);
@@ -127,28 +120,21 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
         );
         $configurationSectionFieldsFilter->setArrayAllowed(true);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects($this->exactly(2))
             ->method('normalizeValue')
-            ->willReturnMap(
+            ->willReturnMap([
+                [$entityClass, DataType::ENTITY_TYPE, $requestType, false, false, [], $entityType],
                 [
-                    [
-                        $entityClass,
-                        DataType::ENTITY_TYPE,
-                        $this->context->getRequestType(),
-                        false,
-                        false,
-                        $entityType
-                    ],
-                    [
-                        ConfigurationOption::class,
-                        DataType::ENTITY_TYPE,
-                        $this->context->getRequestType(),
-                        false,
-                        false,
-                        'configurationoptions'
-                    ],
+                    ConfigurationOption::class,
+                    DataType::ENTITY_TYPE,
+                    $requestType,
+                    false,
+                    false,
+                    [],
+                    'configurationoptions'
                 ]
-            );
+            ]);
 
         $this->context->setClassName($entityClass);
         $this->context->getFilters()->add('fields[configuration]', $configurationSectionFieldsFilter, false);
@@ -198,28 +184,21 @@ class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
             'include description'
         );
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects($this->exactly(2))
             ->method('normalizeValue')
-            ->willReturnMap(
+            ->willReturnMap([
+                [$entityClass, DataType::ENTITY_TYPE, $requestType, false, false, [], $entityType],
                 [
-                    [
-                        $entityClass,
-                        DataType::ENTITY_TYPE,
-                        $this->context->getRequestType(),
-                        false,
-                        false,
-                        $entityType
-                    ],
-                    [
-                        ConfigurationOption::class,
-                        DataType::ENTITY_TYPE,
-                        $this->context->getRequestType(),
-                        false,
-                        false,
-                        'configurationoptions'
-                    ],
+                    ConfigurationOption::class,
+                    DataType::ENTITY_TYPE,
+                    $requestType,
+                    false,
+                    false,
+                    [],
+                    'configurationoptions'
                 ]
-            );
+            ]);
 
         $this->context->setClassName($entityClass);
         $this->context->getFilters()->add('fields[configurationoptions]', $configurationOptionsFieldsFilter, false);

@@ -272,7 +272,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected string value. Given "".',
+                'detail' => 'Expected not empty string value. Given "".',
                 'source' => ['parameter' => 'meta']
             ],
             $response
@@ -291,7 +291,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected an array of strings. Given ",title".',
+                'detail' => 'Expected an array of not empty strings. Given ",title".',
                 'source' => ['parameter' => 'meta']
             ],
             $response
@@ -310,7 +310,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected an array of strings. Given "title,".',
+                'detail' => 'Expected an array of not empty strings. Given "title,".',
                 'source' => ['parameter' => 'meta']
             ],
             $response

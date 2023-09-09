@@ -1456,11 +1456,12 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             )
             ->willReturn($fullMetadata);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['testType', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, $normalizedType],
-                ['val1', 'string', $this->context->getRequestType(), false, false, 'normalizedVal1']
+                ['testType', DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
+                ['val1', 'string', $requestType, false, false, [], 'normalizedVal1']
             ]);
 
         $this->entityInstantiator->expects(self::once())
@@ -1540,11 +1541,12 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             )
             ->willReturn($fullMetadata);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['testType', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, $normalizedType],
-                ['val1', 'string', $this->context->getRequestType(), false, false, 'normalizedVal1']
+                ['testType', DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
+                ['val1', 'string', $requestType, false, false, [], 'normalizedVal1']
             ]);
 
         $this->entityIdHelper->expects(self::never())
@@ -1622,11 +1624,12 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             )
             ->willReturn($fullMetadata);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['testType', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, $normalizedType],
-                ['val1', 'string', $this->context->getRequestType(), false, false, 'normalizedVal1']
+                ['testType', DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
+                ['val1', 'string', $requestType, false, false, [], 'normalizedVal1']
             ]);
 
         $this->entityIdHelper->expects(self::once())
@@ -1706,11 +1709,12 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             )
             ->willReturn($fullMetadata);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['testType', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, $normalizedType],
-                ['val1', 'string', $this->context->getRequestType(), false, false, 'normalizedVal1']
+                ['testType', DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
+                ['val1', 'string', $requestType, false, false, [], 'normalizedVal1']
             ]);
 
         $this->context->setClassName('Test\PrimaryClass');
@@ -1784,11 +1788,12 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             )
             ->willReturn($fullMetadata);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['testType', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, $normalizedType],
-                ['val1', 'string', $this->context->getRequestType(), false, false, 'normalizedVal1']
+                ['testType', DataType::ENTITY_CLASS, $requestType, false, false, [], $normalizedType],
+                ['val1', 'string', $requestType, false, false, [], 'normalizedVal1']
             ]);
 
         $this->context->setClassName('Test\PrimaryClass');

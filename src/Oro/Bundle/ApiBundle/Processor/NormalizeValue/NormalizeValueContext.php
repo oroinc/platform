@@ -25,6 +25,7 @@ class NormalizeValueContext extends Context
     private bool $rangeAllowed = false;
     private string $arrayDelimiter = ',';
     private string $rangeDelimiter = '..';
+    private array $options = [];
 
     public function __construct()
     {
@@ -182,5 +183,29 @@ class NormalizeValueContext extends Context
     public function setRangeDelimiter(string $delimiter): void
     {
         $this->rangeDelimiter = $delimiter;
+    }
+
+    /**
+     * Gets additional options that should be used during a value normalization.
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
+     * Adds an additional option that should be used during a value normalization.
+     */
+    public function addOption(string $name, mixed $value): void
+    {
+        $this->options[$name] = $value;
+    }
+
+    /**
+     * Removes an option from the list of additional options that should be used during a value normalization.
+     */
+    public function removeOption(string $name): void
+    {
+        unset($this->options[$name]);
     }
 }

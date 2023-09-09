@@ -42,7 +42,7 @@ class NormalizeFilterValues implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -148,7 +148,8 @@ class NormalizeFilterValues implements ProcessorInterface
             $dataType,
             $requestType,
             $isArrayAllowed,
-            $isRangeAllowed
+            $isRangeAllowed,
+            $filter->getValueNormalizationOptions()
         );
     }
 

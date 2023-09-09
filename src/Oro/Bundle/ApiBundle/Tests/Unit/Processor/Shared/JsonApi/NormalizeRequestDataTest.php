@@ -23,10 +23,10 @@ use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
  */
 class NormalizeRequestDataTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
+    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $valueNormalizer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
+    /** @var EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityIdTransformer;
 
     /** @var NormalizeRequestData */
@@ -163,8 +163,8 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->willReturnMap([
-                ['users', 'entityClass', $requestType, false, false, 'Test\User'],
-                ['groups', 'entityClass', $requestType, false, false, 'Test\Group']
+                ['users', 'entityClass', $requestType, false, false, [], 'Test\User'],
+                ['groups', 'entityClass', $requestType, false, false, [], 'Test\Group']
             ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
@@ -231,7 +231,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->willReturnMap([
-                ['users', 'entityClass', $requestType, false, false, 'Test\User']
+                ['users', 'entityClass', $requestType, false, false, [], 'Test\User']
             ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
@@ -365,8 +365,8 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->willReturnMap([
-                ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
-                ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
+                ['users', 'entityClass', $this->context->getRequestType(), false, false, [], 'Test\User'],
+                ['groups', 'entityClass', $this->context->getRequestType(), false, false, [], 'Test\Group']
             ]);
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
@@ -448,8 +448,8 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->willReturnMap([
-                ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
-                ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
+                ['users', 'entityClass', $this->context->getRequestType(), false, false, [], 'Test\User'],
+                ['groups', 'entityClass', $this->context->getRequestType(), false, false, [], 'Test\Group']
             ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
@@ -526,8 +526,8 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->willReturnMap([
-                ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
-                ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
+                ['users', 'entityClass', $this->context->getRequestType(), false, false, [], 'Test\User'],
+                ['groups', 'entityClass', $this->context->getRequestType(), false, false, [], 'Test\Group']
             ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
@@ -610,8 +610,8 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->willReturnMap([
-                ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
-                ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
+                ['users', 'entityClass', $this->context->getRequestType(), false, false, [], 'Test\User'],
+                ['groups', 'entityClass', $this->context->getRequestType(), false, false, [], 'Test\Group']
             ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
@@ -695,8 +695,8 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->willReturnMap([
-                ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
-                ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
+                ['users', 'entityClass', $this->context->getRequestType(), false, false, [], 'Test\User'],
+                ['groups', 'entityClass', $this->context->getRequestType(), false, false, [], 'Test\Group']
             ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
@@ -766,7 +766,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('users', 'entityClass', $requestType, false, false)
+            ->with('users', 'entityClass', $requestType, false, false, [])
             ->willReturn('Test\User');
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
@@ -813,7 +813,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('users', 'entityClass', $requestType, false, false)
+            ->with('users', 'entityClass', $requestType, false, false, [])
             ->willReturn('Test\User');
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');

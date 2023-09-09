@@ -41,8 +41,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     private const GUID_REQUIREMENT = '[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}';
     private const ORDER_BY_REQUIREMENT = '-?[\w\.]+(,-?[\w\.]+)*';
 
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -203,6 +202,9 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedValue, $result);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function getArrayRequirementProvider(): array
     {
         return [
@@ -313,6 +315,9 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedValue, $result);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function getRangeRequirementProvider(): array
     {
         return [
@@ -423,6 +428,9 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedValue, $result);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function getArrayRangeRequirementProvider(): array
     {
         return [
@@ -584,8 +592,9 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [null, null, DataType::GUID, [RequestType::REST], true],
             [null, null, DataType::GUID, [RequestType::REST], false],
             [null, null, DataType::ORDER_BY, [RequestType::REST], true],
-            [' ', ' ', DataType::STRING, [RequestType::REST], true],
-            [' ', ' ', DataType::STRING, [RequestType::REST], false],
+            ['0', '0', DataType::STRING, [RequestType::REST], false],
+            [['0', '1'], '0,1', DataType::STRING, [RequestType::REST], true],
+            [['0', '1'], ['0', '1'], DataType::STRING, [RequestType::REST], true],
             [',', ',', DataType::STRING, [RequestType::REST], false],
             ['test', 'test', DataType::STRING, [RequestType::REST], true],
             ['test', 'test', DataType::STRING, [RequestType::REST], false],
@@ -1069,9 +1078,6 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         return [
             [new Range('test1', 'test2'), new Range('test1', 'test2'), DataType::STRING],
             [new Range('test1', 'test2'), 'test1..test2', DataType::STRING],
-            [new Range(' ', ' '), ' .. ', DataType::STRING],
-            [new Range(' ', 'test2'), ' ..test2', DataType::STRING],
-            [new Range('test1', ' '), 'test1.. ', DataType::STRING],
             [new Range(123, 456), new Range(123, 456), DataType::INTEGER],
             [new Range(123, 456), '123..456', DataType::INTEGER],
             [new Range(-456, -123), '-456..-123', DataType::INTEGER],
@@ -1212,7 +1218,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'Expected string value. Given "".',
+                'Expected not empty string value. Given "".',
                 '',
                 DataType::STRING,
                 [RequestType::REST]
@@ -1224,8 +1230,56 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected an array of strings. Given ",".',
+                'Expected an array of not empty strings. Given ",".',
                 ',',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of not empty strings. Given "test,".',
+                'test,',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of not empty strings. Given ",test".',
+                ',test',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of not empty strings. Given "test1,,test2".',
+                'test1,,test2',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of not empty strings. Given " ,".',
+                ' ,',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of not empty strings. Given ", ".',
+                ', ',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of not empty strings. Given "test, ".',
+                'test, ',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of not empty strings. Given " ,test".',
+                ' ,test',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of not empty strings. Given "test1, ,test2".',
+                'test1, ,test2',
                 DataType::STRING,
                 [RequestType::REST]
             ],
@@ -1542,6 +1596,12 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
+                'Expected GUID value. Given "".',
+                '',
+                DataType::GUID,
+                [RequestType::REST]
+            ],
+            [
                 'Expected GUID value. Given "test".',
                 'test',
                 DataType::GUID,
@@ -1563,6 +1623,30 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 'Expected an array of GUIDs. Given '
                 . '"EAC12975-D94D-4E96-88B1-101B99914DEF,7eab7435-44bb-493a-9bda-dea3fda3c0dh".',
                 'EAC12975-D94D-4E96-88B1-101B99914DEF,7eab7435-44bb-493a-9bda-dea3fda3c0dh',
+                DataType::GUID,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of GUIDs. Given ",7eab7435-44bb-493a-9bda-dea3fda3c0dh".',
+                ',7eab7435-44bb-493a-9bda-dea3fda3c0dh',
+                DataType::GUID,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of GUIDs. Given "7eab7435-44bb-493a-9bda-dea3fda3c0dh,".',
+                '7eab7435-44bb-493a-9bda-dea3fda3c0dh,',
+                DataType::GUID,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of GUIDs. Given " ,7eab7435-44bb-493a-9bda-dea3fda3c0dh".',
+                ' ,7eab7435-44bb-493a-9bda-dea3fda3c0dh',
+                DataType::GUID,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of GUIDs. Given "7eab7435-44bb-493a-9bda-dea3fda3c0dh, ".',
+                '7eab7435-44bb-493a-9bda-dea3fda3c0dh, ',
                 DataType::GUID,
                 [RequestType::REST]
             ]
@@ -1590,7 +1674,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'Expected a pair of strings (string..string). Given "..".',
+                'Expected a pair of not empty strings (not empty string..not empty string). Given "..".',
                 '..',
                 DataType::STRING,
                 [RequestType::REST]
@@ -1602,7 +1686,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected a pair of strings (string..string). Given "..test".',
+                'Expected a pair of not empty strings (not empty string..not empty string). Given "..test".',
                 '..test',
                 DataType::STRING,
                 [RequestType::REST]
@@ -1614,8 +1698,20 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected a pair of strings (string..string). Given "test..".',
+                'Expected a pair of not empty strings (not empty string..not empty string). Given "test..".',
                 'test..',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of not empty strings (not empty string..not empty string). Given " ..test".',
+                ' ..test',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of not empty strings (not empty string..not empty string). Given "test.. ".',
+                'test.. ',
                 DataType::STRING,
                 [RequestType::REST]
             ],

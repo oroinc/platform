@@ -72,7 +72,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('test1,test2', DataType::STRING, $this->context->getRequestType(), true)
+            ->with('test1,test2', DataType::STRING, $this->context->getRequestType(), true, false, [])
             ->willReturn(['test1', 'test2']);
 
         $this->context->getFilterValues()->set('meta', $filterValue);
@@ -100,7 +100,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
         $exception = new \UnexpectedValueException('invalid value');
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('test1,', DataType::STRING, $this->context->getRequestType(), true)
+            ->with('test1,', DataType::STRING, $this->context->getRequestType(), true, false, [])
             ->willThrowException($exception);
 
         $this->context->getFilterValues()->set('meta', $filterValue);
@@ -126,7 +126,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('test1,test2', DataType::STRING, $this->context->getRequestType(), true)
+            ->with('test1,test2', DataType::STRING, $this->context->getRequestType(), true, false, [])
             ->willReturn(['test1', 'test2']);
 
         $this->context->getFilterValues()->set('meta', $filterValue);
@@ -157,7 +157,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('test1,test2', DataType::STRING, $this->context->getRequestType(), true)
+            ->with('test1,test2', DataType::STRING, $this->context->getRequestType(), true, false, [])
             ->willReturn(['test1', 'test2']);
 
         $this->context->getFilterValues()->set('meta', $filterValue);

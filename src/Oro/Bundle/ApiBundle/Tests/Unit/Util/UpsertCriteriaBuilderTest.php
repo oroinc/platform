@@ -53,9 +53,9 @@ class UpsertCriteriaBuilderTest extends \PHPUnit\Framework\TestCase
         $this->valueNormalizer->expects(self::exactly(3))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['123', 'integer', $context->getRequestType(), false, false, 123],
-                ['val', 'string', $context->getRequestType(), false, false, 'normalized'],
-                ['345', 'integer', $context->getRequestType(), false, false, 345],
+                ['123', 'integer', $context->getRequestType(), false, false, [], 123],
+                ['val', 'string', $context->getRequestType(), false, false, [], 'normalized'],
+                ['345', 'integer', $context->getRequestType(), false, false, [], 345],
             ]);
 
         $criteria = $this->upsertCriteriaBuilder->getUpsertFindEntityCriteria(
@@ -87,8 +87,8 @@ class UpsertCriteriaBuilderTest extends \PHPUnit\Framework\TestCase
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['val1', 'string', $context->getRequestType(), false, false, 'normalized1'],
-                ['val5', 'string', $context->getRequestType(), false, false, 'normalized5']
+                ['val1', 'string', $context->getRequestType(), false, false, [], 'normalized1'],
+                ['val5', 'string', $context->getRequestType(), false, false, [], 'normalized5']
             ]);
 
         $criteria = $this->upsertCriteriaBuilder->getUpsertFindEntityCriteria(
