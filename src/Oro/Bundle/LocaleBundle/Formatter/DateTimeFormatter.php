@@ -150,7 +150,9 @@ class DateTimeFormatter implements DateTimeFormatterInterface
 
         if (!isset($this->cachedPatterns[$key])) {
             $intlFormatter = new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN);
-            $this->cachedPatterns[$key] = $intlFormatter->getPattern();
+            // replace non-breaking spaces with spaces
+            $intlPattern = str_replace("\xE2\x80\xAF", ' ', $intlFormatter->getPattern());
+            $this->cachedPatterns[$key] = $intlPattern;
         }
 
         return $this->cachedPatterns[$key];
