@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Filter\StringComparisonFilter;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -27,10 +28,10 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
  */
 class NormalizeFilterValuesTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
+    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $valueNormalizer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerRegistry */
+    /** @var EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $entityIdTransformerRegistry;
 
     /** @var NormalizeFilterValues */
@@ -98,20 +99,26 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
     public function testProcessForFieldFilters()
     {
         $filters = $this->context->getFilters();
-        $integerFilter = new ComparisonFilter('integer');
-        $stringFilter = new ComparisonFilter('string');
-        $filters->add('id', $integerFilter);
-        $filters->add('label', $stringFilter);
+        $idFilter = new ComparisonFilter('integer');
+        $labelFilter = new StringComparisonFilter('string');
+        $nameFilter = new StringComparisonFilter('string');
+        $nameFilter->setAllowEmpty(true);
+        $filters->add('id', $idFilter);
+        $filters->add('label', $labelFilter);
+        $filters->add('name', $nameFilter);
 
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('id', new FilterValue('id', '1'));
-        $filterValues->set('label', new FilterValue('label', 'test'));
+        $filterValues->set('label', new FilterValue('label', 'test_label'));
+        $filterValues->set('name', new FilterValue('label', 'test_name'));
 
-        $this->valueNormalizer->expects(self::exactly(2))
+        $requestType = $this->context->getRequestType();
+        $this->valueNormalizer->expects(self::exactly(3))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['1', 'integer', $this->context->getRequestType(), false, false, 1],
-                ['test', 'string', $this->context->getRequestType(), false, false, 'test']
+                ['1', 'integer', $requestType, false, false, [], 1],
+                ['test_label', 'string', $requestType, false, false, [], 'normalized_label'],
+                ['test_name', 'string', $requestType, false, false, ['allow_empty' => true], 'normalized_name']
             ]);
         $this->entityIdTransformerRegistry->expects(self::never())
             ->method('getEntityIdTransformer');
@@ -120,7 +127,8 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertSame(1, $filterValues->get('id')->getValue());
-        self::assertSame('test', $filterValues->get('label')->getValue());
+        self::assertSame('normalized_label', $filterValues->get('label')->getValue());
+        self::assertSame('normalized_name', $filterValues->get('name')->getValue());
 
         self::assertFalse($this->context->hasErrors());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
@@ -137,7 +145,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('no', 'boolean', $this->context->getRequestType(), false, false)
+            ->with('no', 'boolean', $this->context->getRequestType(), false, false, [])
             ->willReturn(false);
         $this->entityIdTransformerRegistry->expects(self::never())
             ->method('getEntityIdTransformer');
@@ -169,7 +177,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('predefinedId', 'string', $this->context->getRequestType(), false, false)
+            ->with('predefinedId', 'string', $this->context->getRequestType(), false, false, [])
             ->willReturn('predefinedId');
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->entityIdTransformerRegistry->expects(self::once())
@@ -209,7 +217,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('predefinedId', 'string', $this->context->getRequestType(), false, false)
+            ->with('predefinedId', 'string', $this->context->getRequestType(), false, false, [])
             ->willReturn('predefinedId');
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->entityIdTransformerRegistry->expects(self::once())
@@ -249,7 +257,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('no', 'boolean', $this->context->getRequestType(), false, false)
+            ->with('no', 'boolean', $this->context->getRequestType(), false, false, [])
             ->willReturn(false);
         $this->entityIdTransformerRegistry->expects(self::never())
             ->method('getEntityIdTransformer');
@@ -283,7 +291,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('predefinedId1,predefinedId2', 'string', $this->context->getRequestType(), true, false)
+            ->with('predefinedId1,predefinedId2', 'string', $this->context->getRequestType(), true, false, [])
             ->willReturn(['predefinedId1', 'predefinedId2']);
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->entityIdTransformerRegistry->expects(self::once())
@@ -326,7 +334,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('predefinedId1..predefinedId2', 'string', $this->context->getRequestType(), false, true)
+            ->with('predefinedId1..predefinedId2', 'string', $this->context->getRequestType(), false, true, [])
             ->willReturn(new Range('predefinedId1', 'predefinedId2'));
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->entityIdTransformerRegistry->expects(self::once())
@@ -357,8 +365,8 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
     public function testProcessForInvalidDataType()
     {
         $filters = $this->context->getFilters();
-        $integerFilter = new ComparisonFilter('integer');
-        $filters->add('id', $integerFilter);
+        $idFilter = new ComparisonFilter('integer');
+        $filters->add('id', $idFilter);
 
         $exception = new \UnexpectedValueException('invalid data type');
 
@@ -367,7 +375,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('invalid', 'integer', $this->context->getRequestType(), false, false)
+            ->with('invalid', 'integer', $this->context->getRequestType(), false, false, [])
             ->willThrowException($exception);
 
         $this->context->setFilterValues($filterValues);
@@ -390,8 +398,8 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
     public function testProcessForNotSupportedFilter()
     {
         $filters = $this->context->getFilters();
-        $integerFilter = new ComparisonFilter('string');
-        $filters->add('label', $integerFilter);
+        $idFilter = new ComparisonFilter('string');
+        $filters->add('label', $idFilter);
 
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('id', new FilterValue('id', '1'));
@@ -399,7 +407,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('test', 'string', $this->context->getRequestType(), false, false)
+            ->with('test', 'string', $this->context->getRequestType(), false, false, [])
             ->willReturn('test');
 
         $this->context->setFilterValues($filterValues);
@@ -436,7 +444,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('predefinedId', 'string', $this->context->getRequestType(), false, false)
+            ->with('predefinedId', 'string', $this->context->getRequestType(), false, false, [])
             ->willReturn('predefinedId');
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->entityIdTransformerRegistry->expects(self::once())
@@ -486,7 +494,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('predefinedId', 'string', $this->context->getRequestType(), false, false)
+            ->with('predefinedId', 'string', $this->context->getRequestType(), false, false, [])
             ->willReturn('predefinedId');
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->entityIdTransformerRegistry->expects(self::once())
@@ -537,7 +545,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('predefinedId', 'string', $this->context->getRequestType(), false, false)
+            ->with('predefinedId', 'string', $this->context->getRequestType(), false, false, [])
             ->willReturn('predefinedId');
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->entityIdTransformerRegistry->expects(self::once())
@@ -588,7 +596,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('predefinedId1,predefinedId2', 'string', $this->context->getRequestType(), true, false)
+            ->with('predefinedId1,predefinedId2', 'string', $this->context->getRequestType(), true, false, [])
             ->willReturn(['predefinedId1', 'predefinedId2']);
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->entityIdTransformerRegistry->expects(self::once())
@@ -641,7 +649,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('predefinedId1..predefinedId2', 'string', $this->context->getRequestType(), false, true)
+            ->with('predefinedId1..predefinedId2', 'string', $this->context->getRequestType(), false, true, [])
             ->willReturn(new Range('predefinedId1', 'predefinedId2'));
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->entityIdTransformerRegistry->expects(self::once())
@@ -698,7 +706,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('predefinedId1..predefinedId2', 'string', $this->context->getRequestType(), false, true)
+            ->with('predefinedId1..predefinedId2', 'string', $this->context->getRequestType(), false, true, [])
             ->willReturn(new Range('predefinedId1', 'predefinedId2'));
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $this->entityIdTransformerRegistry->expects(self::once())

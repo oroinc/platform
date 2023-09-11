@@ -218,7 +218,7 @@ class RegisterDynamicFilters extends RegisterFilters
             return $this->createFilter($filterConfig, $propertyPath, $context);
         } catch (\Throwable $e) {
             throw new \LogicException(
-                sprintf('The filter "%s" for "%s" cannot be created.', $fieldName, $entityClass),
+                sprintf('The filter "%s" for "%s" cannot be created.', $fieldName, $context->getClassName()),
                 $e->getCode(),
                 $e
             );

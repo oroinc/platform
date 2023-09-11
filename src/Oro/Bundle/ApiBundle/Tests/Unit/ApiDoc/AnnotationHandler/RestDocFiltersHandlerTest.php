@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
+use Oro\Bundle\ApiBundle\Filter\StringComparisonFilter;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -122,7 +123,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('int', $this->requestType, false, false, [])
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -149,7 +150,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('int', $this->requestType, false, false, [])
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -183,7 +184,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('int', $this->requestType, false, false, [])
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -218,7 +219,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('int', $this->requestType, false, false, [])
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -252,7 +253,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('int', $this->requestType, true, false, [])
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -286,7 +287,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('int', $this->requestType, false, true, [])
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -321,7 +322,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('int', $this->requestType, true, true, [])
             ->willReturn('\d+');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -332,6 +333,40 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
                     'description' => 'A filter',
                     'requirement' => '\d+',
                     'type'        => 'integer or array or range'
+                ]
+            ],
+            $annotation->getFilters()
+        );
+    }
+
+    public function testHandleForStringComparisonFilterWithEmptyValueAllowed()
+    {
+        $annotation = new ApiDoc([]);
+        $filters = new FilterCollection();
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $filter1 = new StringComparisonFilter('string', 'A filter');
+        $filter1->setField('field1');
+        $filter1->setAllowEmpty(true);
+        $filters->add('filter1', $filter1);
+
+        $this->dataTypeConverter->expects(self::once())
+            ->method('convertDataType')
+            ->with('string', self::VIEW)
+            ->willReturn('string');
+        $this->valueNormalizer->expects(self::once())
+            ->method('getRequirement')
+            ->with('string', $this->requestType, false, false, ['allow_empty' => true])
+            ->willReturn('.+');
+
+        $this->filtersHandler->handle($annotation, $filters, $metadata);
+
+        self::assertSame(
+            [
+                'filter1' => [
+                    'description' => 'A filter',
+                    'requirement' => '.+',
+                    'type'        => 'string'
                 ]
             ],
             $annotation->getFilters()
@@ -358,11 +393,11 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('int', $this->requestType, false, false, [])
             ->willReturn('\d+');
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('Test\TargetEntity', DataType::ENTITY_TYPE, $this->requestType)
+            ->with('Test\TargetEntity', DataType::ENTITY_TYPE, $this->requestType, false, false, [])
             ->willReturn('target_entity');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
@@ -400,7 +435,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('int', $this->requestType, false, false, [])
             ->willReturn('\d+');
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');

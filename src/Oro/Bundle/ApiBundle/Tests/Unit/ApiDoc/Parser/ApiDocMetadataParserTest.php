@@ -363,7 +363,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType))
             ->willReturn('targets');
 
         $config = new EntityDefinitionConfig();
@@ -403,7 +403,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType))
             ->willReturn('targets');
 
         $config = new EntityDefinitionConfig();
@@ -444,7 +444,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType))
             ->willReturn('targets');
 
         $config = new EntityDefinitionConfig();
@@ -484,7 +484,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType))
             ->willReturn('targets');
 
         $config = new EntityDefinitionConfig();
@@ -524,7 +524,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType))
             ->willReturn('targets');
 
         $config = new EntityDefinitionConfig();
@@ -672,7 +672,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType))
             ->willReturn('targets');
 
         $config = new EntityDefinitionConfig();
@@ -737,7 +737,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType))
             ->willReturn('targets');
 
         $config = new EntityDefinitionConfig();
