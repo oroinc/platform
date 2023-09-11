@@ -35,7 +35,7 @@ class OrganizationAccessDeniedException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'oro.security.organization.access_denied';
     }

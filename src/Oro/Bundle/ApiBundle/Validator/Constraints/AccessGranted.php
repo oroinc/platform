@@ -28,7 +28,7 @@ class AccessGranted extends Constraint implements ConstraintWithStatusCodeInterf
     /**
      * {@inheritdoc}
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }

@@ -86,7 +86,7 @@ class BusinessUnitSelectAutocomplete extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return OroJquerySelect2HiddenType::class;
     }

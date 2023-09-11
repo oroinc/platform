@@ -57,7 +57,7 @@ HELP
      * @noinspection PhpMissingParentCallCommonInspection
      * @throws \Exception
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Check extended entity configs');
 
@@ -76,6 +76,6 @@ HELP
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

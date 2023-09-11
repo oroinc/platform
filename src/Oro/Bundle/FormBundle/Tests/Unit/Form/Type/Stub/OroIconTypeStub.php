@@ -38,12 +38,12 @@ class OroIconTypeStub extends AbstractType
     /**
      * @return string
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_icon_select';
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return Select2ChoiceType::class;
     }

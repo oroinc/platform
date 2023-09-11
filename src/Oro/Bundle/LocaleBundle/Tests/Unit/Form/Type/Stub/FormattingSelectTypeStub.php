@@ -13,7 +13,7 @@ class FormattingSelectTypeStub extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return FormattingSelectType::NAME;
     }
@@ -31,7 +31,7 @@ class FormattingSelectTypeStub extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

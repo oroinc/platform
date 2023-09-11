@@ -29,7 +29,7 @@ abstract class AbstractDebugCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = $input->getArgument($this->getArgumentName());
 
@@ -49,7 +49,7 @@ abstract class AbstractDebugCommand extends Command
             $service = $this->container->get($types[$name]);
         } catch (\TypeError|\ErrorException $e) {
             $this->printErrorServiceLoadException($output, $e, $types[$name]);
-            return 1;
+            return Command::FAILURE;
         }
 
         $docCommentParser = new DocCommentParser();
@@ -65,7 +65,7 @@ abstract class AbstractDebugCommand extends Command
         );
         $table->render();
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function outputAllItems(OutputInterface $output): int
@@ -88,7 +88,7 @@ abstract class AbstractDebugCommand extends Command
         }
         $table->render();
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function printErrorServiceLoadException(OutputInterface $output, \Throwable $e, string $type): void

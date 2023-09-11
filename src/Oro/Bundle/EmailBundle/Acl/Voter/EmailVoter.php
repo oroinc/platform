@@ -80,7 +80,7 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
      * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function vote(TokenInterface $token, $object, array $attributes)
+    public function vote(TokenInterface $token, $object, array $attributes): int
     {
         if (!is_object($object)) {
             return self::ACCESS_ABSTAIN;

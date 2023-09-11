@@ -73,7 +73,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $limit = (int) $input->getOption('limit');
         $offset = ((int) $input->getOption('page') - 1) * $limit;
@@ -115,7 +115,7 @@ HELP
             ->render()
         ;
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function getUserRow(User $user): array

@@ -62,7 +62,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $locale = $input->getOption('locale');
         $workflowName = $input->getArgument('workflow');
@@ -74,6 +74,6 @@ HELP
 
         $output->write(Yaml::dump(ArrayConverter::expandToTree($translations), self::INLINE_LEVEL));
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

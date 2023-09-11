@@ -486,7 +486,7 @@ abstract class AbstractUser implements
      *
      * @return string[]
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return array_map(static fn (Role $role) => (string) $role, $this->getUserRoles());
     }

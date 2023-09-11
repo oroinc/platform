@@ -33,7 +33,7 @@ class MultiCurrencyType extends PriceType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }

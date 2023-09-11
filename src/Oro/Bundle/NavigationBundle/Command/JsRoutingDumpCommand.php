@@ -101,13 +101,13 @@ class JsRoutingDumpCommand extends Command
     /**
      * {@inheritDoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $format = $input->getOption('format');
         if (!\in_array($format, ['js', 'json'])) {
             $output->writeln('<error>Invalid format specified. Use js or json.</error>');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $callback = $input->getOption('callback');
@@ -116,7 +116,7 @@ class JsRoutingDumpCommand extends Command
                 '<error>If you include --callback it must not be empty. Do you perhaps want --format=json</error>'
             );
 
-            return 1;
+            return Command::FAILURE;
         }
 
         if ('json' !== $format) {
@@ -131,7 +131,7 @@ class JsRoutingDumpCommand extends Command
 
         $this->dump($input, $output);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function normalizeTargetPath(string $targetPath): string

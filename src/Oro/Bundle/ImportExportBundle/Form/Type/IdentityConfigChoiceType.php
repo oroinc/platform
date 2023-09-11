@@ -77,7 +77,7 @@ class IdentityConfigChoiceType extends AbstractConfigType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
@@ -93,7 +93,7 @@ class IdentityConfigChoiceType extends AbstractConfigType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_importexport_identity_config_choice';
     }

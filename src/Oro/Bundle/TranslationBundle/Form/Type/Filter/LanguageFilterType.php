@@ -32,7 +32,7 @@ class LanguageFilterType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }
@@ -40,7 +40,7 @@ class LanguageFilterType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return EntityFilterType::class;
     }

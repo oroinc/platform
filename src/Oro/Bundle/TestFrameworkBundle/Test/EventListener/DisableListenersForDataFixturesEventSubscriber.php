@@ -26,7 +26,7 @@ class DisableListenersForDataFixturesEventSubscriber implements EventSubscriberI
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [DisableListenersForDataFixturesEvent::NAME => 'collectListeners'];
     }

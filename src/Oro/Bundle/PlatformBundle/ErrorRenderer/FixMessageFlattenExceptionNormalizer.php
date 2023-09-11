@@ -48,7 +48,7 @@ class FixMessageFlattenExceptionNormalizer implements NormalizerInterface
     /**
      * {@inheritDoc}
      */
-    public function supportsNormalization($data, string $format = null)
+    public function supportsNormalization($data, string $format = null): bool
     {
         return $this->innerNormalizer->supportsNormalization($data, $format);
     }

@@ -78,7 +78,7 @@ HELP
      * @throws \Exception
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $availableLocales = $this->languageProvider->getAvailableLanguageCodes();
 
@@ -114,7 +114,7 @@ HELP
 
         $output->writeln('<info>Done.</info>');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function processLocales(array $locales, OutputInterface $output): void

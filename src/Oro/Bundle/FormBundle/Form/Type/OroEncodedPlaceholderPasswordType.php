@@ -89,7 +89,7 @@ class OroEncodedPlaceholderPasswordType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return PasswordType::class;
     }
@@ -97,7 +97,7 @@ class OroEncodedPlaceholderPasswordType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_encoded_placeholder_password';
     }

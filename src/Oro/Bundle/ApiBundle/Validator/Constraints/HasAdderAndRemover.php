@@ -29,7 +29,7 @@ class HasAdderAndRemover extends Constraint implements ConstraintWithStatusCodeI
     /**
      * {@inheritdoc}
      */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['class', 'property'];
     }
@@ -37,7 +37,7 @@ class HasAdderAndRemover extends Constraint implements ConstraintWithStatusCodeI
     /**
      * {@inheritdoc}
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }

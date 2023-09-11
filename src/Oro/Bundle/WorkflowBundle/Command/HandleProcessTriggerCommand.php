@@ -53,7 +53,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $processName = $input->getOption('name');
 
@@ -61,7 +61,7 @@ HELP
         if (!filter_var($triggerId, FILTER_VALIDATE_INT)) {
             $output->writeln('<error>No process trigger identifier defined</error>');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         /** @var ProcessTrigger $processTrigger */
@@ -69,14 +69,14 @@ HELP
         if (!$processTrigger) {
             $output->writeln('<error>Process trigger not found</error>');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $processDefinition = $processTrigger->getDefinition();
         if ($processName !== $processDefinition->getName()) {
             $output->writeln(sprintf('<error>Trigger not found in process definition "%s"</error>', $processName));
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $processData = new ProcessData();
@@ -119,6 +119,6 @@ HELP
             throw $e;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

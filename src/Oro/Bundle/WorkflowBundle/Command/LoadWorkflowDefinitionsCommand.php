@@ -84,7 +84,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $usedDirectories = $input->getOption('directories') ?: null;
         $usedWorkflows = $input->getOption('workflows') ?: null;
@@ -151,6 +151,6 @@ HELP
             $output->writeln('No workflow definitions found.');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

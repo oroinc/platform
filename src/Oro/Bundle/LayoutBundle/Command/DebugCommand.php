@@ -82,7 +82,7 @@ HELP
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -105,7 +105,7 @@ HELP
             if (null === $object) {
                 $io->error('Data provider not found.');
 
-                return 1;
+                return Command::FAILURE;
             }
             $options['name'] = $dataProviderName;
             $options['class'] = \get_class($object);
@@ -113,7 +113,7 @@ HELP
             if (!array_key_exists('methods', $options)) {
                 $io->error('Data provider has no public methods that starts with "get" "has" or "is".');
 
-                return 1;
+                return Command::FAILURE;
             }
         } elseif ($blockTypeName = $input->getOption('type')) {
             $registry = $this->getLayoutRegistry();
@@ -122,7 +122,7 @@ HELP
             } catch (InvalidArgumentException $exception) {
                 $io->error('Block type not found.');
 
-                return 1;
+                return Command::FAILURE;
             }
             $options['class'] = \get_class($object);
             $options['hierarchy'] = $this->getBlockTypeHierarchy($object);
@@ -134,7 +134,7 @@ HELP
         $options['format'] = $input->getOption('format');
         $helper->describe($io, $object, $options);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getBlockTypeOptionsResolver(

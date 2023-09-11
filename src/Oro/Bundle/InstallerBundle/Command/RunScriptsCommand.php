@@ -48,7 +48,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $commandExecutor = new CommandExecutor(
             $input->hasOption('env') ? $input->getOption('env') : null,
@@ -66,7 +66,7 @@ HELP
             $scriptExecutor->runScript($scriptFile);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getContainer(): ContainerInterface

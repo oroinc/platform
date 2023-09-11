@@ -17,7 +17,7 @@ class RelatedEntityFieldFallbackValueConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'oro_entity.related_entity_field_fallback_value_validator';
     }
@@ -25,7 +25,7 @@ class RelatedEntityFieldFallbackValueConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'scalarValueConstraints';
     }

@@ -78,7 +78,7 @@ class MultipleEntityType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_multiple_entity';
     }
@@ -86,7 +86,7 @@ class MultipleEntityType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return SymfonyMultipleEntityType::class;
     }

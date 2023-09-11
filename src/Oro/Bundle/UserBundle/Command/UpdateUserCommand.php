@@ -6,6 +6,7 @@ namespace Oro\Bundle\UserBundle\Command;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -66,7 +67,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $username = $input->getArgument('user-name');
         /** @var User $user */
@@ -85,6 +86,6 @@ HELP
             return $exception->getCode() ?: 1;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

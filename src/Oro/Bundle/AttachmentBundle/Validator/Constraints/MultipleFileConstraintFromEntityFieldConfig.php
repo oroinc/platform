@@ -37,7 +37,7 @@ class MultipleFileConstraintFromEntityFieldConfig extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }

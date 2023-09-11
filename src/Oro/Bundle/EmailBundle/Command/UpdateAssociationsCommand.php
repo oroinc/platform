@@ -46,12 +46,12 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->producer->send(UpdateEmailAssociationsTopic::getName(), []);
 
         $output->writeln('<info>Update of associations has been scheduled.</info>');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

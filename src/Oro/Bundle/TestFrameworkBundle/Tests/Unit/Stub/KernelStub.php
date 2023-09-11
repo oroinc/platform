@@ -56,7 +56,7 @@ class KernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return $this->registeredBundles;
     }

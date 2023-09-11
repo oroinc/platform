@@ -54,7 +54,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $class = $input->getArgument('class');
         $identifiers = $input->getArgument('identifiers');
@@ -74,6 +74,6 @@ HELP
 
         $output->writeln('Started index update for entities.');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

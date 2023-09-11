@@ -42,7 +42,7 @@ class UserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         $userClass = $this->userLoader->getUserClass();
         if (!$user instanceof $userClass) {
@@ -81,7 +81,7 @@ class UserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return is_a($class, $this->userLoader->getUserClass(), true);
     }

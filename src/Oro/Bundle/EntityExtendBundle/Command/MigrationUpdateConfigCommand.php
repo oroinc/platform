@@ -70,7 +70,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Update extended entities configuration');
 
@@ -94,9 +94,9 @@ HELP
                 sprintf('<error>The options file "%s" was not found.</error>', $this->optionsPath)
             );
 
-            return 1;
+            return Command::FAILURE;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

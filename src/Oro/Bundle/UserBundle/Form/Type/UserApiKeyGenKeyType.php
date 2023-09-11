@@ -37,7 +37,7 @@ class UserApiKeyGenKeyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }
@@ -45,7 +45,7 @@ class UserApiKeyGenKeyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return HiddenType::class;
     }

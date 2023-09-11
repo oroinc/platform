@@ -48,7 +48,7 @@ class EntityFilterType extends AbstractChoiceType
     /**
      * {@inheritDoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceFilterType::class;
     }
@@ -56,7 +56,7 @@ class EntityFilterType extends AbstractChoiceType
     /**
      * {@inheritDoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_type_entity_filter';
     }

@@ -64,7 +64,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         try {
@@ -91,6 +91,6 @@ HELP
             return $e->getCode() ?: 1;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

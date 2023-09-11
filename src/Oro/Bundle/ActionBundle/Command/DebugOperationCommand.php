@@ -83,7 +83,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('action-group')) {
             $output->writeln('Load action_groups ...');
@@ -122,6 +122,6 @@ HELP
             $output->writeln('No actions found.');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

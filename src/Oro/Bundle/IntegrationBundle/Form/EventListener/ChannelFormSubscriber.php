@@ -33,7 +33,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         $this->inflector = $inflector;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA  => 'preSet',

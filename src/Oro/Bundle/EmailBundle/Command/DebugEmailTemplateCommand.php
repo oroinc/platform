@@ -53,7 +53,7 @@ class DebugEmailTemplateCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$input->getArgument('template')) {
             return $this->processList($output);

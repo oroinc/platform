@@ -52,7 +52,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $queueName = $input->getArgument('queue');
         $messageProcessorName = (string) $input->getArgument('processor-service');

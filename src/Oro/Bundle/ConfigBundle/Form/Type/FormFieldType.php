@@ -118,7 +118,7 @@ class FormFieldType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_config_form_field_type';
     }

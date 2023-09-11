@@ -24,7 +24,7 @@ class ScopeCollectionTypeStub extends ScopeCollectionType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return CollectionType::class;
     }

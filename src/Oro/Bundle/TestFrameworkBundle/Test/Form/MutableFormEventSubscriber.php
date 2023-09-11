@@ -13,7 +13,7 @@ class MutableFormEventSubscriber implements EventSubscriberInterface
     /** @var array */
     protected static $events = [];
 
-    /** @var \Symfony\Component\EventDispatcher\EventSubscriberInterface */
+    /** @var EventSubscriberInterface */
     protected $wrapped;
 
     public function __construct(EventSubscriberInterface $wrapped)
@@ -24,7 +24,7 @@ class MutableFormEventSubscriber implements EventSubscriberInterface
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return self::$events;
     }

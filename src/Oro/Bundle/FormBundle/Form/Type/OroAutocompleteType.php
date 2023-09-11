@@ -35,7 +35,7 @@ class OroAutocompleteType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }
@@ -43,7 +43,7 @@ class OroAutocompleteType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }

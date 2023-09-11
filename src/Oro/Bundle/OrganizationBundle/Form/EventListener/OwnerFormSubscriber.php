@@ -55,7 +55,7 @@ class OwnerFormSubscriber implements EventSubscriberInterface
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return array(
             FormEvents::POST_SET_DATA => 'postSetData'

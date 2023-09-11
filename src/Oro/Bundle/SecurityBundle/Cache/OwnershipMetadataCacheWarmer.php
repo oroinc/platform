@@ -20,15 +20,16 @@ class OwnershipMetadataCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): array
     {
         $this->provider->warmUpCache();
+        return [];
     }
 
     /**
      * {inheritdoc}
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }

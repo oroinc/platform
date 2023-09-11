@@ -11,7 +11,7 @@ class UniqueKeys extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'oro_entity_extend.validator.unique_keys';
     }

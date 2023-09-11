@@ -45,7 +45,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSub
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             Events::AFTER_ENTITY_PAGE_LOADED => 'updateEntityResults',

@@ -130,7 +130,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->inputOptionProvider = new InputOptionProvider($output, $input, $this->getHelperSet()->get('question'));
 
@@ -152,7 +152,7 @@ HELP
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

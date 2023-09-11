@@ -14,7 +14,7 @@ class TestUser implements UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return [];
     }

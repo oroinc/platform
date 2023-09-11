@@ -18,7 +18,7 @@ class NotBlankDefaultLocalizedFallbackValue extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'oro_locale.default_localized_fallback_value.not_blank';
     }
@@ -26,7 +26,7 @@ class NotBlankDefaultLocalizedFallbackValue extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }
