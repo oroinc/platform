@@ -21,7 +21,6 @@ styles:
         - 'bundles/oroform/default/scss/components/utilities.scss'
         - 'bundles/oroform/default/scss/components/required-label.scss'
         - 'bundles/oroform/default/scss/components/validation.scss'
-        - 'bundles/oroform/default/scss/components/buttons-equal.scss'
         - 'bundles/oroform/default/scss/components/checkbox.scss'
         - 'bundles/oroform/default/scss/components/checkbox-label.scss'
         - 'bundles/oroform/default/scss/components/label.scss'

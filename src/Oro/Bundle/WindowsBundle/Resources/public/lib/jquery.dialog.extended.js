@@ -49,7 +49,8 @@ define(function (require) {
         restore: null,
         closeText: __('Close'),
         btnCloseClass: 'close-dialog',
-        btnCloseAriaText: __('oro.orowindows.dialog.close.aria_label')
+        btnCloseAriaText: __('oro.orowindows.dialog.close.aria_label'),
+        btnCloseIcon: null
     }, config);
 
     $.widget( 'ui.dialog', $.ui.dialog, {
@@ -404,6 +405,10 @@ define(function (require) {
             .appendTo(buttonPane)
             .end();
             this.uiDialogTitlebarClose.find('.ui-button-icon, .ui-button-icon-space').attr('aria-hidden', true)
+
+            if (this.options.btnCloseIcon) {
+                this.uiDialogTitlebarClose.append(this.options.btnCloseIcon)
+            }
             // append other buttons to button-pane
             var types =  ['maximize', 'restore', 'minimize'];
             for (var key in types) {
