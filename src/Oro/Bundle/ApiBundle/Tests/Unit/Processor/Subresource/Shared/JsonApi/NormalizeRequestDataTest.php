@@ -56,7 +56,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false)
+            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, [])
             ->willReturn('Test\Class');
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
@@ -116,7 +116,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false)
+            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, [])
             ->willReturn('Test\Class');
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
@@ -151,11 +151,12 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
-                ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
+                ['entity1', DataType::ENTITY_CLASS, $requestType, false, false, [], 'Test\Class1'],
+                ['entity2', DataType::ENTITY_CLASS, $requestType, false, false, [], 'Test\Class2']
             ]);
         $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')
@@ -228,11 +229,12 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
-                ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
+                ['entity1', DataType::ENTITY_CLASS, $requestType, false, false, [], 'Test\Class1'],
+                ['entity2', DataType::ENTITY_CLASS, $requestType, false, false, [], 'Test\Class2']
             ]);
         $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')
@@ -320,7 +322,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false)
+            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, [])
             ->willReturn('Test\Class');
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
@@ -412,11 +414,12 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
-                ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
+                ['entity1', DataType::ENTITY_CLASS, $requestType, false, false, [], 'Test\Class1'],
+                ['entity2', DataType::ENTITY_CLASS, $requestType, false, false, [], 'Test\Class2']
             ]);
         $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')
@@ -472,7 +475,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false)
+            ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, [])
             ->willReturn('Test\Class');
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
@@ -507,11 +510,12 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
-                ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
+                ['entity1', DataType::ENTITY_CLASS, $requestType, false, false, [], 'Test\Class1'],
+                ['entity2', DataType::ENTITY_CLASS, $requestType, false, false, [], 'Test\Class2']
             ]);
         $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')

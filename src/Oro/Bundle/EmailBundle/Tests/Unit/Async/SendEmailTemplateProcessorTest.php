@@ -2,58 +2,60 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Async\SendEmailTemplateProcessor;
 use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
-use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    use LoggerAwareTraitTestTrait;
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    private AggregatedEmailTemplatesSender|\PHPUnit\Framework\MockObject\MockObject $aggregatedEmailTemplatesSender;
+    /** @var AggregatedEmailTemplatesSender|\PHPUnit\Framework\MockObject\MockObject */
+    private $aggregatedEmailTemplatesSender;
 
-    private SendEmailTemplateProcessor $processor;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
+    /** @var SendEmailTemplateProcessor */
+    private $processor;
 
     protected function setUp(): void
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->aggregatedEmailTemplatesSender = $this->createMock(AggregatedEmailTemplatesSender::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->processor = new SendEmailTemplateProcessor(
-            $managerRegistry,
-            $this->aggregatedEmailTemplatesSender
-        );
-        $this->setUpLoggerMock($this->processor);
-
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $managerRegistry
-            ->expects(self::any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($this->entityManager);
+
+        $this->processor = new SendEmailTemplateProcessor(
+            $doctrine,
+            $this->aggregatedEmailTemplatesSender,
+            $this->logger
+        );
     }
 
     public function testSendException(): void
     {
-        $this->aggregatedEmailTemplatesSender
-            ->expects(self::once())
+        $this->aggregatedEmailTemplatesSender->expects(self::once())
             ->method('send')
             ->willThrowException(new EntityNotFoundException());
 
-        $this->entityManager
-            ->expects(self::any())
+        $this->entityManager->expects(self::any())
             ->method('find')
             ->with(\stdClass::class, 42)
             ->willReturn(new \stdClass());
 
-        $this->loggerMock->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with('Cannot send email template.', ['exception' => new EntityNotFoundException()]);
 
@@ -77,13 +79,12 @@ class SendEmailTemplateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->aggregatedEmailTemplatesSender->expects(self::once())
             ->method('send');
 
-        $this->entityManager
-            ->expects(self::any())
+        $this->entityManager->expects(self::any())
             ->method('find')
             ->with(\stdClass::class, 42)
             ->willReturn(new \stdClass());
 
-        $this->loggerMock->expects(self::never())
+        $this->logger->expects(self::never())
             ->method(self::anything());
 
         $message = new Message();

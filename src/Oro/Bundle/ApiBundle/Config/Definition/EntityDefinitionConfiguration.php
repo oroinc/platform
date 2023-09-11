@@ -21,6 +21,7 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
                 ->performNoDeepMerging()
                 ->prototype('scalar')->cannotBeEmpty()->end()
             ->end()
+            ->scalarNode(ConfigUtil::IDENTIFIER_DESCRIPTION)->end()
             ->booleanNode(ConfigUtil::DISABLE_INCLUSION)->end()
             ->booleanNode(ConfigUtil::DISABLE_FIELDSET)->end()
             ->arrayNode(ConfigUtil::DISABLE_META_PROPERTIES)
@@ -41,6 +42,17 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
                 ->end()
                 ->prototype('scalar')->cannotBeEmpty()->end()
             ->end();
+
+        /** @var NodeBuilder $upsertNode */
+        $upsertNode = $node
+            ->arrayNode(ConfigUtil::UPSERT)
+                ->treatFalseLike([ConfigUtil::UPSERT_DISABLE => true])
+                ->treatTrueLike([ConfigUtil::UPSERT_DISABLE => false])
+                ->children()
+                    ->booleanNode(ConfigUtil::UPSERT_DISABLE)->end();
+        $this->appendArrayOfNotEmptyStrings($upsertNode, ConfigUtil::UPSERT_ADD);
+        $this->appendArrayOfNotEmptyStrings($upsertNode, ConfigUtil::UPSERT_REMOVE);
+        $this->appendArrayOfNotEmptyStrings($upsertNode, ConfigUtil::UPSERT_REPLACE);
     }
 
     /**
@@ -61,6 +73,17 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         if (empty($config[ConfigUtil::DISABLE_META_PROPERTIES])) {
             unset($config[ConfigUtil::DISABLE_META_PROPERTIES]);
         }
+        if (\array_key_exists(ConfigUtil::UPSERT, $config)) {
+            if (empty($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_ADD])) {
+                unset($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_ADD]);
+            }
+            if (empty($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REMOVE])) {
+                unset($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REMOVE]);
+            }
+            if (empty($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REPLACE])) {
+                unset($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REPLACE]);
+            }
+        }
 
         return $config;
     }
@@ -73,5 +96,27 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         parent::configureFieldNode($node);
         $node
             ->booleanNode(ConfigUtil::META_PROPERTY)->end();
+    }
+
+    private function appendArrayOfNotEmptyStrings(NodeBuilder $node, string $name): void
+    {
+        $node->arrayNode($name)
+            ->variablePrototype()
+                ->validate()
+                    ->always(function (mixed $value) {
+                        if (!\is_array($value)) {
+                            throw new \InvalidArgumentException(sprintf(
+                                'Expected "array", but got "%s"',
+                                get_debug_type($value)
+                            ));
+                        }
+                        foreach ($value as $val) {
+                            if (!\is_string($val) || '' === $val) {
+                                throw new \InvalidArgumentException('Expected array of not empty strings');
+                            }
+                        }
+
+                        return $value;
+                    });
     }
 }

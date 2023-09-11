@@ -38,32 +38,24 @@ class EmailUserAccessRule implements AccessRuleInterface
      */
     public function process(Criteria $criteria): void
     {
-        $alias = $criteria->getAlias();
-
-        $viewPermissionExpression = $this->getExpressionWithEmailTypeRestriction(
-            $alias,
-            false,
-            $criteria->getExpression()
-        );
-        $viewPrivatePermissionExpression = $this->getExpressionWithEmailTypeRestriction(
-            $alias,
-            true,
-            $this->getPrivateAccessEmailsExpression($alias)
-        );
-
-        $ownerCriteria = null;
-        if (null !== $viewPermissionExpression && null !== $viewPrivatePermissionExpression) {
-            $ownerCriteria = new CompositeExpression(
-                CompositeExpression::TYPE_OR,
-                [$viewPermissionExpression, $viewPrivatePermissionExpression]
-            );
-        } elseif (null !== $viewPermissionExpression) {
-            $ownerCriteria = $viewPermissionExpression;
-        } elseif (null !== $viewPrivatePermissionExpression) {
-            $ownerCriteria = $viewPrivatePermissionExpression;
+        $viewPublicConditionData = $this->builder->getAclConditionData(EmailUser::class);
+        $viewPrivateConditionData = $this->builder->getAclConditionData(EmailUser::class, 'VIEW_PRIVATE');
+        if ($viewPublicConditionData === $viewPrivateConditionData) {
+            return;
         }
 
-        $criteria->setExpression($ownerCriteria);
+        $alias = $criteria->getAlias();
+        $criteria->setExpression(new CompositeExpression(
+            CompositeExpression::TYPE_OR,
+            [
+                $this->getExpressionWithEmailTypeRestriction($alias, false, $criteria->getExpression()),
+                $this->getExpressionWithEmailTypeRestriction(
+                    $alias,
+                    true,
+                    $this->getPrivateAccessEmailsExpression($alias, $viewPrivateConditionData)
+                )
+            ]
+        ));
     }
 
     private function getExpressionWithEmailTypeRestriction(
@@ -83,7 +75,7 @@ class EmailUserAccessRule implements AccessRuleInterface
             );
         }
 
-        if ($expression) {
+        if (null !== $expression) {
             $completeExpression = new CompositeExpression(
                 CompositeExpression::TYPE_AND,
                 [$expression, $completeExpression]
@@ -93,9 +85,8 @@ class EmailUserAccessRule implements AccessRuleInterface
         return $completeExpression;
     }
 
-    private function getPrivateAccessEmailsExpression(string $alias): ?ExpressionInterface
+    private function getPrivateAccessEmailsExpression(string $alias, array $conditionData): ?ExpressionInterface
     {
-        $conditionData = $this->builder->getAclConditionData(EmailUser::class, 'VIEW_PRIVATE');
         if (empty($conditionData)) {
             return null;
         }

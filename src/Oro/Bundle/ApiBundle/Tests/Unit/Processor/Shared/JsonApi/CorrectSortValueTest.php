@@ -241,7 +241,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         );
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with($defaultValue, DataType::ORDER_BY, $this->context->getRequestType(), false)
+            ->with($defaultValue, DataType::ORDER_BY, $this->context->getRequestType())
             ->willReturn($normalizedDefaultValue);
         $filterValueAccessor = $this->createMock(FilterValueAccessorInterface::class);
         $filterValueAccessor->expects(self::once())

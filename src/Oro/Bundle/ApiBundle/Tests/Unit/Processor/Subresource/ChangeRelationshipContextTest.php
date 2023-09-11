@@ -18,6 +18,11 @@ class ChangeRelationshipContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testInitialExisting(): void
+    {
+        self::assertTrue($this->context->isExisting());
+    }
+
     public function testParentEntity()
     {
         self::assertNull($this->context->getParentEntity());

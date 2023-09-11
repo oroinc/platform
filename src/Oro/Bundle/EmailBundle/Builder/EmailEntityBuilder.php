@@ -28,6 +28,7 @@ use Psr\Log\LoggerInterface;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class EmailEntityBuilder
 {
@@ -45,6 +46,9 @@ class EmailEntityBuilder
 
     /** @var ManagerRegistry */
     private $doctrine;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /** @var array [entity class => [field name => length, ...], ...] */
     private $fieldLength = [];
@@ -101,11 +105,19 @@ class EmailEntityBuilder
         $organization = null
     ) {
         $emailUser = new EmailUser();
-
-        $email = $this->email($subject, $from, $to, $sentAt, $internalDate, $importance, $cc, $bcc);
+        $this->initializeEmailUser(
+            $emailUser,
+            null,
+            $subject,
+            $from,
+            $to,
+            $sentAt,
+            $internalDate,
+            $importance,
+            $cc,
+            $bcc
+        );
         $emailUser->setReceivedAt($receivedAt);
-        $emailUser->setEmail($email);
-        $email->addEmailUser($emailUser);
         if ($owner !== null) {
             if ($owner instanceof User) {
                 $emailUser->setOwner($owner);
@@ -118,6 +130,51 @@ class EmailEntityBuilder
         } elseif ($owner !== null) {
             $emailUser->setOrganization($owner->getOrganization());
         }
+
+        return $emailUser;
+    }
+
+    /**
+     * Initializes EmailUser entity object.
+     *
+     * @param EmailUser            $emailUser    The email user to be initialized
+     * @param Email|null           $email        The email that is associated to the email user to be initialized
+     * @param string               $subject      The email subject
+     * @param string               $from         The FROM email address,
+     *                                           for example: john@example.com or "John Smith" <john@example.c4m>
+     * @param string|string[]|null $to           The TO email address(es).
+     *                                           Example of email address see in description of $from parameter
+     * @param \DateTimeInterface   $sentAt       The date/time when email sent
+     * @param \DateTimeInterface   $internalDate The date/time an email server returned in INTERNALDATE field
+     * @param int                  $importance   The email importance flag.
+     *                                           Can be one of *_IMPORTANCE constants of Email class
+     * @param string|string[]|null $cc           The CC email address(es).
+     *                                           Example of email address see in description of $from parameter
+     * @param string|string[]|null $bcc          The BCC email address(es).
+     *                                           Example of email address see in description of $from parameter
+     *
+     * @return EmailUser
+     *
+     * @SuppressWarnings(ExcessiveParameterList)
+     */
+    public function initializeEmailUser(
+        EmailUser $emailUser,
+        ?Email $email,
+        $subject,
+        $from,
+        $to,
+        $sentAt,
+        $internalDate,
+        $importance,
+        $cc,
+        $bcc
+    ) {
+        if (null === $email) {
+            $email = new Email();
+        }
+        $this->initializwEmail($email, $subject, $from, $to, $sentAt, $internalDate, $importance, $cc, $bcc);
+        $emailUser->setEmail($email);
+        $email->addEmailUser($emailUser);
 
         $this->batch->addEmailUser($emailUser);
 
@@ -132,8 +189,8 @@ class EmailEntityBuilder
      *                                           for example: john@example.com or "John Smith" <john@example.c4m>
      * @param string|string[]|null $to           The TO email address(es).
      *                                           Example of email address see in description of $from parameter
-     * @param \DateTime            $sentAt       The date/time when email sent
-     * @param \DateTime            $internalDate The date/time an email server returned in INTERNALDATE field
+     * @param \DateTimeInterface   $sentAt       The date/time when email sent
+     * @param \DateTimeInterface   $internalDate The date/time an email server returned in INTERNALDATE field
      * @param integer $importance                The email importance flag.
      *                                           Can be one of *_IMPORTANCE constants of Email class
      * @param string|string[]|null $cc           The CC email address(es).
@@ -153,11 +210,57 @@ class EmailEntityBuilder
         $cc = null,
         $bcc = null
     ) {
+        $email = new Email();
+        $this->initializwEmail(
+            $email,
+            $subject,
+            $from,
+            $to,
+            $sentAt,
+            $internalDate,
+            $importance,
+            $cc,
+            $bcc
+        );
+
+        return $email;
+    }
+
+    /**
+     * Initializes Email entity object.
+     *
+     * @param Email                $email        The email to be initialized
+     * @param string               $subject      The email subject
+     * @param string $from                       The FROM email address,
+     *                                           for example: john@example.com or "John Smith" <john@example.c4m>
+     * @param string|string[]|null $to           The TO email address(es).
+     *                                           Example of email address see in description of $from parameter
+     * @param \DateTimeInterface   $sentAt       The date/time when email sent
+     * @param \DateTimeInterface   $internalDate The date/time an email server returned in INTERNALDATE field
+     * @param integer $importance                The email importance flag.
+     *                                           Can be one of *_IMPORTANCE constants of Email class
+     * @param string|string[]|null $cc           The CC email address(es).
+     *                                           Example of email address see in description of $from parameter
+     * @param string|string[]|null $bcc          The BCC email address(es).
+     *                                           Example of email address see in description of $from parameter
+     *
+     * @return Email
+     */
+    protected function initializwEmail(
+        Email $email,
+        $subject,
+        $from,
+        $to,
+        $sentAt,
+        $internalDate,
+        $importance,
+        $cc,
+        $bcc
+    ) {
         if (empty($from)) {
             throw new EmailAddressParseException('Missed FROM part in email message.');
         }
-        $result = new Email();
-        $result
+        $email
             ->setSubject($subject)
             ->setFromName($this->truncateFullEmailAddress($from, Email::class, 'fromName'))
             ->setFromEmailAddress($this->address($from))
@@ -165,11 +268,9 @@ class EmailEntityBuilder
             ->setInternalDate($internalDate)
             ->setImportance($importance);
 
-        $this->addRecipients($result, EmailRecipient::TO, $to);
-        $this->addRecipients($result, EmailRecipient::CC, $cc);
-        $this->addRecipients($result, EmailRecipient::BCC, $bcc);
-
-        return $result;
+        $this->addRecipients($email, EmailRecipient::TO, $to);
+        $this->addRecipients($email, EmailRecipient::CC, $cc);
+        $this->addRecipients($email, EmailRecipient::BCC, $bcc);
     }
 
     /**
@@ -282,7 +383,7 @@ class EmailEntityBuilder
             ->setBodyContent($content)
             ->setBodyIsText(!$isHtml)
             ->setPersistent($persistent)
-            ->setTextBody($this->getEmailBodyHelper()->getTrimmedClearText($content, !$isHtml));
+            ->setTextBody($this->getEmailBodyHelper()->getTrimmedClearText($content));
 
         return $result;
     }
@@ -494,7 +595,7 @@ class EmailEntityBuilder
     /**
      * Get built batch contains all entities managed by this builder
      *
-     * @return EmailEntityBatchInterface
+     * @return EmailEntityBatchProcessor
      */
     public function getBatch()
     {

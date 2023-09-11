@@ -16,7 +16,7 @@ use Oro\Component\ChainProcessor\ParameterBagInterface;
  */
 class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
+    /** @var ActionProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $customizationProcessor;
 
     protected function setUp(): void
@@ -791,6 +791,79 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
                     self::assertSame($configExtras, $context->getConfigExtras());
                     self::assertEquals('collection', $context->getFirstGroup());
                     self::assertEquals('collection', $context->getLastGroup());
+                    self::assertEquals($data, $context->getResult());
+
+                    $contextData = $context->getResult();
+                    $contextData['anotherKey'] = 'anotherValue';
+                    $context->setResult($contextData);
+                }
+            );
+
+        $handledData = $handler($data, $context);
+        self::assertEquals(
+            ['key' => 'value', 'anotherKey' => 'anotherValue'],
+            $handledData
+        );
+    }
+
+    public function testWithCustomConfig()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $rootEntityClass = Entity\Product::class;
+        $propertyPath = 'owner';
+        $entityClass = Entity\User::class;
+        $config = new EntityDefinitionConfig();
+        $config->addField($propertyPath)->createAndSetTargetEntity();
+        $customConfig = new EntityDefinitionConfig();
+        $customFieldConfig = $customConfig->addField($propertyPath)->createAndSetTargetEntity();
+        $configExtras = [new EntityDefinitionConfigExtra()];
+        $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = [
+            'action'     => 'get',
+            'sharedData' => $sharedData,
+            'config'     => [$rootEntityClass => $customConfig]
+        ];
+
+        $handler = new AssociationHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $rootEntityClass,
+            $propertyPath,
+            $entityClass,
+            $config,
+            $configExtras,
+            false
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) use (
+                    $version,
+                    $requestType,
+                    $rootEntityClass,
+                    $propertyPath,
+                    $entityClass,
+                    $customFieldConfig,
+                    $configExtras,
+                    $data
+                ) {
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals($rootEntityClass, $context->getRootClassName());
+                    self::assertEquals($propertyPath, $context->getPropertyPath());
+                    self::assertEquals($entityClass, $context->getClassName());
+                    self::assertSame($customFieldConfig, $context->getConfig());
+                    self::assertSame($configExtras, $context->getConfigExtras());
+                    self::assertEquals('item', $context->getFirstGroup());
+                    self::assertEquals('item', $context->getLastGroup());
                     self::assertEquals($data, $context->getResult());
 
                     $contextData = $context->getResult();

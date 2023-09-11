@@ -21,6 +21,7 @@ class ActionConfig
     private array $fields = [];
     /** @var string[] */
     private array $disabledMetaProperties = [];
+    private ?UpsertConfig $upsertConfig = null;
 
     /**
      * Gets a native PHP array representation of the configuration.
@@ -60,6 +61,12 @@ class ActionConfig
         if (isset($result[ConfigUtil::DISABLE_SORTING]) && false === $result[ConfigUtil::DISABLE_SORTING]) {
             unset($result[ConfigUtil::DISABLE_SORTING]);
         }
+        if (null !== $this->upsertConfig) {
+            $upsertConfig = $this->upsertConfig->toArray();
+            if ($upsertConfig) {
+                $result['upsert'] = $upsertConfig;
+            }
+        }
 
         $fields = ConfigUtil::convertObjectsToArray($this->fields, true);
         if ($fields) {
@@ -87,6 +94,9 @@ class ActionConfig
     {
         $this->items = ConfigUtil::cloneItems($this->items);
         $this->fields = ConfigUtil::cloneObjects($this->fields);
+        if (null !== $this->upsertConfig) {
+            $this->upsertConfig = clone $this->upsertConfig;
+        }
     }
 
     /**
@@ -373,6 +383,18 @@ class ActionConfig
     }
 
     /**
+     * Gets a form option.
+     */
+    public function getFormOption(string $name, mixed $defaultValue = null): mixed
+    {
+        $formOptions = $this->get(ConfigUtil::FORM_OPTIONS);
+
+        return null !== $formOptions && \array_key_exists($name, $formOptions)
+            ? $formOptions[$name]
+            : $defaultValue;
+    }
+
+    /**
      * Sets the form options.
      */
     public function setFormOptions(?array $formOptions): void
@@ -389,9 +411,9 @@ class ActionConfig
      */
     public function setFormOption(string $name, mixed $value): void
     {
-        $formOptions = $this->getFormOptions();
+        $formOptions = $this->items[ConfigUtil::FORM_OPTIONS] ?? [];
         $formOptions[$name] = $value;
-        $this->setFormOptions($formOptions);
+        $this->items[ConfigUtil::FORM_OPTIONS] = $formOptions;
     }
 
     /**
@@ -401,7 +423,7 @@ class ActionConfig
      */
     public function getFormConstraints(): ?array
     {
-        return FormConstraintUtil::getFormConstraints($this->getFormOptions());
+        return FormConstraintUtil::getFormConstraints($this->get(ConfigUtil::FORM_OPTIONS));
     }
 
     /**
@@ -409,7 +431,10 @@ class ActionConfig
      */
     public function addFormConstraint(Constraint $constraint): void
     {
-        $this->setFormOptions(FormConstraintUtil::addFormConstraint($this->getFormOptions(), $constraint));
+        $this->items[ConfigUtil::FORM_OPTIONS] = FormConstraintUtil::addFormConstraint(
+            $this->get(ConfigUtil::FORM_OPTIONS),
+            $constraint
+        );
     }
 
     /**
@@ -417,7 +442,9 @@ class ActionConfig
      */
     public function removeFormConstraint(string $constraintClass): void
     {
-        $this->setFormOptions(FormConstraintUtil::removeFormConstraint($this->getFormOptions(), $constraintClass));
+        $this->setFormOptions(
+            FormConstraintUtil::removeFormConstraint($this->get(ConfigUtil::FORM_OPTIONS), $constraintClass)
+        );
     }
 
     /**
@@ -712,5 +739,17 @@ class ActionConfig
     public function setStatusCodes(?StatusCodesConfig $statusCodes): void
     {
         $this->set(ConfigUtil::STATUS_CODES, $statusCodes);
+    }
+
+    /**
+     * Gets the configuration of the upsert operation.
+     */
+    public function getUpsertConfig(): UpsertConfig
+    {
+        if (null === $this->upsertConfig) {
+            $this->upsertConfig = new UpsertConfig();
+        }
+
+        return $this->upsertConfig;
     }
 }

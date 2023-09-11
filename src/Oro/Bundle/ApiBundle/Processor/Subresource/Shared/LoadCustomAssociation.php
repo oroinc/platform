@@ -84,14 +84,17 @@ abstract class LoadCustomAssociation implements ProcessorInterface
 
     protected function loadParentEntityData(SubresourceContext $context): ?array
     {
+        $config = $this->getLoadParentEntityDataConfig($context);
+        $normalizationContext = $context->getNormalizationContext();
+        $normalizationContext['config'][$context->getParentClassName()] = $config;
         $data = $this->entitySerializer->serialize(
             $this->getQueryBuilder(
                 $context->getParentClassName(),
                 $context->getParentId(),
                 $context->getParentMetadata()
             ),
-            $this->getLoadParentEntityDataConfig($context),
-            $context->getNormalizationContext()
+            $config,
+            $normalizationContext
         );
 
         return $data ? reset($data) : null;

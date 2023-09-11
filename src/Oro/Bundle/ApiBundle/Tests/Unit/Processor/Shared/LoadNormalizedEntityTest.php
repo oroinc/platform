@@ -3,21 +3,22 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\CreateProcessorTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ParameterBag;
 
-class LoadNormalizedEntityTest extends FormProcessorTestCase
+class LoadNormalizedEntityTest extends CreateProcessorTestCase
 {
     /** @var ActionProcessorBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $processorBag;
@@ -100,9 +101,13 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function testProcessWhenGetActionSuccess()
     {
+        $normalizedEntityConfigExtras = [
+            new ExpandRelatedEntitiesConfigExtra(['association1'])
+        ];
         $getResult = ['key' => 'value'];
         $getConfigExtras = [
             new TestConfigExtra('test_extra'),
@@ -137,6 +142,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $this->context->setCorsRequest(true);
         $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
+        $this->context->setNormalizedEntityConfigExtras($normalizedEntityConfigExtras);
 
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
@@ -152,6 +158,9 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $expectedGetContext->skipGroup(ApiActionGroup::DATA_SECURITY_CHECK);
         $expectedGetContext->skipGroup(ApiActionGroup::NORMALIZE_RESULT);
         $expectedGetContext->setSoftErrorsHandling(true);
+        foreach ($normalizedEntityConfigExtras as $extra) {
+            $expectedGetContext->addConfigExtra($extra);
+        }
 
         $getProcessor->expects(self::once())
             ->method('process')
@@ -169,7 +178,9 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
                 ) {
                     self::assertEquals($expectedGetContext, $context);
 
-                    $context->setConfigExtras($getConfigExtras);
+                    foreach ($getConfigExtras as $extra) {
+                        $context->addConfigExtra($extra);
+                    }
                     $context->setConfig($getConfig);
                     foreach ($getConfigSections as $key => $value) {
                         $context->setConfigOf($key, $value);
@@ -185,7 +196,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $expectedContext = new FormContextStub($this->configProvider, $this->metadataProvider);
+        $expectedContext = new CreateContext($this->configProvider, $this->metadataProvider);
         $expectedContext->setAction(ApiAction::UPDATE);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
@@ -196,7 +207,13 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $expectedContext->setSharedData($this->sharedData);
         $expectedContext->setId($this->context->getId());
         $expectedContext->setClassName($this->context->getClassName());
-        $expectedContext->setConfigExtras($getConfigExtras);
+        $expectedContext->setNormalizedEntityConfigExtras($normalizedEntityConfigExtras);
+        foreach ($normalizedEntityConfigExtras as $extra) {
+            $expectedContext->addConfigExtra($extra);
+        }
+        foreach ($getConfigExtras as $extra) {
+            $expectedContext->addConfigExtra($extra);
+        }
         $expectedContext->setConfig($getConfig);
         foreach ($getConfigSections as $key => $value) {
             $expectedContext->setConfigOf($key, $value);

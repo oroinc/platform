@@ -9,8 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetHttpResponseStatusCodeTest extends GetListProcessorTestCase
 {
-    /** @var SetHttpResponseStatusCode */
-    private $processor;
+    private SetHttpResponseStatusCode $processor;
 
     protected function setUp(): void
     {
@@ -19,35 +18,48 @@ class SetHttpResponseStatusCodeTest extends GetListProcessorTestCase
         $this->processor = new SetHttpResponseStatusCode();
     }
 
+    public function testProcessWhenResponseStatusCodeAlreadySet(): void
+    {
+        $this->context->setResponseStatusCode(Response::HTTP_ACCEPTED);
+        $this->context->setResult([]);
+        $this->processor->process($this->context);
+
+        self::assertEquals(Response::HTTP_ACCEPTED, $this->context->getResponseStatusCode());
+    }
+
+    public function testProcessWhenNoErrors(): void
+    {
+        $this->context->setResult([]);
+        $this->processor->process($this->context);
+
+        self::assertEquals(Response::HTTP_OK, $this->context->getResponseStatusCode());
+    }
+
+    public function testProcessWhenNoErrorsAndNoResult(): void
+    {
+        $this->processor->process($this->context);
+
+        self::assertEquals(Response::HTTP_NO_CONTENT, $this->context->getResponseStatusCode());
+    }
+
     /**
-     * @dataProvider processDataProvider
+     * @dataProvider processHasErrorsDataProvider
      */
-    public function testProcess(array $errors, int $expectedCode, bool $hasResult = true)
+    public function testProcessHasErrors(array $errors, int $expectedCode): void
     {
         foreach ($errors as $error) {
             $this->context->addError($error);
         }
 
-        if ($hasResult) {
-            $this->context->setResult([]);
-        }
+        $this->context->setResult([]);
         $this->processor->process($this->context);
 
         self::assertEquals($expectedCode, $this->context->getResponseStatusCode());
     }
 
-    public function processDataProvider(): array
+    public function processHasErrorsDataProvider(): array
     {
         return [
-            'no errors'                                                                                 => [
-                [],
-                Response::HTTP_OK
-            ],
-            'no errors, no result'                                                                      => [
-                [],
-                Response::HTTP_NO_CONTENT,
-                false
-            ],
             'one error without code'                                                                    => [
                 [
                     $this->getError()

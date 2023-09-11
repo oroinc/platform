@@ -12,23 +12,23 @@ class NormalizeString extends AbstractProcessor
     private const REQUIREMENT = '.+';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getDataTypeString(): string
     {
-        return 'string';
+        return true === $this->getOption('allow_empty') ? 'string' : 'not empty string';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getDataTypePluralString(): string
     {
-        return 'strings';
+        return true === $this->getOption('allow_empty') ? 'strings' : 'not empty strings';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getRequirement(): string
     {
@@ -36,7 +36,7 @@ class NormalizeString extends AbstractProcessor
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function processRequirement(NormalizeValueContext $context): void
     {
@@ -44,10 +44,25 @@ class NormalizeString extends AbstractProcessor
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function normalizeValue(mixed $value): mixed
     {
         return $value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function validateValue(string $value): void
+    {
+        parent::validateValue($value);
+        if (true !== $this->getOption('allow_empty') && '' === trim($value, ' ')) {
+            throw new \UnexpectedValueException(sprintf(
+                'Expected %s value. Given "%s".',
+                $this->getDataTypeString(),
+                $value
+            ));
+        }
     }
 }

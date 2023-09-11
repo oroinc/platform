@@ -66,7 +66,7 @@ class QueryFactory
 
     public function getNotInitializedToManyAssociationQueryBuilder(array $associationMapping): QueryBuilder
     {
-        if ($associationMapping['mappedBy'] && $associationMapping['type'] === ClassMetadata::ONE_TO_MANY) {
+        if (self::isOneToManyAssociation($associationMapping)) {
             return $this->doctrineHelper
                 ->createQueryBuilder($associationMapping['targetEntity'], 'r')
                 ->innerJoin('r.' . $associationMapping['mappedBy'], 'e');
@@ -75,6 +75,67 @@ class QueryFactory
         return $this->doctrineHelper
             ->createQueryBuilder($associationMapping['sourceEntity'], 'e')
             ->innerJoin('e.' . $associationMapping['fieldName'], 'r');
+    }
+
+    public function getComplexToManyAssociationQueryBuilder(array $associationMappings, array $entityIds): QueryBuilder
+    {
+        $qb = $this->getNotInitializedComplexToManyAssociationQueryBuilder($associationMappings);
+        $associationMapping = end($associationMappings);
+        $this->initializeAssociationQueryBuilder($qb, $associationMapping['sourceEntity'], $entityIds);
+
+        return $qb;
+    }
+
+    public function getNotInitializedComplexToManyAssociationQueryBuilder(array $associationMappings): QueryBuilder
+    {
+        if (\count($associationMappings) < 2) {
+            throw new \LogicException('At least 2 association must be provided.');
+        }
+
+        $firstAssociationMapping = array_shift($associationMappings);
+        $lastAssociationMapping = array_pop($associationMappings);
+
+        if (self::isOneToManyAssociation($lastAssociationMapping)) {
+            $qb = $this->doctrineHelper
+                ->createQueryBuilder($lastAssociationMapping['targetEntity'], 'r')
+                ->innerJoin('r.' . $lastAssociationMapping['mappedBy'], 'a1');
+            $joinIndex = 1;
+            foreach ($associationMappings as $mapping) {
+                if (empty($mapping['inversedBy'])) {
+                    throw new \RuntimeException(sprintf(
+                        'Cannot build to-many association query because "inversedBy" option is empty'
+                        . ' for "%s::%s" association. You need to set an association query manually.',
+                        $mapping['sourceEntity'],
+                        $mapping['fieldName']
+                    ));
+                }
+                $qb->innerJoin(sprintf('a%d.%s', $joinIndex, $mapping['inversedBy']), 'a' . ($joinIndex + 1));
+                $joinIndex++;
+            }
+            if (empty($firstAssociationMapping['inversedBy'])) {
+                throw new \RuntimeException(sprintf(
+                    'Cannot build to-many association query because "inversedBy" option is empty'
+                    . ' for "%s::%s" association. You need to set an association query manually.',
+                    $firstAssociationMapping['sourceEntity'],
+                    $firstAssociationMapping['fieldName']
+                ));
+            }
+            $qb->innerJoin(sprintf('a%d.%s', $joinIndex, $firstAssociationMapping['inversedBy']), 'e');
+
+            return $qb;
+        }
+
+        $qb = $this->doctrineHelper
+            ->createQueryBuilder($firstAssociationMapping['sourceEntity'], 'e')
+            ->innerJoin('e.' . $firstAssociationMapping['fieldName'], 'a1');
+        $joinIndex = 1;
+        foreach ($associationMappings as $mapping) {
+            $qb->innerJoin(sprintf('a%d.%s', $joinIndex, $mapping['fieldName']), 'a' . ($joinIndex + 1));
+            $joinIndex++;
+        }
+        $qb->innerJoin(sprintf('a%d.%s', $joinIndex, $lastAssociationMapping['fieldName']), 'r');
+
+        return $qb;
     }
 
     public function initializeAssociationQueryBuilder(
@@ -232,5 +293,10 @@ class QueryFactory
                 ->where(sprintf('%s.%s IN (:ids)', $alias, $entityIdField))
                 ->setParameter('ids', $entityIds);
         }
+    }
+
+    private static function isOneToManyAssociation(array $associationMapping): bool
+    {
+        return $associationMapping['mappedBy'] && $associationMapping['type'] === ClassMetadata::ONE_TO_MANY;
     }
 }

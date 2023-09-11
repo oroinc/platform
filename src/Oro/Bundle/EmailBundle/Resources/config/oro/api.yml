@@ -9,31 +9,15 @@ api:
         Oro\Bundle\EmailBundle\Api\Model\EmailContextItem:
             alias: emailcontext
             plural_alias: emailcontext
+        # need to define the alias manually because the EmailBody does not have system alias,
+        # see "entity_alias_exclusions" section in EmailBundle/Resources/config/oro/entity.yml.
+        # an entity without the alias are considered as not known in API even if the entity
+        # is defined in "entities" section of api.yml.
+        Oro\Bundle\EmailBundle\Entity\EmailBody:
+            alias: emailbody
+            plural_alias: emailbodies
 
     entities:
-#        Oro\Bundle\EmailBundle\Entity\EmailTemplate: ~
-#        Oro\Bundle\EmailBundle\Entity\AutoResponseRule: ~
-#        Oro\Bundle\EmailBundle\Entity\AutoResponseRuleCondition: ~
-
-        Oro\Bundle\EmailBundle\Entity\Email:
-            documentation_resource: '@OroEmailBundle/Resources/doc/api/email.md'
-            exclude: false # override exclude rule from entity.yml
-            actions:
-                get: false
-                get_list: false
-                update: false
-                create: false
-                delete: false
-                delete_list: false
-                get_subresource: false
-                get_relationship: false
-                update_relationship: false
-                add_relationship: false
-                delete_relationship: false
-            subresources:
-                recipients:
-                    exclude: true
-
         Oro\Bundle\EmailBundle\Api\Model\EmailContextEntity:
             documentation_resource: '@OroEmailBundle/Resources/doc/api/email_context_entity.md'
             disable_meta_properties: true
@@ -180,13 +164,421 @@ api:
                 get_subresource: false
                 get_relationship: false
 
-#        Oro\Bundle\EmailBundle\Entity\EmailAttachment: ~
-#        Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent: ~
-#        Oro\Bundle\EmailBundle\Entity\EmailBody: ~
-#        Oro\Bundle\EmailBundle\Entity\EmailFolder: ~
-#        Oro\Bundle\EmailBundle\Entity\EmailOrigin: ~
-#        Oro\Bundle\EmailBundle\Entity\EmailRecipient: ~
-#        Oro\Bundle\EmailBundle\Entity\EmailThread: ~
-#        Oro\Bundle\EmailBundle\Entity\EmailUser: ~
-#        Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin: ~
+        Oro\Bundle\EmailBundle\Entity\Email:
+            documentation_resource: '@OroEmailBundle/Resources/doc/api/email.md'
+            exclude: false # override exclude rule from entity.yml
+            exclusion_policy: custom_fields
+            fields:
+                from:
+                    data_type: object
+                    property_path: _
+                    depends_on: [ fromName, fromEmailAddress.email ]
+                    exclusion_policy: all
+                    fields:
+                        name:
+                            data_type: string
+                        email:
+                            data_type: string
+                fromName:
+                    exclude: true
+                toRecipients:
+                    data_type: objects
+                    property_path: _
+                    depends_on: [ recipients.name, recipients.type, recipients.emailAddress.email ]
+                    exclusion_policy: all
+                    fields:
+                        name:
+                            data_type: string
+                        email:
+                            data_type: string
+                ccRecipients:
+                    data_type: objects
+                    property_path: _
+                    depends_on: [ recipients.name, recipients.type, recipients.emailAddress.email ]
+                    exclusion_policy: all
+                    fields:
+                        name:
+                            data_type: string
+                        email:
+                            data_type: string
+                bccRecipients:
+                    data_type: objects
+                    property_path: _
+                    depends_on: [ recipients.name, recipients.type, recipients.emailAddress.email ]
+                    exclusion_policy: all
+                    fields:
+                        name:
+                            data_type: string
+                        email:
+                            data_type: string
+                importance:
+                    data_type: string
+                body:
+                    data_type: object
+                    property_path: emailBody
+                    form_options:
+                        data_class: Oro\Bundle\EmailBundle\Api\Model\EmailBody
+                        property_path: body
+                        required: false
+                        constraints:
+                            - Valid: ~
+                    exclusion_policy: all
+                    fields:
+                        type:
+                            data_type: string
+                            property_path: bodyIsText
+                            form_options:
+                                property_path: type
+                                constraints:
+                                    - NotBlank: ~
+                                    - Choice: { choices: [ 'text', 'html' ] }
+                        content:
+                            property_path: bodyContent
+                            form_options:
+                                property_path: content
+                shortTextBody:
+                    property_path: emailBody.textBody
+                hasEmailAttachments:
+                    property_path: emailBody.hasAttachments
+                emailAttachments:
+                    property_path: emailBody.attachments
+                createdAt:
+                    property_path: created
+                messageIds:
+                    data_type: array
+                    property_path: multiMessageId
+                acceptLanguage:
+                    property_path: acceptLanguageHeader
+                references:
+                    data_type: array
+                    property_path: refs
+            subresources:
+                emailAttachments:
+                    actions:
+                        update_relationship: false
+                        add_relationship: false
+                        delete_relationship: false
+                emailUsers:
+                    actions:
+                        update_relationship: false
+                        add_relationship: false
+                        delete_relationship: false
+            actions:
+                delete: false
+                delete_list: false
+                create:
+                    form_options:
+                        data_class: Oro\Bundle\EmailBundle\Api\Model\Email
+                    fields:
+                        subject:
+                            form_options:
+                                constraints:
+                                    - NotBlank: ~
+                                    - Length: { max: 998 }
+                        from:
+                            form_type: Oro\Bundle\EmailBundle\Api\Form\Type\EmailAddressType
+                            form_options:
+                                property_path: from
+                                constraints:
+                                    - NotBlank: ~
+                                    - Valid: ~
+                        toRecipients:
+                            form_type: Symfony\Component\Form\Extension\Core\Type\CollectionType
+                            form_options:
+                                property_path: toRecipients
+                                entry_type: Oro\Bundle\EmailBundle\Api\Form\Type\EmailAddressType
+                                by_reference: true
+                                allow_add: true
+                                allow_delete: true
+                                constraints:
+                                    - Valid: ~
+                        ccRecipients:
+                            form_type: Symfony\Component\Form\Extension\Core\Type\CollectionType
+                            form_options:
+                                property_path: ccRecipients
+                                entry_type: Oro\Bundle\EmailBundle\Api\Form\Type\EmailAddressType
+                                by_reference: true
+                                allow_add: true
+                                allow_delete: true
+                                constraints:
+                                    - Valid: ~
+                        bccRecipients:
+                            form_type: Symfony\Component\Form\Extension\Core\Type\CollectionType
+                            form_options:
+                                property_path: bccRecipients
+                                entry_type: Oro\Bundle\EmailBundle\Api\Form\Type\EmailAddressType
+                                by_reference: true
+                                allow_add: true
+                                allow_delete: true
+                                constraints:
+                                    - Valid: ~
+                        importance:
+                            form_options:
+                                constraints:
+                                    - Choice: { choices: [ 'normal', 'low', 'high' ] }
+                        shortTextBody:
+                            form_options:
+                                property_path: _
+                                mapped: false
+                        bodySynced:
+                            form_options:
+                                mapped: false
+                        hasEmailAttachments:
+                            form_options:
+                                property_path: _
+                                mapped: false
+                        emailAttachments:
+                            form_options:
+                                property_path: emailAttachments
+                        messageId:
+                            form_options:
+                                constraints:
+                                    - NotBlank: ~
+                                    - Length: { max: 512 }
+                        messageIds:
+                            form_options:
+                                property_path: messageIds
+                        head:
+                            form_options:
+                                mapped: false
+                        acceptLanguage:
+                            form_options:
+                                property_path: acceptLanguage
+                        sentAt:
+                            form_options:
+                                constraints:
+                                    - NotBlank: ~
+                        internalDate:
+                            form_options:
+                                constraints:
+                                    - NotBlank: ~
+                        xMessageId:
+                            form_options:
+                                constraints:
+                                    - Length: { max: 255 }
+                        xThreadId:
+                            form_options:
+                                constraints:
+                                    - Length: { max: 255 }
+                update:
+                    form_options:
+                        data_class: Oro\Bundle\EmailBundle\Api\Model\Email
+                    fields:
+                        subject:
+                            form_options:
+                                mapped: false
+                        from:
+                            form_type: Oro\Bundle\EmailBundle\Api\Form\Type\EmailAddressType
+                            form_options:
+                                property_path: from
+                                mapped: false
+                        toRecipients:
+                            form_type: Symfony\Component\Form\Extension\Core\Type\CollectionType
+                            form_options:
+                                property_path: toRecipients
+                                entry_type: Oro\Bundle\EmailBundle\Api\Form\Type\EmailAddressType
+                                by_reference: true
+                                allow_add: true
+                                allow_delete: true
+                        ccRecipients:
+                            form_type: Symfony\Component\Form\Extension\Core\Type\CollectionType
+                            form_options:
+                                property_path: ccRecipients
+                                entry_type: Oro\Bundle\EmailBundle\Api\Form\Type\EmailAddressType
+                                by_reference: true
+                                allow_add: true
+                                allow_delete: true
+                        bccRecipients:
+                            form_type: Symfony\Component\Form\Extension\Core\Type\CollectionType
+                            form_options:
+                                property_path: bccRecipients
+                                entry_type: Oro\Bundle\EmailBundle\Api\Form\Type\EmailAddressType
+                                by_reference: true
+                                allow_add: true
+                                allow_delete: true
+                        importance:
+                            form_options:
+                                mapped: false
+                        shortTextBody:
+                            form_options:
+                                property_path: _
+                                mapped: false
+                        bodySynced:
+                            form_options:
+                                mapped: false
+                        hasEmailAttachments:
+                            form_options:
+                                property_path: _
+                                mapped: false
+                        emailAttachments:
+                            form_options:
+                                property_path: emailAttachments
+                        sentAt:
+                            form_options:
+                                mapped: false
+                        internalDate:
+                            form_options:
+                                mapped: false
+                        messageId:
+                            form_options:
+                                mapped: false
+                        messageIds:
+                            form_options:
+                                property_path: messageIds
+                                mapped: false
+                        head:
+                            form_options:
+                                mapped: false
+                        acceptLanguage:
+                            form_options:
+                                property_path: acceptLanguage
+                                mapped: false
+                        xMessageId:
+                            form_options:
+                                mapped: false
+                        xThreadId:
+                            form_options:
+                                mapped: false
+                        references:
+                            form_options:
+                                mapped: false
+                        emailUsers:
+                            form_options:
+                                mapped: false
+
+        Oro\Bundle\EmailBundle\Entity\EmailUser:
+            documentation_resource: '@OroEmailBundle/Resources/doc/api/email_user.md'
+            inner_join_associations: [ email ]
+            fields:
+                unsyncedFlagCount:
+                    exclude: true
+                origin:
+                    exclude: true
+                private:
+                    property_path: isEmailPrivate
+                folders:
+                    data_type: objects
+                    property_path: _
+                    form_type: Symfony\Component\Form\Extension\Core\Type\CollectionType
+                    form_options:
+                        property_path: folders
+                        entry_type: Oro\Bundle\EmailBundle\Api\Form\Type\EmailFolderType
+                        by_reference: true
+                        allow_add: true
+                        allow_delete: true
+                        constraints:
+                              - Count:
+                                    min: 1
+                    depends_on: [ folders.type, folders.name, folders.fullName ]
+                    exclusion_policy: all
+                    fields:
+                        type:
+                            data_type: string
+                        name:
+                            data_type: string
+                        path:
+                            data_type: string
+                # declare excluded field for "folders" entity property
+                # to be able to use "folders" property in "depends_on" option
+                _folders:
+                    property_path: folders
+                    exclude: true
+            actions:
+                create:
+                    fields:
+                        private:
+                            form_options:
+                                mapped: false
+                update:
+                    fields:
+                        private:
+                            form_options:
+                                mapped: false
+                        email:
+                            form_options:
+                                mapped: false
+                        owner:
+                            form_options:
+                                mapped: false
+                        organization:
+                            form_options:
+                                mapped: false
+                get_relationship: false
+                get_subresource: false
+
+        Oro\Bundle\EmailBundle\Entity\EmailBody:
+            # this entity does not have own API resource
+            actions: false
+
+        Oro\Bundle\EmailBundle\Entity\EmailAttachment:
+            documentation_resource: '@OroEmailBundle/Resources/doc/api/email_attachment.md'
+            inner_join_associations: [ attachmentContent, emailBody ]
+            disable_meta_properties: true
+            disable_fieldset: true
+            disable_inclusion: true
+            fields:
+                file:
+                    exclude: true
+                contentEncoding:
+                    property_path: attachmentContent.contentTransferEncoding
+                content:
+                    property_path: attachmentContent.content
+                email:
+                    target_class: Oro\Bundle\EmailBundle\Entity\Email
+                    property_path: _
+            filters:
+                fields:
+                    email:
+                        data_type: integer
+                        property_path: emailBody.email.id
+                        operators: [ '=', '!=', '<', '<=', '>', '>=' ]
+            actions:
+                create:
+                    form_options:
+                        data_class: Oro\Bundle\EmailBundle\Api\Model\EmailAttachment
+                    fields:
+                        fileName:
+                            form_options:
+                                constraints:
+                                    - NotBlank: ~
+                                    - Length: { max: 255 }
+                        contentType:
+                            form_options:
+                                constraints:
+                                    - NotBlank: ~
+                                    - Length: { max: 100 }
+                        contentEncoding:
+                            form_options:
+                                property_path: contentEncoding
+                                constraints:
+                                    - NotBlank: ~
+                                    - Choice: { choices: [ 'base64', 'quoted-printable' ] }
+                        content:
+                            form_options:
+                                property_path: content
+                                constraints:
+                                    - NotBlank: ~
+                        email:
+                            form_options:
+                                property_path: email
+                        embeddedContentId:
+                            form_options:
+                                constraints:
+                                    - Length: { max: 255 }
+                    status_codes:
+                        200: false
+                        201: false
+                        400: false
+                        403: Returned always
+                        409: false
+                        500: false
+                update: false
+                delete: false
+                delete_list: false
+                get_relationship: false
+                get_subresource: false
+
+#        Oro\Bundle\EmailBundle\Entity\EmailTemplate: ~
+#        Oro\Bundle\EmailBundle\Entity\AutoResponseRule: ~
+#        Oro\Bundle\EmailBundle\Entity\AutoResponseRuleCondition: ~
 #        Oro\Bundle\EmailBundle\Entity\Mailbox: ~

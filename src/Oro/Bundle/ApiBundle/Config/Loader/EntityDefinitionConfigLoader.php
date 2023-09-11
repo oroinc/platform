@@ -13,6 +13,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
     private const METHOD_MAP = [
         ConfigUtil::EXCLUSION_POLICY        => 'setExclusionPolicy',
         ConfigUtil::IDENTIFIER_FIELD_NAMES  => 'setIdentifierFieldNames',
+        ConfigUtil::IDENTIFIER_DESCRIPTION  => 'setIdentifierDescription',
         ConfigUtil::MAX_RESULTS             => 'setMaxResults',
         ConfigUtil::ORDER_BY                => 'setOrderBy',
         ConfigUtil::HINTS                   => 'setHints',
@@ -60,6 +61,8 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
                 $this->loadFields($definition, $value);
             } elseif (ConfigUtil::DISABLE_META_PROPERTIES === $key) {
                 $this->loadDisabledMetaProperties($definition, $value);
+            } elseif (ConfigUtil::UPSERT === $key) {
+                $this->loadUpsertConfig($definition, $value);
             } elseif ($this->factory->hasLoader($key)) {
                 $this->loadSection($definition, $this->factory->getLoader($key), $key, $value);
             } else {
@@ -89,6 +92,26 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
                 $definition->enableMetaProperties();
             } else {
                 $definition->disableMetaProperty($val);
+            }
+        }
+    }
+
+    private function loadUpsertConfig(EntityDefinitionConfig $definition, array $value): void
+    {
+        if (isset($value[ConfigUtil::UPSERT_DISABLE])) {
+            $definition->getUpsertConfig()->setEnabled(!$value[ConfigUtil::UPSERT_DISABLE]);
+        }
+        if (isset($value[ConfigUtil::UPSERT_REPLACE])) {
+            $definition->getUpsertConfig()->replaceFields($value[ConfigUtil::UPSERT_REPLACE]);
+        }
+        if (isset($value[ConfigUtil::UPSERT_ADD])) {
+            foreach ($value[ConfigUtil::UPSERT_ADD] as $fieldNames) {
+                $definition->getUpsertConfig()->addFields($fieldNames);
+            }
+        }
+        if (isset($value[ConfigUtil::UPSERT_REMOVE])) {
+            foreach ($value[ConfigUtil::UPSERT_REMOVE] as $fieldNames) {
+                $definition->getUpsertConfig()->removeFields($fieldNames);
             }
         }
     }

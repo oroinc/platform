@@ -12,9 +12,9 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 class IdentifierDescriptionHelper
 {
     public const ID_DESCRIPTION = 'The unique identifier of a resource.';
-
-    private const REQUIRED_ID_DESCRIPTION =
-        '<p>' . self::ID_DESCRIPTION . '</p><p><strong>The required field.</strong></p>';
+    private const REQUIRED_ID_DESCRIPTION = '<p>' . self::ID_DESCRIPTION . '</p>' . self::REQUIRED_ID_NOTE;
+    private const REQUIRED_ID_DESCRIPTION_TEMPLATE = '<p>%s</p>' . self::REQUIRED_ID_NOTE;
+    private const REQUIRED_ID_NOTE = '<p><strong>The required field.</strong></p>';
 
     private DoctrineHelper $doctrineHelper;
 
@@ -46,7 +46,12 @@ class IdentifierDescriptionHelper
         if (null !== $identifierField) {
             if (!$identifierField->getDescription()) {
                 $identifierField->setDescription(
-                    $this->getDescriptionForIdentifierField($entityClass, $identifierFieldName, $targetAction)
+                    $this->getDescriptionForIdentifierField(
+                        $definition,
+                        $entityClass,
+                        $identifierFieldName,
+                        $targetAction
+                    )
                 );
             } elseif (ApiAction::UPDATE === $targetAction
                 && self::ID_DESCRIPTION === $identifierField->getDescription()
@@ -57,20 +62,29 @@ class IdentifierDescriptionHelper
     }
 
     private function getDescriptionForIdentifierField(
+        EntityDefinitionConfig $definition,
         string $entityClass,
         string $identifierFieldName,
         string $targetAction
     ): string {
+        $required = false;
         if (ApiAction::UPDATE === $targetAction) {
-            return self::REQUIRED_ID_DESCRIPTION;
-        }
-        if (ApiAction::CREATE === $targetAction
+            $required = true;
+        } elseif (ApiAction::CREATE === $targetAction
             && !$this->hasIdentifierGenerator($entityClass, $identifierFieldName)
         ) {
-            return self::REQUIRED_ID_DESCRIPTION;
+            $required = true;
         }
 
-        return self::ID_DESCRIPTION;
+        if ($definition->hasIdentifierDescription()) {
+            return $required
+                ? sprintf(self::REQUIRED_ID_DESCRIPTION_TEMPLATE, $definition->getIdentifierDescription())
+                : $definition->getIdentifierDescription();
+        }
+
+        return $required
+            ? self::REQUIRED_ID_DESCRIPTION
+            : self::ID_DESCRIPTION;
     }
 
     private function hasIdentifierGenerator(string $entityClass, string $identifierFieldName): bool

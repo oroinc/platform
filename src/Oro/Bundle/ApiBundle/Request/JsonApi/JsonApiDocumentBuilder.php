@@ -30,6 +30,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     public const TYPE = 'type';
     public const HREF = 'href';
     public const META_UPDATE = 'update';
+    public const META_UPSERT = 'upsert';
 
     private const ERROR_STATUS = 'status';
     private const ERROR_CODE = 'code';

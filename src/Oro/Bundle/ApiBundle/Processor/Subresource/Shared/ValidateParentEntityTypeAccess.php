@@ -40,15 +40,14 @@ class ValidateParentEntityTypeAccess implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */
 
-        $parentConfig = $context->getParentConfig();
-
         $isGranted = true;
+        $parentConfig = $context->getParentConfig();
         if ($parentConfig && $parentConfig->hasAclResource()) {
             $aclResource = $parentConfig->getAclResource();
             if ($aclResource) {

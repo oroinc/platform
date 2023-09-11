@@ -66,7 +66,7 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('integer');
         $this->valueNormalizer->expects(self::once())
             ->method('getRequirement')
-            ->with('int', $this->requestType)
+            ->with('int', $this->requestType, false, false, [])
             ->willReturn('\d+');
 
         $this->identifierHandler->handle($annotation, $route, $metadata, $description);
@@ -101,8 +101,8 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('getRequirement')
             ->willReturnMap([
-                ['int', $this->requestType, false, false, '\d+'],
-                ['string', $this->requestType, false, false, ValueNormalizer::DEFAULT_REQUIREMENT]
+                ['int', $this->requestType, false, false, [], '\d+'],
+                ['string', $this->requestType, false, false, [], ValueNormalizer::DEFAULT_REQUIREMENT]
             ]);
 
         $this->identifierHandler->handle($annotation, $route, $metadata, $description);

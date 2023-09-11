@@ -697,11 +697,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with(
-                'Test\Class',
-                DataType::ENTITY_TYPE,
-                self::identicalTo($this->requestType)
-            )
+            ->with('Test\Class', DataType::ENTITY_TYPE, self::identicalTo($this->requestType))
             ->willReturn('test_entity');
 
         $this->errorCompleter->complete($error, $this->requestType);

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Create;
 
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -20,14 +19,19 @@ class PersistEntity implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
-        /** @var SingleItemContext $context */
+        /** @var CreateContext $context */
 
         if ($context->isProcessed(SaveEntity::OPERATION_NAME)) {
             // the entity was already saved
+            return;
+        }
+
+        if ($context->isExisting()) {
+            // only a new entity need to be persistent
             return;
         }
 

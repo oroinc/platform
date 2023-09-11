@@ -93,6 +93,12 @@ invalid_identifier_field_names:
     expected: []
     error: 'Invalid type for path "entity.identifier_field_names". Expected "array", but got "int"'
 
+invalid_identifier_description:
+    config:
+        identifier_description: [123]
+    expected: []
+    error: 'Invalid type for path "entity.identifier_description". Expected "scalar", but got "array"'
+
 default_max_results:
     config:
         max_results: ~
@@ -264,6 +270,108 @@ invalid_value_for_disable_partial_load:
     expected: []
     error: 'Invalid type for path "entity.disable_partial_load". Expected "bool", but got "int"'
 
+upsert_enable_short_syntax:
+    config:
+        upsert: true
+    expected:
+        upsert:
+            disable: false
+
+upsert_disable_short_syntax:
+    config:
+        upsert: false
+    expected:
+        upsert:
+            disable: true
+
+upsert_enable:
+    config:
+        upsert:
+            disable: false
+    expected:
+        upsert:
+            disable: false
+
+upsert_disable:
+    config:
+        upsert:
+            disable: true
+    expected:
+        upsert:
+            disable: true
+
+upsert_add:
+    config:
+        upsert:
+            add: [[field1], [field2, field3]]
+    expected:
+        upsert:
+            add: [[field1], [field2, field3]]
+
+upsert_remove:
+    config:
+        upsert:
+            remove: [[field1], [field2, field3]]
+    expected:
+        upsert:
+            remove: [[field1], [field2, field3]]
+
+upsert_replace:
+    config:
+        upsert:
+            replace: [[field1], [field2, field3]]
+    expected:
+        upsert:
+            replace: [[field1], [field2, field3]]
+
+invalid_value_for_upsert:
+    config:
+        upsert: 123
+    expected: []
+    error: 'Invalid type for path "entity.upsert". Expected "array", but got "int"'
+
+invalid_value_for_upsert_add:
+    config:
+        upsert:
+            add: 'test'
+    expected: []
+    error: 'Invalid type for path "entity.upsert.add". Expected "array", but got "string"'
+
+invalid_value_for_upsert_add_group:
+    config:
+        upsert:
+            add: ['test']
+    expected: []
+    error: 'Invalid configuration for path "entity.upsert.add.0": Expected "array", but got "string"'
+
+invalid_value_for_upsert_add_group_element:
+    config:
+        upsert:
+            add: [['test', 123]]
+    expected: []
+    error: 'Invalid configuration for path "entity.upsert.add.0": Expected array of not empty strings'
+
+invalid_value_for_upsert_add_group_element_empty_string:
+    config:
+        upsert:
+            add: [['test', '']]
+    expected: []
+    error: 'Invalid configuration for path "entity.upsert.add.0": Expected array of not empty strings'
+
+invalid_value_for_upsert_remove_group_element:
+    config:
+        upsert:
+            remove: [['test', 123]]
+    expected: []
+    error: 'Invalid configuration for path "entity.upsert.remove.0": Expected array of not empty strings'
+
+invalid_value_for_upsert_replace_group_element:
+    config:
+        upsert:
+            replace: [['test', 123]]
+    expected: []
+    error: 'Invalid configuration for path "entity.upsert.replace.0": Expected array of not empty strings'
+
 all_attributes:
     config:
         exclusion_policy: all
@@ -272,6 +380,7 @@ all_attributes:
             id: DESC
         max_results: 50
         identifier_field_names: ['id']
+        identifier_description: 'Test description.'
         hints:
             - HINT_1
             - {name: HINT_2, value: hint_val2}
@@ -285,6 +394,7 @@ all_attributes:
             id: DESC
         max_results: 50
         identifier_field_names: ['id']
+        identifier_description: 'Test description.'
         hints:
             - {name: HINT_1}
             - {name: HINT_2, value: hint_val2}

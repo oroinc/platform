@@ -559,7 +559,7 @@ class Email implements ActivityInterface, ExtendEntityInterface
     /**
      * Get thread
      *
-     * @return EmailThread
+     * @return EmailThread|null
      */
     public function getThread()
     {
@@ -583,7 +583,7 @@ class Email implements ActivityInterface, ExtendEntityInterface
     /**
      * Get email references
      *
-     * @return array
+     * @return string[]
      */
     public function getRefs()
     {
@@ -592,13 +592,14 @@ class Email implements ActivityInterface, ExtendEntityInterface
             preg_match_all('/<(.+?)>/is', $this->refs, $refs);
             $refs = $refs[0];
         }
+
         return $refs;
     }
 
     /**
      * Set email references
      *
-     * @param $refs
+     * @param string $refs
      *
      * @return $this
      */

@@ -71,6 +71,36 @@ class OptionsRequestTest extends RestJsonApiTestCase
         self::assertAllowResponseHeader($response, 'OPTIONS, GET');
     }
 
+    public function testOptionsMethodForItemRouteWithInvalidDataTypeOfEntityId()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->options(
+            $this->getItemRouteName(),
+            ['entity' => $entityType, 'id' => 'test']
+        );
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, DELETE');
+    }
+
+    public function testOptionsMethodForRelationshipRouteWithInvalidDataTypeOfEntityId()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->options(
+            $this->getRelationshipRouteName(),
+            ['entity' => $entityType, 'id' => 'test', 'association' => 'owner']
+        );
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH');
+    }
+
+    public function testOptionsMethodForSubresourceRouteWithInvalidDataTypeOfEntityId()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->options(
+            $this->getSubresourceRouteName(),
+            ['entity' => $entityType, 'id' => 'test', 'association' => 'owner']
+        );
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET');
+    }
+
     public function testTryOptionsMethodForItemRouteWithUnknownEntityType()
     {
         $response = $this->options(
@@ -140,60 +170,6 @@ class OptionsRequestTest extends RestJsonApiTestCase
             ],
             $response,
             Response::HTTP_NOT_FOUND
-        );
-    }
-
-    public function testTryOptionsMethodForItemRouteWithInvalidDataTypeOfEntityId()
-    {
-        $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->options(
-            $this->getItemRouteName(),
-            ['entity' => $entityType, 'id' => 'test'],
-            [],
-            false
-        );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'entity identifier constraint',
-                'detail' => 'Expected integer value. Given "test".'
-            ],
-            $response
-        );
-    }
-
-    public function testTryOptionsMethodForRelationshipRouteWithInvalidDataTypeOfEntityId()
-    {
-        $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->options(
-            $this->getRelationshipRouteName(),
-            ['entity' => $entityType, 'id' => 'test', 'association' => 'owner'],
-            [],
-            false
-        );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'entity identifier constraint',
-                'detail' => 'Expected integer value. Given "test".'
-            ],
-            $response
-        );
-    }
-
-    public function testTryOptionsMethodForSubresourceRouteWithInvalidDataTypeOfEntityId()
-    {
-        $entityType = $this->getEntityType(TestDepartment::class);
-        $response = $this->options(
-            $this->getSubresourceRouteName(),
-            ['entity' => $entityType, 'id' => 'test', 'association' => 'owner'],
-            [],
-            false
-        );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'entity identifier constraint',
-                'detail' => 'Expected integer value. Given "test".'
-            ],
-            $response
         );
     }
 

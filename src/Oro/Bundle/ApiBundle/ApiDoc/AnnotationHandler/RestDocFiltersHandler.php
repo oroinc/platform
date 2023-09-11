@@ -85,7 +85,8 @@ class RestDocFiltersHandler
                 $dataType,
                 $this->docViewDetector->getRequestType(),
                 $isArrayAllowed,
-                $isRangeAllowed
+                $isRangeAllowed,
+                $filter->getValueNormalizationOptions()
             )
         ];
         if ($filter instanceof FieldFilterInterface) {

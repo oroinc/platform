@@ -4,17 +4,18 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * Provides the implementation for methods from FormContext interface.
- * @see \Oro\Bundle\ApiBundle\Processor\FormContext
+ * Provides the implementation for methods from {@see FormContext} interface.
  */
 trait FormContextTrait
 {
     private array $requestData = [];
+    private bool $existing = false;
     private ?array $includedData = null;
     private ?IncludedEntityCollection $includedEntities = null;
     private ?AdditionalEntityCollection $additionalEntities = null;
@@ -22,6 +23,7 @@ trait FormContextTrait
     private ?FormBuilderInterface $formBuilder = null;
     private ?FormInterface $form = null;
     private bool $skipFormValidation = false;
+    private ?array $normalizedEntityConfigExtras = null;
 
     /**
      * Returns request data.
@@ -37,6 +39,22 @@ trait FormContextTrait
     public function setRequestData(array $requestData): void
     {
         $this->requestData = $requestData;
+    }
+
+    /**
+     * Gets a value indicates whether an existing entity should be updated or new one should be created.
+     */
+    public function isExisting(): bool
+    {
+        return $this->existing;
+    }
+
+    /**
+     * Sets a value indicates whether an existing entity should be updated or new one should be created.
+     */
+    public function setExisting(bool $existing): void
+    {
+        $this->existing = $existing;
     }
 
     /**
@@ -199,6 +217,28 @@ trait FormContextTrait
     public function skipFormValidation(bool $skipFormValidation): void
     {
         $this->skipFormValidation = $skipFormValidation;
+    }
+
+    /**
+     * Gets config extras that should be used by {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity}
+     * and {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities} processors.
+     *
+     * @return ConfigExtraInterface[]
+     */
+    public function getNormalizedEntityConfigExtras(): array
+    {
+        return $this->normalizedEntityConfigExtras ?? [];
+    }
+
+    /**
+     * Sets config extras that should be used by {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity}
+     * and {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities} processors.
+     *
+     * @param ConfigExtraInterface[] $extras
+     */
+    public function setNormalizedEntityConfigExtras(array $extras): void
+    {
+        $this->normalizedEntityConfigExtras = $extras;
     }
 
     /**

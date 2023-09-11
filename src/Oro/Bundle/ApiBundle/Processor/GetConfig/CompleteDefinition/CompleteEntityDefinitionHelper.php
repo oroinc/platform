@@ -434,6 +434,9 @@ class CompleteEntityDefinitionHelper
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function completeDependentAssociations(
         EntityOverrideProviderInterface $entityOverrideProvider,
         EntityDefinitionConfig $definition,
@@ -473,9 +476,14 @@ class CompleteEntityDefinitionHelper
                     );
                 }
                 $formOptions = $field->getFormOptions();
-                if (null === $formOptions || !\array_key_exists('mapped', $formOptions)) {
-                    $formOptions['mapped'] = false;
-                    $field->setFormOptions($formOptions);
+                if (null === $formOptions) {
+                    $field->setFormOption('mapped', false);
+                } elseif (!\array_key_exists('mapped', $formOptions)) {
+                    $formPropertyPath = $formOptions['property_path'] ?? null;
+                    if (!$formPropertyPath || ConfigUtil::IGNORE_PROPERTY_PATH === $formPropertyPath) {
+                        $formOptions['mapped'] = false;
+                        $field->setFormOptions($formOptions);
+                    }
                 }
             }
             $dependsOn = $field->getDependsOn();

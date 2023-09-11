@@ -54,7 +54,7 @@ class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
         }
 
         $itemTargetContexts = [];
-        $staredData = null;
+        $sharedData = null;
         foreach ($items as $item) {
             $itemContext = $item->getContext();
             if ($itemContext->hasErrors()) {
@@ -68,22 +68,22 @@ class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
             if (!\is_object($itemEntity)) {
                 continue;
             }
+            $isNewEntity = $itemContext->getTargetAction() === ApiAction::CREATE;
             if ($itemTargetContext instanceof FormContext) {
+                $isNewEntity = !$itemTargetContext->isExisting();
                 $itemTargetContexts[] = $itemTargetContext;
-                if (null === $staredData) {
-                    $staredData = $itemTargetContext->getSharedData();
+                if (null === $sharedData) {
+                    $sharedData = $itemTargetContext->getSharedData();
                 }
             }
-            if ($itemContext->getTargetAction() === ApiAction::CREATE
-                && $this->isManageableEntity($this->entityManager, $itemEntity)
-            ) {
+            if ($isNewEntity && $this->isManageableEntity($this->entityManager, $itemEntity)) {
                 $this->entityManager->persist($itemEntity);
             }
         }
 
         $this->flushDataHandler->flushData(
             $this->entityManager,
-            new FlushDataHandlerContext($itemTargetContexts, $staredData ?? new ParameterBag())
+            new FlushDataHandlerContext($itemTargetContexts, $sharedData ?? new ParameterBag())
         );
     }
 

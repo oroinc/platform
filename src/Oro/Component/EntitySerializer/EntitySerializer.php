@@ -4,6 +4,7 @@ namespace Oro\Component\EntitySerializer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -416,6 +417,44 @@ class EntitySerializer
             || (null !== $fieldConfig && null !== $fieldConfig->getTargetEntity());
     }
 
+    private function isCollectionValuedAssociation(string $propertyPath, EntityMetadata $entityMetadata): bool
+    {
+        $delimiterPos = strpos($propertyPath, ConfigUtil::PATH_DELIMITER);
+        while (false !== $delimiterPos) {
+            $parentPropertyName = substr($propertyPath, 0, $delimiterPos);
+            if (!$entityMetadata->isAssociation($parentPropertyName)) {
+                return false;
+            }
+            $parentAssociationMapping = $entityMetadata->getAssociationMapping($parentPropertyName);
+            $entityMetadata = $this->doctrineHelper->getEntityMetadata($parentAssociationMapping['targetEntity']);
+            $propertyPath = substr($propertyPath, $delimiterPos + 1);
+            $delimiterPos = strpos($propertyPath, ConfigUtil::PATH_DELIMITER);
+        }
+
+        return $entityMetadata->isCollectionValuedAssociation($propertyPath);
+    }
+
+    private function getAssociationMappings(string $propertyPath, EntityMetadata $entityMetadata): array
+    {
+        $result = [];
+        $delimiterPos = strpos($propertyPath, ConfigUtil::PATH_DELIMITER);
+        while (false !== $delimiterPos) {
+            $parentPropertyName = substr($propertyPath, 0, $delimiterPos);
+            if (!$entityMetadata->isAssociation($parentPropertyName)) {
+                throw MappingException::mappingNotFound($entityMetadata->getEntityClass(), $parentPropertyName);
+            }
+            $parentAssociationMapping = $entityMetadata->getAssociationMapping($parentPropertyName);
+            $result[] = $parentAssociationMapping;
+            $entityMetadata = $this->doctrineHelper->getEntityMetadata($parentAssociationMapping['targetEntity']);
+            $propertyPath = substr($propertyPath, $delimiterPos + 1);
+            $delimiterPos = strpos($propertyPath, ConfigUtil::PATH_DELIMITER);
+        }
+
+        $result[] = $entityMetadata->getAssociationMapping($propertyPath);
+
+        return $result;
+    }
+
     protected function getQuery(QueryBuilder $qb, EntityConfig $config): Query
     {
         $query = $this->queryFactory->getQuery($qb, $config);
@@ -468,16 +507,27 @@ class EntitySerializer
                 }
             } else {
                 $propertyPath = $this->configAccessor->getPropertyPath($field, $config->getField($field));
-                if ($entityMetadata->isCollectionValuedAssociation($propertyPath)) {
+                if ($this->isCollectionValuedAssociation($propertyPath, $entityMetadata)) {
                     $accessibleIds = $this->getAccessibleIds($entityIds, $entityClass, $propertyPath);
                     if (!empty($accessibleIds)) {
-                        $relatedValue = $this->loadRelatedCollectionValuedAssociationData(
-                            $config,
-                            $entityMetadata->getAssociationMapping($propertyPath),
-                            $field,
-                            $accessibleIds,
-                            $context
-                        );
+                        $associationMappings = $this->getAssociationMappings($propertyPath, $entityMetadata);
+                        if (\count($associationMappings) > 1) {
+                            $relatedValue = $this->loadRelatedCollectionValuedComplexAssociationData(
+                                $config,
+                                $associationMappings,
+                                $field,
+                                $accessibleIds,
+                                $context
+                            );
+                        } else {
+                            $relatedValue = $this->loadRelatedCollectionValuedAssociationData(
+                                $config,
+                                reset($associationMappings),
+                                $field,
+                                $accessibleIds,
+                                $context
+                            );
+                        }
                         if (null !== $relatedValue) {
                             $relatedData[$field] = $relatedValue;
                         }
@@ -515,6 +565,40 @@ class EntitySerializer
         return $this->loadRelatedItems(
             $this->loadRelatedItemsIds(
                 $this->queryFactory->getNotInitializedToManyAssociationQueryBuilder($associationMapping),
+                $associationMapping['sourceEntity'],
+                $targetEntityClass,
+                $entityIds,
+                $targetConfig
+            ),
+            $targetEntityClass,
+            $targetConfig,
+            $context
+        );
+    }
+
+    protected function loadRelatedCollectionValuedComplexAssociationData(
+        EntityConfig $config,
+        array $associationMappings,
+        string $field,
+        array $entityIds,
+        array $context
+    ): ?array {
+        $associationMapping = end($associationMappings);
+        $targetEntityClass = $associationMapping['targetEntity'];
+        $targetConfig = $this->configAccessor->getTargetEntity($config, $field);
+
+        if ($this->isSingleStepLoading($targetEntityClass, $targetConfig)) {
+            return $this->loadRelatedItemsForSimpleEntity(
+                $this->queryFactory->getComplexToManyAssociationQueryBuilder($associationMappings, $entityIds),
+                $targetEntityClass,
+                $targetConfig,
+                $context
+            );
+        }
+
+        return $this->loadRelatedItems(
+            $this->loadRelatedItemsIds(
+                $this->queryFactory->getNotInitializedComplexToManyAssociationQueryBuilder($associationMappings),
                 $associationMapping['sourceEntity'],
                 $targetEntityClass,
                 $entityIds,
