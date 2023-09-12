@@ -30,7 +30,7 @@ class TwigTemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): array
     {
         if (null === $this->twig) {
             $this->twig = $this->container->get('twig');
@@ -47,12 +47,13 @@ class TwigTemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
                 // might be a syntax error or a non-Twig template
             }
         }
+        return [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }

@@ -54,7 +54,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritDoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return is_object($data) && $this->supportsClass($this->getClass($data));
     }

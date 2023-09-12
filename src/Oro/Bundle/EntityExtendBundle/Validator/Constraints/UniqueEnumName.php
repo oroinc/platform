@@ -20,7 +20,7 @@ class UniqueEnumName extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return UniqueEnumNameValidator::ALIAS;
     }
@@ -28,7 +28,7 @@ class UniqueEnumName extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['entityClassName', 'fieldName'];
     }

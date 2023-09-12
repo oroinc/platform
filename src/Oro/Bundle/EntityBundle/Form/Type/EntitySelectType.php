@@ -76,7 +76,7 @@ class EntitySelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return OroJquerySelect2HiddenType::class;
     }
@@ -92,7 +92,7 @@ class EntitySelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }

@@ -73,7 +73,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $menu = $input->getOption('menu');
         $user = null;
@@ -98,7 +98,7 @@ HELP
             if (!$helper->ask($input, $output, $question)) {
                 $output->writeln('<error>Command aborted</error>');
 
-                return 1;
+                return Command::FAILURE;
             }
         }
 
@@ -120,7 +120,7 @@ HELP
 
         $output->writeln($message);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function resetMenuUpdates(?User $user = null, ?string $menuName = null): void

@@ -53,7 +53,7 @@ class FileVoter extends AbstractEntityVoter implements ServiceSubscriberInterfac
     /**
      * {@inheritDoc}
      */
-    public function vote(TokenInterface $token, $object, array $attributes)
+    public function vote(TokenInterface $token, $object, array $attributes): int
     {
         $this->token = $token;
         try {

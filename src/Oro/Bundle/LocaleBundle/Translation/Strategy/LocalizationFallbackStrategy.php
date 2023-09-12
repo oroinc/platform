@@ -61,7 +61,7 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface, Cach
     /**
      * {@inheritDoc}
      */
-    public function warmUp($cacheDir): void
+    public function warmUp($cacheDir): array
     {
         try {
             $this->clearCache();
@@ -70,6 +70,7 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface, Cach
             // Cache warming can be used during upgrade from the app version where not all required columns yet exist.
             // Silently skips warming of locale fallbacks in this case, considering as not an error.
         }
+        return [];
     }
 
     /**

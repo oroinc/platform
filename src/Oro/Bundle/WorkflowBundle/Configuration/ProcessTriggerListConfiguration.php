@@ -31,7 +31,7 @@ class ProcessTriggerListConfiguration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('configuration');
         $rootNode = $treeBuilder->getRootNode();

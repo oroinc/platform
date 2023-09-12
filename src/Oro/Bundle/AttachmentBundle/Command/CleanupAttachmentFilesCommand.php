@@ -146,7 +146,7 @@ HELP
             $io->text(sprintf('    <info>%s --force</info>', $this->getName()));
         }
 
-        return $hasErrors ? 1 : 0;
+        return $hasErrors ? self::FAILURE : self::SUCCESS;
     }
 
     abstract protected function getAttachmentFileNames(): iterable;

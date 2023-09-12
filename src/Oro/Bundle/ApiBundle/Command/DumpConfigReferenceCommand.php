@@ -85,6 +85,6 @@ HELP
         $dumper = new YamlReferenceDumper();
         $output->writeln($dumper->dump($configuration));
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

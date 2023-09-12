@@ -45,7 +45,7 @@ class NotificationAlertCleanupCronCommand extends Command implements CronCommand
     /**
      * {@inheritDoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var EntityRepository $entityRepository */
         $entityRepository = $this->doctrine->getRepository(NotificationAlert::class);
@@ -73,6 +73,6 @@ class NotificationAlertCleanupCronCommand extends Command implements CronCommand
             $symfonyStyle->note('There are no outdated notification alerts.');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

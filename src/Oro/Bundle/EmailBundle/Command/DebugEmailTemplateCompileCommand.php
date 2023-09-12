@@ -97,7 +97,7 @@ class DebugEmailTemplateCompileCommand extends Command
         if (!$template) {
             $output->writeln(sprintf('Template "%s" not found', $templateName));
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $params = $this->getNormalizedParams($input->getOption('params-file'));
@@ -134,7 +134,7 @@ class DebugEmailTemplateCompileCommand extends Command
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getNormalizedParams(?string $paramsFile = null): array

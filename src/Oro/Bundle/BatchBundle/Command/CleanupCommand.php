@@ -97,7 +97,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $interval = $input->getOption('interval');
 
@@ -109,7 +109,7 @@ HELP
         if (!count($jobInstanceIterator)) {
             $output->writeln('<info>There are no jobs eligible for clean up</info>');
 
-            return 1;
+            return Command::FAILURE;
         }
         $output->writeln(sprintf('<comment>Batch jobs will be deleted:</comment> %d', count($jobInstanceIterator)));
 
@@ -117,7 +117,7 @@ HELP
 
         $output->writeln('<info>Batch job history cleanup complete</info>');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

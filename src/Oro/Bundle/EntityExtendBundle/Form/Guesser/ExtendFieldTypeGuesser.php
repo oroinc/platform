@@ -12,6 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 /**
  * Provides a guess for form type and form options based on entity field config.
@@ -45,7 +46,7 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
     /**
      * {@inheritdoc}
      */
-    public function guessType($className, $property)
+    public function guessType($className, $property): ?TypeGuess
     {
         if (!$this->extendConfigProvider->hasConfig($className, $property)) {
             return $this->createDefaultTypeGuess();

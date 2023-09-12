@@ -37,7 +37,7 @@ class FeatureDependedFirewallMap extends FirewallMap
     /**
      * {@inheritDoc}
      */
-    public function getListeners(Request $request)
+    public function getListeners(Request $request): array
     {
         $context = $this->getContext($request);
         if (null === $context) {

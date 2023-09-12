@@ -9,7 +9,7 @@ class RelatedEntityStandaloneCollectionApiType extends AbstractPatchableApiType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return RelatedEntityCollectionApiType::class;
     }
@@ -17,7 +17,7 @@ class RelatedEntityStandaloneCollectionApiType extends AbstractPatchableApiType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_related_entity_standalone_collection_api';
     }

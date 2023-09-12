@@ -117,6 +117,6 @@ HELP
             $this->environment
         ));
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

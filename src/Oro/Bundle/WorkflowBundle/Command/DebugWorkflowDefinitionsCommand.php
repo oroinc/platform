@@ -72,7 +72,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->hasArgument('workflow-name') && $input->getArgument('workflow-name')) {
             return $this->dumpWorkflowDefinition($input->getArgument('workflow-name'), $output);

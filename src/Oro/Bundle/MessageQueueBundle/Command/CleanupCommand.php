@@ -74,7 +74,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('dry-run')) {
             $output->writeln(
@@ -84,7 +84,7 @@ HELP
                 )
             );
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $output->writeln(sprintf(
@@ -94,7 +94,7 @@ HELP
 
         $output->writeln('<info>Message queue job history cleanup complete</info>');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

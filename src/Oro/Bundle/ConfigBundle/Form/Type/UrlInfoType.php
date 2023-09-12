@@ -25,7 +25,7 @@ class UrlInfoType extends AbstractType
         $this->router = $router;
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }

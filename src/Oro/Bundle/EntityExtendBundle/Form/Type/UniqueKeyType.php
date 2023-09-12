@@ -59,7 +59,7 @@ class UniqueKeyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_unique_key_type';
     }

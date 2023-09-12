@@ -70,7 +70,7 @@ class WidgetSortByType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_type_widget_sort_by';
     }

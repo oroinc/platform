@@ -67,7 +67,7 @@ class NoteApiType extends NoteType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_note_api';
     }

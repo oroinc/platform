@@ -23,7 +23,7 @@ class ChoiceType extends AbstractConfigType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_entity_config_choice';
     }
@@ -31,7 +31,7 @@ class ChoiceType extends AbstractConfigType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return SymfonyChoiceType::class;
     }

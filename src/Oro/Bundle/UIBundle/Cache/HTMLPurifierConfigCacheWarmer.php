@@ -26,7 +26,7 @@ class HTMLPurifierConfigCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritDoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): array
     {
         foreach ($this->htmlTagProvider->getScopes() as $scope) {
             $this->htmlTagHelper->sanitize(
@@ -36,12 +36,13 @@ class HTMLPurifierConfigCacheWarmer implements CacheWarmerInterface
             );
         }
         $this->htmlTagHelper->escape('<p style="border: none">text</p><a href="http://localhost"></a>');
+        return [];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return false;
     }

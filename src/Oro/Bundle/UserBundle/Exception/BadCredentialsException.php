@@ -20,9 +20,9 @@ class BadCredentialsException extends BaseBadCredentialsException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
-        return $this->messageKey;
+        return $this->messageKey ?? '';
     }
 
     /**

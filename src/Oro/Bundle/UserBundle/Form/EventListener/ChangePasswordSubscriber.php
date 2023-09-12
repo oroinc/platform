@@ -12,7 +12,7 @@ class ChangePasswordSubscriber extends UserSubscriber
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return array(
             FormEvents::POST_SUBMIT => 'onSubmit',

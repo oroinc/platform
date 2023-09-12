@@ -15,7 +15,7 @@ class NotDangerousProtocol extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return $this->validator;
     }

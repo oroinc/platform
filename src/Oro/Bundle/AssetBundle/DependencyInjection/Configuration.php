@@ -11,7 +11,7 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritDoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $finder = new NodeJsExecutableFinder();
         $treeBuilder = new TreeBuilder('oro_asset');

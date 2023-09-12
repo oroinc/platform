@@ -31,7 +31,7 @@ abstract class AbstractFormGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessRequired($class, $property)
+    public function guessRequired($class, $property): ?ValueGuess
     {
         return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
     }
@@ -39,7 +39,7 @@ abstract class AbstractFormGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessMaxLength($class, $property)
+    public function guessMaxLength($class, $property): ?ValueGuess
     {
         return new ValueGuess(null, ValueGuess::LOW_CONFIDENCE);
     }
@@ -47,7 +47,7 @@ abstract class AbstractFormGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessPattern($class, $property)
+    public function guessPattern($class, $property): ?ValueGuess
     {
         return new ValueGuess(null, ValueGuess::LOW_CONFIDENCE);
     }

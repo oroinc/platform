@@ -24,7 +24,7 @@ class TestUser implements UserInterface
         return $this->phone;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
     }
 

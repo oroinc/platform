@@ -89,7 +89,7 @@ class WorkflowStepSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_workflow_step_select';
     }
@@ -97,7 +97,7 @@ class WorkflowStepSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return EntityType::class;
     }

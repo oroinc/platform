@@ -72,7 +72,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln($this->getDescription());
 
@@ -81,12 +81,12 @@ HELP
             $output->writeln('<error>This is an internal command. Please do not run it manually.</error>');
             $output->writeln('<error>Execution of this command can break the system.</error>');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $this->extendConfigDumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function getFilter(InputInterface $input): ?callable

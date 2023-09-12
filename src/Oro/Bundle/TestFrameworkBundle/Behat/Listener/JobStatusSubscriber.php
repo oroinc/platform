@@ -39,7 +39,7 @@ class JobStatusSubscriber implements EventSubscriberInterface
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             BeforeStepTested::BEFORE => ['beforeStep', -500],

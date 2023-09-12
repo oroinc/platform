@@ -19,6 +19,7 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Form\Guess\ValueGuess;
 
 /**
  * Guesses form types based on "form_type_guesses" configuration and API metadata.
@@ -83,7 +84,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function guessType($class, $property)
+    public function guessType($class, $property): ?TypeGuess
     {
         $metadata = $this->metadataAccessor?->getMetadata($class);
         if (null !== $metadata) {
@@ -122,7 +123,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessRequired($class, $property)
+    public function guessRequired($class, $property): ?ValueGuess
     {
         return null;
     }
@@ -130,7 +131,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessMaxLength($class, $property)
+    public function guessMaxLength($class, $property): ?ValueGuess
     {
         return null;
     }
@@ -138,7 +139,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessPattern($class, $property)
+    public function guessPattern($class, $property): ?ValueGuess
     {
         return null;
     }

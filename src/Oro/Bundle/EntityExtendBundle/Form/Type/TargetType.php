@@ -84,7 +84,7 @@ class TargetType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_entity_target_type';
     }
@@ -92,7 +92,7 @@ class TargetType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return Select2ChoiceType::class;
     }

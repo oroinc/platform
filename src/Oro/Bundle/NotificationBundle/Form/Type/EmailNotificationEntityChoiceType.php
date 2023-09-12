@@ -19,7 +19,7 @@ class EmailNotificationEntityChoiceType extends EntityChoiceType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }

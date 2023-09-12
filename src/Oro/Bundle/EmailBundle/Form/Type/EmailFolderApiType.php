@@ -80,7 +80,7 @@ class EmailFolderApiType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_email_email_folder_api';
     }

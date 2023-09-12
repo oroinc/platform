@@ -57,7 +57,7 @@ class SetPasswordType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_set_password';
     }
@@ -65,7 +65,7 @@ class SetPasswordType extends AbstractType
     /**
      * @return string
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TextType::class;
     }

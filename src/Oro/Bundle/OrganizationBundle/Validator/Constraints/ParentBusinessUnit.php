@@ -16,7 +16,7 @@ class ParentBusinessUnit extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'parent_business_unit_validator';
     }
@@ -24,7 +24,7 @@ class ParentBusinessUnit extends Constraint
     /**
      * @inheritdoc
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;
     }

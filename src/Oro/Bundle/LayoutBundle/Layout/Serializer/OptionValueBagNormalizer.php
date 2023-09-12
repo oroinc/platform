@@ -30,7 +30,7 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof OptionValueBag;
     }

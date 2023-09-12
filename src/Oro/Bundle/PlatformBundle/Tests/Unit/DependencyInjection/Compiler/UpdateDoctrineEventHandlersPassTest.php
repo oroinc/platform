@@ -132,13 +132,13 @@ class UpdateDoctrineEventHandlersPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             'Passing "connection: default" to "some_subscriber" tags is default behaviour now.'
             . ' Specify one of "search, security" or remove default one.',
-            $subscriberDef->getDeprecationMessage('some_subscriber')
+            $subscriberDef->getDeprecation('some_subscriber')['message']
         );
         self::assertTrue($listenerDef->isDeprecated());
         self::assertEquals(
             'Passing "connection: default" to "some_listener" tags is default behaviour now.'
             . ' Specify one of "search, security" or remove default one.',
-            $listenerDef->getDeprecationMessage('some_listener')
+            $listenerDef->getDeprecation('some_listener')['message']
         );
     }
 }

@@ -80,7 +80,7 @@ class CommentTypeApi extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_comment_api';
     }

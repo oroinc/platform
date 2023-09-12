@@ -14,7 +14,7 @@ class NotSqlKeyword extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return NotSqlKeywordValidator::ALIAS;
     }

@@ -57,7 +57,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $targetDir = realpath($this->projectDir . '/public') . '/js';
 
@@ -85,7 +85,7 @@ HELP
             throw new \RuntimeException('Unable to write file ' . $file);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

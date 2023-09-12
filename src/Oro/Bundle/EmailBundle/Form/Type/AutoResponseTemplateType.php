@@ -136,7 +136,7 @@ class AutoResponseTemplateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_email_autoresponse_template';
     }

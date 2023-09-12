@@ -17,7 +17,7 @@ class ReportEntityChoiceType extends EntityChoiceType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_report_entity_choice';
     }

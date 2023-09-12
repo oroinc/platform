@@ -9,7 +9,7 @@ class OptionalPrice extends NotBlank
     /**
      * {@inheritdoc}
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return [self::CLASS_CONSTRAINT];
     }

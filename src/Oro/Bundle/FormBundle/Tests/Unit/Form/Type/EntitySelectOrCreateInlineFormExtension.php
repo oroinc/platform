@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     protected $em;
 
@@ -40,7 +40,7 @@ class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
     /**
      * @return array|\Symfony\Component\Form\FormTypeInterface[]
      */
-    protected function loadTypes()
+    protected function loadTypes(): array
     {
         return [
             new OroJquerySelect2HiddenType($this->em, $this->searchRegistry, $this->configProvider),

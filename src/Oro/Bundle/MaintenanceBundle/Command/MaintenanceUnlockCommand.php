@@ -51,12 +51,12 @@ HELP
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
         if (!$this->confirmUnlock($input, $io)) {
-            return 0;
+            return Command::SUCCESS;
         }
 
         $driver = $this->driverFactory->getDriver();
@@ -65,12 +65,12 @@ HELP
             $this->dispatcher->dispatch(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_OFF);
             $io->success('Maintenance mode is turned off.');
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $io->error('Failed to turn off maintenance mode.');
 
-        return 1;
+        return Command::FAILURE;
     }
 
     protected function confirmUnlock(InputInterface $input, SymfonyStyle $io): bool

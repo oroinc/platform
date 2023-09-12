@@ -40,7 +40,7 @@ class CumulativeRoutingFileLoader extends AbstractLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return $type === $this->routeType;
     }

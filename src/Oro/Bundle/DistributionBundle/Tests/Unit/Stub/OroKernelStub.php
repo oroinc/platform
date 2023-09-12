@@ -76,7 +76,7 @@ class OroKernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return array_map(
             function (array $params) {

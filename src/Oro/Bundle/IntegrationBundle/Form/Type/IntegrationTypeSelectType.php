@@ -63,7 +63,7 @@ class IntegrationTypeSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return Select2ChoiceType::class;
     }
@@ -79,7 +79,7 @@ class IntegrationTypeSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_integration_type_select';
     }

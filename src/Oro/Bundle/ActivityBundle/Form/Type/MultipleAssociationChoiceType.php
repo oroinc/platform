@@ -42,7 +42,7 @@ class MultipleAssociationChoiceType extends BaseMultipleAssociationChoiceType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_activity_multiple_association_choice';
     }
@@ -50,7 +50,7 @@ class MultipleAssociationChoiceType extends BaseMultipleAssociationChoiceType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return BaseMultipleAssociationChoiceType::class;
     }

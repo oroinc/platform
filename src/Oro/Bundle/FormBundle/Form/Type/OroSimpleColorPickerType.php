@@ -96,7 +96,7 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return HiddenType::class;
     }
@@ -112,7 +112,7 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_simple_color_picker';
     }
