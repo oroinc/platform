@@ -128,7 +128,7 @@
         "gedmo/doctrine-extensions": "~3.10.0",
         "predis/predis": "~1.1.6",
         "psr/log": "1.1.*",
-        "oro/platform-serialised-fields": "5.1.*"
+        "oro/platform-serialised-fields": "6.0.*"
     },
     "require-dev": {
         "behat/behat": "~3.12.0",
@@ -227,7 +227,7 @@
             "require": "~5.4.0"
         },
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "6.0-dev"
         }
     },
     "autoload": {
