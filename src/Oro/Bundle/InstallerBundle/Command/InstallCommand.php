@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
@@ -19,6 +20,7 @@ use Oro\Bundle\LocaleBundle\Command\LocalizationOptionsCommandTrait;
 use Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand;
 use Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension;
 use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
+use Oro\Bundle\PricingProBundle\DependencyInjection\Configuration as CurrencyProConfig;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
@@ -50,6 +52,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     private ScriptManager $scriptManager;
     private ManagerRegistry $doctrine;
     private EventDispatcherInterface $eventDispatcher;
+    private InputInterface $input;
 
     public function __construct(
         ContainerInterface $container,
@@ -77,13 +80,13 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->addOption('user-firstname', null, InputOption::VALUE_OPTIONAL, 'Admin user first name')
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'Admin user last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'Admin user password')
-            ->addOption('sample-data', null, InputOption::VALUE_OPTIONAL, 'Load sample data')
-        ;
+            ->addOption('sample-data', null, InputOption::VALUE_OPTIONAL, 'Load sample data');
         $this->addLocalizationOptions();
         $this
             ->addOption('skip-download-translations', null, InputOption::VALUE_NONE, 'Skip downloading translations')
             ->addOption('skip-translations', null, InputOption::VALUE_NONE, 'Skip applying translations')
             ->addOption('drop-database', null, InputOption::VALUE_NONE, 'Delete all existing data')
+            ->addOption('default-currency', null, InputOption::VALUE_OPTIONAL, 'Oro default currency')
             ->setDescription('Application installer.')
             // @codingStandardsIgnoreStart
             ->setHelp(
@@ -187,6 +190,7 @@ HELP
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->input = $input;
         $this->inputOptionProvider = new InputOptionProvider($output, $input, $this->getHelperSet()->get('question'));
 
         $this->validateApplicationUrl($input->getOption('application-url'));
@@ -492,7 +496,28 @@ HELP
                 $configManager->set($configKey, $value);
             }
         }
+        $currency = $this->input->getOption('default-currency');
+        if (null !== $currency) {
+            /** @var ConfigManager $configManager */
+            $configManager = $this->getContainer()->get('oro_config.global');
+            $currencyConfigKey = CurrencyConfig::getConfigKeyByName(CurrencyConfig::KEY_DEFAULT_CURRENCY);
 
+            $currentCurrency = $configManager->get($currencyConfigKey);
+
+            if ($currentCurrency !== $currency) {
+                $configManager->set($currencyConfigKey, $currency);
+
+                $configManager->set(
+                    CurrencyProConfig::getConfigKeyByName(CurrencyProConfig::DEFAULT_CURRENCY),
+                    $currency
+                );
+
+                $configManager->set(
+                    CurrencyProConfig::getConfigKeyByName(CurrencyProConfig::ENABLED_CURRENCIES),
+                    [$currency]
+                );
+            }
+        }
         $configManager->flush();
     }
 
