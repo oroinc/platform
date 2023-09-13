@@ -45,7 +45,7 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_email.mailbox.manager' => MailboxManager::class

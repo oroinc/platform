@@ -68,7 +68,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntities()
+    public function getEntities(): array
     {
         $query = $this->queryBuilder->getQuery();
 
@@ -78,7 +78,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntitiesByIds($identifier, array $values)
+    public function getEntitiesByIds($identifier, array $values): array
     {
         QueryBuilderUtil::checkIdentifier($identifier);
         $qb        = clone ($this->queryBuilder);

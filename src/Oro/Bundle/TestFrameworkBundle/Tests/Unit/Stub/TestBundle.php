@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class TestBundle implements BundleInterface
@@ -12,7 +13,7 @@ class TestBundle implements BundleInterface
     protected $name;
 
     /** @var string */
-    protected $path;
+    protected $path = 'foo/bar';
 
     /**
      * @param string $name
@@ -25,7 +26,7 @@ class TestBundle implements BundleInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -33,7 +34,7 @@ class TestBundle implements BundleInterface
     /**
      * {@inheritdoc}
      */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return $this->name;
     }
@@ -62,7 +63,7 @@ class TestBundle implements BundleInterface
     /**
      * {@inheritdoc}
      */
-    public function getContainerExtension()
+    public function getContainerExtension(): ?ExtensionInterface
     {
     }
 
@@ -84,7 +85,7 @@ class TestBundle implements BundleInterface
     /**
      * {@inheritdoc}
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }

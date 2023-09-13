@@ -30,7 +30,7 @@ class ReminderExtension extends AbstractTypeExtension implements ServiceSubscrib
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_reminder.entity.manager' => ReminderManager::class

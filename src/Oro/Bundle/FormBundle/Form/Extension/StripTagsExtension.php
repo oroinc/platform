@@ -32,7 +32,7 @@ class StripTagsExtension extends AbstractTypeExtension implements ServiceSubscri
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_ui.html_tag_helper' => HtmlTagHelper::class

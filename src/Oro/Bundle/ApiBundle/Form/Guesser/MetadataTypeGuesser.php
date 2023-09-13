@@ -84,7 +84,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function guessType($class, $property): ?TypeGuess
+    public function guessType(string $class, string $property): ?TypeGuess
     {
         $metadata = $this->metadataAccessor?->getMetadata($class);
         if (null !== $metadata) {
@@ -123,7 +123,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessRequired($class, $property): ?ValueGuess
+    public function guessRequired(string $class, string $property): ?ValueGuess
     {
         return null;
     }
@@ -131,7 +131,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessMaxLength($class, $property): ?ValueGuess
+    public function guessMaxLength(string $class, string $property): ?ValueGuess
     {
         return null;
     }
@@ -139,7 +139,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessPattern($class, $property): ?ValueGuess
+    public function guessPattern(string $class, string $property): ?ValueGuess
     {
         return null;
     }

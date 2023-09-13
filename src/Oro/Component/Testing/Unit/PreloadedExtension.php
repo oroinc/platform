@@ -3,6 +3,7 @@
 namespace Oro\Component\Testing\Unit;
 
 use Symfony\Component\Form\FormTypeGuesserInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\PreloadedExtension as BasePreloadExtension;
 
 /**
@@ -33,7 +34,7 @@ class PreloadedExtension extends BasePreloadExtension
     /**
      * {@inheritdoc}
      */
-    public function getType($name)
+    public function getType($name): FormTypeInterface
     {
         if (isset($this->types[$name])) {
             return $this->types[$name];
@@ -45,7 +46,7 @@ class PreloadedExtension extends BasePreloadExtension
     /**
      * {@inheritdoc}
      */
-    public function hasType($name)
+    public function hasType($name): bool
     {
         return isset($this->types[$name]) || parent::hasType($name);
     }

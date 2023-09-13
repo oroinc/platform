@@ -195,7 +195,7 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             EntityIdAccessor::class,

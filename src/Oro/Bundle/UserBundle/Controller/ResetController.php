@@ -18,6 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -35,7 +36,7 @@ class ResetController extends AbstractController
      * @param Request $request
      * @Route("/send-email", name="oro_user_reset_send_email", methods={"POST"})
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      */
     public function sendEmailAction(Request $request)
     {
@@ -306,7 +307,7 @@ class ResetController extends AbstractController
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(
             parent::getSubscribedServices(),

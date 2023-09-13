@@ -58,7 +58,7 @@ class WebpackExtension extends AbstractExtension implements ServiceSubscriberInt
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_asset.webpack_server' => WebpackServer::class,

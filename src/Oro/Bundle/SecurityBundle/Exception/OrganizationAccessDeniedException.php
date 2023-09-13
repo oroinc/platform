@@ -43,7 +43,7 @@ class OrganizationAccessDeniedException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function getMessageData()
+    public function getMessageData(): array
     {
         return ['%organization_name%' => $this->organizationName];
     }

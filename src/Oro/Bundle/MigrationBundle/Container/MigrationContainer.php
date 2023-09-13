@@ -47,7 +47,7 @@ class MigrationContainer extends DependencyInjectionContainer
     /**
      * {@inheritdoc}
      */
-    public function isCompiled()
+    public function isCompiled(): bool
     {
         return $this->publicContainer->isCompiled();
     }
@@ -63,7 +63,7 @@ class MigrationContainer extends DependencyInjectionContainer
     /**
      * {@inheritdoc}
      */
-    public function has(string $id)
+    public function has(string $id): bool
     {
         return $this->publicContainer->has($id) || $this->privateContainer->has($id);
     }
@@ -71,7 +71,7 @@ class MigrationContainer extends DependencyInjectionContainer
     /**
      * {@inheritdoc}
      */
-    public function get($id, $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1)
+    public function get($id, $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1): ?object
     {
         return $this->privateContainer->has($id)
             ? $this->privateContainer->get($id)
@@ -81,7 +81,7 @@ class MigrationContainer extends DependencyInjectionContainer
     /**
      * {@inheritdoc}
      */
-    public function initialized(string $id)
+    public function initialized(string $id): bool
     {
         return $this->publicContainer->initialized($id);
     }
@@ -97,7 +97,7 @@ class MigrationContainer extends DependencyInjectionContainer
     /**
      * {@inheritdoc}
      */
-    public function getServiceIds()
+    public function getServiceIds(): array
     {
         return $this->publicContainer->getServiceIds();
     }
@@ -105,7 +105,7 @@ class MigrationContainer extends DependencyInjectionContainer
     /**
      * {@inheritdoc}
      */
-    public function getRemovedIds()
+    public function getRemovedIds(): array
     {
         return $this->publicContainer->getRemovedIds();
     }

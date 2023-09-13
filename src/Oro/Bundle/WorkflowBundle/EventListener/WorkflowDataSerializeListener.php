@@ -140,7 +140,7 @@ class WorkflowDataSerializeListener implements ServiceSubscriberInterface
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_workflow.serializer.data.serializer' => WorkflowAwareSerializer::class

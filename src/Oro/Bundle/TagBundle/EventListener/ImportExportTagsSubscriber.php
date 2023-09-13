@@ -217,7 +217,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSub
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_tag.tag_import.manager' => TagImportManager::class

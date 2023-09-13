@@ -42,7 +42,7 @@ class HelpExtension extends AbstractExtension implements ServiceSubscriberInterf
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_help.help_link_provider' => HelpLinkProvider::class,

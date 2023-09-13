@@ -31,6 +31,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -40,7 +41,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 abstract class AbstractMenuController extends AbstractController
 {
     /**
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws AccessDeniedException
      */
     protected function checkAcl(array $context)
     {
@@ -332,7 +333,7 @@ abstract class AbstractMenuController extends AbstractController
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(
             parent::getSubscribedServices(),

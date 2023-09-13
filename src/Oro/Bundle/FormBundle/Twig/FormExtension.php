@@ -157,7 +157,7 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'twig.form.renderer' => FormRendererInterface::class,

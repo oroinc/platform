@@ -316,7 +316,7 @@ class DataGridExtension extends AbstractExtension implements ServiceSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_datagrid.datagrid.manager' => ManagerInterface::class,

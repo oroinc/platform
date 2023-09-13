@@ -142,7 +142,7 @@ class CurrencyExtension extends AbstractExtension implements ServiceSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_locale.formatter.number' => NumberFormatter::class,

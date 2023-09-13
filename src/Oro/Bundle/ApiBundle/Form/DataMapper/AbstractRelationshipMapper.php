@@ -30,7 +30,7 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
     /**
      * {@inheritDoc}
      */
-    public function mapDataToForms($viewData, $forms): void
+    public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
         $empty = null === $viewData;
 
@@ -53,7 +53,7 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
     /**
      * {@inheritDoc}
      */
-    public function mapFormsToData($forms, &$viewData): void
+    public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
     {
         if (null === $viewData) {
             return;

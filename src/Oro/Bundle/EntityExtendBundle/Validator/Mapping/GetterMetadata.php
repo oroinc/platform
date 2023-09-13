@@ -65,7 +65,7 @@ class GetterMetadata extends MemberMetadata
     /**
      * {@inheritdoc}
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         return array_merge(parent::__sleep(), ['methodType']);
     }
@@ -105,7 +105,7 @@ class GetterMetadata extends MemberMetadata
     /**
      * @inheritDoc
      */
-    protected function newReflectionMember($objectOrClassName)
+    protected function newReflectionMember($objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {
         if ($this->methodType === self::METHOD_REAL) {
             return new \ReflectionMethod($objectOrClassName, $this->getName());
@@ -117,7 +117,7 @@ class GetterMetadata extends MemberMetadata
     /**
      * @inheritDoc
      */
-    public function getPropertyValue($containingValue)
+    public function getPropertyValue($containingValue): mixed
     {
         if ($this->methodType === self::METHOD_REAL) {
             return $this->newReflectionMember($containingValue)->invoke($containingValue);

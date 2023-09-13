@@ -39,7 +39,7 @@ class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate
     /**
      * @see \Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate::enableOptionalWarmers
      */
-    public function enableOptionalWarmers()
+    public function enableOptionalWarmers(): void
     {
         $this->optionalsEnabled = true;
     }
@@ -47,7 +47,7 @@ class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate
     /**
      * @see \Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate::enableOnlyOptionalWarmers
      */
-    public function enableOnlyOptionalWarmers()
+    public function enableOnlyOptionalWarmers(): void
     {
         $this->optionalsEnabled = true;
         $this->onlyOptionalsEnabled = true;

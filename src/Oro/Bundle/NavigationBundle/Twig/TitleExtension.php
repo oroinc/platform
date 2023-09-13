@@ -168,7 +168,7 @@ class TitleExtension extends AbstractExtension implements ServiceSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_navigation.title_service' => TitleServiceInterface::class,

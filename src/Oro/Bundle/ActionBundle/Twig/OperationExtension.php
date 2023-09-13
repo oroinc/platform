@@ -132,7 +132,7 @@ class OperationExtension extends AbstractExtension implements ServiceSubscriberI
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_action.provider.route' => RouteProviderInterface::class,

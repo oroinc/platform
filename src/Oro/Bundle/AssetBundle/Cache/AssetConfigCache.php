@@ -36,7 +36,7 @@ class AssetConfigCache implements WarmableInterface
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir): array
+    public function warmUp(string $cacheDir): array
     {
         $config['paths'] = $this->getBundlesPath();
         $config['devServerOptions'] = $this->webpackDevServerOptions;

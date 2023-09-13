@@ -110,7 +110,7 @@ class MicrosoftAccessTokenController extends AbstractAccessTokenController
         return new JsonResponse($response);
     }
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(
             parent::getSubscribedServices(),

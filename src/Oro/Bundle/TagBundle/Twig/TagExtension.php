@@ -76,7 +76,7 @@ class TagExtension extends AbstractExtension implements ServiceSubscriberInterfa
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_tag.tag.manager' => TagManager::class,

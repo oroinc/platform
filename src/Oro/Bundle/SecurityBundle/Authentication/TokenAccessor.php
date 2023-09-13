@@ -24,7 +24,7 @@ class TokenAccessor implements TokenAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         return $this->tokenStorage->getToken();
     }

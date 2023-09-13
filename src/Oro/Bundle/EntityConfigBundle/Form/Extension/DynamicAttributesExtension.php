@@ -53,7 +53,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_entity_config.manager.attribute_manager' => AttributeManager::class,
