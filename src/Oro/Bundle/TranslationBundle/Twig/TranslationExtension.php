@@ -66,7 +66,7 @@ class TranslationExtension extends AbstractExtension implements ServiceSubscribe
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_translation.helper.translation_route' => TranslationsDatagridRouteHelper::class,

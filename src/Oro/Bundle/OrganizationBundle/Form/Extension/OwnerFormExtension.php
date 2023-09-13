@@ -93,7 +93,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'security.acl.voter.basic_permissions' => AclVoterInterface::class,

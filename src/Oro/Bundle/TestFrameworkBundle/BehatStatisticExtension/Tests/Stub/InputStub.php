@@ -31,7 +31,7 @@ class InputStub implements InputInterface
     /**
      * {@inheritdoc}
      */
-    public function getFirstArgument()
+    public function getFirstArgument(): ?string
     {
         return current($this->arguments);
     }
@@ -39,7 +39,7 @@ class InputStub implements InputInterface
     /**
      * {@inheritdoc}
      */
-    public function hasParameterOption($values, $onlyParams = false)
+    public function hasParameterOption($values, $onlyParams = false): bool
     {
     }
 
@@ -67,7 +67,7 @@ class InputStub implements InputInterface
     /**
      * {@inheritdoc}
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
@@ -89,14 +89,14 @@ class InputStub implements InputInterface
     /**
      * {@inheritdoc}
      */
-    public function hasArgument($name)
+    public function hasArgument($name): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -123,14 +123,14 @@ class InputStub implements InputInterface
     /**
      * {@inheritdoc}
      */
-    public function hasOption($name)
+    public function hasOption($name): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isInteractive()
+    public function isInteractive(): bool
     {
     }
 

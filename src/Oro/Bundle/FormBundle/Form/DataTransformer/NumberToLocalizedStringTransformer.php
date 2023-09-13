@@ -36,7 +36,7 @@ class NumberToLocalizedStringTransformer extends BaseTransformer
     /**
      * {@inheritdoc}
      */
-    public function transform($value)
+    public function transform($value): string
     {
         if (null === $value) {
             return '';

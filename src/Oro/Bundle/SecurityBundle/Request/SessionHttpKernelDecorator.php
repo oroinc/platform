@@ -37,7 +37,7 @@ class SessionHttpKernelDecorator implements HttpKernelInterface, TerminableInter
     /**
      * {@inheritdoc}
      */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, int $type = self::MASTER_REQUEST, bool $catch = true): Response
     {
         if (null === $this->collectedSessionOptions) {
             $this->collectedSessionOptions = $this->applyBasePathToCookiePath(

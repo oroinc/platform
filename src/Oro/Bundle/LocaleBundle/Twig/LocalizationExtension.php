@@ -83,7 +83,7 @@ class LocalizationExtension extends AbstractExtension implements ServiceSubscrib
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_locale.formatter.language_code' => LanguageCodeFormatter::class,

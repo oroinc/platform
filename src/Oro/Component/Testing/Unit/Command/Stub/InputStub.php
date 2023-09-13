@@ -5,6 +5,9 @@ namespace Oro\Component\Testing\Unit\Command\Stub;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 
+/**
+ * Stub for Symfony\Component\Console\Input\InputInterface
+ */
 class InputStub implements InputInterface
 {
     /** @var string */
@@ -31,7 +34,7 @@ class InputStub implements InputInterface
     /**
      * {@inheritdoc}
      */
-    public function getFirstArgument()
+    public function getFirstArgument(): ?string
     {
         return current($this->arguments);
     }
@@ -39,7 +42,7 @@ class InputStub implements InputInterface
     /**
      * {@inheritdoc}
      */
-    public function hasParameterOption($values, $onlyParams = false)
+    public function hasParameterOption($values, $onlyParams = false): bool
     {
     }
 
@@ -67,7 +70,7 @@ class InputStub implements InputInterface
     /**
      * {@inheritdoc}
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
@@ -89,14 +92,14 @@ class InputStub implements InputInterface
     /**
      * {@inheritdoc}
      */
-    public function hasArgument($name)
+    public function hasArgument($name): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -123,7 +126,7 @@ class InputStub implements InputInterface
     /**
      * {@inheritdoc}
      */
-    public function hasOption($name)
+    public function hasOption($name): bool
     {
         return array_key_exists($name, $this->options);
     }
@@ -131,7 +134,7 @@ class InputStub implements InputInterface
     /**
      * {@inheritdoc}
      */
-    public function isInteractive()
+    public function isInteractive(): bool
     {
     }
 

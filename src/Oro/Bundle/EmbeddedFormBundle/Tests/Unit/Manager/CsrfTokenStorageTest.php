@@ -7,6 +7,7 @@ use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProviderInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 use Symfony\Contracts\Cache\ItemInterface;
 
 class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
@@ -47,11 +48,10 @@ class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTokenShouldReturnNullIfTokenIsNotCached(): void
+    public function testGetTokenShouldThrowExceptionIfTokenIsNotCached(): void
     {
-        self::assertNull(
-            $this->csrfTokenStorage->getToken(self::TEST_CSRF_TOKEN_ID)
-        );
+        self::expectException(TokenNotFoundException::class);
+        $this->csrfTokenStorage->getToken(self::TEST_CSRF_TOKEN_ID);
     }
 
     public function testGetTokenShouldReturnCachedToken(): void
@@ -98,7 +98,8 @@ class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
 
         $this->csrfTokenStorage->removeToken(self::TEST_CSRF_TOKEN_ID);
 
-        self::assertNull($this->csrfTokenStorage->getToken(self::TEST_CSRF_TOKEN_ID));
+        self::expectException(TokenNotFoundException::class);
+        $this->csrfTokenStorage->getToken(self::TEST_CSRF_TOKEN_ID);
     }
 
     public function testClear(): void
@@ -107,7 +108,8 @@ class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
 
         $this->csrfTokenStorage->clear();
 
-        self::assertNull($this->csrfTokenStorage->getToken(self::TEST_CSRF_TOKEN_ID));
+        self::expectException(TokenNotFoundException::class);
+        $this->csrfTokenStorage->getToken(self::TEST_CSRF_TOKEN_ID);
     }
 
     private function assertSavedToken(): void

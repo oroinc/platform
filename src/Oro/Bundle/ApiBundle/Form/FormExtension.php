@@ -41,7 +41,7 @@ class FormExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function getType($name)
+    public function getType(string $name)
     {
         if (!\array_key_exists($name, $this->types)) {
             throw new InvalidArgumentException(sprintf(
@@ -75,7 +75,7 @@ class FormExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function hasType($name)
+    public function hasType(string $name)
     {
         return \array_key_exists($name, $this->types);
     }
@@ -83,7 +83,7 @@ class FormExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function getTypeExtensions($name)
+    public function getTypeExtensions(string $name)
     {
         $extensions = [];
 
@@ -111,7 +111,7 @@ class FormExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function hasTypeExtensions($name)
+    public function hasTypeExtensions(string $name)
     {
         return isset($this->typeExtensions[$name]);
     }

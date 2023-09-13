@@ -23,7 +23,7 @@ class BuildVersionStrategy implements VersionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getVersion($path): string
+    public function getVersion(string $path): string
     {
         if ($this->version === null) {
             $version = '';
@@ -41,7 +41,7 @@ class BuildVersionStrategy implements VersionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function applyVersion($path): string
+    public function applyVersion(string $path): string
     {
         $version = $this->getVersion($path);
         if ($version === '') {

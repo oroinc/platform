@@ -32,7 +32,7 @@ class ConsoleFormatter extends BaseConsoleFormatter
     /**
      * {@inheritdoc}
      */
-    public function format(array $record)
+    public function format(array $record): mixed
     {
         $formatted = parent::format($record);
 

@@ -35,7 +35,7 @@ abstract class AbstractFieldConfigBasedValidationLoader extends AbstractLoader
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         if (!$this->isClassApplicable($metadata)) {
             return false;

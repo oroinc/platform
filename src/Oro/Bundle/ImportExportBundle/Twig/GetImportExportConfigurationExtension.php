@@ -45,7 +45,7 @@ class GetImportExportConfigurationExtension extends AbstractExtension implements
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_importexport.configuration.registry' => ImportExportConfigurationRegistryInterface::class,

@@ -34,7 +34,7 @@ class ExpressionLanguage extends SymfonyExpressionLanguage
      * Copy of {@see \Symfony\Component\ExpressionLanguage\ExpressionLanguage::parse()}:
      * - makes use own $parser and $cache properties.
      */
-    public function parse($expression, array $names)
+    public function parse($expression, array $names): ParsedExpression
     {
         if ($expression instanceof ParsedExpression) {
             return $expression;

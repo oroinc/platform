@@ -52,7 +52,7 @@ class All extends Composite
     /**
      * {@inheritdoc}
      */
-    protected function getCompositeOption()
+    protected function getCompositeOption(): string
     {
         return 'constraints';
     }

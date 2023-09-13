@@ -114,7 +114,7 @@ class TwigRenderer extends Renderer implements TwigRendererInterface, LoggerAwar
         $blockNameSuffix,
         array $variables = [],
         $renderParentBlock = false
-    ) {
+    ): string {
         $context = $this->layoutContextStack->getCurrentContext();
         $metadata = $context ? $this->renderCache->getMetadata($view, $context) : null;
         $blockId = $view->vars['id'];

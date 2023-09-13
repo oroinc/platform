@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Authentication\Handler;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authentication;
 
@@ -13,7 +14,7 @@ class DefaultAuthenticationSuccessHandler extends Authentication\DefaultAuthenti
 {
     use ProcessRequestParameterLikeRouteTrait;
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
     {
         $this->processRequestParameter($request, $this->options['target_path_parameter']);
         return parent::onAuthenticationSuccess($request, $token);

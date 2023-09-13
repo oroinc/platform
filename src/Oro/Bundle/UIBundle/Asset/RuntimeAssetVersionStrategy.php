@@ -21,7 +21,7 @@ class RuntimeAssetVersionStrategy implements VersionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getVersion($path)
+    public function getVersion($path): string
     {
         $dynamicVersion = $this->assetVersionManager->getAssetVersion($this->packageName);
 
@@ -35,7 +35,7 @@ class RuntimeAssetVersionStrategy implements VersionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function applyVersion($path)
+    public function applyVersion($path): string
     {
         $versionized = sprintf(self::FORMAT, ltrim($path, '/'), $this->getVersion($path));
 

@@ -30,7 +30,7 @@ class AssetConfigCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir): array
+    public function warmUp(string $cacheDir): array
     {
         $this->cache->warmUp($cacheDir);
         return [];
