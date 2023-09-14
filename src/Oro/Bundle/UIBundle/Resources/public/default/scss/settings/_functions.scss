@@ -55,7 +55,7 @@
 }
 
 /** @return the value in a $theme-fonts map associated with a given key;
-    Use: font-family: get-font-name('main') => font-family: 'Lato';
+    Use: font-family: get-font-name('main') => font-family: 'Poppins';
 */
 
 @function get-font-name($key) {

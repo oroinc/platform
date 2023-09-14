@@ -34,7 +34,7 @@ define(function(require) {
          * @inheritdoc
          */
         initializeWidget: function(options) {
-            this.initializeOptions = Object.assign(this.initializeOptions, config);
+            this.initializeOptions = Object.assign({}, this.initializeOptions, config);
 
             UniformFileInputWidgetView.__super__.initializeWidget.call(this, options);
             if (this.$el.is('.error')) {

@@ -828,9 +828,7 @@
         {%- endif -%}
         >
             {{- UIMacro.clientControlIcon(parameters) -}}
-            <span class="text-clip">
-                {{- parameters.label is defined ? parameters.label : '' -}}
-            </span>
+            {{- parameters.label is defined ? parameters.label : '' -}}
         </button>
     {% endapply %}
 {% endmacro %}

@@ -1,7 +1,7 @@
 /* @theme: default; */
 @use 'sass:list';
 
-// Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal, ('woff', 'woff2'), swap);
+// Use: @include font-face('Poppins', '../fonts/poppins/Poppins-Italic-subset', 400, normal, ('woff'), swap);
 @mixin font-face(
     $font-family,
     $file-path,
