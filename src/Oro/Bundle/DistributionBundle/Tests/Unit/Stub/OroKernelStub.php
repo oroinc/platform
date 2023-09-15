@@ -34,7 +34,7 @@ class OroKernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         $dir =  __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
 
@@ -44,7 +44,7 @@ class OroKernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         $appDir = ($this->appDir ? '/' . $this->appDir : '');
 
@@ -54,7 +54,7 @@ class OroKernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function getLogDir()
+    public function getLogDir(): string
     {
         $appDir = ($this->appDir ? '/' . $this->appDir : '');
 
@@ -76,7 +76,7 @@ class OroKernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return array_map(
             function (array $params) {

@@ -15,7 +15,7 @@ class BusinessUnitTreeSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return BusinessUnitTreeType::class;
     }
@@ -47,7 +47,7 @@ class BusinessUnitTreeSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_business_unit_tree_select';
     }

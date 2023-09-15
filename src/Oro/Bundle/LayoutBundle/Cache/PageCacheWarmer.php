@@ -31,7 +31,7 @@ class PageCacheWarmer implements CacheWarmerInterface
     /**
      * @inheritDoc
      */
-    public function warmUp($cacheDir): void
+    public function warmUp($cacheDir): array
     {
         foreach ($this->pageRequestProviders as $pageRequestProvider) {
             if (!$pageRequestProvider instanceof AbstractPageRequestProvider) {
@@ -44,6 +44,7 @@ class PageCacheWarmer implements CacheWarmerInterface
                 $this->warmPageCache($request);
             }
         }
+        return [];
     }
 
     private function warmPageCache(Request $request): void

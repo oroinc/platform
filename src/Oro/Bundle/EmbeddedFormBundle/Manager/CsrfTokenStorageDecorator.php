@@ -45,7 +45,7 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface, ClearableToken
     /**
      * {@inheritdoc}
      */
-    public function hasToken($tokenId)
+    public function hasToken($tokenId): bool
     {
         return $this->getTokenStorage()->hasToken($tokenId);
     }
@@ -53,7 +53,7 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface, ClearableToken
     /**
      * {@inheritdoc}
      */
-    public function getToken($tokenId)
+    public function getToken($tokenId): string
     {
         return $this->getTokenStorage()->getToken($tokenId);
     }
@@ -69,7 +69,7 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface, ClearableToken
     /**
      * {@inheritdoc}
      */
-    public function removeToken($tokenId)
+    public function removeToken($tokenId): ?string
     {
         return $this->getTokenStorage()->removeToken($tokenId);
     }

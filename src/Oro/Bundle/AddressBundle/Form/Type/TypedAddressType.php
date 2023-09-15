@@ -63,7 +63,7 @@ class TypedAddressType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return AddressType::class;
     }
@@ -79,7 +79,7 @@ class TypedAddressType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_typed_address';
     }

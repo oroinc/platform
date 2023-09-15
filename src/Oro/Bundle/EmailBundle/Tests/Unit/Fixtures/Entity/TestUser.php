@@ -72,7 +72,7 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
         return $this->firstName . ' ' . $this->lastName;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
     }
 

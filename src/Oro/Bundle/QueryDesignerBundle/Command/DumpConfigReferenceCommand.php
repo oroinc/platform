@@ -45,7 +45,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output = new SymfonyStyle($input, $output);
 
@@ -53,6 +53,6 @@ HELP
         $dumper = new YamlReferenceDumper();
         $output->writeln($dumper->dump($this->configuration));
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

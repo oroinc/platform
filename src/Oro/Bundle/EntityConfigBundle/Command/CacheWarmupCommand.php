@@ -46,12 +46,12 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Warm up the entity config cache');
 
         $this->configCacheWarmer->warmUpCache();
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

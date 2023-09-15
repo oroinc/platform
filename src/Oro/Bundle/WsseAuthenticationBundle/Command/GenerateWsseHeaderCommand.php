@@ -47,7 +47,7 @@ class GenerateWsseHeaderCommand extends Command
      * @throws \InvalidArgumentException
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $apiKey = $input->getArgument('apiKey');
         /** @var UserApi $userApi */
@@ -103,7 +103,7 @@ class GenerateWsseHeaderCommand extends Command
         );
         $output->writeln('');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

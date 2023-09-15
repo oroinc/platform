@@ -107,7 +107,7 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             ManagerRegistry::class,

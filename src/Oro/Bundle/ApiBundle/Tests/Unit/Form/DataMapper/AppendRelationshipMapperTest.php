@@ -72,7 +72,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         // Can't use isIdentical() above because mocks always clone their
         // arguments which can't be disabled in PHPUnit 3.6
@@ -95,7 +95,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertNotSame($engine, $form->getData());
         self::assertEquals($engine, $form->getData());
@@ -111,7 +111,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
 
         self::assertNull($form->getPropertyPath());
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertNull($form->getData());
     }
@@ -130,7 +130,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertNull($form->getData());
     }
@@ -157,7 +157,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
             ->method('setData')
             ->with($default);
 
-        $this->mapper->mapDataToForms(null, [$form]);
+        $this->mapper->mapDataToForms(null, new \ArrayIterator([$form]));
     }
 
     public function testMapDataToFormsCollectionShouldBeIgnored()
@@ -176,7 +176,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
-        $this->mapper->mapDataToForms($car, [$form]);
+        $this->mapper->mapDataToForms($car, new \ArrayIterator([$form]));
 
         self::assertNull($form->getData());
     }
@@ -197,7 +197,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setData($engine);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
     public function testMapFormsToDataWritesBackIfByReferenceButNoReference()
@@ -216,7 +216,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setData($engine);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
     public function testMapFormsToDataWritesBackIfByReferenceAndReference()
@@ -240,7 +240,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setData($engine);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
     public function testMapFormsToDataIgnoresUnmapped()
@@ -259,7 +259,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setMapped(false);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
     public function testMapFormsToDataIgnoresUnsubmittedForms()
@@ -277,7 +277,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setData($engine);
         $form = $this->getForm($config, true, false);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
     public function testMapFormsToDataIgnoresEmptyData()
@@ -294,7 +294,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setData(null);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
     public function testMapFormsToDataIgnoresUnsynchronized()
@@ -312,7 +312,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setData($engine);
         $form = $this->getForm($config, false);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
     public function testMapFormsToDataIgnoresDisabled()
@@ -331,7 +331,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setDisabled(true);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData([$form], $car);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
     public function testMapFormsToDataElementsShouldBeAddedToCollectionWhenAdderAndRemoverExist()
@@ -358,7 +358,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setData([$group2, $group3]);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData([$form], $user);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $user);
 
         $expected = new ArrayCollection();
         $expected->add($group1);
@@ -391,7 +391,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setData([$group2, $group3]);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData([$form], $user);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $user);
 
         $expected = new ArrayCollection();
         $expected->add($group1);
@@ -431,7 +431,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setData($groupsFormData);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData([$form], $product);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $product);
     }
 
     public function testMapFormsToDataElementsShouldBeAddedToCollectionInCaseOfExtendedToManyAssociation()
@@ -464,7 +464,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $config->setData([$group2, $group3, $product]);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData([$form], $user);
+        $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $user);
 
         $expectedGroups = new ArrayCollection();
         $expectedGroups->add($group1);

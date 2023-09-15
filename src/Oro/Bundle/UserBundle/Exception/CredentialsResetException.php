@@ -9,7 +9,7 @@ class CredentialsResetException extends AccountStatusException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Your password was reset by administrator. Please, check your email for details.';
     }

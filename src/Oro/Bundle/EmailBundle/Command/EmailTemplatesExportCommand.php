@@ -43,14 +43,14 @@ class EmailTemplatesExportCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $destination = $input->getArgument('destination');
 
         if (!is_dir($destination) || !is_writable($destination)) {
             $output->writeln(sprintf('<error>Destination path "%s" should be writable folder</error>', $destination));
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $templates = $this->getEmailTemplates($input->getOption('template'));
@@ -80,7 +80,7 @@ class EmailTemplatesExportCommand extends Command
             );
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

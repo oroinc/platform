@@ -27,7 +27,7 @@ class ValidLoadedItems extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }
@@ -35,7 +35,7 @@ class ValidLoadedItems extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOption()
+    public function getDefaultOption(): ?string
     {
         return 'constraints';
     }

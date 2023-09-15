@@ -41,7 +41,7 @@ class FileVoter extends AbstractEntityVoter implements ServiceSubscriberInterfac
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_attachment.acl.file_access_control_checker' => FileAccessControlChecker::class,
@@ -53,7 +53,7 @@ class FileVoter extends AbstractEntityVoter implements ServiceSubscriberInterfac
     /**
      * {@inheritDoc}
      */
-    public function vote(TokenInterface $token, $object, array $attributes)
+    public function vote(TokenInterface $token, $object, array $attributes): int
     {
         $this->token = $token;
         try {

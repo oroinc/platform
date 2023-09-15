@@ -9,14 +9,14 @@ use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
  */
 class PgsqlAdvisorySchemaInUrlEnvVarProcessor implements EnvVarProcessorInterface
 {
-    public static function getProvidedTypes()
+    public static function getProvidedTypes(): array
     {
         return [
             'pgsql_advisory_schema' => 'string',
         ];
     }
 
-    public function getEnv(string $prefix, string $name, \Closure $getEnv)
+    public function getEnv(string $prefix, string $name, \Closure $getEnv): mixed
     {
         $url = $getEnv($name);
 

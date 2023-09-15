@@ -80,7 +80,7 @@ HELP
             throw new InvalidArgumentException('Unknown feature.');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getConfigs(array $configs, bool $verbose): array

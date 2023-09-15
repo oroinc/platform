@@ -80,7 +80,7 @@ class MessageQueueCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'message_queue';
     }

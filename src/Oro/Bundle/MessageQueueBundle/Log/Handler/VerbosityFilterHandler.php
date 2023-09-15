@@ -78,7 +78,7 @@ class VerbosityFilterHandler extends HandlerWrapper implements EventSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConsoleEvents::COMMAND => ['onCommand', 255]

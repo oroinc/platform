@@ -78,7 +78,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $subject     = $input->getOption('subject');
         $message     = $input->getOption('message');
@@ -105,11 +105,11 @@ HELP
             $this->logger->error('An error occurred while sending mass notification', ['exception' => $exception]);
             $output->writeln('An error occurred while sending mass notification');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $output->writeln(sprintf('%s notifications have been added to the queue', $count));
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

@@ -201,7 +201,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $kernel = $this->getKernel();
         $io = new SymfonyStyle($input, $output);
@@ -224,7 +224,7 @@ HELP
             $io->success('All assets were successfully built.');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /** @SuppressWarnings(PHPMD.UnusedLocalVariable) */

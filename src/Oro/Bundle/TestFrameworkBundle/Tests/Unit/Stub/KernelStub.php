@@ -6,6 +6,7 @@ use Oro\Bundle\DistributionBundle\OroKernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class KernelStub extends OroKernel
 {
@@ -56,7 +57,7 @@ class KernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return $this->registeredBundles;
     }
@@ -85,7 +86,7 @@ class KernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
     {
     }
 
@@ -106,7 +107,7 @@ class KernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function locateResource($name)
+    public function locateResource($name): string
     {
     }
 
@@ -120,35 +121,36 @@ class KernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function getEnvironment()
+    public function getEnvironment(): string
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isDebug()
+    public function isDebug(): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getStartTime()
+    public function getStartTime(): float
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
+        return 'var/cache';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return $this->logDir;
     }
@@ -156,7 +158,7 @@ class KernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function getCharset()
+    public function getCharset(): string
     {
     }
 }

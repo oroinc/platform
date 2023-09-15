@@ -45,7 +45,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSub
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             Events::AFTER_ENTITY_PAGE_LOADED => 'updateEntityResults',
@@ -217,7 +217,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSub
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_tag.tag_import.manager' => TagImportManager::class

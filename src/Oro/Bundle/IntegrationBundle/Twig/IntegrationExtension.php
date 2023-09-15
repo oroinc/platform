@@ -83,7 +83,7 @@ class IntegrationExtension extends AbstractExtension implements ServiceSubscribe
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             EventDispatcherInterface::class,

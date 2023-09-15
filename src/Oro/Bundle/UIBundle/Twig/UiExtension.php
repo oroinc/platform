@@ -663,7 +663,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_ui.content_provider.manager.twig' => TwigContentProviderManager::class,

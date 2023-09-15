@@ -31,7 +31,7 @@ class ItemIdentifierCollectionTypeSubscriber implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         // this subscriber should be executed after CollectionTypeSubscriber
         return [

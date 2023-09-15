@@ -53,7 +53,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -66,6 +66,6 @@ HELP
             $io->text('<info>[file+]</info> ' . $translationFile);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

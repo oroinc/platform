@@ -58,7 +58,7 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter implements ServiceS
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_draft.helper.draft_permission_helper' => DraftPermissionHelper::class

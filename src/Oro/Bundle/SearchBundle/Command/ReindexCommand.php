@@ -71,7 +71,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $class = $input->getArgument('class');
         $isScheduled = $input->getOption('scheduled');
@@ -94,7 +94,7 @@ HELP
             $output->writeln('Reindex finished successfully.');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function getSearchIndexer($useAsynchronousIndexer = false): IndexerInterface

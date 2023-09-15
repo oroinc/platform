@@ -21,7 +21,7 @@ class InteractiveExecutionSubscriber implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             AfterStepTested::AFTER  => ['afterStep', 1000],

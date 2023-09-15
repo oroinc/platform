@@ -33,7 +33,7 @@ class DebugJsConstraintConvertersCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $table = new Table($output);
         $table->setHeaders([
@@ -48,7 +48,7 @@ class DebugJsConstraintConvertersCommand extends Command
         }
         $table->render();
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getRealClass(ConstraintConverterInterface $converter): string

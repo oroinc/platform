@@ -66,7 +66,7 @@ class SystemEmailTemplateSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_email_system_template_list';
     }
@@ -74,7 +74,7 @@ class SystemEmailTemplateSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return Select2TranslatableEntityType::class;
     }

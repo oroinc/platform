@@ -34,7 +34,7 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_entity_extend.extend.field_type_helper' => FieldTypeHelper::class,

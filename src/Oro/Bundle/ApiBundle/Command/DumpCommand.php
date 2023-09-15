@@ -17,6 +17,7 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -131,7 +132,7 @@ HELP
             $this->dumpResources($input, $output);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function dumpNotAccessibleEntities(InputInterface $input, OutputInterface $output): void

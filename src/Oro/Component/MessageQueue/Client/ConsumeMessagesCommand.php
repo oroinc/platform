@@ -65,7 +65,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $clientDestinationName = $input->getArgument('clientDestinationName');
         if ($clientDestinationName) {
@@ -83,7 +83,7 @@ HELP
 
         $this->consume($this->queueConsumer, $this->getConsumerExtension($extensions));
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void

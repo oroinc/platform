@@ -11,7 +11,7 @@ class TestLogger extends BaseTestLogger implements DebugLoggerInterface
     /**
      * {@inheritDoc}
      */
-    public function countErrors(Request $request = null)
+    public function countErrors(Request $request = null): int
     {
         return count($this->recordsByLevel['error'] ?? []);
     }
@@ -19,7 +19,7 @@ class TestLogger extends BaseTestLogger implements DebugLoggerInterface
     /**
      * {@inheritDoc}
      */
-    public function getLogs(Request $request = null)
+    public function getLogs(Request $request = null): array
     {
         return $this->records;
     }

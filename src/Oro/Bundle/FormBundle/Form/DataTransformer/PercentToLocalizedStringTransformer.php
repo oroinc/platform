@@ -29,7 +29,7 @@ class PercentToLocalizedStringTransformer extends BaseTransformer
     /**
      * {@inheritDoc}
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value): int|float|null
     {
         $result = parent::reverseTransform($value);
         if (is_int($result) && self::FRACTIONAL === $this->type) {
@@ -42,7 +42,7 @@ class PercentToLocalizedStringTransformer extends BaseTransformer
     /**
      * {@inheritDoc}
      */
-    protected function getNumberFormatter()
+    protected function getNumberFormatter(): \NumberFormatter
     {
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
         if (null !== $this->scale) {

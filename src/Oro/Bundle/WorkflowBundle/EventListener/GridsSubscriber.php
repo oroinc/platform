@@ -19,7 +19,7 @@ class GridsSubscriber implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             implode('.', [OrmResultBeforeQuery::NAME, 'process-definitions-grid'])  => 'onProcessesResultBeforeQuery',

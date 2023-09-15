@@ -286,7 +286,7 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_layout.text.helper' => TextHelper::class,

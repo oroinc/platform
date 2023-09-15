@@ -55,6 +55,6 @@ HELP
         $dumper = new YamlReferenceDumper();
         $output->writeln($dumper->dump($this->configuration));
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

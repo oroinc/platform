@@ -18,6 +18,7 @@ use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Component\PhpUtils\PhpIniUtil;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -93,7 +94,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $commandExecutor = $this->getCommandExecutor($input, $output);
 
@@ -107,7 +108,7 @@ HELP
         $force = $input->getOption('force');
         if ($force) {
             if (!$this->checkReadyToUpdate($output)) {
-                return 1;
+                return Command::FAILURE;
             }
 
             $eventDispatcher = $this->getEventDispatcher();
@@ -138,11 +139,11 @@ HELP
             $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
 
             if (!$this->checkReadyToUpdate($output)) {
-                return 1;
+                return Command::FAILURE;
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */

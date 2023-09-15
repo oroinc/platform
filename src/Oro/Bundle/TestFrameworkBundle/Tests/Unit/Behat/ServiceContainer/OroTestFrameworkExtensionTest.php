@@ -167,7 +167,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
                         'type' => 'symfony_bundle',
                         'settings' => [
                             'contexts' => [OroMainContext::class],
-                            'paths' => ['/Features'],
+                            'paths' => ['foo/bar/Features'],
                         ],
                     ],
                 ],

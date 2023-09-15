@@ -99,7 +99,7 @@ HELP
         if ('Cancel' === $mode) {
             $io->comment('Migration was cancelled.');
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         if ('Automatic' === $mode) {
@@ -125,7 +125,7 @@ HELP
             } while (!$input->hasOption('mode') && $io->confirm('Would you like to import another storage?', false));
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getMode(InputInterface $input, SymfonyStyle $io): string

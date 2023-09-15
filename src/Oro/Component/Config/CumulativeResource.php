@@ -105,7 +105,7 @@ class CumulativeResource implements ResourceInterface, SelfCheckingResourceInter
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->resource;
     }

@@ -79,13 +79,13 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $languageCode = (string)$input->getOption('language');
         $formattingCode = (string)$input->getOption('formatting-code');
 
         if ($languageCode === Translator::DEFAULT_LOCALE && $formattingCode === Translator::DEFAULT_LOCALE) {
-            return 0;
+            return Command::SUCCESS;
         }
 
         /** @var LocalizationRepository $localizationRepository */
@@ -110,7 +110,7 @@ HELP
             throw new \RuntimeException('Default localization not found');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function createLanguage(Language $defaultLanguage, string $languageCode): Language

@@ -17,9 +17,10 @@ class ExtendEntityAutocompleteWarmer extends CacheWarmer
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): array
     {
         $this->extendAutocompleteGenerator->generate();
+        return [];
     }
 
     public function isOptional(): bool

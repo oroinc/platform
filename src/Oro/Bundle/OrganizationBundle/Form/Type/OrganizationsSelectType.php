@@ -59,7 +59,7 @@ class OrganizationsSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_organizations_select';
     }

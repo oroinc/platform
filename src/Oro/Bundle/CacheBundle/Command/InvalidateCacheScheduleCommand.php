@@ -68,14 +68,14 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $service = $input->getArgument(self::ARGUMENT_SERVICE_NAME);
         $dataStorage = $this->buildDataStorage($input);
 
         $this->getService($service)->handle($dataStorage);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function buildDataStorage(InputInterface $input): InvalidateCacheDataStorage

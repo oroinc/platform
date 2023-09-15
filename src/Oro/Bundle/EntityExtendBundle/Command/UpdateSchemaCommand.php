@@ -87,7 +87,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $symfonyStyle = new SymfonyStyle($input, $output);
 
@@ -114,7 +114,7 @@ HELP
         if ($sqlCount && $input->getOption('dry-run')) {
             $symfonyStyle->write(implode(';' . PHP_EOL, $sqls) . ';', true);
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         if ($sqlCount) {
@@ -131,7 +131,7 @@ HELP
             } catch (RecoverableUpdateSchemaException $e) {
                 $symfonyStyle->error('Failed to update the database schema! All changes in the schema were reverted.');
 
-                return 1;
+                return Command::FAILURE;
             }
         }
 
@@ -144,7 +144,7 @@ HELP
             );
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function getClassesMetadata(EntityManager $em): array

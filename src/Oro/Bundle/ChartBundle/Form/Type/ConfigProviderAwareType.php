@@ -28,7 +28,7 @@ abstract class ConfigProviderAwareType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_chart_aware';
     }

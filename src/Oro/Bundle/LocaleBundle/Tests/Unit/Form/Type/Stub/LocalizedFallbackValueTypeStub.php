@@ -14,7 +14,7 @@ class LocalizedFallbackValueTypeStub extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'stub_localized_fallback_value';
     }

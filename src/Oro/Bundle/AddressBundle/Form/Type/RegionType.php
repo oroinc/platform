@@ -69,7 +69,7 @@ class RegionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return Select2TranslatableEntityType::class;
     }
@@ -85,7 +85,7 @@ class RegionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_region';
     }

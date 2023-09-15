@@ -28,9 +28,10 @@ class ResourcesCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritDoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         $this->warmUpCache();
+        return [];
     }
 
     /**

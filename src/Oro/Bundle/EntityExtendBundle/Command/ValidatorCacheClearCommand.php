@@ -55,7 +55,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $cacheDir = $this->kernel->getCacheDir();
 
@@ -76,6 +76,6 @@ HELP
 
         $io->success('The cache was successfully cleared.');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

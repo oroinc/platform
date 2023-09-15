@@ -63,7 +63,7 @@ class DebugEmailVariablesCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('System Variables');
         $this->processSystemVariables($output);
@@ -74,7 +74,7 @@ class DebugEmailVariablesCommand extends Command
             $this->processEntityVariables($output, $input->getOption('entity-class'), $input->getOption('entity-id'));
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function processSystemVariables(OutputInterface $output)

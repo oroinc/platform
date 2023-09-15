@@ -38,7 +38,7 @@ class ReportController extends AbstractController
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [
             'oro_report.entity_provider' => EntityProvider::class,

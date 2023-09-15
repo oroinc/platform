@@ -110,7 +110,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $symfonyStyle = new SymfonyStyle($input, $output);
 
@@ -133,7 +133,7 @@ HELP
                 )
             );
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $hasErrors = false;
