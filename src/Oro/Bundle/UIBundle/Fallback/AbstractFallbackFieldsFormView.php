@@ -4,6 +4,7 @@ namespace Oro\Bundle\UIBundle\Fallback;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,6 +30,8 @@ abstract class AbstractFallbackFieldsFormView
      */
     protected $translator;
 
+    protected ?FieldAclHelper $fieldAclHelper = null;
+
     public function __construct(
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
@@ -37,6 +40,11 @@ abstract class AbstractFallbackFieldsFormView
         $this->requestStack = $requestStack;
         $this->doctrine = $doctrine;
         $this->translator = $translator;
+    }
+
+    public function setFieldAclHelper(FieldAclHelper $fieldAclHelper): void
+    {
+        $this->fieldAclHelper = $fieldAclHelper;
     }
 
     /**

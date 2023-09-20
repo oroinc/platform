@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Form;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SecurityBundle\Acl\Voter\EntityClassResolverUtil;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
@@ -13,6 +14,9 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
+/**
+ * Provides methods for checking access to entity fields.
+ */
 class FieldAclHelper
 {
     /** @var AuthorizationCheckerInterface */
@@ -84,6 +88,11 @@ class FieldAclHelper
             return true;
         }
 
+        $className = EntityClassResolverUtil::getEntityClass($entity);
+        if (!$this->isFieldAclEnabled($className)) {
+            return true;
+        }
+
         return $this->authorizationChecker->isGranted('VIEW', new FieldVote($entity, $fieldName));
     }
 
@@ -101,11 +110,33 @@ class FieldAclHelper
             return true;
         }
 
+        $className = EntityClassResolverUtil::getEntityClass($entity);
+        if (!$this->isFieldAclEnabled($className)) {
+            return true;
+        }
+
         $permission = $this->doctrineHelper->isNewEntity($entity)
             ? 'CREATE'
             : 'EDIT';
 
         return $this->authorizationChecker->isGranted($permission, new FieldVote($entity, $fieldName));
+    }
+
+    /**
+     * Checks whether the rendering of the given field is granted.
+     */
+    public function isFieldAvailable(object $entity, string $fieldName): bool
+    {
+        $className = EntityClassResolverUtil::getEntityClass($entity);
+        if (!$this->isFieldAclEnabled($className)) {
+            return true;
+        }
+
+        if ($this->isRestrictedFieldsVisible($className)) {
+            return true;
+        }
+
+        return $this->isFieldModificationGranted($entity, $fieldName);
     }
 
     /**

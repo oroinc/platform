@@ -9,7 +9,6 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -19,8 +18,6 @@ use Symfony\Component\Form\FormView;
  * Form extension that check access to fields.
  * It cannot be registered with form.type_extension tag because
  * this extension should be registered as first extension for all forms.
- *
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 {
@@ -31,10 +28,16 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     protected $logger;
 
     /** @var bool */
-    protected $showRestricted = true;
+    protected $showRestricted = false;
 
     /** @var array List of non accessible fields with committed data */
     protected $disabledFields = [];
+
+    /**
+     * This option indicates the field for which check the permission (this is necessary if the name of
+     * the form field does not match the name of the entity field name).
+     */
+    public const CHECK_FIELD_NAME = 'check_field_name';
 
     public function __construct(FieldAclHelper $fieldAclHelper, LoggerInterface $logger)
     {
@@ -42,144 +45,112 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$this->isApplicable($options)) {
             return;
         }
 
-        // Filter submitted data and ignore data for restricted fields
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit'], -255);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit'], -10);
     }
 
-    /**
-     * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (!$this->isApplicable($options)) {
             return;
         }
 
-        // removes 'trash' view fields that can be added to removed fields in finishView method of the form
+        $entity = $this->getEntityByForm($form);
+        if (!$entity) {
+            return;
+        }
+
+        $this->removeTrashFields($view, $form);
+        $this->filterProtectedFields($view, $form, $entity);
+    }
+
+    /**
+     * Removes 'trash' view fields that can be added to removed fields in finishView method of the form.
+     */
+    private function removeTrashFields(FormView $view, FormInterface $form): void
+    {
         foreach (array_keys($view->children) as $fieldName) {
             if (!$form->has($fieldName) && !$view->children[$fieldName] instanceof FormView) {
                 unset($view->children[$fieldName]);
             }
         }
-
-        $entity = $this->getEntityByForm($form);
-        $hiddenFieldsWithErrors = [];
-        /** @var FormInterface $childForm */
-        foreach ($form as $childName => $childForm) {
-            if ($this->isFormGranted($entity, $childForm)) {
-                continue;
-            }
-
-            if ($this->isViewGranted($entity, $childForm)) {
-                $view->children[$childName]->vars['attr']['readonly'] = true;
-                if (count($view->children[$childName]->children)) {
-                    foreach ($view->children[$childName]->children as $child) {
-                        $child->vars['attr']['readonly'] = true;
-                    }
-                }
-            } else {
-                $view->offsetUnset($childName);
-                if ($childForm->getErrors()->count()) {
-                    $hiddenFieldsWithErrors[$childName] = (string)$childForm->getErrors();
-                }
-            }
-        }
-
-        $this->processHiddenFieldsWithErrors($hiddenFieldsWithErrors, $view, $form);
     }
 
-    /**
-     * Used on post submit to add validation errors
-     */
-    public function postSubmit(FormEvent $event)
+    private function filterProtectedFields(FormView $view, FormInterface $form, object $entity): void
     {
-        $form = $event->getForm();
-        $entity = $event->getData();
-        $className = $form->getConfig()->getDataClass();
-        if ($entity instanceof $className) {
-            foreach ($this->disabledFields as $field) {
-                $this->fieldAclHelper->addFieldModificationDeniedFormError($form->get($field));
+        foreach ($view as $fieldName => $fieldView) {
+            $aclField = $this->getAclField($form, $fieldName);
+            $readonly = !$this->fieldAclHelper->isFieldModificationGranted($entity, $aclField);
+            if ($this->showRestricted) {
+                $this->processRestrictedFields($fieldView, $readonly);
+            } elseif ($readonly) {
+                $view->offsetUnset($fieldName);
             }
         }
     }
 
+    private function processRestrictedFields(FormView $view, bool $readonly): void
+    {
+        $view->vars['attr']['readonly'] = $readonly;
+        $view->vars['disabled'] = $readonly;
+        foreach ($view->children as $childForm) {
+            $this->processRestrictedFields($childForm, $readonly);
+        }
+    }
+
     /**
-     * Validate input data. If form data contain data for forbidden fields - set the original data for such fields and
-     * collect this fields to add validation error.
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * For security reasons, all fields that are not available for modification are ignored or remove from form.
      */
     public function preSubmit(FormEvent $event)
     {
+        $form = $event->getForm();
         $data = $event->getData();
         if (empty($data)) {
             return;
         }
 
-        $form = $event->getForm();
-        $entity = $this->getEntityByForm($form);
-        if (null === $entity) {
-            return;
+        [$protectedFields, $permittedData] = $this->processProtectedFields($form, $data);
+        if ($protectedFields) {
+            $this->processProtectedFieldsErrors($form, $protectedFields);
         }
 
-        foreach ($form->all() as $childForm) {
-            if ($this->isFormGranted($entity, $childForm)) {
-                continue;
-            }
-
-            $fieldName = $childForm->getName();
-            if (isset($data[$fieldName]) && $data[$fieldName]) {
-                if (empty($childForm->all()) && $data[$fieldName] !== $childForm->getData()) {
-                    $this->disabledFields[] = $fieldName;
-                    $data[$fieldName] = $childForm->getData();
-                }
-
-                if (count($childForm->all())) {
-                    foreach ($childForm->all() as $child) {
-                        /** @var Form $child */
-                        $childFieldName = $child->getName();
-                        if (isset($data[$fieldName][$childFieldName])
-                            && $data[$fieldName][$childFieldName] != $child->getViewData()
-                        ) {
-                            if (!isset($this->disabledFields[$fieldName])) {
-                                $this->disabledFields[] = $fieldName;
-                            }
-                            $data[$fieldName][$child->getName()] = $child->getViewData();
-                        }
-                    }
-                }
-            } else {
-                $form->remove($fieldName);
-            }
-        }
-
-        $event->setData($data);
+        $event->setData($permittedData);
     }
 
-    /**
-     * @param array $options
-     *
-     * @return bool
-     */
+    private function processProtectedFields(FormInterface $form, array $data): array
+    {
+        $protectedFields = [];
+        $entity = $this->getEntityByForm($form);
+        if (null === $entity?->getId()) {
+            return [$protectedFields, $data];
+        }
+
+        foreach ($form->all() as $field) {
+            $aclField = $this->getAclField($form, $field->getName());
+            if (!$this->fieldAclHelper->isFieldModificationGranted($entity, $aclField)) {
+                if (!$this->showRestricted && isset($data[$field->getName()])) {
+                    $protectedFields[] = $field->getName();
+                } else {
+                    $form->remove($field->getName());
+                }
+
+                unset($data[$field->getName()]);
+            }
+        }
+
+        return [$protectedFields, $data];
+    }
+
     protected function isApplicable(array $options)
     {
         if (empty($options['data_class'])) {
@@ -188,8 +159,6 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 
         $className = $options['data_class'];
         $isFieldAclEnabled = $this->fieldAclHelper->isFieldAclEnabled($className);
-
-        $this->showRestricted = true;
         if ($isFieldAclEnabled) {
             $this->showRestricted = $this->fieldAclHelper->isRestrictedFieldsVisible($className);
         }
@@ -197,43 +166,6 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         return $isFieldAclEnabled;
     }
 
-    /**
-     * Check if current session allowed to modify form
-     *
-     * @param bool|object   $entity
-     * @param FormInterface $form
-     *
-     * @return bool
-     */
-    protected function isFormGranted($entity, FormInterface $form)
-    {
-        if (!is_object($entity)) {
-            return true;
-        }
-
-        return $this->fieldAclHelper->isFieldModificationGranted($entity, $this->getPropertyByForm($form));
-    }
-
-    /**
-     * @param bool|object   $entity
-     * @param FormInterface $form
-     *
-     * @return bool
-     */
-    protected function isViewGranted($entity, FormInterface $form)
-    {
-        if (!$this->showRestricted || !is_object($entity)) {
-            return false;
-        }
-
-        return $this->fieldAclHelper->isFieldViewGranted($entity, $this->getPropertyByForm($form));
-    }
-
-    /**
-     * @param FormInterface $form
-     *
-     * @return object|null
-     */
     protected function getEntityByForm(FormInterface $form)
     {
         $result = null;
@@ -250,12 +182,64 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
         return $result;
     }
 
+    private function getAclField(FormInterface $form, string $fieldName): ?string
+    {
+        if ($form->has($fieldName)) {
+            $field = $form->get($fieldName);
+            $config = $field->getConfig();
+
+            return $config->getOption(self::CHECK_FIELD_NAME) ?? $fieldName;
+        }
+
+        return $fieldName;
+    }
+
     /**
-     * Return class property form mapped to
-     *
-     * @param FormInterface $form
-     *
-     * @return string
+     * In case if we have an error in the non-accessible fields - add validation error.
+     */
+    private function processProtectedFieldsErrors(FormInterface $form, array $protectedFields): void
+    {
+        $message = 'You do not have access to change the fields: %s.';
+        $form->addError(new FormError(sprintf($message, implode(', ', $protectedFields))));
+        foreach ($protectedFields as $fieldName) {
+            $message = sprintf('Non accessible field `%s` detected in form `%s`.', $fieldName, $form->getName());
+            $this->logger->error($message);
+        }
+    }
+
+    /**
+     * @deprecated since 5.1, will be removed in 6.0
+     */
+    public function postSubmit(FormEvent $event)
+    {
+    }
+
+    /**
+     * @deprecated since 5.1, will be removed in 6.0
+     */
+    protected function isFormGranted($entity, FormInterface $form)
+    {
+        if (!$this->showRestricted || !is_object($entity)) {
+            return false;
+        }
+
+        return $this->fieldAclHelper->isFieldViewGranted($entity, $this->getPropertyByForm($form));
+    }
+
+    /**
+     * @deprecated since 5.1, will be removed in 6.0
+     */
+    protected function isViewGranted($entity, FormInterface $form)
+    {
+        if (!$this->showRestricted || !is_object($entity)) {
+            return false;
+        }
+
+        return $this->fieldAclHelper->isFieldViewGranted($entity, $this->getPropertyByForm($form));
+    }
+
+    /**
+     * @deprecated since 5.1, will be removed in 6.0
      */
     protected function getPropertyByForm(FormInterface $form)
     {
@@ -273,34 +257,10 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     }
 
     /**
-     * in case if we have error in the non accessible fields - add validation error.
+     * @deprecated since 5.1, will be removed in 6.0
      */
     protected function processHiddenFieldsWithErrors(array $hiddenFieldsWithErrors, FormView $view, FormInterface $form)
     {
-        if (count($hiddenFieldsWithErrors)) {
-            $viewErrors = array_key_exists('errors', $view->vars) ? $view->vars['errors'] : [];
-            $errorsArray = [];
-            foreach ($viewErrors as $error) {
-                $errorsArray[] = $error;
-            }
-            $errorsArray[] = new FormError(
-                sprintf(
-                    'The form contains fields "%s" that are required or not valid but you have no access to them. '
-                    . 'Please contact your administrator to solve this issue.',
-                    implode(', ', array_keys($hiddenFieldsWithErrors))
-                )
-            );
-            $view->vars['errors'] = new FormErrorIterator($form, $errorsArray);
-            foreach ($hiddenFieldsWithErrors as $fieldName => $errorsString) {
-                $this->logger->error(
-                    sprintf(
-                        'Non accessible field `%s` detected in form `%s`. Validation errors: %s',
-                        $fieldName,
-                        $form->getName(),
-                        $errorsString
-                    )
-                );
-            }
-        }
+        throw new \LogicException('Use processProtectedFieldsErrors method instead processHiddenFieldsWithErrors.');
     }
 }
