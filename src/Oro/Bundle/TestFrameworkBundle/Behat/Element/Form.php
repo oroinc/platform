@@ -28,9 +28,10 @@ class Form extends Element
         if ($isEmbeddedForm) {
             $this->getDriver()->switchToIFrame($this->options['embedded-id']);
         }
+        $this->closeOverlays();
         foreach ($table->getRows() as $row) {
             [$label, $value] = $row;
-            $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
+            $locator = $this->getFieldMapping($label) ?? $label;
             $value = self::normalizeValue($value);
 
             $field = $this->findField($locator);
@@ -44,6 +45,7 @@ class Form extends Element
             }
 
             $field = $this->wrapField($label, $field);
+            $field->focus();
             $field->setValue($value);
             $field->blur();
             $this->getDriver()->waitForAjax();
@@ -60,14 +62,8 @@ class Form extends Element
      */
     public function typeInField($label, $value, $clearField = true)
     {
-        $field = null;
-        if (isset($this->options['mapping'][$label])) {
-            $field = $this->findField($this->options['mapping'][$label]);
-        }
-
-        if (null === $field) {
-            $field = $this->findFieldByLabel($label, false);
-        }
+        $this->closeOverlays();
+        $field = $this->findFieldUsingMapping($label, false);
 
         if (null === $field) {
             $field = $this->getPage()->find('named', ['field', $label]);
@@ -96,7 +92,7 @@ class Form extends Element
     {
         foreach ($table->getRows() as $row) {
             [$label, $value] = $row;
-            $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
+            $locator = $this->getFieldMapping($label) ?? $label;
             $field = $this->findField($locator);
             self::assertNotNull($field, sprintf('Field `%s` not found', $label));
 
@@ -191,79 +187,19 @@ class Form extends Element
         $this->findElementInParents($field, '.entity-select-btn')->click();
     }
 
-    /**
-     * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
     public function findField($locator)
     {
         $selector = is_array($locator)
             ? $locator
             : ['type' => 'named', 'locator' => ['field', $locator]];
-        $field = $this->find($selector['type'], $selector['locator']);
+
+        $field = $this->find($selector['type'], $selector['locator'])
+            ?: $this->findFieldByLabel($locator, false);
 
         if ($field) {
-            $type = $field->getAttribute('type');
-            $classes = preg_split('/\s+/', (string)$field->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
-            $isExternalFileField = $field->getAttribute('data-is-external-file') === '1';
-
-            if ('file' === $type) {
-                return $this->elementFactory->wrapElement('FileField', $field);
-            }
-
-            if ($isExternalFileField) {
-                return $this->elementFactory->wrapElement('ExternalFileField', $field);
-            }
-
-            if ('datetime' === $type) {
-                return $this->elementFactory->wrapElement('DateTimePicker', $field->getParent()->getParent());
-            }
-
-            if (in_array('custom-checkbox__input', $classes, true)) {
-                return $this->elementFactory->wrapElement(
-                    'PrettyCheckbox',
-                    $field->getParent()->find('css', '.custom-checkbox__input')
-                );
-            }
-
-            if ('checkbox' === $type) {
-                return $this->elementFactory->wrapElement('Checkbox', $field);
-            }
-
-            if (in_array('select2-offscreen', $classes, true)) {
-                return $this->elementFactory->wrapElement('Select2Entity', $field);
-            }
-
-            if (in_array('select2-input', $classes, true)) {
-                return $this->elementFactory->wrapElement('Select2Entities', $field);
-            }
-
-            if ('select' === $field->getTagName()) {
-                return $this->elementFactory->wrapElement('Select', $field);
-            }
-
-            if ('textarea' === $field->getTagName()) {
-                $wysiwyg = $field->getParent()->find('css', '.grapesjs');
-                if ($wysiwyg) {
-                    return $this->elementFactory->wrapElement('WysiwygField', $field);
-                }
-            }
-
-            if ('orodigitalasset/js/app/views/digital-asset-choose-form-view'
-                === (string) $field->getParent()->getAttribute('data-bound-view')) {
-                return $this->elementFactory->wrapElement('DigitalAssetManagerField', $field);
-            }
-
-            return $field;
-        }
-
-        if (!$field && is_array($locator)) {
+            return $this->autoWrapField($field);
+        } elseif (is_array($locator)) {
             self::fail(sprintf('Cannot find element by %s locator "%s"', $locator['type'], $locator['locator']));
-        }
-
-        if ($field = $this->findFieldByLabel($locator)) {
-            return $field;
         }
 
         if ($fieldSetLabel = $this->findFieldSetLabel($locator)) {
@@ -279,47 +215,147 @@ class Form extends Element
      * @return NodeElement|null
      * @throws ElementNotFoundException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function findFieldByLabel($locator, $failOnError = true)
     {
-        if ($label = $this->findLabel($locator)) {
-            $sndParent = $label->getParent()->getParent();
-            $classes = preg_split('/\s+/', (string)$sndParent->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
+        $label = $this->findLabel($locator);
+        if (!$label) {
+            return null;
+        }
+        $sndParent = $label->getParent()->getParent();
+        $classes = preg_split('/\s+/', (string)$sndParent->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
 
-            if (in_array('control-group-collection', $classes, true)) {
-                $elementName = InflectorFactory::create()->singularize(trim($label->getText())).'Collection';
-                $elementName = $this->elementFactory->hasElement($elementName) ? $elementName : 'CollectionField';
+        if (in_array('control-group-collection', $classes, true)) {
+            $elementName = InflectorFactory::create()->singularize(trim($label->getText())) . 'Collection';
+            $elementName = $this->elementFactory->hasElement($elementName) ? $elementName : 'CollectionField';
 
-                return $this->elementFactory->wrapElement($elementName, $sndParent);
-            } elseif (in_array('control-group-oro_file', $classes, true)) {
-                $input = $sndParent->find('css', 'input[type="file"]');
-                if ($input !== null) {
-                    return $this->elementFactory->wrapElement('FileField', $input);
-                }
+            return $this->elementFactory->wrapElement($elementName, $sndParent);
+        }
 
-                $input = $sndParent->find('css', 'input[data-is-external-file="1"]');
+        if (in_array('control-group-oro_file', $classes, true)) {
+            $input = $sndParent->find('css', 'input[type="file"]');
+            if ($input !== null) {
+                return $this->elementFactory->wrapElement('FileField', $input);
+            }
 
+            $input = $sndParent->find('css', 'input[data-is-external-file="1"]');
+            if ($input) {
                 return $this->elementFactory->wrapElement('ExternalFileField', $input);
-            } elseif ($select = $sndParent->find('css', 'select')) {
-                return $select;
-            } elseif (in_array('control-group-checkbox', $classes, true)) {
-                return $sndParent->find('css', 'input[type=checkbox]');
-            } elseif (in_array('control-group-choice', $classes, true)) {
-                return $this->elementFactory->wrapElement('GroupChoiceField', $sndParent->find('css', '.controls'));
-            } elseif ($label->getAttribute('for')
-                && $field = $sndParent->find('css', '#'.$label->getAttribute('for'))
-            ) {
-                return $field;
-            } elseif ($label->getAttribute('for')
-                && $field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))
-            ) {
-                return $field;
-            } elseif ($failOnError) {
-                self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
             }
         }
 
+        $field = $sndParent->find('css', 'select');
+        if (!$field && in_array('control-group-checkbox', $classes, true)) {
+            $field = $sndParent->find('css', 'input[type=checkbox]');
+        }
+
+        if (!$field && in_array('control-group-choice', $classes, true)) {
+            $checkboxes = $sndParent->find('css', '.controls');
+            if ($checkboxes
+                && (
+                    $sndParent->findAll('css', 'input[type=radio]')
+                    || $sndParent->findAll('css', 'input[type=checkbox]')
+                )
+            ) {
+                return $this->elementFactory->wrapElement('GroupChoiceField', $checkboxes);
+            }
+        }
+
+        if (!$field && $label->getAttribute('for')) {
+            $field = $sndParent->find('css', '#' . $label->getAttribute('for'));
+            if (!$field) {
+                $field = $this->getPage()->find('css', '#' . $label->getAttribute('for'));
+            }
+        }
+
+        if ($field) {
+            return $this->autoWrapField($field);
+        }
+
+        if ($failOnError) {
+            self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
+        }
+
         return null;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    protected function autoWrapField(?NodeElement $field): NodeElement
+    {
+        // Do not wrap twice
+        if ($field instanceof Element) {
+            return $field;
+        }
+
+        $type = $field->getAttribute('type');
+        $classes = preg_split('/\s+/', (string)$field->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
+        $isExternalFileField = $field->getAttribute('data-is-external-file') === '1';
+
+        if ('file' === $type) {
+            return $this->elementFactory->wrapElement('FileField', $field);
+        }
+
+        if ($isExternalFileField) {
+            return $this->elementFactory->wrapElement('ExternalFileField', $field);
+        }
+
+        if ('datetime' === $type
+            || (string)$field->getAttribute('data-bound-view') === 'oroui/js/app/views/datepicker/datepicker-view'
+            || in_array('datepicker-input', $classes, true)
+        ) {
+            if (!in_array('input', $classes)) { // Skip frontend datepickers, because of the different UI
+                return $this->elementFactory->wrapElement('DateTimePicker', $field);
+            }
+        }
+
+        if (in_array('custom-checkbox__input', $classes, true)) {
+            return $this->elementFactory->wrapElement(
+                'PrettyCheckbox',
+                $field->getParent()->find('css', '.custom-checkbox__input')
+            );
+        }
+
+        if ('checkbox' === $type) {
+            return $this->elementFactory->wrapElement('Checkbox', $field);
+        }
+
+        if (in_array('select2-offscreen', $classes, true)) {
+            if (strtolower($field->getTagName()) === 'select' && $field->hasAttribute('multiple')) {
+                $select2Input = $field->getParent()->find('css', '.select2-input');
+                if ($select2Input) {
+                    return $this->elementFactory->wrapElement('Select2Entities', $select2Input);
+                }
+            } else {
+                return $this->elementFactory->wrapElement('Select2Entity', $field);
+            }
+        }
+
+        if (in_array('select2-input', $classes, true)) {
+            return $this->elementFactory->wrapElement('Select2Entities', $field);
+        }
+
+        if ('select' === $field->getTagName()) {
+            return $this->elementFactory->wrapElement('Select', $field);
+        }
+
+        if ('textarea' === $field->getTagName()) {
+            $wysiwyg = $field->getParent()->find('css', '.grapesjs');
+            if ($wysiwyg) {
+                return $this->elementFactory->wrapElement('WysiwygField', $field);
+            }
+        }
+
+        if ('orodigitalasset/js/app/views/digital-asset-choose-form-view'
+            === (string)$field->getParent()->getAttribute('data-bound-view')
+        ) {
+            return $this->elementFactory->wrapElement('DigitalAssetManagerField', $field);
+        }
+
+        return $field;
     }
 
     /**
@@ -340,8 +376,9 @@ class Form extends Element
         # Replace non-breaking space with regular space
         $value = str_replace("\xE2\x80\xAF", ' ', $value);
 
-        if (0 === strpos($value, '[')) {
+        if (str_starts_with($value, '[')) {
             $value = trim($value, '[]');
+
             return self::normalizeValue($value ? explode(',', $value) : []);
         }
 
@@ -425,7 +462,6 @@ class Form extends Element
      */
     protected function findElementInParents(NodeElement $element, $type, $deep = 3)
     {
-        $field = null;
         $parentElement = $element->getParent();
         $i = 0;
 
@@ -446,12 +482,7 @@ class Form extends Element
      */
     public function getFieldValidationErrors($fieldName)
     {
-        if (isset($this->options['mapping'][$fieldName])) {
-            $field = $this->findField($this->options['mapping'][$fieldName]);
-        } else {
-            $field = $this->findFieldByLabel($fieldName);
-        }
-
+        $field = $this->findFieldUsingMapping($fieldName);
         self::assertNotNull($field, sprintf('Field `%s` not found', $fieldName));
 
         $fieldId = $field->getAttribute('id');
@@ -529,23 +560,22 @@ class Form extends Element
      */
     public function getAllFieldValidationErrors($fieldName)
     {
-        if (isset($this->options['mapping'][$fieldName])) {
-            $field = $this->findField($this->options['mapping'][$fieldName]);
-        } else {
-            $field = $this->findFieldByLabel($fieldName);
-        }
+        $field = $this->findFieldUsingMapping($fieldName);
         $fieldId = $field->getAttribute('id');
 
         // This element doesn't count server side validation errors without "for" attribute
         $errorSpans = $this->findAll('css', "span.validation-failed[id='$fieldId-error']");
-        $errorSpans = array_merge($this->findAll(
-            'xpath',
-            sprintf(
-                '%s%s',
-                $field->getXpath(),
-                '/following-sibling::span[@class="validation-failed"]'
-            )
-        ), $errorSpans);
+        $errorSpans = array_merge(
+            $this->findAll(
+                'xpath',
+                sprintf(
+                    '%s%s',
+                    $field->getXpath(),
+                    '/following-sibling::span[@class="validation-failed"]'
+                )
+            ),
+            $errorSpans
+        );
 
         return array_map(function (NodeElement $error) {
             return $error->getText();
@@ -554,13 +584,56 @@ class Form extends Element
 
     private function wrapField($label, NodeElement $field): NodeElement
     {
-        if (isset($this->options['mapping'][$label]['element'])) {
+        if (isset($this->getFieldMapping($label)['element'])) {
             $field = $this->elementFactory->wrapElement(
-                $this->options['mapping'][$label]['element'],
+                $this->getFieldMapping($label)['element'],
                 $field
             );
         }
 
         return $field;
+    }
+
+    private function closeOverlays()
+    {
+        try {
+            # Close datepicker
+            $dropdownMask = $this->getPage()->findAll('css', '#oro-dropdown-mask');
+            if ($dropdownMask) {
+                $activeElement = $this->getDriver()->evaluateScript('return document.activeElement');
+                if ($activeElement instanceof \WebDriver\Element && $id = $activeElement->getAttribute('id')) {
+                    $classes = $activeElement->getAttribute('class');
+                    if (str_contains($classes, 'datepicker-input')) {
+                        $this->getDriver()->executeScript(sprintf('$("#%s").datepicker("hide")', $id));
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+        }
+    }
+
+    public function setOptions(array $options)
+    {
+        // Convert all mappings to lowercase
+        if (array_key_exists('mapping', $options)) {
+            $options['mapping'] = array_change_key_case($options['mapping'], CASE_LOWER);
+        }
+
+        parent::setOptions($options);
+    }
+
+    protected function getFieldMapping(string $label): mixed
+    {
+        return $this->options['mapping'][strtolower($label)] ?? null;
+    }
+
+    protected function findFieldUsingMapping(string $fieldName, bool $failOnError = true): NodeElement|null|Element
+    {
+        $fieldMapping = $this->getFieldMapping($fieldName);
+        if ($fieldMapping) {
+            return $this->findField($fieldMapping);
+        }
+
+        return $this->findFieldByLabel($fieldName, $failOnError);
     }
 }

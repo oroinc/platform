@@ -42,8 +42,8 @@ class DigitalAssetManagerField extends Element implements SuiteAwareInterface
     public function upload(string $filename): void
     {
         $digitalAssetInDialogForm = $this->elementFactory->createElement('Digital Asset Dialog Form');
-        $digitalAssetInDialogForm->fillField($digitalAssetInDialogForm->getOption('mapping')['Title'], $filename);
-        $digitalAssetInDialogForm->fillField($digitalAssetInDialogForm->getOption('mapping')['File'], $filename);
+        $digitalAssetInDialogForm->fillField($digitalAssetInDialogForm->getOption('mapping')['title'], $filename);
+        $digitalAssetInDialogForm->fillField($digitalAssetInDialogForm->getOption('mapping')['file'], $filename);
         $digitalAssetInDialogForm->clickOrPress('Upload');
 
         $this->getDriver()->waitForAjax();
