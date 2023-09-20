@@ -46,11 +46,18 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:
-          CustomDateTimeField: 'custom_entity_type[CustomDateTimeField]'
+          CustomDateTimeField:
+            type: 'css'
+            locator: '[name="custom_entity_type[CustomDateTimeField]"]'
+            element: DateTimePicker
+          CustomDateField:
+            type: 'css'
+            locator: '[name="custom_entity_type[CustomDateField]"]'
+            element: DateTimePicker
           CustomWYSIWYGField:
             type: 'css'
             locator: '[name="custom_entity_type[CustomWYSIWYGField]"]'
-            class: Oro\Bundle\CMSBundle\Tests\Behat\Element\WysiwygField
+            element: WysiwygField
 
     Column Name Field:
       selector: 'input[data-name="field__header"]'
