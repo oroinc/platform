@@ -105,20 +105,24 @@
             </div>
 
             <div class="digital-asset-controls hide" data-role="digital-asset-controls">
-                <a href="#" role="button" data-role="digital-asset-update" class="btn btn-icon btn-square-lighter"
-                   title="{{ 'oro.digitalasset.dam.form.choose_another.label'|trans }}"
-                   aria-label="{{ 'oro.digitalasset.dam.form.choose_another.label'|trans }}">
-                    <span class="fa-edit" aria-hidden="true"></span>
-                </a>
+                {% if form.vars.allowUpdate %}
+                    <a href="#" role="button" data-role="digital-asset-update" class="btn btn-icon btn-square-lighter"
+                       title="{{ 'oro.digitalasset.dam.form.choose_another.label'|trans }}"
+                       aria-label="{{ 'oro.digitalasset.dam.form.choose_another.label'|trans }}">
+                        <span class="fa-edit" aria-hidden="true"></span>
+                    </a>
+                {% endif %}
 
                 {% if form.emptyFile is defined %}
                     {{ form_row(form.emptyFile) }}
 
-                    <a href="#" role="button" data-role="digital-asset-remove" class="btn btn-icon btn-square-lighter"
-                       title="{{ 'oro.digitalasset.dam.form.remove.label'|trans }}"
-                       aria-label="{{ 'oro.digitalasset.dam.form.remove.label'|trans }}">
-                        <span class="fa-close" aria-hidden="true"></span>
-                    </a>
+                    {% if form.vars.allowDelete %}
+                        <a href="#" role="button" data-role="digital-asset-remove" class="btn btn-icon btn-square-lighter"
+                           title="{{ 'oro.digitalasset.dam.form.remove.label'|trans }}"
+                           aria-label="{{ 'oro.digitalasset.dam.form.remove.label'|trans }}">
+                            <span class="fa-close" aria-hidden="true"></span>
+                        </a>
+                    {% endif %}
                 {% endif %}
             </div>
 

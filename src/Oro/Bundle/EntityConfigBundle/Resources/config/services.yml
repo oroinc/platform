@@ -323,6 +323,8 @@ services:
         abstract: true
         arguments:
             - '@oro_entity_config.manager.attribute_manager'
+            - '@oro_security.form.field_acl_helper'
+
 
     oro_entity_config.voter.attribute_family_voter:
         class: Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter

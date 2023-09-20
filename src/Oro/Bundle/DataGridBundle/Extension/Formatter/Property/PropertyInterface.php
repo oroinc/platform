@@ -5,9 +5,6 @@ namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
 /**
- * Interface PropertyInterface
- * @package Oro\Bundle\DataGridBundle\Extension\Formatter\Property
- *
  * Every property should be stateless
  */
 interface PropertyInterface
@@ -35,6 +32,8 @@ interface PropertyInterface
     const TYPE_KEY          = 'type';
     const NAME_KEY          = 'name';
     const DATA_NAME_KEY     = 'data_name';
+    const COLUMN_NAME       = 'column_name';
+    const SOURCE_NAME       = 'source_name';
     const TRANSLATABLE_KEY  = 'translatable';
     const FRONTEND_TYPE_KEY = 'frontend_type';
     const DIVISOR_KEY       = 'divisor';

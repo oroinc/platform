@@ -42,6 +42,10 @@ oro_behat_extension:
       selector: '.select2-input'
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entities
 
+    Select2EntitiesOrdered:
+      selector: '.select2-input'
+      class: Oro\Bundle\FormBundle\Tests\Behat\Element\Select2EntitiesOrdered
+
     Textarea:
       class: Oro\Bundle\FormBundle\Tests\Behat\Element\Textarea
 

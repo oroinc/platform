@@ -3078,13 +3078,15 @@ JS;
     public function iSeeElementGoesAfterAnother(string $element1Name, string $element2Name)
     {
         $element1 = $this->createElement($this->fixStepArgument($element1Name));
-        $this->assertTrue($element1->isValid(), sprintf('Element %s is not found', $element1Name));
+        $this->assertTrue($element1->isValid(), sprintf('Element %s not found', $element1Name));
 
         $element2 = $this->createElement($this->fixStepArgument($element2Name));
-        $this->assertTrue($element2->isValid(), sprintf('Element %s is not found', $element2Name));
+        $this->assertTrue($element2->isValid(), sprintf('Element %s not found', $element2Name));
 
         $page = $this->getSession()->getPage();
         $nextElement = $page->find('xpath', $element2->getXpath() . '/following-sibling::*');
+        $this->assertTrue($nextElement->isValid(), sprintf('Next element for %s not found', $element2Name));
+
         $this->assertEquals(
             $element1->getOuterHtml(),
             $nextElement->getOuterHtml(),

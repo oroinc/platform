@@ -9,6 +9,7 @@ use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
+use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
@@ -147,13 +148,16 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false)
     {
         $result = null;
+        $oid = $acl->getObjectIdentity();
 
         // check if field security metadata has alias and if so - use it instead of field being passed
-        $type = $acl->getObjectIdentity()->getType();
+        $type = $oid->getType();
         $securityMetadataProvider = $this->getSecurityMetadataProvider();
         if ($securityMetadataProvider->isProtectedEntity($type)) {
             $field = $securityMetadataProvider->getProtectedFieldName($type, $field);
@@ -161,6 +165,12 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
         // check object ACEs
         $aces = $acl->getObjectFieldAces($field);
+
+        // return true if entity field has no permissions.
+        if (!$this->fieldHasPermission($oid, $field, $masks)) {
+            return true;
+        }
+
         if (!empty($aces)) {
             $result = $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
         }
@@ -186,6 +196,30 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         }
 
         return $result;
+    }
+
+    protected function fieldHasPermission(ObjectIdentityInterface $oid, string $field, array $masks): bool
+    {
+        if (!class_exists($oid->getType())) {
+            return true;
+        }
+
+        $extension = $this->getContext()->getAclExtension();
+        $securityMetadataProvider = $this->getSecurityMetadataProvider();
+        $fields = $securityMetadataProvider->getMetadata($oid->getType())->getFields();
+        if (!isset($fields[$field])) {
+            return true;
+        }
+
+        $securityFieldMetadata = $fields[$field];
+        $securityFieldPermissions = $securityFieldMetadata->getPermissions();
+        if (!$securityFieldPermissions) {
+            return true;
+        }
+
+        $permissions = $extension->getPermissions(reset($masks), true);
+
+        return in_array(reset($permissions), $securityFieldPermissions, true);
     }
 
     /**

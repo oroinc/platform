@@ -133,6 +133,16 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
 
+    oro_datagrid.event_listener.datagrid_field_acl:
+        class: Oro\Bundle\DataGridBundle\EventListener\DataGridFieldAclListener
+        arguments:
+            - '@security.token_storage'
+            - '@oro_security.form.field_acl_helper'
+            - '@oro_entity_extend.datagrid.extension.fields_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: -255 }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre, method: onPreBuild, priority: -255 }
+
     oro_datagrid.event_listener.cell_selection:
         class: Oro\Bundle\DataGridBundle\EventListener\CellSelectionListener
         tags:

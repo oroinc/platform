@@ -10,9 +10,9 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -21,19 +21,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class FieldAclExtension extends AbstractExtension
 {
-    const FIELD_ACL = 'field_acl';
-
-    /** @var AuthorizationCheckerInterface */
-    protected $authChecker;
-
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var OwnershipQueryHelper */
-    protected $ownershipQueryHelper;
-
     /** @var array [column name => [entity alias, field name], ...] */
-    protected $fieldAclConfig = [];
+    private $fieldAclConfig = [];
 
     /**
      * @var array [entity alias => [
@@ -45,16 +34,13 @@ class FieldAclExtension extends AbstractExtension
      *                  ...
      *              ]
      */
-    protected $ownershipFields = [];
+    private $ownershipFields = [];
 
     public function __construct(
-        AuthorizationCheckerInterface $authorizationChecker,
-        ConfigManager $configManager,
-        OwnershipQueryHelper $ownershipQueryHelper
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private ConfigManager $configManager,
+        private OwnershipQueryHelper $ownershipQueryHelper,
     ) {
-        $this->authChecker = $authorizationChecker;
-        $this->configManager = $configManager;
-        $this->ownershipQueryHelper = $ownershipQueryHelper;
     }
 
     /**
@@ -98,11 +84,11 @@ class FieldAclExtension extends AbstractExtension
         /** @var ResultRecord[] $records */
         $records = $result->getData();
         foreach ($records as $record) {
-            foreach ($this->fieldAclConfig as $columnName => $fieldData) {
-                list($entityAlias, $fieldName) = $fieldData;
+            foreach ($this->fieldAclConfig as $fieldData) {
+                [$entityAlias, $fieldName, $columnName] = $fieldData;
                 $entityReference = $this->getEntityReference($record, $entityAlias);
                 if (null !== $entityReference
-                    && !$this->authChecker->isGranted('VIEW', new FieldVote($entityReference, $fieldName))
+                    && !$this->authorizationChecker->isGranted('VIEW', new FieldVote($entityReference, $fieldName))
                 ) {
                     // set column value to null if user does not have an access to view this value
                     $record->setValue($columnName, null);
@@ -127,9 +113,7 @@ class FieldAclExtension extends AbstractExtension
         $qb = $datasource->getQueryBuilder();
         $this->ownershipFields = $this->ownershipQueryHelper->addOwnershipFields(
             $qb,
-            function ($entityClass, $entityAlias) {
-                return $this->isFieldAclEnabled($entityClass);
-            }
+            fn ($entityClass, $entityAlias) => $this->isFieldAclEnabled($entityClass)
         );
 
         foreach ($fieldAclConfig as $columnName => $fieldConfig) {
@@ -147,7 +131,8 @@ class FieldAclExtension extends AbstractExtension
 
             $parts = explode('.', $fieldExpr);
             if (count($parts) === 2 && isset($this->ownershipFields[$parts[0]])) {
-                $this->fieldAclConfig[$columnName] = $parts;
+                $dataAlias = [$fieldConfig[PropertyInterface::COLUMN_NAME] ?? $columnName];
+                $this->fieldAclConfig[$columnName] = array_merge($parts, $dataAlias);
             }
         }
     }
@@ -164,37 +149,26 @@ class FieldAclExtension extends AbstractExtension
             $entityConfig = $this->configManager->getEntityConfig('security', $entityClass);
             $result =
                 $entityConfig->get('field_acl_supported')
-                && $entityConfig->get('field_acl_enabled');
+                && $entityConfig->get('field_acl_enabled')
+                && !$entityConfig->get('show_restricted_fields');
         }
 
         return $result;
     }
 
-    /**
-     * @param ResultRecord $record
-     * @param string       $entityAlias
-     *
-     * @return DomainObjectReference|null
-     */
-    protected function getEntityReference(ResultRecord $record, $entityAlias)
+    private function getEntityReference(ResultRecord $record, $entityAlias)
     {
-        list(
+        [
             $entityClass,
             $entityIdFieldAlias,
             $organizationIdFieldAlias,
             $ownerIdFieldAlias
-        ) = $this->ownershipFields[$entityAlias];
+        ] = $this->ownershipFields[$entityAlias];
 
         $ownerId = $record->getValue($ownerIdFieldAlias);
         if (null === $ownerId) {
             return null;
         }
-
-        return new DomainObjectReference(
-            $entityClass,
-            $record->getValue($entityIdFieldAlias),
-            $ownerId,
-            $record->getValue($organizationIdFieldAlias)
-        );
+        return new ObjectIdentity('entity', $entityClass);
     }
 }
