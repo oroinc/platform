@@ -162,7 +162,7 @@ class OperationRegistry
      */
     protected function isApplicable(array $config, OperationFindCriteria $findCriteria)
     {
-        if (!(bool)$config['enabled']) {
+        if ($config['enabled'] === false) {
             return false;
         }
 

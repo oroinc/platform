@@ -114,7 +114,7 @@ class Configuration implements ConfigurationInterface
             ->integerNode('order')
                 ->defaultValue(0)
             ->end()
-            ->booleanNode('enabled')
+            ->variableNode('enabled')
                 ->defaultTrue()
             ->end()
             ->booleanNode('page_reload')

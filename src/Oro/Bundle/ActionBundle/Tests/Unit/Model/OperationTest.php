@@ -11,6 +11,7 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
@@ -44,6 +45,8 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     /** @var Operation */
     private $operation;
 
+    private OptionsResolver $optionsResolver;
+
     protected function setUp(): void
     {
         $this->definition = $this->createMock(OperationDefinition::class);
@@ -51,6 +54,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         $this->conditionFactory = $this->createMock(ExpressionFactory::class);
         $this->attributeAssembler = $this->createMock(AttributeAssembler::class);
         $this->formOptionsAssembler = $this->createMock(FormOptionsAssembler::class);
+        $this->optionsResolver = $this->createMock(OptionsResolver::class);
         $this->data = new ActionData();
 
         $this->operation = new Operation(
@@ -58,6 +62,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
             $this->conditionFactory,
             $this->attributeAssembler,
             $this->formOptionsAssembler,
+            $this->optionsResolver,
             $this->definition
         );
     }
@@ -74,7 +79,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     public function testIsEnabled()
     {
         $this->definition->expects($this->once())
-            ->method('isEnabled')
+            ->method('getEnabled')
             ->willReturn(true);
 
         $this->assertEquals(true, $this->operation->isEnabled());
@@ -131,6 +136,54 @@ class OperationTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function ($name) {
                 return [$name];
             });
+
+        $this->definition
+            ->expects($this->once())
+            ->method('getFrontendOptions')
+            ->willReturn([]);
+        $this->definition
+            ->expects($this->once())
+            ->method('getButtonOptions')
+            ->willReturn([]);
+
+        $this->optionsResolver
+            ->expects($this->exactly(3))
+            ->method('resolveOptions')
+            ->willReturnOnConsecutiveCalls(
+                ['enabled' => true],
+                [],
+                []
+            );
+
+        $this->definition
+            ->expects($this->once())
+            ->method('setFrontendOptions')
+            ->with($this->equalTo([]))
+            ->willReturnSelf();
+
+        $this->definition
+            ->expects($this->once())
+            ->method('setButtonOptions')
+            ->with($this->equalTo([]))
+            ->willReturnSelf();
+
+        $this->definition
+            ->expects($this->once())
+            ->method('setEnabled')
+            ->with($this->equalTo(true))
+            ->willReturnSelf();
+
+        if (!$exceptionMessage) {
+            $this->definition
+                ->expects($this->exactly(2))
+                ->method('getEnabled')
+                ->willReturn(true);
+        } else {
+            $this->definition
+                ->expects($this->exactly(1))
+                ->method('getEnabled')
+                ->willReturn(true);
+        }
 
         $this->actionFactory->expects($this->any())
             ->method('create')
@@ -224,15 +277,60 @@ class OperationTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsAvailable(array $inputData, array $expectedData)
     {
-        $this->definition->expects($this->any())
+        $this->definition
+            ->expects($this->once())
             ->method('getConditions')
             ->willReturnMap($inputData['config']['conditions']);
 
-        $this->definition->expects($this->any())
-            ->method('getFormOptions')
-            ->willReturn($inputData['config']['form_options']);
+        $this->definition
+            ->expects($this->once())
+            ->method('getFrontendOptions')
+            ->willReturn(['frontend_option' => true]);
 
-        $this->conditionFactory->expects($expectedData['conditionFactory'])
+        $this->definition
+            ->expects($this->once())
+            ->method('getButtonOptions')
+            ->willReturn(['button_option' => true]);
+
+        $this->definition
+            ->expects($this->once())
+            ->method('getEnabled')
+            ->willReturn(true);
+
+        $this->optionsResolver
+            ->expects($this->exactly(3))
+            ->method('resolveOptions')
+            ->withConsecutive(
+                [$this->equalTo($inputData['data']), ['enabled' => true]],
+                [$this->equalTo($inputData['data']), ['frontend_option' => true]],
+                [$this->equalTo($inputData['data']), ['button_option' => true]]
+            )
+            ->willReturnOnConsecutiveCalls(
+                ['enabled' => true],
+                ['frontend_option' => true],
+                ['button_option' => true]
+            );
+
+        $this->definition
+            ->expects($this->once())
+            ->method('setFrontendOptions')
+            ->with($this->equalTo(['frontend_option' => true]))
+            ->willReturnSelf();
+
+        $this->definition
+            ->expects($this->once())
+            ->method('setButtonOptions')
+            ->with($this->equalTo(['button_option' => true]))
+            ->willReturnSelf();
+
+        $this->definition
+            ->expects($this->once())
+            ->method('setEnabled')
+            ->with($this->equalTo(true))
+            ->willReturnSelf();
+
+        $this->conditionFactory
+            ->expects($expectedData['conditionFactory'])
             ->method('create')
             ->willReturnCallback(function ($type, $config) use ($inputData) {
                 return $inputData['conditions'][$config[0]];
@@ -274,8 +372,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
                         'form_options' => [],
                     ],
                     'conditions' => [
-                        'preconditions' => $this->createCondition($this->once(), $data, false),
-                        'conditions' => $this->createCondition($this->never(), $data, true),
+                        'preconditions' => $this->createCondition($this->once(), $data, false)
                     ],
                 ],
                 'expected' => [
@@ -294,12 +391,11 @@ class OperationTest extends \PHPUnit\Framework\TestCase
                         'form_options' => [],
                     ],
                     'conditions' => [
-                        'preconditions' => $this->createCondition($this->once(), $data, true),
-                        'conditions' => $this->createCondition($this->once(), $data, false),
+                        'preconditions' => $this->createCondition($this->once(), $data, false)
                     ],
                 ],
                 'expected' => [
-                    'conditionFactory' => $this->exactly(2),
+                    'conditionFactory' => $this->once(),
                     'available' => false,
                     'errors' => ['error3', 'error4'],
                 ],
@@ -316,11 +412,10 @@ class OperationTest extends \PHPUnit\Framework\TestCase
                     ],
                     'conditions' => [
                         'preconditions' => $this->createCondition($this->once(), $data, true),
-                        'conditions' => $this->createCondition($this->once(), $data, true),
                     ],
                 ],
                 'expected' => [
-                    'conditionFactory' => $this->exactly(2),
+                    'conditionFactory' => $this->once(),
                     'available' => true,
                     'errors' => [],
                 ],
@@ -548,11 +643,24 @@ class OperationTest extends \PHPUnit\Framework\TestCase
             ->with($this->data, $attributes)
             ->willReturn(new ArrayCollection([$attribute]));
 
+        $this->optionsResolver
+            ->expects($this->exactly(6))
+            ->method('resolveOptions')
+            ->willReturnOnConsecutiveCalls(
+                ['enabled' => true],
+                [],
+                [],
+                ['enabled' => true],
+                [],
+                []
+            );
+
         $operation = new Operation(
             $this->actionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
             $this->formOptionsAssembler,
+            $this->optionsResolver,
             $definition
         );
 

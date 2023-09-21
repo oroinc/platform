@@ -90,7 +90,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getDefinition')
             ->willReturn($definition);
         $this->operation->expects($this->once())
-            ->method('isAvailable')
+            ->method('isAllowed')
             ->willReturn(true);
 
         $result = $this->handler->process($this->operation);
@@ -115,7 +115,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getDefinition')
             ->willReturn($definition);
         $this->operation->expects($this->once())
-            ->method('isAvailable')
+            ->method('isAllowed')
             ->willReturn(true);
 
         $result = $this->handler->process($this->operation);
@@ -193,7 +193,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getDefinition')
             ->willReturn($definition);
         $this->operation->expects($this->once())
-            ->method('isAvailable')
+            ->method('isAllowed')
             ->willReturnCallback(function (ActionData $data, Collection $errors) {
                 $errors->add(['message' => 'some error']);
 
@@ -315,7 +315,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getDefinition')
             ->willReturn($definition);
         $this->operation->expects($this->once())
-            ->method('isAvailable')
+            ->method('isAllowed')
             ->willReturn(true);
         $this->operation->expects($this->once())
             ->method('execute')
