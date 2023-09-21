@@ -82,7 +82,7 @@ class ExecuteOperationHandler
             $executionForm->handleRequest($request);
             $isValidForm = $executionForm->isSubmitted() && $executionForm->isValid();
         }
-        if (!$isValidForm || !$operation->isAvailable($data, $result->getValidationErrors())) {
+        if (!$isValidForm || !$operation->isAllowed($data, $result->getValidationErrors())) {
             throw new ForbiddenOperationException(
                 sprintf('Operation "%s" execution is forbidden!', $operation->getName())
             );

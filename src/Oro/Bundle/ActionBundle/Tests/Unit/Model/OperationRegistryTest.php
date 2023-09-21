@@ -11,6 +11,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Model\OperationRegistryFilterInterface;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Bundle\ActionBundle\Tests\Unit\Filter\Stub\CallbackOperationRegistryFilter;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2;
@@ -46,6 +47,8 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var OperationAssembler */
     private $assembler;
 
+    private OptionsResolver $optionsResolver;
+
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurationProviderInterface::class);
@@ -55,6 +58,8 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
         $this->formOptionsAssembler = $this->createMock(FormOptionsAssembler::class);
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->optionsResolver = $this->createMock(OptionsResolver::class);
+
 
         $this->applicationProvider->expects($this->any())
             ->method('isApplicationsValid')
@@ -76,7 +81,8 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
             $this->actionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
-            $this->formOptionsAssembler
+            $this->formOptionsAssembler,
+            $this->optionsResolver
         );
     }
 
@@ -118,6 +124,13 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 'datagrid' => null,
                 'group' => null,
                 'expected' => []
+            ],
+            'variable enabled type' => [
+                'entityClass' => null,
+                'route' => 'route-operation-22',
+                'datagrid' => null,
+                'group' => null,
+                'expected' => ['operation22']
             ],
             'incorrect parameters' => [
                 'entityClass' => 'unknown',
@@ -443,6 +456,11 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
                 'label' => 'Datagrid and exclude_entities matches',
                 'datagrids' => ['datagrid1'],
                 'exclude_entities' => [TestEntity1::class],
+            ],
+            'operation22' => [
+                'label' => 'Operation with variable value for enabled',
+                'enabled' => '$enabled',
+                'routes' => ['route-operation-22']
             ],
         ];
 

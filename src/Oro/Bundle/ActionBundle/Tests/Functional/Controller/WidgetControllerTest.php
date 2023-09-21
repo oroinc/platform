@@ -162,7 +162,7 @@ class WidgetControllerTest extends WebTestCase
 
         if ($actions) {
             foreach ($actions as $action) {
-                $this->assertNotEmpty($crawler->selectLink($action));
+                $this->assertNotEmpty($crawler->selectButton($action));
             }
         } else {
             $this->assertEmpty($crawler);
