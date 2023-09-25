@@ -353,6 +353,8 @@ JS;
             40 => 'ArrowDown',
             45 => 'Insert',
             46 => 'Delete',
+            90 => 'Z',
+            89 => 'Y'
         ];
         $options = json_decode(self::charToOptions($char, $modifier), true);
 
