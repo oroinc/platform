@@ -2411,6 +2411,8 @@ JS;
             'ArrowDown' => 40,
             'Insert' => 45,
             'Delete' => 46,
+            'Z' => 90,
+            'Y' => 89
         ];
 
         $parts = explode("+", $key);
