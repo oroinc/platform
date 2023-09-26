@@ -495,6 +495,10 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
             $fieldName = array_shift($row);
 
             foreach ($row as $cell) {
+                if (!$cell) {
+                    continue;
+                }
+
                 [$permission, $value] = explode(':', $cell);
                 $userRoleForm->setPermission($fieldName, $permission, $value, true);
             }

@@ -16,9 +16,11 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
-use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 
+/**
+ *
+ */
 class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private const ENTITY_CLASS = 'stdClass';
@@ -37,9 +39,6 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var OperationRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $operationRegistry;
 
-    /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $optionsResolver;
-
     /** @var OperationButtonProviderExtension */
     private $extension;
 
@@ -47,7 +46,6 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->operationRegistry = $this->createMock(OperationRegistry::class);
         $this->contextHelper = $this->createMock(ContextHelper::class);
-        $this->optionsResolver = $this->createMock(OptionsResolver::class);
 
         $routeProvider = $this->createMock(RouteProviderInterface::class);
         $routeProvider->expects($this->any())
@@ -63,8 +61,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OperationButtonProviderExtension(
             $this->operationRegistry,
             $this->contextHelper,
-            $routeProvider,
-            $this->optionsResolver
+            $routeProvider
         );
     }
 
@@ -139,88 +136,169 @@ class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isAvailableDataProvider
      */
-    public function testIsAvailable(OperationButton $button, bool $expected)
+    public function testIsAvailable(bool $expected)
     {
-        $definition = $button->getOperation()->getDefinition();
-        $definition->setFrontendOptions(['frontend' => 'not resolved'])->setButtonOptions(['button' => 'not resolved']);
-        $this->optionsResolver->expects($this->exactly(2))
-            ->method('resolveOptions')
-            ->withConsecutive(
-                [$this->anything(), $definition->getFrontendOptions()],
-                [$this->anything(), $definition->getButtonOptions()]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['frontend' => 'resolved'],
-                ['button' => 'resolved']
-            );
+        $context = $this->createButtonSearchContext();
+        $buttonContext = $this->createMock(ButtonContext::class);
+        $button = $this->createMock(OperationButton::class);
+        $operation = $this->createMock(Operation::class);
+        $actionData = $this->createMock(ActionData::class);
+        $definition = $this->createMock(OperationDefinition::class);
 
-        $this->contextHelper->expects($this->once())
+        $this->contextHelper
+            ->expects($this->once())
             ->method('getActionData')
-            ->willReturn(new ActionData());
+            ->with($this->equalTo([
+                ContextHelper::ENTITY_ID_PARAM => 42,
+                ContextHelper::ENTITY_CLASS_PARAM => 'stdClass',
+                ContextHelper::DATAGRID_PARAM => 'test_datagrid_name',
+                ContextHelper::FROM_URL_PARAM => '/test/referrer/utl',
+                ContextHelper::ROUTE_PARAM => 'test_route_name',
+            ]))
+            ->willReturn($actionData);
 
-        $this->assertEquals($expected, $this->extension->isAvailable($button, $this->createButtonSearchContext()));
-        $this->assertEquals(['frontend' => 'resolved'], $definition->getFrontendOptions());
-        $this->assertEquals(['button' => 'resolved'], $definition->getButtonOptions());
+        $button
+            ->expects($this->exactly(2))
+            ->method('getOperation')
+            ->willReturn($operation);
+
+        $button
+            ->expects($this->once())
+            ->method('getButtonContext')
+            ->willReturn($buttonContext);
+
+        $button
+            ->expects($this->once())
+            ->method('setData')
+            ->with($this->equalTo($actionData));
+
+        $operation
+            ->expects($this->once())
+            ->method('isAvailable')
+            ->with($actionData)
+            ->willReturn($expected);
+
+        $operation
+            ->expects($this->once())
+            ->method('getDefinition')
+            ->willReturn($definition);
+
+        $definition
+            ->expects($this->once())
+            ->method('getEnabled')
+            ->willReturn($expected);
+
+        $buttonContext
+            ->expects($this->once())
+            ->method('setEnabled')
+            ->with($this->equalTo($expected));
+
+        $this->assertEquals($expected, $this->extension->isAvailable($button, $context));
     }
 
     public function isAvailableDataProvider(): array
     {
-        $operationButtonAvailable = $this->createOperationButton(true);
-        $operationButtonNotAvailable = $this->createOperationButton(false);
-
         return [
             'available' => [
-                'button' => $operationButtonAvailable,
-                'expected' => true
+                'expected' => true,
             ],
             'not available' => [
-                'button' => $operationButtonNotAvailable,
                 'expected' => false
             ]
         ];
     }
 
-    public function testIsAvailableException()
+    public function isAvailableExceptionDataProvider(): array
     {
-        $this->contextHelper->expects($this->once())
+        return [
+            'with errors' => [
+                new ArrayCollection()
+            ],
+            'no errors' => [
+                null
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider isAvailableExceptionDataProvider
+     */
+    public function testIsAvailableException(?ArrayCollection $errors)
+    {
+        $context = $this->createButtonSearchContext();
+        $buttonContext = $this->createMock(ButtonContext::class);
+        $button = $this->createMock(OperationButton::class);
+        $operation = $this->createMock(Operation::class);
+        $actionData = $this->createMock(ActionData::class);
+        $definition = $this->createMock(OperationDefinition::class);
+        $exception = new \Exception('Exception text');
+
+        $this->contextHelper
+            ->expects($this->once())
             ->method('getActionData')
-            ->willReturn(new ActionData());
+            ->with($this->equalTo([
+                ContextHelper::ENTITY_ID_PARAM => 42,
+                ContextHelper::ENTITY_CLASS_PARAM => 'stdClass',
+                ContextHelper::DATAGRID_PARAM => 'test_datagrid_name',
+                ContextHelper::FROM_URL_PARAM => '/test/referrer/utl',
+                ContextHelper::ROUTE_PARAM => 'test_route_name',
+            ]))
+            ->willReturn($actionData);
 
-        $button = $this->createOperationButton(false);
-        /** @var Operation|\PHPUnit\Framework\MockObject\MockObject $operation */
-        $operation = $button->getOperation();
-        $definition = $operation->getDefinition();
-        $definition->setFrontendOptions(['frontend' => 'not resolved'])->setButtonOptions(['button' => 'not resolved']);
-        $this->optionsResolver->expects($this->exactly(2))
-            ->method('resolveOptions')
-            ->withConsecutive(
-                [$this->anything(), $definition->getFrontendOptions()],
-                [$this->anything(), $definition->getButtonOptions()]
-            )
-            ->willReturnOnConsecutiveCalls(
-                ['frontend' => 'resolved'],
-                ['button' => 'resolved']
-            );
+        $button
+            ->expects($this->atMost(3))
+            ->method('getOperation')
+            ->willReturn($operation);
 
-        $exception = new \Exception('exception when check conditions');
+        $button
+            ->expects($this->once())
+            ->method('getButtonContext')
+            ->willReturn($buttonContext);
 
-        $operation->expects($this->any())
+        $button
+            ->expects($this->once())
+            ->method('setData')
+            ->with($this->equalTo($actionData));
+
+        $operation
+            ->expects($this->once())
             ->method('isAvailable')
+            ->with($actionData)
             ->willThrowException($exception);
 
-        $errors = new ArrayCollection();
-        $this->extension->isAvailable($button, $this->createButtonSearchContext(), $errors);
-        $this->assertCount(1, $errors);
-        $this->assertEquals(
-            $errors->first(),
-            [
+        if ($errors) {
+            $operation
+                ->expects($this->once())
+                ->method('getName')
+                ->willReturn('Operation name');
+        }
+
+        $operation
+            ->expects($this->once())
+            ->method('getDefinition')
+            ->willReturn($definition);
+
+        $definition
+            ->expects($this->once())
+            ->method('getEnabled')
+            ->willReturn(true);
+
+        $buttonContext
+            ->expects($this->once())
+            ->method('setEnabled')
+            ->with($this->equalTo(true));
+
+        $this->assertEquals(false, $this->extension->isAvailable($button, $context, $errors));
+
+        if ($errors) {
+            $this->assertEquals([
                 'message' => sprintf(
                     'Checking conditions of operation "%s" failed.',
-                    $operation->getName()
+                    'Operation name'
                 ),
                 'parameters' => ['exception' => $exception]
-            ]
-        );
+            ], $errors->first());
+        }
     }
 
     public function testIsAvailableExceptionUnsupportedButton()

@@ -54,6 +54,14 @@ Feature: Notification Alerts Grid operations
     Then there is 6 record in grid
     And I reset "External ID" filter
 
+  Scenario: Check notifications alerts grid "id" filter
+    When I filter id as Contains "b681"
+    Then there are 3 records in grid
+    When I reset id filter
+    And I filter id as Contains "b689"
+    Then there are 0 records in grid
+    And I reset "ID" filter
+
   Scenario: Check notifications alerts grid multiple filters
     When I set filter "Operation" as is equal to "import" and press Enter key
     And I set filter "Alert Type" as is equal to "sync" and press Enter key

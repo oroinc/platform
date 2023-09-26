@@ -16,6 +16,9 @@ use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 
+/**
+ * Connects Action and Button
+ */
 class OperationButtonProviderExtension implements ButtonProviderExtensionInterface
 {
     /** @var OperationRegistry */
@@ -36,13 +39,11 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     public function __construct(
         OperationRegistry $operationRegistry,
         ContextHelper $contextHelper,
-        RouteProviderInterface $routeProvider,
-        OptionsResolver $optionsResolver
+        RouteProviderInterface $routeProvider
     ) {
         $this->operationRegistry = $operationRegistry;
         $this->contextHelper = $contextHelper;
         $this->routeProvider = $routeProvider;
-        $this->optionsResolver = $optionsResolver;
     }
 
     /**
@@ -104,12 +105,8 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
             $result = false;
         }
 
-        $definition = $button->getOperation()->getDefinition();
-        $definition->setFrontendOptions(
-            $this->optionsResolver->resolveOptions($actionData, $definition->getFrontendOptions())
-        )->setButtonOptions(
-            $this->optionsResolver->resolveOptions($actionData, $definition->getButtonOptions())
-        );
+        $button->getButtonContext()
+            ->setEnabled($button->getOperation()->getDefinition()->getEnabled());
 
         $button->setData($actionData);
 

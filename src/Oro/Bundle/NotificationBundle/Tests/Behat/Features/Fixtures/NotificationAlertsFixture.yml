@@ -1,6 +1,6 @@
 Oro\Bundle\NotificationBundle\Entity\NotificationAlert:
   alert{0..2}:
-    id: 'b7588038-ea19-4c1d-b685-2efe4358c7b<current()>'
+    id: 'b7588038-ea19-4c1d-b681-2efe4358c7b<current()>'
     sourceType: 'ms365'
     resourceType: 'calendar'
     alertType: 'auth'
@@ -13,7 +13,7 @@ Oro\Bundle\NotificationBundle\Entity\NotificationAlert:
     updatedAt: '<dateTime()>'
     organization: '@organization'
   alert{3..5}:
-    id: 'b7588038-ea19-4c1d-b685-2efe4358c7b<current()>'
+    id: 'b7588038-ea19-4c1d-b682-2efe4358c7b<current()>'
     sourceType: 'ms365'
     resourceType: 'calendar'
     alertType: 'sync'
@@ -26,7 +26,7 @@ Oro\Bundle\NotificationBundle\Entity\NotificationAlert:
     updatedAt: '<dateTime()>'
     organization: '@organization'
   alert{6..8}:
-    id: 'b7588038-ea19-4c1d-b685-2efe4358c7b<current()>'
+    id: 'b7588038-ea19-4c1d-b683-2efe4358c7b<current()>'
     sourceType: 'ms365'
     resourceType: 'tasks'
     alertType: 'sync'

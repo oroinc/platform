@@ -5,33 +5,26 @@ namespace Oro\Bundle\SecurityBundle\Form;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SecurityBundle\Acl\Voter\EntityClassResolverUtil;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
+/**
+ * Provides methods for checking access to entity fields.
+ */
 class FieldAclHelper
 {
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
     public function __construct(
-        AuthorizationCheckerInterface $authorizationChecker,
-        ConfigManager $configManager,
-        DoctrineHelper $doctrineHelper
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private ConfigManager $configManager,
+        private DoctrineHelper $doctrineHelper
     ) {
-        $this->authorizationChecker = $authorizationChecker;
-        $this->configManager = $configManager;
-        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -78,9 +71,10 @@ class FieldAclHelper
      *
      * @return bool
      */
-    public function isFieldViewGranted($entity, $fieldName)
+    public function isFieldViewGranted(object $entity, string $fieldName)
     {
-        if (!is_object($entity)) {
+        $className = EntityClassResolverUtil::getEntityClass($entity);
+        if (!$this->isFieldAclEnabled($className)) {
             return true;
         }
 
@@ -95,9 +89,10 @@ class FieldAclHelper
      *
      * @return bool
      */
-    public function isFieldModificationGranted($entity, $fieldName)
+    public function isFieldModificationGranted(object $entity, $fieldName)
     {
-        if (!is_object($entity)) {
+        $className = EntityClassResolverUtil::getEntityClass($entity);
+        if (!$this->isFieldAclEnabled($className)) {
             return true;
         }
 
@@ -106,6 +101,23 @@ class FieldAclHelper
             : 'EDIT';
 
         return $this->authorizationChecker->isGranted($permission, new FieldVote($entity, $fieldName));
+    }
+
+    /**
+     * Checks whether the rendering of the given field is granted.
+     */
+    public function isFieldAvailable(object $entity, string $fieldName): bool
+    {
+        $className = EntityClassResolverUtil::getEntityClass($entity);
+        if (!$this->isFieldAclEnabled($className)) {
+            return true;
+        }
+
+        if ($this->isRestrictedFieldsVisible($className)) {
+            return true;
+        }
+
+        return $this->isFieldModificationGranted($entity, $fieldName);
     }
 
     /**
@@ -157,5 +169,10 @@ class FieldAclHelper
         }
 
         return $entityConfig;
+    }
+
+    private function getClassName(string|object $entityOrClassName): string
+    {
+        return is_object($entityOrClassName) ? ClassUtils::getRealClass($entityOrClassName) : $entityOrClassName;
     }
 }

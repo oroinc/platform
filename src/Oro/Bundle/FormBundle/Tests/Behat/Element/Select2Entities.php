@@ -8,6 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 /**
  * Fill field with many entities e.g. contexts field in send email form
+ *
+ * !!! For multiselects where order matters use Select2EntitiesOrdered element instead !!!
  */
 class Select2Entities extends Element implements ClearableInterface
 {
@@ -16,12 +18,18 @@ class Select2Entities extends Element implements ClearableInterface
      */
     public function setValue($values)
     {
-        $this->getDriver()->waitForAjax();
-        $this->clear();
-        $this->focus();
         $values = true === is_array($values) ? $values : [$values];
+        $this->getDriver()->waitForAjax();
+        $this->clearExcept($values);
+        if (!$this->isActive()) {
+            $this->focus();
+        }
 
         foreach ($values as $value) {
+            if ($this->hasValue($value)) {
+                continue;
+            }
+
             $this->type($value);
             $searchResults = array_filter(
                 $this->getSearchResults(),
@@ -43,6 +51,7 @@ class Select2Entities extends Element implements ClearableInterface
             self::assertNotEquals('No matches found', $result->getText(), sprintf('No matches found for "%s"', $value));
             $result->click();
         }
+        $this->close();
     }
 
     /**
@@ -114,6 +123,12 @@ class Select2Entities extends Element implements ClearableInterface
         });
     }
 
+    public function blur()
+    {
+        $this->close();
+        parent::blur();
+    }
+
     /**
      * Check if input is active and ready for input
      */
@@ -124,28 +139,47 @@ class Select2Entities extends Element implements ClearableInterface
             && $this->getParent()->getParent()->getParent()->hasClass('select2-container-active');
     }
 
+    public function isOpened(): bool
+    {
+        return $this->getParent()->getParent()->getParent()->hasClass('select2-dropdown-open');
+    }
+
     /**
      * Close search results dropdown
      */
     public function close()
     {
-        $this->getDriver()->keyDown($this->getXpath(), 27);
+        if ($this->isOpened()) {
+            $this->getDriver()->executeJsOnXpath($this->getXpath(), '$({{ELEMENT}}).select2("close")');
+
+            if ($this->isOpened()) {
+                $this->getDriver()->keyDown($this->getXpath(), 27);
+            }
+        }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function clear()
+    protected function clearExcept(array $values = [])
     {
-        $driver = $this->getDriver();
-        $closeLinks = $this->getParent()->getParent()
-            ->findAll('css', '.select2-search-choice-close');
+        $closeLinksXpathProto = '//*[contains(concat(" ",normalize-space(@class)," ")," select2-search-choice ")%s]'
+            . '//a[contains(@class, "select2-search-choice-close")]';
+        if ($values) {
+            $exceptSubEls = [];
+            foreach ($values as $value) {
+                $exceptSubEls[] = sprintf('./div[not(text()="%s")]', $value);
+            }
 
+            $closeLinksXpath = sprintf($closeLinksXpathProto, ' and ' . implode(' and ', $exceptSubEls));
+        } else {
+            $closeLinksXpath = sprintf($closeLinksXpathProto, '');
+        }
+
+        $closeLinks = $this->getParent()->getParent()->findAll('xpath', $closeLinksXpath);
         if (!$closeLinks) {
             return;
         }
 
         /** @var NodeElement $closeLink */
+        $driver = $this->getDriver();
         foreach ($closeLinks as $closeLink) {
             // Click with javascript because element is not visible, only pseudo class ::before
             // https://symfony.com/doc/current/components/css_selector.html#limitations-of-the-cssselector-component
@@ -157,12 +191,31 @@ class Select2Entities extends Element implements ClearableInterface
         });
     }
 
+    public function clear()
+    {
+        $this->clearExcept();
+    }
+
     public function getValue()
     {
         $valueElements = $this->getParent()->getParent()->findAll('css', 'li.select2-search-choice');
 
-        return array_map(function (NodeElement $element) {
+        $value = array_map(function (NodeElement $element) {
             return $element->getText();
         }, $valueElements);
+
+        $this->close();
+
+        return $value;
+    }
+
+    protected function hasValue(string $value): bool
+    {
+        $searchXpath = sprintf(
+            '//*[contains(concat(" ",normalize-space(@class)," ")," select2-search-choice ") and ./div[text()="%s"]]',
+            $value
+        );
+
+        return (bool)$this->getParent()->getParent()->find('xpath', $searchXpath);
     }
 }

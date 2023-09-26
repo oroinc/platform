@@ -388,20 +388,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 ],
                 'message' => 'Invalid type for path "actions.operations.oper1.order". Expected "int", but got "string"'
             ],
-            'incorrect operation[enabled]' => [
-                'input' => [
-                    'oper1' => [
-                        'label' => 'Test Label',
-                        'applications' => [],
-                        'entities' => [],
-                        'routes' => [],
-                        'order' => 10,
-                        'enabled' => 'not bool value',
-                    ]
-                ],
-                'message' => 'Invalid type for path "actions.operations.oper1.enabled".'
-                    . ' Expected "bool", but got "string"'
-            ],
             'incorrect operation[frontend_options]' => [
                 'input' => [
                     'oper1' => [
