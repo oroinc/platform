@@ -7,6 +7,7 @@ namespace Oro\Bundle\CronBundle\Command;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -65,6 +66,9 @@ HELP
         foreach ($applicationCommands as $name => $command) {
             if ($this === $command) {
                 continue;
+            }
+            if ($command instanceof LazyCommand) {
+                $command = $command->getCommand();
             }
             $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
             if ($this->checkCommand($output, $command)) {
