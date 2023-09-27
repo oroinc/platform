@@ -156,3 +156,13 @@ Feature: Update user profile and user entity ACL
     Given I proceed as the Manager
     When I click My User in user menu
     Then I should not see an "Edit Button" element
+
+  Scenario: Edit button leads to user edit page from user view page and to profile edit page from profile view page
+    Given I proceed as the Admin
+    And I click My User in user menu
+    When I click "Entity Edit Button"
+    Then I should be on User Profile Update page
+    When I go to System/User Management/Users
+    And click View admin@example.com in grid
+    And I click "Entity Edit Button"
+    Then I should be on User Edit page

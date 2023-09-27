@@ -138,7 +138,7 @@ oro_behat_extension:
 
     User Edit:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserEdit
-      route: 'oro_user_edit'
+      route: 'oro_user_update'
 
     Role View:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\RoleView
