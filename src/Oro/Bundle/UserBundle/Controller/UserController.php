@@ -47,10 +47,7 @@ class UserController extends AbstractController
      */
     public function viewAction(User $user)
     {
-        return $this->view(
-            $user,
-            $this->get(TokenAccessorInterface::class)->getUserId() === $user->getId()
-        );
+        return $this->view($user);
     }
 
     /**
