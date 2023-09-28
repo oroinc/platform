@@ -1,33 +1,19 @@
 /* @theme: default; */
 
 .validation-failed,
-.validation-error,
-.validation-passed,
-.validation-warning {
-    @extend %base-notification;
+.validation-error {
+    padding: $validation-failed-inner-offset;
 
-    display: block;
+    font-size: $validation-failed-font-size;
+    display: flex;
+    gap: $validation-failed-gap;
+
     color: $validation-failed-color;
 
-    &--lite {
-        @extend %base-notification-light;
-    }
-}
-
-.validation-failed,
-.validation-error {
-    @extend %base-notification-error;
-
-    &__icon {
-        @include fa-icon($fa-var-warning, before, true) {
-            display: inline-block;
-            margin-right: 6px;
-        }
-    }
-
-    &--flex {
+    &__content {
         display: flex;
-        align-items: baseline;
+        gap: $validation-failed-gap;
+        align-items: $validation-failed-align-items;
     }
 
     /* Following css rule covers case when a few inputs has the same place for errors (e.g. datetime picker).
@@ -40,30 +26,8 @@
 
 .validation-warning {
     @extend %base-notification-warning;
-
-    &__icon {
-        @include fa-icon($fa-var-warning, before, true) {
-            display: inline-block;
-            margin-right: 6px;
-        }
-    }
 }
 
 .validation-passed {
     @extend %base-notification-success;
-}
-
-.controls {
-    &.validation-error {
-        &::before {
-            content: none;
-        }
-    }
-}
-
-.input-widget-select {
-    &.error {
-        border: $input-widget-select-error-border;
-        box-shadow: $input-widget-select-error-box-shadow;
-    }
 }

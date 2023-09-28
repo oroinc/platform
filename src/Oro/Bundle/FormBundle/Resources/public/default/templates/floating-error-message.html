@@ -1,4 +1,11 @@
+<% let orofrontend = _.macros('orofrontend'); %>
 <div class="floating-error-message" role="alert" x-out-of-boundaries>
     <span class="arrow" aria-hidden="true"></span>
-    <span class="content"><span class="validation-failed__icon " aria-hidden="true"></span><%= content %></span>
+    <div class="content">
+        <%= orofrontend.renderIcon({
+            id: 'alert-circle',
+            extraClass: 'theme-icon--small validation-failed__icon'
+        }) %>
+        <span class="validation-error__text"><%- content %></span>
+    </div>
 </div>
