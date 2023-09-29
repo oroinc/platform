@@ -12,9 +12,12 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CompleteStatusCodesTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var CompleteStatusCodes */
@@ -29,7 +32,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         $this->processor = new CompleteStatusCodes($this->doctrineHelper);
     }
 
-    public function testAddStatusCodesForCreateActionForNotManageableEntity()
+    public function testAddStatusCodesForCreateAndForNotManageableEntity(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setStatusCodes(new StatusCodesConfig());
@@ -54,7 +57,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testAddStatusCodesForCreateActionEntityWithCompositeId()
+    public function testAddStatusCodesForCreateAndEntityWithCompositeId(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setStatusCodes(new StatusCodesConfig());
@@ -80,7 +83,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testAddStatusCodesForCreateActionEntityWithoutIdGenerator()
+    public function testAddStatusCodesForCreateAndEntityWithoutIdGenerator(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setStatusCodes(new StatusCodesConfig());
@@ -116,7 +119,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testAddStatusCodesForCreateActionEntityWithIdGenerator()
+    public function testAddStatusCodesForCreateAndEntityWithIdGenerator(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setStatusCodes(new StatusCodesConfig());
@@ -154,7 +157,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testAddStatusCodesForCreateActionEntityWithIdGeneratorButWhenConfiguredIdDoesNotMatchEntityId()
+    public function testAddStatusCodesForCreateAndEntityWithIdGeneratorButWhenConfiguredIdDoesNotMatchEntityId(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setStatusCodes(new StatusCodesConfig());
@@ -194,7 +197,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testAddStatusCodesForCreateActionEntityWithIdGeneratorAndRenamedId()
+    public function testAddStatusCodesForCreateAndEntityWithIdGeneratorAndRenamedId(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setStatusCodes(new StatusCodesConfig());
@@ -233,7 +236,85 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testAddStatusCodesForCreateActionWhenConflictStatusCodeAlreadyAdded()
+    public function testAddStatusCodesForCreateAndEntityWithoutIdGeneratorAndUpsertByFieldsAllowed(): void
+    {
+        $definition = new EntityDefinitionConfig();
+        $definition->setStatusCodes(new StatusCodesConfig());
+        $definition->setIdentifierFieldNames(['id']);
+        $definition->getUpsertConfig()->addFields(['field1']);
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($classMetadata);
+
+        $classMetadata->expects(self::once())
+            ->method('usesIdGenerator')
+            ->willReturn(false);
+
+        $this->context->setResult($definition);
+        $this->context->setTargetAction(ApiAction::CREATE);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                Response::HTTP_CONFLICT => [
+                    'description' => 'Returned when the specified entity type does not match the server\'s endpoint'
+                        . ' or a client-generated identifier already exists'
+                        . ' or when more than one entities were found by the upsert operation'
+                ]
+            ],
+            $definition->getStatusCodes()->toArray()
+        );
+    }
+
+    public function testAddStatusCodesForCreateAndEntityWithIdGeneratorAndUpsertByFieldsAllowed(): void
+    {
+        $definition = new EntityDefinitionConfig();
+        $definition->setStatusCodes(new StatusCodesConfig());
+        $definition->setIdentifierFieldNames(['id']);
+        $definition->getUpsertConfig()->addFields(['field1']);
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($classMetadata);
+
+        $classMetadata->expects(self::once())
+            ->method('usesIdGenerator')
+            ->willReturn(true);
+        $classMetadata->expects(self::once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+
+        $this->context->setResult($definition);
+        $this->context->setTargetAction(ApiAction::CREATE);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                Response::HTTP_CONFLICT => [
+                    'description' => 'Returned when the specified entity type does not match the server\'s endpoint'
+                        . ' or when more than one entities were found by the upsert operation'
+                ]
+            ],
+            $definition->getStatusCodes()->toArray()
+        );
+    }
+
+    public function testAddStatusCodesForCreateAndWhenConflictStatusCodeAlreadyAdded(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setStatusCodes(new StatusCodesConfig());
@@ -251,7 +332,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testAddStatusCodesForUpdateAction()
+    public function testAddStatusCodesForUpdate(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setStatusCodes(new StatusCodesConfig());
@@ -271,7 +352,7 @@ class CompleteStatusCodesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testAddStatusCodesForUpdateActionWhenConflictStatusCodeAlreadyAdded()
+    public function testAddStatusCodesForUpdateAndWhenConflictStatusCodeAlreadyAdded(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setStatusCodes(new StatusCodesConfig());

@@ -362,7 +362,7 @@ class Channel implements OrganizationAwareInterface
     }
 
     /**
-     * @param User $owner
+     * @param User|null $owner
      *
      * @return $this
      */

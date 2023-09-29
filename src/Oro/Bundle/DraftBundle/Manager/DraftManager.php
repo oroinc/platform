@@ -43,12 +43,6 @@ class DraftManager
         $this->publisher = $publisher;
     }
 
-    /**
-     * @param DraftableInterface $source
-     * @param \ArrayAccess $context
-     *
-     * @return DraftableInterface
-     */
     public function createDraft(DraftableInterface $source, \ArrayAccess $context = null): DraftableInterface
     {
         $context = $context ?? $this->createContext();
@@ -58,12 +52,6 @@ class DraftManager
         return $copier->copy($source);
     }
 
-    /**
-     * @param DraftableInterface $source
-     * @param \ArrayAccess $context
-     *
-     * @return DraftableInterface
-     */
     public function createPublication(DraftableInterface $source, \ArrayAccess $context = null): DraftableInterface
     {
         $context = $context ?? $this->createContext();

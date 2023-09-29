@@ -129,7 +129,7 @@ class MailboxType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_email_mailbox';
     }
@@ -238,8 +238,6 @@ class MailboxType extends AbstractType
 
     /**
      * Set folder start sync date to prevent sync old emails
-     *
-     * @param Mailbox $data
      */
     protected function setFolderStartSync(Mailbox $data = null)
     {

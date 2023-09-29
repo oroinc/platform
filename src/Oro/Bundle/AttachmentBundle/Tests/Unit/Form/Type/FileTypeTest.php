@@ -237,6 +237,7 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
                     'data_class' => File::class,
                     'checkEmptyFile' => false,
                     'allowDelete' => true,
+                    'allowUpdate' => true,
                     'addEventSubscriber' => true,
                     'fileOptions' => [
                         'required' => false,
@@ -253,6 +254,7 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
                     'data_class' => File::class,
                     'checkEmptyFile' => true,
                     'allowDelete' => true,
+                    'allowUpdate' => true,
                     'addEventSubscriber' => true,
                     'fileOptions' => [
                         'required' => true,
@@ -276,6 +278,7 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
                     'data_class' => File::class,
                     'checkEmptyFile' => true,
                     'allowDelete' => true,
+                    'allowUpdate' => true,
                     'addEventSubscriber' => true,
                     'fileOptions' => [
                         'required' => false,

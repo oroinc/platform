@@ -266,7 +266,7 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param Localization   $entity
+     * @param Localization|null $entity
      * @param Localization[] $entities
      */
     private function assertRepositoryCalls(Localization $entity = null, array $entities = [])

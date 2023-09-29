@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Mapping;
@@ -36,7 +37,7 @@ class PropertyMetadata extends MemberMetadata
     /**
      * @inheritDoc
      */
-    protected function newReflectionMember($objectOrClassName)
+    protected function newReflectionMember($objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {
         $className = \is_string($objectOrClassName) ? $objectOrClassName : \get_class($objectOrClassName);
         $propertyType = $this->getPropertyType($className, $this->getName());
@@ -78,7 +79,7 @@ class PropertyMetadata extends MemberMetadata
     /**
      * @inheritDoc
      */
-    public function getPropertyValue($containingValue)
+    public function getPropertyValue($containingValue): mixed
     {
         $reflProperty = $this->getReflectionMember($containingValue);
 

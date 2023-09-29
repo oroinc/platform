@@ -65,7 +65,7 @@ class CookieTokenStorage implements TokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function hasToken($tokenId)
+    public function hasToken($tokenId): bool
     {
         return $this->getCookieValue($tokenId) !== '';
     }

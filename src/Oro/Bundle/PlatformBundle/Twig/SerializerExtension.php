@@ -35,7 +35,7 @@ class SerializerExtension extends BaseSerializerExtension implements ServiceSubs
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'jms_serializer' => SerializerInterface::class,

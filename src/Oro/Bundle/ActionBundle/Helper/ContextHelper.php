@@ -32,11 +32,6 @@ class ContextHelper
     /** @var  PropertyAccessorInterface */
     protected $propertyAccessor;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param RequestStack $requestStack
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         PropertyAccessorInterface $propertyAccessor,

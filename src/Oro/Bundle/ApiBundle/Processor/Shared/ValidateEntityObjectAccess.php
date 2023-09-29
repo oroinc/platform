@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Model\EntityHolderInterface;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -26,15 +27,15 @@ class ValidateEntityObjectAccess implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */
 
         $isGranted = true;
-        $entity = $context->getResult();
-        if ($entity) {
+        $entity = $this->getEntity($context);
+        if (null !== $entity) {
             $config = $context->getConfig();
             if (null !== $config && $config->hasAclResource()) {
                 $aclResource = $config->getAclResource();
@@ -52,5 +53,15 @@ class ValidateEntityObjectAccess implements ProcessorInterface
                 $this->permission
             ));
         }
+    }
+
+    private function getEntity(SingleItemContext $context): ?object
+    {
+        $entity = $context->getResult();
+        if ($entity instanceof EntityHolderInterface) {
+            $entity = $entity->getEntity();
+        }
+
+        return $entity;
     }
 }

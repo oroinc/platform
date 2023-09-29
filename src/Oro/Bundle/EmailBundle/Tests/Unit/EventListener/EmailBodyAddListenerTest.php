@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
@@ -16,33 +18,34 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EmailBodyAddListener */
-    private $listener;
-
-    /** @var ConfigProvider */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
-    /** @var EmailAttachmentManager */
+    /** @var EmailAttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
     private $emailAttachmentManager;
 
-    /** @var EmailActivityListProvider */
+    /** @var EmailActivityListProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $activityListProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /** @var ActivityListChainProvider */
+    /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $chainProvider;
 
-    /** @var EntityManager */
-    private $entityManager;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    /** @var EmailBodyAddListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -52,7 +55,7 @@ class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->chainProvider = $this->createMock(ActivityListChainProvider::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->listener = new EmailBodyAddListener(
             $this->emailAttachmentManager,
@@ -61,97 +64,67 @@ class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
             $this->authorizationChecker,
             $this->tokenStorage,
             $this->chainProvider,
-            $this->entityManager
+            $this->doctrine
         );
     }
 
-    public function testLinkToScopeIsNotGranted()
+    public function testLinkToScopeWhenAccessToAttachmentsIsNotGranted(): void
     {
-        $event = $this->createMock(EmailBodyAdded::class);
-
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
-            ->willReturn(1);
-        $this->authorizationChecker->expects($this->once())
+            ->willReturn($this->createMock(TokenInterface::class));
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
+            ->with('CREATE', 'entity:' . Attachment::class)
             ->willReturn(false);
-        $this->activityListProvider->expects($this->never())
+        $this->activityListProvider->expects(self::never())
             ->method('getTargetEntities')
             ->willReturn([new SomeEntity()]);
 
-        $this->listener->linkToScope($event);
+        $this->listener->linkToScope(new EmailBodyAdded($this->createMock(Email::class)));
     }
 
     /**
-     * @dataProvider getTestData
+     * @dataProvider linkToScopeDataProvider
      */
-    public function testLinkToScope($config, $managerCalls, $attachmentCalls)
+    public function testLinkToScope(int|bool $config, int $managerCalls, int $attachmentCalls): void
     {
         $attachments = $this->createMock(EmailAttachment::class);
         $emailBody = $this->createMock(EmailBody::class);
         $email = $this->createMock(Email::class);
-        $event = $this->createMock(EmailBodyAdded::class);
         $configInterface = $this->createMock(ConfigInterface::class);
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
-            ->willReturn(1);
-        $this->authorizationChecker->expects($this->once())
+            ->willReturn($this->createMock(TokenInterface::class));
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
+            ->with('CREATE', 'entity:' . Attachment::class)
             ->willReturn(true);
-        $this->activityListProvider->expects($this->once())
+        $this->activityListProvider->expects(self::once())
             ->method('getTargetEntities')
             ->willReturn([new SomeEntity()]);
 
-        $configInterface->expects($this->once())
+        $configInterface->expects(self::once())
             ->method('get')
             ->willReturn($config);
-        $this->configProvider
-            ->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->willReturn($configInterface);
 
-        $this->emailAttachmentManager
-            ->expects($this->exactly($managerCalls))
+        $this->emailAttachmentManager->expects(self::exactly($managerCalls))
             ->method('linkEmailAttachmentToTargetEntity');
-        $emailBody->expects($this->exactly($attachmentCalls))
+        $emailBody->expects(self::exactly($attachmentCalls))
             ->method('getAttachments')
             ->willReturn([$attachments]);
-        $email->expects($this->exactly($attachmentCalls))
+        $email->expects(self::exactly($attachmentCalls))
             ->method('getEmailBody')
             ->willReturn($emailBody);
-        $event->expects($this->once())
-            ->method('getEmail')
-            ->willReturn($email);
 
-        $this->listener->linkToScope($event);
+        $this->listener->linkToScope(new EmailBodyAdded($email));
     }
 
-    public function testUpdateActivityDescription()
-    {
-        $activityList = $this->createMock(ActivityList::class);
-
-        $event = $this->createMock(EmailBodyAdded::class);
-
-        $email = $this->createMock(Email::class);
-
-        $event->expects($this->once())
-            ->method('getEmail')
-            ->willReturn($email);
-
-        $this->chainProvider->expects($this->once())
-            ->method('getUpdatedActivityList')
-            ->with($this->identicalTo($email), $this->identicalTo($this->entityManager))
-            ->willReturn($activityList);
-
-        $this->entityManager->expects($this->once())
-            ->method('persist')
-            ->with($activityList);
-
-        $this->listener->updateActivityDescription($event);
-    }
-
-    public function getTestData()
+    public function linkToScopeDataProvider(): array
     {
         return [
             'link to scope if number true' => [
@@ -175,5 +148,71 @@ class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
                 'attachmentCalls' => 0
             ]
         ];
+    }
+
+    public function testUpdateActivityDescription(): void
+    {
+        $email = $this->createMock(Email::class);
+        $activityList = $this->createMock(ActivityList::class);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(Email::class)
+            ->willReturn($em);
+
+        $this->chainProvider->expects(self::once())
+            ->method('getUpdatedActivityList')
+            ->with(self::identicalTo($email), self::identicalTo($em))
+            ->willReturn($activityList);
+
+        $em->expects(self::once())
+            ->method('beginTransaction');
+        $em->expects(self::once())
+            ->method('persist')
+            ->with($activityList);
+        $em->expects(self::once())
+            ->method('flush');
+        $em->expects(self::once())
+            ->method('commit');
+        $em->expects(self::never())
+            ->method('rollback');
+
+        $this->listener->updateActivityDescription(new EmailBodyAdded($email));
+    }
+
+    public function testUpdateActivityDescriptionWhenItIsFailed(): void
+    {
+        $exception = new \RuntimeException('some error');
+        $this->expectExceptionObject($exception);
+
+        $email = $this->createMock(Email::class);
+        $activityList = $this->createMock(ActivityList::class);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(Email::class)
+            ->willReturn($em);
+
+        $this->chainProvider->expects(self::once())
+            ->method('getUpdatedActivityList')
+            ->with(self::identicalTo($email), self::identicalTo($em))
+            ->willReturn($activityList);
+
+        $em->expects(self::once())
+            ->method('beginTransaction');
+        $em->expects(self::once())
+            ->method('persist')
+            ->with($activityList);
+        $em->expects(self::once())
+            ->method('flush')
+            ->willThrowException($exception);
+        $em->expects(self::never())
+            ->method('commit');
+        $em->expects(self::once())
+            ->method('rollback');
+
+        $this->listener->updateActivityDescription(new EmailBodyAdded($email));
     }
 }

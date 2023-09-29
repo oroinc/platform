@@ -14,7 +14,7 @@ class WidgetDefinitionConfiguration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('sidebar_widgets');
         $rootNode = $treeBuilder->getRootNode();

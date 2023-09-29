@@ -13,6 +13,14 @@ api:
 
         Oro\Bundle\UserBundle\Entity\Role:
             documentation_resource: '@OroUserBundle/Resources/doc/api/role.md'
+            upsert: false
+            actions:
+                update:
+                    fields:
+                        role:
+                            form_options:
+                                constraints:
+                                    - NotBlank: ~
 
         Oro\Bundle\UserBundle\Entity\User:
             documentation_resource: '@OroUserBundle/Resources/doc/api/user.md'

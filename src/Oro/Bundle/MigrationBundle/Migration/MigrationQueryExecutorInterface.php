@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
  */
 interface MigrationQueryExecutorInterface
 {
-    public function getConnection():Connection;
+    public function getConnection(): Connection;
 
     public function execute($query, $dryRun): void;
 

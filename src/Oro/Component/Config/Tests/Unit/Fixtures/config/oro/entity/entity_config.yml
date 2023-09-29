@@ -1,0 +1,5 @@
+entity_config:
+    sharding:
+        entity:
+            items:
+                discrimination_field: ~

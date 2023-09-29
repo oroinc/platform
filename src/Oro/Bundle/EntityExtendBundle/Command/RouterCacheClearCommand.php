@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
@@ -37,7 +38,7 @@ class RouterCacheClearCommand extends Command
         parent::__construct();
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return
             $this->router instanceof WarmableInterface
@@ -61,7 +62,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -92,7 +93,7 @@ HELP
 
         $io->success('The cache was successfully cleared.');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function ensureDirNotExists(string $dir): void

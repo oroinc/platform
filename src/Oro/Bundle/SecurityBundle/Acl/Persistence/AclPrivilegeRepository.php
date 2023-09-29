@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The repository class that allows to manage Privilege models.
- * @see \Oro\Bundle\SecurityBundle\Model\AclPrivilege
+ * @see AclPrivilege
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -690,7 +690,7 @@ class AclPrivilegeRepository
      * @param OID $oid
      * @param \SplObjectStorage $acls
      * @param AclExtensionInterface $extension
-     * @param AclInterface $rootAcl
+     * @param AclInterface|null $rootAcl
      * @param string|null $aclGroup
      */
     protected function addPermissions(
@@ -725,8 +725,8 @@ class AclPrivilegeRepository
      * @param AclPrivilege          $privilege
      * @param string[]              $permissions
      * @param AclExtensionInterface $extension
-     * @param AclInterface          $rootAcl
-     * @param AclInterface          $acl
+     * @param AclInterface|null     $rootAcl
+     * @param AclInterface|null     $acl
      */
     protected function addAclPermissions(
         SID $sid,

@@ -117,7 +117,7 @@ class EnumValueType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_enum_value';
     }

@@ -23,10 +23,11 @@ class SetIsInstalledCacheWarmer implements CacheWarmerInterface
         return false;
     }
 
-    public function warmUp($cacheDir): void
+    public function warmUp($cacheDir): array
     {
         if (!$this->applicationState->isInstalled()) {
             $this->applicationState->setInstalled();
         }
+        return [];
     }
 }

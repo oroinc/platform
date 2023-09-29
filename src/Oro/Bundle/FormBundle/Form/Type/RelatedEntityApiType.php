@@ -70,7 +70,7 @@ class RelatedEntityApiType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_related_entity_api';
     }

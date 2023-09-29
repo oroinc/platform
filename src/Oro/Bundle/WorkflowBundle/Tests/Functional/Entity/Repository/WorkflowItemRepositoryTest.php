@@ -319,7 +319,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
 
         $ids = ['none' => []];
         foreach ($entities as $entity) {
-            $workflowName = $entity['workflowName'] ? : 'none';
+            $workflowName = $entity['workflowName'] ?: 'none';
 
             $ids[$workflowName][] = $entity['entityId'];
         }

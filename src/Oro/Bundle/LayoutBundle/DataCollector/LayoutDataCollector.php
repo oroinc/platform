@@ -128,10 +128,6 @@ class LayoutDataCollector extends DataCollector
 
     /**
      * Prepare options for twig rendering
-     *
-     * @param array $options
-     *
-     * @return array
      */
     private function prepareOptions(array $options): array
     {

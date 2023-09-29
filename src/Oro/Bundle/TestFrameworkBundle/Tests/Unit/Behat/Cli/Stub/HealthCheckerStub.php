@@ -26,7 +26,7 @@ class HealthCheckerStub implements HealthCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             BeforeFeatureTested::BEFORE => 'check'

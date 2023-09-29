@@ -133,7 +133,7 @@ class FlushData implements ProcessorInterface
                 $item = reset($items);
                 if ($isUniqueConstraintViolationException) {
                     $item->getContext()->addError(
-                        Error::createConflictValidationError('The entity already exists')
+                        Error::createConflictValidationError('The entity already exists.')
                             ->setInnerException($e)
                     );
                 } else {

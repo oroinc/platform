@@ -33,7 +33,7 @@ class TagListener implements ServiceSubscriberInterface
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_tag.helper.taggable_helper' => TaggableHelper::class,

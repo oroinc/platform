@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Mock;
 
 use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;
@@ -19,11 +20,11 @@ class LimitsExtensionsCommand extends Command
         $this->configureLimitsExtensions();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->extensions = $this->getLimitsExtensions($input, $output);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function getExtensions()

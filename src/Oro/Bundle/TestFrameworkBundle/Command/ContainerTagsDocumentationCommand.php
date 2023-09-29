@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\TestFrameworkBundle\Command;
@@ -86,7 +87,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $includedTags = (array)$input->getOption('included');
         $excludedTags = (array)$input->getOption('exclude');
@@ -109,7 +110,7 @@ HELP
             $io->text('Total: ' . count($rows));
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function getAsTableRows(array $documentationInfo, bool $withDocs, bool $withoutDocs): array

@@ -42,11 +42,11 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ChainAdditionalEmailAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $additionalEmailAssociationProvider;
 
+    /** @var WebsiteAwareEntityHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $websiteAwareHelper;
+
     /** @var WorkflowNotificationHandler */
     private $handler;
-
-    /** @var WebsiteAwareEntityHelper|\PHPUnit\Framework\MockObject\MockObject  */
-    private $websiteAwareHelper;
 
     protected function setUp(): void
     {

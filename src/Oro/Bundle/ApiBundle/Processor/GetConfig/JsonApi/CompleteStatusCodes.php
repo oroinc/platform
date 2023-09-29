@@ -24,7 +24,7 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -62,6 +62,9 @@ class CompleteStatusCodes extends AbstractAddStatusCodes
             $description = 'Returned when the specified entity type does not match the server\'s endpoint';
             if (!$this->hasIdGenerator($definition, $entityClass)) {
                 $description .= ' or a client-generated identifier already exists';
+            }
+            if ($definition->getUpsertConfig()->getFields()) {
+                $description .= ' or when more than one entities were found by the upsert operation';
             }
             $this->addStatusCode($statusCodes, Response::HTTP_CONFLICT, $description);
         }

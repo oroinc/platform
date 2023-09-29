@@ -296,7 +296,7 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
     private function templateWithContainer(?string $container = null): TemplateReference
     {
         return new TemplateReference(
-            '@TestBundle/Default/' . ($container ? $container . '/'  : '') . 'test.html.twig',
+            '@TestBundle/Default/' . ($container ? $container . '/' : '') . 'test.html.twig',
             'twig'
         );
     }

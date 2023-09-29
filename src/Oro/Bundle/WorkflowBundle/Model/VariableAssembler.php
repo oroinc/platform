@@ -228,11 +228,6 @@ class VariableAssembler extends BaseAbstractAssembler
         }
     }
 
-    /**
-     * @param array $options
-     * @param array $parameters
-     * @return string
-     */
     private function guessOptionLabel(array $options, array $parameters): string
     {
         $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;

@@ -20,7 +20,7 @@ class SchemaWithNameGenerator extends Schema
      * @param DbIdentifierNameGenerator $nameGenerator
      * @param Table[]                   $tables
      * @param Sequence[]                $sequences
-     * @param SchemaConfig              $schemaConfig
+     * @param SchemaConfig|null $schemaConfig
      */
     public function __construct(
         DbIdentifierNameGenerator $nameGenerator,

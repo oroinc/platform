@@ -56,8 +56,8 @@ services:
             - '@Psr\Container\ContainerInterface'
         tags:
             - { name: container.service_subscriber }
-            - { name: container.service_subscriber, id: 'twig.loader.native_filesystem' }
-            - { name: container.service_subscriber, id: 'oro_ui.templating.template_name_parser', key: Symfony\Component\Templating\TemplateNameParser }
+            - { name: container.service_subscriber, id: twig.loader.native_filesystem }
+            - { name: container.service_subscriber, id: oro_ui.templating.template_name_parser, key: Symfony\Component\Templating\TemplateNameParser }
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 
     oro_ui.view.content_provider.listener:
@@ -65,8 +65,8 @@ services:
         arguments:
             - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: container.service_subscriber, id: oro_ui.content_provider.manager }
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+            - { name: container.service_subscriber, id: oro_ui.content_provider.manager, key: Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager }
 
     oro_ui.config_settings.listener:
         class: Oro\Bundle\UIBundle\EventListener\ConfigSettingsListener
@@ -130,7 +130,7 @@ services:
         arguments:
             - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: container.service_subscriber, id: oro_ui.content_provider.manager }
+            - { name: container.service_subscriber, id: oro_ui.content_provider.manager, key: Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager }
 
     oro_ui.provider.widget_context:
         class: Oro\Bundle\UIBundle\Provider\WidgetContextProvider

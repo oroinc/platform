@@ -22,7 +22,7 @@ class WorkflowTransitionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }
@@ -30,7 +30,7 @@ class WorkflowTransitionType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return WorkflowAttributesType::class;
     }

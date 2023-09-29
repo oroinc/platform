@@ -36,9 +36,9 @@ class WorkflowDefinitionApplicationsRegistryFilterTest extends \PHPUnit\Framewor
 
     public function filterDataProvider(): array
     {
-        $wd1 = (new WorkflowDefinition)->setName('wd1')->setApplications(['default']);
-        $wd2 = (new WorkflowDefinition)->setName('wd2')->setApplications(['default', 'commerce']);
-        $wd3 = (new WorkflowDefinition)->setName('wd3');
+        $wd1 = (new WorkflowDefinition())->setName('wd1')->setApplications(['default']);
+        $wd2 = (new WorkflowDefinition())->setName('wd2')->setApplications(['default', 'commerce']);
+        $wd3 = (new WorkflowDefinition())->setName('wd3');
         $definitions = new ArrayCollection(['wd1' => $wd1, 'wd2' => $wd2, 'wd3' => $wd3]);
 
         return [

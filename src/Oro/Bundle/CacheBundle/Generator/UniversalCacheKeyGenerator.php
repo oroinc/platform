@@ -63,10 +63,8 @@ class UniversalCacheKeyGenerator
 
     /**
      * Adopt cache key to be valid for Symfony Cache adapters
-     * @param string $cacheKey
-     * @return string
      */
-    public static function normalizeCacheKey(string $cacheKey) : string
+    public static function normalizeCacheKey(string $cacheKey): string
     {
         return false !== strpbrk($cacheKey, ItemInterface::RESERVED_CHARACTERS)
             ? rawurlencode($cacheKey)

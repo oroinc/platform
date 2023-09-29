@@ -48,7 +48,6 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
             ->add('entity_acl_extension', $this->entityExtension)
             ->getContainer($this);
 
-
         $this->selector = new AclExtensionSelector(
             ['action_acl_extension', 'entity_acl_extension'],
             $container,

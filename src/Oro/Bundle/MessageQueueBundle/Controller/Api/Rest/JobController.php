@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\AbstractFOSRestController;

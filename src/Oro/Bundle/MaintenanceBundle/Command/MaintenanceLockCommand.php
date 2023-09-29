@@ -69,7 +69,7 @@ HELP
             if (!$io->askQuestion($question)) {
                 $io->caution('Maintenance cancelled!');
 
-                return 0;
+                return Command::SUCCESS;
             }
         }
 
@@ -77,12 +77,12 @@ HELP
             $this->dispatcher->dispatch(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_ON);
             $io->success('Maintenance mode is turned on.');
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $io->error('Failed to turn on maintenance mode.');
 
-        return 1;
+        return Command::FAILURE;
     }
 
     private function getDriver(): AbstractDriver

@@ -125,7 +125,6 @@ class TransportTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-
         $this->transport->send($message);
     }
 

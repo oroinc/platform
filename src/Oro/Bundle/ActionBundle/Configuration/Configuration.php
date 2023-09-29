@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);
         $rootNode = $treeBuilder->getRootNode();
@@ -114,7 +114,7 @@ class Configuration implements ConfigurationInterface
             ->integerNode('order')
                 ->defaultValue(0)
             ->end()
-            ->booleanNode('enabled')
+            ->variableNode('enabled')
                 ->defaultTrue()
             ->end()
             ->booleanNode('page_reload')

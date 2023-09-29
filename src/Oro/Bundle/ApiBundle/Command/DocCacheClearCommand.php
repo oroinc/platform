@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
@@ -116,6 +117,6 @@ HELP
             $this->environment
         ));
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

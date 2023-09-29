@@ -86,7 +86,7 @@ class ReportChartSchemaType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_report_chart_data_schema';
     }

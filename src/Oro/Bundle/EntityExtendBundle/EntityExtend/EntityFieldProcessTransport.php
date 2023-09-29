@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\EntityExtend;
@@ -61,9 +62,6 @@ class EntityFieldProcessTransport
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getFieldsMetadata(): array
     {
         return $this->metadataProvider->getExtendEntityFieldsMetadata($this->class);

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\ActionBundle\Model\Attribute;
@@ -190,7 +190,7 @@ class AttributeGuesserTest extends \PHPUnit\Framework\TestCase
             $valueMap[] = [$entity, $metadata];
         }
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->with($this->isType('string'))

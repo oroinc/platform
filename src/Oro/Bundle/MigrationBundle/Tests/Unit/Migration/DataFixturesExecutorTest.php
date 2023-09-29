@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
@@ -16,13 +17,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
     /** @var DataFixturesExecutor */
@@ -202,7 +203,7 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
 
         $this->dataFixturesExecutor->execute([$fixture], 'test');
 
-        static::assertSame('so_ME', $fixture->getLanguage());
-        static::assertSame('te_ST', $fixture->getFormattingCode());
+        self::assertSame('so_ME', $fixture->getLanguage());
+        self::assertSame('te_ST', $fixture->getFormattingCode());
     }
 }

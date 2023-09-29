@@ -10,9 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Price implements CurrencyAwareInterface, \JsonSerializable
 {
-    const MAX_VALUE_SCALE = 4;
-
     use CurrencyAwareTrait;
+    const MAX_VALUE_SCALE = 4;
 
     /**
      * @var float

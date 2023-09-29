@@ -135,7 +135,13 @@
 
     &--container {
         display: $content-sidebar-container-display;
+        grid-template-columns: $content-sidebar-container-grid-template-columns;
+        grid-template-rows: $content-sidebar-container-grid-template-rows;
         margin-left: $content-sidebar-container-offset-left;
+
+        @media only screen and (max-width: 992px) {
+            grid-template-columns: $content-sidebar-container-tablet-grid-template-columns;
+        }
 
         &:only-child {
             height: 100%;
@@ -143,17 +149,6 @@
     }
 
     &--content {
-        width: calc(100% - #{$content-sidebar-width});
-        flex: $content-sidebar-container-flex;
-
-        @media only screen and (max-width: 992px) {
-            width: calc(100% - #{$content-sidebar-minimized-width});
-        }
-
-        &.content-sidebar-minimized {
-            width: calc(100% - #{$content-sidebar-minimized-width});
-        }
-
         .responsive-section {
             .form-horizontal {
                 padding: $content-sidebar-form-horizontal-offset-inner;

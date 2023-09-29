@@ -182,7 +182,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
      * of a filter registered in this manager with the given name
      *
      * @param string $name   A filter name
-     * @param array  $params An additional parameters of a new filter
+     * @param array|null $params An additional parameters of a new filter
      *
      * @return FilterInterface
      */

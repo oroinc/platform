@@ -58,11 +58,6 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
         );
     }
 
-    /**
-     * @param string $fieldType
-     *
-     * @return FieldConfigModel
-     */
     protected function getFieldConfigModel(string $fieldType): FieldConfigModel
     {
         $entity = new EntityConfigModel(TestEntity::class);

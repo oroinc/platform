@@ -130,11 +130,6 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
 
     /**
      * Get valid UserApi for given token
-     *
-     * @param TokenInterface $token
-     * @param Collection $secrets
-     *
-     * @return UserApiKeyInterface
      */
     private function getValidUserApi(
         TokenInterface $token,

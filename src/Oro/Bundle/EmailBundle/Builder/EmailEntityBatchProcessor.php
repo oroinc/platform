@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Butch processor for Email entity.
  */
-class EmailEntityBatchProcessor implements EmailEntityBatchInterface
+class EmailEntityBatchProcessor
 {
     /**
      * @var EmailAddressManager
@@ -81,8 +81,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
 
     /**
      * Register EmailAddress object
-     *
-     * @throws \LogicException
      */
     public function addAddress(EmailAddress $obj)
     {
@@ -101,17 +99,11 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     public function getAddress($email)
     {
-        $key = strtolower($email);
-
-        return isset($this->addresses[$key])
-            ? $this->addresses[$key]
-            : null;
+        return $this->addresses[strtolower($email)] ?? null;
     }
 
     /**
      * Register EmailFolder object
-     *
-     * @throws \LogicException
      */
     public function addFolder(EmailFolder $obj)
     {
@@ -133,38 +125,47 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     public function getFolder($type, $fullName)
     {
-        $key = strtolower(sprintf('%s_%s', $type, $fullName));
-
-        return isset($this->folders[$key])
-            ? $this->folders[$key]
-            : null;
+        return $this->folders[strtolower(sprintf('%s_%s', $type, $fullName))] ?? null;
     }
 
     /**
-     * Tell the given EntityManager to manage this batch
+     * Gets all email folders that exist in the batch.
+     *
+     * @return EmailFolder[]
      */
-    public function persist(EntityManagerInterface $em): void
+    public function getFolders(): array
     {
-        $this->persistFolders($em);
-        $this->persistAddresses($em);
-        $this->persistEmailUsers($em);
+        return array_values($this->folders);
     }
 
     /**
-     * Get the list of all changes made by {@see persist()} method
-     * For example new objects can be replaced by existing ones from a database
+     * Tells the given entity manager to manage entities involved into this batch
+     * and returns the list of all persisted entities.
+     */
+    public function persist(EntityManagerInterface $em, bool $dryRun = false): array
+    {
+        $persistedEntities[] = $this->persistFolders($em, $dryRun);
+        $persistedEntities[] = $this->persistAddresses($em, $dryRun);
+        $persistedEntities[] = $this->persistEmailUsers($em, $dryRun);
+
+        return array_merge(...$persistedEntities);
+    }
+
+    /**
+     * Gets the list of all changes made by {@see persist()} method
+     * For example new objects can be replaced by existing ones from a database.
      *
      * @return array [old, new] The list of changes
      */
-    public function getChanges()
+    public function getChanges(): array
     {
         return $this->changes;
     }
 
     /**
-     * {@inhericDoc}
+     * Clears the batch.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->changes = [];
         $this->emailUsers = [];
@@ -184,15 +185,21 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Persist EmailUser objects
      */
-    protected function persistEmailUsers(EntityManagerInterface $em): void
+    protected function persistEmailUsers(EntityManagerInterface $em, bool $dryRun): array
     {
         $this->processDuplicateEmails($em);
 
+        $persistedEntities = [];
         foreach ($this->emailUsers as $emailUser) {
-            $em->persist($emailUser);
+            if (!$dryRun) {
+                $em->persist($emailUser);
+            }
+            $persistedEntities[] = $emailUser;
 
             $this->eventDispatcher->dispatch(new EmailUserAdded($emailUser), EmailUserAdded::NAME);
         }
+
+        return $persistedEntities;
     }
 
     /**
@@ -275,27 +282,34 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Tell the given EntityManager to manage EmailAddress objects in this batch
      */
-    protected function persistAddresses(EntityManagerInterface $em)
+    protected function persistAddresses(EntityManagerInterface $em, bool $dryRun): array
     {
+        $persistedEntities = [];
         $repository = $this->emailAddressManager->getEmailAddressRepository($em);
         foreach ($this->addresses as $key => $obj) {
             /** @var EmailAddress $dbObj */
             $dbObj = $repository->findOneBy(['email' => $obj->getEmail()]);
             if ($dbObj === null) {
                 $obj->setOwner($this->emailOwnerProvider->findEmailOwner($em, $obj->getEmail()));
-                $em->persist($obj);
+                if (!$dryRun) {
+                    $em->persist($obj);
+                }
+                $persistedEntities[] = $obj;
             } else {
                 $this->updateAddressReferences($obj, $dbObj);
                 $this->addresses[$key] = $dbObj;
             }
         }
+
+        return $persistedEntities;
     }
 
     /**
      * Tell the given EntityManager to manage EmailFolder objects in this batch
      */
-    protected function persistFolders(EntityManagerInterface $em)
+    protected function persistFolders(EntityManagerInterface $em, bool $dryRun): array
     {
+        $persistedEntities = [];
         $repository = $em->getRepository('OroEmailBundle:EmailFolder');
         foreach ($this->folders as $key => $obj) {
             if ($obj->getId() !== null) {
@@ -304,13 +318,18 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
             /** @var EmailFolder $dbObj */
             $dbObj = $repository->findOneBy(['fullName' => $obj->getFullName(), 'type' => $obj->getType()]);
             if ($dbObj === null) {
-                $em->persist($obj);
+                if (!$dryRun) {
+                    $em->persist($obj);
+                }
+                $persistedEntities[] = $obj;
             } else {
                 $this->changes[] = ['old' => $obj, 'new' => $dbObj];
                 $this->updateFolderReferences($obj, $dbObj);
                 $this->folders[$key] = $dbObj;
             }
         }
+
+        return $persistedEntities;
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
@@ -22,24 +23,13 @@ abstract class CacheCommand extends Command
 {
     protected ?string $cacheDir;
 
-    private EntityProxyGenerator $entityProxyGenerator;
-    private EntityAliasResolver $entityAliasResolver;
-    protected ExtendConfigDumper $extendConfigDumper;
-    private ManagerRegistry $doctrine;
-    private KernelInterface $kernel;
-
     public function __construct(
-        EntityProxyGenerator $entityProxyGenerator,
-        EntityAliasResolver $entityAliasResolver,
-        ExtendConfigDumper $extendConfigDumper,
-        ManagerRegistry $doctrine,
-        KernelInterface $kernel
+        private EntityProxyGenerator $entityProxyGenerator,
+        private EntityAliasResolver $entityAliasResolver,
+        protected ExtendConfigDumper $extendConfigDumper,
+        private ManagerRegistry $doctrine,
+        private KernelInterface $kernel
     ) {
-        $this->entityProxyGenerator = $entityProxyGenerator;
-        $this->entityAliasResolver = $entityAliasResolver;
-        $this->extendConfigDumper = $extendConfigDumper;
-        $this->doctrine = $doctrine;
-        $this->kernel = $kernel;
         parent::__construct();
     }
 

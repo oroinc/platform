@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroAttachmentBundle_Entity_File;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -37,6 +38,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *      }
  * )
  * @SuppressWarnings(PHPMD.TooManyFields)
+ * @mixin OroAttachmentBundle_Entity_File
  */
 class File implements FileExtensionInterface, ExtendEntityInterface
 {
@@ -488,11 +490,6 @@ class File implements FileExtensionInterface, ExtendEntityInterface
         ] = $serialized;
     }
 
-    /**
-     * @param string $parentEntityClass
-     *
-     * @return File
-     */
     public function setParentEntityClass(?string $parentEntityClass): File
     {
         $this->parentEntityClass = $parentEntityClass;
@@ -505,11 +502,6 @@ class File implements FileExtensionInterface, ExtendEntityInterface
         return $this->parentEntityClass;
     }
 
-    /**
-     * @param int $parentEntityId
-     *
-     * @return File
-     */
     public function setParentEntityId(?int $parentEntityId): File
     {
         $this->parentEntityId = $parentEntityId;

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\CronBundle\Command;
@@ -49,7 +50,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>Removing all previously loaded commands...</info>');
         $this->doctrine->getRepository('OroCronBundle:Schedule')
@@ -74,7 +75,7 @@ HELP
 
         $em->flush();
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function createSchedule(

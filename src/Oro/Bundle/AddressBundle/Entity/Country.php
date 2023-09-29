@@ -4,6 +4,7 @@ namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroAddressBundle_Entity_Country;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -30,6 +31,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
  *          }
  *      }
  * )
+ * @mixin OroAddressBundle_Entity_Country
  */
 class Country implements Translatable, ExtendEntityInterface
 {

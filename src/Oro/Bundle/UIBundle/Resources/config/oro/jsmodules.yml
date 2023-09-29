@@ -88,6 +88,7 @@ configs:
     oroui/js/error: {}
     oroui/js/extend/bootstrap/bootstrap-dropdown: {}
     oroui/js/extend/scriptjs: {}
+    oroui/js/extend/underscore: {}
     oroui/js/fuzzy-search: {}
     oroui/js/messenger: {}
     oroui/js/mobile/page-header: {}
@@ -146,6 +147,7 @@ dynamic-imports:
         - oroui/js/standart-confirmation
         - oroui/js/tools/api-accessor
         - oroui/js/tools/search-api-accessor
+        - oroui/js/widget-manager
         - underscore
     jstree:
         - oroui/js/app/views/jstree/base-tree-view

@@ -525,7 +525,6 @@ datagrids:
                 frontend_type:  select
                 label:          oro.email.emailtemplate.type.label
                 choices:        "@oro_email.emailtemplate.datagrid_helper->getTypeChoices"
-                translatable_options: false
             isSystem:
                 frontend_type:  boolean
                 label:          oro.email.emailtemplate.is_system.label
@@ -564,7 +563,6 @@ datagrids:
                     options:
                         field_options:
                             choices: "@oro_email.emailtemplate.datagrid_helper->getTypeChoices"
-                            translatable_options: false
 
                 isSystem:
                     type:           boolean

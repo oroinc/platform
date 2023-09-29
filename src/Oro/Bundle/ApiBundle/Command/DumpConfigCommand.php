@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
@@ -20,6 +21,7 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use ProxyManager\Proxy\VirtualProxyInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -160,7 +162,7 @@ HELP
             $this->dumpConfig($output, $config);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function getConfigExtras(InputInterface $input): array

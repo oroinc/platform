@@ -27,7 +27,7 @@ class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExte
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_entity_config.config.attributes_config_helper' => AttributeConfigHelper::class,

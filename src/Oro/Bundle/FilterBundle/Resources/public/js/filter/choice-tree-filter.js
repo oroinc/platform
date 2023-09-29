@@ -23,9 +23,6 @@ define(function(require) {
         select2component: null,
 
         events: {
-            'click .filter-update': '_onClickUpdateCriteria',
-            'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
-            'click .disable-filter': '_onClickDisableFilter',
             'select2-data-loaded': 'onDataLoaded',
             'select2-loaded': 'onDataLoaded'
         },
@@ -169,7 +166,7 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            if (this.data.length === 0) {
+            if (this.data.length === 0 || value.value.split(',').length !== this.data.length) {
                 this.loadDataById(value);
             } else {
                 const renderedPropertyName = this.renderedPropertyName || 'name';

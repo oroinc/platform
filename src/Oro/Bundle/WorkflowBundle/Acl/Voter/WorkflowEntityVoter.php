@@ -28,7 +28,7 @@ class WorkflowEntityVoter extends AbstractEntityVoter implements ServiceSubscrib
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_workflow.permission_registry' => WorkflowPermissionRegistry::class

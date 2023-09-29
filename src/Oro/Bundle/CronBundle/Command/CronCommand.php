@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\CronBundle\Command;
@@ -76,7 +77,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // check for maintenance mode - do not run cron jobs if it is switched on
         if ($this->maintenanceMode->isOn()) {
@@ -85,7 +86,7 @@ HELP
             $output->writeln(sprintf('<error>%s</error>', $message));
             $this->logger->error($message);
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $schedules = $this->doctrine->getRepository(Schedule::class)->findAll();
@@ -144,7 +145,7 @@ HELP
 
         $output->writeln('All commands scheduled', OutputInterface::VERBOSITY_DEBUG);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

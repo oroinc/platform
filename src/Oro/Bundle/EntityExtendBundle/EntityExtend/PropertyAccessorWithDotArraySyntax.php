@@ -198,7 +198,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue($objectOrArray, $propertyPath)
+    public function getValue($objectOrArray, $propertyPath): mixed
     {
         $zval = [
             self::VALUE => $objectOrArray,
@@ -368,7 +368,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function isReadable($objectOrArray, $propertyPath)
+    public function isReadable($objectOrArray, $propertyPath): bool
     {
         if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
@@ -391,7 +391,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function isWritable($objectOrArray, $propertyPath)
+    public function isWritable($objectOrArray, $propertyPath): bool
     {
         $propertyPath = $this->getPropertyPath($propertyPath);
 

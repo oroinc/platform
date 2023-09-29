@@ -1,9 +1,13 @@
 <div class="toolbar" data-grid-toolbar="top"></div>
 <div class="other-scroll-container">
     <div class="other-scroll"><div></div></div>
-    <div class="grid-scrollable-container">
-        <div class="grid-container">
-            <<%- tableTagName %> class="grid grid-main-container<% if(tableClassName) { %> <%- tableClassName %><% } %>" tabindex="-1"></<%- tableTagName %>>
+    <div class="datagrid">
+        <div class="datagrid-content">
+            <div class="grid-scrollable-container">
+                <div class="grid-container">
+                    <<%- tableTagName %> class="grid grid-main-container<% if(tableClassName) { %> <%- tableClassName %><% } %>" tabindex="-1"></<%- tableTagName %>>
+                </div>
+            </div>
         </div>
     </div>
     <div class="no-data"></div>

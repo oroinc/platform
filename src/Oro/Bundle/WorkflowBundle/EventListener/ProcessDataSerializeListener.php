@@ -93,7 +93,7 @@ class ProcessDataSerializeListener implements ServiceSubscriberInterface
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_workflow.serializer.process.serializer' => SerializerInterface::class

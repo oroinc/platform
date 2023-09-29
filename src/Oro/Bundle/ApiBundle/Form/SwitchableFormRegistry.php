@@ -89,7 +89,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
     /**
      * {@inheritDoc}
      */
-    public function getType($name)
+    public function getType(string $name)
     {
         // prevent using of not registered in API form types
         if ($this->extensionState->isApiFormExtensionActivated()) {

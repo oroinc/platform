@@ -44,9 +44,6 @@ class MessagePriorityTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getMessagePriorityDataProvider
-     *
-     * @param string $priority
-     * @param int $transportPriority
      */
     public function testGetMessagePriority(string $priority, int $transportPriority): void
     {
@@ -77,9 +74,6 @@ class MessagePriorityTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getMessagePriorityNameDataProvider
-     *
-     * @param string $priority
-     * @param string $name
      */
     public function testGetMessagePriorityName(string $priority, string $name): void
     {

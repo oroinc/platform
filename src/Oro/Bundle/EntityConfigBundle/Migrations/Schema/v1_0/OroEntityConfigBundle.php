@@ -126,7 +126,7 @@ class OroEntityConfigBundle implements Migration
     public static function oroEntityConfigOptionsetRelationTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_entity_config_optionset_relation **/
-        $table = $schema->createTable($tableName ? : 'oro_entity_config_optionset_relation');
+        $table = $schema->createTable($tableName ?: 'oro_entity_config_optionset_relation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('option_id', 'integer', ['notnull' => false]);
         $table->addColumn('field_id', 'integer', ['notnull' => false]);
@@ -198,7 +198,7 @@ class OroEntityConfigBundle implements Migration
     public static function oroEntityConfigOptionsetRelationForeignKeys(Schema $schema, $tableName = null)
     {
         /** Generate foreign keys for table oro_entity_config_optionset_relation **/
-        $table = $schema->getTable($tableName ? : 'oro_entity_config_optionset_relation');
+        $table = $schema->getTable($tableName ?: 'oro_entity_config_optionset_relation');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_entity_config_optionset'),
             ['option_id'],

@@ -17,7 +17,7 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return array(
             FormEvents::POST_SUBMIT => 'postSubmit',

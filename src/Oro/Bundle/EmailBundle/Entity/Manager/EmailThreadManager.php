@@ -2,78 +2,86 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 
+/**
+ * Provides a set of methods to manage data related to email threads.
+ */
 class EmailThreadManager
 {
-    /** @var EmailThreadProvider */
-    protected $emailThreadProvider;
+    private EmailThreadProvider $emailThreadProvider;
+    private ManagerRegistry $doctrine;
 
-    /** @var EntityManager */
-    protected $em;
-
-    public function __construct(EmailThreadProvider $emailThreadProvider, EntityManager $em)
+    public function __construct(EmailThreadProvider $emailThreadProvider, ManagerRegistry $doctrine)
     {
         $this->emailThreadProvider = $emailThreadProvider;
-        $this->em = $em;
+        $this->doctrine = $doctrine;
     }
 
     /**
      * @param Email[] $newEmails
      */
-    public function updateThreads(array $newEmails)
+    public function updateThreads(array $newEmails): void
     {
-        foreach ($newEmails as $entity) {
-            $thread = $this->emailThreadProvider->getEmailThread($this->em, $entity);
-            if ($thread) {
-                $this->em->persist($thread);
-                $entity->setThread($thread);
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass(Email::class);
+        foreach ($newEmails as $email) {
+            $threadEmails = $this->emailThreadProvider->getEmailReferences($em, $email);
+            $thread = $this->findThread($threadEmails);
+            if (null === $thread && $threadEmails) {
+                $thread = new EmailThread();
+                $em->persist($thread);
             }
-            $this->updateRefs($this->em, $entity);
+            if (null !== $thread) {
+                $email->setThread($thread);
+                foreach ($threadEmails as $threadEmail) {
+                    if (null === $threadEmail->getThread()) {
+                        $threadEmail->setThread($thread);
+                    }
+                }
+            }
         }
     }
 
     /**
      * @param Email[] $updatedEmails
      */
-    public function updateHeads(array $updatedEmails)
+    public function updateHeads(array $updatedEmails): void
     {
-        foreach ($updatedEmails as $entity) {
-            if (!$entity->getThread() || !$entity->getId()) {
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass(Email::class);
+        foreach ($updatedEmails as $email) {
+            if (!$email->getThread() || !$email->getId()) {
                 continue;
             }
 
-            $threadEmails = $this->emailThreadProvider->getThreadEmails($this->em, $entity);
-            if (count($threadEmails) === 0) {
+            $threadEmails = $this->emailThreadProvider->getThreadEmails($em, $email);
+            if (!$threadEmails) {
                 continue;
             }
 
-            /** @var Email $email */
-            foreach ($threadEmails as $email) {
-                $email->setHead(false);
-                $this->em->persist($email);
+            foreach ($threadEmails as $threadEmail) {
+                $threadEmail->setHead(false);
             }
-            $email = $threadEmails[0];
-            $email->setHead(true);
-            $this->em->persist($email);
+            $threadEmails[0]->setHead(true);
         }
     }
 
-    /**
-     * Updates email references' threadId
-     */
-    protected function updateRefs(EntityManager $entityManager, Email $entity)
+    private function findThread(array $threadEmails): ?EmailThread
     {
-        if ($entity->getThread()) {
-            /** @var Email $email */
-            foreach ($this->emailThreadProvider->getEmailReferences($this->em, $entity) as $email) {
-                if (!$email->getThread()) {
-                    $email->setThread($entity->getThread());
-                    $entityManager->persist($email);
-                }
+        $thread = null;
+        /** @var Email $threadEmail */
+        foreach ($threadEmails as $threadEmail) {
+            $thread = $threadEmail->getThread();
+            if (null !== $thread) {
+                break;
             }
         }
+
+        return $thread;
     }
 }

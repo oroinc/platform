@@ -3,13 +3,17 @@
 namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
-use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -21,26 +25,13 @@ class EmailBodyAddListener
 {
     private const LINK_ATTACHMENT_CONFIG_OPTION = 'auto_link_attachments';
 
-    /** @var ConfigProvider */
-    protected $configProvider;
-
-    /** @var EmailAttachmentManager */
-    protected $attachmentManager;
-
-    /** @var EmailActivityListProvider */
-    protected $activityListProvider;
-
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
-
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
-
-    /** @var ActivityListChainProvider */
-    protected $chainProvider;
-
-    /** @var EntityManager */
-    protected $entityManager;
+    private ConfigProvider $configProvider;
+    private EmailAttachmentManager $attachmentManager;
+    private EmailActivityListProvider $activityListProvider;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private TokenStorageInterface $tokenStorage;
+    private ActivityListChainProvider $chainProvider;
+    private ManagerRegistry $doctrine;
 
     public function __construct(
         EmailAttachmentManager $attachmentManager,
@@ -49,7 +40,7 @@ class EmailBodyAddListener
         AuthorizationCheckerInterface $authorizationChecker,
         TokenStorageInterface $tokenStorage,
         ActivityListChainProvider $chainProvider,
-        EntityManager $entityManager
+        ManagerRegistry $doctrine
     ) {
         $this->attachmentManager = $attachmentManager;
         $this->configProvider = $configProvider;
@@ -57,13 +48,16 @@ class EmailBodyAddListener
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenStorage = $tokenStorage;
         $this->chainProvider = $chainProvider;
-        $this->entityManager = $entityManager;
+        $this->doctrine = $doctrine;
     }
 
-    public function linkToScope(EmailBodyAdded $event)
+    public function linkToScope(EmailBodyAdded $event): void
     {
         if (null !== $this->tokenStorage->getToken()
-            && !$this->authorizationChecker->isGranted('CREATE', 'entity:' . AttachmentScope::ATTACHMENT)
+            && !$this->authorizationChecker->isGranted(
+                'CREATE',
+                ObjectIdentityHelper::encodeIdentityString(EntityAclExtension::NAME, Attachment::class)
+            )
         ) {
             return;
         }
@@ -71,8 +65,8 @@ class EmailBodyAddListener
         $email = $event->getEmail();
         $entities = $this->activityListProvider->getTargetEntities($email);
         foreach ($entities as $entity) {
-            if ((bool)$this->configProvider->getConfig(ClassUtils::getClass($entity))
-                ->get(self::LINK_ATTACHMENT_CONFIG_OPTION)) {
+            $entityConfig = $this->configProvider->getConfig(ClassUtils::getClass($entity));
+            if ($entityConfig->get(self::LINK_ATTACHMENT_CONFIG_OPTION)) {
                 foreach ($email->getEmailBody()->getAttachments() as $attachment) {
                     $this->attachmentManager->linkEmailAttachmentToTargetEntity($attachment, $entity);
                 }
@@ -80,22 +74,20 @@ class EmailBodyAddListener
         }
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function updateActivityDescription(EmailBodyAdded $event)
+    public function updateActivityDescription(EmailBodyAdded $event): void
     {
-        $this->entityManager->beginTransaction();
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass(Email::class);
+        $em->beginTransaction();
         try {
-            $email = $event->getEmail();
-            $activityList = $this->chainProvider->getUpdatedActivityList($email, $this->entityManager);
+            $activityList = $this->chainProvider->getUpdatedActivityList($event->getEmail(), $em);
             if ($activityList) {
-                $this->entityManager->persist($activityList);
-                $this->entityManager->flush();
+                $em->persist($activityList);
+                $em->flush();
             }
-            $this->entityManager->commit();
+            $em->commit();
         } catch (\Exception $e) {
-            $this->entityManager->rollback();
+            $em->rollback();
             throw $e;
         }
     }

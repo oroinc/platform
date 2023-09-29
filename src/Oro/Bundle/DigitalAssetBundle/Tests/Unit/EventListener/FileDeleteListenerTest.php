@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -21,7 +21,7 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
     /** @var File|\PHPUnit\Framework\MockObject\MockObject */
     private $file;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
     protected function setUp(): void
@@ -30,7 +30,7 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->listener = new FileDeleteListener($this->innerFileDeleteListener);
 
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->file = $this->getMockBuilder(File::class)
             ->addMethods(['getDigitalAsset'])
             ->getMock();
@@ -38,8 +38,7 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPreRemove(): void
     {
-        $this->file
-            ->expects($this->once())
+        $this->file->expects($this->once())
             ->method('getDigitalAsset');
 
         $this->listener->preRemove($this->file, new LifecycleEventArgs($this->file, $this->entityManager));
@@ -47,13 +46,11 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPostRemoveWhenDigitalAsset(): void
     {
-        $this->file
-            ->expects($this->once())
+        $this->file->expects($this->once())
             ->method('getDigitalAsset')
             ->willReturn($this->createMock(DigitalAsset::class));
 
-        $this->innerFileDeleteListener
-            ->expects($this->never())
+        $this->innerFileDeleteListener->expects($this->never())
             ->method('postRemove');
 
         $this->listener->postRemove(
@@ -64,8 +61,7 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPostRemove(): void
     {
-        $this->innerFileDeleteListener
-            ->expects($this->once())
+        $this->innerFileDeleteListener->expects($this->once())
             ->method('postRemove')
             ->with($this->file, $args = new LifecycleEventArgs($this->file, $this->entityManager));
 
@@ -74,19 +70,16 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPostUpdateWhenNoDigitalAsset(): void
     {
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
 
-        $unitOfWork
-            ->expects($this->once())
+        $unitOfWork->expects($this->once())
             ->method('getEntityChangeSet')
             ->with($this->file)
-            ->willReturn($changeSet = ['sampleField' => ['sampleValue1', 'sampleValue2']]);
+            ->willReturn(['sampleField' => ['sampleValue1', 'sampleValue2']]);
 
-        $this->innerFileDeleteListener
-            ->expects($this->once())
+        $this->innerFileDeleteListener->expects($this->once())
             ->method('postUpdate')
             ->with($this->file, $args = new LifecycleEventArgs($this->file, $this->entityManager));
 
@@ -95,24 +88,20 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPostUpdateWhenHasDigitalAsset(): void
     {
-        $this->file
-            ->expects($this->once())
+        $this->file->expects($this->once())
             ->method('getDigitalAsset')
             ->willReturn($this->createMock(DigitalAsset::class));
 
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
 
-        $unitOfWork
-            ->expects($this->once())
+        $unitOfWork->expects($this->once())
             ->method('getEntityChangeSet')
             ->with($this->file)
-            ->willReturn($changeSet = ['filename' => ['sampleOldValue', 'sampleNewValue']]);
+            ->willReturn(['filename' => ['sampleOldValue', 'sampleNewValue']]);
 
-        $this->innerFileDeleteListener
-            ->expects($this->never())
+        $this->innerFileDeleteListener->expects($this->never())
             ->method('postUpdate');
 
         $this->listener->postUpdate($this->file, new LifecycleEventArgs($this->file, $this->entityManager));
@@ -120,19 +109,16 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPostUpdate(): void
     {
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
 
-        $unitOfWork
-            ->expects($this->once())
+        $unitOfWork->expects($this->once())
             ->method('getEntityChangeSet')
             ->with($this->file)
-            ->willReturn($changeSet = ['digitalAsset' => ['sampleOldValue', 'sampleNewValue']]);
+            ->willReturn(['digitalAsset' => ['sampleOldValue', 'sampleNewValue']]);
 
-        $this->innerFileDeleteListener
-            ->expects($this->never())
+        $this->innerFileDeleteListener->expects($this->never())
             ->method('postUpdate');
 
         $this->listener->postUpdate($this->file, new LifecycleEventArgs($this->file, $this->entityManager));

@@ -35,7 +35,7 @@ class CalendarFactory implements CalendarFactoryInterface, ServiceSubscriberInte
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_locale.calendar' => Calendar::class

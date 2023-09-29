@@ -38,7 +38,6 @@ class DbalTypeDefaultValueProvider
             throw new \LogicException(sprintf('Default value is not specified for DBAL type %s', $dbalType));
         }
 
-
         return $this->defaultValueByType[$dbalType];
     }
 }

@@ -1,10 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -13,6 +17,7 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,16 +33,19 @@ class DumpCommand extends AbstractDebugCommand
 
     private SubresourcesProvider $subresourcesProvider;
     private EntityClassProviderInterface $entityClassProvider;
+    private ConfigProvider $configProvider;
 
     public function __construct(
         ValueNormalizer $valueNormalizer,
         ResourcesProvider $resourcesProvider,
         SubresourcesProvider $subresourcesProvider,
-        EntityClassProviderInterface $entityClassProvider
+        EntityClassProviderInterface $entityClassProvider,
+        ConfigProvider $configProvider
     ) {
         parent::__construct($valueNormalizer, $resourcesProvider);
         $this->subresourcesProvider = $subresourcesProvider;
         $this->entityClassProvider = $entityClassProvider;
+        $this->configProvider = $configProvider;
     }
 
     protected function configure(): void
@@ -59,6 +67,18 @@ class DumpCommand extends AbstractDebugCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Show resources that are not accessible through API'
+            )
+            ->addOption(
+                'action',
+                null,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Show resources that support the specific API action'
+            )
+            ->addOption(
+                'upsert',
+                null,
+                InputOption::VALUE_NONE,
+                'Show resources that support the upsert operation'
             )
             ->setDescription('Dumps all resources accessible through API.')
             ->setHelp(
@@ -82,11 +102,21 @@ displays a list of entity classes that are <options=bold>not accessible</> throu
 
   <info>php %command.full_name% --not-accessible</info>
 
+The <info>--action</info> option can be used to displays a list of entity classes that support a specific API action:
+
+  <info>php %command.full_name% --action=update_list</info>
+
+The <info>--upsert</info> option can be used to displays a list of entity classes that support the upsert operation:
+
+  <info>php %command.full_name% --upsert</info>
+
 HELP
             )
             ->addUsage('--sub-resources')
             ->addUsage('--sub-resources <entity>')
             ->addUsage('--not-accessible')
+            ->addUsage('--action=<action>')
+            ->addUsage('--upsert')
         ;
 
         parent::configure();
@@ -102,7 +132,7 @@ HELP
             $this->dumpResources($input, $output);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function dumpNotAccessibleEntities(InputInterface $input, OutputInterface $output): void
@@ -132,6 +162,10 @@ HELP
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     public function dumpResources(InputInterface $input, OutputInterface $output): void
     {
         $requestType = $this->getRequestType($input);
@@ -139,6 +173,8 @@ HELP
         $version = Version::normalizeVersion(null);
         $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $version, $requestType);
         $isSubresourcesRequested = $input->getOption('sub-resources');
+        $actions = $input->getOption('action');
+        $upsert = $input->getOption('upsert');
 
         $resources = $this->resourcesProvider->getResources($version, $requestType);
         /** @var ApiResource[] $sortedResources */
@@ -152,12 +188,22 @@ HELP
             if ($entityClass && $resource->getEntityClass() !== $entityClass) {
                 continue;
             }
+            if ($actions && !$this->isResourceHasAnyOfActions($resource, $actions)) {
+                continue;
+            }
+            $upsertAttribute = null;
+            if ($upsert) {
+                $upsertAttribute = $this->getUpsertAttribute($resource, $version, $requestType);
+                if (!$upsertAttribute) {
+                    continue;
+                }
+            }
             $output->writeln(sprintf('<info>%s</info>', $resource->getEntityClass()));
-            $output->writeln(
-                $this->convertResourceAttributesToString(
-                    $this->getResourceAttributes($resource, $requestType)
-                )
-            );
+            $attributes = $this->getResourceAttributes($resource, $requestType);
+            if ($upsertAttribute) {
+                $attributes['Upsert Allowed By'] = $upsertAttribute;
+            }
+            $output->writeln($this->convertResourceAttributesToString($attributes));
             if ($isSubresourcesRequested) {
                 $subresourcesText = $this->getEntitySubresourcesText(
                     $this->subresourcesProvider->getSubresources($resource->getEntityClass(), $version, $requestType),
@@ -246,5 +292,53 @@ HELP
             $entityClass,
             $requestType
         );
+    }
+
+    private function isResourceHasAnyOfActions(ApiResource $resource, array $actions): bool
+    {
+        foreach ($actions as $action) {
+            if (!$resource->isExcludedAction($action)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getUpsertAttribute(ApiResource $resource, string $version, RequestType $requestType): ?string
+    {
+        if ($resource->isExcludedAction(ApiAction::CREATE) && $resource->isExcludedAction(ApiAction::UPDATE)) {
+            return null;
+        }
+
+        $config = $this->configProvider->getConfig(
+            $resource->getEntityClass(),
+            $version,
+            $requestType,
+            [new EntityDefinitionConfigExtra()]
+        )->getDefinition();
+        if (null === $config) {
+            return null;
+        }
+
+        $upsertConfig = $config->getUpsertConfig();
+        if (!$upsertConfig->isEnabled()) {
+            return null;
+        }
+
+        $upsertAttribute = null;
+        if ($upsertConfig->isAllowedById()) {
+            $upsertAttribute .= $this->convertValueToString(['id']);
+        }
+        if ($upsertConfig->getFields()) {
+            foreach ($upsertConfig->getFields() as $fieldNames) {
+                if ($upsertAttribute) {
+                    $upsertAttribute .= ', ';
+                }
+                $upsertAttribute .= $this->convertValueToString($fieldNames);
+            }
+        }
+
+        return $upsertAttribute;
     }
 }

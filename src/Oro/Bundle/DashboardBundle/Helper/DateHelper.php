@@ -495,12 +495,6 @@ class DateHelper
     }
 
     /**
-     * @param \DateTimeInterface $start
-     * @param \DateTimeInterface $end
-     * @param int $dateRangeType
-     *
-     * @return string
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getScaleType(\DateTimeInterface $start, \DateTimeInterface $end, int $dateRangeType): string

@@ -10,7 +10,7 @@ interface CreatedAtAwareInterface
     public function getCreatedAt();
 
     /**
-     * @param \DateTime $createdAt
+     * @param \DateTime|null $createdAt
      * @return mixed
      */
     public function setCreatedAt(\DateTime $createdAt = null);

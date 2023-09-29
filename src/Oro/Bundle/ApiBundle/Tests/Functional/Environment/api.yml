@@ -251,6 +251,7 @@ api:
                     name: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
             identifier_field_names: ['key']
+            identifier_description: 'The unique identifier of a resource. It is a key.'
             fields:
                 databaseId:
                     property_path: id
@@ -259,6 +260,19 @@ api:
                     key:
                         allow_array: true
                     name: ~
+            actions:
+                update_list: true
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIntIdentifier:
+            identifier_field_names: ['key']
+            fields:
+                databaseId:
+                    property_path: id
+            filters:
+                fields:
+                    key: ~
+                    name: ~
+            actions:
+                update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomCompositeIdentifier:
             identifier_field_names: ['key1', 'key2']
             fields:
@@ -267,6 +281,13 @@ api:
             filters:
                 fields:
                     name: ~
+            actions:
+                update_list: true
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestUniqueKeyIdentifier:
+            upsert:
+                add: [['key7'], ['parent', 'key6'], ['children', 'key6']]
+            actions:
+                update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
             fields:
                 fieldPercent100:

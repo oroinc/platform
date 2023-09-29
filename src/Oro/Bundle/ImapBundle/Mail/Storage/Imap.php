@@ -121,10 +121,10 @@ class Imap extends \Laminas\Mail\Storage\Imap
             throw new InvalidArgumentException('need at least user in params');
         }
 
-        $host     = isset($params->host)     ? $params->host     : 'localhost';
+        $host     = isset($params->host) ? $params->host : 'localhost';
         $password = isset($params->password) ? $params->password : '';
-        $port     = isset($params->port)     ? $params->port     : null;
-        $ssl      = isset($params->ssl)      ? $params->ssl      : false;
+        $port     = isset($params->port) ? $params->port : null;
+        $ssl      = isset($params->ssl) ? $params->ssl : false;
 
         try {
             $this->protocol = new ProtocolImap();

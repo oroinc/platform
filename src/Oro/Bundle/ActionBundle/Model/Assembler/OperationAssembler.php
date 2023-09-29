@@ -5,9 +5,13 @@ namespace Oro\Bundle\ActionBundle\Model\Assembler;
 use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
+/**
+ * Factory for Operation class
+ */
 class OperationAssembler extends AbstractAssembler
 {
     /** @var ActionFactoryInterface */
@@ -22,16 +26,20 @@ class OperationAssembler extends AbstractAssembler
     /** @var FormOptionsAssembler */
     private $formOptionsAssembler;
 
+    private OptionsResolver $optionsResolver;
+
     public function __construct(
         ActionFactoryInterface $actionFactory,
         ConditionFactory $conditionFactory,
         AttributeAssembler $attributeAssembler,
-        FormOptionsAssembler $formOptionsAssembler
+        FormOptionsAssembler $formOptionsAssembler,
+        OptionsResolver $optionsResolver
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->attributeAssembler = $attributeAssembler;
         $this->formOptionsAssembler = $formOptionsAssembler;
+        $this->optionsResolver = $optionsResolver;
     }
 
     /**
@@ -46,6 +54,7 @@ class OperationAssembler extends AbstractAssembler
             $this->conditionFactory,
             $this->attributeAssembler,
             $this->formOptionsAssembler,
+            $this->optionsResolver,
             $this->assembleDefinition($name, $configuration)
         );
     }

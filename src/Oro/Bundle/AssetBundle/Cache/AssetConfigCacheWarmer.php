@@ -22,7 +22,7 @@ class AssetConfigCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritdoc}
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return false;
     }
@@ -30,8 +30,9 @@ class AssetConfigCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         $this->cache->warmUp($cacheDir);
+        return [];
     }
 }

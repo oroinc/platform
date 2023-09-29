@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\IntegrationBundle\Command;
@@ -117,7 +118,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Started integration sync scheduling');
         $connector = $input->getOption('connector');
@@ -165,7 +166,7 @@ HELP
         }
         $output->writeln('Integration sync scheduling complete');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

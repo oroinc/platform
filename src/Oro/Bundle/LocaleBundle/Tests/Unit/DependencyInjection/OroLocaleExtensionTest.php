@@ -13,6 +13,7 @@ class OroLocaleExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoad(): void
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroLocaleExtension();
         $extension->load([], $container);

@@ -2,27 +2,21 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadParentEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\AclProtectedEntityLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
-use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdHelper */
-    private $entityIdHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryAclHelper */
-    private $queryAclHelper;
+    /** @var AclProtectedEntityLoader|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityLoader;
 
     /** @var LoadParentEntity */
     private $processor;
@@ -32,24 +26,19 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         parent::setUp();
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->entityIdHelper = $this->createMock(EntityIdHelper::class);
-        $this->queryAclHelper = $this->createMock(QueryAclHelper::class);
+        $this->entityLoader = $this->createMock(AclProtectedEntityLoader::class);
 
-        $this->processor = new LoadParentEntity(
-            $this->doctrineHelper,
-            $this->entityIdHelper,
-            $this->queryAclHelper
-        );
+        $this->processor = new LoadParentEntity($this->doctrineHelper, $this->entityLoader);
     }
 
-    public function testProcessWhenParentEntityIsAlreadyLoaded()
+    public function testProcessWhenParentEntityIsAlreadyLoaded(): void
     {
         $parentEntity = new \stdClass();
 
         $this->doctrineHelper->expects(self::never())
             ->method('getManageableEntityClass');
-        $this->doctrineHelper->expects(self::never())
-            ->method('createQueryBuilder');
+        $this->entityLoader->expects(self::never())
+            ->method('findEntity');
 
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
@@ -57,7 +46,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($parentEntity, $this->context->getParentEntity());
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $parentClass = 'Test\Class';
         $parentConfig = new EntityDefinitionConfig();
@@ -66,8 +55,8 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
             ->method('getManageableEntityClass')
             ->with($parentClass, $parentConfig)
             ->willReturn(null);
-        $this->doctrineHelper->expects(self::never())
-            ->method('createQueryBuilder');
+        $this->entityLoader->expects(self::never())
+            ->method('findEntity');
 
         $this->context->setParentClassName($parentClass);
         $this->context->setParentConfig($parentConfig);
@@ -76,7 +65,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertFalse($this->context->hasParentEntity());
     }
 
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $parentClass = 'Test\Class';
         $parentId = 123;
@@ -89,23 +78,15 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
             ->with($parentClass, $parentConfig)
             ->willReturn($parentClass);
 
-        $qb = $this->createMock(QueryBuilder::class);
-        $this->doctrineHelper->expects(self::once())
-            ->method('createQueryBuilder')
-            ->with($parentClass, 'e')
-            ->willReturn($qb);
-
-        $this->entityIdHelper->expects(self::once())
-            ->method('applyEntityIdentifierRestriction')
-            ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
-
-        $query = $this->createMock(AbstractQuery::class);
-        $this->queryAclHelper->expects(self::once())
-            ->method('protectQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($parentConfig), $this->context->getRequestType())
-            ->willReturn($query);
-        $query->expects(self::once())
-            ->method('getOneOrNullResult')
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with(
+                $parentClass,
+                $parentId,
+                self::identicalTo($parentConfig),
+                self::identicalTo($parentMetadata),
+                self::identicalTo($this->context->getRequestType())
+            )
             ->willReturn($parentEntity);
 
         $this->context->setParentClassName($parentClass);
@@ -117,7 +98,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($parentEntity, $this->context->getParentEntity());
     }
 
-    public function testProcessForManageableEntityWhenEntityNotFound()
+    public function testProcessForManageableEntityWhenEntityNotFound(): void
     {
         $parentClass = 'Test\Class';
         $parentId = 123;
@@ -128,37 +109,16 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
             ->method('getManageableEntityClass')
             ->with($parentClass, $parentConfig)
             ->willReturn($parentClass);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getEntityIdentifierFieldNamesForClass')
-            ->with($parentClass)
-            ->willReturn(['id']);
 
-        $qb = $this->createMock(QueryBuilder::class);
-        $this->doctrineHelper->expects(self::exactly(2))
-            ->method('createQueryBuilder')
-            ->with($parentClass, 'e')
-            ->willReturn($qb);
-
-        $this->entityIdHelper->expects(self::exactly(2))
-            ->method('applyEntityIdentifierRestriction')
-            ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
-
-        $query = $this->createMock(AbstractQuery::class);
-        $this->queryAclHelper->expects(self::once())
-            ->method('protectQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($parentConfig), $this->context->getRequestType())
-            ->willReturn($query);
-        $query->expects(self::once())
-            ->method('getOneOrNullResult')
-            ->willReturn(null);
-
-        $notAclProtectedQuery = $this->createMock(AbstractQuery::class);
-        $qb->expects(self::once())
-            ->method('getQuery')
-            ->willReturn($notAclProtectedQuery);
-        $notAclProtectedQuery->expects(self::once())
-            ->method('getOneOrNullResult')
-            ->with(AbstractQuery::HYDRATE_ARRAY)
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with(
+                $parentClass,
+                $parentId,
+                self::identicalTo($parentConfig),
+                self::identicalTo($parentMetadata),
+                self::identicalTo($this->context->getRequestType())
+            )
             ->willReturn(null);
 
         $this->context->setParentClassName($parentClass);
@@ -170,7 +130,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertFalse($this->context->hasParentEntity());
     }
 
-    public function testProcessForManageableEntityWhenNoAccessToEntity()
+    public function testProcessForManageableEntityWhenNoAccessToEntity(): void
     {
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to the parent entity.');
@@ -184,38 +144,17 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
             ->method('getManageableEntityClass')
             ->with($parentClass, $parentConfig)
             ->willReturn($parentClass);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getEntityIdentifierFieldNamesForClass')
-            ->with($parentClass)
-            ->willReturn(['id']);
 
-        $qb = $this->createMock(QueryBuilder::class);
-        $this->doctrineHelper->expects(self::exactly(2))
-            ->method('createQueryBuilder')
-            ->with($parentClass, 'e')
-            ->willReturn($qb);
-
-        $this->entityIdHelper->expects(self::exactly(2))
-            ->method('applyEntityIdentifierRestriction')
-            ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
-
-        $query = $this->createMock(AbstractQuery::class);
-        $this->queryAclHelper->expects(self::once())
-            ->method('protectQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($parentConfig), $this->context->getRequestType())
-            ->willReturn($query);
-        $query->expects(self::once())
-            ->method('getOneOrNullResult')
-            ->willReturn(null);
-
-        $notAclProtectedQuery = $this->createMock(AbstractQuery::class);
-        $qb->expects(self::once())
-            ->method('getQuery')
-            ->willReturn($notAclProtectedQuery);
-        $notAclProtectedQuery->expects(self::once())
-            ->method('getOneOrNullResult')
-            ->with(AbstractQuery::HYDRATE_ARRAY)
-            ->willReturn(['id' => $parentId]);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with(
+                $parentClass,
+                $parentId,
+                self::identicalTo($parentConfig),
+                self::identicalTo($parentMetadata),
+                self::identicalTo($this->context->getRequestType())
+            )
+            ->willThrowException(new AccessDeniedException('No access to the entity.'));
 
         $this->context->setParentClassName($parentClass);
         $this->context->setParentId($parentId);
@@ -226,7 +165,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertFalse($this->context->hasParentEntity());
     }
 
-    public function testProcessForResourceBasedOnManageableEntity()
+    public function testProcessForResourceBasedOnManageableEntity(): void
     {
         $parentClass = 'Test\Class';
         $parentResourceClass = 'Test\ParentResourceClass';
@@ -240,23 +179,15 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
             ->with($parentResourceClass, $parentConfig)
             ->willReturn($parentClass);
 
-        $qb = $this->createMock(QueryBuilder::class);
-        $this->doctrineHelper->expects(self::once())
-            ->method('createQueryBuilder')
-            ->with($parentClass, 'e')
-            ->willReturn($qb);
-
-        $this->entityIdHelper->expects(self::once())
-            ->method('applyEntityIdentifierRestriction')
-            ->with(self::identicalTo($qb), $parentId, self::identicalTo($parentMetadata));
-
-        $query = $this->createMock(AbstractQuery::class);
-        $this->queryAclHelper->expects(self::once())
-            ->method('protectQuery')
-            ->with(self::identicalTo($qb), self::identicalTo($parentConfig), $this->context->getRequestType())
-            ->willReturn($query);
-        $query->expects(self::once())
-            ->method('getOneOrNullResult')
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with(
+                $parentClass,
+                $parentId,
+                self::identicalTo($parentConfig),
+                self::identicalTo($parentMetadata),
+                self::identicalTo($this->context->getRequestType())
+            )
             ->willReturn($parentEntity);
 
         $this->context->setParentClassName($parentResourceClass);

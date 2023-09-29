@@ -77,7 +77,7 @@ HELP
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $builder = $this->getQueryBuilder();
 
@@ -131,7 +131,7 @@ HELP
             $io->text('<info>There are no notification alerts.</info>');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function isSummaryOutput(InputInterface $input): bool

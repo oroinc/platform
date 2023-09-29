@@ -15,7 +15,7 @@ class EntityClass extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'oro_form.entity_class_validator';
     }

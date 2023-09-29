@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
-use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Request\ErrorStatusCodesWithoutContentTrait;
@@ -80,12 +79,10 @@ class ProcessIncludedEntities implements ProcessorInterface
         array $entityRequestData,
         object $entity,
         string $entityClass,
-        string $entityIncludeId,
+        mixed $entityIncludeId,
         IncludedEntityData $entityData
     ): void {
-        $actionProcessor = $this->processorBag->getProcessor(
-            $entityData->isExisting() ? ApiAction::UPDATE : ApiAction::CREATE
-        );
+        $actionProcessor = $this->processorBag->getProcessor($entityData->getTargetAction());
 
         /** @var SingleItemContext|FormContext $actionContext */
         $actionContext = $actionProcessor->createContext();

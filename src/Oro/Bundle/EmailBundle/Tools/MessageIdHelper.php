@@ -31,9 +31,6 @@ class MessageIdHelper
 
     /**
      * Removes angle brackets from message ID.
-     *
-     * @param string $messageId
-     * @return string
      */
     public static function unwrapMessageId(string $messageId): string
     {

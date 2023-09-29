@@ -45,7 +45,7 @@ class SessionsListener extends MinkSessionsListener
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return array(
             FeatureTested::BEFORE   => array('prepareDefaultMinkFeatureSession', 10),

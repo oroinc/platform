@@ -34,7 +34,7 @@ class CustomEntityType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'custom_entity_type';
     }

@@ -162,7 +162,6 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getAttachmentIconClass')
             ->with($this->file);
 
-
         $this->attachmentManager->expects(self::once())
             ->method('getFileUrl')
             ->with($this->file)

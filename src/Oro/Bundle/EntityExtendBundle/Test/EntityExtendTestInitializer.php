@@ -12,12 +12,9 @@ use Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendEntityMetadataProviderInter
  */
 class EntityExtendTestInitializer
 {
-    /**
-     * @return void
-     */
     public static function initialize(): void
     {
-        $entityMetadataProvider = new class implements ExtendEntityMetadataProviderInterface {
+        $entityMetadataProvider = new class() implements ExtendEntityMetadataProviderInterface {
             public function getExtendEntityMetadata(string $class): ?ConfigInterface
             {
                 return null;
@@ -28,7 +25,7 @@ class EntityExtendTestInitializer
                 return [];
             }
         };
-        $entityFieldIterator = new class implements EntityFieldIteratorInterface {
+        $entityFieldIterator = new class() implements EntityFieldIteratorInterface {
             public function getExtensions(): iterable
             {
                 return [];

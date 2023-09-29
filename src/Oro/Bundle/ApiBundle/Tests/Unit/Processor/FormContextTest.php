@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -11,6 +12,9 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FormContextTest extends \PHPUnit\Framework\TestCase
 {
     private FormContext $context;
@@ -28,6 +32,14 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         $requestData = [];
         $this->context->setRequestData($requestData);
         self::assertSame($requestData, $this->context->getRequestData());
+    }
+
+    public function testExisting()
+    {
+        self::assertFalse($this->context->isExisting());
+
+        $this->context->setExisting(true);
+        self::assertTrue($this->context->isExisting());
     }
 
     public function testIncludedData()
@@ -136,6 +148,15 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->skipFormValidation(false);
         self::assertFalse($this->context->isFormValidationSkipped());
+    }
+
+    public function testNormalizedEntityConfigExtras()
+    {
+        self::assertSame([], $this->context->getNormalizedEntityConfigExtras());
+
+        $extras = [$this->createMock(ConfigExtraInterface::class)];
+        $this->context->setNormalizedEntityConfigExtras($extras);
+        self::assertSame($extras, $this->context->getNormalizedEntityConfigExtras());
     }
 
     public function testGetAllEntities()

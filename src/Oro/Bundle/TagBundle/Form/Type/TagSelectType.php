@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\TagBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
@@ -87,7 +88,7 @@ class TagSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_tag_select';
     }
@@ -95,7 +96,7 @@ class TagSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return OroJquerySelect2HiddenType::class;
     }

@@ -65,8 +65,8 @@ class UserApiType extends UserType
                 }
 
                 return $user && $user->getId()
-                    ? ['ProfileAPI', 'Default']
-                    : ['Registration', 'ProfileAPI', 'Default'];
+                    ? ['ProfileAPI', 'UserForm', 'Default']
+                    : ['Registration', 'ProfileAPI', 'UserForm', 'Default'];
             },
         ]);
     }

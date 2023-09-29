@@ -44,7 +44,7 @@ class BatchItem
      *
      * @param OID $oid
      * @param int $state
-     * @param ACL $acl
+     * @param ACL|null $acl
      */
     public function __construct(OID $oid, $state, ACL $acl = null)
     {

@@ -56,8 +56,6 @@ class EmailClient
     }
 
     /**
-     * @param array $options
-     * @return void
      * @throws GuzzleException
      */
     public function purge(array $options = []): void

@@ -256,7 +256,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      * @param EmailFolder           $folder
      * @param bool                  $isSeen
      * @param User|Mailbox          $owner
-     * @param OrganizationInterface $organization
+     * @param OrganizationInterface|null $organization
      *
      * @return EmailUser
      */

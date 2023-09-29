@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActivityBundle\Form\Type;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -26,7 +26,7 @@ class ContextsSelectType extends AbstractType
 {
     const NAME = 'oro_activity_contexts_select';
 
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     protected $entityManager;
 
     /** @var ConfigManager */
@@ -45,19 +45,19 @@ class ContextsSelectType extends AbstractType
     protected $featureChecker;
 
     public function __construct(
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         ConfigManager $configManager,
         TranslatorInterface $translator,
         EventDispatcherInterface $dispatcher,
         EntityNameResolver $entityNameResolver,
         FeatureChecker $featureChecker
     ) {
-        $this->entityManager      = $entityManager;
-        $this->configManager      = $configManager;
-        $this->translator         = $translator;
-        $this->dispatcher         = $dispatcher;
+        $this->entityManager = $entityManager;
+        $this->configManager = $configManager;
+        $this->translator = $translator;
+        $this->dispatcher = $dispatcher;
         $this->entityNameResolver = $entityNameResolver;
-        $this->featureChecker     = $featureChecker;
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -189,7 +189,7 @@ class ContextsSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return Select2HiddenType::class;
     }
@@ -205,7 +205,7 @@ class ContextsSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }

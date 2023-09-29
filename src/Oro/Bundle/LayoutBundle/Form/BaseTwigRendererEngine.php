@@ -44,7 +44,7 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, $resource, $blockName, array $variables = [])
+    public function renderBlock(FormView $view, $resource, $blockName, array $variables = []): string
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 

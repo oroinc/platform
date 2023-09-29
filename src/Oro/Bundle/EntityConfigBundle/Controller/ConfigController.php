@@ -200,7 +200,7 @@ class ConfigController extends AbstractController
                 )) {
                     continue;
                 }
-                $fields[$field['name']] = $field['label'] ? : $field['name'];
+                $fields[$field['name']] = $field['label'] ?: $field['name'];
             }
         }
 
@@ -397,7 +397,7 @@ class ConfigController extends AbstractController
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(
             parent::getSubscribedServices(),

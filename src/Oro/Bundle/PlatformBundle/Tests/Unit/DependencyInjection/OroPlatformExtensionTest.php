@@ -5,6 +5,7 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -85,5 +86,57 @@ class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals($expectedConfig, $containerBuilder->getExtensionConfig('security'));
+    }
+
+    public function testThatWebBackendPrefixIsUsedDefaultWhenParamNotPassed()
+    {
+        $extension = new OroPlatformExtension();
+
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
+
+        $containerBuilder
+            ->expects($this->any())
+            ->method('getExtensionConfig')
+            ->willReturn([]);
+
+        $containerBuilder
+            ->expects($this->once())
+            ->method('hasParameter')
+            ->with($this->equalTo('web_backend_prefix'))
+            ->willReturn(false);
+
+        $containerBuilder
+            ->expects($this->once())
+            ->method('setParameter')
+            ->with($this->equalTo('web_backend_prefix'), $this->equalTo('/admin'))
+            ->willReturn(false);
+
+        $extension->prepend($containerBuilder);
+    }
+
+    public function testThatWebBackendPrefixIsNotUsedDefaultWhenParameterPassed()
+    {
+        $extension = new OroPlatformExtension();
+
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
+
+        $containerBuilder
+            ->expects($this->any())
+            ->method('getExtensionConfig')
+            ->willReturn([]);
+
+        $containerBuilder
+            ->expects($this->once())
+            ->method('hasParameter')
+            ->with($this->equalTo('web_backend_prefix'))
+            ->willReturn(true);
+
+        $containerBuilder
+            ->expects($this->never())
+            ->method('setParameter')
+            ->with($this->equalTo('web_backend_prefix'), $this->equalTo('/admin'))
+            ->willReturn(false);
+
+        $extension->prepend($containerBuilder);
     }
 }

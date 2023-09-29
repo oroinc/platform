@@ -6,6 +6,7 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Configuration;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationProvider;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\ConfigurationProviderStub;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
 
@@ -18,7 +19,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->configurationProvider = new ConfigurationProvider(
+        $this->configurationProvider = new ConfigurationProviderStub(
             $this->getTempFile('QueryDesignerConfigurationProvider'),
             false,
             new Configuration(['string', 'integer', 'number', 'boolean'])
@@ -97,6 +98,15 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                             'option2' => 'val2'
                         ],
                         'init_module'    => 'module1'
+                    ],
+                    'short_money' => [
+                        'applicable'     => [
+                            ['type' => 'string'],
+                            ['type' => 'string']
+                        ],
+                        'type'           => 'string',
+                        'query_type'     => ['all', 'all'],
+                        'template_theme' => 'embedded'
                     ]
                 ]
             ],

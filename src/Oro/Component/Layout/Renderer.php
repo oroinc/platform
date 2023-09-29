@@ -4,6 +4,7 @@ namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Form\FormRendererInterface;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+use Symfony\Component\Form\FormRendererEngineInterface as SymfonyFormRendererEngineInterface;
 use Symfony\Component\Form\FormView;
 
 /**
@@ -31,7 +32,7 @@ class Renderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function getEngine()
+    public function getEngine(): SymfonyFormRendererEngineInterface
     {
         return $this->engine;
     }
@@ -47,7 +48,7 @@ class Renderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderCsrfToken($tokenId)
+    public function renderCsrfToken($tokenId): string
     {
         throw new \LogicException('Method must not be called during layout rendering.');
     }
@@ -55,7 +56,7 @@ class Renderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, $blockName, array $variables = [])
+    public function renderBlock(FormView $view, $blockName, array $variables = []): string
     {
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
@@ -123,7 +124,7 @@ class Renderer implements FormRendererInterface
         $blockNameSuffix,
         array $variables = [],
         $renderParentBlock = false
-    ) {
+    ): string {
         $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
         $viewAndSuffixCacheKey = $viewCacheKey . '_' . $blockNameSuffix;
 
@@ -231,7 +232,7 @@ class Renderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function humanize($text)
+    public function humanize($text): string
     {
         return ucfirst(trim(strtolower(preg_replace(['/([A-Z])/', '/[_\s]+/'], ['_$1', ' '], $text))));
     }

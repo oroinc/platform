@@ -37,8 +37,11 @@ class Serializer extends SymfonySerializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, string $format = null, array $context = [])
-    {
+    public function normalize(
+        $data,
+        string $format = null,
+        array $context = []
+    ): \ArrayObject|array|string|int|float|bool|null {
         if (null === $data || is_scalar($data)) {
             return $data;
         }
@@ -74,7 +77,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, string $format = null, array $context = []): mixed
     {
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');

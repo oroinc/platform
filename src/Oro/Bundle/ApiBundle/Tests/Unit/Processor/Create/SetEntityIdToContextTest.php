@@ -4,9 +4,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\SetEntityIdToContext;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
-class SetEntityIdToContextTest extends FormProcessorTestCase
+class SetEntityIdToContextTest extends CreateProcessorTestCase
 {
     private SetEntityIdToContext $processor;
 
@@ -32,6 +31,26 @@ class SetEntityIdToContextTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals($entityId, $this->context->getId());
+    }
+
+    public function testProcessForExistingEntity(): void
+    {
+        $entityId = 123;
+
+        $metadata = $this->createMock(EntityMetadata::class);
+        $metadata->expects(self::never())
+            ->method('getIdentifierFieldNames');
+        $metadata->expects(self::never())
+            ->method('getIdentifierValue');
+
+        $this->context->setExisting(true);
+        $this->context->setId($entityId);
+        $this->context->setResult(new \stdClass());
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        self::assertEquals($entityId, $this->context->getId());
+        self::assertFalse($this->context->isProcessed(SetEntityIdToContext::OPERATION_NAME));
     }
 
     public function testProcessWhenNoEntity(): void

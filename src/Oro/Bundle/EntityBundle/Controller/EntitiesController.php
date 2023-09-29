@@ -259,7 +259,7 @@ class EntitiesController extends AbstractController
 
         $entityRepository = $em->getRepository($entityClass);
 
-        $record = !$id ? new $entityClass : $entityRepository->find($id);
+        $record = !$id ? new $entityClass() : $entityRepository->find($id);
 
         $form = $this->createForm(
             CustomEntityType::class,
@@ -358,7 +358,7 @@ class EntitiesController extends AbstractController
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(
             parent::getSubscribedServices(),

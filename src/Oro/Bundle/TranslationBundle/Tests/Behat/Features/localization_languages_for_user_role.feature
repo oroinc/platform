@@ -46,7 +46,7 @@ Feature: Localization languages for user role
       | Upload Translation File   |
       | Download Translation File |
       | Install                   |
-    And I should see following actions for English (United States)) in grid:
+    And I should see following actions for English (United States) in grid:
       | Disable                   |
       | Upload Translation File   |
       | Download Translation File |

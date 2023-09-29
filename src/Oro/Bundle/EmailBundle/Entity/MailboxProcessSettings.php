@@ -50,9 +50,6 @@ abstract class MailboxProcessSettings
         return $this->mailbox;
     }
 
-    /**
-     * @param Mailbox $mailbox
-     */
     public function setMailbox(Mailbox $mailbox = null)
     {
         $this->mailbox = $mailbox;

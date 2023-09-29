@@ -29,7 +29,7 @@ class TestVerbosityCommand extends Command
             $output->writeln('Verbosity: ' . $verbosity);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getVerbosity(OutputInterface $output): ?string

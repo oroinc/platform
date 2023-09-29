@@ -88,7 +88,7 @@ class AutoResponseRuleType extends AbstractQueryDesignerType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return static::NAME;
     }

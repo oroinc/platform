@@ -2,6 +2,7 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Department;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Role;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User;
@@ -232,6 +233,248 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
                     'id'     => 456,
                     'name'   => 'user_name2',
                     'groups' => []
+                ]
+            ],
+            $result
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testManyToManyComplex(): void
+    {
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', [123]);
+
+        $this->addQueryExpectation(
+            'SELECT p0_.id AS id_0, p0_.name AS name_1, u1_.id AS id_2, u1_.name AS name_3'
+            . ' FROM product_table p0_'
+            . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id'
+            . ' WHERE p0_.id IN (?)',
+            [
+                [
+                    'id_0'   => 123,
+                    'name_1' => 'product_name1',
+                    'id_2'   => 1,
+                    'name_3' => 'user_name1'
+                ]
+            ],
+            [1 => 123],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->addQueryExpectation(
+            'SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM user_table u0_'
+            . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
+            . ' WHERE u0_.id = ?',
+            [
+                [
+                    'id_0' => 1,
+                    'id_1' => 10
+                ],
+                [
+                    'id_0' => 1,
+                    'id_1' => 20
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->addQueryExpectation(
+            'SELECT p0_.id AS id_0, g1_.id AS id_1, g1_.name AS name_2'
+            . ' FROM product_table p0_'
+            . ' INNER JOIN user_table u2_ ON p0_.owner_id = u2_.id'
+            . ' INNER JOIN rel_user_to_group_table r3_ ON u2_.id = r3_.user_id'
+            . ' INNER JOIN group_table g1_ ON g1_.id = r3_.user_group_id'
+            . ' WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'   => 123,
+                    'id_1'   => 10,
+                    'name_2' => 'group_name1'
+                ],
+                [
+                    'id_0'   => 123,
+                    'id_1'   => 20,
+                    'name_2' => 'group_name2'
+                ]
+            ],
+            [1 => 123],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'     => null,
+                    'name'   => null,
+                    'owner'  => [
+                        'exclude'          => true,
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id'     => null,
+                            'name'   => null,
+                            'groups' => [
+                                'exclusion_policy' => 'all',
+                                'fields'           => [
+                                    'id' => null
+                                ]
+                            ]
+                        ]
+                    ],
+                    'groups' => [
+                        'property_path'    => 'owner.groups',
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id'   => null,
+                            'name' => null
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'     => 123,
+                    'name'   => 'product_name1',
+                    'groups' => [
+                        [
+                            'id'   => 10,
+                            'name' => 'group_name1'
+                        ],
+                        [
+                            'id'   => 20,
+                            'name' => 'group_name2'
+                        ]
+                    ]
+                ]
+            ],
+            $result
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testOneToManyComplex(): void
+    {
+        $qb = $this->em->getRepository(Department::class)->createQueryBuilder('e')
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', [123]);
+
+        $this->addQueryExpectation(
+            'SELECT d0_.id AS id_0, d0_.name AS name_1, u1_.id AS id_2, u1_.name AS name_3'
+            . ' FROM department_table d0_'
+            . ' LEFT JOIN user_table u1_ ON d0_.owner_id = u1_.id'
+            . ' WHERE d0_.id IN (?)',
+            [
+                [
+                    'id_0'   => 123,
+                    'name_1' => 'department_name1',
+                    'id_2'   => 1,
+                    'name_3' => 'user_name1'
+                ]
+            ],
+            [1 => 123],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->addQueryExpectation(
+            'SELECT u0_.id AS id_0, p1_.id AS id_1'
+            . ' FROM product_table p1_'
+            . ' INNER JOIN user_table u0_ ON p1_.owner_id = u0_.id'
+            . ' WHERE u0_.id = ?',
+            [
+                [
+                    'id_0' => 1,
+                    'id_1' => 10
+                ],
+                [
+                    'id_0' => 1,
+                    'id_1' => 20
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->addQueryExpectation(
+            'SELECT d0_.id AS id_0, p1_.id AS id_1, p1_.name AS name_2'
+            . ' FROM product_table p1_'
+            . ' INNER JOIN user_table u2_ ON p1_.owner_id = u2_.id'
+            . ' INNER JOIN department_table d0_ ON u2_.id = d0_.owner_id'
+            . ' WHERE d0_.id = ?',
+            [
+                [
+                    'id_0'   => 123,
+                    'id_1'   => 10,
+                    'name_2' => 'product_name1'
+                ],
+                [
+                    'id_0'   => 123,
+                    'id_1'   => 20,
+                    'name_2' => 'product_name2'
+                ]
+            ],
+            [1 => 123],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'       => null,
+                    'name'     => null,
+                    'owner'    => [
+                        'exclude'          => true,
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id'       => null,
+                            'name'     => null,
+                            'products' => [
+                                'exclusion_policy' => 'all',
+                                'fields'           => [
+                                    'id' => null
+                                ]
+                            ]
+                        ]
+                    ],
+                    'products' => [
+                        'property_path'    => 'owner.products',
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id'   => null,
+                            'name' => null
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'       => 123,
+                    'name'     => 'department_name1',
+                    'products' => [
+                        [
+                            'id'   => 10,
+                            'name' => 'product_name1'
+                        ],
+                        [
+                            'id'   => 20,
+                            'name' => 'product_name2'
+                        ]
+                    ]
                 ]
             ],
             $result

@@ -10,7 +10,7 @@ class FileMimeTypeConfigType extends MimeTypeConfigType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_attachment_mime_types_file';
     }

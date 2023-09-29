@@ -10,8 +10,8 @@
     {% block link %}
         {% set classes = 'icons-holder-text operation-button ' ~ params.buttonOptions.class|default('')|trim ~ ' ' ~ aClass|default('')|trim ~ ' ' ~ params.buttonOptions.aCss|default('')|trim  %}
         {% set classes = classes|split(' ')|array_unique|join(' ') %}
-        <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
-           href="#"
+        <button {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
+           type="button"
            class="{{ classes }}"
            {% if linkTitle is not empty %}
                title="{{ linkTitle }}"
@@ -40,7 +40,7 @@
                 <span class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text" aria-hidden="true"></span>
             {% endif %}
             {{ linkLabel|trim }}
-        </a>
+        </button>
     {% endblock %}
     {% if not onlyLink|default(false) %}</div>{% endif %}
 {% endblock %}

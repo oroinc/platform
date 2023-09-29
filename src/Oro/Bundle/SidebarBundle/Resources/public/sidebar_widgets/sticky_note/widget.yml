@@ -6,6 +6,4 @@ placement: "both"
 cssClass: 'sidebar-widget-sticky-note'
 description: oro.sidebar.sticky_note_widget.description
 settings:
-    content: |
-        Welcome to OroCRM!
-        OroCRM is an easy-to-use, open source CRM with built-in marketing tools for your ecommerce business. learn more at www.orocrm.com
+    content: 'Click “Configure“ to update this note.'

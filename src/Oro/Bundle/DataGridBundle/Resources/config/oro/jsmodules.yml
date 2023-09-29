@@ -92,7 +92,7 @@ dynamic-imports:
         - orodatagrid/js/app/plugins/grid-component/board-appearance-plugin
         - orodatagrid/js/app/plugins/grid/accessibility-plugin
         - orodatagrid/js/app/plugins/grid/datagrid-settings-plugin
-        - orodatagrid/js/app/plugins/grid/floating-header-plugin
+        - orodatagrid/js/app/plugins/grid/sticky-header-plugin
         - orodatagrid/js/app/plugins/grid/fullscreen-plugin
         - orodatagrid/js/app/plugins/grid/inline-editing-plugin
         - orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin

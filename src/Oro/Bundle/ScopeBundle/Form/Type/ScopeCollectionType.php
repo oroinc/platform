@@ -3,9 +3,15 @@
 namespace Oro\Bundle\ScopeBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Scope collection type.
+ */
 class ScopeCollectionType extends AbstractType
 {
     const NAME = 'oro_scope_collection';
@@ -13,9 +19,20 @@ class ScopeCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return CollectionType::class;
+    }
+
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function ($event) {
+            $collectionForm = $event->getForm();
+            $constraints = $collectionForm->getConfig()->getOption('scope_constraints', []);
+            foreach ($collectionForm as $index => $scopeForm) {
+                FormUtils::mergeFieldOptionsRecursive($collectionForm, $index, ['constraints' => $constraints]);
+            }
+        }, -255);
     }
 
     /**
@@ -27,7 +44,8 @@ class ScopeCollectionType extends AbstractType
             [
                 'entry_type' => ScopeType::class,
                 'error_bubbling' => false,
-                'handle_primary' => false
+                'handle_primary' => false,
+                'scope_constraints' => [],
             ]
         );
     }
@@ -43,7 +61,7 @@ class ScopeCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }

@@ -21,7 +21,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
     private const INCLUDE_ID_META = 'includeId';
     private const INCLUDE_ID_PROPERTY = '__include_id__';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
+    /** @var ActionProcessorBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $processorBag;
 
     /** @var ParameterBag */
@@ -61,6 +61,86 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $includedEntity->setId(111);
         $includedEntityClass = Group::class;
         $includedEntityId = 'testId';
+        $includedRealEntityId = $includedEntity->getId();
+        $includedEntityData = new IncludedEntityData('/included/0', 0);
+        $includedEntities->add($includedEntity, $includedEntityClass, $includedEntityId, $includedEntityData);
+
+        $createMetadata = new EntityMetadata('Test\Entity');
+        $createMetadata->setIdentifierFieldNames(['id']);
+        $includedEntityData->setMetadata($createMetadata);
+
+        $getResult = ['normalizedKey' => 'normalizedValue'];
+        $getMetadata = new EntityMetadata('Test\Entity');
+        $getMetadata->set('metadata_key', 'metadata_value');
+
+        $getContext = new GetContext($this->configProvider, $this->metadataProvider);
+        $getContext->setMetadata($getMetadata);
+        $getProcessor = $this->createMock(ActionProcessorInterface::class);
+
+        $this->processorBag->expects(self::once())
+            ->method('getProcessor')
+            ->with(ApiAction::GET)
+            ->willReturn($getProcessor);
+        $getProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn($getContext);
+
+        $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
+        $expectedGetContext->setVersion($this->context->getVersion());
+        $expectedGetContext->getRequestType()->set($this->context->getRequestType());
+        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setCorsRequest(false);
+        $expectedGetContext->setHateoas(true);
+        $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedGetContext->setSharedData($this->sharedData);
+        $expectedGetContext->setClassName($includedEntityClass);
+        $expectedGetContext->setId($includedRealEntityId);
+        $expectedGetContext->setResult($includedEntity);
+        $expectedGetContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
+        $expectedGetContext->skipGroup(ApiActionGroup::NORMALIZE_RESULT);
+        $expectedGetContext->setSoftErrorsHandling(true);
+        $expectedGetContext->setMetadata($getMetadata);
+
+        $getProcessor->expects(self::once())
+            ->method('process')
+            ->with(self::identicalTo($getContext))
+            ->willReturnCallback(function (GetContext $context) use ($expectedGetContext, $getResult) {
+                self::assertEquals($expectedGetContext, $context);
+
+                $context->setResult($getResult);
+            });
+
+        $this->context->setIncludedData(['key' => 'value']);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->context->setClassName('Test\Entity');
+        $this->context->setId(123);
+        $this->context->setMasterRequest(true);
+        $this->context->setCorsRequest(true);
+        $this->context->setHateoas(true);
+        $this->context->getRequestHeaders()->set('test-header', 'some value');
+
+        $this->processor->process($this->context);
+
+        self::assertSame(
+            array_merge($getResult, [self::INCLUDE_ID_PROPERTY => $includedEntityId]),
+            $includedEntityData->getNormalizedData()
+        );
+        $metadata = $includedEntityData->getMetadata();
+        self::assertSame($getMetadata, $metadata);
+        self::assertTrue($metadata->hasMetaProperty(self::INCLUDE_ID_PROPERTY));
+        self::assertEquals(
+            self::INCLUDE_ID_META,
+            $metadata->getMetaProperty(self::INCLUDE_ID_PROPERTY)->getResultName()
+        );
+    }
+
+    public function testProcessForNewIncludedEntityWhenGetActionSuccessForCompositeId()
+    {
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntity = new Group();
+        $includedEntity->setId(111);
+        $includedEntityClass = Group::class;
+        $includedEntityId = ['id' => 'testId'];
         $includedRealEntityId = $includedEntity->getId();
         $includedEntityData = new IncludedEntityData('/included/0', 0);
         $includedEntities->add($includedEntity, $includedEntityClass, $includedEntityId, $includedEntityData);

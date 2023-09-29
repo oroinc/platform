@@ -133,3 +133,8 @@ $dialog-buttons-inner-border: 0 !default;
 
 $ui-widget-overlay-z-index: 150 !default;
 $ui-widget-overlay-background-color: rgba(255 255 255 / 50%) !default;
+
+$dialog-sticky-offset: 8px !default;
+$dialog-datagrid-sticky-shadow:
+    0 6px 6px -4px rgba(0, 0, 0, .5),
+    0 -8px #fff !default;

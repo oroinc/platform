@@ -73,6 +73,7 @@ configs:
     oroui/js/messenger: {}
     oroui/js/modal: {}
     oroui/js/tools/scroll-helper: {}
+    oroui/js/extend/underscore: {}
 dynamic-imports:
     commons:
         - controllers/page-controller

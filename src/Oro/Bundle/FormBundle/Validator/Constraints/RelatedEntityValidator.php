@@ -4,6 +4,9 @@ namespace Oro\Bundle\FormBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Validates that the given value is a valid related entity.
+ */
 class RelatedEntityValidator extends EntityClassValidator
 {
     /**
@@ -29,7 +32,7 @@ class RelatedEntityValidator extends EntityClassValidator
     /**
      * {@inheritdoc}
      */
-    protected function formatValue($value, $format = 0)
+    protected function formatValue($value, $format = 0): string
     {
         if (is_array($value) && array_key_exists('id', $value) && array_key_exists('entity', $value)) {
             return sprintf(

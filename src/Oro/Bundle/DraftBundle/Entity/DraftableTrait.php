@@ -74,9 +74,6 @@ trait DraftableTrait
         return $this->draftSource;
     }
 
-    /**
-     * @return User
-     */
     public function getDraftOwner(): ?User
     {
         return $this->draftOwner;

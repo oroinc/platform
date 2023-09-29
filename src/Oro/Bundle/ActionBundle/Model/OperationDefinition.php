@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+/**
+ * Contains operation properties from operation config
+ */
 class OperationDefinition
 {
     const PREACTIONS = 'preactions';
@@ -17,7 +20,10 @@ class OperationDefinition
     /** @var string */
     private $label;
 
-    /** @var boolean */
+    /**
+     * The string is used for dynamic resolving by variable
+     * @var bool|string
+     */
     private $enabled = true;
 
     /** @var boolean */
@@ -111,7 +117,6 @@ class OperationDefinition
     }
 
     /**
-     * @param boolean $enabled
      * @return $this
      */
     public function setEnabled($enabled)
@@ -121,10 +126,7 @@ class OperationDefinition
         return $this;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isEnabled()
+    public function getEnabled()
     {
         return $this->enabled;
     }

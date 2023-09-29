@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOptions;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiSelectGuesser;
 use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
@@ -31,7 +31,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
     {
         $metadata = $this->createMock(ClassMetadata::class);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
@@ -60,7 +60,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
     {
         $metadata = $this->createMock(ClassMetadata::class);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
@@ -173,7 +173,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
         $targetMetadata = new ClassMetadata('\oro\target');
         $targetMetadata->identifier = ['id'];
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
@@ -231,7 +231,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
         $targetMetadata = new ClassMetadata('\oro\target');
         $targetMetadata->identifier = ['id'];
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')

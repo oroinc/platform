@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ImportExportBundle\Command\Cron;
@@ -63,7 +64,7 @@ HELP
 
         $output->writeln(sprintf('<info>Were removed "%s" files.</info>', count($files)));
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

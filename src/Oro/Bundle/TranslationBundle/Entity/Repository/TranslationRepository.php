@@ -118,7 +118,6 @@ class TranslationRepository extends EntityRepository
         return $qb->getQuery()->getArrayResult();
     }
 
-
     /**
      * @param int $languageId
      * @return array

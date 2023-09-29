@@ -13,6 +13,7 @@ use Oro\Bundle\UserBundle\Exception\ImpersonationAuthenticationException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
@@ -124,7 +125,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
     /**
      * {@inheritdoc}
      */
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authException = null): Response
     {
         if ($authException) {
             $request->getSession()->set(Security::AUTHENTICATION_ERROR, $authException);
@@ -170,7 +171,6 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
     }
 
     /**
-     * @param  Impersonation $impersonation
      * @throws AuthenticationCredentialsNotFoundException when token is not found
      * @throws CustomUserMessageAuthenticationException when token is already used
      * @throws CustomUserMessageAuthenticationException when token is expired

@@ -109,7 +109,7 @@ class EntityConfigModel extends ConfigModel
     }
 
     /**
-     * @param  callable $filter function (FieldConfigModel $model)
+     * @param \Closure|null $filter function (FieldConfigModel $model)
      * @return ArrayCollection|FieldConfigModel[]
      */
     public function getFields(\Closure $filter = null)

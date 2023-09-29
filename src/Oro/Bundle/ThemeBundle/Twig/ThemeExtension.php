@@ -64,7 +64,7 @@ class ThemeExtension extends AbstractExtension implements ServiceSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             ThemeRegistry::class

@@ -26,12 +26,8 @@
                 and oro_config_value('oro_data_grid.full_screen_layout_enabled') %}
             {% set metaData = metaData|merge({enableFullScreenLayout: true}) %}
         {% endif %}
-        {% if renderParams.enableFloatingHeaderPlugin is defined %}
-            {% set metaData = metaData|merge({enableFloatingHeaderPlugin: renderParams.enableFloatingHeaderPlugin}) %}
-        {% else %}
-            {% set metaData = metaData|merge({enableFloatingHeaderPlugin: isMobileVersion()}) %}
-        {% endif %}
         {% set metaData = metaData|merge({
+            enableStickyHeaderPlugin: renderParams.enableStickyHeaderPlugin ?? true,
             responsiveGrids: {
                 enable: renderParams.responsiveGrids.enable|default(false)
             },

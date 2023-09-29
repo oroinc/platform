@@ -8,7 +8,7 @@ interface CurrencyQueryBuilderTransformerInterface
 {
     /**
      * @param string       $originalFieldName
-     * @param QueryBuilder $qb
+     * @param QueryBuilder|null $qb
      * @param null         $rootAlias
      * @param null         $newFieldName
      *

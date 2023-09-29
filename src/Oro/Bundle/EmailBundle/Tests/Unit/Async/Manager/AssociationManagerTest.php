@@ -4,9 +4,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Async\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -17,8 +17,8 @@ class AssociationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var EmailActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailActivityManager;
+    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $activityManager;
 
     /** @var EmailOwnersProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $emailOwnersProvider;
@@ -35,14 +35,14 @@ class AssociationManagerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->emailActivityManager = $this->createMock(EmailActivityManager::class);
+        $this->activityManager = $this->createMock(ActivityManager::class);
         $this->emailOwnersProvider = $this->createMock(EmailOwnersProvider::class);
         $this->emailManager = $this->createMock(EmailManager::class);
         $this->producer = $this->createMock(MessageProducerInterface::class);
 
         $this->associationManager = new AssociationManager(
             $this->doctrineHelper,
-            $this->emailActivityManager,
+            $this->activityManager,
             $this->emailOwnersProvider,
             $this->emailManager,
             $this->producer
@@ -61,7 +61,7 @@ class AssociationManagerTest extends \PHPUnit\Framework\TestCase
     ) {
         $owner = new \stdClass();
         $entityRepository = $this->createMock(EntityRepository::class);
-        $entityManager= $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManager::class);
 
         $entityRepository->expects(self::once())
             ->method('find')
@@ -80,12 +80,13 @@ class AssociationManagerTest extends \PHPUnit\Framework\TestCase
             ->method('findEmailsByIds')
             ->willReturn($emails);
 
-        $this->emailActivityManager->expects(self::exactly(count($ids)))
-            ->method('addAssociation')
+        $this->activityManager->expects(self::exactly(count($ids)))
+            ->method('addActivityTarget')
             ->willReturn($addAssociation);
 
         $this->doctrineHelper->expects(self::once())
-            ->method('getEntityManager')
+            ->method('getEntityManagerForClass')
+            ->with(Email::class)
             ->willReturn($entityManager);
 
         $countNewAssociations = $this->associationManager->processAddAssociation($ids, $targetClass, $targetId);

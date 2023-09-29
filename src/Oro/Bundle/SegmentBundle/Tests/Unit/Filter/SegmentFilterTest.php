@@ -5,7 +5,6 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Filter;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -76,7 +75,7 @@ class SegmentFilterTest extends OrmTestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $extendConfigProvider;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var SubQueryLimitHelper|\PHPUnit\Framework\MockObject\MockObject */
@@ -90,7 +89,7 @@ class SegmentFilterTest extends OrmTestCase
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::any())
             ->method('trans')

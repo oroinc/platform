@@ -77,7 +77,7 @@ class PhoneExtension extends AbstractExtension implements ServiceSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_address.provider.phone' => PhoneProviderInterface::class,

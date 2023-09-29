@@ -56,7 +56,7 @@ class TransitionIsAllowed extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return TransitionIsAllowedValidator::ALIAS;
     }
@@ -64,7 +64,7 @@ class TransitionIsAllowed extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;
     }

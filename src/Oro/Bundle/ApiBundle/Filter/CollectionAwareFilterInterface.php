@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Filter;
 interface CollectionAwareFilterInterface
 {
     /**
-     * Sets a flag indicates whether the filter represents a collection valued association.
+     * Sets a flag indicates whether the filter is applied to a collection valued association.
      */
     public function setCollection(bool $collection): void;
 }

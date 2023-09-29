@@ -57,23 +57,24 @@ class OroMainContext extends MinkContext implements
     SessionAliasProviderAwareInterface,
     AppKernelAwareInterface
 {
-    const SKIP_WAIT_PATTERN = '/'.
-        '^(?:|I )should see .+ flash message$|'.
-        '^(?:|I )should see .+ flash message and I close it$|'.
-        '^(?:|I )should see .+ error message$|'.
-        '^(?:|I )should see success message with number of records were deleted$|'.
-        '^(?:|I )should see Schema updated flash message$'.
-    '/';
+    use AssertTrait;
+    use PageObjectDictionary;
+    use SessionAliasProviderAwareTrait;
+    use SpinTrait;
+    use AppKernelAwareTrait;
+    use ScreenshotTrait;
 
-    use AssertTrait,
-        PageObjectDictionary,
-        SessionAliasProviderAwareTrait,
-        SpinTrait,
-        AppKernelAwareTrait,
-        ScreenshotTrait;
+    const SKIP_WAIT_PATTERN = '/' .
+        '^(?:|I )should see .+ flash message$|' .
+        '^(?:|I )should see .+ flash message and I close it$|' .
+        '^(?:|I )should see .+ error message$|' .
+        '^(?:|I )should see success message with number of records were deleted$|' .
+        '^(?:|I )should see Schema updated flash message$' .
+    '/';
 
     private ?Stopwatch $stopwatch = null;
     private bool $debug = false;
+    private string $rememberedURL = '';
 
     /**
      * @BeforeScenario
@@ -776,11 +777,10 @@ class OroMainContext extends MinkContext implements
      * @param string $session
      * @param string $alias
      * @param string $credential
-     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::switchToActorWindowSession
+     * @see OroMainContext::switchToActorWindowSession
      *
      * @Given /^(?:|I )login as "(?P<credential>(?:[^"]|\\")*)" and use in (?P<session>\w+) as (?P<alias>\w+)$/
      * @Given /^(?:|I )login as administrator and use in "(?P<session>[^"]*)" as "(?P<alias>[^"]*)"$/
-     *
      */
     public function loginAsUserWithPasswordInSession($session, $alias, $credential = 'admin')
     {
@@ -859,7 +859,6 @@ class OroMainContext extends MinkContext implements
         } else {
             $element = $this->findElementContains($selector, $title);
         }
-
 
         self::assertTrue(
             $element->isValid(),
@@ -1916,8 +1915,8 @@ JS;
     /**
      * Switch to named session window (aliases must be initialized earlier)
      * @param string $sessionAlias
-     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::sessionsInit
-     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::loginAsUserWithPasswordInSession
+     * @see OroMainContext::sessionsInit
+     * @see OroMainContext::loginAsUserWithPasswordInSession
      * To define session aliases
      *
      * Example1: I operate as the Manager
@@ -1932,7 +1931,7 @@ JS;
      * @Then /^I proceed as the ([^"]*)$/
      * @Then /^I switch to the "([^"]*)" session$/
      *
-     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::iOperateAsActorUnderSession
+     * @see OroMainContext::iOperateAsActorUnderSession
      */
     public function switchToActorWindowSession($sessionAlias)
     {
@@ -2393,8 +2392,6 @@ JS;
      * Example: And I press "Esc" key on "Default Addresses" element
      *
      * @When /^(?:|I )press "(?P<key>[^"]*)" key on "(?P<elementName>[\w\s]*)" element$/
-     * @param string $key
-     * @param string $elementName
      */
     public function pressKeyboardKey(string $key, string $elementName)
     {
@@ -2414,6 +2411,8 @@ JS;
             'ArrowDown' => 40,
             'Insert' => 45,
             'Delete' => 46,
+            'Z' => 90,
+            'Y' => 89
         ];
 
         $parts = explode("+", $key);
@@ -2445,8 +2444,6 @@ JS;
      * Example: Then I should see "Some" element focused
      *
      * @Then /^(?:|I )should see "(?P<elementName>[\w\s]*)" element focused$/
-     *
-     * @param string $elementName
      */
     public function iShouldSeeElementFocused(string $elementName)
     {
@@ -2462,8 +2459,6 @@ JS;
      * Example: Then I should not see "Some" element focused
      *
      * @Then /^(?:|I )should not see "(?P<elementName>[\w\s]*)" element focused$/
-     *
-     * @param string $elementName
      */
     public function iShouldNotSeeElementFocused(string $elementName)
     {
@@ -2479,8 +2474,6 @@ JS;
      * Example: Then I should see focus within "Some" element
      *
      * @Then /^(?:|I )should see focus within "(?P<elementName>[\w\s]*)" element$/
-     *
-     * @param string $elementName
      */
     public function iShouldSeeFocusWithinElement(string $elementName)
     {
@@ -2495,8 +2488,6 @@ JS;
      * Example: Then I should not see focus within "Some" element
      *
      * @Then /^(?:|I )should not see focus within "(?P<elementName>[\w\s]*)" element$/
-     *
-     * @param string $elementName
      */
     public function iShouldNotSeeFocusWithinElement(string $elementName)
     {
@@ -3089,13 +3080,15 @@ JS;
     public function iSeeElementGoesAfterAnother(string $element1Name, string $element2Name)
     {
         $element1 = $this->createElement($this->fixStepArgument($element1Name));
-        $this->assertTrue($element1->isValid(), sprintf('Element %s is not found', $element1Name));
+        $this->assertTrue($element1->isValid(), sprintf('Element %s not found', $element1Name));
 
         $element2 = $this->createElement($this->fixStepArgument($element2Name));
-        $this->assertTrue($element2->isValid(), sprintf('Element %s is not found', $element2Name));
+        $this->assertTrue($element2->isValid(), sprintf('Element %s not found', $element2Name));
 
         $page = $this->getSession()->getPage();
         $nextElement = $page->find('xpath', $element2->getXpath() . '/following-sibling::*');
+        $this->assertTrue($nextElement->isValid(), sprintf('Next element for %s not found', $element2Name));
+
         $this->assertEquals(
             $element1->getOuterHtml(),
             $nextElement->getOuterHtml(),
@@ -3112,6 +3105,58 @@ JS;
     public function assertPageMatchesRegexp(string $pattern): void
     {
         $this->assertSession()->pageTextMatches($this->fixStepArgument($pattern));
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should not see "Product 1" and continue checking the condition is met for maximum 10 seconds
+     *
+     * @Then /^(?:|I )should not see "(?P<text>.*)" and continue checking the condition is met for maximum (?P<number>\d+) seconds$/
+     */
+    public function assertPageNotContainsTextWithWait($number, $text)
+    {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            try {
+                $context->assertSession()->pageTextNotContains($this->fixStepArgument($text));
+
+                return true;
+            } catch (\Exception $e) {
+                $this->getSession()->reload();
+
+                return false;
+            }
+        }, $number, 2000000);
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was found in the text of the current page.', $text)
+        );
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should see "Product 1" and continue checking the condition is met for maximum 10 seconds
+     *
+     * @Then /^(?:|I )should see "(?P<text>.*)" and continue checking the condition is met for maximum (?P<number>\d+) seconds$/
+     */
+    public function assertPageContainsTextWithWait($number, $text)
+    {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            try {
+                $context->assertSession()->pageTextContains($this->fixStepArgument($text));
+
+                return true;
+            } catch (\Exception $e) {
+                $this->getSession()->reload();
+
+                return false;
+            }
+        }, $number, 2000000);
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was not found in the text of the current page.', $text)
+        );
     }
 
     /**
@@ -3180,13 +3225,34 @@ JS;
      * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" if present$/
      *
      * @param string $button
-     * @throws \Behat\Mink\Exception\ElementNotFoundException
+     * @throws ElementNotFoundException
      */
     public function pressButtonIfPresent($button)
     {
         if ($this->isElementVisible($button)) {
             $this->pressButton($button);
         }
+    }
+
+    /**
+     * And I remember current URL
+     *
+     * @Then /^(?:|I )remember current URL$/
+     */
+    public function rememberURL(): void
+    {
+        $session = $this->getMink()->getSession();
+        $this->rememberedURL = $session->getCurrentUrl();
+    }
+
+    /**
+     * And I follow remembered URL
+     *
+     * @Then /^(?:|I )follow remembered URL$/
+     */
+    public function followRememberedUrl(): void
+    {
+        $this->visitPath($this->rememberedURL);
     }
 
     /**

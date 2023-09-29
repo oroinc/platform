@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroNavigationBundle_Entity_MenuUpdate;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
@@ -81,6 +82,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
  * @method MenuUpdate getDescription(Localization $localization = null)
  * @method MenuUpdate getDefaultDescription()
  * @method MenuUpdate setDefaultDescription($value)
+ * @mixin OroNavigationBundle_Entity_MenuUpdate
  */
 class MenuUpdate implements
     MenuUpdateInterface,

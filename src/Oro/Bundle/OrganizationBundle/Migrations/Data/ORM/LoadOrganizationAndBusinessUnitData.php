@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
@@ -7,6 +8,9 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
+/**
+ * Loads default organization and business unit
+ */
 class LoadOrganizationAndBusinessUnitData extends AbstractFixture implements OrderedFixtureInterface
 {
     const MAIN_ORGANIZATION  = 'default';

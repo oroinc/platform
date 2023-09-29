@@ -9,9 +9,6 @@ class TransitionTemplate extends WorkflowTemplate
 {
     const NAME = 'transition';
 
-    /**
-     * @return string
-     */
     public function getTemplate(): string
     {
         return parent::getTemplate() . '.transition.{{ transition_name }}';

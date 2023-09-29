@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ImapBundle\Command\Cron;
@@ -54,7 +55,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>Process the invalid credentials origins</info>');
         $processedOrigins = $this->syncCredentialsIssueManager->processInvalidOrigins();
@@ -78,6 +79,6 @@ HELP
             );
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

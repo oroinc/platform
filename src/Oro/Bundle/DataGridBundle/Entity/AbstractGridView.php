@@ -271,7 +271,7 @@ abstract class AbstractGridView implements ViewInterface
     }
 
     /**
-     * @param AbstractUser $owner
+     * @param AbstractUser|null $owner
      *
      * @return $this
      */
@@ -357,7 +357,7 @@ abstract class AbstractGridView implements ViewInterface
     /**
      * Set organization
      *
-     * @param OrganizationInterface $organization
+     * @param OrganizationInterface|null $organization
      *
      * @return $this
      */

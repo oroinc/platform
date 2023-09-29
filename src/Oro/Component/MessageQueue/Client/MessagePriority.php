@@ -14,7 +14,6 @@ class MessagePriority
     public const HIGH = 'oro.message_queue.client.high_message_priority';
     public const VERY_HIGH = 'oro.message_queue.client.very_high_message_priority';
 
-    /** @var array */
     public static array $map = [
         MessagePriority::VERY_LOW => 0,
         MessagePriority::LOW => 1,

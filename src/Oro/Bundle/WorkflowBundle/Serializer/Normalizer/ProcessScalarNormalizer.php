@@ -23,7 +23,7 @@ class ProcessScalarNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritDoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return is_scalar($data) || $data === null;
     }

@@ -29,10 +29,6 @@ class ChoiceAccountType extends AbstractType
     /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param OAuthManagerRegistry $oauthManagerRegistry
-     */
     public function __construct(
         TranslatorInterface $translator,
         OAuthManagerRegistry $oauthManagerRegistry
@@ -52,7 +48,7 @@ class ChoiceAccountType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }

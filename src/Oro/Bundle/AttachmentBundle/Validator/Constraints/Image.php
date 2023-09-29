@@ -12,7 +12,7 @@ class Image extends BaseImage
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'oro_attachment_image_validator';
     }

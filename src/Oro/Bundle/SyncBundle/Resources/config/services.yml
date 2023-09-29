@@ -45,6 +45,7 @@ services:
         arguments:
             - '@oro_sync.websocket_client.basic'
             - '@oro_distribution.handler.application_status'
+            - '@oro_sync.client.backend_websocket_parameters.provider'
         calls:
             - [setLogger, ['@logger']]
         tags:

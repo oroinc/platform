@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Environment;
@@ -17,7 +18,6 @@ class BehatSecretsReader
     private array                      $configuration = [];
 
     /**
-     * @return static
      * @throws BehatSecretsReaderException
      */
     public static function getInstance(): static
@@ -58,8 +58,6 @@ class BehatSecretsReader
     }
 
     /**
-     * @param string $propertyPath
-     * @return string|null
      * @throws BehatSecretsReaderException
      */
     public function getValue(string $propertyPath): ?string

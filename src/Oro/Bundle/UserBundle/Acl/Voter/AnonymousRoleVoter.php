@@ -15,7 +15,7 @@ class AnonymousRoleVoter implements VoterInterface
     /**
      * {@inheritDoc}
      */
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function vote(TokenInterface $token, $subject, array $attributes): int
     {
         if (!\is_object($subject) || !$subject instanceof Role) {
             return self::ACCESS_ABSTAIN;

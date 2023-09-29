@@ -48,7 +48,7 @@ abstract class AbstractNavigationHistoryItem implements
     protected $visitedAt;
 
     /**
-     * @var \int
+     * @var int
      *
      * @ORM\Column(name="visit_count", type="integer")
      */
@@ -80,9 +80,6 @@ abstract class AbstractNavigationHistoryItem implements
      */
     protected $user;
 
-    /**
-     * @param array $values
-     */
     public function __construct(array $values = null)
     {
         if (!empty($values)) {
@@ -221,7 +218,7 @@ abstract class AbstractNavigationHistoryItem implements
     }
 
     /**
-     * @param AbstractUser $user
+     * @param AbstractUser|null $user
      * @return AbstractNavigationHistoryItem
      */
     public function setUser(AbstractUser $user = null)

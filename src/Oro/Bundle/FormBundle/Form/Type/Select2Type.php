@@ -73,7 +73,7 @@ class Select2Type extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return $this->parentForm;
     }
@@ -89,7 +89,7 @@ class Select2Type extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return $this->blockPrefix;
     }

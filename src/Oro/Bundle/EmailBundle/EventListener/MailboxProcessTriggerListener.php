@@ -37,7 +37,7 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_email.mailbox.process_storage' => MailboxProcessStorage::class,

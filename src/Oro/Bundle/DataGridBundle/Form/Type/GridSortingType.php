@@ -30,7 +30,7 @@ class GridSortingType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_datagrid_sorting';
     }

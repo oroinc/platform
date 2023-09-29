@@ -165,13 +165,56 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         );
     }
 
+    public function testUnknownMetaProperty()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['meta' => 'another'],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The "another" is not known meta property. Known properties: title.',
+                'source' => ['parameter' => 'meta']
+            ],
+            $response
+        );
+    }
+
+    public function testUnknownMetaPropertyWhenTitleMetaPropertyIsDisabled()
+    {
+        $this->appendEntityConfig(
+            TestEmployee::class,
+            ['disable_meta_properties' => ['title']]
+        );
+
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['meta' => 'another'],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The "another" is not known meta property. Known properties: title.',
+                'source' => ['parameter' => 'meta']
+            ],
+            $response
+        );
+    }
+
     public function testMetaTitlesWhenMetaFilterIsDisabled()
     {
         $this->appendEntityConfig(
             TestEmployee::class,
-            [
-                'disable_meta_properties' => true
-            ]
+            ['disable_meta_properties' => true]
         );
 
         $entityType = $this->getEntityType(TestEmployee::class);
@@ -192,6 +235,31 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         );
     }
 
+    public function testMetaTitlesWhenTitleMetaPropertyIsDisabled()
+    {
+        $this->appendEntityConfig(
+            TestEmployee::class,
+            ['disable_meta_properties' => ['title']]
+        );
+
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['meta' => 'title'],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The "title" is not allowed meta property. Allowed properties: .',
+                'source' => ['parameter' => 'meta']
+            ],
+            $response
+        );
+    }
+
     public function testMetaWithEmptyValue()
     {
         $response = $this->cget(
@@ -204,7 +272,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected string value. Given "".',
+                'detail' => 'Expected not empty string value. Given "".',
                 'source' => ['parameter' => 'meta']
             ],
             $response
@@ -223,7 +291,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected an array of strings. Given ",title".',
+                'detail' => 'Expected an array of not empty strings. Given ",title".',
                 'source' => ['parameter' => 'meta']
             ],
             $response
@@ -242,7 +310,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected an array of strings. Given "title,".',
+                'detail' => 'Expected an array of not empty strings. Given "title,".',
                 'source' => ['parameter' => 'meta']
             ],
             $response

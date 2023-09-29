@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
@@ -96,7 +96,7 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
             new IncludedEntityData('/included/0', 0, $isExistingEntity)
         );
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
             ->with(self::identicalTo($entity), false)
@@ -135,7 +135,7 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityManager')
@@ -171,7 +171,7 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityManager')

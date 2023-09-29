@@ -166,7 +166,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }

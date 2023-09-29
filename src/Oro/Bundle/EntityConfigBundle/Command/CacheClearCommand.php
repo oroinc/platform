@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
@@ -52,7 +53,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Clear the entity config cache');
 
@@ -62,6 +63,6 @@ HELP
             $this->configCacheWarmer->warmUpCache();
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

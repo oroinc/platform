@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ReminderBundle\Command;
@@ -71,12 +72,12 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $reminders = $this->getReminderRepository()->findRemindersToSend();
         if (!$reminders) {
             $output->writeln('<info>No reminders to sent</info>');
-            return 0;
+            return Command::SUCCESS;
         }
 
         $output->writeln(
@@ -97,7 +98,7 @@ HELP
             throw $e;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function sendReminders(OutputInterface $output, array $reminders): int

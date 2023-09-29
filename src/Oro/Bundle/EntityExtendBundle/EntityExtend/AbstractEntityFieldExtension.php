@@ -64,16 +64,15 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
         return $this->extensionCache[$transport->getClass()][$extensionClass][$key];
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isset(EntityFieldProcessTransport $transport): void
     {
     }
 
-    /**
-     * @inheritDoc
-     */
+    protected function getMethodsData(EntityFieldProcessTransport $transport): array
+    {
+        return [];
+    }
+
     public function getMethods(EntityFieldProcessTransport $transport): array
     {
         return [];
@@ -84,7 +83,7 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
         $propertyName = $propertyName ?? $transport->getName();
         $defaultValue = null;
         if (!$transport->getStorage()->offsetExists($propertyName)) {
-            if ($transport->getObjectVar($propertyName)) {
+            if (null !== $transport->getObjectVar($propertyName)) {
                 $defaultValue = $transport->getObjectVar($propertyName);
             } elseif (array_key_exists($propertyName, $this->getCollectionFields($transport))) {
                 $defaultValue = new ArrayCollection();
@@ -231,5 +230,22 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
         foreach ($transport->getValue() as $item) {
             $this->addItemToCollection($collection, $item, $transport, $transport->getName());
         }
+    }
+
+    public function getMethodInfo(EntityFieldProcessTransport $transport): void
+    {
+        $methods = $this->getMethodsData($transport);
+        $fieldsMetadata = $transport->getFieldsMetadata();
+        if (!isset($methods[$transport->getName()]) || empty($fieldsMetadata)) {
+            return;
+        }
+        if (is_array($methods[$transport->getName()]) && !isset($methods[$transport->getName()]['argument'])) {
+            return;
+        }
+        $fieldName = is_array($methods[$transport->getName()])
+            ? $methods[$transport->getName()]['argument']
+            : $methods[$transport->getName()];
+        $transport->setResult($fieldsMetadata[$fieldName] ?? []);
+        $transport->setProcessed(true);
     }
 }

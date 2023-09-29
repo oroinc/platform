@@ -11,7 +11,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function configureEntityNode(NodeBuilder $node): void
     {
@@ -21,9 +21,14 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
                 ->performNoDeepMerging()
                 ->prototype('scalar')->cannotBeEmpty()->end()
             ->end()
+            ->scalarNode(ConfigUtil::IDENTIFIER_DESCRIPTION)->end()
             ->booleanNode(ConfigUtil::DISABLE_INCLUSION)->end()
             ->booleanNode(ConfigUtil::DISABLE_FIELDSET)->end()
-            ->booleanNode(ConfigUtil::DISABLE_META_PROPERTIES)->end()
+            ->arrayNode(ConfigUtil::DISABLE_META_PROPERTIES)
+                ->treatFalseLike([false])
+                ->treatTrueLike([true])
+                ->prototype('scalar')->end()
+            ->end()
             ->booleanNode(ConfigUtil::DISABLE_PARTIAL_LOAD)->end()
             ->arrayNode(ConfigUtil::INNER_JOIN_ASSOCIATIONS)
                 ->prototype('scalar')->end()
@@ -37,10 +42,21 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
                 ->end()
                 ->prototype('scalar')->cannotBeEmpty()->end()
             ->end();
+
+        /** @var NodeBuilder $upsertNode */
+        $upsertNode = $node
+            ->arrayNode(ConfigUtil::UPSERT)
+                ->treatFalseLike([ConfigUtil::UPSERT_DISABLE => true])
+                ->treatTrueLike([ConfigUtil::UPSERT_DISABLE => false])
+                ->children()
+                    ->booleanNode(ConfigUtil::UPSERT_DISABLE)->end();
+        $this->appendArrayOfNotEmptyStrings($upsertNode, ConfigUtil::UPSERT_ADD);
+        $this->appendArrayOfNotEmptyStrings($upsertNode, ConfigUtil::UPSERT_REMOVE);
+        $this->appendArrayOfNotEmptyStrings($upsertNode, ConfigUtil::UPSERT_REPLACE);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function postProcessConfig(array $config): array
     {
@@ -54,17 +70,53 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         if (empty($config[ConfigUtil::DOCUMENTATION_RESOURCE])) {
             unset($config[ConfigUtil::DOCUMENTATION_RESOURCE]);
         }
+        if (empty($config[ConfigUtil::DISABLE_META_PROPERTIES])) {
+            unset($config[ConfigUtil::DISABLE_META_PROPERTIES]);
+        }
+        if (\array_key_exists(ConfigUtil::UPSERT, $config)) {
+            if (empty($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_ADD])) {
+                unset($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_ADD]);
+            }
+            if (empty($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REMOVE])) {
+                unset($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REMOVE]);
+            }
+            if (empty($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REPLACE])) {
+                unset($config[ConfigUtil::UPSERT][ConfigUtil::UPSERT_REPLACE]);
+            }
+        }
 
         return $config;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function configureFieldNode(NodeBuilder $node): void
     {
         parent::configureFieldNode($node);
         $node
             ->booleanNode(ConfigUtil::META_PROPERTY)->end();
+    }
+
+    private function appendArrayOfNotEmptyStrings(NodeBuilder $node, string $name): void
+    {
+        $node->arrayNode($name)
+            ->variablePrototype()
+                ->validate()
+                    ->always(function (mixed $value) {
+                        if (!\is_array($value)) {
+                            throw new \InvalidArgumentException(sprintf(
+                                'Expected "array", but got "%s"',
+                                get_debug_type($value)
+                            ));
+                        }
+                        foreach ($value as $val) {
+                            if (!\is_string($val) || '' === $val) {
+                                throw new \InvalidArgumentException('Expected array of not empty strings');
+                            }
+                        }
+
+                        return $value;
+                    });
     }
 }

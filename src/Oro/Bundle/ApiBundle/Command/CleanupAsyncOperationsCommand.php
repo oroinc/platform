@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
@@ -99,7 +100,7 @@ HELP
                 $iterator->count()
             ));
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $output->writeln(sprintf(
@@ -113,7 +114,7 @@ HELP
             if (time() > $endTime) {
                 $output->writeln('<info>The command was terminated by time limit.</info>');
 
-                return 0;
+                return Command::SUCCESS;
             }
             try {
                 $deleteHandler->delete($operation);
@@ -128,7 +129,7 @@ HELP
 
         $output->writeln('<info>The deletion complete.</info>');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getOutdatedAsyncOperationsQueryBuilder(\DateTime $minDate, int $operationTimeout): QueryBuilder

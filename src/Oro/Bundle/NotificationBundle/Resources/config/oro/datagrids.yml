@@ -230,6 +230,7 @@ datagrids:
             query:
                 select:
                     - alert.id
+                    - CAST(alert.id as string) as casted_Id
                     - alert.sourceType
                     - alert.resourceType
                     - alert.alertType
@@ -340,7 +341,7 @@ datagrids:
             columns:
                 id:
                     type: string
-                    data_name: alert.id
+                    data_name: casted_Id
                 createdAt:
                     type: datetime
                     data_name: alert.createdAt

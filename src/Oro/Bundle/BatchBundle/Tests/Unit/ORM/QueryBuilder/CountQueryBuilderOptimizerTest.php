@@ -5,7 +5,6 @@ namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\QueryBuilder;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -752,7 +751,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
         ];
     }
 
-    private function getQueryBuilderWith3thJoinTables(EntityManager $em): QueryBuilder
+    private function getQueryBuilderWith3thJoinTables(EntityManagerInterface $em): QueryBuilder
     {
         return (new QueryBuilder($em))
             ->from(User::class, 'u')

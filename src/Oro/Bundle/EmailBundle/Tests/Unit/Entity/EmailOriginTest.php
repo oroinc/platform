@@ -18,16 +18,32 @@ class EmailOriginTest extends \PHPUnit\Framework\TestCase
 
     public function testFolderGetterAndSetter()
     {
-        $folder = $this->createMock(EmailFolder::class);
+        $folder1 = new EmailFolder();
+        $folder1->setType('inbox');
+        $folder1->setName('Test1');
+        $folder1->setFullName('Inbox/Test1');
+
+        $folder2 = new EmailFolder();
+        $folder2->setType('inbox');
+        $folder2->setName('Test2');
+        $folder2->setFullName('Inbox/Test2');
 
         $entity = new TestEmailOrigin();
-        $entity->addFolder($folder);
+        $entity->addFolder($folder1);
+        $entity->addFolder($folder2);
 
         $folders = $entity->getFolders();
 
         $this->assertInstanceOf(ArrayCollection::class, $folders);
-        $this->assertCount(1, $folders);
-        $this->assertSame($folder, $folders[0]);
+        $this->assertCount(2, $folders);
+        $this->assertSame($folder1, $folders[0]);
+        $this->assertSame($folder2, $folders[1]);
+
+        $this->assertSame($folder1, $entity->getFolder('inbox'));
+        $this->assertSame($folder1, $entity->getFolder('inbox', 'Inbox/Test1'));
+        $this->assertSame($folder2, $entity->getFolder('inbox', 'Inbox/Test2'));
+        $this->assertNull($entity->getFolder('inbox', 'Inbox/Test3'));
+        $this->assertNull($entity->getFolder('sent'));
     }
 
     public function testIsActive()

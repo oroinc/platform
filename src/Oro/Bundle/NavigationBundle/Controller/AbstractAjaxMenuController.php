@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateDisplayManager;
@@ -52,7 +52,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
 
         $updates = $menuUpdateRepository->findMenuUpdatesByScope($menuName, $scope);
 
-        /** @var EntityManager $em */
+        /** @var EntityManagerInterface $em */
         $em = $this->getDoctrine()->getManagerForClass($manager->getEntityClass());
 
         foreach ($updates as $update) {
@@ -129,7 +129,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        /** @var EntityManager $entityManager */
+        /** @var EntityManagerInterface $entityManager */
         $entityManager = $this->getDoctrine()->getManagerForClass($manager->getEntityClass());
 
         if ($menuUpdate->isCustom()) {
@@ -204,7 +204,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
         $parentKey = $request->get('parentKey');
         $position = $request->get('position');
 
-        /** @var EntityManager $entityManager */
+        /** @var EntityManagerInterface $entityManager */
         $entityManager = $this->getDoctrine()->getManagerForClass($manager->getEntityClass());
 
         $scope = $this->findOrCreateScope($context, $manager->getScopeType());

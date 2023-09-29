@@ -9,7 +9,7 @@ class TagStandaloneCollectionApiType extends AbstractPatchableApiType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TagCollectionApiType::class;
     }
@@ -17,7 +17,7 @@ class TagStandaloneCollectionApiType extends AbstractPatchableApiType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_tag_standalone_collection_api';
     }

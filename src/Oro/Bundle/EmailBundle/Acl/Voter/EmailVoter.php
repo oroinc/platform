@@ -45,7 +45,7 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_email.mailbox.manager' => MailboxManager::class
@@ -80,7 +80,7 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
      * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function vote(TokenInterface $token, $object, array $attributes)
+    public function vote(TokenInterface $token, $object, array $attributes): int
     {
         if (!is_object($object)) {
             return self::ACCESS_ABSTAIN;

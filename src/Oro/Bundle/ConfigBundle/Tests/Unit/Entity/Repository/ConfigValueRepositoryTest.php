@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Entity\Repository;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ConfigBundle\Entity\Config;
@@ -12,18 +12,18 @@ use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository;
 
 class ConfigValueRepositoryTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
+
     /** @var ConfigValueRepository */
     private $repository;
 
-    /** @var EntityManager */
-    private $om;
-
     protected function setUp(): void
     {
-        $this->om = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
 
         $this->repository = new ConfigValueRepository(
-            $this->om,
+            $this->em,
             new ClassMetadata('Oro\Bundle\ConfigBundle\Entity\Config\Value')
         );
     }
@@ -56,14 +56,14 @@ class ConfigValueRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('getQuery')
             ->willReturn($query);
 
-        $this->om->expects($this->once())
+        $this->em->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $this->om->expects($this->once())
+        $this->em->expects($this->once())
             ->method('beginTransaction');
 
-        $this->om->expects($this->once())
+        $this->em->expects($this->once())
             ->method('commit');
 
         $removed = [

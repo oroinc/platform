@@ -90,12 +90,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after, method: onResultAfter }
 
-    oro_report.provider.report_entity_name:
-        class: 'Oro\Bundle\ReportBundle\Provider\ReportEntityNameProvider'
-        public: false
-        tags:
-            - { name: oro_entity.name_provider, priority: 0 }
-
     oro_report.calendar_date_manager:
         class: Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager
         public: true

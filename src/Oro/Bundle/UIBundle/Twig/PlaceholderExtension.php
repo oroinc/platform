@@ -126,7 +126,7 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_ui.placeholder.provider' => PlaceholderProvider::class,

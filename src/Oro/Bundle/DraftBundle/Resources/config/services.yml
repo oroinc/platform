@@ -78,6 +78,7 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 255 }
 
     oro_draft.consumption.draftable_filter_extension:
         class: Oro\Bundle\DraftBundle\Consumption\Extension\DraftableFilterExtension

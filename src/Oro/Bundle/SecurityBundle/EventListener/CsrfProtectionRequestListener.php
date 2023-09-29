@@ -18,7 +18,6 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 class CsrfProtectionRequestListener
 {
     private CsrfRequestManager $csrfRequestManager;
-
     private CsrfTokenManagerInterface $csrfTokenManager;
 
     public function __construct(CsrfRequestManager $csrfRequestManager, CsrfTokenManagerInterface $csrfTokenManager)
@@ -40,7 +39,7 @@ class CsrfProtectionRequestListener
 
         $request = $event->getRequest();
 
-        $this->csrfTokenManager->getToken(csrfRequestManager::CSRF_TOKEN_ID);
+        $this->csrfTokenManager->getToken(CsrfRequestManager::CSRF_TOKEN_ID);
 
         // check CSRF Protection annotation and validate token. Refresh used token after check
         $csrProtectionAttribute = '_' . CsrfProtection::ALIAS_NAME;
@@ -66,7 +65,7 @@ class CsrfProtectionRequestListener
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 

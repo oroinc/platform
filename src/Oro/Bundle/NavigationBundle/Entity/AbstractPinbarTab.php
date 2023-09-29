@@ -127,9 +127,6 @@ class AbstractPinbarTab implements NavigationItemInterface
         return null;
     }
 
-    /**
-     * @return string
-     */
     public function getTitle(): ?string
     {
         return $this->title;
@@ -159,9 +156,6 @@ class AbstractPinbarTab implements NavigationItemInterface
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getTitleShort(): ?string
     {
         return $this->titleShort;

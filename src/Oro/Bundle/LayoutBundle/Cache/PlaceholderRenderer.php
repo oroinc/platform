@@ -13,11 +13,11 @@ use Symfony\Contracts\Service\ResetInterface;
 class PlaceholderRenderer implements ResetInterface
 {
     private LayoutManager $layoutManager;
-    
+
     private LayoutContextStack $layoutContextStack;
-    
+
     private LoggerInterface $logger;
-    
+
     private array $renderedPlaceholders = [];
 
     public function __construct(

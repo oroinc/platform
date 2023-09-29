@@ -1,4 +1,6 @@
-<?php return [
+<?php
+
+return [
     'chained_result' => [
         'entity' => 'MyOwn\\SuperCustom\\Entity',
         'steps' => [

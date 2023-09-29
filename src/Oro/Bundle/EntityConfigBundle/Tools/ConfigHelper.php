@@ -80,7 +80,6 @@ class ConfigHelper
 
         $parts = EntityLabelBuilder::explodeClassName($className);
 
-
         $propertyName = InflectorFactory::create()->tableize($scope) . '_' . $propertyName;
         if ($fieldName) {
             $parts[] = InflectorFactory::create()->tableize($fieldName);

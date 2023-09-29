@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SearchBundle\Entity\IndexInteger;

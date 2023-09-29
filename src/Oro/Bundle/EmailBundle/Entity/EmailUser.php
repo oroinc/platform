@@ -221,7 +221,7 @@ class EmailUser
     /**
      * Set organization
      *
-     * @param OrganizationInterface $organization
+     * @param OrganizationInterface|null $organization
      * @return $this
      */
     public function setOrganization(OrganizationInterface $organization = null)
@@ -496,17 +496,11 @@ class EmailUser
         return $fromEmailAddress->getOwner();
     }
 
-    /**
-     * @return bool
-     */
     public function isEmailPrivate(): bool
     {
         return $this->isEmailPrivate ?: false;
     }
 
-    /**
-     * @param bool $isEmailPrivate
-     */
     public function setIsEmailPrivate(bool $isEmailPrivate): void
     {
         $this->isEmailPrivate = $isEmailPrivate;

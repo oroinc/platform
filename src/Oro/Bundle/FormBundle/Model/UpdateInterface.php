@@ -1,9 +1,13 @@
 <?php
+
 namespace Oro\Bundle\FormBundle\Model;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Interface for form update DTO
+ */
 interface UpdateInterface
 {
     /**

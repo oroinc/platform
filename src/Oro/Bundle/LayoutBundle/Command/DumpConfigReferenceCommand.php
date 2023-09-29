@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\LayoutBundle\Command;
@@ -44,7 +45,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output = new SymfonyStyle($input, $output);
 
@@ -57,6 +58,6 @@ HELP
             $output->writeln(sprintf(' - Resources/views/layouts/*/config/%s', $fileName));
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DraftBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroDraftBundle_Entity_DraftProject;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -31,6 +32,7 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  *          },
  *      }
  * )
+ * @mixin OroDraftBundle_Entity_DraftProject
  */
 class DraftProject implements DatesAwareInterface, OrganizationAwareInterface, ExtendEntityInterface
 {

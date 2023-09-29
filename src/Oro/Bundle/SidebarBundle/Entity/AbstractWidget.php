@@ -105,7 +105,7 @@ class AbstractWidget
     /**
      * Set settings
      *
-     * @param string $settings
+     * @param array $settings
      * @return Widget
      */
     public function setSettings($settings)
@@ -118,7 +118,7 @@ class AbstractWidget
     /**
      * Get settings
      *
-     * @return string
+     * @return array
      */
     public function getSettings()
     {
@@ -204,7 +204,7 @@ class AbstractWidget
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return Widget
      */
     public function setOrganization(Organization $organization = null)

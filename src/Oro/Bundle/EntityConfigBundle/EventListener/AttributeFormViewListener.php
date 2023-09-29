@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamilyAwareInterface
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
+use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\Form\FormView;
@@ -16,34 +17,68 @@ use Twig\Environment;
  */
 class AttributeFormViewListener
 {
-    /**
-     * @var AttributeManager
-     */
-    private $attributeManager;
-
-    public function __construct(AttributeManager $attributeManager)
-    {
-        $this->attributeManager = $attributeManager;
+    public function __construct(
+        private AttributeManager $attributeManager,
+        private FieldAclHelper $fieldAclHelper
+    ) {
     }
 
     public function onEdit(BeforeListRenderEvent $event)
     {
         $entity = $event->getEntity();
-
         if (!$entity instanceof AttributeFamilyAwareInterface) {
             return;
         }
 
         $scrollData = $event->getScrollData();
-        $groupsData = $this->attributeManager->getGroupsWithAttributes($entity->getAttributeFamily());
+        $groupsData = $this->getGroupsWithAttributes($this->attributeManager, $entity, true);
         $this->filterGroupAttributes($groupsData, 'form', 'is_enabled');
         $this->addNotEmptyGroupBlocks($scrollData, $groupsData);
-
-        foreach ($groupsData as $groupsDatum) {
-            $this->addAttributeEditBlocks($event, $groupsDatum['group'], $groupsDatum['attributes']);
+        foreach ($groupsData as $groupData) {
+            $this->addAttributeEditBlocks($event, $groupData['group'], $groupData['attributes']);
         }
 
         $this->removeEmptyGroupBlocks($scrollData, $groupsData);
+    }
+
+    public function onViewList(BeforeListRenderEvent $event)
+    {
+        $entity = $event->getEntity();
+        if (!$entity instanceof AttributeFamilyAwareInterface) {
+            return;
+        }
+
+        $scrollData = $event->getScrollData();
+        $groupsData = $this->getGroupsWithAttributes($this->attributeManager, $entity);
+        $this->filterGroupAttributes($groupsData, 'view', 'is_displayable');
+        $this->addNotEmptyGroupBlocks($scrollData, $groupsData);
+        foreach ($groupsData as $groupData) {
+            $this->addAttributeViewBlocks($event, $groupData['group'], $groupData['attributes']);
+        }
+
+        $this->removeEmptyGroupBlocks($scrollData, $groupsData);
+    }
+
+    protected function getGroupsWithAttributes(
+        AttributeManager $attributeManager,
+        object $entity,
+        bool $editable = false
+    ): array {
+        $groups = $attributeManager->getGroupsWithAttributes($entity->getAttributeFamily());
+
+        foreach ($groups as &$group) {
+            $attributes = array_filter(
+                $group['attributes'],
+                function (FieldConfigModel $model) use ($entity, $editable) {
+                    return $editable
+                        ? $this->fieldAclHelper->isFieldAvailable($entity, $model->getFieldName())
+                        : $this->fieldAclHelper->isFieldViewGranted($entity, $model->getFieldName());
+                }
+            );
+            $group['attributes'] = $attributes;
+        }
+
+        return $groups;
     }
 
     private function removeEmptyGroupBlocks(ScrollData $scrollData, array $groups)
@@ -94,7 +129,6 @@ class AttributeFormViewListener
             return;
         }
 
-
         $scrollData = $event->getScrollData();
         $formView = $event->getFormView();
 
@@ -140,27 +174,6 @@ class AttributeFormViewListener
     protected function renderAttributeEditData(Environment $twig, FormView $attributeView, FieldConfigModel $attribute)
     {
         return $twig->render('@OroEntityConfig/Attribute/row.html.twig', ['child' => $attributeView]);
-    }
-
-    public function onViewList(BeforeListRenderEvent $event)
-    {
-        $entity = $event->getEntity();
-
-        if (!$entity instanceof AttributeFamilyAwareInterface) {
-            return;
-        }
-
-        $groups = $this->attributeManager->getGroupsWithAttributes($entity->getAttributeFamily());
-        $scrollData = $event->getScrollData();
-        $this->filterGroupAttributes($groups, 'view', 'is_displayable');
-        $this->addNotEmptyGroupBlocks($scrollData, $groups);
-
-        /** @var AttributeGroup $group */
-        foreach ($groups as $groupData) {
-            $this->addAttributeViewBlocks($event, $groupData['group'], $groupData['attributes']);
-        }
-
-        $this->removeEmptyGroupBlocks($scrollData, $groups);
     }
 
     /**

@@ -74,8 +74,16 @@ define(function(require) {
             return result;
         },
 
+        getRowConstructor(model) {
+            if (model.get('rowView') && model.get('rowView').prototype) {
+                return model.get('rowView');
+            }
+
+            return this.row || this.itemView;
+        },
+
         initItemView: function(model) {
-            const RowView = this.row || this.itemView;
+            const RowView = this.getRowConstructor(model);
             if (RowView) {
                 const rowOptions = {
                     autoRender: false,

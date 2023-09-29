@@ -11,7 +11,8 @@ use Oro\Component\Testing\Unit\EntityTrait;
 
 class EmailTemplateTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTestCaseTrait, EntityTrait;
+    use EntityTestCaseTrait;
+    use EntityTrait;
 
     public function testConstruct(): void
     {

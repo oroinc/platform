@@ -38,8 +38,6 @@ class Acl
     private $category;
 
     /**
-     * @param array $data
-     *
      * @throws \InvalidArgumentException
      */
     public function __construct(array $data = null)
@@ -206,7 +204,7 @@ class Acl
         ];
     }
 
-    public function __unserialize(array $serialized):void
+    public function __unserialize(array $serialized): void
     {
         [
             $this->id,

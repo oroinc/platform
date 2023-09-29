@@ -42,7 +42,7 @@ class AssociationChoiceType extends AbstractAssociationType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_association_choice';
     }
@@ -50,7 +50,7 @@ class AssociationChoiceType extends AbstractAssociationType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return SymfonyChoiceType::class;
     }

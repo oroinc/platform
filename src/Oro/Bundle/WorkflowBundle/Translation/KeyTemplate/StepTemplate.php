@@ -9,9 +9,6 @@ class StepTemplate extends WorkflowTemplate
 {
     const NAME = 'step';
 
-    /**
-     * @return string
-     */
     public function getTemplate(): string
     {
         return parent::getTemplate() . '.step.{{ step_name }}';

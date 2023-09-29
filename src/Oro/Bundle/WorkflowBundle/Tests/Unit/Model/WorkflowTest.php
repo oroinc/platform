@@ -35,7 +35,8 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityWithWorkflow;
  */
 class WorkflowTest extends \PHPUnit\Framework\TestCase
 {
-    private DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
     protected function setUp(): void
     {
@@ -96,7 +97,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
             ->with('test_transition')
             ->willReturn(false);
 
-        $transition = $this->getTransitionMock('test_transition', false);
+        $transition = $this->getTransitionMock('test_transition');
 
         $workflow = $this->createWorkflow('test_workflow');
         $workflow->getTransitionManager()->setTransitions([$transition]);
@@ -107,14 +108,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isTransitionAllowedDataProvider
-     *
-     * @param mixed $expectedResult
-     * @param bool $transitionExist
-     * @param bool $transitionAllowed
-     * @param bool $isTransitionStart
-     * @param bool $hasCurrentStep
-     * @param bool $stepAllowTransition
-     * @param bool $fireExceptions
      */
     public function testIsTransitionAllowed(
         mixed $expectedResult,
@@ -278,13 +271,11 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $stepName = 'stepOne';
 
         $this->expectException(InvalidTransitionException::class);
-        $this->expectExceptionMessage(
-            \sprintf(
-                'Step "%s" of workflow "%s" doesn\'t have allowed transition "transition".',
-                $stepName,
-                $workflowName
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'Step "%s" of workflow "%s" doesn\'t have allowed transition "transition".',
+            $stepName,
+            $workflowName
+        ));
 
         $workflowStep = new WorkflowStep();
         $workflowStep->setName($stepName);
@@ -410,11 +401,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
      */
     public function testStart(array $data, ?string $transitionName): void
     {
-        if (!$transitionName) {
-            $expectedTransitionName = TransitionManager::DEFAULT_START_TRANSITION_NAME;
-        } else {
-            $expectedTransitionName = $transitionName;
-        }
+        $expectedTransitionName = $transitionName ?: TransitionManager::DEFAULT_START_TRANSITION_NAME;
 
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('step_name');
@@ -509,12 +496,12 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $workflow->getAttributeManager()->setAttributes([$entityAttribute]);
         $workflow->getAttributeManager()->setEntityAttributeName($entityAttribute->getName());
 
-        $item = $workflow->start(new EntityWithWorkflow(), [$entityAttributeName => new $entityClass]);
+        $item = $workflow->start(new EntityWithWorkflow(), [$entityAttributeName => new $entityClass()]);
 
         $this->assertInstanceOf(WorkflowItem::class, $item);
         $this->assertEquals(new \stdClass(), $item->getEntity());
         $this->assertEquals(
-            ['entity' => new EntityWithWorkflow(), $entityAttributeName => new $entityClass],
+            ['entity' => new EntityWithWorkflow(), $entityAttributeName => new $entityClass()],
             $item->getData()->getValues()
         );
     }
@@ -559,13 +546,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($variables, $workflow->getVariables());
     }
 
-    /**
-     * @param WorkflowStep $step
-     * @param string $expectedTransitionName
-     * @param Collection|null $errors
-     *
-     * @return Transition|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function assertTransitionCalled(
         WorkflowStep $step,
         string $expectedTransitionName,
@@ -755,84 +735,79 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [
-                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecord('step1'),
                 ],
                 ['step1'],
             ],
             [
                 [
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step2'),
                 ],
                 ['step1', 'step2'],
             ],
             [
                 [
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
-                    $this->getTransitionRecordMock('step3'),
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step2'),
+                    $this->getTransitionRecord('step3'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step2'),
                 ],
                 ['step1', 'step2'],
             ],
             [
                 [
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
-                    $this->getTransitionRecordMock('step3'),
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step3'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step2'),
+                    $this->getTransitionRecord('step3'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step3'),
                 ],
                 ['step1', 'step3'],
             ],
             [
                 [
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
-                    $this->getTransitionRecordMock('step3'),
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step3'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step2'),
+                    $this->getTransitionRecord('step3'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step2'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step2'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step3'),
                 ],
                 ['step1', 'step3'],
             ],
             [
                 [
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
-                    $this->getTransitionRecordMock('step3'),
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step2'),
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step3'),
-                    $this->getTransitionRecordMock('step3'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step2'),
+                    $this->getTransitionRecord('step3'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step2'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step2'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step3'),
+                    $this->getTransitionRecord('step3'),
                 ],
                 ['step1', 'step3'],
             ],
             [
                 [
-                    $this->getTransitionRecordMock('step1'),
-                    $this->getTransitionRecordMock('step3'),
-                    $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecord('step1'),
+                    $this->getTransitionRecord('step3'),
+                    $this->getTransitionRecord('step2'),
                 ],
                 ['step1', 'step3', 'step2'],
             ],
         ];
     }
 
-    /**
-     * @param string $stepToName
-     *
-     * @return WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getTransitionRecordMock(string $stepToName): WorkflowTransitionRecord
+    private function getTransitionRecord(string $stepToName): WorkflowTransitionRecord
     {
         $workflowStep = new WorkflowStep();
         $workflowStep->setName($stepToName);
@@ -845,15 +820,6 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         return $record;
     }
 
-    /**
-     * @param string $workflowName
-     * @param AclManager $aclManager
-     * @param AttributeManager $attributeManager
-     * @param TransitionManager $transitionManager
-     * @param VariableManager $variableManager
-     *
-     * @return Workflow
-     */
     private function createWorkflow(
         string $workflowName = null,
         AclManager $aclManager = null,

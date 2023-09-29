@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Command;
@@ -53,7 +54,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $io->text('Rebuilding the translation cache ...');
@@ -61,7 +62,7 @@ HELP
         if (!$this->rebuildTranslationCacheProcessor->rebuildCache()) {
             $io->error('The rebuild failed.');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $io->success('The rebuild complete.');
@@ -70,7 +71,7 @@ HELP
             $this->renderSanitizationErrors($io);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function renderSanitizationErrors(SymfonyStyle $io): void

@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Async;
 
 use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByTypeTopic;

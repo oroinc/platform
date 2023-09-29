@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\UserBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;

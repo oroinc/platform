@@ -2,6 +2,7 @@
 default: &default
     extensions:
         Behat\MinkExtension:
+            browser_name: chrome
             base_url: 'http://localhost.com/'
             default_session: 'first_session'
             sessions:
@@ -74,6 +75,8 @@ chromedriver:
                                         - "--window-size=1920,1080"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
+                                        - "--disable-extensions"
+                                        - "--disable-dev-shm-usage"
                 first_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:9515'
@@ -90,6 +93,8 @@ chromedriver:
                                         - "--window-size=1920,1080"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
+                                        - "--disable-extensions"
+                                        - "--disable-dev-shm-usage"
                 system_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:9515'
@@ -106,6 +111,8 @@ chromedriver:
                                         - "--window-size=1920,1080"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
+                                        - "--disable-extensions"
+                                        - "--disable-dev-shm-usage"
                 375_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:9515'
@@ -122,6 +129,8 @@ chromedriver:
                                         - "--window-size=375,640"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
+                                        - "--disable-extensions"
+                                        - "--disable-dev-shm-usage"
 
                 640_session:
                     oroSelenium2:
@@ -139,6 +148,8 @@ chromedriver:
                                         - "--window-size=640,1100"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
+                                        - "--disable-extensions"
+                                        - "--disable-dev-shm-usage"
 
                 mobile_session:
                     oroSelenium2:
@@ -155,5 +166,7 @@ chromedriver:
                                         - "--headless"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
+                                        - "--disable-extensions"
+                                        - "--disable-dev-shm-usage"
                                     mobileEmulation:
                                         deviceName: "iPhone 12 Pro"

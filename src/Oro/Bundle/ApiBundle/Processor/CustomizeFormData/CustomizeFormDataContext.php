@@ -57,6 +57,8 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * This event is dispatched after the database transaction is open but before data are flushed into the database.
+     * Do not call EntityManager::persist() and EntityManager::remove() during handling of this event,
+     * use {@see addAdditionalEntity()} and {@see addAdditionalEntityToRemove()} instead.
      * @see \Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandler
      */
     public const EVENT_PRE_FLUSH_DATA = 'pre_flush_data';
@@ -289,6 +291,7 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     {
         $this->getAdditionalEntityCollection()->add($entity);
     }
+
     /**
      * Adds an entity to the list of additional entities involved to the request processing
      * when this entity should be removed from the database.
@@ -320,7 +323,7 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     /**
      * Gets a collection contains the list of additional entities involved to the request processing.
      */
-    private function getAdditionalEntityCollection(): AdditionalEntityCollection
+    public function getAdditionalEntityCollection(): AdditionalEntityCollection
     {
         if (null === $this->additionalEntities) {
             throw new \LogicException('The collection of additional entities was not initialized.');

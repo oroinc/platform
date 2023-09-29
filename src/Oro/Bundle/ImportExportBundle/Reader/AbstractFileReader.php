@@ -174,6 +174,6 @@ abstract class AbstractFileReader extends AbstractReader implements ClosableInte
 
     protected function validateEncoding(string $item): bool
     {
-        return (boolean)mb_detect_encoding($item, self::DEFAULT_ENCODING, true);
+        return (bool)mb_detect_encoding($item, self::DEFAULT_ENCODING, true);
     }
 }

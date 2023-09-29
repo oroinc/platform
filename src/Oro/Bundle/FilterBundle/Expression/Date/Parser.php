@@ -21,8 +21,6 @@ class Parser
     /**
      * @param array $tokens
      * @param bool $returnRawToken
-     * @param string|null $timeZone
-     *
      * @return mixed
      */
     public function parse($tokens, $returnRawToken = false)

@@ -20,9 +20,6 @@ class WorkflowTemplate implements TranslationKeyTemplateInterface
         return static::NAME;
     }
 
-    /**
-     * @return string
-     */
     public function getTemplate(): string
     {
         return self::KEY_PREFIX . '.{{ workflow_name }}';

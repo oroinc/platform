@@ -35,7 +35,7 @@ class Router
     }
 
     /**
-     * @param array|object|null $context
+     * @param array|object $context
      */
     public function redirect(mixed $context): RedirectResponse
     {
@@ -81,7 +81,7 @@ class Router
      *
      * @return string|null JSON string representing raw route data taken from request.
      */
-    private function getRawRouteData(Request $request):? string
+    private function getRawRouteData(Request $request): ?string
     {
         $result = $request->get(self::ACTION_PARAMETER);
 
@@ -181,7 +181,7 @@ class Router
      * Parses value of route parameters.
      *
      * @param array $arrayData
-     * @param array|object|null $context
+     * @param array|object $context
      *
      * @return mixed
      */

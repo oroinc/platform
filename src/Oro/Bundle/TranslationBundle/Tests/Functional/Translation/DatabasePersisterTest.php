@@ -114,7 +114,7 @@ class DatabasePersisterTest extends WebTestCase
             ->getSingleScalarResult();
     }
 
-    private function getTranslationEntity(Language $language, TranslationKey $key):Translation
+    private function getTranslationEntity(Language $language, TranslationKey $key): Translation
     {
         /** @var EntityRepository $repo */
         return self::getContainer()->get('doctrine')

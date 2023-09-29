@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroLocaleBundle_Entity_LocalizedFallbackValue;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -26,6 +27,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
  *          }
  *      }
  * )
+ * @mixin OroLocaleBundle_Entity_LocalizedFallbackValue
  */
 class LocalizedFallbackValue extends AbstractLocalizedFallbackValue implements ExtendEntityInterface
 {

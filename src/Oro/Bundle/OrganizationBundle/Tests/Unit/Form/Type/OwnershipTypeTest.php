@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;

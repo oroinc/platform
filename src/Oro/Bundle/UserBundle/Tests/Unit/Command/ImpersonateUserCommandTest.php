@@ -72,7 +72,7 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProducedError(
             $commandTester,
-            \sprintf('User with username "%s" does not exist.', self::USERNAME)
+            sprintf('User with username "%s" does not exist.', self::USERNAME)
         );
     }
 
@@ -84,7 +84,7 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->assertProducedError(
             $commandTester,
-            \sprintf('Unsupported user type, the user "%s" cannot be impersonated.', self::USERNAME)
+            sprintf('Unsupported user type, the user "%s" cannot be impersonated.', self::USERNAME)
         );
     }
 

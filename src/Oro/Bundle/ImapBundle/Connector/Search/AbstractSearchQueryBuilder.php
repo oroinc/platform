@@ -19,7 +19,7 @@ abstract class AbstractSearchQueryBuilder
     /**
      * Adds AND operator.
      *
-     * @param Closure $callback
+     * @param Closure|null $callback
      * @return $this
      */
     public function andOperator(Closure $callback = null)
@@ -35,7 +35,7 @@ abstract class AbstractSearchQueryBuilder
     /**
      * Adds OR operator.
      *
-     * @param Closure $callback
+     * @param Closure|null $callback
      * @return $this
      */
     public function orOperator(Closure $callback = null)
@@ -51,7 +51,7 @@ abstract class AbstractSearchQueryBuilder
     /**
      * Adds OR operator.
      *
-     * @param Closure $callback
+     * @param Closure|null $callback
      * @return $this
      */
     public function notOperator(Closure $callback = null)

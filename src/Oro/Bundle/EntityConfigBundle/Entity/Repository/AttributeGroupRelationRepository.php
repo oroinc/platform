@@ -135,7 +135,6 @@ class AttributeGroupRelationRepository extends EntityRepository
             $queryBuilder->where($queryBuilder->expr()->isNotNull('attributeGroup.attributeFamily'));
         }
 
-
         return $queryBuilder->getQuery()->getSingleColumnResult();
     }
 

@@ -696,47 +696,33 @@ abstract class WebTestCase extends BaseWebTestCase
         return in_array($fixtureClass, self::$loadedFixtures, true);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return object|mixed
-     */
-    protected function getReference($name)
+    protected function getReference(string $name): object
     {
         return $this->getReferenceRepository()->getReference($name);
     }
 
-    /**
-     * @param string $name
-     * @return bool
-     */
-    protected function hasReference($name)
+    protected function hasReference(string $name): bool
     {
         return $this->getReferenceRepository()->hasReference($name);
     }
 
-    /**
-     * @return bool
-     */
-    protected function hasReferenceRepository()
+    protected function hasReferenceRepository(): bool
     {
         return null !== self::$referenceRepository;
     }
 
-    /**
-     * @throws \Exception
-     */
     protected function getReferenceRepository(string $class = null): ReferenceRepository
     {
         if (null === self::$referenceRepository) {
             throw new \LogicException('The reference repository is not set. Have you loaded fixtures?');
         }
 
-        if (is_null($class)) {
+        if (null === $class) {
             return self::$referenceRepository;
         }
 
-        if (!$objectManager = $this->getContainer()->get('doctrine')->getManagerForClass($class)) {
+        $objectManager = $this->getContainer()->get('doctrine')->getManagerForClass($class);
+        if (!$objectManager) {
             throw new \Exception(sprintf(
                 'Reference repository is not created for class "%s". Did you forget'
                 . ' to associate your object manager with class "%s"?',
@@ -938,7 +924,7 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function generateRandomString($length = 10)
     {
         $random = "";
-        mt_srand((double)microtime() * 1000000);
+        mt_srand((float)microtime() * 1000000);
         $char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         $char_list .= "abcdefghijklmnopqrstuvwxyz";
         $char_list .= "1234567890_";

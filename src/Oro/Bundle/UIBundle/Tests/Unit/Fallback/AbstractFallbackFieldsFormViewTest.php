@@ -4,6 +4,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Fallback;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,6 +29,9 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
     /** @var FallbackFieldsFormViewStub|\PHPUnit\Framework\MockObject\MockObject */
     protected $fallbackFieldsFormView;
 
+    /** @var FieldAclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    protected $fieldAclHelper;
+
     /** @var ScrollData|\PHPUnit\Framework\MockObject\MockObject */
     protected $scrollData;
 
@@ -37,17 +41,26 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
         $this->event = $this->createMock(BeforeListRenderEvent::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->fieldAclHelper = $this->createMock(FieldAclHelper::class);
 
-        $this->translator->expects($this->any())
+        $this->translator
+            ->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(function ($id) {
-                return $id . '.trans';
-            });
+            ->willReturnCallback(fn ($id) => $id . '.trans');
+        $this->fieldAclHelper
+            ->expects($this->any())
+            ->method('isFieldAvailable')
+            ->willReturn(true);
+        $this->fieldAclHelper
+            ->expects($this->any())
+            ->method('isFieldViewGranted')
+            ->willReturn(true);
 
         $this->fallbackFieldsFormView = new FallbackFieldsFormViewStub(
             $this->requestStack,
             $this->doctrine,
-            $this->translator
+            $this->translator,
+            $this->fieldAclHelper
         );
         $this->scrollData = $this->createMock(ScrollData::class);
     }

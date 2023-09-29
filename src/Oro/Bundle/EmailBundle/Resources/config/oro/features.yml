@@ -60,11 +60,15 @@ features:
             - 'user_mailbox'
             - 'user_bar_settings'
             - 'integration_email_settings'
-            - 'oro_hangouts_call.enable_google_hangouts_for_email'
         sidebar_widgets:
             - 'recent_emails'
         dashboard_widgets:
             - 'recent_emails'
+        api_resources:
+            - 'Oro\Bundle\EmailBundle\Entity\Email'
+            - 'Oro\Bundle\EmailBundle\Api\Model\EmailContextEntity'
+            - 'Oro\Bundle\EmailBundle\Api\Model\EmailContextItem'
+            - 'Oro\Bundle\EmailBundle\Api\Model\EmailContextSearchItem'
         entities:
             - 'Oro\Bundle\EmailBundle\Entity\Email'
             - 'Oro\Bundle\EmailBundle\Entity\EmailUser'

@@ -26,7 +26,9 @@ oro_behat_extension:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
 
     GridHeader:
-      selector: '.grid-container .grid-header:nth-child(1)'
+      selector:
+        type: 'xpath'
+        locator: '//div[contains(@class,"grid-container") or contains(@class, "datagrid-sticky")]//thead[contains(@class,"grid-header") and not(contains(@class, "datagrid-thead-invisible"))]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader
 
     GridRow:

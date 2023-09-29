@@ -21,6 +21,7 @@ define(function(require, exports, module) {
         stateEnabled: true,
         incrementalPosition: true,
         preventModelRemoval: false,
+        extraHeaderContainerClass: 'ui-dialog-extra-header-content',
         messengerContainerClass: 'ui-dialog-messages',
         mobileLoadingBar: true,
         desktopLoadingBar: false,
@@ -170,24 +171,32 @@ define(function(require, exports, module) {
         onWidgetRender: function(content) {
             this._initAdjustHeight(content);
             this._setMaxSize();
-            this._addMessengerContainer();
+            this._extraContainers();
             this._initLoadingBar();
         },
 
         /**
-         * Add temporary container for messages into dialog window
+         * Add temporary containers
          * @private
          */
-        _addMessengerContainer: function() {
-            const containerClass = this.options.messengerContainerClass;
+        _extraContainers: function() {
+            const extraHeaderClass = this.options.extraHeaderContainerClass;
+            const messengerClass = this.options.messengerContainerClass;
             const $uiDialog = this.widget.dialog('instance').uiDialog;
 
-            if (containerClass && !$uiDialog.find('.' + containerClass).length) {
+            if (extraHeaderClass && !$uiDialog.find(`.${extraHeaderClass}`).length) {
+                this.$extraHeaderContainer = $('<div/>')
+                    .addClass(extraHeaderClass)
+                    .attr('data-role', 'extra-header-container');
+
+                this.$extraHeaderContainer.insertBefore(this.widget);
+            }
+            if (messengerClass && !$uiDialog.find(`.${messengerClass}`).length) {
                 this.$messengerContainer = $('<div/>')
-                    .addClass(containerClass)
+                    .addClass(messengerClass)
                     .attr('data-role', 'messenger-temporary-container');
 
-                this.widget.before(this.$messengerContainer);
+                this.$messengerContainer.insertBefore(this.widget);
             }
         },
 
@@ -220,7 +229,7 @@ define(function(require, exports, module) {
         _initLoadingBar: function() {
             if ((this.options.mobileLoadingBar && tools.isMobile()) ||
                 (this.options.desktopLoadingBar && !tools.isMobile())) {
-                this.subview('LoadingBarView', new LoadingBarView({
+                this.subview('loadingBarView', new LoadingBarView({
                     container: this.widget.dialog('instance').uiDialogTitlebar,
                     ajaxLoading: true
                 }));
@@ -228,11 +237,11 @@ define(function(require, exports, module) {
                 this.widget.on({
                     [`ajaxStart${this.eventNamespace()}`]: e => {
                         e.stopPropagation();
-                        this.subview('LoadingBarView').showLoader();
+                        this.subview('loadingBarView').showLoader();
                     },
                     [`ajaxComplete${this.eventNamespace()}`]: e => {
                         e.stopPropagation();
-                        this.subview('LoadingBarView').hideLoader();
+                        this.subview('loadingBarView').hideLoader();
                     }
                 });
             }
@@ -458,6 +467,17 @@ define(function(require, exports, module) {
             }
         },
 
+        _renderExtraHeaderContent() {
+            if (this.$extraHeaderContainer && this.$extraHeaderContainer.length) {
+                const $content = this.$el.find('[data-dialog-extra-header-content]');
+
+                if ($content.length) {
+                    this.$extraHeaderContainer.html('');
+                }
+                this.$el.find('[data-dialog-extra-header-content]').appendTo(this.$extraHeaderContainer);
+            }
+        },
+
         /**
          * Show dialog
          */
@@ -482,6 +502,7 @@ define(function(require, exports, module) {
             }
             this.loadingElement = this.$el.closest('.ui-dialog');
             DialogWidget.__super__.show.call(this);
+            this._renderExtraHeaderContent();
 
             this._fixDialogMinHeight(true);
             this.widget.on('dialogmaximize dialogrestore', () => {

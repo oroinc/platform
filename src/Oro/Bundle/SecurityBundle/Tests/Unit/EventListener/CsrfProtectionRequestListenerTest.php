@@ -6,7 +6,6 @@ use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Csrf\CookieTokenStorage;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\SecurityBundle\EventListener\CsrfProtectionRequestListener;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,11 +17,14 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private CsrfRequestManager|MockObject $csrfRequestManager;
+    /** @var CsrfRequestManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $csrfRequestManager;
 
-    private CsrfTokenManagerInterface|MockObject $csrfTokenManager;
+    /** @var CsrfTokenManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $csrfTokenManager;
 
-    private CsrfProtectionRequestListener $listener;
+    /** @var CsrfProtectionRequestListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -32,14 +34,30 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new CsrfProtectionRequestListener($this->csrfRequestManager, $this->csrfTokenManager);
     }
 
+    private function getControllerEvent(Request $request, int $requestType): ControllerEvent
+    {
+        return new ControllerEvent(
+            $this->createMock(HttpKernelInterface::class),
+            function () {
+            },
+            $request,
+            $requestType
+        );
+    }
+
+    private function getResponseEvent(Request $request, int $requestType, Response $response): ResponseEvent
+    {
+        return new ResponseEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $request,
+            $requestType,
+            $response
+        );
+    }
+
     public function testOnKernelControllerNotMasterRequest(): void
     {
-        $event = new ControllerEvent(
-            $this->createMock(HttpKernelInterface::class),
-            fn ($x) => $x,
-            new Request(),
-            HttpKernelInterface::SUB_REQUEST
-        );
+        $event = $this->getControllerEvent(new Request(), HttpKernelInterface::SUB_REQUEST);
 
         $this->csrfRequestManager->expects(self::never())
             ->method(self::anything());
@@ -52,14 +70,9 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $request = Request::create('/');
         $request->cookies->set(CsrfRequestManager::CSRF_TOKEN_ID, 'test');
 
-        $event = new ControllerEvent(
-            $this->createMock(HttpKernelInterface::class),
-            fn ($x) => $x,
-            $request,
-            HttpKernelInterface::MAIN_REQUEST
-        );
+        $event = $this->getControllerEvent($request, HttpKernelInterface::MAIN_REQUEST);
 
-        $this->csrfTokenManager->expects($this->once())
+        $this->csrfTokenManager->expects(self::once())
             ->method('getToken')
             ->with(CsrfRequestManager::CSRF_TOKEN_ID);
 
@@ -68,20 +81,16 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnKernelControllerDisabledCheck(): void
     {
-        $csrfProtection = new CsrfProtection(['enabled' => false]);
-
         $request = Request::create('/');
-        $request->attributes->set('_' . CsrfProtection::ALIAS_NAME, $csrfProtection);
+        $request->attributes->set(
+            '_' . CsrfProtection::ALIAS_NAME,
+            new CsrfProtection(['enabled' => false])
+        );
         $request->cookies->set(CsrfRequestManager::CSRF_TOKEN_ID, 'test');
 
-        $event = new ControllerEvent(
-            $this->createMock(HttpKernelInterface::class),
-            fn ($x) => $x,
-            $request,
-            HttpKernelInterface::MAIN_REQUEST
-        );
+        $event = $this->getControllerEvent($request, HttpKernelInterface::MAIN_REQUEST);
 
-        $this->csrfTokenManager->expects($this->once())
+        $this->csrfTokenManager->expects(self::once())
             ->method('getToken')
             ->with(CsrfRequestManager::CSRF_TOKEN_ID);
         $this->csrfRequestManager->expects(self::never())
@@ -95,17 +104,13 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnKernelControllerCsrfPassed(bool $useRequest): void
     {
-        $csrfProtection = new CsrfProtection(['enabled' => true, 'useRequest' => $useRequest]);
-
         $request = Request::create('/');
-        $request->attributes->set('_' . CsrfProtection::ALIAS_NAME, $csrfProtection);
-
-        $event = new ControllerEvent(
-            $this->createMock(HttpKernelInterface::class),
-            fn ($x) => $x,
-            $request,
-            HttpKernelInterface::MAIN_REQUEST
+        $request->attributes->set(
+            '_' . CsrfProtection::ALIAS_NAME,
+            new CsrfProtection(['enabled' => true, 'useRequest' => $useRequest])
         );
+
+        $event = $this->getControllerEvent($request, HttpKernelInterface::MAIN_REQUEST);
 
         $this->csrfRequestManager->expects(self::once())
             ->method('refreshRequestToken')
@@ -124,17 +129,16 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnKernelControllerCsrfFail(bool $useRequest): void
     {
-        $csrfProtection = new CsrfProtection(['enabled' => true, 'useRequest' => $useRequest]);
+        $this->expectException(AccessDeniedHttpException::class);
+        $this->expectExceptionMessage('Invalid CSRF token');
 
         $request = Request::create('/');
-        $request->attributes->set('_' . CsrfProtection::ALIAS_NAME, $csrfProtection);
-
-        $event = new ControllerEvent(
-            $this->createMock(HttpKernelInterface::class),
-            fn ($x) => $x,
-            $request,
-            HttpKernelInterface::MAIN_REQUEST
+        $request->attributes->set(
+            '_' . CsrfProtection::ALIAS_NAME,
+            new CsrfProtection(['enabled' => true, 'useRequest' => $useRequest])
         );
+
+        $event = $this->getControllerEvent($request, HttpKernelInterface::MAIN_REQUEST);
 
         $this->csrfRequestManager->expects(self::once())
             ->method('isRequestTokenValid')
@@ -143,8 +147,6 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->csrfRequestManager->expects(self::never())
             ->method('refreshRequestToken');
-
-        $this->expectException(AccessDeniedHttpException::class);
 
         $this->listener->onKernelController($event);
     }
@@ -160,12 +162,8 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnKernelResponseNotMasterRequest(): void
     {
         $response = new Response();
-        $event = new ResponseEvent(
-            $this->createMock(HttpKernelInterface::class),
-            new Request(),
-            HttpKernelInterface::SUB_REQUEST,
-            $response
-        );
+
+        $event = $this->getResponseEvent(new Request(), HttpKernelInterface::SUB_REQUEST, $response);
 
         $this->listener->onKernelResponse($event);
 
@@ -175,14 +173,9 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnKernelResponseNoCsrfProtection(): void
     {
         $request = Request::create('/');
-
         $response = new Response();
-        $event = new ResponseEvent(
-            $this->createMock(HttpKernelInterface::class),
-            $request,
-            HttpKernelInterface::MAIN_REQUEST,
-            $response
-        );
+
+        $event = $this->getResponseEvent($request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $this->listener->onKernelResponse($event);
 
@@ -197,12 +190,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $request->attributes->set(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE, $cookie);
         $response = new Response();
 
-        $event = new ResponseEvent(
-            $this->createMock(HttpKernelInterface::class),
-            $request,
-            HttpKernelInterface::MAIN_REQUEST,
-            $response
-        );
+        $event = $this->getResponseEvent($request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $this->listener->onKernelResponse($event);
 

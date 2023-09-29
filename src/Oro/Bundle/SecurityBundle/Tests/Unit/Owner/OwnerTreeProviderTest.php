@@ -328,13 +328,13 @@ class OwnerTreeProviderTest extends OrmTestCase
             [
                 [
                     'orgId'      => self::ORG_1,
-                    'parentBuId' => null,
-                    'buId'       => self::MAIN_BU_1,
+                    'parentBuId' => self::MAIN_BU_1,
+                    'buId'       => self::BU_2,
                 ],
                 [
                     'orgId'      => self::ORG_1,
-                    'parentBuId' => self::MAIN_BU_1,
-                    'buId'       => self::BU_2,
+                    'parentBuId' => null,
+                    'buId'       => self::MAIN_BU_1,
                 ],
                 [
                     'orgId'      => self::ORG_1,

@@ -108,7 +108,7 @@ class OrmDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'orm';
     }

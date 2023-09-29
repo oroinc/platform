@@ -57,7 +57,7 @@ class SaveEntity implements ProcessorInterface
             );
         } catch (UniqueConstraintViolationException $e) {
             $context->addError(
-                Error::createConflictValidationError('The entity already exists')
+                Error::createConflictValidationError('The entity already exists.')
                     ->setInnerException($e)
             );
         }

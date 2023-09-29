@@ -101,7 +101,7 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [null],
-            [new \stdClass],
+            [new \stdClass()],
         ];
     }
 

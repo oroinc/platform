@@ -323,6 +323,8 @@ services:
         abstract: true
         arguments:
             - '@oro_entity_config.manager.attribute_manager'
+            - '@oro_security.form.field_acl_helper'
+
 
     oro_entity_config.voter.attribute_family_voter:
         class: Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter
@@ -484,6 +486,11 @@ services:
         arguments:
             - '@oro_entity_config.config_model_manager'
             - '@oro_entity_config.provider.attribute_value'
+
+    oro_entity_config.provider.attribute_family_entity_name:
+        class: Oro\Bundle\EntityConfigBundle\Provider\AttributeFamilyEntityNameProvider
+        tags:
+            - { name: oro_entity.name_provider, priority: 100 }
 
     oro_entity_config.provider.attribute_value:
         class: Oro\Bundle\EntityConfigBundle\Provider\AttributeValueProvider

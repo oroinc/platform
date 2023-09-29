@@ -22,7 +22,7 @@ class OroEntityManagerStub extends OroEntityManager implements LazyLoadingInterf
     /**
      * {@inheritdoc}
      */
-    public function getProxyInitializer() : ?Closure
+    public function getProxyInitializer(): ?Closure
     {
         return $this->proxyInitializer;
     }

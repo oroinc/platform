@@ -87,6 +87,18 @@ class FormUtils
         $form->add($fieldName, get_class($config->getType()->getInnerType()), $options);
     }
 
+    public static function mergeFieldOptionsRecursive(
+        FormInterface $form,
+        string $fieldName,
+        array $mergeOptions = []
+    ) {
+        $config  = $form->get($fieldName)->getConfig();
+        $options = $config->getOptions();
+
+        $options = array_merge_recursive($options, $mergeOptions);
+        $form->add($fieldName, get_class($config->getType()->getInnerType()), $options);
+    }
+
     /**
      * Appends CSS class(es) to given form view
      */
@@ -108,8 +120,8 @@ class FormUtils
      *
      * @param FormBuilderInterface     $builder
      * @param DataTransformerInterface $transformerToReplace
-     * @param string                   $type               Model or View transformer type to replace in
-     * @param callable                 $comparisonCallback Callable function that will be
+     * @param string                   $type Model or View transformer type to replace in
+     * @param callable|null            $comparisonCallback Callable function that will be
      *                                                     used for old transformer detection
      */
     public static function replaceTransformer(

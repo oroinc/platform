@@ -62,10 +62,6 @@ class TopicMeta
         return $this->queueNames;
     }
 
-    /**
-     * @param string $queueName
-     * @return string
-     */
     public function getMessageProcessorName(string $queueName = ''): string
     {
         return (string)($this->messageProcessorByQueueName[$queueName ?: Config::DEFAULT_QUEUE_NAME] ?? '');

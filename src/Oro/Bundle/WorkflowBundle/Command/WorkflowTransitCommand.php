@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
@@ -51,7 +52,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $workflowItemId = $input->getOption('workflow-item');
         $transitionName = $input->getOption('transition');
@@ -103,6 +104,6 @@ HELP
             throw $e;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

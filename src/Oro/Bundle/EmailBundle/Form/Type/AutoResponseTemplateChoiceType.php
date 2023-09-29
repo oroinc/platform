@@ -67,7 +67,7 @@ class AutoResponseTemplateChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return EmailTemplateSelectType::class;
     }
@@ -83,7 +83,7 @@ class AutoResponseTemplateChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_email_autoresponse_template_choice';
     }

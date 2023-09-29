@@ -79,7 +79,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     }
 
     /**
-     * Indicates whether the filter represents a collection valued association.
+     * Indicates whether the filter is applied to a collection valued association.
      */
     public function isCollection(): bool
     {

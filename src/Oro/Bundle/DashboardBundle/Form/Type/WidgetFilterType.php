@@ -82,7 +82,7 @@ class WidgetFilterType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_dashboard_query_filter';
     }

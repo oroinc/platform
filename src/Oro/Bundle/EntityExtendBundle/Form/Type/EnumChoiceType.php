@@ -38,7 +38,7 @@ class EnumChoiceType extends AbstractEnumType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return TranslatableEntityType::class;
     }
@@ -54,7 +54,7 @@ class EnumChoiceType extends AbstractEnumType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_enum_choice';
     }

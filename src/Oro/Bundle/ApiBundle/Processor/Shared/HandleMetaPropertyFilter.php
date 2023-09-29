@@ -31,7 +31,7 @@ class HandleMetaPropertyFilter implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -77,13 +77,11 @@ class HandleMetaPropertyFilter implements ProcessorInterface
         }
 
         $names = (array)$names;
-        $configExtra = $context->getConfigExtra(MetaPropertiesConfigExtra::NAME);
-        if (null === $configExtra) {
-            $configExtra = new MetaPropertiesConfigExtra();
+        $configExtra = $context->getConfigExtra(MetaPropertiesConfigExtra::NAME) ?? new MetaPropertiesConfigExtra();
+        $allowedMetaProperties = $filter->getAllowedMetaProperties();
+        if ($allowedMetaProperties) {
             $context->addConfigExtra($configExtra);
         }
-
-        $allowedMetaProperties = $filter->getAllowedMetaProperties();
         foreach ($names as $name) {
             if (\array_key_exists($name, $allowedMetaProperties)) {
                 $configExtra->addMetaProperty($name, $allowedMetaProperties[$name]);
@@ -91,7 +89,7 @@ class HandleMetaPropertyFilter implements ProcessorInterface
                 $context->addError($this->createInvalidFilterValueKeyError(
                     $filterValue->getSourceKey(),
                     sprintf(
-                        'The "%s" value is not allowed. Allowed values: %s',
+                        'The "%s" is not known meta property. Known properties: %s.',
                         $name,
                         implode(', ', array_keys($allowedMetaProperties))
                     )

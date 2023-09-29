@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ImportExportBundle\Command;
@@ -89,7 +90,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (! is_file($sourceFile = $input->getArgument('file'))) {
             throw new \InvalidArgumentException(sprintf('File not found: %s', $sourceFile));
@@ -140,7 +141,7 @@ HELP
             $output->writeln('Scheduled successfully.');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

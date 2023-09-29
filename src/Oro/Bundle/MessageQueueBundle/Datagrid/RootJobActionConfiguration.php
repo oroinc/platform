@@ -1,9 +1,13 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 
+/**
+ * The datagrid action configuration provider for the root job
+ */
 class RootJobActionConfiguration
 {
     /**

@@ -1,3 +1,5 @@
+const config = require('module-config').default(module.id);
+
 define(function(require) {
     'use strict';
 
@@ -198,6 +200,14 @@ define(function(require) {
     });
 
     _.defer = asap;
+
+    _.getThemeSpriteUrl = function() {
+        if ('themeSpriteUrl' in config) {
+            return config.themeSpriteUrl;
+        }
+
+        return null;
+    };
 
     return _;
 });

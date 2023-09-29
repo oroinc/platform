@@ -47,7 +47,7 @@ class ExtendConfigProcessor
      */
     public function processConfigs(array $configs, LoggerInterface $logger = null, $dryRun = false)
     {
-        $this->logger = $logger ? : new NullLogger();
+        $this->logger = $logger ?: new NullLogger();
         if ($configs) {
             try {
                 $this->appendConfigs = $this->getAndRemoveElement($configs, self::APPEND_CONFIGS, []);

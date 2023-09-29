@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\PlatformBundle\Command;
@@ -46,13 +47,13 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('List of optional listeners:');
         foreach ($this->optionalListenerManager->getListeners() as $listener) {
             $output->writeln(sprintf('  <comment>> %s</comment>', $listener));
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

@@ -3,6 +3,7 @@ define(function(require) {
 
     const $ = require('jquery');
     const _ = require('underscore');
+    const {isIOS, isSoftwareKeyboardEnabled} = require('oroui/js/tools');
     const Popper = require('popper').default;
     const BaseView = require('oroui/js/app/views/base/view');
     const VALIDATOR_ERROR_CLASS = 'validation-failed';
@@ -94,6 +95,20 @@ define(function(require) {
 
                 this.scrollParent = getScrollParent(popperReference[0]);
 
+                const getBoundariesElement = () => {
+                    const boundariesElementSelector = this.$el.attr('data-boundaries-element');
+
+                    if (boundariesElementSelector) {
+                        const boundaryElement = this.$el.parents(boundariesElementSelector).last()[0];
+
+                        if (boundaryElement) {
+                            return boundaryElement;
+                        }
+                    }
+
+                    return 'window';
+                };
+
                 this.popper = new Popper(popperReference, messageEl, {
                     placement: _.isRTL() ? 'top-end' : 'top-start',
                     positionFixed: true,
@@ -106,12 +121,26 @@ define(function(require) {
                         },
 
                         preventOverflow: {
-                            boundariesElement: 'window'
+                            boundariesElement: getBoundariesElement()
                         },
 
                         hide: {
                             enabled: true,
                             fn: this.hideModifier.bind(this)
+                        }
+                    },
+
+                    onUpdate({instance, positionFixed}) {
+                        if (isIOS() && positionFixed && isSoftwareKeyboardEnabled()) {
+                            // Set top fixed position by body overscroll
+                            instance.popper.style.top = `${Math.abs(visualViewport.offsetTop)}px`;
+                        }
+                    },
+
+                    onCreate({instance}) {
+                        if (isIOS()) {
+                            // Update popper when keyboard is enabled, update popper properly when user did overscroll
+                            instance.scheduleUpdate();
                         }
                     }
                 });

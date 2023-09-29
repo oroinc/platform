@@ -103,7 +103,7 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_entity_extend.enum_value_provider' => EnumValueProvider::class,

@@ -4,70 +4,53 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var Organization */
-    protected $organization;
-
-    /** @var EmailEntityBuilder */
-    protected $emailEntityBuilder;
-
-    /** @var EmailOriginHelper */
-    protected $emailOriginHelper;
-
-    /** @var UserManager */
-    protected $userManager;
+    use ContainerAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function getDependencies(): array
     {
-        $this->emailEntityBuilder = $container->get('oro_email.email.entity.builder');
-        $this->emailOriginHelper = $container->get('oro_email.tools.email_origin_helper');
-        $this->userManager = $container->get('oro_user.manager');
+        return [LoadUserData::class, LoadOrganization::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function load(ObjectManager $manager): void
     {
-        return [LoadUserData::class];
-    }
+        $emailEntityBuilder = $this->getEmailEntityBuilder();
+        $emailOriginHelper = $this->getEmailOriginHelper();
+        $userManager = $this->getUserManager();
 
-    /**
-     * {@inheritdoc}
-     */
-    public function load(ObjectManager $manager)
-    {
-        $this->em = $manager;
-        $this->organization = $manager->getRepository(Organization::class)->getFirst();
+        $organization = $this->getReference(LoadOrganization::ORGANIZATION);
 
-        $user1 = $this->createUser('Richard', 'Bradley');
-        $user2 = $this->createUser('Brenda', 'Brock');
-        $user3 = $this->createUser('Shawn', 'Bryson');
+        $user1 = $this->createUser($userManager, $organization, 'Richard', 'Bradley');
+        $user2 = $this->createUser($userManager, $organization, 'Brenda', 'Brock');
+        $user3 = $this->createUser($userManager, $organization, 'Shawn', 'Bryson');
 
         $this->setReference('user_1', $user1);
         $this->setReference('user_2', $user2);
         $this->setReference('user_3', $user3);
 
         $email1 = $this->createEmail(
+            $emailEntityBuilder,
+            $emailOriginHelper,
+            $organization,
             'Test Email 1',
             'email1@orocrm-pro.func-test',
             'test1@example.com',
@@ -78,6 +61,9 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
         $email1->addActivityTarget($user3);
 
         $email2 = $this->createEmail(
+            $emailEntityBuilder,
+            $emailOriginHelper,
+            $organization,
             'Test Email 1',
             'email2@orocrm-pro.func-test',
             'test1@example.com',
@@ -87,30 +73,29 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
         );
         $email2->addActivityTarget($user1);
 
-        $this->emailEntityBuilder->getBatch()->persist($this->em);
-        $this->em->flush();
+        $emailEntityBuilder->getBatch()->persist($manager);
+        $manager->flush();
 
         $this->setReference('email_1', $email1);
         $this->setReference('email_2', $email2);
     }
 
-    /**
-     * @param string               $subject
-     * @param string               $messageId
-     * @param string               $from
-     * @param string|string[]      $to
-     * @param string|string[]|null $cc
-     * @param string|string[]|null $bcc
-     *
-     * @return Email
-     */
-    protected function createEmail($subject, $messageId, $from, $to, $cc = null, $bcc = null)
-    {
-        $origin = $this->emailOriginHelper->getEmailOrigin($this->getReference('simple_user')->getEmail());
+    private function createEmail(
+        EmailEntityBuilder $emailEntityBuilder,
+        EmailOriginHelper $emailOriginHelper,
+        Organization $organization,
+        string $subject,
+        string $messageId,
+        string $from,
+        string $to,
+        ?string $cc = null,
+        ?string $bcc = null
+    ): Email {
+        $origin = $emailOriginHelper->getEmailOrigin($this->getReference('simple_user')->getEmail());
         $folder = $origin->getFolder(FolderType::SENT);
-        $date   = new \DateTime('now', new \DateTimeZone('UTC'));
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        $emailUser = $this->emailEntityBuilder->emailUser(
+        $emailUser = $emailEntityBuilder->emailUser(
             $subject,
             $from,
             $to,
@@ -121,7 +106,7 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
             $cc,
             $bcc,
             null,
-            $this->organization
+            $organization
         );
         $emailUser->addFolder($folder);
         $emailUser->getEmail()->setMessageId($messageId);
@@ -130,25 +115,38 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
         return $emailUser->getEmail();
     }
 
-    /**
-     * @param string $firstName
-     * @param string $lastName
-     *
-     * @return User
-     */
-    protected function createUser($firstName, $lastName)
-    {
+    private function createUser(
+        UserManager $userManager,
+        Organization $organization,
+        string $firstName,
+        string $lastName
+    ): User {
         /** @var User $user */
-        $user = $this->userManager->createUser();
-        $user->setOrganization($this->organization);
+        $user = $userManager->createUser();
+        $user->setOrganization($organization);
         $user->setFirstName($firstName);
         $user->setLastName($lastName);
         $user->setUsername(strtolower($firstName . '.' . $lastName));
         $user->setPassword(strtolower($firstName . '.' . $lastName));
         $user->setEmail(strtolower($firstName . '_' . $lastName . '@example.com'));
 
-        $this->userManager->updateUser($user);
+        $userManager->updateUser($user);
 
         return $user;
+    }
+
+    private function getEmailEntityBuilder(): EmailEntityBuilder
+    {
+        return $this->container->get('oro_email.email.entity.builder');
+    }
+
+    private function getEmailOriginHelper(): EmailOriginHelper
+    {
+        return $this->container->get('oro_email.tools.email_origin_helper');
+    }
+
+    private function getUserManager(): UserManager
+    {
+        return $this->container->get('oro_user.manager');
     }
 }

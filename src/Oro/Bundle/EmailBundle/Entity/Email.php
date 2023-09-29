@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroEmailBundle_Entity_Email;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -50,6 +51,7 @@ use Symfony\Component\HttpFoundation\AcceptHeader;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyFields)
+ * @mixin OroEmailBundle_Entity_Email
  */
 class Email implements ActivityInterface, ExtendEntityInterface
 {
@@ -501,7 +503,7 @@ class Email implements ActivityInterface, ExtendEntityInterface
      */
     public function setMultiMessageId($multiMessageId)
     {
-        $this->multiMessageId = $multiMessageId ? serialize($multiMessageId): null;
+        $this->multiMessageId = $multiMessageId ? serialize($multiMessageId) : null;
 
         return $this;
     }
@@ -557,7 +559,7 @@ class Email implements ActivityInterface, ExtendEntityInterface
     /**
      * Get thread
      *
-     * @return EmailThread
+     * @return EmailThread|null
      */
     public function getThread()
     {
@@ -581,7 +583,7 @@ class Email implements ActivityInterface, ExtendEntityInterface
     /**
      * Get email references
      *
-     * @return array
+     * @return string[]
      */
     public function getRefs()
     {
@@ -590,13 +592,14 @@ class Email implements ActivityInterface, ExtendEntityInterface
             preg_match_all('/<(.+?)>/is', $this->refs, $refs);
             $refs = $refs[0];
         }
+
         return $refs;
     }
 
     /**
      * Set email references
      *
-     * @param $refs
+     * @param string $refs
      *
      * @return $this
      */

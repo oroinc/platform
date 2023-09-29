@@ -9,7 +9,7 @@ class PasswordChangedException extends AccountStatusException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'Password has been changed.';
     }

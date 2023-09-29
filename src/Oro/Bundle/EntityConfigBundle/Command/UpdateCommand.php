@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
@@ -77,7 +78,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Update configuration data for entities');
 
@@ -107,6 +108,6 @@ HELP
             $input->getOption('dry-run')
         );
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

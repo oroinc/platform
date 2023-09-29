@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Doctrine\Common\Collections\Criteria as CommonCriteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\Value;
+use Doctrine\DBAL\Platforms\Keywords\PostgreSQL100Keywords;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
@@ -20,6 +21,8 @@ use Oro\Bundle\ApiBundle\Util\OptimizeJoinsFieldVisitorFactory;
 use Oro\Bundle\ApiBundle\Util\RequireJoinsDecisionMaker;
 use Oro\Bundle\ApiBundle\Util\RequireJoinsFieldVisitorFactory;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Component\Testing\Unit\ORM\Mocks\ConnectionMock;
+use Oro\Component\Testing\Unit\ORM\Mocks\DatabasePlatformMock;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -29,15 +32,17 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
 {
     private const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
 
-    /** @var EntityClassResolver */
-    private $entityClassResolver;
-
-    /** @var CriteriaConnector */
-    private $criteriaConnector;
+    private EntityClassResolver $entityClassResolver;
+    private CriteriaConnector $criteriaConnector;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $platform = new DatabasePlatformMock();
+        $platform->setReservedKeywordsClass(PostgreSQL100Keywords::class);
+        /** @var ConnectionMock $connection */
+        $connection = $this->em->getConnection();
+        $connection->setDatabasePlatform($platform);
 
         $this->entityClassResolver = new EntityClassResolver($this->doctrine);
 
@@ -73,12 +78,15 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    private function assertQuery(CommonCriteria $criteria, string $expectedDql): void
-    {
+    private function assertQuery(
+        CommonCriteria $criteria,
+        string $expectedDql,
+        string $rootEntityClass = Entity\User::class
+    ): void {
         $qb = new QueryBuilder($this->em);
         $qb
             ->select('e')
-            ->from(Entity\User::class, 'e');
+            ->from($rootEntityClass, 'e');
 
         $this->criteriaConnector->applyCriteria($qb, $criteria);
 
@@ -150,6 +158,24 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             . ' INNER JOIN e.category category'
             . ' INNER JOIN e.groups groups'
             . ' WHERE category.name = :category_name AND groups.name = :groups_name'
+        );
+    }
+
+    public function testWhereWhenJoinAliasEqualsToDatabaseKeyword()
+    {
+        $criteria = $this->createCriteria();
+        $criteria->andWhere(
+            $criteria::expr()->andX(
+                $criteria::expr()->eq('group.name', 'test_group')
+            )
+        );
+
+        $this->assertQuery(
+            $criteria,
+            'SELECT e FROM Test:Contact e'
+            . ' INNER JOIN e.group group1'
+            . ' WHERE group1.name = :group1_name',
+            Entity\Contact::class
         );
     }
 

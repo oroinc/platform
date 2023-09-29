@@ -226,10 +226,10 @@ class EntityChangesToAuditEntryConverter
         }
 
         if ($audit->getVersion() < 2) {
-            return $defaultAction ? : AbstractAudit::ACTION_CREATE;
+            return $defaultAction ?: AbstractAudit::ACTION_CREATE;
         }
 
-        return $defaultAction ? : AbstractAudit::ACTION_UPDATE;
+        return $defaultAction ?: AbstractAudit::ACTION_UPDATE;
     }
 
     /**
@@ -284,6 +284,7 @@ class EntityChangesToAuditEntryConverter
             ->setParameter('objectClass', $entityClass)
             ->setParameter('objectId', (string) $entityId)
             ->orderBy('a.version', Criteria::DESC)
+            ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
 

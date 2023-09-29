@@ -87,7 +87,7 @@ class WorkflowExtension extends AbstractExtension implements ServiceSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             WorkflowVariableFormatter::class,

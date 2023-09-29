@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Client\Meta;
@@ -46,7 +47,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $table = new Table($output);
         $table->setHeaders(['Client Name', 'Transport Name', 'Subscribers']);
@@ -72,6 +73,6 @@ HELP
         $output->writeln('');
         $table->render();
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

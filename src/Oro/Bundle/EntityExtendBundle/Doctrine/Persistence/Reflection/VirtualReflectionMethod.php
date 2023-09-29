@@ -2,14 +2,21 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Doctrine\Persistence\Reflection;
 
+use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
+
 /**
- * Emulates extend entity virtual methods as ReflectionMethod/
+ * Emulates extend entity virtual methods as ReflectionMethod
  */
 class VirtualReflectionMethod extends \ReflectionMethod
 {
     protected const DONOR_METHOD_NAME = 'get';
-    private string $virtualMethod = '';
+    private string $virtualMethod;
     private bool $isRealMethod = false;
+
+    /**
+     * When method belongs to a parent class, $this->class can't be used to know the original object class name
+     */
+    private string $objectClass;
 
     public function __construct(object|string $objectOrMethod, ?string $method = null)
     {
@@ -23,6 +30,7 @@ class VirtualReflectionMethod extends \ReflectionMethod
             // If it is not possible to create a reflection method, we try to create a virtual method
             $this->virtualMethod = $method;
             parent::__construct($objectOrMethod, static::DONOR_METHOD_NAME);
+            $this->objectClass = is_string($objectOrMethod) ? $objectOrMethod : $objectOrMethod::class;
         }
     }
 
@@ -55,7 +63,19 @@ class VirtualReflectionMethod extends \ReflectionMethod
             return parent::getNumberOfRequiredParameters();
         }
 
-        return str_starts_with($this->virtualMethod, 'get') ? 0 : 1;
+        $isGetMethod = str_starts_with($this->virtualMethod, 'get');
+        if ($isGetMethod) {
+            return 0;
+        }
+        if (str_starts_with($this->virtualMethod, 'remove') || str_starts_with($this->virtualMethod, 'add')) {
+            return 1;
+        }
+        $methodInfo = EntityPropertyInfo::getExtendedMethodInfo($this->objectClass, $this->virtualMethod);
+        if (empty($methodInfo)) {
+            return 1;
+        }
+
+        return $methodInfo['is_nullable'] ? 0 : 1;
     }
 
     public function invoke($object, mixed ...$args): mixed

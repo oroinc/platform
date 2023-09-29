@@ -25,7 +25,7 @@ class ParameterBagNormalizer extends AbstractObjectNormalizer
      *
      * {@inheritdoc}
      */
-    protected function extractAttributes($object, $format = null, array $context = [])
+    protected function extractAttributes($object, $format = null, array $context = []): array
     {
         return $object->keys();
     }
@@ -43,7 +43,7 @@ class ParameterBagNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritDoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof ParameterBag;
     }

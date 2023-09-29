@@ -59,11 +59,6 @@ class TopicMetaRegistry
         $this->queuesByTopic = $queuesByTopic;
     }
 
-    /**
-     * @param string $topicName
-     *
-     * @return TopicMeta
-     */
     public function getTopicMeta(string $topicName): TopicMeta
     {
         $topicName = strtolower($topicName);

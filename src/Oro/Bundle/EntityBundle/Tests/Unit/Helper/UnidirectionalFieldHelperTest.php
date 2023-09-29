@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
+use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity1;
 
 class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -94,5 +95,16 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
                 'expected' => '',
             ],
         ];
+    }
+
+    public function testCreateUnidirectionalField(): void
+    {
+        $fieldName = 'fieldName';
+        $expected = 'Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity1::fieldName';
+
+        $this->assertEquals(
+            $expected,
+            UnidirectionalFieldHelper::createUnidirectionalField(TestEntity1::class, $fieldName)
+        );
     }
 }

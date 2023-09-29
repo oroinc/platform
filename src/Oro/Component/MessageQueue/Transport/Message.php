@@ -74,7 +74,7 @@ class Message implements MessageInterface
      */
     public function getHeader(string $name, string $default = ''): string
     {
-        return array_key_exists($name, $this->headers) ?$this->headers[$name] : $default;
+        return array_key_exists($name, $this->headers) ? $this->headers[$name] : $default;
     }
 
     /**

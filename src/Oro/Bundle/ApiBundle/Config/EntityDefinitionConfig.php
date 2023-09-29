@@ -33,6 +33,9 @@ class EntityDefinitionConfig extends EntityConfig
     private ?string $key = null;
     /** @var string[] */
     private array $identifierFieldNames = [];
+    /** @var string[] */
+    private array $disabledMetaProperties = [];
+    private ?UpsertConfig $upsertConfig = null;
 
     /**
      * Gets a string that unique identify this instance of entity definition config.
@@ -53,7 +56,7 @@ class EntityDefinitionConfig extends EntityConfig
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -78,6 +81,9 @@ class EntityDefinitionConfig extends EntityConfig
         ) {
             unset($result[ConfigUtil::DISABLE_META_PROPERTIES]);
         }
+        if ($this->disabledMetaProperties) {
+            $result[ConfigUtil::DISABLED_META_PROPERTIES] = $this->disabledMetaProperties;
+        }
         if (isset($result[ConfigUtil::DISABLE_PARTIAL_LOAD])
             && false === $result[ConfigUtil::DISABLE_PARTIAL_LOAD]
         ) {
@@ -88,6 +94,12 @@ class EntityDefinitionConfig extends EntityConfig
         }
         if (isset($result[ConfigUtil::COLLAPSE]) && false === $result[ConfigUtil::COLLAPSE]) {
             unset($result[ConfigUtil::COLLAPSE]);
+        }
+        if (null !== $this->upsertConfig) {
+            $upsertConfig = $this->upsertConfig->toArray();
+            if ($upsertConfig) {
+                $result['upsert'] = $upsertConfig;
+            }
         }
 
         $keys = array_keys($result);
@@ -108,6 +120,17 @@ class EntityDefinitionConfig extends EntityConfig
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __clone()
+    {
+        parent::__clone();
+        if (null !== $this->upsertConfig) {
+            $this->upsertConfig = clone $this->upsertConfig;
+        }
     }
 
     /**
@@ -438,6 +461,18 @@ class EntityDefinitionConfig extends EntityConfig
     }
 
     /**
+     * Gets a form option.
+     */
+    public function getFormOption(string $name, mixed $defaultValue = null): mixed
+    {
+        $formOptions = $this->get(ConfigUtil::FORM_OPTIONS);
+
+        return null !== $formOptions && \array_key_exists($name, $formOptions)
+            ? $formOptions[$name]
+            : $defaultValue;
+    }
+
+    /**
      * Sets the form options.
      */
     public function setFormOptions(?array $formOptions): void
@@ -454,9 +489,9 @@ class EntityDefinitionConfig extends EntityConfig
      */
     public function setFormOption(string $name, mixed $value): void
     {
-        $formOptions = $this->getFormOptions();
+        $formOptions = $this->items[ConfigUtil::FORM_OPTIONS] ?? [];
         $formOptions[$name] = $value;
-        $this->setFormOptions($formOptions);
+        $this->items[ConfigUtil::FORM_OPTIONS] = $formOptions;
     }
 
     /**
@@ -466,7 +501,7 @@ class EntityDefinitionConfig extends EntityConfig
      */
     public function getFormConstraints(): ?array
     {
-        return FormConstraintUtil::getFormConstraints($this->getFormOptions());
+        return FormConstraintUtil::getFormConstraints($this->get(ConfigUtil::FORM_OPTIONS));
     }
 
     /**
@@ -474,7 +509,10 @@ class EntityDefinitionConfig extends EntityConfig
      */
     public function addFormConstraint(Constraint $constraint): void
     {
-        $this->setFormOptions(FormConstraintUtil::addFormConstraint($this->getFormOptions(), $constraint));
+        $this->items[ConfigUtil::FORM_OPTIONS] = FormConstraintUtil::addFormConstraint(
+            $this->get(ConfigUtil::FORM_OPTIONS),
+            $constraint
+        );
     }
 
     /**
@@ -482,7 +520,9 @@ class EntityDefinitionConfig extends EntityConfig
      */
     public function removeFormConstraint(string $constraintClass): void
     {
-        $this->setFormOptions(FormConstraintUtil::removeFormConstraint($this->getFormOptions(), $constraintClass));
+        $this->setFormOptions(
+            FormConstraintUtil::removeFormConstraint($this->get(ConfigUtil::FORM_OPTIONS), $constraintClass)
+        );
     }
 
     /**
@@ -591,7 +631,7 @@ class EntityDefinitionConfig extends EntityConfig
      */
     public function hasDisableMetaProperties(): bool
     {
-        return $this->has(ConfigUtil::DISABLE_META_PROPERTIES);
+        return $this->has(ConfigUtil::DISABLE_META_PROPERTIES) || !empty($this->disabledMetaProperties);
     }
 
     /**
@@ -616,6 +656,48 @@ class EntityDefinitionConfig extends EntityConfig
     public function disableMetaProperties(): void
     {
         $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = true;
+    }
+
+    /**
+     * Indicates whether a requesting of the given additional meta property is enabled.
+     */
+    public function isMetaPropertyEnabled(string $metaPropertyName): bool
+    {
+        return
+            $this->isMetaPropertiesEnabled()
+            && !\in_array($metaPropertyName, $this->disabledMetaProperties, true);
+    }
+
+    /**
+     * Enables a requesting of the given additional meta property.
+     */
+    public function enableMetaProperty(string $metaPropertyName): void
+    {
+        $index = array_search($metaPropertyName, $this->disabledMetaProperties, true);
+        if (false !== $index) {
+            unset($this->disabledMetaProperties[$index]);
+            $this->disabledMetaProperties = array_values($this->disabledMetaProperties);
+        }
+    }
+
+    /**
+     * Disables a requesting of the given additional meta property.
+     */
+    public function disableMetaProperty(string $metaPropertyName): void
+    {
+        if (!\in_array($metaPropertyName, $this->disabledMetaProperties, true)) {
+            $this->disabledMetaProperties[] = $metaPropertyName;
+        }
+    }
+
+    /**
+     * Gets the names of additional meta properties a requesting of that are disabled.
+     *
+     * @return string[]
+     */
+    public function getDisabledMetaProperties(): array
+    {
+        return $this->disabledMetaProperties;
     }
 
     /**
@@ -743,5 +825,17 @@ class EntityDefinitionConfig extends EntityConfig
     public function setStatusCodes(?StatusCodesConfig $statusCodes): void
     {
         $this->set(ConfigUtil::STATUS_CODES, $statusCodes);
+    }
+
+    /**
+     * Gets the configuration of the upsert operation.
+     */
+    public function getUpsertConfig(): UpsertConfig
+    {
+        if (null === $this->upsertConfig) {
+            $this->upsertConfig = new UpsertConfig();
+        }
+
+        return $this->upsertConfig;
     }
 }

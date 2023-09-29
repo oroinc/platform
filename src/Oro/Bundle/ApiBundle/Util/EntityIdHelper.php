@@ -20,7 +20,7 @@ class EntityIdHelper
     /**
      * Sets the identifier value to a given entity.
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException when the given identifier is invalid
      */
     public function setEntityIdentifier(object $entity, mixed $entityId, EntityIdMetadataInterface $metadata): void
     {
@@ -42,7 +42,7 @@ class EntityIdHelper
             if (null === $propertyName) {
                 throw new \InvalidArgumentException(sprintf(
                     'The entity "%s" does not have metadata for the "%s" property.',
-                    \get_class($entity),
+                    $metadata->getClassName(),
                     $fieldName
                 ));
             }
@@ -54,7 +54,7 @@ class EntityIdHelper
                 if (null === $property) {
                     throw new \InvalidArgumentException(sprintf(
                         'The entity "%s" does not have the "%s" property.',
-                        \get_class($entity),
+                        $metadata->getClassName(),
                         $propertyName
                     ));
                 }
@@ -108,8 +108,8 @@ class EntityIdHelper
             foreach ($idFieldNames as $fieldName) {
                 if (!\array_key_exists($fieldName, $entityId)) {
                     throw new RuntimeException(sprintf(
-                        'The entity identifier array must have the key "%s" because '
-                        . 'the entity "%s" has composite identifier.',
+                        'The entity identifier array must have the key "%s" because'
+                        . ' the entity "%s" has composite identifier.',
                         $fieldName,
                         $metadata->getClassName()
                     ));
@@ -214,7 +214,7 @@ class EntityIdHelper
                 if (null === $property) {
                     throw new \InvalidArgumentException(sprintf(
                         'The entity "%s" does not have the "%s" property.',
-                        \get_class($entity),
+                        $metadata->getClassName(),
                         $fieldName
                     ));
                 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
@@ -61,7 +62,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $locale = $input->getOption('locale');
         $workflowName = $input->getArgument('workflow');
@@ -73,6 +74,6 @@ HELP
 
         $output->write(Yaml::dump(ArrayConverter::expandToTree($translations), self::INLINE_LEVEL));
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

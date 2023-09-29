@@ -1,0 +1,7 @@
+services:
+    oro_search.tests.entity_name_resolver.classes_provider:
+        class: Oro\Bundle\SearchBundle\Tests\Functional\Environment\TestEntityNameResolverClassesProvider
+        decorates: oro_entity.tests.entity_name_resolver.classes_provider
+        arguments:
+            - '@.inner'
+            - '@oro_search.provider.search_mapping'

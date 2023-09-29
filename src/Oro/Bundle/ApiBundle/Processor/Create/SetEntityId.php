@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Create;
 
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -25,7 +24,12 @@ class SetEntityId implements ProcessorInterface
      */
     public function process(ContextInterface $context): void
     {
-        /** @var SingleItemContext $context */
+        /** @var CreateContext $context */
+
+        if ($context->isExisting()) {
+            // an existing in the database entity already has an identifier
+            return;
+        }
 
         $entityId = $context->getId();
         if (null === $entityId) {
