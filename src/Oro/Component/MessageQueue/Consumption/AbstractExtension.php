@@ -1,6 +1,10 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption;
 
+/**
+ * Abstract extension that implements all methods of the ExtensionInterface
+ */
 abstract class AbstractExtension implements ExtensionInterface
 {
     public function onStart(Context $context)

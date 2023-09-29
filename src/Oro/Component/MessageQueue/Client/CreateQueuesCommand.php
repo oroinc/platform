@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Client;
@@ -46,7 +47,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         foreach ($this->destinationMetaRegistry->getDestinationsMeta() as $meta) {
             $output->writeln(sprintf('Creating queue: <comment>%s</comment>', $meta->getTransportQueueName()));
@@ -54,6 +55,6 @@ HELP
             $this->clientDriver->createQueue($meta->getTransportQueueName());
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

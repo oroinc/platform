@@ -33,7 +33,7 @@ class OroBatchBundle implements Migration
     public static function oroBatchJobExecutionTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_batch_job_execution **/
-        $table = $schema->createTable($tableName ? : 'oro_batch_job_execution');
+        $table = $schema->createTable($tableName ?: 'oro_batch_job_execution');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('job_instance_id', 'integer', []);
         $table->addColumn('status', 'integer', []);
@@ -59,7 +59,7 @@ class OroBatchBundle implements Migration
     public static function oroBatchJobInstanceTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_batch_job_instance **/
-        $table = $schema->createTable($tableName ? : 'oro_batch_job_instance');
+        $table = $schema->createTable($tableName ?: 'oro_batch_job_instance');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('code', 'string', ['length' => 100]);
         $table->addColumn('label', 'string', ['notnull' => false, 'length' => 255]);
@@ -82,7 +82,7 @@ class OroBatchBundle implements Migration
     public static function oroBatchMappingFieldTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_batch_mapping_field **/
-        $table = $schema->createTable($tableName ? : 'oro_batch_mapping_field');
+        $table = $schema->createTable($tableName ?: 'oro_batch_mapping_field');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('item_id', 'integer', ['notnull' => false]);
         $table->addColumn('source', 'string', ['length' => 255]);
@@ -102,7 +102,7 @@ class OroBatchBundle implements Migration
     public static function oroBatchMappingItemTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_batch_mapping_item **/
-        $table = $schema->createTable($tableName ? : 'oro_batch_mapping_item');
+        $table = $schema->createTable($tableName ?: 'oro_batch_mapping_item');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->setPrimaryKey(['id']);
         /** End of generate table oro_batch_mapping_item **/
@@ -117,7 +117,7 @@ class OroBatchBundle implements Migration
     public static function oroBatchStepExecutionTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_batch_step_execution **/
-        $table = $schema->createTable($tableName ? : 'oro_batch_step_execution');
+        $table = $schema->createTable($tableName ?: 'oro_batch_step_execution');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('job_execution_id', 'integer', ['notnull' => false]);
         $table->addColumn('step_name', 'string', ['notnull' => false, 'length' => 100]);
@@ -152,9 +152,9 @@ class OroBatchBundle implements Migration
         $jobInstanceTableName = null
     ) {
         /** Generate foreign keys for table oro_batch_job_execution **/
-        $table = $schema->getTable($tableName ? : 'oro_batch_job_execution');
+        $table = $schema->getTable($tableName ?: 'oro_batch_job_execution');
         $table->addForeignKeyConstraint(
-            $schema->getTable($jobInstanceTableName ? : 'oro_batch_job_instance'),
+            $schema->getTable($jobInstanceTableName ?: 'oro_batch_job_instance'),
             ['job_instance_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
@@ -175,9 +175,9 @@ class OroBatchBundle implements Migration
         $mappingItemTableName = null
     ) {
         /** Generate foreign keys for table oro_batch_mapping_field **/
-        $table = $schema->getTable($tableName ? : 'oro_batch_mapping_field');
+        $table = $schema->getTable($tableName ?: 'oro_batch_mapping_field');
         $table->addForeignKeyConstraint(
-            $schema->getTable($mappingItemTableName ? : 'oro_batch_mapping_item'),
+            $schema->getTable($mappingItemTableName ?: 'oro_batch_mapping_item'),
             ['item_id'],
             ['id'],
             ['onDelete' => null, 'onUpdate' => null]
@@ -198,9 +198,9 @@ class OroBatchBundle implements Migration
         $jobExecutionTableName = null
     ) {
         /** Generate foreign keys for table oro_batch_step_execution **/
-        $table = $schema->getTable($tableName ? : 'oro_batch_step_execution');
+        $table = $schema->getTable($tableName ?: 'oro_batch_step_execution');
         $table->addForeignKeyConstraint(
-            $schema->getTable($jobExecutionTableName ? : 'oro_batch_job_execution'),
+            $schema->getTable($jobExecutionTableName ?: 'oro_batch_job_execution'),
             ['job_execution_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]

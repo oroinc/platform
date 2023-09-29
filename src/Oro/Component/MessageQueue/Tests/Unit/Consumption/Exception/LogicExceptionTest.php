@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Exception;
 
 use Oro\Component\MessageQueue\Consumption\Exception\ExceptionInterface;

@@ -1,6 +1,7 @@
 <?php
 
 // @codingStandardsIgnoreStart
+
 namespace PhpUtilsOneFileTestInvalidNamespace;
 
 class Foo

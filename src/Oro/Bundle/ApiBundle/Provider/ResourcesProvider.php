@@ -156,10 +156,10 @@ class ResourcesProvider implements ResetInterface
     }
 
     /**
-     * Checks whether a given entity is enabled for API.
+     * Checks whether the given API action is enabled for the given entity.
      *
      * @param string      $entityClass The FQCN of an entity
-     * @param string      $action      The API action, {@see \Oro\Bundle\ApiBundle\Request\ApiAction}
+     * @param string      $action      The API action, {@see ApiAction}
      * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *

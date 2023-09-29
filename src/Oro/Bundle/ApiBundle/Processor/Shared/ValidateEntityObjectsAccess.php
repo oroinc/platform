@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Model\EntityHolderInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -26,7 +27,8 @@ class ValidateEntityObjectsAccess implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ContextInterface $context): void
     {
@@ -41,18 +43,30 @@ class ValidateEntityObjectsAccess implements ProcessorInterface
         $config = $context->getConfig();
         foreach ($entities as $entity) {
             $isGranted = true;
-            if (null !== $config && $config->hasAclResource()) {
-                $aclResource = $config->getAclResource();
-                if ($aclResource) {
-                    $isGranted = $this->authorizationChecker->isGranted($aclResource, $entity);
+            $entityToValidate = $this->getEntityToValidate($entity);
+            if (null !== $entityToValidate) {
+                if (null !== $config && $config->hasAclResource()) {
+                    $aclResource = $config->getAclResource();
+                    if ($aclResource) {
+                        $isGranted = $this->authorizationChecker->isGranted($aclResource, $entityToValidate);
+                    }
+                } else {
+                    $isGranted = $this->authorizationChecker->isGranted($this->permission, $entityToValidate);
                 }
-            } else {
-                $isGranted = $this->authorizationChecker->isGranted($this->permission, $entity);
             }
             if ($isGranted) {
                 $validatedEntities[] = $entity;
             }
         }
         $context->setResult($validatedEntities);
+    }
+
+    private function getEntityToValidate(object $entity): ?object
+    {
+        if ($entity instanceof EntityHolderInterface) {
+            return $entity->getEntity();
+        }
+
+        return $entity;
     }
 }

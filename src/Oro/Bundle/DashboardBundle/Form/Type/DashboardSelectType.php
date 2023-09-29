@@ -24,7 +24,7 @@ class DashboardSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return EntityType::class;
     }
@@ -68,7 +68,7 @@ class DashboardSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_dashboard_select';
     }

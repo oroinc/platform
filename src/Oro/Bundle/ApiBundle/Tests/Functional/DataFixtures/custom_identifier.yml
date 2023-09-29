@@ -2,11 +2,27 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
     test_custom_id1:
         key: 'item 1'
         name: 'Item 1'
+        children: ['@test_custom_id3']
     test_custom_id2:
         key: 'item 2'
         name: 'Item 2'
+        parent: '@test_custom_id3'
     test_custom_id3:
         key: 'item 3'
         name: 'Item 3'
         parent: '@test_custom_id1'
         children: ['@test_custom_id2']
+
+Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
+    product1:
+        name: 'Test Product 1'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder:
+    order{1..2}:
+        poNumber: 'PO<current()>'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem:
+    order_line_item{1..2}:
+        order: '@order<current()>'
+        product: '@product1'
+        quantity: 10

@@ -48,7 +48,7 @@ class OrganizationBasicAuthenticationListener
      * @param string                            $providerKey
      * @param AuthenticationEntryPointInterface $authenticationEntryPoint
      * @param OrganizationManager               $manager
-     * @param LoggerInterface                   $logger
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         TokenStorageInterface $tokenStorage,

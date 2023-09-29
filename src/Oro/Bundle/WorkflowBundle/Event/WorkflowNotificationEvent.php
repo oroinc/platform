@@ -17,7 +17,7 @@ class WorkflowNotificationEvent extends NotificationEvent
     /**
      * @param object $entity
      * @param WorkflowTransitionRecord $transitionRecord
-     * @param AbstractUser $transitionUser
+     * @param AbstractUser|null $transitionUser
      */
     public function __construct(
         $entity,

@@ -169,31 +169,27 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityMetadataForClass');
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(3))
             ->method('normalizeValue')
             ->willReturnMap([
-                [
-                    'primary_entity',
-                    DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
-                    false,
-                    false,
-                    self::TEST_CLASS_NAME
-                ],
+                ['primary_entity', DataType::ENTITY_CLASS, $requestType, false, false, [], self::TEST_CLASS_NAME],
                 [
                     'association_1_entity',
                     DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
+                    $requestType,
                     false,
                     false,
+                    [],
                     'Test\Association1Target'
                 ],
                 [
                     'association_2_entity',
                     DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
+                    $requestType,
                     false,
                     false,
+                    [],
                     'Test\Association2Target'
                 ]
             ]);
@@ -346,31 +342,27 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                 ['Test\Association3Target', true, $association3Metadata]
             ]);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(3))
             ->method('normalizeValue')
             ->willReturnMap([
-                [
-                    'primary_entity',
-                    DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
-                    false,
-                    false,
-                    self::TEST_CLASS_NAME
-                ],
+                ['primary_entity', DataType::ENTITY_CLASS, $requestType, false, false, [], self::TEST_CLASS_NAME],
                 [
                     'association_1_entity',
                     DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
+                    $requestType,
                     false,
                     false,
+                    [],
                     'Test\Association1Target'
                 ],
                 [
                     'association_2_entity',
                     DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
+                    $requestType,
                     false,
                     false,
+                    [],
                     'Test\Association2Target'
                 ]
             ]);
@@ -481,23 +473,18 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                 ['Test\Association1Target', true, $association1Metadata]
             ]);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                [
-                    'primary_entity',
-                    DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
-                    false,
-                    false,
-                    self::TEST_CLASS_NAME
-                ],
+                ['primary_entity', DataType::ENTITY_CLASS, $requestType, false, false, [], self::TEST_CLASS_NAME],
                 [
                     'association_1_1_entity',
                     DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
+                    $requestType,
                     false,
                     false,
+                    [],
                     'Test\Association1Target'
                 ]
             ]);
@@ -576,7 +563,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false)
+            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, [])
             ->willReturn(self::TEST_CLASS_NAME);
 
         $this->context->setResult($this->createConfigObject($config));
@@ -654,7 +641,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false)
+            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, [])
             ->willReturn(self::TEST_CLASS_NAME);
 
         $this->context->setResult($this->createConfigObject($config));
@@ -730,7 +717,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false)
+            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, [])
             ->willReturn(self::TEST_CLASS_NAME);
 
         $this->context->setParentClassName(self::TEST_CLASS_NAME);
@@ -789,7 +776,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
-            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false)
+            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, [])
             ->willReturn(self::TEST_CLASS_NAME);
 
         $this->context->setParentClassName(self::TEST_CLASS_NAME);
@@ -846,23 +833,18 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityMetadataForClass');
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                [
-                    'primary_entity',
-                    DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
-                    false,
-                    false,
-                    self::TEST_CLASS_NAME
-                ],
+                ['primary_entity', DataType::ENTITY_CLASS, $requestType, false, false, [], self::TEST_CLASS_NAME],
                 [
                     'association_1_entity',
                     DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
+                    $requestType,
                     false,
                     false,
+                    [],
                     'Test\Association1Target'
                 ]
             ]);
@@ -990,23 +972,18 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                 ['Test\Association2Target', true, $association2Metadata]
             ]);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                [
-                    'primary_entity',
-                    DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
-                    false,
-                    false,
-                    self::TEST_CLASS_NAME
-                ],
+                ['primary_entity', DataType::ENTITY_CLASS, $requestType, false, false, [], self::TEST_CLASS_NAME],
                 [
                     'association_1_entity',
                     DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
+                    $requestType,
                     false,
                     false,
+                    [],
                     'Test\Association1Target'
                 ]
             ]);
@@ -1112,23 +1089,18 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                 ['Test\Association1Target', true, $association1Metadata]
             ]);
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                [
-                    'primary_entity',
-                    DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
-                    false,
-                    false,
-                    self::TEST_CLASS_NAME
-                ],
+                ['primary_entity', DataType::ENTITY_CLASS, $requestType, false, false, [], self::TEST_CLASS_NAME],
                 [
                     'association_1_1_entity',
                     DataType::ENTITY_CLASS,
-                    $this->context->getRequestType(),
+                    $requestType,
                     false,
                     false,
+                    [],
                     'Test\Association1Target'
                 ]
             ]);

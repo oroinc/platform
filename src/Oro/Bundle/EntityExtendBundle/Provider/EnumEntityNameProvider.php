@@ -5,10 +5,13 @@ namespace Oro\Bundle\EntityExtendBundle\Provider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 
+/**
+ * Provides a text representation of enum entities.
+ */
 class EnumEntityNameProvider implements EntityNameProviderInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getName($format, $locale, $entity)
     {
@@ -20,7 +23,7 @@ class EnumEntityNameProvider implements EntityNameProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getNameDQL($format, $locale, $className, $alias)
     {

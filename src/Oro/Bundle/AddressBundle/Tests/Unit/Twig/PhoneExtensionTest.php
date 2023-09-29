@@ -53,12 +53,12 @@ class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
     public function testGetPhoneNumbers(?object $object)
     {
         $sourcePhones = [
-            ['123-456-789', new \stdClass],
-            ['987-654-321', new \stdClass],
+            ['123-456-789', new \stdClass()],
+            ['987-654-321', new \stdClass()],
         ];
         $expectedPhones = [
-            ['phone' => '123-456-789', 'object' => new \stdClass],
-            ['phone' => '987-654-321', 'object' => new \stdClass],
+            ['phone' => '123-456-789', 'object' => new \stdClass()],
+            ['phone' => '987-654-321', 'object' => new \stdClass()],
         ];
 
         $this->provider->expects($object ? $this->once() : $this->never())

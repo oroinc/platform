@@ -114,7 +114,6 @@ class ExtendConfigDumper
      */
     public function updateConfig($filter = null, $updateCustom = false)
     {
-        $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
         $this->clear(true);
 
         if ($updateCustom) {
@@ -132,7 +131,7 @@ class ExtendConfigDumper
 
         foreach ($extendConfigs as $extendConfig) {
             if ($extendConfig->is('upgradeable')) {
-                $this->checkSchema($extendConfig, $configProvider, $aliases, $filter);
+                $this->checkSchema($extendConfig, $configProvider, $filter);
                 $this->updateStateValues($extendConfig, $configProvider);
             }
         }
@@ -218,8 +217,8 @@ class ExtendConfigDumper
      */
     public function checkConfig()
     {
-        $hasAliases = ExtendClassLoadingUtils::aliasesExist($this->cacheDir);
-        if ($hasAliases) {
+        $hasClasses = ExtendClassLoadingUtils::classesExist($this->cacheDir);
+        if ($hasClasses) {
             return;
         }
 
@@ -270,12 +269,7 @@ class ExtendConfigDumper
     {
         $filesystem = new Filesystem();
 
-        if ($keepEntityProxies) {
-            $aliasesPath = ExtendClassLoadingUtils::getAliasesPath($this->cacheDir);
-            if ($filesystem->exists($aliasesPath)) {
-                $filesystem->remove($aliasesPath);
-            }
-        } else {
+        if (!$keepEntityProxies) {
             $baseCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir);
             if ($filesystem->exists($baseCacheDir)) {
                 $finder = new Finder();
@@ -368,14 +362,12 @@ class ExtendConfigDumper
      *
      * @param ConfigInterface $extendConfig
      * @param ConfigProvider  $configProvider
-     * @param array|null      $aliases
      * @param callable|null   $filter function (ConfigInterface $config) : bool
      * @throws \ReflectionException
      */
     private function checkSchema(
         ConfigInterface $extendConfig,
         ConfigProvider $configProvider,
-        $aliases,
         $filter = null
     ) {
         $className  = $extendConfig->getId()->getClassName();
@@ -483,11 +475,8 @@ class ExtendConfigDumper
 
         if ($type === 'Extend') {
             $parentClassName = class_exists($className) ? get_parent_class($className) : false;
-            if ($parentClassName === $entityName) {
-                $parentClassName = $aliases[$entityName];
-            }
             $schema['parent']  = $parentClassName;
-            $schema['inherit'] = class_exists($parentClassName) ? get_parent_class($parentClassName): false;
+            $schema['inherit'] = class_exists($parentClassName) ? get_parent_class($parentClassName) : false;
         } elseif ($extendConfig->has('inherit')) {
             $schema['inherit'] = $extendConfig->get('inherit');
         }

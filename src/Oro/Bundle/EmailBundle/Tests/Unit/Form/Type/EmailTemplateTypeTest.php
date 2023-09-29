@@ -136,7 +136,6 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
 
         $form = $this->factory->create(EmailTemplateType::class, $defaultData);
 
-
         $this->assertEquals($defaultData, $form->getData());
         $this->assertEquals($defaultData, $form->getViewData());
 

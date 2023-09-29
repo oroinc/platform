@@ -205,7 +205,7 @@ services:
             - [ addExcludedRoute, ['oro_rest_api_doc_resource']]
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onResponse }
-            - { name: container.service_subscriber, id: oro_navigation.navigation_history_logger }
+            - { name: container.service_subscriber, id: oro_navigation.navigation_history_logger, key: Oro\Bundle\NavigationBundle\Utils\NavigationHistoryLogger }
 
     oro_navigation.event.master_request_route_listener:
         class: Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener

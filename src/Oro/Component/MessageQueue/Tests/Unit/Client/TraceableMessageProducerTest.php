@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\CallbackMessageBuilder;
@@ -81,7 +82,7 @@ class TraceableMessageProducerTest extends \PHPUnit\Framework\TestCase
         $internalMessageProducer
             ->expects($this->once())
             ->method('send')
-            ->willThrowException(new \Exception);
+            ->willThrowException(new \Exception());
 
         $messageProducer = new TraceableMessageProducer($internalMessageProducer);
 

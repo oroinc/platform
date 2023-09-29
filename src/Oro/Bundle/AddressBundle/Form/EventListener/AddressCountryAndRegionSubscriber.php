@@ -34,7 +34,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return array(
             FormEvents::PRE_SET_DATA => 'preSetData',
@@ -54,7 +54,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             return;
         }
 
-        /** @var $country \Oro\Bundle\AddressBundle\Entity\Country */
+        /** @var $country Country */
         $country = $address->getCountry();
 
         if (null === $country) {
@@ -97,7 +97,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        /** @var $country \Oro\Bundle\AddressBundle\Entity\Country */
+        /** @var $country Country */
         $country = $this->om->getRepository('OroAddressBundle:Country')
             ->find(isset($data['country']) ? $data['country'] : false);
 

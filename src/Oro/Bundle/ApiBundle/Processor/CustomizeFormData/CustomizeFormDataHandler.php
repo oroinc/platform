@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Symfony\Component\Form\FormEvent;
@@ -58,7 +59,7 @@ class CustomizeFormDataHandler
         $context->getRequestType()->set($formContext->getRequestType());
         $context->setSharedData($formContext->getSharedData());
         $context->setClassName($form->getConfig()->getDataClass());
-        $context->setParentAction($formContext->getAction());
+        $context->setParentAction($this->getParentAction($formContext));
         $context->setForm($form);
         $config = $formContext->getConfig();
         if (null === $form->getParent()) {
@@ -80,6 +81,25 @@ class CustomizeFormDataHandler
         $context->setEntityMapper($formContext->getEntityMapper());
 
         return $context;
+    }
+
+    private function getParentAction(FormContext $formContext): string
+    {
+        $action = $formContext->getAction();
+        switch ($action) {
+            case ApiAction::CREATE:
+                if ($formContext->isExisting()) {
+                    $action = ApiAction::UPDATE;
+                }
+                break;
+            case ApiAction::UPDATE:
+                if (!$formContext->isExisting()) {
+                    $action = ApiAction::CREATE;
+                }
+                break;
+        }
+
+        return $action;
     }
 
     private function getPropertyPath(FormInterface $form): string

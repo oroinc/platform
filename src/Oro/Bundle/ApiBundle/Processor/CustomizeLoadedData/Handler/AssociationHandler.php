@@ -57,24 +57,24 @@ class AssociationHandler extends EntityHandler
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createCustomizationContext(): CustomizeLoadedDataContext
+    protected function createCustomizationContext(array $context): CustomizeLoadedDataContext
     {
-        $customizationContext = parent::createCustomizationContext();
+        $customizationContext = parent::createCustomizationContext($context);
         $customizationContext->setRootClassName($this->rootEntityClass);
         $customizationContext->setPropertyPath($this->propertyPath);
 
         /** @var EntityDefinitionConfig $config */
-        $config = $customizationContext->getConfig();
+        $config = $context['config'][$this->rootEntityClass] ?? $customizationContext->getConfig();
         $customizationContext->setRootConfig($config);
-        $customizationContext->setConfig($this->getAssociationConfig($config, $this->propertyPath));
+        $customizationContext->setConfig($config->findFieldByPath($this->propertyPath)?->getTargetEntity());
 
         return $customizationContext;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function isRedundantHandler(callable $handler): bool
     {
@@ -83,17 +83,5 @@ class AssociationHandler extends EntityHandler
             && $this->propertyPath === $handler->propertyPath
             && is_a($this->rootEntityClass, $handler->rootEntityClass, true)
             && parent::isRedundantHandler($handler);
-    }
-
-    private function getAssociationConfig(
-        EntityDefinitionConfig $config,
-        string $propertyPath
-    ): ?EntityDefinitionConfig {
-        $associationConfig = $config->findFieldByPath($propertyPath);
-        if (null === $associationConfig) {
-            return null;
-        }
-
-        return $associationConfig->getTargetEntity();
     }
 }

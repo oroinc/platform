@@ -41,7 +41,6 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCa
             ->willReturn($connection);
     }
 
-
     public function testCouldBeConstructedWithoutAnyArgument(): void
     {
         $this->expectNotToPerformAssertions();

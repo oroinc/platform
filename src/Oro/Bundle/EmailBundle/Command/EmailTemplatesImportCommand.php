@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Command;
@@ -53,14 +54,14 @@ class EmailTemplatesImportCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $source = $input->getArgument('source');
 
         if ((!is_dir($source) && !is_file($source)) || !is_readable($source)) {
             $output->writeln(sprintf('<error>Source path "%s" should exist and be readable</error>', $source));
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $templates = $this->getRawTemplates($source);
@@ -86,7 +87,7 @@ class EmailTemplatesImportCommand extends Command
 
         $this->doctrineHelper->getEntityManagerForClass(EmailTemplate::class)->flush();
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**
@@ -148,10 +149,6 @@ class EmailTemplatesImportCommand extends Command
         $this->doctrineHelper->getEntityManagerForClass(EmailTemplate::class)->persist($emailTemplate);
     }
 
-    /**
-     * @param EmailTemplate $emailTemplate
-     * @param array $template
-     */
     protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template)
     {
         $emailTemplate->setContent($template['content']);

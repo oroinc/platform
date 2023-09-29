@@ -53,7 +53,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      *
      * @return bool
      */
-    public function isGranted($attribute, $subject = null)
+    public function isGranted($attribute, $subject = null): bool
     {
         if (\is_string($attribute) && !empty($attribute) && $annotation = $this->getAnnotation($attribute)) {
             if (null === $subject) {

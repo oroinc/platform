@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Command;
@@ -40,7 +41,7 @@ during execution of this command:
 HELP;
     }
 
-    private function addLocalizationOptionsUsage() : self
+    private function addLocalizationOptionsUsage(): self
     {
         return $this
             ->addUsage('--language=en --formatting-code=en_US')

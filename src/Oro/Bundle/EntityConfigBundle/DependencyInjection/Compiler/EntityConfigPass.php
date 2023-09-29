@@ -99,7 +99,7 @@ class EntityConfigPass implements CompilerPassInterface
             'oro_entity_config',
             [
                 new YamlCumulativeFileLoader(self::CONFIG_FILE),
-                new FolderYamlCumulativeFileLoader(self::APP_CONFIG_PATH),
+                new FolderYamlCumulativeFileLoader($this->getAppConfigPath()),
             ]
         );
         $result = [];
@@ -117,5 +117,10 @@ class EntityConfigPass implements CompilerPassInterface
         }
 
         return $result;
+    }
+
+    protected function getAppConfigPath(): string
+    {
+        return self::APP_CONFIG_PATH;
     }
 }

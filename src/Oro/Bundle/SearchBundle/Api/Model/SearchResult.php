@@ -21,9 +21,8 @@ class SearchResult
     /**
      * @param SearchQueryInterface $query
      * @param bool                 $hasMore Indicates whether an additional record with
-     *                                      key "_" {@see \Oro\Component\EntitySerializer\ConfigUtil::INFO_RECORD_KEY}
-     *                                      and value ['has_more' => true]
-     *                                      {@see \Oro\Component\EntitySerializer\ConfigUtil::HAS_MORE}
+     *                                      key "_" {@see ConfigUtil::INFO_RECORD_KEY}
+     *                                      and value ['has_more' => true] {@see ConfigUtil::HAS_MORE}
      *                                      should be added to the collection of records
      *                                      if the search index has more records than it was requested.
      */

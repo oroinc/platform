@@ -83,7 +83,7 @@ class RegisterConfiguredFilters extends RegisterFilters
                 $filter = $this->createFilter($field, $propertyPath, $context);
             } catch (\Throwable $e) {
                 throw new \LogicException(
-                    sprintf('The filter "%s" for "%s" cannot be created.', $filterKey, $entityClass),
+                    sprintf('The filter "%s" for "%s" cannot be created.', $filterKey, $context->getClassName()),
                     $e->getCode(),
                     $e
                 );

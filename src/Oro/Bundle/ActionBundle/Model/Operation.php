@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
@@ -13,6 +14,9 @@ use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
+/**
+ * Responsible for operation actions
+ */
 class Operation
 {
     /** @var ActionFactoryInterface */
@@ -42,26 +46,27 @@ class Operation
     /** @var array */
     private $formOptions;
 
+    private OptionsResolver $optionsResolver;
+
     public function __construct(
         ActionFactoryInterface $actionFactory,
         ConditionFactory $conditionFactory,
         AttributeAssembler $attributeAssembler,
         FormOptionsAssembler $formOptionsAssembler,
+        OptionsResolver $optionsResolver,
         OperationDefinition $definition
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->attributeAssembler = $attributeAssembler;
         $this->formOptionsAssembler = $formOptionsAssembler;
+        $this->optionsResolver = $optionsResolver;
         $this->definition = $definition;
     }
 
-    /**
-     * @return bool
-     */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
-        return $this->getDefinition()->isEnabled();
+        return $this->getDefinition()->getEnabled() === true;
     }
 
     /**
@@ -105,16 +110,11 @@ class Operation
      * Check that operation is available to show
      *
      * @param ActionData $data
-     * @param Collection $errors
      * @return bool
      */
-    public function isAvailable(ActionData $data, Collection $errors = null)
+    public function isAvailable(ActionData $data)
     {
-        if ($this->hasForm()) {
-            return $this->isPreConditionAllowed($data, $errors);
-        } else {
-            return $this->isAllowed($data, $errors);
-        }
+        return $this->isPreConditionAllowed($data);
     }
 
     /**
@@ -124,20 +124,23 @@ class Operation
      * @param Collection|null $errors
      * @return bool
      */
-    protected function isAllowed(ActionData $data, Collection $errors = null)
+    public function isAllowed(ActionData $data, Collection $errors = null)
     {
         return $this->isPreConditionAllowed($data, $errors) &&
-            $this->evaluateConditions($data, OperationDefinition::CONDITIONS, $errors);
+            $this->evaluateConditions($data, OperationDefinition::CONDITIONS, $errors) &&
+            $this->getDefinition()->getEnabled();
     }
 
     /**
      * @param ActionData $data
-     * @param Collection $errors
+     * @param Collection|null $errors
      * @return bool
      */
     protected function isPreConditionAllowed(ActionData $data, Collection $errors = null)
     {
         $this->executeActions($data, OperationDefinition::PREACTIONS);
+
+        $this->resolveDefinitionVariableProperties($data);
 
         return $this->evaluateConditions($data, OperationDefinition::PRECONDITIONS, $errors);
     }
@@ -205,7 +208,7 @@ class Operation
     /**
      * @param ActionData $data
      * @param string $name
-     * @param Collection $errors
+     * @param Collection|null $errors
      * @return boolean
      */
     protected function evaluateConditions(ActionData $data, $name, Collection $errors = null)
@@ -239,5 +242,25 @@ class Operation
     public function __clone()
     {
         $this->definition = clone $this->getDefinition();
+    }
+
+    private function resolveDefinitionVariableProperties(ActionData $actionData): void
+    {
+        $definition = $this->getDefinition();
+
+        $properties = [
+            'enabled' => $definition->getEnabled()
+        ];
+
+        $resolvedOptions = $this->optionsResolver->resolveOptions($actionData, $properties);
+
+        $definition
+            ->setFrontendOptions(
+                $this->optionsResolver->resolveOptions($actionData, $definition->getFrontendOptions())
+            )
+            ->setButtonOptions(
+                $this->optionsResolver->resolveOptions($actionData, $definition->getButtonOptions())
+            )
+            ->setEnabled($resolvedOptions['enabled']);
     }
 }

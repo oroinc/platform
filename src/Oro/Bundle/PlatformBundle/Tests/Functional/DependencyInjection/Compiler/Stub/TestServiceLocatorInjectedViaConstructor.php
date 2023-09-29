@@ -10,7 +10,7 @@ class TestServiceLocatorInjectedViaConstructor extends TestServiceLocatorInjecti
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [
             'router' => RouterInterface::class,

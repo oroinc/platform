@@ -44,10 +44,10 @@ trait MenuItemTestTrait
      *
      * @return ItemInterface
      */
-    public function createItem($name)
+    public function createItem($name, array $options = [])
     {
         $factory = new MenuFactory();
 
-        return $factory->createItem($name);
+        return $factory->createItem($name, $options);
     }
 }

@@ -19,6 +19,7 @@ services:
     arguments:
       - '@output.formatter.pretty'
       - '@oro_test.artifacts.screenshot_generator'
+      - '@mink'
 
   oro_test.artifacts.failed_feature_subscriber:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\FailedFeaturesSubscriber

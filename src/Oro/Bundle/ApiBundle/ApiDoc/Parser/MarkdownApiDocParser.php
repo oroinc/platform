@@ -98,14 +98,13 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
      */
     public function registerDocumentationResource(string $resource): bool
     {
-        $pos = strrpos($resource, '.md');
-        if (false === $pos) {
+        if (!str_ends_with($resource, '.md')) {
             // unsupported resource
             return false;
         }
 
         /** @var string $filePath */
-        $filePath = $this->fileLocator->locate(substr($resource, 0, $pos + 3));
+        $filePath = $this->fileLocator->locate($resource);
         if (!isset($this->parsedFiles[$filePath])) {
             $existingData = $this->loadedData;
             $this->loadedData = [];

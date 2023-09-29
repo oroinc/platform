@@ -107,7 +107,7 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_multiple_association_choice';
     }
@@ -115,7 +115,7 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return SymfonyChoiceType::class;
     }

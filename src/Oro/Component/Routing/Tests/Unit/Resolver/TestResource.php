@@ -21,7 +21,7 @@ class TestResource implements ResourceInterface, SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return (string)$this->name;
     }
@@ -29,7 +29,7 @@ class TestResource implements ResourceInterface, SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh($timestamp)
+    public function isFresh($timestamp): bool
     {
         return true;
     }

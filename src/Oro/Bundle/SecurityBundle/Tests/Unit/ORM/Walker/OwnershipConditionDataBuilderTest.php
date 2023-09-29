@@ -185,7 +185,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
         string $targetEntityClassName,
         ?array $expectedConstraint,
         string $expectedGroup = ''
-    ) : void {
+    ): void {
         $this->buildTestTree();
 
         if ($ownerType !== null) {

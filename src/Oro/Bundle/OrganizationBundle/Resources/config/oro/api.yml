@@ -14,6 +14,7 @@ api:
 
         Oro\Bundle\OrganizationBundle\Entity\Organization:
             documentation_resource: '@OroOrganizationBundle/Resources/doc/api/organization.md'
+            upsert: false
             actions:
                 delete: false
                 delete_list: false

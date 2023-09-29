@@ -52,7 +52,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_entity_create_or_select_inline';
     }
@@ -60,7 +60,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return OroJquerySelect2HiddenType::class;
     }

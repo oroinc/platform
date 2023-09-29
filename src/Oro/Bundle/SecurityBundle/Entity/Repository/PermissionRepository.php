@@ -10,7 +10,7 @@ class PermissionRepository extends EntityRepository
 {
     /**
      * @param string $class
-     * @param array $ids
+     * @param array|null $ids
      * @return Permission[]
      */
     public function findByEntityClassAndIds($class, array $ids = null)

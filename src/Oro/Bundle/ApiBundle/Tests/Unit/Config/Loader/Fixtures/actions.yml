@@ -57,59 +57,96 @@ empty_order_by:
 
 sorting:
     config:
-        actions:
-            get_list:
-                disable_sorting: false
-            get_subresource:
-                disable_sorting: true
+        get_list:
+            disable_sorting: false
+        get_subresource:
+            disable_sorting: true
     expected:
-        actions:
-            get_list:
-                disable_sorting: false
-            get_subresource:
-                disable_sorting: true
+        get_subresource:
+            disable_sorting: true
 
 inclusion:
     config:
-        actions:
-            get_list:
-                disable_inclusion: false
-            get_subresource:
-                disable_inclusion: true
+        get_list:
+            disable_inclusion: false
+        get_subresource:
+            disable_inclusion: true
     expected:
-        actions:
-            get_list:
-                disable_inclusion: false
-            get_subresource:
-                disable_inclusion: true
+        get_subresource:
+            disable_inclusion: true
 
 fieldset:
     config:
-        actions:
-            get_list:
-                disable_fieldset: false
-            get_subresource:
-                disable_fieldset: true
+        get_list:
+            disable_fieldset: false
+        get_subresource:
+            disable_fieldset: true
     expected:
-        actions:
-            get_list:
-                disable_fieldset: false
-            get_subresource:
-                disable_fieldset: true
+        get_subresource:
+            disable_fieldset: true
 
 meta_properties:
     config:
-        actions:
-            get_list:
-                disable_meta_properties: false
-            get_subresource:
-                disable_meta_properties: true
+        get_list:
+            disable_meta_properties: false
+        get_subresource:
+            disable_meta_properties: true
+        get:
+            disable_meta_properties: [ prop1, prop2 ]
+        create:
+            disable_meta_properties: [ prop1, prop2, true, prop3 ]
     expected:
-        actions:
-            get_list:
-                disable_meta_properties: false
-            get_subresource:
-                disable_meta_properties: true
+        get_subresource:
+            disable_meta_properties: true
+        get:
+            disabled_meta_properties: [ prop1, prop2 ]
+        create:
+            disable_meta_properties: true
+            disabled_meta_properties: [ prop1, prop2, prop3 ]
+
+upsert_enable:
+    config:
+        create:
+            upsert:
+                disable: false
+    expected: []
+
+upsert_disable:
+    config:
+        create:
+            upsert:
+                disable: true
+    expected: []
+
+upsert_add:
+    config:
+        create:
+            upsert:
+                add: [[field1], [field2, field3]]
+    expected:
+        create:
+            upsert: [[field1], [field2, field3]]
+
+upsert_remove:
+    config:
+        create:
+            upsert:
+                add: [[field1], [field2, field3], [field4]]
+                remove: [[field1], [field2, field3]]
+    expected:
+        create:
+            upsert: [[field4]]
+
+upsert_replace:
+    config:
+        create:
+            upsert:
+                add: [[field1], [field2, field3], [field4]]
+                remove: [[field1], [field2, field3]]
+                replace: [[field5]]
+    expected:
+        create:
+            upsert: [[field5]]
 
 full:
     config:

@@ -182,7 +182,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     protected function getExtendGetterMethods(string $entityClass): array
     {
         if (!isset($this->extendGetterMethods[$entityClass])) {
-            $extendEntityMethods = array_keys(EntityPropertyInfo::getExtendedMethods($entityClass));
+            $extendEntityMethods = EntityPropertyInfo::getExtendedMethods($entityClass);
             $extendEntityMethods = array_filter($extendEntityMethods, function (string $methodName) {
                 return str_starts_with($methodName, 'get') || str_starts_with($methodName, 'is');
             });

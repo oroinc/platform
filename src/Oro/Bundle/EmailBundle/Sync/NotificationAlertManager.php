@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Sync;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager as BaseManager;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
-use Psr\Log\LoggerInterface;
 
 /**
  * The extended notification alert manager that adds method that can return notification alerts
@@ -13,19 +10,6 @@ use Psr\Log\LoggerInterface;
  */
 class NotificationAlertManager extends BaseManager
 {
-    private TokenAccessor $tokenAccessor;
-
-    public function __construct(
-        string          $sourceType,
-        string          $resourceType,
-        ManagerRegistry $doctrine,
-        TokenAccessor   $tokenAccessor,
-        LoggerInterface $logger
-    ) {
-        $this->tokenAccessor = $tokenAccessor;
-        parent::__construct($sourceType, $resourceType, $doctrine, $tokenAccessor, $logger);
-    }
-
     /**
      * @return array [userId => [alertType => notificationAlertCount, ...], ...]
      */

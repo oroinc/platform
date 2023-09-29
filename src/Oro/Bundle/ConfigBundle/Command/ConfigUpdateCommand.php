@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ConfigBundle\Command;
@@ -54,12 +55,12 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configManager = $this->configManager;
         $configManager->set($input->getArgument('name'), $input->getArgument('value'));
         $configManager->flush();
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

@@ -19,7 +19,7 @@ class WebsocketServerCommandFactory
         return new WebsocketServerCommand(
             $entryPoint,
             $dsnParameters->getHost(),
-            $dsnParameters->getPort(),
+            (int)$dsnParameters->getPort(),
             $serverRegistry
         );
     }

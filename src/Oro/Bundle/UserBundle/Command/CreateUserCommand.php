@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\UserBundle\Command;
@@ -77,7 +78,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var User $user */
         $user = $this->userManager->createUser();
@@ -99,7 +100,7 @@ HELP
             return $exception->getCode() ?: 1;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

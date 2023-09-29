@@ -14,9 +14,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
  */
 class MigrateFilteredAttachments implements FixtureInterface, ContainerAwareInterface, VersionedFixtureInterface
 {
-    protected const PREFIX = 'attachment/resize';
-
     use ContainerAwareTrait;
+    protected const PREFIX = 'attachment/resize';
 
     /**
      * {@inheritdoc}

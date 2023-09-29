@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\AddressBundle\Utils;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\AddressBundle\Entity\Country;
+use Oro\Bundle\AddressBundle\Entity\Region;
 
 /**
  * Contains a set of static methods that are used in API managers and controllers for different kind of addresses.
@@ -10,12 +12,7 @@ use Doctrine\ORM\EntityManager;
  */
 class AddressApiUtils
 {
-    /**
-     * @param bool $isTypedAddress
-     *
-     * @return array
-     */
-    public static function getAddressConfig($isTypedAddress = false)
+    public static function getAddressConfig(bool $isTypedAddress = false): array
     {
         $result = [
             'fields' => [
@@ -40,7 +37,7 @@ class AddressApiUtils
         return $result;
     }
 
-    public static function fixAddress(array &$address, EntityManager $em)
+    public static function fixAddress(array &$address, EntityManagerInterface $em): void
     {
         // just a temporary workaround until new API is implemented
         // - convert country name to country code (as result we accept both the code and the name)
@@ -74,16 +71,9 @@ class AddressApiUtils
         }
     }
 
-    /**
-     * @param string        $countryName
-     * @param EntityManager $em
-     *
-     * @return string|null
-     */
-    protected static function getCountryCodeByName($countryName, EntityManager $em)
+    protected static function getCountryCodeByName(string $countryName, EntityManagerInterface $em): ?string
     {
-        $countryRepo = $em->getRepository('OroAddressBundle:Country');
-        $country     = $countryRepo->createQueryBuilder('c')
+        $country = $em->getRepository(Country::class)->createQueryBuilder('c')
             ->select('c.iso2Code')
             ->where('c.name = :name')
             ->setParameter('name', $countryName)
@@ -93,36 +83,24 @@ class AddressApiUtils
         return !empty($country) ? $country[0]['iso2Code'] : null;
     }
 
-    /**
-     * @param string        $region
-     * @param EntityManager $em
-     *
-     * @return bool
-     */
-    protected static function isRegionCombinedCodeByCode($region, EntityManager $em)
+    protected static function isRegionCombinedCodeByCode(string $regionCode, EntityManagerInterface $em): bool
     {
-        $regionRepo = $em->getRepository('OroAddressBundle:Region');
-        $region     = $regionRepo->createQueryBuilder('r')
+        $region = $em->getRepository(Region::class)->createQueryBuilder('r')
             ->select('r.combinedCode')
             ->where('r.combinedCode = :region')
-            ->setParameter('region', $region)
+            ->setParameter('region', $regionCode)
             ->getQuery()
             ->getArrayResult();
 
         return !empty($region);
     }
 
-    /**
-     * @param string        $countryCode
-     * @param string        $regionCode
-     * @param EntityManager $em
-     *
-     * @return string|null
-     */
-    protected static function getRegionCombinedCodeByCode($countryCode, $regionCode, EntityManager $em)
-    {
-        $regionRepo = $em->getRepository('OroAddressBundle:Region');
-        $region     = $regionRepo->createQueryBuilder('r')
+    protected static function getRegionCombinedCodeByCode(
+        string $countryCode,
+        string $regionCode,
+        EntityManagerInterface $em
+    ): ?string {
+        $region = $em->getRepository(Region::class)->createQueryBuilder('r')
             ->select('r.combinedCode')
             ->innerJoin('r.country', 'c')
             ->where('c.iso2Code = :country AND r.code = :region')
@@ -134,17 +112,12 @@ class AddressApiUtils
         return !empty($region) ? $region[0]['combinedCode'] : null;
     }
 
-    /**
-     * @param string        $countryCode
-     * @param string        $regionName
-     * @param EntityManager $em
-     *
-     * @return string|null
-     */
-    protected static function getRegionCombinedCodeByName($countryCode, $regionName, EntityManager $em)
-    {
-        $regionRepo = $em->getRepository('OroAddressBundle:Region');
-        $region     = $regionRepo->createQueryBuilder('r')
+    protected static function getRegionCombinedCodeByName(
+        string $countryCode,
+        string $regionName,
+        EntityManagerInterface $em
+    ): ?string {
+        $region = $em->getRepository(Region::class)->createQueryBuilder('r')
             ->select('r.combinedCode')
             ->innerJoin('r.country', 'c')
             ->where('c.iso2Code = :country AND r.name = :region')

@@ -13,4 +13,9 @@ class ConnectionChecker extends BaseConnectionChecker
     {
         return false;
     }
+
+    public function isConfigured(): bool
+    {
+        return false;
+    }
 }

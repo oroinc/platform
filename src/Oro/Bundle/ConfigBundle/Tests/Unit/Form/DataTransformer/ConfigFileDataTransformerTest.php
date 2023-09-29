@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\DataTransformer;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -198,9 +198,9 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(null, $this->transformer->reverseTransform($file));
     }
 
-    private function getEntityManager(): EntityManager|\PHPUnit\Framework\MockObject\MockObject
+    private function getEntityManager(): EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
     {
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper->expects(self::any())
             ->method('getEntityManagerForClass')
             ->with(File::class)

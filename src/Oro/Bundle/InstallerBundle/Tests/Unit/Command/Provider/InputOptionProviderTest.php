@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Command\Provider;
@@ -194,7 +195,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
                 ['option-b', 'some-test-value'],
             ]);
 
-        static::assertEquals(
+        self::assertEquals(
             [
                 '--option-a' => 'default-value-a',
                 '--option-b' => 'some-test-value',

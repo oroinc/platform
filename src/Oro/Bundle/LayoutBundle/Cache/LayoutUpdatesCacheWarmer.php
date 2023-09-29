@@ -35,7 +35,7 @@ class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
     /**
      * @inheritDoc
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return false;
     }
@@ -43,11 +43,12 @@ class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
     /**
      * @inheritDoc
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): array
     {
         $this->loadLayoutUpdates();
         $this->collectExpressionsFromBlockTypes();
         $this->expressionLanguageCacheWarmer->write();
+        return [];
     }
 
     private function loadLayoutUpdates(): void

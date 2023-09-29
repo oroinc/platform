@@ -84,7 +84,7 @@ abstract class AbstractEntityVoter implements VoterInterface
     /**
      * {@inheritDoc}
      */
-    public function vote(TokenInterface $token, $object, array $attributes)
+    public function vote(TokenInterface $token, $object, array $attributes): int
     {
         if (!\is_object($object)) {
             return self::ACCESS_ABSTAIN;

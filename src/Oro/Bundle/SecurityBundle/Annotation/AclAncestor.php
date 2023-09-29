@@ -17,7 +17,6 @@ class AclAncestor
     /**
      * Constructor
      *
-     * @param  array $data
      * @throws \InvalidArgumentException
      */
     public function __construct(array $data = null)

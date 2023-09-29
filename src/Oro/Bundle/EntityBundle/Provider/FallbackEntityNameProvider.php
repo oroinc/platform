@@ -4,8 +4,10 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Inflector\Inflector;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -16,13 +18,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FallbackEntityNameProvider implements EntityNameProviderInterface
 {
-    const TRANSLATION_KEY = 'oro.entity.item';
+    private const TRANSLATION_KEY = 'oro.entity.item';
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var TranslatorInterface */
-    protected $translator;
+    private ManagerRegistry $doctrine;
+    private TranslatorInterface $translator;
     private Inflector $inflector;
 
     public function __construct(ManagerRegistry $doctrine, TranslatorInterface $translator, Inflector $inflector)
@@ -33,102 +32,84 @@ class FallbackEntityNameProvider implements EntityNameProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getName($format, $locale, $entity)
     {
         $fieldName = $this->getFieldName(ClassUtils::getClass($entity));
-
         if (!$fieldName) {
             return false;
         }
 
         $entityId = $this->getFieldValue($entity, $fieldName);
 
-        if ($format === self::SHORT) {
-            return $entityId;
+        if (self::SHORT === $format) {
+            return (string)$entityId;
         }
 
-        if ($format === self::FULL) {
-            return $this->translator->trans(self::TRANSLATION_KEY, ['%id%' => $entityId]);
+        if (self::FULL === $format) {
+            return $this->trans(self::TRANSLATION_KEY, ['%id%' => $entityId], $locale);
         }
 
         return false;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getNameDQL($format, $locale, $className, $alias)
     {
         $fieldName = $this->getFieldName($className);
-
         if (!$fieldName) {
             return false;
         }
 
-        if ($format === self::SHORT) {
-            if ($fieldName) {
-                return $alias . '.' . $fieldName;
-            }
+        if (self::SHORT === $format) {
+            return sprintf('CAST(%s.%s AS string)', $alias, $fieldName);
         }
 
-        if ($format === self::FULL) {
-            // replace translation placeholder with identifier fieldName
-            $fallbackValue = str_replace(
+        if (self::FULL === $format) {
+            return sprintf('CONCAT(%s)', str_replace(
                 '%id%',
                 sprintf("', %s.%s, '", $alias, $fieldName),
-                $this->translator->trans(self::TRANSLATION_KEY)
-            );
-
-            return sprintf("CONCAT('%s')", $fallbackValue);
+                (string)(new Expr())->literal($this->trans(self::TRANSLATION_KEY, [], $locale))
+            ));
         }
 
         return false;
     }
 
-    /**
-     * Return single class Identifier Field Name or null if there a multiple or none
-     *
-     * @param $className
-     *
-     * @return string|null
-     */
-    protected function getFieldName($className)
+    private function getFieldName(string $className): ?string
     {
         $manager = $this->doctrine->getManagerForClass($className);
         if (null === $manager) {
             return null;
         }
 
-        $metadata = $manager->getClassMetadata($className);
-
-        $identifierFieldNames = $metadata->getIdentifierFieldNames();
-        if (count($identifierFieldNames) !== 1) {
+        $identifierFieldNames = $manager->getClassMetadata($className)->getIdentifierFieldNames();
+        if (\count($identifierFieldNames) !== 1) {
             return null;
         }
 
         return reset($identifierFieldNames);
     }
 
-    /**
-     * @param object $entity
-     * @param string $fieldName
-     *
-     * @return mixed
-     */
-    protected function getFieldValue($entity, $fieldName)
+    private function getFieldValue(object $entity, string $fieldName): mixed
     {
         $getterName = 'get' . $this->inflector->classify($fieldName);
-
         if (EntityPropertyInfo::methodExists($entity, $getterName)) {
             return $entity->{$getterName}();
         }
 
-        if (isset($entity->{$fieldName})) {
-            return $entity->{$fieldName};
+        return $entity->{$fieldName} ?? null;
+    }
+
+    private function trans(string $key, array $params, string|Localization|null $locale): string
+    {
+        if ($locale instanceof Localization) {
+            $locale = $locale->getLanguageCode();
         }
 
-        return null;
+        return $this->translator->trans($key, $params, null, $locale);
     }
 }

@@ -54,7 +54,7 @@ class BusinessUnitSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_business_unit_select';
     }
@@ -62,7 +62,7 @@ class BusinessUnitSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return Select2EntityType::class;
     }

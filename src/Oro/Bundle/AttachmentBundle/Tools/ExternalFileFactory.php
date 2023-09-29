@@ -36,10 +36,6 @@ class ExternalFileFactory implements LoggerAwareInterface
 
     /**
      * Creates {@see ExternalFile} from the {@see File} entity.
-     *
-     * @param File $file
-     *
-     * @return ExternalFile|null
      */
     public function createFromFile(File $file): ?ExternalFile
     {
@@ -59,10 +55,6 @@ class ExternalFileFactory implements LoggerAwareInterface
      * Creates {@see ExternalFile} from the specified URL.
      * Makes a HEAD request to fetch file size, MIME type, file name.
      * Returns ExternalFile with $error property set if an error occurs.
-     *
-     * @param string $url
-     *
-     * @return ExternalFile
      *
      * @throws ExternalFileNotAccessibleException
      */

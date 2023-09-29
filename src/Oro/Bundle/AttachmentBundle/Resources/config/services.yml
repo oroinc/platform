@@ -809,3 +809,10 @@ services:
         class: Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper
         arguments:
             - '%oro_attachment.liip_imagine.unsupported_mime_types%'
+
+    oro_attachment.strategy_processor.attachment_audit_strategy:
+        class: 'Oro\Bundle\AttachmentBundle\Strategy\AttachmentAuditStrategyProcessor'
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\AttachmentBundle\Entity\Attachment }

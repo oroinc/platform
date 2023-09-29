@@ -87,11 +87,12 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
     {
         $filterValue = FilterValue::createFromSource('fields[entity]', 'entity', 'field1');
 
+        $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap([
-                ['entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Entity'],
-                ['field1', DataType::STRING, $this->context->getRequestType(), true, false, 'field1']
+                ['entity', DataType::ENTITY_CLASS, $requestType, false, false, [], 'Test\Entity'],
+                ['field1', DataType::STRING, $requestType, true, false, [], 'field1']
             ]);
 
         $this->context->getFilterValues()->set('fields[entity]', $filterValue);

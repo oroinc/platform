@@ -11,9 +11,6 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider configureOptionsDataProvider
-     *
-     * @param array $options
-     * @param array $expected
      */
     public function testConfigureOptions(array $options, array $expected): void
     {
@@ -53,10 +50,6 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider buildViewDataProvider
-     *
-     * @param array $vars
-     * @param array $options
-     * @param string $expectedType
      */
     public function testBuildView(array $vars, array $options, string $expectedType): void
     {

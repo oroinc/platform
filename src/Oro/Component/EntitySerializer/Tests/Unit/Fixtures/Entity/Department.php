@@ -36,7 +36,7 @@ class Department
     private Collection $staff;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="products")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="departments")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
      */
     private ?User $owner = null;

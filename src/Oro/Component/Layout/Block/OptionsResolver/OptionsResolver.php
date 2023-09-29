@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionsResolver;
 /**
  * Decorator class of `Symfony\Component\OptionsResolver\OptionsResolver` with removed methods, that not allowed for
  * using with expressions, like `setAllowedTypes` etc.
- * @see \Symfony\Component\OptionsResolver\OptionsResolver
+ * @see BaseOptionsResolver
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OptionsResolver implements Options
@@ -203,9 +203,6 @@ class OptionsResolver implements Options
         $this->optionsResolver->offsetUnset($option);
     }
 
-    /**
-     * @return int
-     */
     public function count(): int
     {
         return $this->optionsResolver->count();

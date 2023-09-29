@@ -34,7 +34,7 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         $this->navigationHistoryLogger = $this->createMock(NavigationHistoryLogger::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_navigation.navigation_history_logger', $this->navigationHistoryLogger)
+            ->add(NavigationHistoryLogger::class, $this->navigationHistoryLogger)
             ->getContainer($this);
 
         $this->listener = new ResponseHistoryListener(
@@ -59,12 +59,12 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         return new Response('message', $statusCode);
     }
 
-    private function getEvent(Request $request, Response $response, bool $isMasterRequest = true): ResponseEvent
+    private function getEvent(Request $request, Response $response, bool $isMainRequest = true): ResponseEvent
     {
         return new ResponseEvent(
             $this->createMock(HttpKernelInterface::class),
             $request,
-            $isMasterRequest ? HttpKernelInterface::MASTER_REQUEST : HttpKernelInterface::SUB_REQUEST,
+            $isMainRequest ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::SUB_REQUEST,
             $response
         );
     }

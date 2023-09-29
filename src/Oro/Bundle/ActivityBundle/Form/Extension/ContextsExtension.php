@@ -60,7 +60,7 @@ class ContextsExtension extends AbstractTypeExtension implements ServiceSubscrib
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_activity.manager' => ActivityManager::class,

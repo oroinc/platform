@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Profiler;
 
 use Oro\Component\MessageQueue\Client\MessagePriority;
@@ -79,7 +80,7 @@ class MessageQueueCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'message_queue';
     }

@@ -39,16 +39,6 @@ class UserHandler extends AbstractUserHandler
     /** @var EmailTemplateManager */
     private $emailTemplateManager;
 
-    /**
-     * @param FormInterface $form
-     * @param RequestStack $requestStack
-     * @param UserManager $manager
-     * @param EmailTemplateManager|null $emailTemplateManager
-     * @param ConfigManager $userConfigManager
-     * @param FlashBagInterface $flashBag
-     * @param TranslatorInterface $translator
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,

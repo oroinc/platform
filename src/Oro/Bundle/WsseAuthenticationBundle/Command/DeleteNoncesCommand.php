@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\WsseAuthenticationBundle\Command;
@@ -51,7 +52,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -64,7 +65,7 @@ HELP
         }
 
         $io->success(\sprintf('Deleted nonce cache for %s firewall.', $firewall));
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getNonceCache(string $firewallName): AdapterInterface

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroEntityConfigBundle_Attribute_Entity_AttributeFamily;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
@@ -49,6 +50,7 @@ use Oro\Component\Layout\ContextItemInterface;
  * @method AttributeFamily setImage(File $image)
  * @method LocalizedFallbackValue getLabel(Localization $localization = null)
  * @method LocalizedFallbackValue getDefaultLabel()
+ * @mixin OroEntityConfigBundle_Attribute_Entity_AttributeFamily
  */
 class AttributeFamily implements
     DatesAwareInterface,

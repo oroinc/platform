@@ -17,7 +17,7 @@ class DateTimeFormatter implements ValueFormatterInterface
      * @param \DateTime $value
      * @return string
      */
-    public function format($value) : string
+    public function format($value): string
     {
         if (!$value instanceof \DateTime) {
             throw new UnexpectedTypeException($value, '\DateTime');

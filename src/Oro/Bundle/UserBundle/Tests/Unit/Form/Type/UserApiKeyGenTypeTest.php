@@ -52,7 +52,7 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
     public function testApiKeyElementIdIsStringOption()
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->factory->create(UserApiKeyGenType::class, null, ['apiKeyElementId' => new \stdClass]);
+        $this->factory->create(UserApiKeyGenType::class, null, ['apiKeyElementId' => new \stdClass()]);
     }
 
     public function testDefaultOptions()

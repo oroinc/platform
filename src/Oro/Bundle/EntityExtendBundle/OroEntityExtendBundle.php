@@ -91,7 +91,7 @@ class OroEntityExtendBundle extends Bundle
             && !CommandExecutor::isCurrentCommand('oro:install')
             && !CommandExecutor::isCurrentCommand('oro:assets:install')
         ) {
-            if (!ExtendClassLoadingUtils::aliasesExist($this->cacheDir)
+            if (!ExtendClassLoadingUtils::classesExist($this->cacheDir)
                 && !CommandExecutor::isCommandRunning('oro:entity-extend:update-config')
             ) {
                 $this->checkConfigs();

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\IntegrationBundle\Command;
@@ -102,7 +103,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $interval = $input->getOption('interval');
 
@@ -120,7 +121,7 @@ HELP
         if (!count($iterator)) {
             $output->writeln('<info>There are no integration statuses eligible for clean up</info>');
 
-            return 0;
+            return Command::SUCCESS;
         }
         $output->writeln(sprintf('<comment>Integration statuses will be deleted:</comment> %d', count($iterator)));
 
@@ -128,7 +129,7 @@ HELP
 
         $output->writeln('<info>Integration statuses history cleanup completed</info>');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**

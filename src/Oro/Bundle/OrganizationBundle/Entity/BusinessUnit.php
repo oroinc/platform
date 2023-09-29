@@ -4,6 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroOrganizationBundle_Entity_BusinessUnit;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -50,6 +51,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
+ * @mixin OroOrganizationBundle_Entity_BusinessUnit
  */
 class BusinessUnit implements
     EmailHolderInterface,
@@ -439,7 +441,7 @@ class BusinessUnit implements
     }
 
     /**
-     * @param BusinessUnit $value
+     * @param BusinessUnit|null $value
      *
      * @return BusinessUnit
      */

@@ -103,7 +103,9 @@ define(function(require) {
             // work around with trigger event to get current state of model (selected or not)
             const state = {selected: false};
             this.model.trigger('backgrid:isSelected', this.model, state);
+            const data = this.model.toJSON();
             this.$el.html(this.template({
+                ...data,
                 checked: state.selected
             }));
             this.$checkbox = this.$el.find(this.checkboxSelector);

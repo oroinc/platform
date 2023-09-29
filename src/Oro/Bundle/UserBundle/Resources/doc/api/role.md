@@ -30,8 +30,7 @@ Example:
    "data": {
       "type": "userroles",
       "attributes": {
-         "extend_description": "A guest role",
-         "role": "IS_AUTHENTICATED_AT_FIRST",
+         "role": "ROLE_GUEST",
          "label": "Guest"
       },
       "relationships": {
@@ -64,17 +63,7 @@ Example:
       "type": "userroles",
       "id": "10",
       "attributes": {
-         "extend_description": "A guest role new",
-         "role": "IS_AUTHENTICATED_AT_FIRST",
          "label": "Guest"
-      },
-      "relationships": {
-         "organization": {
-            "data": {
-               "type": "organizations",
-               "id": "1"
-            }
-         }
       }
    }
 }
@@ -95,6 +84,22 @@ Delete a collection of user roles.
 
 ## FIELDS
 
+### role
+
+#### create
+
+{@inheritdoc}
+
+**Note**: The submitted value is just a recommended prefix. It is used to generate unique code for the role.
+
+#### update
+
+{@inheritdoc}
+
+**This field must not be empty, if it is passed.**
+
+**Note**: The submitted value is just a recommended prefix. It is used to generate unique code for the role.
+
 ### label
 
 #### create
@@ -102,6 +107,12 @@ Delete a collection of user roles.
 {@inheritdoc}
 
 **The required field.**
+
+#### update
+
+{@inheritdoc}
+
+**This field must not be empty, if it is passed.**
 
 ## SUBRESOURCES
 

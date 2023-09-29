@@ -27,7 +27,7 @@ class MessageProcessorProxy implements MessageProcessorInterface, ValueHolderInt
     /**
      * {@inheritdoc}
      */
-    public function getWrappedValueHolderValue() : ?object
+    public function getWrappedValueHolderValue(): ?object
     {
         return $this->messageProcessor;
     }

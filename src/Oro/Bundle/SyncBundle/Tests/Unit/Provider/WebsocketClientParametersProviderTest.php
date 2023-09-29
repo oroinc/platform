@@ -125,4 +125,14 @@ class WebsocketClientParametersProviderTest extends \PHPUnit\Framework\TestCase
             ['peer_fingerprint', ['ab', 'cd'], ['peer_fingerprint' => ['ab', 'cd']]],
         ];
     }
+
+    public function testUserAgent()
+    {
+        $userAgent = 'user_agent/1.2';
+        $wsClientParamsProvider = new WebsocketClientParametersProvider(sprintf(
+            '//*:8080?%s',
+            http_build_query(['user_agent' => $userAgent])
+        ));
+        self::assertEquals($wsClientParamsProvider->getUserAgent(), $userAgent);
+    }
 }

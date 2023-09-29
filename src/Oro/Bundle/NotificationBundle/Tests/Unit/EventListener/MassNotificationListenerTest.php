@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
@@ -13,13 +13,13 @@ use Symfony\Component\Mime\RawMessage;
 
 class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
+    private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     private MassNotificationListener $listener;
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
@@ -56,10 +56,6 @@ class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider logMassNotificationDataProvider
-     *
-     * @param SymfonyEmail $symfonyEmail
-     * @param int $sentCount
-     * @param MassNotification $massNotification
      */
     public function testLogMassNotification(
         SymfonyEmail $symfonyEmail,

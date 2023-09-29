@@ -23,7 +23,7 @@ class ConsoleErrorHandler extends HandlerWrapper
 
     /**
      * @param ConsumerState $consumerState
-     * @param HandlerInterface $handler
+     * @param HandlerInterface|null $handler
      * @param int $level
      */
     public function __construct(ConsumerState $consumerState, ?HandlerInterface $handler, $level = Logger::DEBUG)

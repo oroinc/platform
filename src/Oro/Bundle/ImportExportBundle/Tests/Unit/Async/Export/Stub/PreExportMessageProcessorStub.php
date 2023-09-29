@@ -42,7 +42,7 @@ class PreExportMessageProcessorStub extends PreExportMessageProcessorAbstract
     /**
      * {@inheritdoc}
      */
-    protected function getExportingEntityIds(array $body):array
+    protected function getExportingEntityIds(array $body): array
     {
         return $this->exportingEntityIds;
     }

@@ -94,7 +94,6 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
             ['resource_files' => [], 'cache_dir' => $cacheDir]
         );
 
-
         $translator->setStrategyProvider($strategyProvider);
         $translator->setResourceCache(new MemoryCache());
         $translator->setMessageCatalogueSanitizer($this->createMock(MessageCatalogueSanitizer::class));

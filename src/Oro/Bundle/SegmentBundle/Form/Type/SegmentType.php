@@ -89,7 +89,7 @@ class SegmentType extends AbstractQueryDesignerType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_segment';
     }

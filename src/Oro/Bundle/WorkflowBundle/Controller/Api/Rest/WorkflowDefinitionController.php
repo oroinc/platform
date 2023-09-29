@@ -89,7 +89,7 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      * Create new workflow definition
      *
      * @param Request $request
-     * @param WorkflowDefinition $workflowDefinition
+     * @param WorkflowDefinition|null $workflowDefinition
      * @return Response
      * @ApiDoc(
      *      description="Create new workflow definition",

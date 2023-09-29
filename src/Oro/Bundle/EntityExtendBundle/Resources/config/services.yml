@@ -49,6 +49,13 @@ services:
         tags:
             - { name: kernel.cache_warmer, priority: 30 }
 
+    oro_entity_extend.entity.cache.autocomplete_warmer:
+        class: Oro\Bundle\EntityExtendBundle\Cache\ExtendEntityAutocompleteWarmer
+        arguments:
+            - "@oro_entity_extend.autocomplete_class_generator"
+        tags:
+            - { name: kernel.cache_warmer, priority: 20 }
+
     oro_entity_extend.datagrid.extension.fields_helper:
         class: Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper
         arguments:
@@ -499,6 +506,7 @@ services:
         class: Oro\Bundle\EntityExtendBundle\ImportExport\Serializer\EnumNormalizer
         arguments:
             - "@oro_entity.helper.field_helper"
+            - '@oro_entity_extend.enum_value_provider'
         tags:
             - { name: oro_importexport.normalizer, priority: 20 }
 
@@ -656,9 +664,8 @@ services:
 
     oro_entity_extend.enum_entity_name_provider:
         class: Oro\Bundle\EntityExtendBundle\Provider\EnumEntityNameProvider
-        public: false
         tags:
-            - { name: oro_entity.name_provider, priority: 0 }
+            - { name: oro_entity.name_provider }
 
     oro_entity_extend.event_listener.entity_structure_options_listener:
         class: Oro\Bundle\EntityExtendBundle\EventListener\EntityExtendedStructureOptionsListener
@@ -795,3 +802,13 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Twig\GetAttributeNodeExtension
         tags:
             - { name: twig.extension }
+
+    oro_entity_extend.autocomplete_class_generator:
+        class: Oro\Bundle\EntityExtendBundle\Tools\ExtendAutocompleteGenerator
+        arguments:
+            - "@oro_entity_config.config_manager"
+            - !service_locator
+                'Oro\Bundle\EntityExtendBundle\EntityExtend\EntityFieldIterator': '@oro_entity_extend.entity_field_iterator'
+                'Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendEntityMetadataProvider': '@oro_entity_extend.entity_metadata_provider'
+            - '%kernel.cache_dir%'
+            - '@logger'

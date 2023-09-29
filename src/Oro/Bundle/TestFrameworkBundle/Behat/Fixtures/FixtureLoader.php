@@ -175,11 +175,6 @@ class FixtureLoader
         return $file;
     }
 
-    /**
-     * @param string $filename
-     * @param array $paths
-     * @return string|null
-     */
     private function findFileInPath(string $filename, array $paths): ?string
     {
         foreach ($paths as $path) {

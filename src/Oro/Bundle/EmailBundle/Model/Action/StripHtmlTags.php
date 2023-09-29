@@ -62,6 +62,6 @@ class StripHtmlTags extends AbstractAction
         }
 
         $this->attribute = isset($options['attribute']) ? $options['attribute'] : $options[0];
-        $this->html      = isset($options['html'])      ? $options['html']      : $options[1];
+        $this->html      = isset($options['html']) ? $options['html'] : $options[1];
     }
 }

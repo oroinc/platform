@@ -13,7 +13,7 @@ class ScheduleIntervalTypeStub extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return ScheduleIntervalType::NAME;
     }

@@ -18,10 +18,8 @@ class ConsumerState
     /** @var ExtensionInterface */
     private $extension;
 
-    /** @var string */
     private string $messageProcessorName = '';
 
-    /** @var string */
     private string $messageProcessorClass = '';
 
     /** @var MessageInterface */
@@ -85,8 +83,6 @@ class ConsumerState
 
     /**
      * Returns a message processor name that is executed at the moment.
-     *
-     * @return string
      */
     public function getMessageProcessorName(): string
     {
@@ -103,8 +99,6 @@ class ConsumerState
 
     /**
      * Returns a message processor class that is executed at the moment.
-     *
-     * @return string
      */
     public function getMessageProcessorClass(): string
     {
@@ -152,8 +146,6 @@ class ConsumerState
 
     /**
      * Sets a job that is executed at the moment.
-     *
-     * @param Job $job
      */
     public function setJob(Job $job = null)
     {

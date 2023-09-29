@@ -321,7 +321,7 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_email.email_holder_helper' => EmailHolderHelper::class,

@@ -46,3 +46,7 @@ services:
 
     oro_sync.client.wamp.factory:
         class: Oro\Bundle\SyncBundle\Client\Wamp\Factory\WampClientFactory
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }

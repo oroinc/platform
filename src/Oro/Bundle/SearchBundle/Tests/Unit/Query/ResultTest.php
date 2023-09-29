@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;

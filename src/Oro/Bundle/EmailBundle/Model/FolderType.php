@@ -3,21 +3,21 @@
 namespace Oro\Bundle\EmailBundle\Model;
 
 /**
- * Provides possible types of folders
+ * Provides possible types of folders.
  */
 class FolderType
 {
-    const INBOX  = 'inbox';
-    const SENT   = 'sent';
-    const TRASH  = 'trash';
-    const DRAFTS = 'drafts';
-    const SPAM   = 'spam';
-    const OTHER  = 'other';
+    public const INBOX = 'inbox';
+    public const SENT = 'sent';
+    public const TRASH = 'trash';
+    public const DRAFTS = 'drafts';
+    public const SPAM = 'spam';
+    public const OTHER = 'other';
 
     /**
      * @return string[]
      */
-    public static function outgoingTypes()
+    public static function outgoingTypes(): array
     {
         return [
             static::SENT,
@@ -28,7 +28,7 @@ class FolderType
     /**
      * @return string[]
      */
-    public static function incomingTypes()
+    public static function incomingTypes(): array
     {
         return [
             static::INBOX,

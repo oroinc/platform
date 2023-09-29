@@ -174,11 +174,6 @@ abstract class AbstractButtonProviderExtension implements
         ($application === $this->applicationProvider->getCurrentApplication());
     }
 
-    /**
-     * @param ButtonInterface $button
-     * @param \Exception $e
-     * @param Collection $errors
-     */
     protected function addError(ButtonInterface $button, \Exception $e, Collection $errors = null)
     {
         if (null === $errors) {

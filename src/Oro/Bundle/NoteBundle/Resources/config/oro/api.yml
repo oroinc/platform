@@ -2,3 +2,4 @@ api:
     entities:
         Oro\Bundle\NoteBundle\Entity\Note:
             documentation_resource: '@OroNoteBundle/Resources/doc/api/note.md'
+            disable_meta_properties: [ title ]

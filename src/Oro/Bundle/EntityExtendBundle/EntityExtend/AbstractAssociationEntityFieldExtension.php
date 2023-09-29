@@ -14,17 +14,24 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityStaticCache;
  */
 abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExtensionInterface
 {
+    protected const OBJECT_INDEX = 0;
+    protected const METHOD_INDEX = 1;
+    public const TYPE_INDEX = 2;
+
     abstract protected function isApplicable(EntityFieldProcessTransport $transport): bool;
 
     abstract protected function getRelationKind(): ?string;
 
     abstract protected function getRelationType(): string;
 
-    public function getMethods(EntityFieldProcessTransport $transport): array
+    protected function getMethodsData(EntityFieldProcessTransport $transport): array
     {
+        if (!$this->isApplicable($transport)) {
+            return [];
+        }
         $methods = [
-            'getAssociationRelationType' => [$this, 'callGetRelationType'],
-            'getAssociationRelationKind' => [$this, 'callGetRelationKind'],
+            'getAssociationRelationType' => [$this, 'callGetRelationType', 'string'],
+            'getAssociationRelationKind' => [$this, 'callGetRelationKind', '?string'],
         ];
 
         switch ($this->getRelationType()) {
@@ -32,42 +39,55 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
             case RelationType::MULTIPLE_MANY_TO_ONE:
                 $methods[NameGenerator::generateSupportTargetMethodName($this->getRelationKind())] = [
                     $this,
-                    'callSupport'
+                    'callSupport',
+                    'bool'
                 ];
                 $methods[NameGenerator::generateGetTargetsMethodName($this->getRelationKind())] = [
                     $this,
-                    'callGetTargets'
+                    'callGetTargets',
+                    'array|object'
                 ];
                 $methods[NameGenerator::generateHasTargetMethodName($this->getRelationKind())] = [
                     $this,
-                    'callHasTarget'
+                    'callHasTarget',
+                    'bool'
                 ];
                 $methods[NameGenerator::generateAddTargetMethodName($this->getRelationKind())] = [
                     $this,
-                    'callAddTarget'
+                    'callAddTarget',
+                    'self'
                 ];
                 $methods[NameGenerator::generateRemoveTargetMethodName($this->getRelationKind())] = [
                     $this,
-                    'callRemoveTarget'
+                    'callRemoveTarget',
+                    'self'
                 ];
                 break;
             case RelationType::MANY_TO_ONE:
                 $methods[NameGenerator::generateSupportTargetMethodName($this->getRelationKind())] = [
                     $this,
-                    'callSupport'
+                    'callSupport',
+                    'bool'
                 ];
                 $methods[NameGenerator::generateGetTargetMethodName($this->getRelationKind())] = [
                     $this,
-                    'callGetTarget'
+                    'callGetTarget',
+                    '?object'
                 ];
                 $methods[NameGenerator::generateSetTargetMethodName($this->getRelationKind())] = [
                     $this,
-                    'callSetTarget'
+                    'callSetTarget',
+                    'self'
                 ];
                 break;
         }
 
         return $methods;
+    }
+
+    public function getMethods(EntityFieldProcessTransport $transport): array
+    {
+        return array_keys($this->getMethodsData($transport));
     }
 
     protected function callGetRelationType(EntityFieldProcessTransport $transport): void
@@ -167,9 +187,15 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
             return;
         }
 
-        $methods = $this->getMethods($transport);
+        $methods = $this->getMethodsData($transport);
         if (isset($methods[$transport->getName()])) {
-            call_user_func($methods[$transport->getName()], $transport);
+            call_user_func(
+                [
+                    $methods[$transport->getName()][self::OBJECT_INDEX],
+                    $methods[$transport->getName()][self::METHOD_INDEX]
+                ],
+                $transport
+            );
             $transport->setProcessed(true);
         }
     }
@@ -202,11 +228,29 @@ abstract class AbstractAssociationEntityFieldExtension implements EntityFieldExt
             return;
         }
         // get a list of associated methods
-        $methods = array_keys($this->getMethods($transport));
-        if (EntityPropertyInfo::isMethodMatchExists($methods, $transport->getName())) {
+        if (EntityPropertyInfo::isMethodMatchExists($this->getMethods($transport), $transport->getName())) {
             $transport->setResult(true);
             $transport->setProcessed(true);
             ExtendEntityStaticCache::setMethodExistsCache($transport, true);
         }
+    }
+
+    public function getMethodInfo(EntityFieldProcessTransport $transport): void
+    {
+        $methods = $this->getMethodsData($transport);
+        if (!isset($methods[$transport->getName()])) {
+            return;
+        }
+        $transport->setResult([
+            ExtendEntityMetadataProvider::FIELD_NAME => $this->getRelationKind(),
+            ExtendEntityMetadataProvider::FIELD_TYPE => $methods[$transport->getName()][self::TYPE_INDEX],
+            ExtendEntityMetadataProvider::IS_EXTEND => true,
+            ExtendEntityMetadataProvider::IS_NULLABLE => str_starts_with(
+                $methods[$transport->getName()][self::TYPE_INDEX],
+                '?'
+            ),
+            ExtendEntityMetadataProvider::IS_SERIALIZED => false,
+        ]);
+        $transport->setProcessed(true);
     }
 }

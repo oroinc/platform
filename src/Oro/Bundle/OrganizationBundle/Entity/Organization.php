@@ -4,6 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroOrganizationBundle_Entity_Organization;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -35,6 +36,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *          },
  *      }
  * )
+ * @mixin OroOrganizationBundle_Entity_Organization
  */
 class Organization implements OrganizationInterface, ExtendEntityInterface
 {

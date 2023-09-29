@@ -67,7 +67,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     /**
      * {@inheritDoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return [];
     }

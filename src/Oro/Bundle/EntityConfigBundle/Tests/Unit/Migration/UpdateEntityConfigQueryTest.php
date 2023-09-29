@@ -90,7 +90,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
             ->method('execute')
             ->with(['data serialized payload to persist', '42']);
 
-        $logger = new ArrayLogger;
+        $logger = new ArrayLogger();
 
         $this->query->setConnection($this->connection);
         $this->query->execute($logger);

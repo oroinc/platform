@@ -8,8 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Sync\NotificationAlertManager;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Psr\Log\LoggerInterface;
 
 class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
@@ -20,20 +19,20 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
-    /** @var TokenAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
-
-    /** @var NotificationAlertManager */
-    private $notificationAlertManager;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
+
+    /** @var NotificationAlertManager */
+    private $notificationAlertManager;
 
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
         $this->connection = $this->createMock(Connection::class);
-        $this->tokenAccessor = $this->createMock(TokenAccessor::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
@@ -47,7 +46,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         $this->em->expects(self::any())
             ->method('getClassMetadata')
             ->with(NotificationAlert::class)
-            ->willReturn($this->mockMetadata());
+            ->willReturn($this->getMetadata());
         $this->connection->expects(self::any())
             ->method('convertToPHPValue')
             ->willReturnCallback(function ($value, $type) {
@@ -76,7 +75,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function mockMetadata(): MockObject
+    private function getMetadata(): ClassMetadata
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects(self::any())
@@ -146,6 +145,11 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             });
 
         return $metadata;
+    }
+
+    private function createDateTime(string $dateTime = 'now'): \DateTime
+    {
+        return new \DateTime($dateTime);
     }
 
     public function testGetNotificationAlertsCountGroupedByUserAndType(): void

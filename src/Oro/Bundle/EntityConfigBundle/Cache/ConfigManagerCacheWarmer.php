@@ -18,13 +18,14 @@ class ConfigManagerCacheWarmer implements CacheWarmerInterface
         $this->configManager = $configManager;
     }
 
-    public function isOptional()
+    public function isOptional(): bool
     {
         return false;
     }
 
-    public function warmUp(string $cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         $this->configManager->clear();
+        return [];
     }
 }

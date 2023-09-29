@@ -39,7 +39,6 @@ class BuildTopicMetaRegistryPass implements CompilerPassInterface
             }
         }
 
-
         $topicRegistry = $container->getDefinition($topicRegistryId);
 
         $topicRegistry->setArgument('$topicServiceProvider', new ServiceLocatorArgument($topicServices));

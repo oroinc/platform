@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
@@ -12,7 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class WidgetControllerTest extends WebTestCase
 {
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     private $em;
 
     /** @var Widget */

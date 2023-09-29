@@ -7,9 +7,6 @@ namespace Oro\Bundle\SyncBundle\Client;
  */
 interface WebsocketClientInterface
 {
-    /**
-     * @return string
-     */
     public function connect(): ?string;
 
     public function disconnect(): bool;

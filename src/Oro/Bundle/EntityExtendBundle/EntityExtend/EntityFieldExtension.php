@@ -321,7 +321,6 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         }
     }
 
-
     /**
      * @inheritDoc
      */
@@ -382,7 +381,7 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
         }
     }
 
-    public function getMethods(EntityFieldProcessTransport $transport): array
+    protected function getMethodsData(EntityFieldProcessTransport $transport): array
     {
         return array_merge(
             $this->getSetMethods($transport),
@@ -390,5 +389,10 @@ class EntityFieldExtension extends AbstractEntityFieldExtension implements Entit
             $this->getRemoveMethods($transport),
             $this->getAddMethods($transport),
         );
+    }
+
+    public function getMethods(EntityFieldProcessTransport $transport): array
+    {
+        return array_keys($this->getMethodsData($transport));
     }
 }

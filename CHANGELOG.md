@@ -57,6 +57,33 @@ The current file describes significant changes in the code that may affect the u
 - [2.1.0](#210-2017-03-30)
 
 
+## UNRELEASED
+
+### Added
+
+#### ApiBundle
+* String value(s) contains only space symbols is not allowed for string API filters. For example the following filters
+  are not valid: `filter[code]= `, `filter[code]=code1, ,code2`. If by some reasons you want to allow value(s) contains
+  only space symbols for some filters, you can use `allow_empty` filter option in `Resources/config/oro/api.yml`, e.g.:
+
+```yaml
+api:
+  entities:
+    Acme\Bundle\AcmeBundle\Entity\SomeEntity:
+      filters:
+        code:
+          options:
+            allow_empty: true
+```
+* Added the ability to specify `\Symfony\Component\Validator\Constraints\GroupSequence` in validation groups of API config via nested arrays.
+
+#### FormBundle
+* Added the chain of constraint converters to `\Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverter` with basic implementation in `\Oro\Bundle\FormBundle\Form\Extension\JsValidation\GenericConstraintConverter`.
+* Added `\Oro\Bundle\FormBundle\Form\Extension\JsValidation\RangeConstraintConverter` for `Range` constraint with the ability to handle `minPropertyPath` and `maxPropertyPath`.
+
+#### PlatformBundle
+* Added `\Oro\Bundle\PlatformBundle\Validator\Constraints\ValidEmbeddable` that allows to apply `Valid` constraint with explicit validation groups specified in `embeddedGroups` option. 
+
 ## 5.1.0 (2023-03-31)
 
 [Show detailed list of changes](incompatibilities-5-1.md)

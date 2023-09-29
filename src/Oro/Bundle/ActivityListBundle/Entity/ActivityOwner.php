@@ -75,7 +75,7 @@ class ActivityOwner
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      *
      * @return self
      */
@@ -99,7 +99,7 @@ class ActivityOwner
     /**
      * Set activity
      *
-     * @param ActivityList $activity
+     * @param ActivityList|null $activity
      *
      * @return self
      */
@@ -111,7 +111,7 @@ class ActivityOwner
     }
 
     /**
-     * @param User $user
+     * @param User|null $user
      *
      * @return self
      */

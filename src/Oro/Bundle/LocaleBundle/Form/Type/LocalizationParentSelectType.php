@@ -46,7 +46,7 @@ class LocalizationParentSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return OroEntitySelectOrCreateInlineType::class;
     }
@@ -62,7 +62,7 @@ class LocalizationParentSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }

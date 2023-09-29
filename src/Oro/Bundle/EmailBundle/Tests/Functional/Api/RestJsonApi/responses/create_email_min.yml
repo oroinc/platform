@@ -1,0 +1,72 @@
+data:
+    type: emails
+    id: '<toString(@createdEmail->id)>'
+    attributes:
+        createdAt: '@createdEmail->created->format("Y-m-d\TH:i:s\Z")'
+        subject: 'Test Email'
+        sentAt: '2023-02-01T10:20:30Z'
+        importance: normal
+        internalDate: '2023-02-01T08:10:10Z'
+        head: true
+        messageId: '<test@email-api.func-test>'
+        messageIds: null
+        xMessageId: null
+        xThreadId: null
+        references: []
+        acceptLanguage: null
+        bodySynced: false
+        from:
+            name: null
+            email: admin@example.com
+        toRecipients:
+            -
+                name: null
+                email: user1@example.com
+        ccRecipients: {  }
+        bccRecipients: {  }
+        shortTextBody: null
+        hasEmailAttachments: null
+        body: null
+    relationships:
+        emailUsers:
+            data:
+                -
+                    type: emailusers
+                    id: '<toString(@createdEmail->emailUsers->first()->id)>'
+        activityTargets:
+            data:
+                -
+                    type: users
+                    id: '<toString(@user1->id)>'
+                -
+                    type: users
+                    id: '<toString(@user->id)>'
+        emailAttachments:
+            data: []
+included:
+    -
+        type: emailusers
+        id: '<toString(@createdEmail->emailUsers->first()->id)>'
+        attributes:
+            createdAt: '@createdEmail->emailUsers->first()->createdAt->format("Y-m-d\TH:i:s\Z")'
+            receivedAt: '@createdEmail->emailUsers->first()->receivedAt->format("Y-m-d\TH:i:s\Z")'
+            seen: false
+            private: true
+            folders:
+                -
+                    type: other
+                    name: Other
+                    path: Other
+        relationships:
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            email:
+                data:
+                    type: emails
+                    id: '<toString(@createdEmail->id)>'

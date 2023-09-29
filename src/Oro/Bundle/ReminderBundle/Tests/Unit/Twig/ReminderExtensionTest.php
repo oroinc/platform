@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Twig;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
@@ -20,7 +20,7 @@ class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
     /** @var MessageParamsProvider|\PHPUnit\Framework\MockObject\MockObject */
@@ -32,7 +32,7 @@ class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->paramsProvider = $this->createMock(MessageParamsProvider::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);

@@ -9,7 +9,7 @@ class OrganizationException extends AccountStatusException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'You don\'t have active organization assigned.';
     }

@@ -1,0 +1,54 @@
+disable_specified_meta_properties:
+    configs:
+        -
+            disable_meta_properties: [ prop1, prop2 ]
+        -
+            disable_meta_properties: [ prop3 ]
+    expected:
+        disable_meta_properties: [ prop1, prop2, prop3 ]
+
+disable_meta_properties:
+    configs:
+        -
+            disable_meta_properties: [ prop1, prop2 ]
+        -
+            disable_meta_properties: [ prop3 ]
+        -
+            disable_meta_properties: true
+        -
+            disable_meta_properties: [ prop4 ]
+    expected:
+        disable_meta_properties: [ prop1, prop2, prop3, true, prop4 ]
+
+upsert:
+    configs:
+        -
+            upsert:
+                add: [[field1]]
+            actions:
+                create:
+                    upsert:
+                        add: [[field1]]
+        -
+            upsert:
+                add: [[field2, field3], [field4]]
+            actions:
+                create:
+                    upsert:
+                        add: [[field2, field3], [field4]]
+        -
+            upsert:
+                remove: [[field4]]
+            actions:
+                create:
+                    upsert:
+                        remove: [[field4]]
+    expected:
+        upsert:
+            add: [[field1], [field2, field3], [field4]]
+            remove: [[field4]]
+        actions:
+            create:
+                upsert:
+                    add: [[field1], [field2, field3], [field4]]
+                    remove: [[field4]]

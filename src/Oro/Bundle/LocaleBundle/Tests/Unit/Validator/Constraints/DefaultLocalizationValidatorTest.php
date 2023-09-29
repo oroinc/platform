@@ -108,7 +108,7 @@ class DefaultLocalizationValidatorTest extends ConstraintValidatorTestCase
 
         $this->localizationManager->expects($this->once())
             ->method('getLocalization')
-            ->willReturn((new Localization)->setName('L1'));
+            ->willReturn((new Localization())->setName('L1'));
 
         $constraint = new Constraints\DefaultLocalization();
         $this->validator->validate(1, $constraint);

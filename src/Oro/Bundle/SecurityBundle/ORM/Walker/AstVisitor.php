@@ -374,7 +374,7 @@ class AstVisitor extends Visitor
     private function getPostgreSqlJsonbContainsExpression(
         Expr\Path|AST\ArithmeticExpression $leftOperand,
         mixed $value
-    ) : AST\Node {
+    ): AST\Node {
         if (!\is_array($value)) {
             $value = [$value];
         }

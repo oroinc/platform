@@ -160,7 +160,6 @@ class ImapEmailGoogleOAuthManagerTest extends \PHPUnit\Framework\TestCase
         $expiredOriginNoToken1->setAccessTokenExpiresAt($this->getDateObject(true));
         $expiredOriginNoToken1->setRefreshToken('sampleRefreshToken');
 
-
         $expiredOriginNoToken2 = new TestUserEmailOrigin();
         $expiredOriginNoToken2->setAccessTokenExpiresAt($this->getDateObject(true));
 

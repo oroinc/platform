@@ -49,4 +49,9 @@ class UnidirectionalFieldHelper
 
         return null;
     }
+
+    public static function createUnidirectionalField(string $className, string $fieldName): string
+    {
+        return sprintf("%s%s%s", $className, self::DELIMITER, $fieldName);
+    }
 }

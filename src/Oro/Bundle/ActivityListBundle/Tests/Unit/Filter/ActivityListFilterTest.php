@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Filter;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,7 +26,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
@@ -64,7 +64,7 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->qb = $this->createMock(QueryBuilder::class);
         $this->qb->expects($this->any())
             ->method('getEntityManager')

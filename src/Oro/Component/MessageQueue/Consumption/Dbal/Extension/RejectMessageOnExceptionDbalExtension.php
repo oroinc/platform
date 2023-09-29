@@ -1,9 +1,13 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption\Dbal\Extension;
 
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 
+/**
+ * Rejects message on DBAL exception
+ */
 class RejectMessageOnExceptionDbalExtension extends AbstractExtension
 {
     /**

@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser as BaseKernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\Request as InternalRequest;
 use Symfony\Component\BrowserKit\Response as InternalResponse;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +42,7 @@ class Client extends BaseKernelBrowser
         array $server = [],
         string $content = null,
         bool $changeHistory = true
-    ) {
+    ): Crawler {
         if (strpos($uri, 'http://') === false && strpos($uri, 'https://') === false) {
             $uri = self::LOCAL_URL . $uri;
         }

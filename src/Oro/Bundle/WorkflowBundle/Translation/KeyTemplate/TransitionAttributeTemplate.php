@@ -9,9 +9,6 @@ class TransitionAttributeTemplate extends TransitionTemplate
 {
     const NAME = 'transition_attribute';
 
-    /**
-     * @return string
-     */
     public function getTemplate(): string
     {
         return parent::getTemplate() . '.attribute.{{ attribute_name }}';

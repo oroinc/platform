@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EmailBundle\Model\FolderType;
@@ -22,28 +22,24 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
  */
 class EmailUserFromEmailModelBuilder
 {
-    private ManagerRegistry $managerRegistry;
-
+    private ManagerRegistry $doctrine;
     private EmailEntityBuilder $emailEntityBuilder;
-
     private EmailOriginHelper $emailOriginHelper;
-
     private ParentMessageIdProvider $parentMessageIdProvider;
-
-    private EmailActivityManager $emailActivityManager;
+    private ActivityManager $activityManager;
 
     public function __construct(
-        ManagerRegistry $managerRegistry,
+        ManagerRegistry $doctrine,
         EmailEntityBuilder $emailEntityBuilder,
         EmailOriginHelper $emailOriginHelper,
         ParentMessageIdProvider $parentMessageIdProvider,
-        EmailActivityManager $emailActivityManager
+        ActivityManager $activityManager
     ) {
-        $this->managerRegistry = $managerRegistry;
+        $this->doctrine = $doctrine;
         $this->emailEntityBuilder = $emailEntityBuilder;
         $this->emailOriginHelper = $emailOriginHelper;
         $this->parentMessageIdProvider = $parentMessageIdProvider;
-        $this->emailActivityManager = $emailActivityManager;
+        $this->activityManager = $activityManager;
     }
 
     public function createFromEmailModel(
@@ -136,15 +132,16 @@ class EmailUserFromEmailModelBuilder
     public function addActivityEntities(EmailUser $emailUser, iterable $activityEntities = []): void
     {
         // Associate the email with the target entity if exist
+        $email = $emailUser->getEmail();
         foreach ($activityEntities as $targetEntity) {
-            $this->emailActivityManager->addAssociation($emailUser->getEmail(), $targetEntity);
+            $this->activityManager->addActivityTarget($email, $targetEntity);
         }
     }
 
     public function persistAndFlush(): void
     {
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->managerRegistry->getManagerForClass(Email::class);
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = $this->doctrine->getManagerForClass(Email::class);
 
         // Persist the email and all related entities such as folders, email addresses etc.
         $this->emailEntityBuilder

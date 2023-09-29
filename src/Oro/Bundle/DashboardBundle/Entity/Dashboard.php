@@ -5,6 +5,7 @@ namespace Oro\Bundle\DashboardBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroDashboardBundle_Entity_Dashboard;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -40,6 +41,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          }
  *      }
  * )
+ * @mixin OroDashboardBundle_Entity_Dashboard
  */
 class Dashboard implements ExtendEntityInterface
 {
@@ -311,7 +313,7 @@ class Dashboard implements ExtendEntityInterface
     }
 
     /**
-     * @param Dashboard $dashboard
+     * @param Dashboard|null $dashboard
      * @return Dashboard
      */
     public function setStartDashboard(Dashboard $dashboard = null)
@@ -348,7 +350,7 @@ class Dashboard implements ExtendEntityInterface
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return Dashboard
      */
     public function setOrganization(Organization $organization = null)

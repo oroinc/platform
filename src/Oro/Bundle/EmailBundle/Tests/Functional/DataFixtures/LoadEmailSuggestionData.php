@@ -4,72 +4,74 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class LoadEmailSuggestionData extends AbstractFixture implements DependentFixtureInterface
+class LoadEmailSuggestionData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    /** @var EntityManager */
-    protected $em;
+    use ContainerAwareTrait;
 
-    /** @var Organization */
-    protected $organization;
-
-    /** @var Email */
-    protected $email;
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return ['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailActivityData'];
+        return [LoadEmailActivityData::class, LoadOrganization::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $this->em = $manager;
-        $this->organization = $manager->getRepository(Organization::class)->getFirst();
+        $userManager = $this->getUserManager();
 
-        $this->email = new Email();
-        $this->email->setEmail('test1@example.com');
+        $organization = $this->getReference(LoadOrganization::ORGANIZATION);
 
-        $this->em->persist($this->email);
+        $email = new Email();
+        $email->setEmail('test1@example.com');
 
-        $user4 = $this->createUser('Lucas', 'Thornton');
-        $user5 = $this->createUser('Traci', 'Patric');
+        $manager->persist($email);
+
+        $user4 = $this->createUser($userManager, $organization, 'Lucas', 'Thornton', $email);
+        $user5 = $this->createUser($userManager, $organization, 'Traci', 'Patric', $email);
 
         $this->setReference('user_4', $user4);
         $this->setReference('user_5', $user5);
 
-        $this->em->flush();
+        $manager->flush();
     }
 
-    /**
-     * @param string $firstName
-     * @param string $lastName
-     *
-     * @return User
-     */
-    protected function createUser($firstName, $lastName)
-    {
-        $user = new User();
-        $user->setOrganization($this->organization);
+    private function createUser(
+        UserManager $userManager,
+        Organization $organization,
+        string $firstName,
+        string $lastName,
+        Email $email
+    ): User {
+        /** @var User $user */
+        $user = $userManager->createUser();
+        $user->setOrganization($organization);
         $user->setFirstName($firstName);
         $user->setLastName($lastName);
         $user->setUsername(strtolower($firstName . '.' . $lastName));
         $user->setPassword(strtolower($firstName . '.' . $lastName));
         $user->setEmail(strtolower($firstName . '_' . $lastName . '@example.com'));
+        $user->addEmail($email);
 
-        $user->addEmail($this->email);
-
-        $this->em->persist($user);
+        $userManager->updateUser($user);
 
         return $user;
+    }
+
+    private function getUserManager(): UserManager
+    {
+        return $this->container->get('oro_user.manager');
     }
 }

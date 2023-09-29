@@ -91,7 +91,7 @@ class DashboardExtension extends AbstractExtension implements ServiceSubscriberI
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_dashboard.widget_config_value.date_range.converter' => FilterDateRangeConverter::class,

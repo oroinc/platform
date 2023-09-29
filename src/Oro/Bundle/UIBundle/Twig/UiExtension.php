@@ -406,8 +406,8 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     }
 
     /**
-     * @param array $additionalContent
-     * @param array $keys
+     * @param array|null $additionalContent
+     * @param array|null $keys
      *
      * @return array
      */
@@ -493,11 +493,11 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
 
         return sprintf(
             '%s%s%s%s%s',
-            isset($urlParts['scheme'])? $urlParts['scheme'] . '://' : '',
+            isset($urlParts['scheme']) ? $urlParts['scheme'] . '://' : '',
             $urlParts['host'] ?? '',
             isset($urlParts['port']) ? ':' . $urlParts['port'] : '',
             $urlParts['path'] ?? '',
-            $urlParts['query'] ? '?' . $urlParts['query']: ''
+            $urlParts['query'] ? '?' . $urlParts['query'] : ''
         );
     }
 
@@ -663,7 +663,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_ui.content_provider.manager.twig' => TwigContentProviderManager::class,

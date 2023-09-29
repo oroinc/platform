@@ -96,7 +96,7 @@ class ActiveDashboard
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return ActiveDashboard
      */
     public function setOrganization(Organization $organization = null)

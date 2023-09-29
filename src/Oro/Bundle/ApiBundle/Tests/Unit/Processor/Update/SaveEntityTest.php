@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
@@ -99,7 +98,7 @@ class SaveEntityTest extends FormProcessorTestCase
     {
         $entity = new \stdClass();
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')

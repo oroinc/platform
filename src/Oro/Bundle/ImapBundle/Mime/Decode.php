@@ -22,6 +22,7 @@
  *
  * This file is a copy of {@see Laminas\Mime\Decode}
  */
+
 namespace Oro\Bundle\ImapBundle\Mime;
 
 use Laminas\Mime\Decode as BaseDecode;

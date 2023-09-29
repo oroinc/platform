@@ -81,9 +81,6 @@ class IndexListener implements OptionalListenerInterface
         $this->mappingProvider = $mappingProvider;
     }
 
-    /**
-     * @param OnFlushEventArgs $args
-     */
     public function onFlush(OnFlushEventArgs $args): void
     {
         if (!$this->enabled) {
@@ -385,9 +382,6 @@ class IndexListener implements OptionalListenerInterface
         return null;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;

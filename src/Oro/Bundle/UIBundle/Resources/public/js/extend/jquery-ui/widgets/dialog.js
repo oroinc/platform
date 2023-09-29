@@ -17,12 +17,16 @@ $.widget('ui.dialog', $.ui.dialog, {
     _title: function(title) {
         const {title: titleText, closeOnDialogTitle} = this.options;
 
+        if (!titleText) {
+            title.hide();
+        }
+
         title.append(
             this._renderBadge(),
             $('<span/>', {'class': 'ui-dialog-title__inner'}).text(titleText)
         );
 
-        if (closeOnDialogTitle) {
+        if (closeOnDialogTitle && titleText) {
             title
                 .attr({role: 'button', tabindex: '0'})
                 .on('click', e => {

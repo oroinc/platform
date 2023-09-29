@@ -163,7 +163,7 @@ class OperationFormHandler
 
     /**
      * @param \Exception $e
-     * @param Collection $errors
+     * @param Collection|null $errors
      *
      * @return ArrayCollection
      */

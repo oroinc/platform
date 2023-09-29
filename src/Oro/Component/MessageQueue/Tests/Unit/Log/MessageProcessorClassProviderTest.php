@@ -46,8 +46,6 @@ class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isInitializedDataProvider
-     *
-     * @param bool $isInitialized
      */
     public function testGetMessageProcessorClassByNameForLazyLoadingService(bool $isInitialized): void
     {

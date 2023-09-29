@@ -66,7 +66,7 @@ abstract class AbstractDashboardFixture extends AbstractFixture implements Conta
      * Create dashboard entity with admin user
      *
      * @param string $widgetName
-     * @param array $layoutPosition
+     * @param array|null $layoutPosition
      * @return WidgetModel
      */
     protected function createWidgetModel($widgetName, array $layoutPosition = null)

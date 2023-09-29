@@ -22,6 +22,7 @@
  *
  * This file is a copy of {@see Laminas\Mail\Header\HeaderWrap}
  */
+
 namespace Oro\Bundle\ImapBundle\Mail\Header;
 
 use Laminas\Mail\Header\HeaderWrap as BaseHeaderWrap;

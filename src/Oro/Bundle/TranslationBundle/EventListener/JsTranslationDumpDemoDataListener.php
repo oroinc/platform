@@ -24,11 +24,6 @@ class JsTranslationDumpDemoDataListener
 
     private ApplicationState $applicationState;
 
-    /**
-     * @param JsTranslationDumper $jsTranslationDumper
-     * @param LanguageProvider $languageProvider
-     * @param ApplicationState $applicationState
-     */
     public function __construct(
         JsTranslationDumper $jsTranslationDumper,
         LanguageProvider $languageProvider,

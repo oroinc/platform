@@ -61,8 +61,12 @@ $content-sidebar-control-i-padding: 12px 0 !default;
 $content-sidebar-control-i-color: $primary-400 !default;
 $content-sidebar-control-i-font-size: 16px !default;
 
-$content-sidebar-container-display: flex !default;
+$content-sidebar-container-display: grid !default;
+$content-sidebar-container-grid-template-columns: auto minmax(0, 1fr) !default;
+$content-sidebar-container-grid-template-rows: minmax(0, 1fr) !default;
+$content-sidebar-container-tablet-grid-template-columns: auto minmax(
+    calc(100% - #{$content-sidebar-minimized-width}), 1fr
+) !default;
 $content-sidebar-container-offset-left: null !default;
-$content-sidebar-container-flex: 1 1 auto !default;
 
 $content-sidebar-form-horizontal-offset-inner: 0 !default;

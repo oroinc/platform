@@ -40,7 +40,7 @@ class AjaxApplicationUrlController extends AbstractController
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             ConfigManager::class,

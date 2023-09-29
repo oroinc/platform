@@ -2,241 +2,172 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailEntity;
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestThread;
+use Oro\Component\Testing\ReflectionUtil;
 
 class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailThreadProvider */
+    /** @var EmailThreadProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $emailThreadProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var EmailThreadManager */
     private $emailThreadManager;
 
-    /** @var array */
-    private $fixtures = [];
-
     protected function setUp(): void
     {
-        $thread1 = new TestThread(1);
-        $thread2 = new TestThread(2);
-        $thread3 = new TestThread(3);
-        $this->fixtures = [
-            'emails' => [
-                1 => new TestEmailEntity(1),
-                2 => (new TestEmailEntity(2))
-                        ->setThread($thread1)
-                        ->setHead(false),
-                3 => (new TestEmailEntity(3))
-                        ->setThread($thread2),
-                4 => (new TestEmailEntity(4))
-                        ->setHead(false)
-                        ->setThread($thread3),
-                5 => (new TestEmailEntity(5))
-                        ->setHead(true)
-                        ->setThread($thread3),
-            ],
-            'threads' => [
-                null => new TestThread(),
-                1 => $thread1,
-                2 => $thread2,
-                3 => $thread3,
-            ],
-        ];
-
         $this->emailThreadProvider = $this->createMock(EmailThreadProvider::class);
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
 
-        $this->emailThreadManager = new EmailThreadManager($this->emailThreadProvider, $this->em);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->with(Email::class)
+            ->willReturn($this->em);
+
+        $this->emailThreadManager = new EmailThreadManager($this->emailThreadProvider, $doctrine);
     }
 
-    /**
-     * @dataProvider updateThreadsDataProvider
-     */
-    public function testUpdateThreads(
-        array $newEmails,
-        array $threadIds,
-        array $emailReferences,
-        array $expectedEmails,
-        array $expectedReferences
-    ) {
-        $consecutiveThreads = array_map(
-            function ($threadId) {
-                return $this->findFixtureBy($threadId, 'threads');
-            },
-            $threadIds
-        );
-
-        $this->emailThreadProvider->expects($this->exactly(count($consecutiveThreads)))
-            ->method('getEmailThread')
-            ->willReturnOnConsecutiveCalls(...$consecutiveThreads);
-        $this->emailThreadProvider->expects($this->any())
-            ->method('getEmailReferences')
-            ->willReturn($emailReferences);
-
-        $this->emailThreadManager->updateThreads($newEmails);
-        $this->assertEquals($expectedEmails, $newEmails);
-        $this->assertEquals($expectedReferences, $emailReferences);
-    }
-
-    public function updateThreadsDataProvider(): array
+    private function getEmail(?int $id, ?bool $head, ?EmailThread $thread = null): Email
     {
-        return [
-            'new email without thread' => [
-                [
-                    new TestEmailEntity(),
-                ],
-                [
-                    null,
-                ],
-                [],
-                [
-                    (new TestEmailEntity())
-                        ->setThread(new TestThread()),
-                ],
-                [],
-            ],
-            'new email within thread' => [
-                [
-                    new TestEmailEntity(),
-                ],
-                [
-                    1,
-                ],
-                [
-                    new TestEmailEntity(1),
-                    (new TestEmailEntity(2))
-                        ->setThread(new TestThread(3)),
-                ],
-                [
-                    (new TestEmailEntity())
-                        ->setThread(new TestThread(1)),
-                ],
-                [
-                    (new TestEmailEntity(1))
-                        ->setThread(new TestThread(1)),
-                    (new TestEmailEntity(2))
-                        ->setThread(new TestThread(3)),
-                ]
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider updateHeadsDataProvider
-     */
-    public function testUpdateHeads(array $updatedEmails, array $returnThreadEmails, array $expectedEmails)
-    {
-        $consecutiveThreadEmails = array_map(
-            function (TestEmailEntity $entity, $returnEmails) {
-                return $returnEmails ? $this->getThreadEmails($entity) : [];
-            },
-            $updatedEmails,
-            $returnThreadEmails
-        );
-
-        $this->emailThreadProvider->expects($this->any())
-            ->method('getThreadEmails')
-            ->willReturnOnConsecutiveCalls(...$consecutiveThreadEmails);
-
-        $this->emailThreadManager->updateHeads($updatedEmails);
-        $this->assertEquals($expectedEmails, $updatedEmails);
-    }
-
-    public function updateHeadsDataProvider(): array
-    {
-        return [
-            'new emails are not updated' => [
-                [
-                    (new TestEmailEntity())
-                        ->setHead(false),
-                    (new TestEmailEntity())
-                        ->setHead(true)
-                ],
-                [
-                    true,
-                    true,
-                ],
-                [
-                    (new TestEmailEntity())
-                        ->setHead(false),
-                    (new TestEmailEntity())
-                        ->setHead(true),
-                ],
-            ],
-            'emails without thread are not updated' => [
-                [
-                    (new TestEmailEntity(4))
-                        ->setHead(false),
-                    (new TestEmailEntity(4))
-                        ->setHead(true),
-                ],
-                [
-                    true,
-                    true,
-                ],
-                [
-                    (new TestEmailEntity(4))
-                        ->setHead(false),
-                    (new TestEmailEntity(4))
-                        ->setHead(true),
-                ],
-            ],
-            'updated email should be head' => [
-                [
-                    (new TestEmailEntity(4))
-                        ->setThread(new TestThread(3))
-                        ->setHead(false)
-                ],
-                [
-                    true,
-                ],
-                [
-                    (new TestEmailEntity(4))
-                        ->setThread(new TestThread(3))
-                        ->setHead(true)
-                ],
-            ],
-            'updated email without thread emails are not updated' => [
-                [
-                    (new TestEmailEntity(4))
-                        ->setThread(new TestThread(3))
-                        ->setHead(false)
-                ],
-                [
-                    false,
-                ],
-                [
-                    (new TestEmailEntity(4))
-                        ->setThread(new TestThread(3))
-                        ->setHead(false)
-                ],
-            ],
-        ];
-    }
-
-    private function getThreadEmails(object $entity): array
-    {
-        return array_merge(
-            [$entity],
-            array_filter($this->fixtures['emails'], function (TestEmailEntity $email) use ($entity) {
-                return $entity !== $email && $entity->getThread() == $email->getThread();
-            })
-        );
-    }
-
-    private function findFixtureBy(?string $value, string $key): mixed
-    {
-        if (array_key_exists($key, $this->fixtures) && array_key_exists($value, $this->fixtures[$key])) {
-            return $this->fixtures[$key][$value];
+        $email = new Email();
+        if (null !== $id) {
+            ReflectionUtil::setId($email, $id);
+        }
+        $email->setHead($head);
+        if (null !== $thread) {
+            $email->setThread($thread);
         }
 
-        return null;
+        return $email;
+    }
+
+    private function getThread(?int $id): EmailThread
+    {
+        $thread = new EmailThread();
+        if (null !== $id) {
+            ReflectionUtil::setId($thread, $id);
+        }
+
+        return $thread;
+    }
+
+    public function testUpdateThreadsForNewEmailWithoutThread(): void
+    {
+        $newEmail = $this->getEmail(null, true);
+
+        $this->emailThreadProvider->expects(self::once())
+            ->method('getEmailReferences')
+            ->with(self::identicalTo($this->em), self::identicalTo($newEmail))
+            ->willReturn([]);
+
+        $this->emailThreadManager->updateThreads([$newEmail]);
+
+        self::assertNull($newEmail->getThread());
+    }
+
+    public function testUpdateThreadsForNewEmailWhenExistsAnotherEmailThatShouldBeAddedToThread(): void
+    {
+        $newEmail = $this->getEmail(null, true);
+        $threadEmail = $this->getEmail(1, true);
+
+        $this->emailThreadProvider->expects(self::once())
+            ->method('getEmailReferences')
+            ->with(self::identicalTo($this->em), self::identicalTo($newEmail))
+            ->willReturn([$threadEmail]);
+
+        $this->emailThreadManager->updateThreads([$newEmail]);
+
+        self::assertEquals($this->getThread(null), $newEmail->getThread());
+        self::assertSame($newEmail->getThread(), $threadEmail->getThread());
+    }
+
+    public function testUpdateThreadsForNewEmailWithinThread(): void
+    {
+        $newEmail = $this->getEmail(null, true);
+        $thread1 = $this->getThread(1);
+        $thread2 = $this->getThread(2);
+        $threadEmail1 = $this->getEmail(1, true);
+        $threadEmail2 = $this->getEmail(2, true, $thread1);
+        $threadEmail3 = $this->getEmail(3, true, $thread2);
+
+        $this->emailThreadProvider->expects(self::once())
+            ->method('getEmailReferences')
+            ->with(self::identicalTo($this->em), self::identicalTo($newEmail))
+            ->willReturn([$threadEmail1, $threadEmail2, $threadEmail3]);
+
+        $this->emailThreadManager->updateThreads([$newEmail]);
+
+        self::assertEquals($thread1, $newEmail->getThread());
+        self::assertEquals($thread1, $threadEmail1->getThread());
+        self::assertEquals($thread1, $threadEmail2->getThread());
+        self::assertEquals($thread2, $threadEmail3->getThread());
+    }
+
+    public function testUpdateHeadsForNewEmails(): void
+    {
+        $newEmail1 = $this->getEmail(null, false);
+        $newEmail2 = $this->getEmail(null, true);
+
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getThreadEmails');
+
+        $this->emailThreadManager->updateHeads([$newEmail1, $newEmail2]);
+
+        self::assertFalse($newEmail1->isHead());
+        self::assertTrue($newEmail2->isHead());
+    }
+
+    public function testUpdateHeadsForEmailsWithoutThread(): void
+    {
+        $updatedEmail1 = $this->getEmail(1, false);
+        $updatedEmail2 = $this->getEmail(1, true);
+
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getThreadEmails');
+
+        $this->emailThreadManager->updateHeads([$updatedEmail1, $updatedEmail2]);
+
+        self::assertFalse($updatedEmail1->isHead());
+        self::assertTrue($updatedEmail2->isHead());
+    }
+
+    public function testUpdateHeadsWhenUpdatedEmailShouldBeHead(): void
+    {
+        $updatedEmail = $this->getEmail(4, false, $this->getThread(3));
+        $threadEmail = $this->getEmail(1, true, $this->getThread(3));
+
+        $this->emailThreadProvider->expects(self::once())
+            ->method('getThreadEmails')
+            ->with(self::identicalTo($this->em), self::identicalTo($updatedEmail))
+            ->willReturn([$updatedEmail, $threadEmail]);
+
+        $this->emailThreadManager->updateHeads([$updatedEmail]);
+
+        self::assertTrue($updatedEmail->isHead());
+        self::assertFalse($threadEmail->isHead());
+    }
+
+    public function testUpdateHeadsForUpdatedEmailWithoutThreadEmails(): void
+    {
+        $updatedEmail = $this->getEmail(4, false, $this->getThread(3));
+        $threadEmail = $this->getEmail(1, false, $this->getThread(3));
+
+        $this->emailThreadProvider->expects(self::once())
+            ->method('getThreadEmails')
+            ->with(self::identicalTo($this->em), self::identicalTo($updatedEmail))
+            ->willReturn([$threadEmail, $updatedEmail]);
+
+        $this->emailThreadManager->updateHeads([$updatedEmail]);
+
+        self::assertFalse($updatedEmail->isHead());
+        self::assertTrue($threadEmail->isHead());
     }
 }

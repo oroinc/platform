@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Filter message queue consumer related logs depending on its verbosity setting.
  * It is disabled by default and gets activated as soon as ConsumerState::startConsumption is called.
- * @see \Oro\Component\MessageQueue\Log\ConsumerState::startConsumption
+ * @see ConsumerState::startConsumption
  *
  * @property FilterHandler $handler
  */
@@ -37,11 +37,6 @@ class VerbosityFilterHandler extends HandlerWrapper implements EventSubscriberIn
         OutputInterface::VERBOSITY_DEBUG => Logger::DEBUG,
     ];
 
-    /**
-     * @param ConsumerState $consumerState
-     * @param HandlerInterface $handler
-     * @param array $verbosityLevelMap
-     */
     public function __construct(ConsumerState $consumerState, ?HandlerInterface $handler, array $verbosityLevelMap = [])
     {
         parent::__construct($handler ? new FilterHandler($handler) : new NullHandler());
@@ -83,7 +78,7 @@ class VerbosityFilterHandler extends HandlerWrapper implements EventSubscriberIn
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConsoleEvents::COMMAND => ['onCommand', 255]

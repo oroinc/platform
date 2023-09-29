@@ -1,0 +1,89 @@
+data:
+    type: emails
+    id: '<toString(@createdEmail->id)>'
+    attributes:
+        createdAt: '@createdEmail->created->format("Y-m-d\TH:i:s\Z")'
+        subject: 'Test Email'
+        sentAt: '2023-02-01T10:20:30Z'
+        importance: high
+        internalDate: '2023-02-01T08:10:10Z'
+        head: true
+        messageId: '<test@email-api.func-test>'
+        messageIds:
+            - '<test@email-api.func-test>'
+            - '<test1@email-api.func-test>'
+        xMessageId: test_x_message_id
+        xThreadId: test_x_thread_id
+        references:
+            - '<id1@email-api.func-test>'
+        acceptLanguage: en-US
+        bodySynced: true
+        from:
+            name: 'John Doo'
+            email: admin@example.com
+        toRecipients:
+            -
+                name: 'User 1'
+                email: user1@example.com
+        ccRecipients:
+            -
+                name: 'Recipient 2'
+                email: email3@example.com
+            -
+                name: 'User 1'
+                email: user1@example.com
+        bccRecipients:
+            -
+                name: 'Recipient 2'
+                email: email2@example.com
+            -
+                name: 'User 1'
+                email: user1@example.com
+        shortTextBody: 'Test email body'
+        hasEmailAttachments: false
+        body:
+            content: 'Test <b>email</b> body'
+            type: html
+    relationships:
+        emailUsers:
+            data:
+                -
+                    type: emailusers
+                    id: '<toString(@createdEmail->emailUsers->first()->id)>'
+        activityTargets:
+            data:
+                -
+                    type: users
+                    id: '<toString(@user1->id)>'
+                -
+                    type: users
+                    id: '<toString(@user->id)>'
+        emailAttachments:
+            data: []
+included:
+    -
+        type: emailusers
+        id: '<toString(@createdEmail->emailUsers->first()->id)>'
+        attributes:
+            createdAt: '@createdEmail->emailUsers->first()->createdAt->format("Y-m-d\TH:i:s\Z")'
+            receivedAt: '2023-02-01T10:20:31Z'
+            seen: false
+            private: true
+            folders:
+                -
+                    type: sent
+                    name: Sent
+                    path: Sent
+        relationships:
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            email:
+                data:
+                    type: emails
+                    id: '<toString(@createdEmail->id)>'

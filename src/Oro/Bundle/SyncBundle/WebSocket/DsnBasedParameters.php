@@ -31,15 +31,12 @@ class DsnBasedParameters
         }
 
         $this->schema = $parsedDsn['scheme'] ?? 'tcp';
-        $this->host = $parsedDsn['host'] ?? '*';
-        $this->port = isset($parsedDsn['port']) ? (int)$parsedDsn['port'] : null;
+        $this->host = $parsedDsn['host'] ?? '';
+        $this->port = isset($parsedDsn['port']) ? (int)$parsedDsn['port'] : 8080;
         $this->path = trim($parsedDsn['path'] ?? '', '/');
         parse_str($parsedDsn['query'] ?? '', $this->parameters);
     }
 
-    /**
-     * @return string
-     */
     public function getScheme(): string
     {
         return $this->schema;

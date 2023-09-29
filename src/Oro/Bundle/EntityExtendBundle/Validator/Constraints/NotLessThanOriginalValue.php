@@ -22,7 +22,7 @@ class NotLessThanOriginalValue extends Constraint
     /**
      * {@inheritDoc}
      */
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return static::PROPERTY_CONSTRAINT;
     }
@@ -30,7 +30,7 @@ class NotLessThanOriginalValue extends Constraint
     /**
      * {@inheritDoc}
      */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return ['scope', 'option'];
     }

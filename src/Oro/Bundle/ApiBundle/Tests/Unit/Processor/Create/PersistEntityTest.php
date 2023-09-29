@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\PersistEntity;
 use Oro\Bundle\ApiBundle\Processor\Create\SaveEntity;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
-class PersistEntityTest extends FormProcessorTestCase
+class PersistEntityTest extends CreateProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var PersistEntity */
@@ -26,7 +25,7 @@ class PersistEntityTest extends FormProcessorTestCase
         $this->processor = new PersistEntity($this->doctrineHelper);
     }
 
-    public function testProcessWhenEntityAlreadySaved()
+    public function testProcessWhenEntityAlreadySaved(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
@@ -37,7 +36,19 @@ class PersistEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoEntity()
+    public function testProcessForExistingEntity(): void
+    {
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityManager');
+
+        $this->context->setExisting(true);
+        $this->context->setResult(new \stdClass());
+        $this->context->setMetadata($this->createMock(EntityMetadata::class));
+        $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
+    }
+
+    public function testProcessWhenNoEntity(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
@@ -46,7 +57,7 @@ class PersistEntityTest extends FormProcessorTestCase
         self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
-    public function testProcessForNotSupportedEntity()
+    public function testProcessForNotSupportedEntity(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
@@ -56,7 +67,7 @@ class PersistEntityTest extends FormProcessorTestCase
         self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $entity = new \stdClass();
 
@@ -70,11 +81,11 @@ class PersistEntityTest extends FormProcessorTestCase
         self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
-    public function testProcessForManageableEntityButNoApiMetadata()
+    public function testProcessForManageableEntityButNoApiMetadata(): void
     {
         $entity = new \stdClass();
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
@@ -90,11 +101,11 @@ class PersistEntityTest extends FormProcessorTestCase
         self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $entity = new \stdClass();
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')

@@ -105,6 +105,7 @@ Feature: Update user profile and user entity ACL
     And I go to System/User Management/Roles
     And I click edit Sales Manager in grid
     And I check "Update User Profile" entity permission
+    And I click "Entity" in scrollspy
     And select following permissions:
       | User | View:Global | Edit:Global |
     And I save and close form
@@ -132,6 +133,7 @@ Feature: Update user profile and user entity ACL
     And I should be on Role View page
     When I click "Edit"
     And I uncheck "Update User Profile" entity permission
+    And I click "Entity" in scrollspy
     And select following permissions:
       | User | View:Global | Edit:Global |
     And I save and close form
@@ -154,3 +156,13 @@ Feature: Update user profile and user entity ACL
     Given I proceed as the Manager
     When I click My User in user menu
     Then I should not see an "Edit Button" element
+
+  Scenario: Edit button leads to user edit page from user view page and to profile edit page from profile view page
+    Given I proceed as the Admin
+    And I click My User in user menu
+    When I click "Entity Edit Button"
+    Then I should be on User Profile Update page
+    When I go to System/User Management/Users
+    And click View admin@example.com in grid
+    And I click "Entity Edit Button"
+    Then I should be on User Edit page

@@ -40,7 +40,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
+    /** @var ActionProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $customizationProcessor;
 
     /** @var CustomizeFormDataHandler */

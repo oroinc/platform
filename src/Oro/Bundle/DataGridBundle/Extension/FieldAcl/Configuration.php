@@ -6,6 +6,9 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Configuration of protected fields (acl for fields) for the datagrids.
+ */
 class Configuration implements ConfigurationInterface
 {
     const FIELDS_ACL = '[fields_acl]';
@@ -14,7 +17,7 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritDoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder('fields_acl');
 
@@ -28,6 +31,8 @@ class Configuration implements ConfigurationInterface
                         ->treatNullLike([PropertyInterface::DISABLED_KEY => false])
                         ->children()
                             ->scalarNode(PropertyInterface::DATA_NAME_KEY)->end()
+                            ->scalarNode(PropertyInterface::COLUMN_NAME)->end() // Grid column name.
+                            ->scalarNode(PropertyInterface::SOURCE_NAME)->end() // ORM field name.
                             ->booleanNode(PropertyInterface::DISABLED_KEY)->defaultFalse()->end()
                         ->end()
                     ->end()

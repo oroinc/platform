@@ -29,8 +29,6 @@ class TestConnector extends AbstractConnector implements OrderedConnectorInterfa
 
     /**
      * Returns label for UI
-     *
-     * @return string
      */
     public function getLabel(): string
     {

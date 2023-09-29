@@ -25,7 +25,7 @@ class OroDateTimeType extends OroDateType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return DateTimeType::class;
     }
@@ -33,7 +33,7 @@ class OroDateTimeType extends OroDateType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_datetime';
     }

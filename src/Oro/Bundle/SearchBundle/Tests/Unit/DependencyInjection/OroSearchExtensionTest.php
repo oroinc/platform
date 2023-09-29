@@ -10,6 +10,7 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoad(): void
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroSearchExtension();
         $extension->load([], $container);
@@ -36,6 +37,7 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoadWithCustomConfigs(): void
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $config = [
             'engine_dsn'        => 'some-other-engine:',

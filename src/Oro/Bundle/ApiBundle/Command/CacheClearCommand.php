@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
@@ -68,6 +69,6 @@ HELP
 
         $io->success('API cache was successfully cleared.');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

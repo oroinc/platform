@@ -240,7 +240,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param MailboxProcessSettings $processSettings
+     * @param MailboxProcessSettings|null $processSettings
      *
      * @return $this
      */

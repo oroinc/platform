@@ -8,12 +8,6 @@ namespace Oro\Component\MessageQueue\Util;
 class JSON
 {
     /**
-     * @param mixed $data
-     *
-     * @param bool $throwOnError
-     *
-     * @return mixed
-     *
      * @throws \JsonException
      */
     public static function decode(mixed $data, bool $throwOnError = true): mixed
@@ -33,10 +27,6 @@ class JSON
     }
 
     /**
-     * @param mixed $value
-     *
-     * @return string
-     *
      * @throws \JsonException
      */
     public static function encode(mixed $value, bool $throwOnError = true): string

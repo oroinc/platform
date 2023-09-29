@@ -30,7 +30,7 @@ class TagsReportFilterType extends DictionaryFilterType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }

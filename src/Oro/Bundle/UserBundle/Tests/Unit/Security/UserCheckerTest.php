@@ -156,7 +156,6 @@ class UserCheckerTest extends \PHPUnit\Framework\TestCase
         $this->userChecker->checkPreAuth($user);
     }
 
-
     public function testCheckPreAuthForUserWithPasswordChangedAfterLastLogin(): void
     {
         $this->expectException(PasswordChangedException::class);

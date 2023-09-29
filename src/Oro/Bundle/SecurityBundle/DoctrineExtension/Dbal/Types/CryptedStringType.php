@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;

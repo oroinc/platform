@@ -2,6 +2,7 @@
 
 namespace Oro\Component\TestUtils\Listener;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestListener as BaseListener;
 use PHPUnit\Framework\TestListenerDefaultImplementation;
@@ -43,5 +44,10 @@ class TestListener implements BaseListener
                 $reflection->getName()
             )($propertyNames);
         }
+    }
+
+    public function startTest(Test $test): void
+    {
+        AnnotationReader::addGlobalIgnoredName('mixin');
     }
 }

@@ -85,7 +85,7 @@ class AclVoter extends BaseAclVoter implements AclVoterInterface
     /**
      * {@inheritdoc}
      */
-    public function vote(TokenInterface $token, $object, array $attributes)
+    public function vote(TokenInterface $token, $object, array $attributes): int
     {
         $extension = $this->extensionSelector->select($object, false);
         if (null === $extension) {

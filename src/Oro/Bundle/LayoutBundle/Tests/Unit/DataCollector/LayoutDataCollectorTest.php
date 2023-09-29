@@ -245,7 +245,7 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param BlockView $rootBlock
      * @param array $tree
-     * @param BlockView[] $blockViews
+     * @param BlockView[]|null $blockViews
      *
      * @return BlockView[]
      */

@@ -31,7 +31,7 @@ interface MetadataInterface
     public function is($code, $value = true);
 
     /**
-     * @param callable $filter
+     * @param \Closure|null $filter
      * @return array
      */
     public function all(\Closure $filter = null);

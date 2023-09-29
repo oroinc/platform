@@ -9,9 +9,6 @@ class WorkflowVariableFormOptionTemplate extends WorkflowVariableTemplate
 {
     const NAME = 'workflow_variable_form_option';
 
-    /**
-     * @return string
-     */
     public function getTemplate(): string
     {
         return parent::getTemplate() . '.{{ option_name }}';

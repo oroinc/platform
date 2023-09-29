@@ -78,6 +78,7 @@ class FileType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['allowDelete'] = $options['allowDelete'];
+        $view->vars['allowUpdate'] = $options['allowUpdate'];
         $view->vars['attachmentViewOptions']['isExternalFile'] = $options['isExternalFile'];
     }
 
@@ -98,6 +99,7 @@ class FileType extends AbstractType
             [
                 'data_class' => File::class,
                 'checkEmptyFile' => false,
+                'allowUpdate' => true,
                 'allowDelete' => true,
                 'addEventSubscriber' => true,
                 'fileOptions' => [],

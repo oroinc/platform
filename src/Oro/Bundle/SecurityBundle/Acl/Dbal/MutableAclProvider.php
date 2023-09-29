@@ -39,12 +39,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     /** @var \SplObjectStorage  */
     private $propertyChanges;
 
-    /**
-     * @param Connection                          $connection
-     * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
-     * @param array                               $options
-     * @param AclCache                            $cache
-     */
     public function __construct(
         Connection $connection,
         PermissionGrantingStrategyInterface $permissionGrantingStrategy,

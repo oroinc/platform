@@ -142,7 +142,7 @@ class EmailUserListener implements ServiceSubscriberInterface
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_email.email_websocket.processor' => WebSocketSendProcessor::class

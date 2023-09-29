@@ -33,7 +33,9 @@ class ApplyController
     {
         $result = $this->entityExtendUpdateHandler->update();
         if ($result->isSuccessful()) {
-            return new JsonResponse();
+            $resultData = !empty($result->getResultData()) ? $result->getResultData() : null;
+
+            return new JsonResponse($resultData);
         }
 
         $responseData = [];

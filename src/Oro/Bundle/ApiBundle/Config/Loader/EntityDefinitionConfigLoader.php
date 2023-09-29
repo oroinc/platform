@@ -13,6 +13,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
     private const METHOD_MAP = [
         ConfigUtil::EXCLUSION_POLICY        => 'setExclusionPolicy',
         ConfigUtil::IDENTIFIER_FIELD_NAMES  => 'setIdentifierFieldNames',
+        ConfigUtil::IDENTIFIER_DESCRIPTION  => 'setIdentifierDescription',
         ConfigUtil::MAX_RESULTS             => 'setMaxResults',
         ConfigUtil::ORDER_BY                => 'setOrderBy',
         ConfigUtil::HINTS                   => 'setHints',
@@ -24,7 +25,6 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         ConfigUtil::DISABLE_SORTING         => ['disableSorting', 'enableSorting'],
         ConfigUtil::DISABLE_INCLUSION       => ['disableInclusion', 'enableInclusion'],
         ConfigUtil::DISABLE_FIELDSET        => ['disableFieldset', 'enableFieldset'],
-        ConfigUtil::DISABLE_META_PROPERTIES => ['disableMetaProperties', 'enableMetaProperties'],
         ConfigUtil::DISABLE_PARTIAL_LOAD    => ['disablePartialLoad', 'enablePartialLoad'],
         ConfigUtil::FORM_EVENT_SUBSCRIBER   => 'setFormEventSubscribers'
     ];
@@ -32,7 +32,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
     private ConfigLoaderFactory $factory;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setConfigLoaderFactory(ConfigLoaderFactory $factory): void
     {
@@ -40,7 +40,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(array $config): mixed
     {
@@ -59,6 +59,10 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         foreach ($config as $key => $value) {
             if (ConfigUtil::FIELDS === $key) {
                 $this->loadFields($definition, $value);
+            } elseif (ConfigUtil::DISABLE_META_PROPERTIES === $key) {
+                $this->loadDisabledMetaProperties($definition, $value);
+            } elseif (ConfigUtil::UPSERT === $key) {
+                $this->loadUpsertConfig($definition, $value);
             } elseif ($this->factory->hasLoader($key)) {
                 $this->loadSection($definition, $this->factory->getLoader($key), $key, $value);
             } else {
@@ -75,6 +79,39 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
                     $name,
                     $this->factory->getLoader(ConfigUtil::FIELDS)->load($config ?? [])
                 );
+            }
+        }
+    }
+
+    private function loadDisabledMetaProperties(EntityDefinitionConfig $definition, mixed $value): void
+    {
+        foreach ((array)$value as $val) {
+            if (true === $val) {
+                $definition->disableMetaProperties();
+            } elseif (false === $val) {
+                $definition->enableMetaProperties();
+            } else {
+                $definition->disableMetaProperty($val);
+            }
+        }
+    }
+
+    private function loadUpsertConfig(EntityDefinitionConfig $definition, array $value): void
+    {
+        if (isset($value[ConfigUtil::UPSERT_DISABLE])) {
+            $definition->getUpsertConfig()->setEnabled(!$value[ConfigUtil::UPSERT_DISABLE]);
+        }
+        if (isset($value[ConfigUtil::UPSERT_REPLACE])) {
+            $definition->getUpsertConfig()->replaceFields($value[ConfigUtil::UPSERT_REPLACE]);
+        }
+        if (isset($value[ConfigUtil::UPSERT_ADD])) {
+            foreach ($value[ConfigUtil::UPSERT_ADD] as $fieldNames) {
+                $definition->getUpsertConfig()->addFields($fieldNames);
+            }
+        }
+        if (isset($value[ConfigUtil::UPSERT_REMOVE])) {
+            foreach ($value[ConfigUtil::UPSERT_REMOVE] as $fieldNames) {
+                $definition->getUpsertConfig()->removeFields($fieldNames);
             }
         }
     }

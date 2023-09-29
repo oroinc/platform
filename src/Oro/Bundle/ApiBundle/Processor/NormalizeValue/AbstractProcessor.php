@@ -11,18 +11,25 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 abstract class AbstractProcessor implements ProcessorInterface
 {
+    private array $options = [];
+
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
         /** @var NormalizeValueContext $context */
 
-        if (!$context->hasRequirement()) {
-            $this->processRequirement($context);
-        }
-        if ($context->hasResult()) {
-            $this->processNormalization($context);
+        $this->options = $context->getOptions();
+        try {
+            if (!$context->hasRequirement()) {
+                $this->processRequirement($context);
+            }
+            if ($context->hasResult()) {
+                $this->processNormalization($context);
+            }
+        } finally {
+            $this->options = [];
         }
     }
 
@@ -179,5 +186,10 @@ abstract class AbstractProcessor implements ProcessorInterface
         }
 
         return $normalizedValues;
+    }
+
+    protected function getOption(string $name): mixed
+    {
+        return $this->options[$name] ?? null;
     }
 }

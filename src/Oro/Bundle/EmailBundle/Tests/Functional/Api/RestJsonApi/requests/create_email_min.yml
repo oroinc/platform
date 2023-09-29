@@ -1,0 +1,12 @@
+data:
+    type: emails
+    attributes:
+        subject: 'Test Email'
+        from:
+            email: '@user->email'
+        toRecipients:
+            -
+                email: '@user1->email'
+        messageId: '<test@email-api.func-test>'
+        sentAt: '2023-02-01T10:20:30.050Z'
+        internalDate: '2023-02-01T10:10:10+02:00'

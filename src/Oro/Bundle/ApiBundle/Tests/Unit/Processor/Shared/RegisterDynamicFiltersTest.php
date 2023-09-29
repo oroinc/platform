@@ -35,11 +35,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 {
+    /** @var FilterFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $filterFactory;
+
     /** @var RegisterDynamicFilters */
     private $processor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FilterFactoryInterface */
-    private $filterFactory;
 
     protected function setUp(): void
     {
@@ -136,6 +136,27 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         self::assertCount(0, $this->context->getFilters());
         self::assertNull($this->context->getFilterValues()->getDefaultGroupName());
         self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
+    }
+
+    public function testProcessNotManageableEntity()
+    {
+        $this->notManageableClassNames = [Entity\User::class];
+
+        $request = $this->getRequest('filter[category.name]=test');
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->filterFactory->expects(self::never())
+            ->method('createFilter');
+
+        $this->context->setClassName(Entity\User::class);
+        $this->context->setConfig($this->getEntityDefinitionConfig(['id', 'category']));
+        $this->context->setConfigOfFilters($this->getFiltersConfig());
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->processor->process($this->context);
+
+        self::assertTrue($this->context->getFilters()->isEmpty());
     }
 
     public function testProcessWhenPrepareFiltersForDocumentation()

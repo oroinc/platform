@@ -44,11 +44,17 @@ class User
      */
     private Collection $products;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Department", mappedBy="owner")
+     */
+    private Collection $departments;
+
     public function __construct(int $id = null)
     {
         $this->id = $id;
         $this->groups = new ArrayCollection();
         $this->products = new ArrayCollection();
+        $this->departments = new ArrayCollection();
     }
 
     public function getId(): ?int

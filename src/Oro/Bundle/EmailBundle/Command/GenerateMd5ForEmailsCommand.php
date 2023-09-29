@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Command;
@@ -46,7 +47,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $emailTemplates = $this->doctrineHelper->getEntityRepository(EmailTemplate::class)->findAll();
 
@@ -55,6 +56,6 @@ HELP
             $output->write($template->getName() . ':'. \md5($template->getContent()), true);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

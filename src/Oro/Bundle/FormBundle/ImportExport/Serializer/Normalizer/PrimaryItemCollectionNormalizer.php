@@ -41,7 +41,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
      *
      * @param mixed $data
      * @param string $type
-     * @param null $format
+     * @param string|null $format
      * @param array $context
      *
      * @return ArrayCollection

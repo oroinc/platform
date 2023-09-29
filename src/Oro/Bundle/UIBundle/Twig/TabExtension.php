@@ -154,7 +154,7 @@ class TabExtension extends AbstractExtension implements ServiceSubscriberInterfa
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_menu.twig.extension' => MenuExtension::class,

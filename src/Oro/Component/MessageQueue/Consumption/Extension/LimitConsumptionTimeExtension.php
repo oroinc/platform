@@ -1,9 +1,13 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 
+/**
+ * Interrupts the consumption if the limit time has passed
+ */
 class LimitConsumptionTimeExtension extends AbstractExtension
 {
     /**

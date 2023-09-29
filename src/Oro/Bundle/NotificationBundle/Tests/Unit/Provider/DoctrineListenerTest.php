@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
@@ -33,7 +33,7 @@ class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
     {
         $args = $this->createMock(PostFlushEventArgs::class);
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
 
         $args->expects($this->once())
             ->method('getEntityManager')

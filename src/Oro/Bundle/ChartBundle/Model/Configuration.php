@@ -17,7 +17,7 @@ class Configuration implements ConfigurationInterface
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE_NAME);
         $treeBuilder->getRootNode()

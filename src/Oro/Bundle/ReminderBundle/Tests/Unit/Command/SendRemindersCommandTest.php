@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Command;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ReminderBundle\Command\SendRemindersCommand;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
     /** @var ReminderRepository|\PHPUnit\Framework\MockObject\MockObject */
@@ -27,7 +27,7 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->repository = $this->createMock(ReminderRepository::class);
         $this->sender = $this->createMock(ReminderSender::class);
 

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
@@ -31,6 +31,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -40,7 +41,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 abstract class AbstractMenuController extends AbstractController
 {
     /**
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws AccessDeniedException
      */
     protected function checkAcl(array $context)
     {
@@ -172,7 +173,7 @@ abstract class AbstractMenuController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var EntityManager $entityManager */
+            /** @var EntityManagerInterface $entityManager */
             $entityManager = $this->getDoctrine()->getManagerForClass($this->getEntityClass());
             $scope = $this->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context);
             $updates = $this->getMenuUpdateMoveManager()->moveMenuItems(
@@ -294,7 +295,7 @@ abstract class AbstractMenuController extends AbstractController
         );
     }
 
-    protected function getCurrentOrganization():? Organization
+    protected function getCurrentOrganization(): ?Organization
     {
         if (null === $token = $this->container->get('security.token_storage')->getToken()) {
             return null;
@@ -332,7 +333,7 @@ abstract class AbstractMenuController extends AbstractController
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(
             parent::getSubscribedServices(),

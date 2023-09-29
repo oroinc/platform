@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
@@ -128,7 +129,7 @@ HELP
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $entity         = $input->getArgument('entity');
@@ -212,7 +213,7 @@ HELP
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function dumpEntityList(OutputInterface $output): void

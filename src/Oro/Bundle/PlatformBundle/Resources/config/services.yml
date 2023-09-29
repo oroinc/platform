@@ -185,3 +185,11 @@ services:
 
     Oro\Component\DependencyInjection\PgsqlAdvisorySchemaInUrlEnvVarProcessor:
         tags: [container.env_var_processor]
+    
+    oro_platform.cache.provider.page_request_provider.abstract:
+        class: 'Oro\Bundle\PlatformBundle\Provider\AbstractPageRequestProvider'
+        arguments:
+            - '@router'
+            - '@oro_config.manager'
+            - '@logger'
+        abstract: true

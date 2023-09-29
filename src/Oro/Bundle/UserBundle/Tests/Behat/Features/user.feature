@@ -1,6 +1,7 @@
 @regression
 @ticket-BB-16591
 @fixture-OroLocaleBundle:PortugueseLocalization.yml
+
 Feature: User
   In order to create users
   As a OroCRM Admin user
@@ -69,7 +70,6 @@ Feature: User
     Given I login as "user1Name" user
     Then should see "Dashboard"
 
-  @skip
   Scenario: Create new user with birthday field formatted in the Portuguese locale
     Given I operate as the Admin
     And I go to System/Configuration
@@ -98,7 +98,7 @@ Feature: User
     And I save and close form
     Then I should see "User saved" flash message
     And I should see user with:
-      | Username | userName2              |
-      | Emails   | email2@test.com        |
-      | Roles    | Administrator          |
-      | Birthday | 24 de Jul de 1990 (age |
+      | Username | userName2               |
+      | Emails   | email2@test.com         |
+      | Roles    | Administrator           |
+      | Birthday | 24 de jul. de 1990 (age |

@@ -249,6 +249,18 @@ class ActionFieldConfig implements FieldConfigInterface
     }
 
     /**
+     * Gets a form option.
+     */
+    public function getFormOption(string $name, mixed $defaultValue = null): mixed
+    {
+        $formOptions = $this->get(ConfigUtil::FORM_OPTIONS);
+
+        return null !== $formOptions && \array_key_exists($name, $formOptions)
+            ? $formOptions[$name]
+            : $defaultValue;
+    }
+
+    /**
      * Sets the form options.
      */
     public function setFormOptions(?array $formOptions): void
@@ -265,9 +277,9 @@ class ActionFieldConfig implements FieldConfigInterface
      */
     public function setFormOption(string $name, mixed $value): void
     {
-        $formOptions = $this->getFormOptions();
+        $formOptions = $this->items[ConfigUtil::FORM_OPTIONS] ?? [];
         $formOptions[$name] = $value;
-        $this->setFormOptions($formOptions);
+        $this->items[ConfigUtil::FORM_OPTIONS] = $formOptions;
     }
 
     /**
@@ -277,7 +289,7 @@ class ActionFieldConfig implements FieldConfigInterface
      */
     public function getFormConstraints(): ?array
     {
-        return FormConstraintUtil::getFormConstraints($this->getFormOptions());
+        return FormConstraintUtil::getFormConstraints($this->get(ConfigUtil::FORM_OPTIONS));
     }
 
     /**
@@ -285,7 +297,10 @@ class ActionFieldConfig implements FieldConfigInterface
      */
     public function addFormConstraint(Constraint $constraint): void
     {
-        $this->setFormOptions(FormConstraintUtil::addFormConstraint($this->getFormOptions(), $constraint));
+        $this->items[ConfigUtil::FORM_OPTIONS] = FormConstraintUtil::addFormConstraint(
+            $this->get(ConfigUtil::FORM_OPTIONS),
+            $constraint
+        );
     }
 
     /**
@@ -293,7 +308,9 @@ class ActionFieldConfig implements FieldConfigInterface
      */
     public function removeFormConstraint(string $constraintClass): void
     {
-        $this->setFormOptions(FormConstraintUtil::removeFormConstraint($this->getFormOptions(), $constraintClass));
+        $this->setFormOptions(
+            FormConstraintUtil::removeFormConstraint($this->get(ConfigUtil::FORM_OPTIONS), $constraintClass)
+        );
     }
 
     /**

@@ -15,6 +15,7 @@ class DatabasePlatformMock extends AbstractPlatform
     private $sequenceNextValSql = '';
     private $prefersIdentityColumns = true;
     private $prefersSequences = false;
+    private $reservedKeywordsClass = null;
 
     /**
      * @override
@@ -136,5 +137,15 @@ class DatabasePlatformMock extends AbstractPlatform
     public function supportsIdentityColumns(): bool
     {
         return $this->prefersIdentityColumns;
+    }
+
+    protected function getReservedKeywordsClass()
+    {
+        return $this->reservedKeywordsClass ?? parent::getReservedKeywordsClass();
+    }
+
+    public function setReservedKeywordsClass(?string $reservedKeywordsClass): void
+    {
+        $this->reservedKeywordsClass = $reservedKeywordsClass;
     }
 }

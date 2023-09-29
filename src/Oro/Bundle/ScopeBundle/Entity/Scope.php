@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ScopeBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroScopeBundle_Entity_Scope;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
@@ -17,6 +18,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
  * )
  * @ORM\Entity()
  * @Config()
+ * @mixin OroScopeBundle_Entity_Scope
  */
 class Scope implements ExtendEntityInterface
 {

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\ImportExport\Serializer;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 
@@ -15,9 +16,12 @@ class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
 {
     protected FieldHelper $fieldHelper;
 
-    public function __construct(FieldHelper $fieldHelper)
+    protected EnumValueProvider $enumValueProvider;
+
+    public function __construct(FieldHelper $fieldHelper, EnumValueProvider $enumValueProvider)
     {
         $this->fieldHelper = $fieldHelper;
+        $this->enumValueProvider = $enumValueProvider;
     }
 
     /**
@@ -25,7 +29,7 @@ class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
      *
      * {@inheritdoc}
      */
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = []): ?array
     {
         if (!$object instanceof AbstractEnumValue) {
             return null;
@@ -50,9 +54,10 @@ class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
     {
         $reflection = new \ReflectionClass($type);
 
+        $choices = $this->enumValueProvider->getEnumChoices($type);
         $args = [
             // isset is used instead of empty as $data['id'] could be "0"
-            'id' => $data['id'] ?? null,
+            'id' => $data['id'] ?? $choices[($data['name'] ?? '')] ?? null,
             'name' => $data['name'] ?? '',
             'priority' => empty($data['priority']) ? 0 : $data['priority'],
             'default' => !empty($data['default']),

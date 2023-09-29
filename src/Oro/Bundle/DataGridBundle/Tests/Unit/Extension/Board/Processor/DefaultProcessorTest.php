@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Board\Processor;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -14,7 +14,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class DefaultProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
@@ -28,7 +28,7 @@ class DefaultProcessorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
         $this->choiceHelper = $this->createMock(ChoiceFieldHelper::class);
 

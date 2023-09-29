@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Command;
@@ -62,7 +63,7 @@ class DebugEmailVariablesCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('System Variables');
         $this->processSystemVariables($output);
@@ -73,12 +74,9 @@ class DebugEmailVariablesCommand extends Command
             $this->processEntityVariables($output, $input->getOption('entity-class'), $input->getOption('entity-id'));
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
-    /**
-     * @param OutputInterface $output
-     */
     private function processSystemVariables(OutputInterface $output)
     {
         $table = new Table($output);

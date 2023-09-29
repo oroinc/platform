@@ -47,13 +47,6 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
     /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
-    /**
-     * @param TranslatorInterface    $translator
-     * @param ConfigManager          $userConfigManager
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param RequestStack           $requestStack
-     * @param OAuthManagerRegistry   $oauthManagerRegistry
-     */
     public function __construct(
         TranslatorInterface $translator,
         ConfigManager $userConfigManager,

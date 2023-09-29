@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Storage;
 
 use Oro\Bundle\LocaleBundle\Storage\EntityFallbackFieldsStorage;

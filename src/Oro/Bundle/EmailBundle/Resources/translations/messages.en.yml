@@ -275,8 +275,6 @@ oro:
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
             unable_to_send_email:         "Unable to send the email."
-            sender_can_not_be_empty:      "Sender can not be empty"
-            recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
         folders.tooltip:          If a folder is uncheked, all the data saved in it will be deleted
@@ -303,18 +301,25 @@ oro:
         entity_grid_all_view_label: All %entity_plural_label%
         entity_description:       Email message
         id.label:                 Id
-        importance.label:         Importance
-        internal_date.label:      Internal date
+        importance:
+            label:                Importance
+            description:          The importance of the email.
+        internal_date:
+            label:                Internal date
+            description:          The internal date of the email.
         message_id.label:         Message Id
         multi_message_id.label:   Multi Message Id
         received_at.label:        Received at
         recipients.label:         Recipients
         send_email:               Send email
         the_email_was_sent:       The email was sent
-        sent_at.label:            Sent at
+        sent_at:
+            label:                Sent at
+            description:          The date and time the email was sent.
         sent_by.label:            sent by {{ user }}
         subject:
             label:                Subject
+            description:          The subject of the email.
             no_subject.label:     (no subject)
         to.label:                 To
         cc_bcc.label:             Cc/Bcc
@@ -324,7 +329,9 @@ oro:
         x_thread_id.label:        xThread Id
         template.label:           Apply template
         type.label:               Type
-        head.label:               Is Head
+        head:
+            label:                Is Head
+            description:          Indicates whether the email is either the first unread or the last message in the thread.
         refs.label:               References Header
         thread.label:             Thread
         seen.label:               Is Seen
@@ -339,8 +346,12 @@ oro:
         empty_body:               Empty body
         unable_to_load_body:      'Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.'
         body_is_unavailable:      Body is unavailable
-        email_users.label:        User Emails
-        body_synced.label:        Email body synced
+        email_users:
+            label:                User Emails
+            description:          An information about users the email is related to.
+        body_synced:
+            label:                Email body synced
+            description:          Indicates whether the email body is synced with an email server.
         status:
             label:                Status
             unread.label:         Unread
@@ -366,21 +377,27 @@ oro:
             entity_label:             User Emails
             entity_plural_label:      User Emails
             entity_grid_all_view_label: All %entity_plural_label%
-            email.label:              Email
-            email.aria_label:         "Opens a default email client to write an email to %email%"
+            email:
+                label:                Email
+                description:          An email to which this entity is related to.
+                aria_label:          "Opens a default email client to write an email to %email%"
             folder.label:             Folder
             id.label:                 Id
             organization.label:       Organization
             owner.label:              User Owner
             mailbox_owner.label:      Mailbox Owner
-            received_at.label:        Received At
-            seen.label:               Seen
+            received_at:
+                label:                Received At
+                description:          The date and time the email was received by a user.
+            seen:
+                label:                Seen
+                description:          Indicates whether the email is seen by a user.
             folders.label:            Folders
             origin.label:             Email Origin
             unsynced_flag_count.label: Unsynced Flag Count
             is_email_private:
                 label:                Private
-                description:          Determinates if the email public or private
+                description:          Indicates whether the email is public or private.
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes

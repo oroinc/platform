@@ -12,7 +12,7 @@ class EmptyOwnerException extends AccountStatusException
     /**
      * {@inheritdoc}
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'oro_user.login.errors.empty_owner';
     }

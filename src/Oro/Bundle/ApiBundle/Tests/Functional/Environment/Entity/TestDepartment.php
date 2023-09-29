@@ -189,7 +189,7 @@ class TestDepartment implements TestFrameworkEntityInterface
     }
 
     /**
-     * @param Organization $organization
+     * @param Organization|null $organization
      *
      * @return self
      */

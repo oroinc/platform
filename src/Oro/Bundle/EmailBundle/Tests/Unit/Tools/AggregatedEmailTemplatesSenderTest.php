@@ -21,25 +21,33 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
-use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use Psr\Log\LoggerInterface;
 
 class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
 {
-    use LoggerAwareTraitTestTrait;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    private DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper;
+    /** @var LocalizedTemplateProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $localizedTemplateProvider;
 
-    private LocalizedTemplateProvider|\PHPUnit\Framework\MockObject\MockObject $localizedTemplateProvider;
+    /** @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailOriginHelper;
 
-    private EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject $emailOriginHelper;
+    /** @var EmailModelSender|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailModelSender;
 
-    private EmailModelSender|\PHPUnit\Framework\MockObject\MockObject $emailModelSender;
+    /** @var EmailTemplate|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailTemplate;
 
-    private AggregatedEmailTemplatesSender $sender;
+    /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityOwnerAccessor;
 
-    private EmailTemplate|\PHPUnit\Framework\MockObject\MockObject $emailTemplate;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    private EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject $entityOwnerAccessor;
+    /** @var AggregatedEmailTemplatesSender */
+    private $sender;
 
     protected function setUp(): void
     {
@@ -49,16 +57,16 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
         $this->emailModelSender = $this->createMock(EmailModelSender::class);
         $this->emailTemplate = $this->createMock(EmailTemplate::class);
         $this->entityOwnerAccessor = $this->createMock(EntityOwnerAccessor::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->sender = new AggregatedEmailTemplatesSender(
             $this->doctrineHelper,
             $this->localizedTemplateProvider,
             $this->emailOriginHelper,
             $this->emailModelSender,
-            $this->entityOwnerAccessor
+            $this->entityOwnerAccessor,
+            $this->logger
         );
-
-        $this->setUpLoggerMock($this->sender);
     }
 
     /**
@@ -114,7 +122,7 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
             ->with(self::isInstanceOf(Email::class))
             ->willThrowException($exception);
 
-        $this->loggerMock->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with(
                 'Failed to send an email to test@test.com using "test" email template for "stdClass" '
@@ -145,7 +153,8 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
 
         $organization = null;
 
-        if ($organizationId = $options['organization_id']) {
+        $organizationId = $options['organization_id'];
+        if ($organizationId) {
             $organization = new Organization();
             $organization->setId($organizationId);
 

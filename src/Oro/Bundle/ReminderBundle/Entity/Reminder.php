@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ReminderBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroReminderBundle_Entity_Reminder;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -37,6 +38,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  * @SuppressWarnings(PHPMD.TooManyFields)
+ * @mixin OroReminderBundle_Entity_Reminder
  */
 class Reminder implements ExtendEntityInterface
 {
@@ -424,7 +426,7 @@ class Reminder implements ExtendEntityInterface
     }
 
     /**
-     * @param User $sender
+     * @param User|null $sender
      *
      * @return Reminder
      */

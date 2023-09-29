@@ -286,10 +286,10 @@ oro:
                 description:     The unique identifier of a user role record.
             role:
                 label:           Role
-                description:     The name used to refer to the role on the interface.
+                description:     The code of the user role.
             label:
                 label:           Label
-                description:     The name of the role in the system, on the program level.
+                description:     A human-readable label that identifies a user role.
             users:
                 label:           Users
                 description:     Users the role is assigned to.

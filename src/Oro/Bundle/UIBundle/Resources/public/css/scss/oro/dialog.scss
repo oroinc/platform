@@ -126,6 +126,12 @@
         }
     }
 
+    .ui-dialog-extra-header-content {
+        &:empty {
+            display: none;
+        }
+    }
+
     .ui-widget-content {
         border: $dialog-widget-content-border;
         color: $dialog-widget-content-color;
@@ -305,6 +311,16 @@
 
         .action-wrapper {
             margin-left: $dialog-buttonpane-action-wrapper-offset-left;
+        }
+    }
+
+    .datagrid {
+        --datagrid-sticky-offset: #{$dialog-sticky-offset};
+    }
+
+    .oro-datagrid {
+        &.stuck .datagrid-sticky {
+            box-shadow: $dialog-datagrid-sticky-shadow;
         }
     }
 }

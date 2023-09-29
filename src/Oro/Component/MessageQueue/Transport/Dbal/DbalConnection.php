@@ -1,9 +1,13 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
+/**
+ * Dbal Connection for message queue transport
+ */
 class DbalConnection implements ConnectionInterface
 {
     /**

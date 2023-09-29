@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
@@ -14,6 +15,7 @@ use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputArgument;
@@ -141,21 +143,21 @@ HELP
         if ($showProcessors) {
             $this->dumpAllProcessors($output, $this->getRequestType($input));
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $showProcessorsWithoutDescription = $input->getOption('processors-without-description');
         if ($showProcessorsWithoutDescription) {
             $this->dumpProcessorsWithoutDescription($output, $this->getRequestType($input));
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $action = $input->getArgument('action');
         if (empty($action)) {
             $this->dumpActions($output);
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         /** @var string[] $attributes */
@@ -172,7 +174,7 @@ HELP
             $input->getOption('no-docs')
         );
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function dumpActions(OutputInterface $output): void

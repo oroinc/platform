@@ -13,6 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Exception\EmailAddressParseException;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressProxy;
@@ -25,13 +26,17 @@ use Psr\Log\LoggerInterface;
  */
 class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    private EmailEntityBatchProcessor|\PHPUnit\Framework\MockObject\MockObject $batch;
+    /** @var EmailEntityBatchProcessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $batch;
 
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    private EmailEntityBuilder $builder;
+    /** @var EmailEntityBuilder */
+    private $builder;
 
     protected function setUp(): void
     {
@@ -87,28 +92,121 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
             ['"Test3" <test3@example.com>', 'test4@example.com']
         );
 
-        self::assertEquals('testSubject', $emailUser->getEmail()->getSubject());
-        self::assertEquals('"Test" <test@example.com>', $emailUser->getEmail()->getFromName());
-        self::assertEquals('test@example.com', $emailUser->getEmail()->getFromEmailAddress()->getEmail());
-        self::assertEquals($date, $emailUser->getEmail()->getSentAt());
+        self::assertEquals($date, $emailUser->getReceivedAt());
 
-        self::assertEquals($date, $emailUser->getEmail()->getInternalDate());
-        self::assertEquals(Email::NORMAL_IMPORTANCE, $emailUser->getEmail()->getImportance());
-        $to = $emailUser->getEmail()->getRecipients(EmailRecipient::TO);
+        $email = $emailUser->getEmail();
+        self::assertEquals('testSubject', $email->getSubject());
+        self::assertEquals('"Test" <test@example.com>', $email->getFromName());
+        self::assertEquals('test@example.com', $email->getFromEmailAddress()->getEmail());
+        self::assertEquals($date, $email->getSentAt());
+        self::assertEquals($date, $email->getInternalDate());
+        self::assertEquals(Email::NORMAL_IMPORTANCE, $email->getImportance());
+        $to = $email->getRecipients(EmailRecipient::TO);
         self::assertEquals('"Test1" <test1@example.com>', $to[0]->getName());
         self::assertEquals('test1@example.com', $to[0]->getEmailAddress()->getEmail());
-        $cc = $emailUser->getEmail()->getRecipients(EmailRecipient::CC);
+        $cc = $email->getRecipients(EmailRecipient::CC);
         self::assertEquals('"Test2" <test2@example.com>', $cc[1]->getName());
         self::assertEquals('test2@example.com', $cc[1]->getEmailAddress()->getEmail());
         self::assertEquals('test1@example.com', $cc[2]->getName());
         self::assertEquals('test1@example.com', $cc[2]->getEmailAddress()->getEmail());
-        $bcc = $emailUser->getEmail()->getRecipients(EmailRecipient::BCC);
+        $bcc = $email->getRecipients(EmailRecipient::BCC);
         self::assertEquals('"Test3" <test3@example.com>', $bcc[3]->getName());
         self::assertEquals('test3@example.com', $bcc[3]->getEmailAddress()->getEmail());
         self::assertEquals('test4@example.com', $bcc[4]->getName());
         self::assertEquals('test4@example.com', $bcc[4]->getEmailAddress()->getEmail());
         self::assertCount(2, $bcc);
-        self::assertTrue($emailUser->getEmail()->getEmailUsers()->contains($emailUser));
+        self::assertTrue($email->getEmailUsers()->contains($emailUser));
+    }
+
+    public function testInitializeEmailUser(): void
+    {
+        $this->mockMetadata();
+
+        $this->initEmailStorage();
+
+        $date = new \DateTime('now');
+        $emailUser = new EmailUser();
+        $this->builder->initializeEmailUser(
+            $emailUser,
+            null,
+            'testSubject',
+            '"Test" <test@example.com>',
+            '"Test1" <test1@example.com>',
+            $date,
+            $date,
+            Email::NORMAL_IMPORTANCE,
+            ['"Test2" <test2@example.com>', 'test1@example.com'],
+            ['"Test3" <test3@example.com>', 'test4@example.com']
+        );
+
+        $email = $emailUser->getEmail();
+        self::assertEquals('testSubject', $email->getSubject());
+        self::assertEquals('"Test" <test@example.com>', $email->getFromName());
+        self::assertEquals('test@example.com', $email->getFromEmailAddress()->getEmail());
+        self::assertEquals($date, $email->getSentAt());
+        self::assertEquals($date, $email->getInternalDate());
+        self::assertEquals(Email::NORMAL_IMPORTANCE, $email->getImportance());
+        $to = $email->getRecipients(EmailRecipient::TO);
+        self::assertEquals('"Test1" <test1@example.com>', $to[0]->getName());
+        self::assertEquals('test1@example.com', $to[0]->getEmailAddress()->getEmail());
+        $cc = $email->getRecipients(EmailRecipient::CC);
+        self::assertEquals('"Test2" <test2@example.com>', $cc[1]->getName());
+        self::assertEquals('test2@example.com', $cc[1]->getEmailAddress()->getEmail());
+        self::assertEquals('test1@example.com', $cc[2]->getName());
+        self::assertEquals('test1@example.com', $cc[2]->getEmailAddress()->getEmail());
+        $bcc = $email->getRecipients(EmailRecipient::BCC);
+        self::assertEquals('"Test3" <test3@example.com>', $bcc[3]->getName());
+        self::assertEquals('test3@example.com', $bcc[3]->getEmailAddress()->getEmail());
+        self::assertEquals('test4@example.com', $bcc[4]->getName());
+        self::assertEquals('test4@example.com', $bcc[4]->getEmailAddress()->getEmail());
+        self::assertCount(2, $bcc);
+        self::assertTrue($email->getEmailUsers()->contains($emailUser));
+    }
+
+    public function testInitializeEmailUserForExistingEmail(): void
+    {
+        $this->mockMetadata();
+
+        $this->initEmailStorage();
+
+        $date = new \DateTime('now');
+        $emailUser = new EmailUser();
+        $email = new Email();
+        $this->builder->initializeEmailUser(
+            $emailUser,
+            $email,
+            'testSubject',
+            '"Test" <test@example.com>',
+            '"Test1" <test1@example.com>',
+            $date,
+            $date,
+            Email::NORMAL_IMPORTANCE,
+            ['"Test2" <test2@example.com>', 'test1@example.com'],
+            ['"Test3" <test3@example.com>', 'test4@example.com']
+        );
+
+        self::assertSame($email, $emailUser->getEmail());
+        self::assertEquals('testSubject', $email->getSubject());
+        self::assertEquals('"Test" <test@example.com>', $email->getFromName());
+        self::assertEquals('test@example.com', $email->getFromEmailAddress()->getEmail());
+        self::assertEquals($date, $email->getSentAt());
+        self::assertEquals($date, $email->getInternalDate());
+        self::assertEquals(Email::NORMAL_IMPORTANCE, $email->getImportance());
+        $to = $email->getRecipients(EmailRecipient::TO);
+        self::assertEquals('"Test1" <test1@example.com>', $to[0]->getName());
+        self::assertEquals('test1@example.com', $to[0]->getEmailAddress()->getEmail());
+        $cc = $email->getRecipients(EmailRecipient::CC);
+        self::assertEquals('"Test2" <test2@example.com>', $cc[1]->getName());
+        self::assertEquals('test2@example.com', $cc[1]->getEmailAddress()->getEmail());
+        self::assertEquals('test1@example.com', $cc[2]->getName());
+        self::assertEquals('test1@example.com', $cc[2]->getEmailAddress()->getEmail());
+        $bcc = $email->getRecipients(EmailRecipient::BCC);
+        self::assertEquals('"Test3" <test3@example.com>', $bcc[3]->getName());
+        self::assertEquals('test3@example.com', $bcc[3]->getEmailAddress()->getEmail());
+        self::assertEquals('test4@example.com', $bcc[4]->getName());
+        self::assertEquals('test4@example.com', $bcc[4]->getEmailAddress()->getEmail());
+        self::assertCount(2, $bcc);
+        self::assertTrue($email->getEmailUsers()->contains($emailUser));
     }
 
     /**

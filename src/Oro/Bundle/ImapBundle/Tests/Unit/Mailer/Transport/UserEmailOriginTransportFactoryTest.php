@@ -39,9 +39,6 @@ class UserEmailOriginTransportFactoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param Dsn $dsn
-     * @param bool $expected
      */
     public function testSupports(Dsn $dsn, bool $expected): void
     {

@@ -142,7 +142,7 @@ class OroWorkflowBundle implements Migration
     public static function oroWorkflowEntityAclIdentityTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_workflow_entity_acl_identity **/
-        $table = $schema->createTable($tableName ? : 'oro_workflow_entity_acl_identity');
+        $table = $schema->createTable($tableName ?: 'oro_workflow_entity_acl_identity');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('workflow_item_id', 'integer', ['notnull' => false]);
         $table->addColumn('workflow_entity_acl_id', 'integer', ['notnull' => false]);
@@ -272,7 +272,7 @@ class OroWorkflowBundle implements Migration
     public static function oroWorkflowEntityAclIdentityForeignKeys(Schema $schema, $tableName = null)
     {
         /** Generate foreign keys for table oro_workflow_entity_acl_identity **/
-        $table = $schema->getTable($tableName ? : 'oro_workflow_entity_acl_identity');
+        $table = $schema->getTable($tableName ?: 'oro_workflow_entity_acl_identity');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_workflow_item'),
             ['workflow_item_id'],

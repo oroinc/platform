@@ -22,14 +22,6 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
     /** @var ManagerRegistry */
     protected $doctrineRegistry;
 
-    /**
-     * @param ManagerRegistry          $doctrineRegistry
-     * @param ProcessorRegistry        $processorRegistry
-     * @param Executor                 $jobExecutor
-     * @param TypesRegistry            $registry
-     * @param LoggerStrategy           $logger
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         ManagerRegistry $doctrineRegistry,
         ProcessorRegistry $processorRegistry,

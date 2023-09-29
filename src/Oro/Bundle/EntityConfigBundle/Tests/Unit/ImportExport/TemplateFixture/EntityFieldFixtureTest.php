@@ -173,7 +173,6 @@ class EntityFieldFixtureTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-
     /**
      * @dataProvider fillEntityDataForSearchableAttributeDataProvider
      */

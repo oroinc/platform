@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
@@ -25,7 +26,7 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
     /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $languageRepository;
 
-    /** @var FileBasedLanguageHelper|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var FileBasedLanguageHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $fileBasedLanguageHelper;
 
     /** @var OroTranslationUpdateCommand */

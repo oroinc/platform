@@ -17,6 +17,8 @@ api:
     entities:
         Oro\Bundle\TranslationBundle\Entity\TranslationKey:
             documentation_resource: '@OroTranslationBundle/Resources/doc/api/translation.md'
+            disable_meta_properties: [ title ]
+            upsert: false
             fields:
                 id:
                     data_type: string
@@ -126,7 +128,7 @@ api:
 
         Oro\Bundle\TranslationBundle\Entity\Language:
             documentation_resource: '@OroTranslationBundle/Resources/doc/api/supported_language.md'
-            disable_meta_properties: true
+            disable_meta_properties: [ title ]
             identifier_field_names: [code]
             fields:
                 id:

@@ -17,7 +17,7 @@ class ConfigurablePermissionConfiguration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder(self::ROOT_NODE);
         $rootNode = $builder->getRootNode();

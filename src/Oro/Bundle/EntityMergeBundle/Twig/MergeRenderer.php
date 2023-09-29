@@ -58,7 +58,7 @@ class MergeRenderer
      */
     public function renderEntityLabel($entity, EntityMetadata $metadata)
     {
-        $template = $metadata->get('template') ? : $this->defaultTemplate;
+        $template = $metadata->get('template') ?: $this->defaultTemplate;
 
         $stringValue = $this->convertToString($entity, $metadata);
 
@@ -83,7 +83,7 @@ class MergeRenderer
      */
     public function renderFieldValue($value, FieldMetadata $metadata, $entity)
     {
-        $template = $metadata->get('template') ? : $this->defaultTemplate;
+        $template = $metadata->get('template') ?: $this->defaultTemplate;
 
         if (is_array($value) || $value instanceof \Traversable) {
             $isListValue = true;
@@ -137,7 +137,7 @@ class MergeRenderer
         if (null === $value || is_scalar($value)) {
             $convertResult = $value;
         } else {
-            $method = $metadata->get('cast_method') ? : '__toString';
+            $method = $metadata->get('cast_method') ?: '__toString';
 
             if (method_exists($value, $method)) {
                 $convertResult = $value->$method();

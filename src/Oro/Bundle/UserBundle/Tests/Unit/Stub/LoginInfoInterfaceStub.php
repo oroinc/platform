@@ -100,7 +100,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritDoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return [];
     }

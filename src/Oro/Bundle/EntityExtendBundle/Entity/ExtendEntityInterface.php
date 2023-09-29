@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Entity;
@@ -10,9 +11,6 @@ interface ExtendEntityInterface
 {
     /**
      * Gets extended property value
-     *
-     * @param string $name
-     * @return mixed
      */
     public function get(string $name): mixed;
 

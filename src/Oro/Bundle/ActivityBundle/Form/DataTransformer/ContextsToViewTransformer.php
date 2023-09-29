@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActivityBundle\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -16,7 +16,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
 {
     const SEPARATOR = '-|-';
 
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     protected $entityManager;
 
     /** @var TranslatorInterface */
@@ -29,11 +29,11 @@ class ContextsToViewTransformer implements DataTransformerInterface
     protected $separator = self::SEPARATOR;
 
     /**
-     * @param EntityManager $entityManager
-     * @param bool          $collectionModel True if result should be Collection instead of array
+     * @param EntityManagerInterface $entityManager
+     * @param bool                   $collectionModel True if result should be Collection instead of array
      */
     public function __construct(
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         $collectionModel = false
     ) {
         $this->entityManager = $entityManager;

@@ -26,7 +26,7 @@ class TestServiceLocatorInjection implements
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'translator' => TranslatorInterface::class,

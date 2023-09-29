@@ -643,7 +643,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         EmailSyncNotificationBag $notificationBag
     ): void {
         $folderName = $folder->getFullName();
-        $folder->setFailedCount((integer)$folder->getFailedCount() + 1);
+        $folder->setFailedCount((int)$folder->getFailedCount() + 1);
         $message = sprintf('The folder "%s" cannot be selected and was skipped.', $folderName);
         $this->logger->info($message);
 

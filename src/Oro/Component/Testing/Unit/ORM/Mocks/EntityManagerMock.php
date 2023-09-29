@@ -69,8 +69,8 @@ class EntityManagerMock extends \Doctrine\ORM\EntityManager
      * Mock factory method to create an EntityManager.
      *
      * @param mixed $conn
-     * @param Configuration $config
-     * @param EventManager $eventManager
+     * @param Configuration|null $config
+     * @param EventManager|null $eventManager
      * @return EntityManagerMock
      */
     public static function create($conn, Configuration $config = null, EventManager $eventManager = null)

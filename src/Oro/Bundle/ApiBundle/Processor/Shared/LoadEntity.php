@@ -2,18 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Metadata\EntityIdMetadataInterface;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
-use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\AclProtectedEntityLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
-use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Loads the entity from the database and adds it to the context.
@@ -21,17 +14,14 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class LoadEntity implements ProcessorInterface
 {
     private DoctrineHelper $doctrineHelper;
-    private EntityIdHelper $entityIdHelper;
-    private QueryAclHelper $queryAclHelper;
+    private AclProtectedEntityLoader $entityLoader;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        EntityIdHelper $entityIdHelper,
-        QueryAclHelper $queryAclHelper
+        AclProtectedEntityLoader $entityLoader
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->entityIdHelper = $entityIdHelper;
-        $this->queryAclHelper = $queryAclHelper;
+        $this->entityLoader = $entityLoader;
     }
 
     /**
@@ -64,7 +54,7 @@ class LoadEntity implements ProcessorInterface
             return;
         }
 
-        $entity = $this->loadEntity(
+        $entity = $this->entityLoader->findEntity(
             $entityClass,
             $context->getId(),
             $config,
@@ -74,51 +64,5 @@ class LoadEntity implements ProcessorInterface
         if (null !== $entity) {
             $context->setResult($entity);
         }
-    }
-
-    private function loadEntity(
-        string $entityClass,
-        mixed $entityId,
-        EntityDefinitionConfig $config,
-        EntityIdMetadataInterface $metadata,
-        RequestType $requestType
-    ): ?object {
-        // try to load an entity by ACL protected query
-        $entity = $this->queryAclHelper
-            ->protectQuery(
-                $this->getQueryBuilder($entityClass, $entityId, $metadata),
-                $config,
-                $requestType
-            )
-            ->getOneOrNullResult();
-        if (null === $entity) {
-            // use a query without ACL protection to check if an entity exists in DB
-            $qb = $this->getQueryBuilder($entityClass, $entityId, $metadata);
-            $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-            if (\count($idFieldNames) !== 0) {
-                $qb->select('e.' . reset($idFieldNames));
-            }
-            $notAclProtectedData = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
-            if ($notAclProtectedData) {
-                throw new AccessDeniedException('No access to the entity.');
-            }
-        }
-
-        return $entity;
-    }
-
-    private function getQueryBuilder(
-        string $entityClass,
-        mixed $entityId,
-        EntityIdMetadataInterface $metadata
-    ): QueryBuilder {
-        $qb = $this->doctrineHelper->createQueryBuilder($entityClass, 'e');
-        $this->entityIdHelper->applyEntityIdentifierRestriction(
-            $qb,
-            $entityId,
-            $metadata
-        );
-
-        return $qb;
     }
 }

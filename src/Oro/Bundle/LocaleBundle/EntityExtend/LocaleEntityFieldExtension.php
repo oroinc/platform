@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\EntityExtend;
@@ -311,9 +312,6 @@ EOF;
         $transport->setProcessed(true);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function get(EntityFieldProcessTransport $transport): void
     {
         $properties = $this->getProperties($transport);
@@ -323,9 +321,6 @@ EOF;
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function set(EntityFieldProcessTransport $transport): void
     {
         $properties = $this->getProperties($transport);
@@ -338,9 +333,6 @@ EOF;
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function call(EntityFieldProcessTransport $transport): void
     {
         if (str_starts_with($transport->getName(), 'get')) {
@@ -382,9 +374,6 @@ EOF;
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isset(EntityFieldProcessTransport $transport): void
     {
         $properties = $this->getProperties($transport);
@@ -394,9 +383,6 @@ EOF;
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function propertyExists(EntityFieldProcessTransport $transport): void
     {
         $properties = $this->getProperties($transport);
@@ -432,12 +418,17 @@ EOF;
         }
     }
 
-    public function getMethods(EntityFieldProcessTransport $transport): array
+    protected function getMethodsData(EntityFieldProcessTransport $transport): array
     {
         return array_merge(
             $this->getGetMethods($transport),
             $this->getSetMethods($transport),
             $this->getDefaultMethods($transport),
         );
+    }
+
+    public function getMethods(EntityFieldProcessTransport $transport): array
+    {
+        return array_keys($this->getMethodsData($transport));
     }
 }

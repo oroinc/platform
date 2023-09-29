@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
@@ -78,7 +79,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $processConfiguration = $this->configurationProvider->getProcessConfiguration(
             $input->getOption('directories') ?: null,
@@ -91,7 +92,7 @@ HELP
         // update triggers cache
         $this->eventTriggerCache->build();
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function createConsoleLogger(OutputInterface $output): ConsoleLogger

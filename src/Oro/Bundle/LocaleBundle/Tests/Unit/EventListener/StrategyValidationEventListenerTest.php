@@ -39,7 +39,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
                     'test',
                     'test',
                     [],
-                    new \stdClass,
+                    new \stdClass(),
                     'prop',
                     'fail'
                 ),

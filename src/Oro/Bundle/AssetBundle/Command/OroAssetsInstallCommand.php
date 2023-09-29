@@ -1,9 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\AssetBundle\Command;
 
 use Oro\Bundle\InstallerBundle\Command\AbstractCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -58,7 +60,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->getContainer()->getParameter('kernel.environment') === 'test') {
             $output->writeln('Assets build skipped. Assets are not needed for test environment.');
@@ -80,6 +82,6 @@ HELP
             ->runCommand('assets:install', $assetsOptions)
             ->runCommand('oro:assets:build');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

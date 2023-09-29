@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Functional\QueryDesigner;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitOutputResultModifier;
@@ -47,7 +47,7 @@ class SubQueryLimitHelperTest extends WebTestCase
     public function testDeleteAfterSetLimit()
     {
         $this->loadFixtures(['@OroQueryDesignerBundle/Tests/Functional/DataFixtures/workflows.yml']);
-        /** @var EntityManager $em */
+        /** @var EntityManagerInterface $em */
         $em = $this->getContainer()->get('doctrine')->getManagerForClass(WorkflowAwareEntity::class);
         $repo = $em->getRepository(WorkflowAwareEntity::class);
 

@@ -111,7 +111,7 @@ abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implem
     }
 
     /**
-     * @param $workflowItem
+     * @param WorkflowItem $workflowItem
      * @param int $deepLevel
      */
     protected function randomTransitionWalk(WorkflowItem $workflowItem, $deepLevel)

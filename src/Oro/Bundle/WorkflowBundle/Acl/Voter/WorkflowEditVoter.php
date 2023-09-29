@@ -15,7 +15,7 @@ class WorkflowEditVoter implements VoterInterface
     /**
      * {@inheritDoc}
      */
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function vote(TokenInterface $token, $subject, array $attributes): int
     {
         if (!$subject instanceof WorkflowDefinition) {
             return self::ACCESS_ABSTAIN;

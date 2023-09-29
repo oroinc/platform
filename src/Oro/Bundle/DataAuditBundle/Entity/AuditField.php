@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Extend\Entity\Autocomplete\OroDataAuditBundle_Entity_AuditField;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
@@ -13,6 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
  * @ORM\Entity(repositoryClass="Oro\Bundle\DataAuditBundle\Entity\Repository\AuditFieldRepository")
  * @ORM\Table(name="oro_audit_field")
  * @Config(mode="hidden")
+ * @mixin OroDataAuditBundle_Entity_AuditField
  */
 class AuditField extends AbstractAuditField implements ExtendEntityInterface
 {

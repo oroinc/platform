@@ -27,6 +27,7 @@ class JobStatusSubscriber implements EventSubscriberInterface
     private \DateTime $startDateTime;
     private string $phpExecutablePath;
     private bool   $shouldNotRunConsumer = false;
+    /** @var array|Process[] */
     private array $processes = [];
     private int $countConsumers;
 
@@ -39,7 +40,7 @@ class JobStatusSubscriber implements EventSubscriberInterface
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             BeforeStepTested::BEFORE => ['beforeStep', -500],
@@ -107,7 +108,7 @@ class JobStatusSubscriber implements EventSubscriberInterface
             sprintf(
                 'The application has not been able to finish processing jobs within the last 900 seconds. ' .
                 'Unprocessed jobs: %s',
-                implode(', ', $activeJobs)
+                implode(', ', (array)$activeJobs)
             )
         );
     }
@@ -123,11 +124,8 @@ class JobStatusSubscriber implements EventSubscriberInterface
             return;
         }
 
-        foreach ($this->processes as $process) {
-            if ($process->isRunning()) {
-                return;
-            }
-        }
+        $this->processes = array_filter($this->processes, fn ($process) => $process->isRunning());
+
         /** @var Filesystem $filesystem */
         $filesystem = $this->kernel->getContainer()->get('filesystem');
         $logDir = realpath($this->kernel->getLogDir());
@@ -140,7 +138,7 @@ class JobStatusSubscriber implements EventSubscriberInterface
             sprintf('--env=%s', $this->kernel->getEnvironment()),
         ];
 
-        for ($i=0; $i < $this->countConsumers; $i++) {
+        for ($i=0; $i < ($this->countConsumers - count($this->processes)); $i++) {
             $process = new Process($command);
 
             $process->start(function ($type, $buffer) use ($filesystem, $logDir) {

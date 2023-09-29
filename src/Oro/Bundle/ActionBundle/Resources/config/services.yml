@@ -233,7 +233,6 @@ services:
             - '@oro_action.operation_registry'
             - '@oro_action.helper.context'
             - '@oro_action.provider.route'
-            - '@oro_action.resolver.options_resolver'
         tags:
             - { name: oro.action.extension.button_provider, priority: -100 }
 

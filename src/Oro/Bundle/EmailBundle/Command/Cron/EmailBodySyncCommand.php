@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Command\Cron;
@@ -86,7 +87,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $store = new SemaphoreStore();
         $lockFactory = new LockFactory($store);
@@ -95,7 +96,7 @@ HELP
         if (!$lock->acquire()) {
             $output->writeln('The command is already running in another process.');
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         $this->synchronizer->setLogger(new OutputLogger($output));
@@ -103,6 +104,6 @@ HELP
 
         $lock->release();
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

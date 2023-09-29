@@ -81,7 +81,7 @@ class EntityType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_entity_type';
     }

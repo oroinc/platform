@@ -65,7 +65,7 @@
         "symfony/security-bundle": "~5.4.17",
         "symfony/serializer": "~5.4.17",
         "symfony/templating": "~5.4.11",
-        "symfony/translation": "~5.4.14",
+        "symfony/translation": "5.4.22",
         "symfony/twig-bridge": "~5.4.17",
         "symfony/twig-bundle": "~5.4.17",
         "symfony/validator": "~5.4.17",
@@ -127,7 +127,8 @@
         "symfony/requirements-checker": "^2.0.0",
         "gedmo/doctrine-extensions": "~3.10.0",
         "predis/predis": "~1.1.6",
-        "psr/log": "1.1.*"
+        "psr/log": "1.1.*",
+        "oro/platform-serialised-fields": "6.0.*"
     },
     "require-dev": {
         "behat/behat": "~3.12.0",
@@ -226,7 +227,7 @@
             "require": "~5.4.0"
         },
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "6.0-dev"
         }
     },
     "autoload": {

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\EntityExtend;
@@ -33,7 +34,11 @@ class AssociationExtendEntity
         $kind = static::getRelationKind($object);
 
         $associations = [];
-        foreach ($entity->get('relation') as $relation) {
+        $entityRelations = $entity->get('relation');
+        if (null === $entityRelations) {
+            return $associations;
+        }
+        foreach ($entityRelations as $relation) {
             $fieldConfigId = $relation['field_id'];
             $isSupported   = $fieldConfigId instanceof FieldConfigId
                 && ($fieldConfigId->getFieldType() === $type
@@ -165,7 +170,7 @@ class AssociationExtendEntity
                     }
                     return;
                 case RelationType::MULTIPLE_MANY_TO_ONE:
-                    $target = $object->set($associations[$targetClass], $target);
+                    $object->set($associations[$targetClass], $target);
                     return;
             }
         }

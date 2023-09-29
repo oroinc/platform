@@ -44,7 +44,7 @@ api:
             disable_meta_properties: true
             fields:
                 id:
-                    data_type: integer
+                    data_type: string
                 entityName:
                     data_type: string
                 entity:

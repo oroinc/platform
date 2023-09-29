@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Duplicator\Filter;
@@ -28,11 +29,11 @@ class StorageFilter implements Filter
         $oldStorage = $reflectionProperty->getValue($object);
 
         if ($oldStorage instanceof \ArrayObject) {
-            $oldStorage = (object) $oldStorage->getArrayCopy();
-            $newStorage =(array) $objectCopier($oldStorage);
+            $oldStorageIterator = new \ArrayIterator($oldStorage->getArrayCopy());
+            $newStorageData = $objectCopier($oldStorageIterator);
 
             $newStorage = new ExtendEntityStorage(
-                $newStorage,
+                $newStorageData->getArrayCopy(),
                 \ArrayObject::STD_PROP_LIST | \ArrayObject::ARRAY_AS_PROPS
             );
         }

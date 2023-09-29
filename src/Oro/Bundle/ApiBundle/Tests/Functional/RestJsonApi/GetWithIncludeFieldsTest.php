@@ -122,7 +122,6 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
             false
         );
 
-
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
@@ -260,7 +259,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected an array of strings. Given ",firstName,lastName".',
+                'detail' => 'Expected an array of not empty strings. Given ",firstName,lastName".',
                 'source' => ['parameter' => 'fields[users]']
             ],
             $response
@@ -274,7 +273,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected an array of strings. Given "firstName,lastName,".',
+                'detail' => 'Expected an array of not empty strings. Given "firstName,lastName,".',
                 'source' => ['parameter' => 'fields[users]']
             ],
             $response
@@ -288,7 +287,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected string value. Given "".',
+                'detail' => 'Expected not empty string value. Given "".',
                 'source' => ['parameter' => 'include']
             ],
             $response
@@ -302,7 +301,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected an array of strings. Given ",owner,organization".',
+                'detail' => 'Expected an array of not empty strings. Given ",owner,organization".',
                 'source' => ['parameter' => 'include']
             ],
             $response
@@ -316,7 +315,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected an array of strings. Given "owner,organization,".',
+                'detail' => 'Expected an array of not empty strings. Given "owner,organization,".',
                 'source' => ['parameter' => 'include']
             ],
             $response

@@ -98,7 +98,7 @@ class MailboxManager
 
     /**
      * @param User|integer $user User or user id
-     * @param Organization|integer|null $organization
+     * @param Organization|null $organization
      *
      * @return QueryBuilder
      */

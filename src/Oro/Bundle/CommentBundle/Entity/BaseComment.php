@@ -175,7 +175,7 @@ abstract class BaseComment
     /**
      * Sets organization
      *
-     * @param Organization $organization
+     * @param Organization|null $organization
      *
      * @return self
      */

@@ -17,10 +17,6 @@ final class BeforeIsolatedTestEvent implements TestIsolationEvent
      */
     private $output;
 
-    /**
-     * @param TaggedNodeInterface $test
-     * @param OutputInterface $output
-     */
     public function __construct(OutputInterface $output, TaggedNodeInterface $test = null)
     {
         $this->output = $output;
@@ -28,7 +24,7 @@ final class BeforeIsolatedTestEvent implements TestIsolationEvent
     }
 
     /**
-     * @return \string[]
+     * @return string[]
      */
     public function getTags()
     {

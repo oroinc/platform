@@ -56,7 +56,7 @@ class DashboardController extends AbstractController
 
     /**
      * @param Request $request
-     * @param Dashboard $dashboard
+     * @param Dashboard|null $dashboard
      *
      * @Route(
      *      "/view/{id}",
@@ -64,7 +64,7 @@ class DashboardController extends AbstractController
      *      requirements={"id"="\d+"},
      *      defaults={"id" = "0"}
      * )
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function viewAction(Request $request, Dashboard $dashboard = null)
     {
@@ -305,7 +305,7 @@ class DashboardController extends AbstractController
     /**
      * Get dashboard with granted permission. If dashboard id is not specified, gets current active or default dashboard
      *
-     * @param Dashboard $dashboard $dashboard
+     * @param Dashboard|null $dashboard $dashboard
      * @param string    $permission
      * @return DashboardModel|null
      */
@@ -406,7 +406,7 @@ class DashboardController extends AbstractController
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [
             WidgetConfigs::class,

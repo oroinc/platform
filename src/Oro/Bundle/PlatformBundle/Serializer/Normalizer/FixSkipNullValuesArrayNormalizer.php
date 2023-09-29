@@ -43,7 +43,7 @@ class FixSkipNullValuesArrayNormalizer implements NormalizerInterface, Serialize
     /**
      * {@inheritDoc}
      */
-    public function supportsNormalization($data, string $format = null)
+    public function supportsNormalization($data, string $format = null): bool
     {
         return \is_array($data) && !empty($data);
     }

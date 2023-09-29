@@ -53,9 +53,6 @@ class ConnectionFactoryTest extends TestCase
         ConnectionFactory::create($this->locatorMock, $this->transportParametersBagMock);
     }
 
-    /**
-     * @return array
-     */
     public function wrongTransportConnectionInstancesProvider(): array
     {
         return ['scalar' => ['test string'], 'array' => [[]], 'object' => [new \StdClass()]];

@@ -35,7 +35,7 @@ trait UpdatedAtAwareTrait
     }
 
     /**
-     * @param \DateTime $updatedAt
+     * @param \DateTime|null $updatedAt
      *
      * @return $this
      */

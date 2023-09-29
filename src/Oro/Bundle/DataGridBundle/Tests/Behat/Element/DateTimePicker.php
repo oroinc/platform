@@ -8,6 +8,27 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class DateTimePicker extends Element
 {
+    public function focus()
+    {
+        $this->open();
+    }
+
+    public function blur()
+    {
+        $this->close();
+        parent::blur();
+    }
+
+    public function getValue()
+    {
+        $value = $this->getDatePicker()->getValue();
+        if ($this->hasTimePicker()) {
+            $value .= ' ' . $this->getTimePicker()->getValue();
+        }
+
+        return $value;
+    }
+
     /**
      * @param string|\DateTime $value
      */
@@ -28,7 +49,7 @@ class DateTimePicker extends Element
                 $monthPicker->selectOption(strtolower($month));
             }
             $this->getCalendarDate($dateTime->format('j'))->click();
-            if ($this->getElements('TimePicker')) {
+            if ($this->hasTimePicker()) {
                 $this->getTimePicker()->setValue($dateTime);
             }
         }
@@ -126,8 +147,21 @@ class DateTimePicker extends Element
     /**
      * @return TimePicker
      */
-    protected function getTimePicker()
+    protected function getTimePicker(): ?TimePicker
     {
+        if ($this->isBoundToHiddenInput()) {
+            return $this->elementFactory->wrapElement(
+                'TimePicker',
+                $this->getParent()->find('xpath', '/following-sibling::input[contains(@class, "timepicker-input")]')
+            );
+        }
+        if ($this->isBoundToVisibleInput()) {
+            return $this->elementFactory->wrapElement(
+                'TimePicker',
+                $this->find('xpath', '/following-sibling::input[contains(@class, "timepicker-input")]')
+            );
+        }
+
         return $this->getElement('TimePicker');
     }
 
@@ -136,6 +170,10 @@ class DateTimePicker extends Element
      */
     protected function getDatePicker()
     {
+        if ($this->isBoundToHiddenInput()) {
+            return $this->getParent()->find('xpath', '/following-sibling::input[contains(@class, "datepicker-input")]');
+        }
+
         return $this->find('css', 'input.datepicker-input');
     }
 
@@ -153,13 +191,18 @@ class DateTimePicker extends Element
      */
     protected function isOpened()
     {
-        $class = $this->getDatePicker()->getAttribute('class');
+        $datePicker = $this->getDatePicker();
+        $class = $datePicker->getAttribute('class');
 
+        $isOpened = false;
         if ($class !== null) {
-            return preg_match('/\bui-datepicker-dialog-is-(below|above)\b/', $class) === 1;
+            $isOpened = preg_match('/\bui-datepicker-dialog-is-(below|above)\b/', $class) === 1;
+        }
+        if (!$isOpened && $datePicker->hasAttribute('aria-expanded')) {
+            $isOpened = $datePicker->getAttribute('aria-expanded') === 'true';
         }
 
-        return false;
+        return $isOpened;
     }
 
     /**
@@ -174,5 +217,29 @@ class DateTimePicker extends Element
     protected function closeCalendarWidget()
     {
         $this->getDatePicker()->click();
+    }
+
+    protected function isBoundToHiddenInput(): bool
+    {
+        return (bool)$this->getAttribute('data-bound-view');
+    }
+
+    protected function isBoundToVisibleInput(): bool
+    {
+        return $this->getTagName() === 'input' && !$this->hasAttribute('data-bound-view');
+    }
+
+    protected function hasTimePicker(): bool
+    {
+        if ($this->isBoundToHiddenInput()) {
+            return (bool)$this->getParent()
+                ->findAll('xpath', '/following-sibling::input[contains(@class, "timepicker-input")]');
+        }
+        if ($this->isBoundToVisibleInput()) {
+            return (bool)$this
+                ->findAll('xpath', '/following-sibling::input[contains(@class, "timepicker-input")]');
+        }
+
+        return (bool)$this->getElements('TimePicker');
     }
 }

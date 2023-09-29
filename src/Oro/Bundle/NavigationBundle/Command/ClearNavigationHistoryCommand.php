@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\NavigationBundle\Command;
@@ -67,7 +68,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $interval = $input->getOption('interval') ?: self::DEFAULT_INTERVAL;
@@ -97,6 +98,6 @@ HELP
             return $e->getCode() ?: 1;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

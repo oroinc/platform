@@ -5,18 +5,17 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\JsTree;
 use Knp\Menu\MenuFactory;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\UIBundle\Model\TreeItem;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
+class MenuUpdateTreeHandlerTest extends TestCase
 {
-    /** @var MenuFactory */
-    private $factory;
+    private MenuFactory $factory;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    private TranslatorInterface|MockObject $translator;
 
-    /** @var MenuUpdateTreeHandler */
-    private $handler;
+    private MenuUpdateTreeHandler $handler;
 
     protected function setUp(): void
     {
@@ -29,7 +28,7 @@ class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTreeDataProvider
      */
-    public function testCreateTree(bool $includeRoot, array $expectedTree)
+    public function testCreateTree(bool $includeRoot, array $expectedTree): void
     {
         $root = $this->factory->createItem('root');
         $root
@@ -38,7 +37,7 @@ class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
         $root->addChild('item2')->setDisplay(false);
 
         $tree = $this->handler->createTree($root, $includeRoot);
-        $this->assertEquals(
+        self::assertEquals(
             $expectedTree,
             $tree
         );
@@ -47,7 +46,7 @@ class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTreeDataProvider
      */
-    public function testGetTreeItemList(bool $includeRoot, array $expectedTreeItemList)
+    public function testGetTreeItemList(bool $includeRoot, array $expectedTreeItemList): void
     {
         $root = $this->factory->createItem('root');
         $root
@@ -56,7 +55,7 @@ class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
         $root->addChild('item2')->setDisplay(false);
 
         $tree = $this->handler->createTree($root, $includeRoot);
-        $this->assertEquals($expectedTreeItemList, $tree);
+        self::assertEquals($expectedTreeItemList, $tree);
     }
 
     public function getTreeDataProvider(): array
@@ -143,6 +142,58 @@ class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
+    }
+
+    public function testCreateForEmptyRoot(): void
+    {
+        self::assertEquals([], $this->handler->createTree(null, true));
+    }
+
+    public function testCreateForNotAllowedRoot(): void
+    {
+        $root = $this->factory->createItem('root', [
+            'extras' => [
+                MenuUpdateTreeHandler::EXTRA_IS_ALLOWED_FOR_BACKOFFICE => false
+            ]
+        ]);
+        $root->addChild('item1');
+        self::assertEquals([
+            [
+                'id' => 'item1',
+                'parent' => 'root',
+                'text' => null,
+                'state' => [
+                    'opened' => false,
+                    'disabled' => false
+                ],
+                'li_attr' => []
+            ],
+        ], $this->handler->createTree($root, true));
+    }
+
+    public function testCreateForNotAllowedChild(): void
+    {
+        $root = $this->factory->createItem('root');
+        $root
+            ->addChild('item1', [
+                'extras' => [
+                    MenuUpdateTreeHandler::EXTRA_IS_ALLOWED_FOR_BACKOFFICE => false
+                ]
+            ]);
+
+        $tree = $this->handler->createTree($root, true);
+        self::assertEquals([
+            [
+                'id' => 'root',
+                'parent' => '#',
+                'text' => null,
+                'state' => [
+                    'opened' => true,
+                    'disabled' => false
+                ],
+                'li_attr' => []
+            ],
+        ], $tree);
     }
 
     public function getTreeItemListDataProvider(): array

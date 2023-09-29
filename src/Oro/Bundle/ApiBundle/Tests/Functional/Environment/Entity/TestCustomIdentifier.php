@@ -25,7 +25,7 @@ class TestCustomIdentifier implements TestFrameworkEntityInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="`key`", type="string", nullable=false)
+     * @ORM\Column(name="`key`", type="string", nullable=false, unique=true)
      */
     public $key;
 
@@ -77,7 +77,7 @@ class TestCustomIdentifier implements TestFrameworkEntityInterface
     }
 
     /**
-     * @return Collection|TestCustomIdentifier[]
+     * @return Collection<int, TestCustomIdentifier>
      */
     public function getChildren()
     {

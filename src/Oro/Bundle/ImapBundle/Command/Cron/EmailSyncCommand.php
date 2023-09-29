@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\ImapBundle\Command\Cron;
@@ -162,7 +163,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->imapEmailSynchronizer->setLogger(new OutputLogger($output));
 
@@ -186,7 +187,7 @@ HELP
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function getMaxJobsCount()

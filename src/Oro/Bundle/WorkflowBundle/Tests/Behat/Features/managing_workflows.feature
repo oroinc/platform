@@ -97,7 +97,9 @@ Feature: Managing workflows
     When I fill form with:
       | Name            | Glorious workflow  |
       | Related Entity  | Business Unit      |
-    And I save and close form
+    Then I should see "Change Entity Confirmation"
+    And I click "Yes"
+    When I save and close form
     Then I should see "Could not save workflow. Please add at least one step and one transition." flash message
     Then I click "Add step"
     And I fill form with:

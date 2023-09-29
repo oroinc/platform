@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Modifies integration form based on integration type
+ */
 class ChannelFormSubscriber implements EventSubscriberInterface
 {
     /** @var TypesRegistry */
@@ -30,7 +33,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         $this->inflector = $inflector;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA  => 'preSet',
@@ -57,7 +60,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         $typeChoices = array_values($form->get('type')->getConfig()->getOption('choices'));
         $firstChoice = reset($typeChoices);
 
-        $type                  = $data->getType() ? : $firstChoice;
+        $type                  = $data->getType() ?: $firstChoice;
         $transportTypeModifier = $this->getTransportTypeModifierClosure($type);
         $transportTypeModifier($form);
 
@@ -113,7 +116,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             $transport = $this->registry->getTransportType($form->get('type')->getData(), $transportType)
                 ->getSettingsEntityFQCN();
             if (class_exists($transport)) {
-                $form->get('transport')->setData(new $transport);
+                $form->get('transport')->setData(new $transport());
             }
         }
     }
@@ -279,9 +282,6 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
     /**
      * Disable fields that are not allowed to be modified since integration has at least one sync completed
-     *
-     * @param FormInterface $form
-     * @param Integration       $integration
      */
     protected function muteFields(FormInterface $form, Integration $integration = null)
     {

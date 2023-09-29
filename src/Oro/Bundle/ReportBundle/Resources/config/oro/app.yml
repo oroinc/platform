@@ -1,0 +1,5 @@
+oro_entity:
+    entity_name_representation:
+        Oro\Bundle\ReportBundle\Entity\Report:
+            full: [ name ]
+            short: [ name ]

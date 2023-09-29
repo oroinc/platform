@@ -14,6 +14,8 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\GaufretteBundle\FileManager;
@@ -22,13 +24,16 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
 {
     private const ASYNC_OPERATION_ID = 123;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|IncludeMapManager */
+    /** @var IncludeMapManager|\PHPUnit\Framework\MockObject\MockObject */
     private $includeMapManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
+    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $valueNormalizer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
+    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityIdTransformerRegistry;
+
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
     private $fileManager;
 
     /** @var CollectProcessedIncludedEntities */
@@ -40,6 +45,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
 
         $this->includeMapManager = $this->createMock(IncludeMapManager::class);
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $this->entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
         $this->fileManager = $this->createMock(FileManager::class);
 
         $this->context->setFileManager($this->fileManager);
@@ -47,7 +53,8 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
 
         $this->processor = new CollectProcessedIncludedEntities(
             $this->includeMapManager,
-            $this->valueNormalizer
+            $this->valueNormalizer,
+            $this->entityIdTransformerRegistry
         );
     }
 
@@ -99,7 +106,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $includedEntity = $this->createMock(\stdClass::class);
         $includedEntityClass = 'Test\Entity';
         $includedEntityType = 'test_entity_type';
-        $includedEntityId = 'test_entity_id';
+        $includedEntityId = 100;
         $includedEntityDatabaseId = 1000;
         $includedEntityData = $this->createMock(IncludedEntityData::class);
         $includedEntityMetadata = $this->createMock(EntityMetadata::class);
@@ -116,6 +123,17 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
             ->method('normalizeValue')
             ->with($includedEntityClass, DataType::ENTITY_TYPE, self::identicalTo($requestType))
             ->willReturn($includedEntityType);
+
+        $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
+        $entityIdTransformer->expects(self::exactly(2))
+            ->method('transform')
+            ->willReturnCallback(function ($id) {
+                return (string)$id;
+            });
+
+        $this->entityIdTransformerRegistry->expects(self::once())
+            ->method('getEntityIdTransformer')
+            ->willReturn($entityIdTransformer);
 
         $item->expects(self::once())
             ->method('getContext')
@@ -135,7 +153,9 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
             ->with(
                 self::identicalTo($this->fileManager),
                 self::ASYNC_OPERATION_ID,
-                [[$includedEntityType, $includedEntityId, $includedEntityDatabaseId]]
+                self::identicalTo(
+                    [[$includedEntityType, (string)$includedEntityId, (string)$includedEntityDatabaseId]]
+                )
             );
 
         $this->context->setIncludedData($this->createMock(IncludedData::class));

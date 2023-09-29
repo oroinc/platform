@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Doctrine\DBAL\Exception as DbalException;
+use Doctrine\DBAL\Platforms\Keywords\KeywordList;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\Join;
 
@@ -69,6 +72,9 @@ class CriteriaNormalizer
                 $aliases[] = $join->getAlias();
             }
 
+            $keywords = $this->getDatabaseReservedKeywords(
+                $this->doctrineHelper->getEntityManagerForClass($rootEntityClass)
+            );
             $this->sortJoinPathMap($pathMap);
             foreach ($pathMap as $path => $item) {
                 if (!$criteria->hasJoin($path)) {
@@ -79,7 +85,7 @@ class CriteriaNormalizer
 
                     $alias = $item[self::FIELD_OPTION];
                     $count = 0;
-                    while (\in_array($alias, $aliases, true)) {
+                    while (\in_array($alias, $aliases, true) || (null !== $keywords && $keywords->isKeyword($alias))) {
                         $alias = sprintf('%s%d', $item[self::FIELD_OPTION], ++$count);
                     }
                     $aliases[] = $alias;
@@ -286,5 +292,15 @@ class CriteriaNormalizer
         return
             str_starts_with($value, Criteria::PLACEHOLDER_START)
             && str_ends_with($value, Criteria::PLACEHOLDER_END);
+    }
+
+    private function getDatabaseReservedKeywords(EntityManagerInterface $em): ?KeywordList
+    {
+        $platform = $em->getConnection()->getDatabasePlatform();
+        try {
+            return $platform->getReservedKeywordsList();
+        } catch (DbalException $e) {
+            return null;
+        }
     }
 }

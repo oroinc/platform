@@ -219,7 +219,8 @@ oro_api:
     # the default value for "class" is "Oro\Bundle\ApiBundle\Filter\ComparisonFilter"
     # the default value for "supported_operators" is ['=', '!=', '*', '!*']
     filters:
-        string: ~
+        string:
+            class: Oro\Bundle\ApiBundle\Filter\StringComparisonFilter
         boolean: ~
         integer:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
@@ -241,6 +242,7 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         guid: ~
         text:
+            class: Oro\Bundle\ApiBundle\Filter\StringComparisonFilter
             # by default, only EXISTS (IS NOT NULL) and NOT EXISTS (IS NULL) operators
             # are enabled for text fields,
             # to enable other operators for a particular field the "operators" option should be
@@ -321,6 +323,7 @@ oro_api:
         - form.type_extension.form.data_collector
         - oro_security.form.extension.aclprotected_fields_type
         - oro_form.extension.constraint_as_option
+        - oro_form.extension.validation_group_sequence
 
     form_type_guesses:
         boolean:

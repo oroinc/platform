@@ -17,7 +17,7 @@ class CurrencySelectionType extends AbstractCurrencySelectionType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return static::NAME;
     }

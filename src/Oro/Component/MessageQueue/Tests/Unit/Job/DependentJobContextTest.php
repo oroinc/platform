@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Job\DependentJobContext;

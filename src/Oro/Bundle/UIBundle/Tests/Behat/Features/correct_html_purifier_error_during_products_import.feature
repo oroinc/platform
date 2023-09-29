@@ -11,8 +11,8 @@ Feature: Correct HTML Purifier error during products import
     And I open "Products" import tab
     And I download "Products" Data Template file with processor "oro_product_product_export_template"
     And fill template with data:
-      | attributeFamily.code | names.default.value | descriptions.default.value                                                            | sku   | status  | type   | inventory_status.id | primaryUnitPrecision.unit.code | primaryUnitPrecision.precision |
-      | default_family       | Test Product 1      | <div><p class="product-view-desc">This medical identifications tag is a beautiful</p> | PSKU1 | enabled | simple | in_stock            | set                            | 1                              |
+      | Product Family.Code | Name.default.value | Description.default.value                                                             | SKU   | Status  | Type   | Inventory Status.Id | Unit of Quantity.Unit.Code | Unit of Quantity.Precision |
+      | default_family      | Test Product 1     | <div><p class="product-view-desc">This medical identifications tag is a beautiful</p> | PSKU1 | enabled | simple | in_stock            | set                        | 1                          |
     And I import file
     Then Email should contains the following "Errors: 1 processed: 0, read: 1, added: 0, updated: 0, replaced: 0" text
     When I follow "Error log" link from the email

@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
@@ -9,6 +10,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for business unit tree
+ */
 class BusinessUnitTreeType extends AbstractType
 {
     /** @var BusinessUnitManager */
@@ -31,7 +35,7 @@ class BusinessUnitTreeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?string
     {
         return ChoiceType::class;
     }
@@ -47,7 +51,7 @@ class BusinessUnitTreeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_business_unit_tree';
     }

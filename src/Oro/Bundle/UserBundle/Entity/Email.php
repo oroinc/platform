@@ -98,7 +98,7 @@ class Email implements EmailInterface
     /**
      * Set user
      *
-     * @param  User $user
+     * @param User|null $user
      * @return Email
      */
     public function setUser(User $user = null)

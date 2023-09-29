@@ -17,7 +17,7 @@ class ProcessorHelperTest extends TestCase
     {
         $this->checkProcessors();
 
-        $this->cache = new ArrayAdapter;
+        $this->cache = new ArrayAdapter();
         $this->processorHelper = new ProcessorHelper('', '', $this->cache);
     }
 

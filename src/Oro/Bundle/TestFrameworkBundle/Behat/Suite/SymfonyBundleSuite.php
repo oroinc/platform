@@ -36,8 +36,6 @@ class SymfonyBundleSuite implements Suite
 
     /**
      * Returns suite bundle.
-     *
-     * @return BundleInterface
      */
     public function getBundle(): BundleInterface
     {

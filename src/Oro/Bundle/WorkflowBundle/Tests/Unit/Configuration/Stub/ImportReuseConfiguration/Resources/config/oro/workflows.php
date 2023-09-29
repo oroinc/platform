@@ -1,4 +1,5 @@
 <?php
+
 return [
     'workflow_with_config_reuse' => [
         'entity' => 'Some\Another\Entity',

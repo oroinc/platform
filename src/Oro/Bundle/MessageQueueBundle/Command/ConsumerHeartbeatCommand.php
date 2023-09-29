@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\MessageQueueBundle\Command;
@@ -72,11 +73,11 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // do nothing if check was disabled with 0 config option value
         if ($this->heartBeatUpdatePeriod === 0) {
-            return 0;
+            return Command::SUCCESS;
         }
 
         if (!$this->consumerHeartbeat->isAlive() && $this->connectionChecker->checkConnection()) {
@@ -84,6 +85,6 @@ HELP
             $this->websocketClient->publish('oro/message_queue_heartbeat', '');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

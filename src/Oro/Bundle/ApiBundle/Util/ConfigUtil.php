@@ -77,6 +77,9 @@ class ConfigUtil extends BaseConfigUtil
     /** a flag indicates whether a requesting of additional meta properties is disabled */
     public const DISABLE_META_PROPERTIES = 'disable_meta_properties';
 
+    /** the names of additional meta properties a requesting of that are disabled */
+    public const DISABLED_META_PROPERTIES = 'disabled_meta_properties';
+
     /** the form type that should be used for the entity */
     public const FORM_TYPE = 'form_type';
 
@@ -155,6 +158,12 @@ class ConfigUtil extends BaseConfigUtil
 
     /** the option for a post processor to be applies to the field value */
     public const POST_PROCESSOR_OPTIONS = 'post_processor_options';
+
+    public const UPSERT = 'upsert';
+    public const UPSERT_DISABLE = 'disable';
+    public const UPSERT_ADD = 'add';
+    public const UPSERT_REMOVE = 'remove';
+    public const UPSERT_REPLACE = 'replace';
 
     /**
      * Gets a native PHP array representation of each object in a given array.

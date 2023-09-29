@@ -12,50 +12,47 @@ use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
 use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 
 /**
  * Sends localized emails to specified recipients using specified email template.
  * Creates {@see EmailUser} entities.
  */
-class AggregatedEmailTemplatesSender implements LoggerAwareInterface
+class AggregatedEmailTemplatesSender
 {
-    use LoggerAwareTrait;
-
     private DoctrineHelper $doctrineHelper;
-
     private LocalizedTemplateProvider $localizedTemplateProvider;
-
     private EmailOriginHelper $emailOriginHelper;
-
     private EmailModelSender $emailModelSender;
-
     private EntityOwnerAccessor $entityOwnerAccessor;
+    private LoggerInterface $logger;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
         LocalizedTemplateProvider $localizedTemplateProvider,
         EmailOriginHelper $emailOriginHelper,
         EmailModelSender $emailModelSender,
-        EntityOwnerAccessor $entityOwnerAccessor
+        EntityOwnerAccessor $entityOwnerAccessor,
+        LoggerInterface $logger
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->localizedTemplateProvider = $localizedTemplateProvider;
         $this->emailOriginHelper = $emailOriginHelper;
         $this->emailModelSender = $emailModelSender;
         $this->entityOwnerAccessor = $entityOwnerAccessor;
+        $this->logger = $logger;
     }
 
     /**
-     * @param object $entity
+     * @param object                 $entity
      * @param EmailHolderInterface[] $recipients
-     * @param From $from
-     * @param string $templateName
-     * @param array $templateParams
+     * @param From                   $from
+     * @param string                 $templateName
+     * @param array                  $templateParams
+     *
      * @return EmailUser[]
      *
-     * @throws \Doctrine\ORM\EntityNotFoundException If the specified email template cannot be found
+     * @throws \Doctrine\ORM\EntityNotFoundException When the specified email template cannot be found
      * @throws \Twig\Error\Error When an error occurred in Twig during email template loading, compilation or rendering
      */
     public function send(

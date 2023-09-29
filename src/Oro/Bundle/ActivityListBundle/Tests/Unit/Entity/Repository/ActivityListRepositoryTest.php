@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Repository;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
@@ -11,7 +11,7 @@ use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 
 class ActivityListRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
     /** @var ActivityListRepository */
@@ -19,7 +19,7 @@ class ActivityListRepositoryTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
 
         $this->repository = new ActivityListRepository(
             $this->entityManager,

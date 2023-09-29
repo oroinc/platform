@@ -145,7 +145,6 @@ class ExportExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->extension->isApplicable($config));
     }
 
-
     public function testProcessConfigsWhenGridExportOptionIsNotSpecified(): void
     {
         $config = DatagridConfiguration::create([]);

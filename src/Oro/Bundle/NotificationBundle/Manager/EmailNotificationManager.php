@@ -41,9 +41,9 @@ class EmailNotificationManager
      * Sends the email notifications
      *
      * @param TemplateEmailNotificationInterface[] $notifications
-     * @param LoggerInterface $logger Override for default logger. If this parameter is specified
-     *                                this logger will be used instead of a logger specified
-     *                                in the constructor
+     * @param LoggerInterface|null $logger Override for default logger. If this parameter is specified
+     *                                     this logger will be used instead of a logger specified
+     *                                     in the constructor
      * @param array $params Additional params for template renderer
      */
     public function process(array $notifications, LoggerInterface $logger = null, array $params = []): void

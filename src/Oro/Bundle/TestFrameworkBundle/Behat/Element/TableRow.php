@@ -53,6 +53,14 @@ class TableRow extends Element
         );
     }
 
+    public function hasCellByHeader(string $header): bool
+    {
+        $columnNumber = (int) $this->getColumnNumberByHeader($header);
+        $columns = $this->findAll('xpath', 'child::td|child::th');
+
+        return isset($columns[$columnNumber]);
+    }
+
     public function getCellValues(array $headers): array
     {
         $values = [];

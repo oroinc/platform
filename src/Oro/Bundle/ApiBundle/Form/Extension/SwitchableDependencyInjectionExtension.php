@@ -48,7 +48,7 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function hasType($name)
+    public function hasType(string $name)
     {
         return $this->getExtension()->hasType($name);
     }
@@ -56,7 +56,7 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function getType($name)
+    public function getType(string $name)
     {
         return $this->getExtension()->getType($name);
     }
@@ -64,7 +64,7 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function hasTypeExtensions($name)
+    public function hasTypeExtensions(string $name)
     {
         return $this->getExtension()->hasTypeExtensions($name);
     }
@@ -72,7 +72,7 @@ class SwitchableDependencyInjectionExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function getTypeExtensions($name)
+    public function getTypeExtensions(string $name)
     {
         return $this->getExtension()->getTypeExtensions($name);
     }

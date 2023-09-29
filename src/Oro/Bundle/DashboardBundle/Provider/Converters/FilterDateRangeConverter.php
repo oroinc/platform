@@ -241,12 +241,6 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             : $startDate;
     }
 
-    /**
-     * @param array $value
-     * @param bool $saveOpenRange
-     *
-     * @return array
-     */
     protected function getPeriodValues(array $value, bool $saveOpenRange): array
     {
         $startValue = $value['value']['start'];
@@ -294,7 +288,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
         $start = $end = $part = $prevStart = $prevEnd = $lastSecondModifier = null;
         $type = $value['type'] ?? AbstractDateFilterType::TYPE_BETWEEN;
         if (array_key_exists($value['type'], static::$valueTypesStartVarsMap)) {
-            /** @var \Carbon\Carbon $start */
+            /** @var Carbon $start */
             $start  = $this->dateCompiler->compile(
                 sprintf('{{%s}}', static::$valueTypesStartVarsMap[$value['type']]['var_start'])
             );
