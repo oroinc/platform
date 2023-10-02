@@ -2,6 +2,8 @@
 
 $validation-failed-inner-offset: spacing('xs') 0 0 !default;
 $validation-failed-font-size: $base-font-size--s !default;
-$validation-failed-gap: spacing('sm') !default;
-$validation-failed-align-items: center !default;
+$validation-failed-gap: 2px !default;
+$validation-failed-align-items: flex-start !default;
 $validation-failed-color: get-var-color('destructive', 'dark') !default;
+
+$validation-failed-icon-offset: 2px 6px 2px 0 !default;
