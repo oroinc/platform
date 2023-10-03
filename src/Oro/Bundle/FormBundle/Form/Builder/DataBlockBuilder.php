@@ -6,37 +6,23 @@ use Oro\Bundle\FormBundle\Config\BlockConfig;
 use Oro\Bundle\FormBundle\Config\FormConfig;
 use Oro\Bundle\FormBundle\Config\SubBlockConfig;
 use Symfony\Component\Form\FormView;
+use Twig\Environment;
 
 /**
  * Builds blocks configuration for the given FormView instance.
  */
 class DataBlockBuilder
 {
-    /** @var TemplateRendererInterface */
-    protected $templateRenderer;
+    protected FormConfig $formConfig;
 
-    /** @var string */
-    protected $formVariableName;
-
-    /** @var FormConfig */
-    protected $formConfig;
-
-    /**
-     * @param TemplateRendererInterface $templateRenderer
-     * @param string                    $formVariableName
-     */
-    public function __construct(TemplateRendererInterface $templateRenderer, $formVariableName)
-    {
-        $this->templateRenderer = $templateRenderer;
-        $this->formVariableName = $formVariableName;
+    public function __construct(
+        protected Environment $twig,
+        protected $parentContext,
+        protected string $formVariableName
+    ) {
     }
 
-    /**
-     * @param FormView $form
-     *
-     * @return FormConfig
-     */
-    public function build(FormView $form)
+    public function build(FormView $form): FormConfig
     {
         $this->formConfig = new FormConfig();
         $this->doBuild($form);
@@ -44,7 +30,7 @@ class DataBlockBuilder
         return $this->formConfig;
     }
 
-    public function doBuild(FormView $form)
+    public function doBuild(FormView $form): void
     {
         $this->addBlocks($form);
 
@@ -70,9 +56,10 @@ class DataBlockBuilder
 
                 $subBlock = $this->getSubBlock($name, $child, $block);
 
-                $html = $this->templateRenderer->render(
-                    '{{ form_row(' . $this->formVariableName . $this->getFullPath($child) . ') }}'
-                );
+                $html = $this->twig->render('@OroForm/Form/data_block_item.html.twig', [
+                    'parentContext' => $this->parentContext,
+                    'formFieldPath' => $this->formVariableName . $this->getFullPath($child)
+                ]);
 
                 $subBlock->setData(array_merge($subBlock->getData(), [$child->vars['name'] => $html]));
             }
@@ -95,7 +82,7 @@ class DataBlockBuilder
         $formPath = '';
         $tmpFormView = $formView;
         while ($tmpFormView->parent) {
-            $formPath = sprintf('.children[\'%s\']', $tmpFormView->vars['name']) . $formPath;
+            $formPath = sprintf('.children.%s', $tmpFormView->vars['name']) . $formPath;
             $tmpFormView = $tmpFormView->parent;
         }
 
@@ -109,7 +96,7 @@ class DataBlockBuilder
      *
      * @return mixed|null|SubBlockConfig
      */
-    protected function getSubBlock($name, FormView $form, BlockConfig $block)
+    protected function getSubBlock(string $name, FormView $form, BlockConfig $block)
     {
         $subBlock = null;
         if (!isset($form->vars['subblock'])) {
@@ -129,13 +116,7 @@ class DataBlockBuilder
         return $subBlock;
     }
 
-    /**
-     * @param string $code
-     * @param array  $config
-     *
-     * @return BlockConfig
-     */
-    protected function addBlock($code, $config = [])
+    protected function addBlock(string $code, array $config = []): BlockConfig
     {
         if ($this->formConfig->hasBlock($code)) {
             $block = $this->formConfig->getBlock($code);
@@ -171,14 +152,7 @@ class DataBlockBuilder
         return $block;
     }
 
-    /**
-     * @param BlockConfig $block
-     * @param string      $code
-     * @param array       $config
-     *
-     * @return SubBlockConfig
-     */
-    protected function addSubBlock(BlockConfig $block, $code, $config = [])
+    protected function addSubBlock(BlockConfig $block, string $code, array $config = []): SubBlockConfig
     {
         if ($block->hasSubBlock($code)) {
             $subBlock = $block->getSubBlock($code);
@@ -210,13 +184,7 @@ class DataBlockBuilder
         return $subBlock;
     }
 
-    /**
-     * @param array  $config
-     * @param string $key
-     *
-     * @return bool
-     */
-    protected function hasValue($config, $key)
+    protected function hasValue(array $config, string $key): bool
     {
         return isset($config[$key]) || array_key_exists($key, $config);
     }
