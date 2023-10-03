@@ -13,15 +13,7 @@ use Twig\Loader\ChainLoader;
  */
 class DataBlockRenderer
 {
-    /**
-     * @param Environment $env
-     * @param array       $context
-     * @param FormView    $form
-     * @param string      $formVariableName
-     *
-     * @return array
-     */
-    public function render(Environment $env, $context, FormView $form, $formVariableName = 'form')
+    public function render(Environment $env, $context, FormView $form, string $formVariableName = 'form'): array
     {
         // remember current loader
         $originalLoader = $env->getLoader();
@@ -30,7 +22,7 @@ class DataBlockRenderer
         $env->setLoader(new ChainLoader(array($originalLoader, new ArrayLoader())));
 
         // build blocks
-        $builder = new DataBlockBuilder(new TwigTemplateRenderer($env, $context), $formVariableName);
+        $builder = new DataBlockBuilder($env, $context, $formVariableName);
         $result  = $builder->build($form);
 
         // restore the original loader
