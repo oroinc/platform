@@ -1,13 +1,1 @@
-<% const orofrontend = _.macros('orofrontend'); %>
-<% const showIcon = obj.showIcon !== void 0 ? showIcon : true %>
-<span class="validation-failed" <% if (obj.id) { %> id="<%- id %>" <% } %> role="alert" >
-    <span class="validation-failed__content">
-        <% if (showIcon) { %>
-            <%= orofrontend.renderIcon({
-                id: 'alert-circle',
-                extraClass: 'theme-icon--medium validation-failed__icon'
-            }) %>
-        <% } %>
-        <span><%- error %></span>
-    </span>
-</span>
+<span class="validation-failed" <% if (obj.id) { %> id="<%- id %>" <% } %> role="alert" ><%- error %></span>
