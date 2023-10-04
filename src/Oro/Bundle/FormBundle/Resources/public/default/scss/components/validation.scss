@@ -17,7 +17,11 @@
     }
 
     &__icon {
-        padding: $validation-failed-icon-offset;
+        width: $validation-failed-icon-size;
+        height: $validation-failed-icon-size;
+        flex-shrink: 0;
+        background: $validation-failed-icon-url;
+        margin: $validation-failed-icon-offset;
     }
 
     /* Following css rule covers case when a few inputs has the same place for errors (e.g. datetime picker).

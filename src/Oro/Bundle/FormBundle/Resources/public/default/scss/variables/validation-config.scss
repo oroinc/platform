@@ -1,9 +1,13 @@
 /* @theme: default; */
 
+@use 'sass:string';
+
 $validation-failed-inner-offset: spacing('xs') 0 0 !default;
 $validation-failed-font-size: $base-font-size--s !default;
 $validation-failed-gap: 2px !default;
 $validation-failed-align-items: flex-start !default;
 $validation-failed-color: get-var-color('destructive', 'dark') !default;
 
+$validation-failed-icon-size: 16px !default;
+$validation-failed-icon-url: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="#{$validation-failed-icon-size}" height="#{$validation-failed-icon-size}" fill="none"><g fill="#{str-replace(string.unquote('#{$validation-failed-color}'), '#', '%23')}" fill-rule="evenodd" clip-path="url(%23a)" clip-rule="evenodd"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2ZM.667 8a7.333 7.333 0 1 1 14.666 0A7.333 7.333 0 0 1 .667 8Z"/><path d="M7.333 10.667c0-.369.299-.667.667-.667h.007a.667.667 0 1 1 0 1.333H8a.667.667 0 0 1-.667-.666ZM8 4.667c.368 0 .666.298.666.666V8a.667.667 0 1 1-1.333 0V5.333c0-.368.299-.666.667-.666Z"/></g><defs><clipPath id="a"><path fill="#{str-replace(string.unquote('#{$validation-failed-color}'), '#', '%23')}" d="M0 0h16v16H0z"/></clipPath></defs></svg>') !default;
 $validation-failed-icon-offset: 2px 6px 2px 0 !default;
