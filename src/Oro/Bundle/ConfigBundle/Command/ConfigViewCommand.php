@@ -57,8 +57,19 @@ HELP
     {
         $configManager = $this->configManager;
         $value = $configManager->get($input->getArgument('name'));
-        $output->writeln($value);
+        if (is_null($value)) {
+            $output->writeln("Value could not be retrieved");
+            return Command::FAILURE;
+        }
+        if (is_array($value) || is_object($value) || is_bool($value)) {
+            $value = json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        }
+        if (!is_scalar($value)) {
+            $output->writeln("Value cannot be displayed");
+            return Command::FAILURE;
+        }
 
+        $output->writeln($value);
         return Command::SUCCESS;
     }
 }
