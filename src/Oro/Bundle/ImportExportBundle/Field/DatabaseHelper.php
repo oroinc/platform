@@ -11,7 +11,9 @@ use Doctrine\ORM\ORMInvalidArgumentException;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Component\DependencyInjection\ServiceLink;
 
@@ -100,9 +102,16 @@ class DatabaseHelper
             if ($this->shouldBeAddedOrganizationLimits($entityName)) {
                 /** @var OwnershipMetadataProvider $ownershipMetadataProvider */
                 $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
-                $organizationField = $ownershipMetadataProvider->getMetadata($entityName)->getOrganizationFieldName();
-                $queryBuilder->andWhere('e.' . $organizationField . ' = :organization')
-                    ->setParameter('organization', $this->tokenAccessor->getOrganization());
+                $metadata = $ownershipMetadataProvider->getMetadata($entityName);
+                $organizationField = $metadata->getOrganizationFieldName();
+                $organization = $this->getEntityOrganizations($metadata);
+                if (\is_array($organization)) {
+                    $queryBuilder->andWhere('e.' . $organizationField . ' in (:organization)')
+                        ->setParameter('organization', $organization);
+                } else {
+                    $queryBuilder->andWhere('e.' . $organizationField . ' = :organization')
+                        ->setParameter('organization', $organization);
+                }
             }
 
             $this->entities[$entityName][$storageKey] = $queryBuilder->getQuery()->getOneOrNullResult();
@@ -176,12 +185,23 @@ class DatabaseHelper
 
         if ($entity && $withLimitations && $this->shouldBeAddedOrganizationLimits($entityName)) {
             $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
-            $organizationField = $ownershipMetadataProvider->getMetadata($entityName)->getOrganizationFieldName();
+            $metadata = $ownershipMetadataProvider->getMetadata($entityName);
+            $organizationField = $metadata->getOrganizationFieldName();
             /** @var FieldHelper $fieldHelper */
             $fieldHelper = $this->fieldHelperLink->getService();
             $entityOrganization = $fieldHelper->getObjectValue($entity, $organizationField);
+            $organization = $this->getEntityOrganizations($metadata);
+            $checkOrganizations = [];
+            if (\is_array($organization)) {
+                foreach ($organization as $value) {
+                    $checkOrganizations[] = $value->getId();
+                }
+            } else {
+                $checkOrganizations[] = $organization->getId();
+            }
+
             if (!$entityOrganization
-                || $entityOrganization->getId() !== $this->tokenAccessor->getOrganizationId()
+                || !\in_array($entityOrganization->getId(), $checkOrganizations)
             ) {
                 return null;
             }
@@ -326,5 +346,10 @@ class DatabaseHelper
         }
 
         return $this->organizationLimitsByEntity[$entityName];
+    }
+
+    protected function getEntityOrganizations(OwnershipMetadataInterface $metadata): Organization|array
+    {
+        return $this->tokenAccessor->getOrganization();
     }
 }
