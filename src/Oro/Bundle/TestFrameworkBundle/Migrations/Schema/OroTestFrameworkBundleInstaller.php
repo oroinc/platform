@@ -5,6 +5,8 @@ namespace Oro\Bundle\TestFrameworkBundle\Migrations\Schema;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
@@ -26,9 +28,11 @@ class OroTestFrameworkBundleInstaller implements
     Installation,
     ActivityExtensionAwareInterface,
     ExtendExtensionAwareInterface,
-    ScopeExtensionAwareInterface
+    ScopeExtensionAwareInterface,
+    AttachmentExtensionAwareInterface
 {
     use ScopeExtensionAwareTrait;
+    use AttachmentExtensionAwareTrait;
 
     public const ENUM_FIELD_NAME = 'testEnumField';
     public const ENUM_FIELD_CODE = 'test_enum_code';
@@ -117,6 +121,14 @@ class OroTestFrameworkBundleInstaller implements
         }
 
         $this->addAttributeFamilyRelationForTestActivityTarget($schema);
+
+        $this->createTestExtendedEntityTable($schema);
+
+        $this->createOroTestFrameworkTestEntityFieldsTable($schema);
+        $this->createOroTestFrameworkManyToManyRelationToTestEntityFieldsTable($schema);
+        $this->addOroTestFrameworkTestEntityFieldsForeignKeys($schema);
+        $this->addOroTestFrameworkManyToManyRelationToTestEntityFieldsForeignKeys($schema);
+        $this->addOroTestFrameworkTestEntityExtendFields($schema);
     }
 
     /**
@@ -751,6 +763,103 @@ class OroTestFrameworkBundleInstaller implements
             ['attribute_family_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'RESTRICT']
+        );
+    }
+
+    protected function createTestExtendedEntityTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_extended_entity');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('regular_field', 'string', ['notnull' => false, 'length' => 255]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    private function createOroTestFrameworkTestEntityFieldsTable(Schema $schema): void
+    {
+        $table = $schema->createTable('oro_test_framework_test_entity_fields');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('integer_field', 'integer', ['notnull' => false]);
+        $table->addColumn('float_field', 'float', ['notnull' => false]);
+        $table->addColumn('decimal_field', 'decimal', ['notnull' => false]);
+        $table->addColumn('smallint_field', 'smallint', ['notnull' => false]);
+        $table->addColumn('bigint_field', 'bigint', ['notnull' => false]);
+        $table->addColumn('text_field', 'text', ['notnull' => false]);
+        $table->addColumn('date_field', 'date', ['notnull' => false]);
+        $table->addColumn('datetime_field', 'datetime', ['notnull' => false]);
+        $table->addColumn('boolean_field', 'boolean', ['notnull' => false]);
+        $table->addColumn('html_field', 'text', ['notnull' => false]);
+        $table->addColumn('string_field', 'string', ['length' => 10]);
+        $table->addColumn('many_to_one_relation_id', 'integer', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    private function createOroTestFrameworkManyToManyRelationToTestEntityFieldsTable(Schema $schema): void
+    {
+        $table = $schema->createTable('oro_test_framework_many_to_many_relation_to_test_entity_fields');
+        $table->addColumn('test_entity_fields_id', 'integer');
+        $table->addColumn('oro_product_id', 'integer');
+        $table->setPrimaryKey(['test_entity_fields_id', 'oro_product_id']);
+    }
+
+    private function addOroTestFrameworkTestEntityFieldsForeignKeys(Schema $schema): void
+    {
+        $table = $schema->getTable('oro_test_framework_test_entity_fields');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('test_extended_entity'),
+            ['many_to_one_relation_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+        );
+    }
+
+    private function addOroTestFrameworkManyToManyRelationToTestEntityFieldsForeignKeys(Schema $schema): void
+    {
+        $table = $schema->getTable('oro_test_framework_many_to_many_relation_to_test_entity_fields');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_test_framework_test_entity_fields'),
+            ['test_entity_fields_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('test_extended_entity'),
+            ['oro_product_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+    }
+
+    private function addOroTestFrameworkTestEntityExtendFields(Schema $schema): void
+    {
+        $this->extendExtension->addEnumField(
+            $schema,
+            'oro_test_framework_test_entity_fields',
+            'multienum_field',
+            'test_entity_fields_multienum_field',
+            true
+        );
+        $this->extendExtension->addEnumField(
+            $schema,
+            'oro_test_framework_test_entity_fields',
+            'enum_field',
+            'test_entity_fields_enum_field'
+        );
+
+        $this->attachmentExtension->addImageRelation(
+            $schema,
+            'oro_test_framework_test_entity_fields',
+            'image_field'
+        );
+
+        $this->extendExtension->addManyToOneRelation(
+            $schema,
+            'test_extended_entity', // Owning table name
+            'oro_test_framework_test_entity_fields', // Field Name
+            'oro_test_framework_test_entity_fields', // Relation table name
+            'string_field',
+            [
+                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM, 'nullable' => true, 'on_delete' => 'SET NULL']
+            ]
         );
     }
 }
