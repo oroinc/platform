@@ -87,7 +87,7 @@ class MigrationExecutor
     {
         $platform = $this->queryExecutor->getConnection()->getDatabasePlatform();
         $schema = $this->getActualSchema();
-        $failedMigrations = false;
+        $failedMigrations = [];
 
         foreach ($migrations as $item) {
             $migration = $item->getMigration();
