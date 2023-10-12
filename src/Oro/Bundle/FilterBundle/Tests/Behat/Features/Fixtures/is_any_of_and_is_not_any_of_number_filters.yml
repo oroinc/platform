@@ -13,8 +13,7 @@ Oro\Bundle\UserBundle\Entity\User:
         email: user1@example.com
         firstName: First
         lastName: User
-        password: password
-        salt: salt
+        password: <userPassword(@firstUser->username)>
         organization: '@organization'
         owner: '@business_unit'
         userRoles: ['@adminRole']
@@ -23,8 +22,7 @@ Oro\Bundle\UserBundle\Entity\User:
         email: user2@example.com
         firstName: Second
         lastName: User
-        password: password
-        salt: salt
+        password: <userPassword(@seoncdUser->username)>
         organization: '@organization'
         owner: '@business_unit'
         userRoles: ['@adminRole']

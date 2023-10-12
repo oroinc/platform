@@ -49,8 +49,7 @@ Oro\Bundle\UserBundle\Entity\User:
         userRoles: ['@admin_role']
         organization: '@organization'
         organizations: ['@organization']
-        password: 'user_with_admin_role'
-        salt: salt
+        password: <userPassword(@user_with_admin_role->username)>
     user_has_all_bu:
         username: 'user_has_all_bu'
         email: 'user_has_all_bu@test.org'
@@ -62,8 +61,7 @@ Oro\Bundle\UserBundle\Entity\User:
         userRoles: ['@second_role', '@third_role']
         organization: '@organization'
         organizations: ['@organization']
-        password: 'user_has_all_bu'
-        salt: salt
+        password: <userPassword(@user_has_all_bu->username)>
     user_has_first_bu:
         username: 'user_has_first_bu'
         email: 'user_has_first_bu@test.org'
@@ -75,8 +73,7 @@ Oro\Bundle\UserBundle\Entity\User:
         userRoles: ['@second_role', '@third_role']
         organization: '@organization'
         organizations: ['@organization']
-        password: 'user_has_first_bu'
-        salt: salt
+        password: <userPassword(@user_has_first_bu->username)>
     user_has_second_bu:
         username: 'user_has_second_bu'
         email: 'user_has_second_bu@test.org'
@@ -88,8 +85,7 @@ Oro\Bundle\UserBundle\Entity\User:
         userRoles: ['@second_role', '@third_role']
         organization: '@organization'
         organizations: ['@organization']
-        password: 'user_has_second_bu'
-        salt: salt
+        password: <userPassword(@user_has_second_bu->username)>
     user_has_third_bu:
         username: 'user_has_third_bu'
         email: 'user_has_third_bu@test.org'
@@ -101,8 +97,7 @@ Oro\Bundle\UserBundle\Entity\User:
         userRoles: ['@second_role', '@third_role']
         organization: '@organization'
         organizations: ['@organization']
-        password: 'user_has_third_bu'
-        salt: salt
+        password: <userPassword(@user_has_third_bu->username)>
     user_has_first_child1_bu:
         username: 'user_has_first_child1_bu'
         email: 'user_has_first_child1_bu@test.org'
@@ -114,8 +109,7 @@ Oro\Bundle\UserBundle\Entity\User:
         userRoles: ['@second_role', '@third_role']
         organization: '@organization'
         organizations: ['@organization']
-        password: 'user_has_first_child1_bu'
-        salt: salt
+        password: <userPassword(@user_has_first_child1_bu->username)>
     user_has_first_child2_bu:
         username: 'user_has_first_child2_bu'
         email: 'user_has_first_child2_bu@test.org'
@@ -127,8 +121,7 @@ Oro\Bundle\UserBundle\Entity\User:
         userRoles: ['@second_role', '@third_role']
         organization: '@organization'
         organizations: ['@organization']
-        password: 'user_has_first_child2_bu'
-        salt: salt
+        password: <userPassword(@user_has_first_child2_bu->username)>
     user_has_first_child1_child_bu:
         username: 'user_has_first_child1_child_bu'
         email: 'user_has_first_child1_child_bu@test.org'
@@ -140,8 +133,7 @@ Oro\Bundle\UserBundle\Entity\User:
         userRoles: ['@second_role', '@third_role']
         organization: '@organization'
         organizations: ['@organization']
-        password: 'user_has_first_child1_child_bu'
-        salt: salt
+        password: <userPassword(@user_has_first_child1_child_bu->username)>
 
 Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityCompany:
     company_first:

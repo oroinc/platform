@@ -18,7 +18,7 @@ use Oro\Bundle\UserBundle\Security\UserProvider;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
@@ -139,7 +139,7 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
         $this->userProvider->expects(self::once())
             ->method('loadUserByUsername')
             ->with(self::USERNAME)
-            ->willThrowException(new UsernameNotFoundException());
+            ->willThrowException(new UserNotFoundException());
 
         $this->ticketProvider->expects($this->once())
             ->method('generateTicket')
