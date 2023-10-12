@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProvid
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -127,7 +127,7 @@ class TicketAuthenticationProvider implements AuthenticationProviderInterface
             try {
                 $user = $this->userProvider->loadUserByUsername($username);
                 $user = $this->userProvider->refreshUser($user);
-            } catch (UsernameNotFoundException $e) {
+            } catch (UserNotFoundException $e) {
                 throw new BadCredentialsException(sprintf(
                     'Ticket "%s" for "%s" is not valid - user was not found.',
                     $token->getCredentials(),

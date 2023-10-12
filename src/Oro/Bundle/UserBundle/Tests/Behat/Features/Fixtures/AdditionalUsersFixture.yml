@@ -9,8 +9,7 @@ Oro\Bundle\UserBundle\Entity\User:
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: test_max1@example.com
-        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@testMax1->username)>
 
     testMax2:
         firstName: Max
@@ -22,8 +21,7 @@ Oro\Bundle\UserBundle\Entity\User:
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: test_max2@example.com
-        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@testMax2->username)>
 
     testPhil:
         firstName: Phil
@@ -35,8 +33,7 @@ Oro\Bundle\UserBundle\Entity\User:
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: test_phil@example.com
-        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@testPhil->username)>
         birthday: <(new \DateTime('2001-02-10'))>
 
     patrick:
@@ -49,5 +46,4 @@ Oro\Bundle\UserBundle\Entity\User:
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: patrick@patrick.com
-        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@patrick->username)>

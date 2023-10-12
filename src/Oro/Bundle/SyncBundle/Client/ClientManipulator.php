@@ -17,7 +17,7 @@ use Psr\Log\NullLogger;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -150,7 +150,7 @@ class ClientManipulator implements ClientManipulatorInterface, LoggerAwareInterf
             $user = $this->userProvider->loadUserByUsername($connection->WAMP->username);
 
             return $this->addUserToClientStorage($connection, $user);
-        } catch (UsernameNotFoundException $exception) {
+        } catch (UserNotFoundException $exception) {
             return $this->addUserToClientStorage($connection);
         }
     }

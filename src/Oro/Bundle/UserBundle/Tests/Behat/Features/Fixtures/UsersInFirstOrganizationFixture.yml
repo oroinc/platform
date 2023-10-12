@@ -23,8 +23,7 @@ Oro\Bundle\UserBundle\Entity\User:
         businessUnits: ['@business_unit']
         enabled: true
         email: user_business_unit@example.com
-        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@user_business_unit->username)>
     user_bu_main_child:
         firstName: Main Child BU
         lastName: user
@@ -36,8 +35,7 @@ Oro\Bundle\UserBundle\Entity\User:
         businessUnits: ['@bu_main_child']
         enabled: true
         email: user_bu_main_child@example.com
-        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@user_bu_main_child->username)>
     user_bu_first:
         firstName: First BU
         lastName: user
@@ -49,8 +47,7 @@ Oro\Bundle\UserBundle\Entity\User:
         businessUnits: ['@bu_first']
         enabled: true
         email: user_bu_first@example.com
-        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@user_bu_first->username)>
     user_bu_first_child:
         firstName: First Child BU
         lastName: user
@@ -62,5 +59,4 @@ Oro\Bundle\UserBundle\Entity\User:
         businessUnits: ['@bu_first_child']
         enabled: true
         email: user_bu_first_child@example.com
-        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@user_bu_first_child->username)>

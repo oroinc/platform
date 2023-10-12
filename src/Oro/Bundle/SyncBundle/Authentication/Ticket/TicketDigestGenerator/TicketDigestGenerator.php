@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator;
 
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
  * Generates unique and secure hash which is used in Sync authentication ticket.
@@ -10,18 +10,18 @@ use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 class TicketDigestGenerator implements TicketDigestGeneratorInterface
 {
     /**
-     * @var PasswordEncoderInterface
+     * @var PasswordHasherInterface
      */
-    private $passwordEncoder;
+    private $passwordHasher;
 
     /**
      * @var string
      */
     private $secret;
 
-    public function __construct(PasswordEncoderInterface $passwordEncoder, string $secret)
+    public function __construct(PasswordHasherInterface $passwordHasher, string $secret)
     {
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
         $this->secret = $secret;
     }
 
@@ -30,6 +30,6 @@ class TicketDigestGenerator implements TicketDigestGeneratorInterface
      */
     public function generateDigest(string $nonce, string $created, string $password): string
     {
-        return $this->passwordEncoder->encodePassword(sprintf('%s|%s|%s', $nonce, $created, $password), $this->secret);
+        return $this->passwordHasher->hash(sprintf('%s|%s|%s', $nonce, $created, $password), $this->secret);
     }
 }
