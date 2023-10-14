@@ -7,31 +7,48 @@ use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 
 class ConfigGetEventTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    protected function setUp(): void
+    public function testEventWhenRequestedOnlyValue(): void
     {
-        $this->configManager = $this->createMock(ConfigManager::class);
-    }
-
-    public function testEvent()
-    {
+        $configManager = $this->createMock(ConfigManager::class);
         $key = 'key';
         $value = 'value';
-        $full = true;
+        $scope = 'scope';
         $scopeId = 1;
 
-        $event = new ConfigGetEvent($this->configManager, $key, $value, $full, $scopeId);
+        $event = new ConfigGetEvent($configManager, $key, $value, false, $scope, $scopeId);
+        self::assertSame($configManager, $event->getConfigManager());
+        self::assertSame($key, $event->getKey());
+        self::assertSame($value, $event->getValue());
+        self::assertFalse($event->isFull());
+        self::assertSame($scope, $event->getScope());
+        self::assertSame($scopeId, $event->getScopeId());
+    }
 
-        $this->assertSame($this->configManager, $event->getConfigManager());
-        $this->assertEquals($key, $event->getKey());
-        $this->assertEquals($value, $event->getValue());
-        $this->assertEquals($full, $event->isFull());
-        $this->assertEquals($scopeId, $event->getScopeId());
+    public function testEventWhenRequestedFullInfo(): void
+    {
+        $configManager = $this->createMock(ConfigManager::class);
+        $key = 'key';
+        $value = 'value';
+        $scope = 'scope';
+        $scopeId = 1;
+
+        $event = new ConfigGetEvent($configManager, $key, $value, true, $scope, $scopeId);
+        self::assertSame($configManager, $event->getConfigManager());
+        self::assertSame($key, $event->getKey());
+        self::assertSame($value, $event->getValue());
+        self::assertTrue($event->isFull());
+        self::assertSame($scope, $event->getScope());
+        self::assertSame($scopeId, $event->getScopeId());
+    }
+
+    public function testSetValue(): void
+    {
+        $value = 'value';
+        $event = new ConfigGetEvent($this->createMock(ConfigManager::class), 'key', $value, false, 'scope', 1);
+        self::assertSame($value, $event->getValue());
 
         $newValue = 'new_value';
         $event->setValue($newValue);
-        $this->assertEquals($newValue, $event->getValue());
+        self::assertSame($newValue, $event->getValue());
     }
 }

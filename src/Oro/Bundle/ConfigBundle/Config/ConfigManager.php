@@ -271,11 +271,14 @@ class ConfigManager
 
         $this->resetMemoryCache();
 
-        $changeSet = new ConfigChangeSet($this->buildChangeSet($updated, $removed, $oldValues));
-        $event = new ConfigUpdateEvent($changeSet, $this->scope, $this->resolveIdentifier($scopeIdentifier));
+        $event = new ConfigUpdateEvent(
+            $this->buildChangeSet($updated, $removed, $oldValues),
+            $this->scope,
+            $this->resolveIdentifier($scopeIdentifier)
+        );
         $this->eventDispatcher->dispatch($event, ConfigUpdateEvent::EVENT_NAME);
 
-        return $changeSet;
+        return new ConfigChangeSet($event->getChangeSet());
     }
 
     protected function dispatchConfigSettingsUpdateEvent(string $eventName, array $settings): array
@@ -414,9 +417,8 @@ class ConfigManager
      */
     protected function getValue($name, $default = false, $full = false, $scopeIdentifier = null, $skipChanges = false)
     {
-        $scopeId = $this->resolveIdentifier($scopeIdentifier);
-        $managers = $this->getScopeManagersToGetValue($default);
         $settingValue = null;
+        $managers = $this->getScopeManagersToGetValue($default);
         foreach ($managers as $scopeName => $manager) {
             $settingValue = $manager->getSettingValue($name, true, $scopeIdentifier, $skipChanges);
             if (null !== $settingValue) {
@@ -430,17 +432,24 @@ class ConfigManager
         }
 
         $value = $settingValue;
-        if ($settingValue !== null && !$full) {
+        if (null !== $settingValue && !$full) {
             $value = $settingValue[self::VALUE_KEY];
         }
 
-        $event = new ConfigGetEvent($this, $name, $value, $full, $scopeId);
+        $event = new ConfigGetEvent(
+            $this,
+            $name,
+            $value,
+            $full,
+            $this->scope,
+            $this->resolveIdentifier($scopeIdentifier)
+        );
         $this->eventDispatcher->dispatch($event, ConfigGetEvent::NAME);
         $this->eventDispatcher->dispatch($event, sprintf('%s.%s', ConfigGetEvent::NAME, $name));
 
         $value = $event->getValue();
 
-        if (null === $value && $settingValue === null) {
+        if (null === $value && null === $settingValue) {
             return $this->getSettingsDefaults($name, $full);
         }
 
@@ -463,15 +472,20 @@ class ConfigManager
         $scopeIdentifier = null,
         bool $skipChanges = false
     ): string {
-        if (is_object($scopeIdentifier)) {
-            $managers = $this->getScopeManagersToGetValue($default);
-            $scopedEntityName = '';
+        if (\is_object($scopeIdentifier)) {
+            $scopedEntityName = null;
             $resolvedScopeId = null;
+            $managers = $this->getScopeManagersToGetValue($default);
             foreach ($managers as $manager) {
-                if ($resolvedScopeId = $manager->getScopeIdFromEntity($scopeIdentifier)) {
+                $resolvedScopeId = $manager->getScopeIdFromEntity($scopeIdentifier);
+                if (null !== $resolvedScopeId) {
                     $scopedEntityName = $manager->getScopedEntityName();
                     break;
                 }
+            }
+            if (null === $scopedEntityName) {
+                $scopedEntityName = '';
+                $resolvedScopeId = 0;
             }
         } else {
             $scopedEntityName = $this->getScopeEntityName();
@@ -482,7 +496,7 @@ class ConfigManager
             '%s|%s|%d|%s|%d|%d|%d',
             $this->getScopeEntityName(),
             $scopedEntityName,
-            (int)$resolvedScopeId,
+            $resolvedScopeId,
             $name,
             (int)$default,
             (int)$full,
@@ -616,19 +630,16 @@ class ConfigManager
         return $changeSet;
     }
 
-    /**
-     * @param int|null|object $scopeIdentifier
-     * @return int|null
-     */
-    protected function resolveIdentifier($scopeIdentifier)
+    protected function resolveIdentifier(int|object|null $scopeIdentifier): int
     {
-        foreach ($this->getScopeManagersToGetValue(false) as $scopeManager) {
+        $managers = $this->getScopeManagersToGetValue(false);
+        foreach ($managers as $scopeManager) {
             $identifier = $scopeManager->resolveIdentifier($scopeIdentifier);
-            if ($identifier !== null) {
+            if (null !== $identifier) {
                 return $identifier;
             }
         }
 
-        return null;
+        return 0;
     }
 }

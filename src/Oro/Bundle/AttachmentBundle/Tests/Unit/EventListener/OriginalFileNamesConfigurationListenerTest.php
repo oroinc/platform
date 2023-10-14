@@ -12,9 +12,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OriginalFileNamesConfigurationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private Session|\PHPUnit\Framework\MockObject\MockObject $session;
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
-    private OriginalFileNamesConfigurationListener $listener;
+    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
+    private $session;
+
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
+
+    /** @var OriginalFileNamesConfigurationListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -41,7 +46,7 @@ class OriginalFileNamesConfigurationListenerTest extends \PHPUnit\Framework\Test
 
         $configUpdateEvent = new ConfigUpdateEvent([
             'oro_test.test' => ['old' => 'Foo', 'new' => 'Bar'],
-        ]);
+        ], 'global', 0);
         $this->listener->afterUpdate($configUpdateEvent);
     }
 
@@ -72,7 +77,7 @@ class OriginalFileNamesConfigurationListenerTest extends \PHPUnit\Framework\Test
         $configUpdateEvent = new ConfigUpdateEvent([
             'oro_test.test' => ['old' => 'Foo', 'new' => 'Bar'],
             'oro_attachment.original_file_names_enabled' => ['old' => false, 'new' => true],
-        ]);
+        ], 'global', 0);
         $this->listener->afterUpdate($configUpdateEvent);
     }
 }

@@ -18,31 +18,13 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager */
-    private $manager;
-
-    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var MemoryCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $memoryCache;
-
-    /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $globalScopeManager;
-
-    /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userScopeManager;
-
-    /** @var ValueProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $defaultValueProvider;
-
     private array $settings = [
         'oro_user' => [
-            'greeting' => [
+            'item1' => [
                 'value' => true,
                 'type' => 'boolean',
             ],
-            'level' => [
+            'item2' => [
                 'value' => 20,
                 'type' => 'scalar',
             ],
@@ -61,6 +43,24 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ],
         ],
     ];
+
+    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
+    private $dispatcher;
+
+    /** @var MemoryCache|\PHPUnit\Framework\MockObject\MockObject */
+    private $memoryCache;
+
+    /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $globalScopeManager;
+
+    /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $userScopeManager;
+
+    /** @var ValueProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $defaultValueProvider;
+
+    /** @var ConfigManager */
+    private $manager;
 
     protected function setUp(): void
     {
@@ -120,13 +120,13 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testFlush(object|int|null $scopeIdentifier, int $idValue)
     {
-        $greetingKey = 'oro_user.greeting';
-        $greetingValue = [
+        $item1Key = 'oro_user.item1';
+        $item1Value = [
             'value' => 'updated value',
             'use_parent_scope_value' => false
         ];
         $changes = [
-            $greetingKey => $greetingValue
+            $item1Key => $item1Value
         ];
 
         $expectedScopeIdentifier = $scopeIdentifier;
@@ -139,20 +139,20 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->with($greetingKey)
+            ->with($item1Key)
             ->willReturn(['value' => 'old value']);
 
-        $singleKeyBeforeEvent = new ConfigSettingsUpdateEvent($this->manager, $greetingValue);
+        $singleKeyBeforeEvent = new ConfigSettingsUpdateEvent($this->manager, $item1Value);
         $beforeEvent = new ConfigSettingsUpdateEvent($this->manager, $changes);
         $afterEvent  = new ConfigUpdateEvent(
             [
-                $greetingKey => ['old' => 'old value', 'new' => 'updated value']
+                $item1Key => ['old' => 'old value', 'new' => 'updated value']
             ],
             'user',
             $idValue
         );
 
-        $loadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false, $idValue);
+        $loadEvent = new ConfigGetEvent($this->manager, $item1Key, 'old value', false, 'user', $idValue);
 
         $this->userScopeManager->expects($this->once())
             ->method('getChanges')
@@ -165,7 +165,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('save')
             ->with($changes, $expectedScopeIdentifier)
             ->willReturn([
-                [$greetingKey => 'updated value'],
+                [$item1Key => 'updated value'],
                 []
             ]);
 
@@ -173,8 +173,8 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [$loadEvent, ConfigGetEvent::NAME],
-                [$loadEvent, ConfigGetEvent::NAME . '.' . $greetingKey],
-                [$singleKeyBeforeEvent, ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $greetingKey],
+                [$loadEvent, ConfigGetEvent::NAME . '.' . $item1Key],
+                [$singleKeyBeforeEvent, ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $item1Key],
                 [$beforeEvent, ConfigSettingsUpdateEvent::BEFORE_SAVE],
                 [$afterEvent, ConfigUpdateEvent::EVENT_NAME]
             );
@@ -187,33 +187,33 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testSave(object|int|null $scopeIdentifier, int $idValue)
     {
-        $greetingKey = 'oro_user.greeting';
-        $levelKey = 'oro_user.level';
+        $item1Key = 'oro_user.item1';
+        $item2Key = 'oro_user.item2';
 
         $data = [
-            'oro_user___greeting' => [
+            'oro_user___item1'   => [
                 'value'                  => 'updated value',
                 'use_parent_scope_value' => false
             ],
-            'oro_user___unknown'  => [
+            'oro_user___unknown' => [
                 'value'                  => 'some value',
                 'use_parent_scope_value' => false
             ],
-            'oro_user___level'    => [
+            'oro_user___item2'   => [
                 'use_parent_scope_value' => true
             ]
         ];
 
-        $greetingsValue = [
+        $item1sValue = [
             'value'                  => 'updated value',
             'use_parent_scope_value' => false
         ];
-        $levelValue = [
+        $item2Value = [
             'use_parent_scope_value' => true
         ];
         $normalizedData = [
-            $greetingKey => $greetingsValue,
-            $levelKey    => $levelValue,
+            $item1Key => $item1sValue,
+            $item2Key => $item2Value,
         ];
 
         $this->userScopeManager->expects($this->any())
@@ -223,46 +223,46 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->userScopeManager->expects($this->exactly(2))
             ->method('getSettingValue')
             ->willReturnMap([
-                [$greetingKey, true, $scopeIdentifier, true, ['value' => 'old value']],
-                [$levelKey, true, $scopeIdentifier, true, ['value' => 2000]]
+                [$item1Key, true, $scopeIdentifier, true, ['value' => 'old value']],
+                [$item2Key, true, $scopeIdentifier, true, ['value' => 2000]]
             ]);
 
-        $singleKeyGreetingEvent = new ConfigSettingsUpdateEvent($this->manager, $greetingsValue);
-        $singleKeyLevelEvent = new ConfigSettingsUpdateEvent($this->manager, $levelValue);
+        $singleKeyItem1Event = new ConfigSettingsUpdateEvent($this->manager, $item1sValue);
+        $singleKeyItem2Event = new ConfigSettingsUpdateEvent($this->manager, $item2Value);
         $beforeEvent = new ConfigSettingsUpdateEvent($this->manager, $normalizedData);
         $afterEvent = new ConfigUpdateEvent(
             [
-                $greetingKey => ['old' => 'old value', 'new' => 'updated value'],
-                $levelKey    => ['old' => 2000, 'new' => 20]
+                $item1Key => ['old' => 'old value', 'new' => 'updated value'],
+                $item2Key => ['old' => 2000, 'new' => 20]
             ],
             'user',
             $idValue
         );
 
-        $greetingOldValueLoadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false, $idValue);
-        $levelOldValueLoadEvent = new ConfigGetEvent($this->manager, $levelKey, '2000', false, $idValue);
-        $levelNullValueLoadEvent = new ConfigGetEvent($this->manager, $levelKey, null, false, $idValue);
+        $item1OldValueLoadEvent = new ConfigGetEvent($this->manager, $item1Key, 'old value', false, 'user', $idValue);
+        $item2OldValueLoadEvent = new ConfigGetEvent($this->manager, $item2Key, '2000', false, 'user', $idValue);
+        $item2NullValueLoadEvent = new ConfigGetEvent($this->manager, $item2Key, null, false, 'user', $idValue);
 
         $this->userScopeManager->expects($this->once())
             ->method('save')
             ->with($normalizedData)
             ->willReturn([
-                [$greetingKey => 'updated value'],
-                [$levelKey]
+                [$item1Key => 'updated value'],
+                [$item2Key]
             ]);
 
         $this->dispatcher->expects($this->exactly(10))
             ->method('dispatch')
             ->withConsecutive(
-                [$greetingOldValueLoadEvent, ConfigGetEvent::NAME],
-                [$greetingOldValueLoadEvent, ConfigGetEvent::NAME . '.' . $greetingKey],
-                [$singleKeyGreetingEvent, ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $greetingKey],
-                [$levelOldValueLoadEvent, ConfigGetEvent::NAME],
-                [$levelOldValueLoadEvent, ConfigGetEvent::NAME . '.' . $levelKey],
-                [$singleKeyLevelEvent, ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $levelKey],
+                [$item1OldValueLoadEvent, ConfigGetEvent::NAME],
+                [$item1OldValueLoadEvent, ConfigGetEvent::NAME . '.' . $item1Key],
+                [$singleKeyItem1Event, ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $item1Key],
+                [$item2OldValueLoadEvent, ConfigGetEvent::NAME],
+                [$item2OldValueLoadEvent, ConfigGetEvent::NAME . '.' . $item2Key],
+                [$singleKeyItem2Event, ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $item2Key],
                 [$beforeEvent, ConfigSettingsUpdateEvent::BEFORE_SAVE],
-                [$levelNullValueLoadEvent, ConfigGetEvent::NAME],
-                [$levelNullValueLoadEvent, ConfigGetEvent::NAME  . '.' . $levelKey],
+                [$item2NullValueLoadEvent, ConfigGetEvent::NAME],
+                [$item2NullValueLoadEvent, ConfigGetEvent::NAME  . '.' . $item2Key],
                 [$afterEvent, ConfigUpdateEvent::EVENT_NAME]
             );
 
