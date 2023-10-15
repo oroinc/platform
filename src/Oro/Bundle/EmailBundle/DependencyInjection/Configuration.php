@@ -2,20 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\DependencyInjection;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const KEY_SMTP_SETTINGS = 'smtp_settings';
-    const KEY_SMTP_SETTINGS_HOST = self::KEY_SMTP_SETTINGS . '_host';
-    const KEY_SMTP_SETTINGS_PORT = self::KEY_SMTP_SETTINGS . '_port';
-    const KEY_SMTP_SETTINGS_ENC = self::KEY_SMTP_SETTINGS . '_encryption';
-    const KEY_SMTP_SETTINGS_USER = self::KEY_SMTP_SETTINGS . '_username';
-    const KEY_SMTP_SETTINGS_PASS = self::KEY_SMTP_SETTINGS . '_password';
-
     /**
      * {@inheritDoc}
      */
@@ -65,25 +57,14 @@ class Configuration implements ConfigurationInterface
                 'attachment_preview_limit' => ['value' => 8],
                 'sanitize_html' => ['value' => false],
                 'threads_grouping' => ['value' => true],
-                self::KEY_SMTP_SETTINGS_HOST => ['value' => ''],
-                self::KEY_SMTP_SETTINGS_PORT => ['value' => null, 'type' => 'integer'],
-                self::KEY_SMTP_SETTINGS_ENC => ['value' => ''],
-                self::KEY_SMTP_SETTINGS_USER => ['value' => ''],
-                self::KEY_SMTP_SETTINGS_PASS => ['value' => ''],
+                'smtp_settings_host' => ['value' => ''],
+                'smtp_settings_port' => ['value' => null, 'type' => 'integer'],
+                'smtp_settings_encryption' => ['value' => ''],
+                'smtp_settings_username' => ['value' => ''],
+                'smtp_settings_password' => ['value' => ''],
             ]
         );
 
         return $treeBuilder;
-    }
-
-    /**
-     * @param string $name
-     * @param string $separator
-     *
-     * @return string
-     */
-    public static function getConfigKeyByName($name, $separator = ConfigManager::SECTION_MODEL_SEPARATOR)
-    {
-        return sprintf('oro_email%s%s', $separator, $name);
     }
 }

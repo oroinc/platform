@@ -6,7 +6,6 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
-use Oro\Bundle\EmailBundle\DependencyInjection\Configuration;
 use Oro\Bundle\EmailBundle\Form\Configurator\EmailConfigurationConfigurator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
@@ -20,10 +19,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
 {
-    private const ENCRYPTED_PASSWORD = 'encrypted_password';
-    private const OLD_PASSWORD = 'old_password';
-    private const NEW_PASSWORD = 'new_password';
-
     /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private static $encryptor;
 
@@ -66,13 +61,15 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         $form = $builder->getForm();
         $form->submit(['otherField' => ['value' => '']]);
 
-        self::assertArrayNotHasKey($this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PASS), $form->getData());
+        self::assertArrayNotHasKey('oro_email___smtp_settings_password', $form->getData());
     }
 
     public function testConfigureWhenSmtpPasswordSettingExistAndNoNewPasswordKeyIsSubmitted(): void
     {
+        $passwordKey = 'oro_email___smtp_settings_password';
+        $oldPassword = 'old_password';
+
         $builder = $this->createFormBuilder();
-        $passwordKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PASS);
         $builder->add($passwordKey, FormFieldType::class);
 
         self::$encryptor->expects(self::never())
@@ -81,55 +78,53 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         $builder->getForm()->submit([]);
 
         $form = $builder->getForm();
-        $form->setData([$passwordKey => ['value' => self::OLD_PASSWORD]]);
+        $form->setData([$passwordKey => ['value' => $oldPassword]]);
         $form->submit([$passwordKey => ['value' => '']]);
 
-        $this->assertSame(self::OLD_PASSWORD, $form->getData()[$passwordKey]['value']);
+        $this->assertSame($oldPassword, $form->getData()[$passwordKey]['value']);
     }
 
     public function testConfigureWhenSmtpPasswordSettingExistAndNewPasswordKeyIsSubmitted(): void
     {
+        $passwordKey = 'oro_email___smtp_settings_password';
+        $encryptedPassword = 'encrypted_password';
+        $oldPassword = 'old_password';
+        $newPassword = 'new_password';
+
         $builder = $this->createFormBuilder();
-        $passwordKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PASS);
         $builder->add($passwordKey, FormFieldType::class);
 
         self::$encryptor->expects(self::once())
             ->method('encryptData')
-            ->with(self::NEW_PASSWORD)
-            ->willReturn(self::ENCRYPTED_PASSWORD);
+            ->with($newPassword)
+            ->willReturn($encryptedPassword);
 
         $form = $builder->getForm();
-        $form->setData([$passwordKey => ['value' => self::OLD_PASSWORD]]);
-        $form->submit([$passwordKey => ['value' => self::NEW_PASSWORD]]);
+        $form->setData([$passwordKey => ['value' => $oldPassword]]);
+        $form->submit([$passwordKey => ['value' => $newPassword]]);
 
-        $this->assertSame(self::ENCRYPTED_PASSWORD, $form->getData()[$passwordKey]['value']);
+        $this->assertSame($encryptedPassword, $form->getData()[$passwordKey]['value']);
     }
 
     public function testConfigureWithParentScopeValue(): void
     {
-        $hostKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_HOST);
-        $portKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PORT);
-        $encKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_ENC);
-        $userKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_USER);
-        $passKey = $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PASS);
-
         $builder = $this->createFormBuilder();
-        $builder->add($hostKey, FormFieldType::class);
-        $builder->add($portKey, FormFieldType::class);
-        $builder->add($encKey, FormFieldType::class);
-        $builder->add($userKey, FormFieldType::class);
-        $builder->add($passKey, FormFieldType::class);
+        $builder->add('oro_email___smtp_settings_host', FormFieldType::class);
+        $builder->add('oro_email___smtp_settings_port', FormFieldType::class);
+        $builder->add('oro_email___smtp_settings_encryption', FormFieldType::class);
+        $builder->add('oro_email___smtp_settings_username', FormFieldType::class);
+        $builder->add('oro_email___smtp_settings_password', FormFieldType::class);
 
         self::$validator->expects($this->never())
             ->method('validate');
 
         $builder->getForm()->submit(
             [
-                $hostKey => ['use_parent_scope_value' => true],
-                $portKey => ['use_parent_scope_value' => true],
-                $encKey => ['use_parent_scope_value' => true],
-                $userKey => ['use_parent_scope_value' => true],
-                $passKey => ['use_parent_scope_value' => true]
+                'oro_email___smtp_settings_host' => ['use_parent_scope_value' => true],
+                'oro_email___smtp_settings_port' => ['use_parent_scope_value' => true],
+                'oro_email___smtp_settings_encryption' => ['use_parent_scope_value' => true],
+                'oro_email___smtp_settings_username' => ['use_parent_scope_value' => true],
+                'oro_email___smtp_settings_password' => ['use_parent_scope_value' => true]
             ]
         );
     }
@@ -137,11 +132,11 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
     public function testConfigureSmtpConnectionConfigurationError(): void
     {
         $builder = $this->createFormBuilder();
-        $builder->add($this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_HOST), FormFieldType::class);
-        $builder->add($this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PORT), FormFieldType::class);
-        $builder->add($this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_ENC), FormFieldType::class);
-        $builder->add($this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_USER), FormFieldType::class);
-        $builder->add($this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PASS), FormFieldType::class);
+        $builder->add('oro_email___smtp_settings_host', FormFieldType::class);
+        $builder->add('oro_email___smtp_settings_port', FormFieldType::class);
+        $builder->add('oro_email___smtp_settings_encryption', FormFieldType::class);
+        $builder->add('oro_email___smtp_settings_username', FormFieldType::class);
+        $builder->add('oro_email___smtp_settings_password', FormFieldType::class);
 
         $error = $this->createMock(ConstraintViolationInterface::class);
         $error->expects($this->once())
@@ -175,14 +170,6 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
                     ]
                 ]
             ]
-        );
-    }
-
-    private function getConfigKey(string $name): string
-    {
-        return Configuration::getConfigKeyByName(
-            $name,
-            ConfigManager::SECTION_VIEW_SEPARATOR
         );
     }
 }

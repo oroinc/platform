@@ -17,9 +17,9 @@ abstract class AbstractScopeManager
 {
     protected ManagerRegistry $doctrine;
     protected CacheInterface $cache;
-    protected EventDispatcherInterface $eventDispatcher;
-    protected ConfigBag $configBag;
-    protected array $changedSettings = [];
+    private EventDispatcherInterface $eventDispatcher;
+    private ConfigBag $configBag;
+    private array $changedSettings = [];
 
     public function __construct(
         ManagerRegistry $doctrine,
@@ -34,25 +34,22 @@ abstract class AbstractScopeManager
     }
 
     /**
-     * Return config value from current scope
+     * Gets a configuration option value.
      */
     public function getSettingValue(
         string $name,
         bool $full = false,
-        mixed $scopeIdentifier = null,
+        object|int|null $scopeIdentifier = null,
         bool $skipChanges = false
-    ): array|null|string {
-        $entityId = $this->resolveIdentifier($scopeIdentifier);
-        $setting = $this->getCachedSetting($entityId, $name, $skipChanges);
-
-        $result = null;
-
-        if ($setting === null) {
+    ): array|string|null {
+        $setting = $this->getCachedSetting($this->resolveIdentifier($scopeIdentifier), $name, $skipChanges);
+        if (null === $setting) {
             return null;
         }
 
-        if ($setting[ConfigManager::VALUE_KEY] !== null
-            || $setting[ConfigManager::USE_PARENT_SCOPE_VALUE_KEY] === false
+        $result = null;
+        if (null !== $setting[ConfigManager::VALUE_KEY]
+            || false === $setting[ConfigManager::USE_PARENT_SCOPE_VALUE_KEY]
         ) {
             $result = $setting[ConfigManager::VALUE_KEY];
             if ($full) {
@@ -65,23 +62,20 @@ abstract class AbstractScopeManager
     }
 
     /**
-     * Get Additional Info of Config Value
+     * Gets an additional info for a configuration option.
      */
-    public function getInfo(string $name, mixed $scopeIdentifier = null): array
+    public function getInfo(string $name, object|int|null $scopeIdentifier = null): array
     {
-        $entityId = $this->resolveIdentifier($scopeIdentifier);
-        $setting = $this->getCachedSetting($entityId, $name);
-
-        $createdAt   = null;
-        $updatedAt   = null;
+        $createdAt = null;
+        $updatedAt = null;
         $isNullValue = true;
-
+        $setting = $this->getCachedSetting($this->resolveIdentifier($scopeIdentifier), $name);
         if (null !== $setting) {
             $isNullValue = false;
-            if (array_key_exists('createdAt', $setting)) {
+            if (\array_key_exists('createdAt', $setting)) {
                 $createdAt = $setting['createdAt'];
             }
-            if (array_key_exists('updatedAt', $setting)) {
+            if (\array_key_exists('updatedAt', $setting)) {
                 $updatedAt = $setting['updatedAt'];
             }
         }
@@ -89,35 +83,11 @@ abstract class AbstractScopeManager
         return [$createdAt, $updatedAt, $isNullValue];
     }
 
-    protected function getCachedSetting(?int $entityId, string $name, bool $skipChanges = false): ?array
-    {
-        $cacheKey = $this->getCacheKey($this->getScopedEntityName(), $entityId);
-        [$section, $key] = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
-
-        $settings = $this->cache->get($cacheKey, function () use ($entityId) {
-            return $this->loadStoredSettings($entityId);
-        });
-
-        $keySetting = null;
-
-        if (!empty($settings[$section][$key])) {
-            $keySetting = $settings[$section][$key];
-        }
-
-        if (!$skipChanges && isset($this->changedSettings[$entityId][$name][ConfigManager::VALUE_KEY])) {
-            if (null === $keySetting) {
-                $keySetting = [];
-            }
-            $keySetting = array_merge($keySetting, $this->changedSettings[$entityId][$name]);
-        }
-
-        return $keySetting;
-    }
-
     /**
-     * Set setting value. To save changes in a database you need to call flush method
+     * Sets a configuration option value.
+     * To save changes to the database you need to call flush method.
      */
-    public function set(string $name, mixed $value, mixed $scopeIdentifier = null): void
+    public function set(string $name, mixed $value, object|int|null $scopeIdentifier = null): void
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
 
@@ -128,9 +98,10 @@ abstract class AbstractScopeManager
     }
 
     /**
-     * Reset setting value to default. To save changes in a database you need to call flush method
+     * Resets configuration option value to its default value.
+     * To save changes to the database you need to call flush method.
      */
-    public function reset(string $name, mixed $scopeIdentifier = null): void
+    public function reset(string $name, object|int|null $scopeIdentifier = null): void
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
 
@@ -142,19 +113,16 @@ abstract class AbstractScopeManager
     }
 
     /**
-     * Removes scope settings. To save changes in a database, a flush method should be called
+     * Removes scope settings.
+     * To save changes to the database, a flush method should be called.
      */
-    public function deleteScope(mixed $scopeIdentifier): void
+    public function deleteScope(object|int $scopeIdentifier): void
     {
-        $entity   = $this->getScopedEntityName();
+        $entity = $this->getScopedEntityName();
         $entityId = $this->resolveIdentifier($scopeIdentifier);
 
-        /** @var Config $config */
-        $config = $this->doctrine->getManagerForClass(Config::class)
-            ->getRepository(Config::class)
-            ->findByEntity($entity, $entityId);
-
-        if ($config) {
+        $config = $this->findByEntity($entity, $entityId);
+        if (null !== $config) {
             foreach ($config->getValues() as $value) {
                 $name = $value->getSection() . ConfigManager::SECTION_MODEL_SEPARATOR . $value->getName();
                 $this->changedSettings[$entityId][$name] = [
@@ -166,10 +134,10 @@ abstract class AbstractScopeManager
         $this->cache->delete($this->getCacheKey($entity, $entityId));
     }
 
-    public function getChanges(mixed $scopeIdentifier = null): array
+    public function getChanges(object|int|null $scopeIdentifier = null): array
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
-        if (array_key_exists($entityId, $this->changedSettings)) {
+        if (\array_key_exists($entityId, $this->changedSettings)) {
             return $this->changedSettings[$entityId];
         }
 
@@ -182,9 +150,9 @@ abstract class AbstractScopeManager
     }
 
     /**
-     * Save changes made with set or reset methods in a database
+     * Saves changes made with set or reset methods to the database.
      */
-    public function flush(mixed $scopeIdentifier = null): void
+    public function flush(object|int|null $scopeIdentifier = null): void
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
         if (!empty($this->changedSettings[$entityId])) {
@@ -194,19 +162,14 @@ abstract class AbstractScopeManager
     }
 
     /**
-     * Save settings with fallback to global scope (default)
+     * Saves settings with fallback to global scope (default).
      */
-    public function save(array $settings, mixed $scopeIdentifier = null): array
+    public function save(array $settings, object|int|null $scopeIdentifier = null): array
     {
-        $entity   = $this->getScopedEntityName();
+        $entity = $this->getScopedEntityName();
         $entityId = $this->resolveIdentifier($scopeIdentifier);
 
-        $em = $this->doctrine->getManagerForClass(Config::class);
-
-        /** @var Config $config */
-        $config = $em
-            ->getRepository(Config::class)
-            ->findByEntity($entity, $entityId);
+        $config = $this->findByEntity($entity, $entityId);
         if (null === $config) {
             $config = new Config();
             $config->setScopedEntity($entity)->setRecordId($entityId);
@@ -227,6 +190,8 @@ abstract class AbstractScopeManager
                 $config->getValues()->add($configValue);
             }
         }
+
+        $em = $this->doctrine->getManagerForClass(Config::class);
         if (0 === $config->getValues()->count()) {
             $em->remove($config);
         } else {
@@ -252,18 +217,17 @@ abstract class AbstractScopeManager
     }
 
     /**
-     * Calculates and returns config change set
-     * Does not modify anything, so even if you call flush after calculating you will not persist any changes
+     * Calculates and returns config change set.
+     * Does not modify anything, so even if you call flush after calculating you will not persist any changes.
      *
-     * @return array [updated,              removed]
-     *               [[name => value, ...], [name, ...]]
+     * @return array [[updated name => value, ...], [removed name, ...]]
      */
-    public function calculateChangeSet(array $settings, mixed $scopeIdentifier = null): array
+    public function calculateChangeSet(array $settings, object|int|null $scopeIdentifier = null): array
     {
-        // find new and updated
-        $updated = $removed = [];
+        $updated = [];
+        $removed = [];
+        $entityId = $this->resolveIdentifier($scopeIdentifier);
         foreach ($settings as $name => $value) {
-            $entityId = $this->resolveIdentifier($scopeIdentifier);
             $currentValue = $this->getSettingValue($name, true, $entityId);
             $useCurrentScope = empty($value[ConfigManager::USE_PARENT_SCOPE_VALUE_KEY]);
 
@@ -282,9 +246,9 @@ abstract class AbstractScopeManager
     }
 
     /**
-     * Reload settings data
+     * Reloads settings data.
      */
-    public function reload(mixed $scopeIdentifier = null): void
+    public function reload(object|int|null $scopeIdentifier = null): void
     {
         $this->resetCache();
 
@@ -297,22 +261,7 @@ abstract class AbstractScopeManager
             return $settings;
         });
 
-        $event = new ConfigManagerScopeIdUpdateEvent();
-        $this->eventDispatcher->dispatch($event, ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
-    }
-
-    abstract public function getScopedEntityName(): string;
-
-    abstract public function getScopeId(): ?int;
-
-    public function setScopeId(int $scopeId): void
-    {
-    }
-
-    protected function dispatchScopeIdChangeEvent()
-    {
-        $event = new ConfigManagerScopeIdUpdateEvent();
-        $this->eventDispatcher->dispatch($event, ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+        $this->dispatchScopeIdChangeEvent();
     }
 
     public function getScopeInfo(): string
@@ -322,47 +271,74 @@ abstract class AbstractScopeManager
 
     public function getScopeIdFromEntity(object $entity): ?int
     {
-        if ($this->isSupportedScopeEntity($entity)) {
-            return $this->getScopeEntityIdValue($entity);
+        if (!$this->isSupportedScopeEntity($entity)) {
+            // must be null because we should not return any scope ID if the entity is not supported as a scope entity
+            return null;
         }
 
-        // Must be null because we should not return any scope id if the entity is not supported as a scope entity.
-        return null;
+        return $this->getScopeEntityIdValue($entity);
     }
 
-    /**
-     * Find scope id by provided entity object
-     */
-    public function setScopeIdFromEntity(?object $entity): void
+    public function setScopeIdFromEntity(object $entity): void
     {
-        if ($entity) {
-            $scopeId = $this->getScopeIdFromEntity($entity);
-
-            if ($scopeId) {
-                $this->setScopeId($scopeId);
-            }
+        $scopeId = $this->getScopeIdFromEntity($entity);
+        if ($scopeId) {
+            $this->setScopeId($scopeId);
         }
     }
 
-    protected function isSupportedScopeEntity(object $entity): bool
+    public function resolveIdentifier(object|int|null $scopeIdentifier): ?int
     {
-        return false;
+        if (\is_object($scopeIdentifier)) {
+            return $this->getScopeIdFromEntity($scopeIdentifier);
+        }
+
+        return $scopeIdentifier ?? $this->getScopeId();
     }
 
-    protected function getScopeEntityIdValue(object $entity): mixed
+    abstract public function getScopedEntityName(): string;
+
+    abstract public function getScopeId(): int;
+
+    abstract public function setScopeId(?int $scopeId): void;
+
+    abstract protected function isSupportedScopeEntity(object $entity): bool;
+
+    abstract protected function getScopeEntityIdValue(object $entity): int;
+
+    protected function dispatchScopeIdChangeEvent(): void
     {
-        return null;
+        $event = new ConfigManagerScopeIdUpdateEvent();
+        $this->eventDispatcher->dispatch($event, ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+    }
+
+    protected function getCachedSetting(?int $entityId, string $name, bool $skipChanges = false): ?array
+    {
+        $cacheKey = $this->getCacheKey($this->getScopedEntityName(), $entityId);
+        [$section, $key] = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
+
+        $settings = $this->cache->get($cacheKey, function () use ($entityId) {
+            return $this->loadStoredSettings($entityId);
+        });
+
+        $keySetting = null;
+        if (!empty($settings[$section][$key])) {
+            $keySetting = $settings[$section][$key];
+        }
+
+        if (!$skipChanges && isset($this->changedSettings[$entityId][$name][ConfigManager::VALUE_KEY])) {
+            $keySetting = array_merge($keySetting ?? [], $this->changedSettings[$entityId][$name]);
+        }
+
+        return $keySetting;
     }
 
     /**
-     * Loads settings from a database
+     * Loads settings from the database.
      */
     protected function loadStoredSettings(?int $entityId): array
     {
-        $config = $this->doctrine->getManagerForClass(Config::class)
-            ->getRepository(Config::class)
-            ->findByEntity($this->getScopedEntityName(), $entityId);
-
+        $config = $this->findByEntity($this->getScopedEntityName(), $entityId);
         if (null === $config) {
             return [];
         }
@@ -372,7 +348,8 @@ abstract class AbstractScopeManager
 
     protected function normalizeSettings(array $settings): array
     {
-        $configFields = $this->configBag->getConfig()['fields'];
+        $config = $this->configBag->getConfig();
+        $configFields = $config['fields'];
         foreach ($settings as $section => $sectionSettings) {
             foreach ($sectionSettings as $key => $setting) {
                 $settingPath = sprintf('%s.%s', $section, $key);
@@ -416,17 +393,19 @@ abstract class AbstractScopeManager
         return UniversalCacheKeyGenerator::normalizeCacheKey($entity . '_' . $entityId);
     }
 
-    public function resolveIdentifier(object|int|null $identifier): ?int
-    {
-        if (\is_object($identifier)) {
-            return $this->getScopeIdFromEntity($identifier);
-        }
-
-        return $identifier ?? $this->getScopeId();
-    }
-
     protected function resetCache(): void
     {
         $this->cache->clear();
+    }
+
+    private function findByEntity(string $scope, ?int $scopeId): ?Config
+    {
+        if (null === $scopeId) {
+            return null;
+        }
+
+        return $this->doctrine->getManagerForClass(Config::class)
+            ->getRepository(Config::class)
+            ->findByEntity($scope, $scopeId);
     }
 }

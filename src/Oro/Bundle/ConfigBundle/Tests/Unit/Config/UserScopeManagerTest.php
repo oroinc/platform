@@ -2,115 +2,37 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\UserScopeManager;
 use Oro\Bundle\ConfigBundle\Entity\Config;
-use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
-use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Contracts\Cache\CacheInterface;
 
 class UserScopeManagerTest extends AbstractScopeManagerTestCase
 {
-    /** @var UserScopeManager */
-    protected $manager;
-
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $securityContext;
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->securityContext = $this->createMock(TokenStorageInterface::class);
-
-        $this->manager->setSecurityContext($this->securityContext);
-    }
-
-    public function testInitializeScopeId()
-    {
-        $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->once())
-            ->method('getUser')
-            ->willReturn($this->getScopedEntity());
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
-
-        $this->assertEquals(123, $this->manager->getScopeId());
-    }
-
-    public function testInitializeScopeIdForNewUser()
-    {
-        $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->once())
-            ->method('getUser')
-            ->willReturn(new User());
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
-
-        $this->assertEquals(0, $this->manager->getScopeId());
-    }
-
-    public function testInitializeScopeIdForUnsupportedUserObject()
-    {
-        $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->once())
-            ->method('getUser')
-            ->willReturn('test user');
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
-
-        $this->assertEquals(0, $this->manager->getScopeId());
-    }
-
-    public function testInitializeScopeIdNoToken()
-    {
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn(null);
-
-        $this->assertEquals(0, $this->manager->getScopeId());
-    }
-
-    public function testSetScopeId()
-    {
-        $this->securityContext->expects($this->never())
-            ->method('getToken');
-
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(self::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
-
-        $this->manager->setScopeId(456);
-
-        $this->assertEquals(456, $this->manager->getScopeId());
+        parent::setUp();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createManager(
-        ManagerRegistry $doctrine,
-        CacheInterface $cache,
-        EventDispatcher $eventDispatcher,
-        ConfigBag $configBag,
-    ): UserScopeManager {
-        return new UserScopeManager($doctrine, $cache, $eventDispatcher, $configBag);
+    protected function createManager(): UserScopeManager
+    {
+        $manager = new UserScopeManager($this->doctrine, $this->cache, $this->dispatcher, $this->configBag);
+        $manager->setSecurityContext($this->securityContext);
+
+        return $manager;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getScopedEntityName(): string
     {
@@ -118,30 +40,88 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getScopedEntity(): User
     {
-        return $this->getEntity(User::class, ['id' => 123]);
+        $entity = new User();
+        $entity->setId(123);
+
+        return $entity;
     }
 
-    public function testDeleteScope()
+    public function testInitializeScopeId(): void
     {
-        $configValue1 = new ConfigValue();
-        $configValue1->setSection('oro_user')->setName('update')->setValue('old value')->setType('scalar');
+        $user = $this->getScopedEntity();
+
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects(self::once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->securityContext->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertSame($user->getId(), $this->manager->getScopeId());
+    }
+
+    public function testInitializeScopeIdForNewUser(): void
+    {
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects(self::once())
+            ->method('getUser')
+            ->willReturn(new User());
+        $this->securityContext->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertSame(0, $this->manager->getScopeId());
+    }
+
+    public function testInitializeScopeIdForUnsupportedUserObject(): void
+    {
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects(self::once())
+            ->method('getUser')
+            ->willReturn('test user');
+        $this->securityContext->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertSame(0, $this->manager->getScopeId());
+    }
+
+    public function testInitializeScopeIdNoToken(): void
+    {
+        $this->securityContext->expects(self::once())
+            ->method('getToken')
+            ->willReturn(null);
+
+        self::assertSame(0, $this->manager->getScopeId());
+    }
+
+    public function testGetScopeIdFromEntityForUserWithEmptyId(): void
+    {
+        self::assertSame(0, $this->manager->getScopeIdFromEntity(new User()));
+    }
+
+    public function testDeleteScope(): void
+    {
+        $scopeId = 101;
 
         $config = new Config();
-        $config->getValues()->add($configValue1);
+        $config->getValues()->add($this->getConfigValue('oro_user', 'update', 'scalar', 'old value'));
 
-        $this->repo->expects($this->once())
+        $this->repo->expects(self::once())
             ->method('findByEntity')
-            ->with($this->getScopedEntityName(), 101)
+            ->with($this->getScopedEntityName(), $scopeId)
             ->willReturn($config);
 
-        $this->manager->deleteScope(101);
+        $this->manager->deleteScope($scopeId);
+
         self::assertEquals(
             ['oro_user.update' => [ConfigManager::USE_PARENT_SCOPE_VALUE_KEY => true]],
-            $this->manager->getChanges(101)
+            $this->manager->getChanges($scopeId)
         );
     }
 }
