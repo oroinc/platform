@@ -3,12 +3,12 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Ticket\TicketDigestGenerator;
 
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDigestGenerator;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class TicketDigestGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var PasswordEncoderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $passwordEncoder;
+    /** @var PasswordHasherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $passwordHasher;
 
     /** @var string */
     private $secret;
@@ -18,10 +18,10 @@ class TicketDigestGeneratorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->passwordEncoder = $this->createMock(PasswordEncoderInterface::class);
+        $this->passwordHasher = $this->createMock(PasswordHasherInterface::class);
         $this->secret = 'sampleSecret';
 
-        $this->ticketDigestGenerator = new TicketDigestGenerator($this->passwordEncoder, $this->secret);
+        $this->ticketDigestGenerator = new TicketDigestGenerator($this->passwordHasher, $this->secret);
     }
 
     public function testGenerateDigest(): void
@@ -32,8 +32,8 @@ class TicketDigestGeneratorTest extends \PHPUnit\Framework\TestCase
         $raw = 'sampleNonce|sampleCreated|samplePassword';
 
         $expectedDigest = 'sampleDigest';
-        $this->passwordEncoder->expects(self::once())
-            ->method('encodePassword')
+        $this->passwordHasher->expects(self::once())
+            ->method('hash')
             ->with($raw, $this->secret)
             ->willReturn($expectedDigest);
 

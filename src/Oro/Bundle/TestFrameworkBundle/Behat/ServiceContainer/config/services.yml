@@ -133,6 +133,13 @@ services:
         tags:
             - {name: nelmio_alice.faker.provider}
 
+    oro_test.faker.provider.user_hash_password:
+        class: Oro\Bundle\TestFrameworkBundle\Faker\UserHashPasswordProvider
+        arguments:
+            - '@nelmio_alice.faker.generator'
+        tags:
+            - { name: nelmio_alice.faker.provider }
+
     oro_test.file_parser.include_processor:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\IncludeProcessor
         decorates: nelmio_alice.file_parser.default_include_processor

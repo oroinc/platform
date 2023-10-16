@@ -8,7 +8,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 /**
  * Provides a set of methods to simplify manage of the User entity.
@@ -29,11 +29,11 @@ class UserManager extends BaseUserManager
     public function __construct(
         UserLoaderInterface $userLoader,
         ManagerRegistry $doctrine,
-        EncoderFactoryInterface $encoderFactory,
+        PasswordHasherFactoryInterface $passwordHasherFactory,
         EnumValueProvider $enumValueProvider,
         ServiceLink $emailProcessor
     ) {
-        parent::__construct($userLoader, $doctrine, $encoderFactory);
+        parent::__construct($userLoader, $doctrine, $passwordHasherFactory);
         $this->enumValueProvider = $enumValueProvider;
         $this->emailProcessorLink = $emailProcessor;
     }

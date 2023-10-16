@@ -9,8 +9,8 @@ use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -23,8 +23,8 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /** @var EncoderFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $encoderFactory;
+    /** @var PasswordHasherFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $passwordHasherFactory;
 
     /** @var BaseUserManager */
     private $userManager;
@@ -33,7 +33,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->userLoader = $this->createMock(UserLoaderInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
-        $this->encoderFactory = $this->createMock(EncoderFactoryInterface::class);
+        $this->passwordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
 
         $this->userLoader->expects(self::any())
             ->method('getUserClass')
@@ -42,7 +42,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         $this->userManager = new BaseUserManager(
             $this->userLoader,
             $this->doctrine,
-            $this->encoderFactory
+            $this->passwordHasherFactory
         );
     }
 
@@ -79,17 +79,17 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @param UserInterface $user
      *
-     * @return PasswordEncoderInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @return PasswordHasherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function expectGetPasswordEncoder(UserInterface $user)
+    private function expectGetPasswordHasher(UserInterface $user)
     {
-        $encoder = $this->createMock(PasswordEncoderInterface::class);
-        $this->encoderFactory->expects(self::once())
-            ->method('getEncoder')
+        $passwordHasher = $this->createMock(PasswordHasherInterface::class);
+        $this->passwordHasherFactory->expects(self::once())
+            ->method('getPasswordHasher')
             ->with($user)
-            ->willReturn($encoder);
+            ->willReturn($passwordHasher);
 
-        return $encoder;
+        return $passwordHasher;
     }
 
     public function findUserDataProvider(): array
@@ -115,9 +115,9 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         $user->setPlainPassword($password);
         $user->setSalt($salt);
 
-        $encoder = $this->expectGetPasswordEncoder($user);
-        $encoder->expects(self::once())
-            ->method('encodePassword')
+        $passwordHasher = $this->expectGetPasswordHasher($user);
+        $passwordHasher->expects(self::once())
+            ->method('hash')
             ->with($password, $salt)
             ->willReturn($encodedPassword);
 

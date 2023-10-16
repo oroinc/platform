@@ -6,8 +6,6 @@ use Faker\Generator;
 use Faker\Provider\Base as BaseProvider;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\TestFrameworkBundle\Provider\XssPayloadProvider;
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 /**
  * Faker provider for XSS payloads
@@ -35,11 +33,6 @@ class XssProvider extends BaseProvider
     private $payloadProvider;
 
     /**
-     * @var PasswordEncoderInterface
-     */
-    private $passwordEncoder;
-
-    /**
      * @var string
      */
     private $prefix = 'p';
@@ -56,7 +49,6 @@ class XssProvider extends BaseProvider
     ) {
         parent::__construct($generator);
         $this->payloadProvider = $payloadProvider;
-        $this->passwordEncoder = new MessageDigestPasswordEncoder();
         $this->crypter = $crypter;
     }
 
@@ -97,16 +89,6 @@ class XssProvider extends BaseProvider
         }
 
         return $payload;
-    }
-
-    /**
-     * @param string $password
-     * @param string $salt
-     * @return string
-     */
-    public function userPassword($password, $salt)
-    {
-        return $this->passwordEncoder->encodePassword($password, $salt);
     }
 
     /**
