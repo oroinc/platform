@@ -15,12 +15,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
  */
 class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private SystemConfigManager|\PHPUnit\Framework\MockObject\MockObject $systemConfigManager;
+    /** @var SystemConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $systemConfigManager;
 
-    private AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-        $attachmentEntityConfigProvider;
+    /** @var AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $attachmentEntityConfigProvider;
 
-    private FileConstraintsProvider $provider;
+    /** @var FileConstraintsProvider */
+    private $provider;
 
     protected function setUp(): void
     {
@@ -37,7 +39,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->systemConfigManager->expects($this->once())
             ->method('get')
-            ->with('oro_attachment.upload_file_mime_types', '', false, null)
+            ->with('oro_attachment.upload_file_mime_types', false, false, null)
             ->willReturn('sample/type1,sample/type2');
 
         $this->assertEquals(['sample/type1', 'sample/type2'], $this->provider->getFileMimeTypes());
@@ -47,7 +49,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->systemConfigManager->expects($this->once())
             ->method('get')
-            ->with('oro_attachment.upload_image_mime_types', '', false, null)
+            ->with('oro_attachment.upload_image_mime_types', false, false, null)
             ->willReturn('sample/type1,sample/type2');
 
         $this->assertEquals(['sample/type1', 'sample/type2'], $this->provider->getImageMimeTypes());
@@ -61,8 +63,8 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         $this->systemConfigManager->expects($this->any())
             ->method('get')
             ->willReturnMap([
-                ['oro_attachment.upload_file_mime_types', '', false, null, $fileMimeTypes],
-                ['oro_attachment.upload_image_mime_types', '', false, null, $imageMimeTypes],
+                ['oro_attachment.upload_file_mime_types', false, false, null, $fileMimeTypes],
+                ['oro_attachment.upload_image_mime_types', false, false, null, $imageMimeTypes],
             ]);
 
         $this->assertEquals($expected, $this->provider->getMimeTypes());
@@ -103,8 +105,8 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         $this->systemConfigManager->expects($this->any())
             ->method('get')
             ->willReturnMap([
-                ['oro_attachment.upload_file_mime_types', '', false, null, $fileMimeTypes],
-                ['oro_attachment.upload_image_mime_types', '', false, null, $imageMimeTypes],
+                ['oro_attachment.upload_file_mime_types', false, false, null, $fileMimeTypes],
+                ['oro_attachment.upload_image_mime_types', false, false, null, $imageMimeTypes],
             ]);
 
         $this->assertEquals($expected, $this->provider->getMimeTypesAsChoices());
@@ -147,8 +149,8 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         $this->systemConfigManager->expects($this->exactly(2))
             ->method('get')
             ->willReturnMap([
-                ['oro_attachment.upload_file_mime_types', '', false, null, 'sample/type1'],
-                ['oro_attachment.upload_image_mime_types', '', false, null, 'sample/type2'],
+                ['oro_attachment.upload_file_mime_types', false, false, null, 'sample/type1'],
+                ['oro_attachment.upload_image_mime_types', false, false, null, 'sample/type2'],
             ]);
 
         $this->assertEquals(
@@ -172,8 +174,8 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         $this->systemConfigManager->expects($this->exactly(2))
             ->method('get')
             ->willReturnMap([
-                ['oro_attachment.upload_file_mime_types', '', false, null, 'sample/type1'],
-                ['oro_attachment.upload_image_mime_types', '', false, null, 'sample/type2'],
+                ['oro_attachment.upload_file_mime_types', false, false, null, 'sample/type1'],
+                ['oro_attachment.upload_image_mime_types', false, false, null, 'sample/type2'],
             ]);
 
         $this->assertEquals(
@@ -212,7 +214,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->systemConfigManager->expects($this->once())
             ->method('get')
-            ->with('oro_attachment.upload_file_mime_types', '', false, null)
+            ->with('oro_attachment.upload_file_mime_types', false, false, null)
             ->willReturn('sample/type1,sample/type2');
 
         $this->assertEquals(
@@ -249,8 +251,8 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         $this->systemConfigManager->expects($this->once())
             ->method('get')
             ->willReturnMap([
-                ['oro_attachment.upload_image_mime_types', '', false, null, 'image/type1,image/type2'],
-                ['oro_attachment.upload_file_mime_types', '', false, null, 'file/type1,file/type2'],
+                ['oro_attachment.upload_image_mime_types', false, false, null, 'image/type1,image/type2'],
+                ['oro_attachment.upload_file_mime_types', false, false, null, 'file/type1,file/type2'],
             ]);
 
         $this->assertEquals(
@@ -299,7 +301,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->systemConfigManager->expects($this->once())
             ->method('get')
-            ->with('oro_attachment.upload_file_mime_types', '', false, null)
+            ->with('oro_attachment.upload_file_mime_types', false, false, null)
             ->willReturn('sample/type1,sample/type2');
 
         $this->assertEquals(
@@ -333,7 +335,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->systemConfigManager->expects($this->once())
             ->method('get')
-            ->with('oro_attachment.maxsize', '', false, null)
+            ->with('oro_attachment.maxsize', false, false, null)
             ->willReturn(10);
 
         $this->assertEquals(10 * Configuration::BYTES_MULTIPLIER, $this->provider->getMaxSize());
@@ -344,7 +346,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         $key = 'oro_attachment.maxsize_key';
         $this->systemConfigManager->expects($this->once())
             ->method('get')
-            ->with($key, '', false, null)
+            ->with($key, false, false, null)
             ->willReturn(0.03);
 
         $this->assertEquals(
@@ -362,7 +364,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->systemConfigManager->expects($this->once())
             ->method('get')
-            ->with('oro_attachment.maxsize', '', false, null)
+            ->with('oro_attachment.maxsize', false, false, null)
             ->willReturn(10);
 
         $this->assertEquals(
@@ -385,7 +387,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->systemConfigManager->expects($this->once())
             ->method('get')
-            ->with('oro_attachment.maxsize', '', false, null)
+            ->with('oro_attachment.maxsize', false, false, null)
             ->willReturn(10);
 
         $this->assertEquals(
@@ -424,7 +426,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->systemConfigManager->expects($this->once())
             ->method('get')
-            ->with('oro_attachment.maxsize', '', false, null)
+            ->with('oro_attachment.maxsize', false, false, null)
             ->willReturn(10);
 
         $this->assertEquals(
@@ -447,7 +449,7 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->systemConfigManager->expects($this->once())
             ->method('get')
-            ->with('oro_attachment.maxsize', '', false, null)
+            ->with('oro_attachment.maxsize', false, false, null)
             ->willReturn(10);
 
         $this->assertEquals(

@@ -11,14 +11,10 @@ use Oro\Bundle\MessageQueueBundle\Client\MessageFilterInterface;
  */
 class MessageFilter implements MessageFilterInterface
 {
-    /**
-     * @var FeatureChecker
-     */
-    private $featureChecker;
+    private FeatureChecker $featureChecker;
 
-    public function __construct(
-        FeatureChecker $featureChecker
-    ) {
+    public function __construct(FeatureChecker $featureChecker)
+    {
         $this->featureChecker = $featureChecker;
     }
 

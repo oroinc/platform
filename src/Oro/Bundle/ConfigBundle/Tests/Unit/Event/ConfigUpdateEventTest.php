@@ -2,115 +2,79 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
 class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
 {
-    private ConfigUpdateEvent $event;
-
-    private array $changeSet = [
-        'oro_user.greeting' => [
-            'old' => 'old value',
-            'new' => 'default value'
-        ],
-        'oro_user.level'    => [
-            'old' => 'pre value',
-            'new' => 50
-        ]
+    private const SCOPE = 'scope';
+    private const SCOPE_ID = 123;
+    private const CHANGE_SET = [
+        'oro_user.key1' => ['old' => 'old value', 'new' => 'default value'],
+        'oro_user.key2' => ['old' => 'pre value', 'new' => 50]
     ];
+
+    private ConfigUpdateEvent $event;
 
     protected function setUp(): void
     {
-        $this->event = new ConfigUpdateEvent($this->changeSet);
+        $this->event = new ConfigUpdateEvent(self::CHANGE_SET, self::SCOPE, self::SCOPE_ID);
     }
 
-    /**
-     * @dataProvider changeSetProvider
-     */
-    public function testChangeSet(mixed $changeSet)
+    public function testGetChangeSet(): void
     {
-        $event = new ConfigUpdateEvent($changeSet);
-        $this->assertEquals($this->changeSet, $event->getChangeSet());
+        self::assertEquals(self::CHANGE_SET, $this->event->getChangeSet());
     }
 
-    public function changeSetProvider(): array
+    public function testGetScope(): void
     {
-        return [
-            'object' => [new ConfigChangeSet($this->changeSet)],
-            'array'  => [$this->changeSet]
-        ];
+        self::assertEquals(self::SCOPE, $this->event->getScope());
+    }
+
+    public function testGetScopeId(): void
+    {
+        self::assertEquals(self::SCOPE_ID, $this->event->getScopeId());
     }
 
     /**
      * @dataProvider isChangedDataProvider
      */
-    public function testIsChanged(string $key, bool $result)
+    public function testIsChanged(string $key, bool $result): void
     {
-        $this->assertEquals($result, $this->event->isChanged($key));
+        self::assertSame($result, $this->event->isChanged($key));
     }
 
     public function isChangedDataProvider(): array
     {
         return [
-            'oro_user.greeting changed'                => ['oro_user.greeting', true],
-            'oro_user.level changed'                   => ['oro_user.level', true],
-            'oro_user.testNotChangedValue not changed' => ['oro_user.testNotChangedValue', false],
+            'oro_user.key1 changed' => ['oro_user.key1', true],
+            'oro_user.key2 changed' => ['oro_user.key2', true],
+            'oro_user.notChanged'   => ['oro_user.notChanged', false],
         ];
     }
 
-    /**
-     * @dataProvider valueRetrievingDataProvider
-     */
-    public function testValueRetrieving(string $key, array $expectedValues, string $exception = null)
+    public function testGetOldValue(): void
     {
-        if ($exception) {
-            $this->expectException($exception);
-        }
-
-        $new = $this->event->getNewValue($key);
-        $old = $this->event->getOldValue($key);
-
-        $this->assertEquals($expectedValues['old'], $old);
-        $this->assertEquals($expectedValues['new'], $new);
+        self::assertEquals('old value', $this->event->getOldValue('oro_user.key1'));
     }
 
-    public function valueRetrievingDataProvider(): array
+    public function testGetNewValue(): void
     {
-        return [
-            'changed value'     => [
-                'oro_user.greeting',
-                [
-                    'old' => 'old value',
-                    'new' => 'default value'
-                ]
-            ],
-            'not changed value' => [
-                'oro_user.someValue',
-                [],
-                \LogicException::class
-            ],
-        ];
+        self::assertEquals('default value', $this->event->getNewValue('oro_user.key1'));
     }
 
-    /**
-     * @dataProvider dataProviderForScopes
-     */
-    public function testScopes(?string $scope, ?int $scopeId)
+    public function testGetOldValueForNotChangedOption(): void
     {
-        $event = new ConfigUpdateEvent([], $scope, $scopeId);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Could not retrieve a value for "oro_user.notChanged".');
 
-        $this->assertEquals($scope, $event->getScope());
-        $this->assertEquals($scopeId, $event->getScopeId());
+        $this->event->getOldValue('oro_user.notChanged');
     }
 
-    public function dataProviderForScopes(): array
+    public function testGetNewValueForNotChangedOption(): void
     {
-        return [
-            ['website', null],
-            ['website', 1],
-            [null, 1],
-            [null, null],
-        ];
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Could not retrieve a value for "oro_user.notChanged".');
+
+        $this->event->getNewValue('oro_user.notChanged');
     }
 }

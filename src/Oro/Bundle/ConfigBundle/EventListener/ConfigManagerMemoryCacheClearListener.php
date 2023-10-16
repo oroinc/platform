@@ -9,8 +9,7 @@ use Oro\Bundle\CacheBundle\Provider\MemoryCache;
  */
 class ConfigManagerMemoryCacheClearListener
 {
-    /** @var MemoryCache */
-    private $memoryCache;
+    private MemoryCache $memoryCache;
 
     public function __construct(MemoryCache $memoryCache)
     {
