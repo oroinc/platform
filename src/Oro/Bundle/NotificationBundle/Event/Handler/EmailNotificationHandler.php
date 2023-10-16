@@ -5,7 +5,6 @@ namespace Oro\Bundle\NotificationBundle\Event\Handler;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
-use Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
@@ -32,22 +31,18 @@ class EmailNotificationHandler implements EventHandlerInterface
     /** @var ChainAdditionalEmailAssociationProvider */
     private $additionalEmailAssociationProvider;
 
-    private WebsiteAwareEntityHelper $websiteAwareEntityHelper;
-
     public function __construct(
         EmailNotificationManager $manager,
         ManagerRegistry $doctrine,
         PropertyAccessorInterface $propertyAccessor,
         EventDispatcherInterface $eventDispatcher,
-        ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider,
-        WebsiteAwareEntityHelper $websiteAwareEntityHelper,
+        ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider
     ) {
         $this->manager = $manager;
         $this->doctrine = $doctrine;
         $this->propertyAccessor = $propertyAccessor;
         $this->eventDispatcher = $eventDispatcher;
         $this->additionalEmailAssociationProvider = $additionalEmailAssociationProvider;
-        $this->websiteAwareEntityHelper = $websiteAwareEntityHelper;
     }
 
     /**
@@ -72,11 +67,10 @@ class EmailNotificationHandler implements EventHandlerInterface
         return new TemplateEmailNotificationAdapter(
             $event->getEntity(),
             $notification,
-            $this->doctrine->getManager(),
+            $this->doctrine,
             $this->propertyAccessor,
             $this->eventDispatcher,
-            $this->additionalEmailAssociationProvider,
-            $this->websiteAwareEntityHelper
+            $this->additionalEmailAssociationProvider
         );
     }
 }

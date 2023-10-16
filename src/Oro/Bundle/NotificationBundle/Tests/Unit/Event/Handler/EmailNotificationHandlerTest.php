@@ -2,33 +2,23 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
 use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
-use Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testHandle()
+    public function testHandle(): void
     {
-        $websiteAware = $this->createMock(WebsiteAwareEntityHelper::class);
         $entity = $this->createMock(\stdClass::class);
-        $event = $this->createMock(NotificationEvent::class);
-        $event->expects($this->any())
-            ->method('getEntity')
-            ->willReturn($entity);
-
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $em = $this->createMock(EntityManager::class);
-
         $additionalEmailAssociationProvider = $this->createMock(ChainAdditionalEmailAssociationProvider::class);
 
         $notification = $this->createMock(EmailNotification::class);
@@ -37,31 +27,29 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
             new TemplateEmailNotificationAdapter(
                 $entity,
                 $notification,
-                $em,
+                $doctrine,
                 PropertyAccess::createPropertyAccessor(),
                 $dispatcher,
-                $additionalEmailAssociationProvider,
-                $websiteAware
+                $additionalEmailAssociationProvider
             )
         ];
 
         $manager = $this->createMock(EmailNotificationManager::class);
-        $manager->expects($this->once())
+        $manager->expects(self::once())
             ->method('process')
-            ->with($this->equalTo($notificationsForManager));
+            ->with($notificationsForManager);
 
-        $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects(self::any())
-            ->method('getManager')
-            ->willReturn($em);
+        $event = $this->createMock(NotificationEvent::class);
+        $event->expects(self::any())
+            ->method('getEntity')
+            ->willReturn($entity);
 
         $handler = new EmailNotificationHandler(
             $manager,
             $doctrine,
             PropertyAccess::createPropertyAccessor(),
             $dispatcher,
-            $additionalEmailAssociationProvider,
-            $websiteAware
+            $additionalEmailAssociationProvider
         );
         $handler->handle($event, $notifications);
     }
