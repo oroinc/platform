@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Handler;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\DependencyInjection\Configuration;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\FormInterface;
 
@@ -14,31 +13,30 @@ use Symfony\Component\Form\FormInterface;
  */
 class UserEmailConfigHandler
 {
-    /** @var EntityManager */
-    private $entityManager;
+    private ManagerRegistry $doctrine;
 
-    public function __construct(EntityManager $entityManager)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->entityManager = $entityManager;
+        $this->doctrine = $doctrine;
     }
 
-    /**
-     * Save user with new configuration
-     */
-    public function handle(ConfigManager $manager, ConfigChangeSet $changeSet, FormInterface $form)
+    public function handle(ConfigManager $manager, ConfigChangeSet $changeSet, FormInterface $form): void
     {
-        $configKey = Configuration::getConfigKeyByName('user_mailbox', ConfigManager::SECTION_VIEW_SEPARATOR);
-        if (!$form->has($configKey)) {
+        $formFieldName = 'oro_email' . ConfigManager::SECTION_VIEW_SEPARATOR . 'user_mailbox';
+        if (!$form->has($formFieldName)) {
             return;
         }
-        $mailboxChildForm = $form->get($configKey);
-        $formData = $mailboxChildForm->getData();
-        $user = is_array($formData) && isset($formData['value']) ? $formData['value'] : null;
+
+        $formData = $form->get($formFieldName)->getData();
+        $user = \is_array($formData) && isset($formData[ConfigManager::VALUE_KEY])
+            ? $formData[ConfigManager::VALUE_KEY]
+            : null;
         if (!$user instanceof User) {
             return;
         }
 
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $em = $this->doctrine->getManagerForClass(User::class);
+        $em->persist($user);
+        $em->flush();
     }
 }

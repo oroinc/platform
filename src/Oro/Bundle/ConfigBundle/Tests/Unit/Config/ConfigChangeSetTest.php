@@ -6,7 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 
 class ConfigChangeSetTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetChanges()
+    public function testGetChanges(): void
     {
         $changes = [
             'item1' => [
@@ -19,7 +19,7 @@ class ConfigChangeSetTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($changes, $configChangeSet->getChanges());
     }
 
-    public function testIsChangedForChangedValue()
+    public function testIsChangedForChangedValue(): void
     {
         $configChangeSet = new ConfigChangeSet(
             [
@@ -32,7 +32,7 @@ class ConfigChangeSetTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($configChangeSet->isChanged('item1'));
     }
 
-    public function testIsChangedForNotChangedValue()
+    public function testIsChangedForNotChangedValue(): void
     {
         $configChangeSet = new ConfigChangeSet(
             [
@@ -45,7 +45,7 @@ class ConfigChangeSetTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($configChangeSet->isChanged('unknown'));
     }
 
-    public function testNewValueRetrieving()
+    public function testGetNewValue(): void
     {
         $configChangeSet = new ConfigChangeSet(
             [
@@ -58,7 +58,7 @@ class ConfigChangeSetTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('new value', $configChangeSet->getNewValue('item1'));
     }
 
-    public function testOldValueRetrieving()
+    public function testGetOldValue(): void
     {
         $configChangeSet = new ConfigChangeSet(
             [
@@ -71,16 +71,20 @@ class ConfigChangeSetTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('old value', $configChangeSet->getOldValue('item1'));
     }
 
-    public function testNewValueRetrievingForUnknownElement()
+    public function testGetNewValueForUnknownOption(): void
     {
         $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Could not retrieve a value for "unknown".');
+
         $configChangeSet = new ConfigChangeSet([]);
         $configChangeSet->getNewValue('unknown');
     }
 
-    public function testOldValueRetrievingForUnknownElement()
+    public function testGetOldValueForUnknownOption(): void
     {
         $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Could not retrieve a value for "unknown".');
+
         $configChangeSet = new ConfigChangeSet([]);
         $configChangeSet->getOldValue('unknown');
     }

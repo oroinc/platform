@@ -6,8 +6,6 @@ use Oro\Bundle\MaintenanceBundle\Drivers\AbstractDriver;
 use Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory;
 use Oro\Bundle\MaintenanceBundle\EventListener\MaintenanceListener;
 use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceRestrictionsChecker;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
@@ -15,17 +13,22 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MaintenanceListenerTest extends TestCase
+class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private AbstractDriver|MockObject $driver;
+    /** @var AbstractDriver|\PHPUnit\Framework\MockObject\MockObject */
+    private $driver;
 
-    private DriverFactory|MockObject $driverFactory;
+    /** @var DriverFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $driverFactory;
 
-    private RouterListener|MockObject $routerListener;
+    /** @var RouterListener|\PHPUnit\Framework\MockObject\MockObject */
+    private $routerListener;
 
-    private MaintenanceListener $maintenanceListener;
+    /** @var MaintenanceRestrictionsChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $maintenanceRestrictionsChecker;
 
-    private MaintenanceRestrictionsChecker|MockObject $maintenanceRestrictionsChecker;
+    /** @var MaintenanceListener */
+    private $maintenanceListener;
 
     protected function setUp(): void
     {
@@ -45,13 +48,14 @@ class MaintenanceListenerTest extends TestCase
             $this->maintenanceRestrictionsChecker,
             503,
             null,
-            null,
-            false
+            null
         );
     }
 
     public function testOnKernelRequestWhenMaintenanceAndMainRequest(): void
     {
+        $this->expectException(ServiceUnavailableHttpException::class);
+
         $this->driver->expects(self::once())
             ->method('decide')
             ->willReturn(true);
@@ -64,8 +68,6 @@ class MaintenanceListenerTest extends TestCase
         $this->routerListener->expects(self::once())
             ->method('onKernelRequest')
             ->with($event);
-
-        self::expectException(ServiceUnavailableHttpException::class);
 
         $this->maintenanceListener->onKernelRequest($event);
     }

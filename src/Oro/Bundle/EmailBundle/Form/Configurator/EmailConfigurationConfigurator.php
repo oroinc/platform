@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Form\Configurator;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
 use Oro\Bundle\EmailBundle\Validator\Constraints\SmtpConnectionConfiguration;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,11 +16,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class EmailConfigurationConfigurator
 {
-    /** @var SymmetricCrypterInterface */
-    protected $encryptor;
-
-    /** @var ValidatorInterface */
-    private $validator;
+    private SymmetricCrypterInterface $encryptor;
+    private ValidatorInterface $validator;
 
     public function __construct(SymmetricCrypterInterface $encryptor, ValidatorInterface $validator)
     {
@@ -29,26 +25,23 @@ class EmailConfigurationConfigurator
         $this->validator = $validator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function configure(FormBuilderInterface $builder, $options)
+    public function configure(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            $passwordKey = $this->getConfigKey(Config::KEY_SMTP_SETTINGS_PASS);
-
-            if (!$event->getForm()->has($passwordKey)) {
+            $passwordFieldName = $this->getFieldName('smtp_settings_password');
+            if (!$event->getForm()->has($passwordFieldName)) {
                 return;
             }
 
-            $data = (array) $event->getData();
+            $data = (array)$event->getData();
 
-            if (empty($data[$passwordKey]['value'])) {
-                $passwordData = $event->getForm()->get($passwordKey)->getData();
-                $data[$passwordKey]['value'] = $passwordData['value'] ?? null;
+            if (empty($data[$passwordFieldName][ConfigManager::VALUE_KEY])) {
+                $passwordData = $event->getForm()->get($passwordFieldName)->getData();
+                $data[$passwordFieldName][ConfigManager::VALUE_KEY] = $passwordData[ConfigManager::VALUE_KEY] ?? null;
             } else {
-                $data[$passwordKey]['value'] = $this->encryptor->encryptData($data[$passwordKey]['value']);
+                $data[$passwordFieldName][ConfigManager::VALUE_KEY] = $this->encryptor->encryptData(
+                    $data[$passwordFieldName][ConfigManager::VALUE_KEY]
+                );
             }
 
             $event->setData($data);
@@ -58,19 +51,19 @@ class EmailConfigurationConfigurator
     }
 
     /**
-     * Validate the form with SmtpConnectionConfiguration constraint
+     * Validates the form with {@see SmtpConnectionConfiguration} constraint.
      */
-    public function postSubmit(FormEvent $event)
+    public function postSubmit(FormEvent $event): void
     {
         $data = $event->getData();
         if (!$this->isSmtpFieldsExist($data)) {
             return;
         }
-        if ($this->getParentScopeValue($data, Config::KEY_SMTP_SETTINGS_HOST)
-            && $this->getParentScopeValue($data, Config::KEY_SMTP_SETTINGS_PORT)
-            && $this->getParentScopeValue($data, Config::KEY_SMTP_SETTINGS_ENC)
-            && $this->getParentScopeValue($data, Config::KEY_SMTP_SETTINGS_USER)
-            && $this->getParentScopeValue($data, Config::KEY_SMTP_SETTINGS_PASS)
+        if ($this->getParentScopeValue($data, 'smtp_settings_host')
+            && $this->getParentScopeValue($data, 'smtp_settings_port')
+            && $this->getParentScopeValue($data, 'smtp_settings_encryption')
+            && $this->getParentScopeValue($data, 'smtp_settings_username')
+            && $this->getParentScopeValue($data, 'smtp_settings_password')
         ) {
             return;
         }
@@ -82,49 +75,28 @@ class EmailConfigurationConfigurator
         }
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    private function getConfigKey($name)
+    private function getFieldName(string $field): string
     {
-        return Config::getConfigKeyByName($name, ConfigManager::SECTION_VIEW_SEPARATOR);
+        return 'oro_email' . ConfigManager::SECTION_VIEW_SEPARATOR . $field;
     }
 
-    /**
-     * @param array $data
-     *
-     * @return bool
-     */
-    private function isSmtpFieldsExist(array $data)
+    private function isSmtpFieldsExist(array $data): bool
     {
-        return $this->isFieldExist($data, Config::KEY_SMTP_SETTINGS_HOST)
-            && $this->isFieldExist($data, Config::KEY_SMTP_SETTINGS_PORT)
-            && $this->isFieldExist($data, Config::KEY_SMTP_SETTINGS_ENC)
-            && $this->isFieldExist($data, Config::KEY_SMTP_SETTINGS_USER)
-            && $this->isFieldExist($data, Config::KEY_SMTP_SETTINGS_PASS);
+        return
+            $this->isFieldExist($data, 'smtp_settings_host')
+            && $this->isFieldExist($data, 'smtp_settings_port')
+            && $this->isFieldExist($data, 'smtp_settings_encryption')
+            && $this->isFieldExist($data, 'smtp_settings_username')
+            && $this->isFieldExist($data, 'smtp_settings_password');
     }
 
-    /**
-     * @param array $data
-     * @param string $key
-     *
-     * @return bool
-     */
-    private function isFieldExist(array $data, $key)
+    private function isFieldExist(array $data, string $field): bool
     {
-        return isset($data[$this->getConfigKey($key)]);
+        return isset($data[$this->getFieldName($field)]);
     }
 
-    /**
-     * @param array $data
-     * @param string $key
-     *
-     * @return bool
-     */
-    private function getParentScopeValue(array $data, $key)
+    private function getParentScopeValue(array $data, string $field): bool
     {
-        return $data[$this->getConfigKey($key)][ConfigManager::USE_PARENT_SCOPE_VALUE_KEY];
+        return $data[$this->getFieldName($field)][ConfigManager::USE_PARENT_SCOPE_VALUE_KEY];
     }
 }

@@ -17,8 +17,7 @@ Oro\Bundle\UserBundle\Entity\User:
     owner: '@business_unit'
     businessUnits: ['@business_unit']
     email (unique): <email()>
-    password: password
-    salt: salts
+    password: <userPassword(@userCharlie->username)>
 
 OroEntityProxy\OroEmailBundle\EmailAddressProxy:
   charlieAddress:

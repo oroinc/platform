@@ -12,7 +12,7 @@ use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
@@ -173,7 +173,7 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $this->userProvider->expects(self::once())
             ->method('loadUserByUsername')
             ->with(self::USERNAME)
-            ->willThrowException(new UsernameNotFoundException());
+            ->willThrowException(new UserNotFoundException());
 
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage(

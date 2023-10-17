@@ -39,6 +39,9 @@ class ConfigSettingsFormOptionsEvent extends Event
         return isset($this->allFormOptions[$configKey]);
     }
 
+    /**
+     * @throws \LogicException when the given configuration option is not known
+     */
     public function getFormOptions(string $configKey): array
     {
         $this->assertKnownConfigKey($configKey);
@@ -46,6 +49,9 @@ class ConfigSettingsFormOptionsEvent extends Event
         return $this->allFormOptions[$configKey];
     }
 
+    /**
+     * @throws \LogicException when the given configuration option is not known
+     */
     public function setFormOptions(string $configKey, array $options): void
     {
         $this->assertKnownConfigKey($configKey);

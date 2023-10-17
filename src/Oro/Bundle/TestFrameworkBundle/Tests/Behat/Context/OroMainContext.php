@@ -769,6 +769,9 @@ class OroMainContext extends MinkContext implements
         $this->fillField('_username', $loginAndPassword);
         $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');
+
+        $this->waitForAjax();
+        $this->pressButtonIfPresent('Organization Notice Close');
     }
 
     /**
@@ -3296,5 +3299,16 @@ JS;
                 break;
             }
         }
+    }
+
+    /**
+     * Example: And I remember element "Add" value as "my_data"
+     *
+     * @When /^(?:|I )remember element "(?P<fieldName>(?:[^"]|\\")*)" value as "(?P<alias>(?:[^"]|\\")*)"$/
+     */
+    public function rememberElementValue(string $elementName, string $alias)
+    {
+        $element = $this->createElement($elementName);
+        VariableStorage::storeData($alias, $element->getValue());
     }
 }

@@ -164,3 +164,10 @@ services:
     oro_test.mailer.message_logger_listener:
         decorates: mailer.message_logger_listener
         class: Oro\Bundle\TestFrameworkBundle\Mailer\EventListener\MessageLoggerListener
+
+    oro_test.faker.provider.user_hash_password:
+        class: Oro\Bundle\TestFrameworkBundle\Faker\UserHashPasswordProvider
+        arguments:
+            - '@nelmio_alice.faker.generator'
+        tags:
+            - { name: nelmio_alice.faker.provider }

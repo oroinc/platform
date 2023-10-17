@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Event;
 
-use Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -13,55 +13,33 @@ class NotificationProcessRecipientsEvent extends Event
 {
     public const NAME = 'oro.notification.event.notification_process_recipients';
 
-    /**
-     * @var object
-     */
-    private $entity;
+    private object $entity;
+    private array $recipients;
 
-    private WebsiteAwareEntityHelper $websiteAwareHelper;
-
-    /**
-     * @var array
-     */
-    private $recipients;
-
-    /**
-     * @param object $entity
-     * @param array $recipients
-     */
-    public function __construct($entity, array $recipients, WebsiteAwareEntityHelper $websiteAwareHelper)
+    public function __construct(object $entity, array $recipients)
     {
         $this->entity = $entity;
         $this->recipients = $recipients;
-        $this->websiteAwareHelper = $websiteAwareHelper;
+    }
+
+    public function getEntity(): object
+    {
+        return $this->entity;
     }
 
     /**
-     * @param array $recipients
-     * @return NotificationProcessRecipientsEvent
+     * @return EmailHolderInterface[]
      */
-    public function setRecipients(array $recipients): self
-    {
-        $this->recipients = $recipients;
-
-        return $this;
-    }
-
     public function getRecipients(): array
     {
         return $this->recipients;
     }
 
     /**
-     * @return object
+     * @param EmailHolderInterface[] $recipients
      */
-    public function getEntity()
+    public function setRecipients(array $recipients): void
     {
-        return $this->entity;
-    }
-
-    public function getWebsiteAwareEntityHelper(): WebsiteAwareEntityHelper
-    {
-        return $this->websiteAwareHelper;
+        $this->recipients = $recipients;
     }
 }
