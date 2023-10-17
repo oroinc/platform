@@ -3,22 +3,65 @@
 namespace Oro\Bundle\MaintenanceBundle\Tests\Unit\Maintenance;
 
 use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceRestrictionsChecker;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MaintenanceRestrictionsCheckerTest extends TestCase
+class MaintenanceRestrictionsCheckerTest extends \PHPUnit\Framework\TestCase
 {
+    private function getMaintenanceRestrictionsChecker(
+        ?string $path,
+        ?string $host,
+        ?string $route,
+        ?array $ips,
+        ?array $query,
+        ?array $cookie,
+        ?array $attributes,
+        ?bool $debug,
+        ?Request $request,
+    ): MaintenanceRestrictionsChecker {
+        $requestStack = new RequestStack();
+        if (null !== $request) {
+            $requestStack->push($request);
+        }
+
+        return new MaintenanceRestrictionsChecker(
+            $requestStack,
+            $path,
+            $host,
+            $route,
+            $ips,
+            $query,
+            $cookie,
+            $attributes,
+            $debug
+        );
+    }
+
+    public function testIsAllowedIpWhenNoCurrentRequest(): void
+    {
+        $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
+            null,
+            null,
+            null,
+            ['127.0.0.1'],
+            [],
+            [],
+            [],
+            false,
+            null
+        );
+
+        self::assertFalse($maintenanceRestrictionsChecker->isAllowedIp());
+    }
+
     /**
-     * @dataProvider allowedIpDataProvider
+     * @dataProvider isAllowedIpDataProvider
      */
-    public function testIsAllowedIp(
-        $ips,
-        $expectedResult
-    ): void {
+    public function testIsAllowedIp(?array $ips, bool $expectedResult): void
+    {
         $request = Request::create('http://test.com/foo?bar=baz');
 
         $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
@@ -36,129 +79,364 @@ class MaintenanceRestrictionsCheckerTest extends TestCase
         self::assertEquals($expectedResult, $maintenanceRestrictionsChecker->isAllowedIp());
     }
 
-    public function allowedIpDataProvider(): array
+    public function isAllowedIpDataProvider(): array
     {
         return [
-            'allowedIpDataSet' => [
-                'ips' => ['127.0.0.1'],
-                'expectedResult' => true
-            ],
-            'notAllowedIpDataSet' => [
-                'ips' => ['192.168.0.1'],
+            'null ips' => [
+                'ips' => null,
                 'expectedResult' => false
             ],
-            'notSetIpDataSet' => [
+            'empty ips' => [
                 'ips' => [],
+                'expectedResult' => false
+            ],
+            'matching ips' => [
+                'ips' => ['192.168.0.1', '127.0.0.1', '192.168.0.2'],
+                'expectedResult' => true
+            ],
+            'not matching ips' => [
+                'ips' => ['192.168.0.1', '192.168.0.2'],
                 'expectedResult' => false
             ]
         ];
     }
 
-    /**
-     * @dataProvider routeFilterDataProvider
-     */
-    public function testRouteFilter(
-        $route,
-        $expectedResult
-    ): void {
-        $request = Request::create('');
-        $request->attributes->set('_route', $route);
-
+    public function testIsAllowedRouteWhenNoCurrentRequest(): void
+    {
         $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
             null,
             null,
-            $route,
+            '\w*route\w*',
             [],
             [],
             [],
             [],
             false,
+            null
+        );
+
+        self::assertFalse($maintenanceRestrictionsChecker->isAllowedRoute());
+    }
+
+    public function testIsAllowedRouteWhenNullRoute(): void
+    {
+        $request = Request::create('');
+        $request->attributes->set('_route', 'route_1');
+
+        $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
+            null,
+            null,
+            null,
+            [],
+            [],
+            [],
+            [],
+            false,
+            $request
+        );
+
+        self::assertFalse($maintenanceRestrictionsChecker->isAllowedRoute());
+    }
+
+    public function testIsAllowedRouteWhenEmptyRoute(): void
+    {
+        $request = Request::create('');
+        $request->attributes->set('_route', 'route_1');
+
+        $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
+            null,
+            null,
+            '',
+            [],
+            [],
+            [],
+            [],
+            false,
+            $request
+        );
+
+        self::assertFalse($maintenanceRestrictionsChecker->isAllowedRoute());
+    }
+
+    /**
+     * @dataProvider isAllowedRouteDataProvider
+     */
+    public function testIsAllowedRoute(bool $debug, ?string $requestRoute, bool $expectedResult): void
+    {
+        $request = Request::create('');
+        if (null !== $requestRoute) {
+            $request->attributes->set('_route', $requestRoute);
+        }
+
+        $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
+            null,
+            null,
+            '\w*route\w*',
+            [],
+            [],
+            [],
+            [],
+            $debug,
             $request
         );
 
         self::assertEquals($expectedResult, $maintenanceRestrictionsChecker->isAllowedRoute());
     }
 
-    public function routeFilterDataProvider(): array
+    public function isAllowedRouteDataProvider(): array
     {
         return [
-            'debug, common route' => [
-                'route' => 'route_1',
+            'no route' => [
+                'debug' => false,
+                'requestRoute' => null,
+                'expectedResult' => false
+            ],
+            'no route, debug' => [
+                'debug' => true,
+                'requestRoute' => null,
+                'expectedResult' => false
+            ],
+            'empty route' => [
+                'debug' => false,
+                'requestRoute' => '',
+                'expectedResult' => false
+            ],
+            'empty route, debug' => [
+                'debug' => true,
+                'requestRoute' => '',
+                'expectedResult' => false
+            ],
+            'matching route' => [
+                'debug' => false,
+                'requestRoute' => 'route_1',
                 'expectedResult' => true
             ],
-            'debug, debug route' => [
-                'route' => '_route_started_with_underscore',
+            'matching route, debug' => [
+                'debug' => true,
+                'requestRoute' => 'route_1',
                 'expectedResult' => true
             ],
-            'debug, no route' => [
-                'route' => 'route_1',
+            'not matching route' => [
+                'debug' => false,
+                'requestRoute' => 'another',
+                'expectedResult' => false
+            ],
+            'not matching route, debug' => [
+                'debug' => true,
+                'requestRoute' => 'another',
+                'expectedResult' => false
+            ],
+            'matching debug route' => [
+                'debug' => false,
+                'requestRoute' => '_route_started_with_underscore',
                 'expectedResult' => true
             ],
-            'not debug, common route' => [
-                'route' => 'route_1',
+            'matching debug route, debug' => [
+                'debug' => true,
+                'requestRoute' => '_route_started_with_underscore',
                 'expectedResult' => true
             ],
-            'not debug, debug route' => [
-                'route' => '_route_started_with_underscore',
-                'expectedResult' => true
+            'not matching debug route' => [
+                'debug' => false,
+                'requestRoute' => '_another',
+                'expectedResult' => false
             ],
-            'not debug, no route' => [
-                'route' => 'route_1',
+            'not matching debug route, debug' => [
+                'debug' => true,
+                'requestRoute' => '_another',
                 'expectedResult' => true
             ]
         ];
     }
 
+    public function testIsAllowedQueryWhenNoCurrentRequest(): void
+    {
+        $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
+            null,
+            null,
+            null,
+            [],
+            ['some' => 'attribute'],
+            [],
+            [],
+            false,
+            null
+        );
+
+        self::assertFalse($maintenanceRestrictionsChecker->isAllowedQuery());
+    }
+
     /**
-     * @dataProvider pathFilterDataProvider
+     * @dataProvider isAllowedQueryDataProvider
      */
-    public function testPathFilter(
-        $path,
-        $expectedResult
-    ): void {
-        $request = Request::create('http://test.com/foo?bar=baz');
+    public function testIsAllowedQuery(string $method, ?array $query, bool $expectedResult): void
+    {
+        $request = Request::create('http://test.com/test?foo=&bar=baz-value', $method);
 
         $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
-            $path,
+            null,
             null,
             null,
             [],
-            [],
+            $query,
             [],
             [],
             false,
             $request
         );
 
-        self::assertEquals($expectedResult, $maintenanceRestrictionsChecker->isAllowedPath());
+        self::assertEquals($expectedResult, $maintenanceRestrictionsChecker->isAllowedQuery());
     }
 
-    public function pathFilterDataProvider(): array
+    public function isAllowedQueryDataProvider(): array
     {
         return [
-            'without path' => [
-                'path' => null,
-                'expectedResult' => false,
+            'null query' => [
+                'method' => 'GET',
+                'query' => null,
+                'expected' => false
             ],
-            'empty path' => [
-                'path' => '',
-                'expectedResult' => false,
+            'empty query' => [
+                'method' => 'GET',
+                'query' => [],
+                'expected' => false
             ],
-            'non matching path' => [
-                'path' => '/bar',
-                'expectedResult' => false,
+            'matching query' => [
+                'method' => 'GET',
+                'query' => ['bar' => '[\w-]+val'],
+                'expected' => true
             ],
-            'matching path' => [
-                'path' => '/foo',
-                'expectedResult' => true,
+            'non matching query' => [
+                'method' => 'GET',
+                'query' => ['bar' => '[\w-]+another'],
+                'expected' => false
             ],
+            'empty query attribute value' => [
+                'method' => 'GET',
+                'query' => ['foo' => '[\w-]+val'],
+                'expected' => false
+            ],
+            'no query attribute' => [
+                'method' => 'GET',
+                'query' => ['another' => '[\w-]+val'],
+                'expected' => false
+            ],
+            'empty pattern' => [
+                'method' => 'GET',
+                'query' => ['bar' => ''],
+                'expected' => false
+            ],
+            'empty pattern, empty query attribute value' => [
+                'method' => 'GET',
+                'query' => ['foo' => ''],
+                'expected' => false
+            ],
+            'matching post query' => [
+                'method' => 'POST',
+                'query' => ['bar' => '[\w-]+val'],
+                'expected' => true
+            ]
         ];
     }
 
+    public function testIsAllowedCookieWhenNoCurrentRequest(): void
+    {
+        $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
+            null,
+            null,
+            null,
+            [],
+            [],
+            ['some' => 'attribute'],
+            [],
+            false,
+            null
+        );
+
+        self::assertFalse($maintenanceRestrictionsChecker->isAllowedCookie());
+    }
+
     /**
-     * @dataProvider hostFilterDataProvider
+     * @dataProvider isAllowedCookieDataProvider
      */
-    public function testHostFilter(?string $host, bool $expectedResult): void
+    public function testIsAllowedCookie(?array $cookies, bool $expectedResult): void
+    {
+        $request = Request::create('http://test.com/test', 'GET', [], ['foo' => '', 'bar' => 'baz-value']);
+
+        $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
+            null,
+            null,
+            null,
+            [],
+            [],
+            $cookies,
+            [],
+            false,
+            $request
+        );
+
+        self::assertEquals($expectedResult, $maintenanceRestrictionsChecker->isAllowedCookie());
+    }
+
+    public function isAllowedCookieDataProvider(): array
+    {
+        return [
+            'null cookies' => [
+                'cookies' => null,
+                'expected' => false
+            ],
+            'empty cookies' => [
+                'cookies' => [],
+                'expected' => false
+            ],
+            'matching cookies' => [
+                'cookies' => ['bar' => '[\w-]+val'],
+                'expected' => true
+            ],
+            'non matching cookies' => [
+                'cookies' => ['bar' => '[\w-]+another'],
+                'expected' => false
+            ],
+            'empty cookies attribute value' => [
+                'cookies' => ['foo' => '[\w-]+val'],
+                'expected' => false
+            ],
+            'no cookies attribute' => [
+                'cookies' => ['another' => '[\w-]+val'],
+                'expected' => false
+            ],
+            'empty pattern' => [
+                'cookies' => ['bar' => ''],
+                'expected' => false
+            ],
+            'empty pattern, empty cookies attribute value' => [
+                'cookies' => ['foo' => ''],
+                'expected' => false
+            ]
+        ];
+    }
+
+    public function testIsAllowedHostWhenNoCurrentRequest(): void
+    {
+        $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
+            null,
+            'test.com',
+            null,
+            [],
+            [],
+            [],
+            [],
+            false,
+            null
+        );
+
+        self::assertFalse($maintenanceRestrictionsChecker->isAllowedHost());
+    }
+
+    /**
+     * @dataProvider isAllowedHostDataProvider
+     */
+    public function testIsAllowedHost(?string $host, bool $expectedResult): void
     {
         $request = Request::create('http://test.com/foo?bar=baz');
 
@@ -177,144 +455,169 @@ class MaintenanceRestrictionsCheckerTest extends TestCase
         self::assertEquals($expectedResult, $maintenanceRestrictionsChecker->isAllowedHost());
     }
 
-    public function hostFilterDataProvider(): array
+    public function isAllowedHostDataProvider(): array
     {
         return [
-            'without host' => [
+            'null host' => [
                 'host' => null,
-                'expected' => false,
+                'expected' => false
             ],
             'empty host' => [
                 'host' => '',
-                'expected' => false,
-            ],
-            'non matching host' => [
-                'host' => 'www.google.com',
-                'expected' => false,
+                'expected' => false
             ],
             'matching host' => [
                 'host' => 'test.com',
-                'expected' => true,
+                'expected' => true
             ],
+            'matching host, case insensitive' => [
+                'host' => 'Test.com',
+                'expected' => true
+            ],
+            'non matching host' => [
+                'host' => 'www.google.com',
+                'expected' => false
+            ]
         ];
     }
 
-    /**
-     * @dataProvider queryFilterDataProvider
-     */
-    public function testQueryFilter(Request $request, ?array $query, bool $expectedResult): void
+    public function testIsAllowedAttributesWhenNoCurrentRequest(): void
     {
         $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
             null,
             null,
             null,
             [],
-            $query,
             [],
             [],
+            ['some' => 'attribute'],
+            false,
+            null
+        );
+
+        self::assertFalse($maintenanceRestrictionsChecker->isAllowedAttributes());
+    }
+
+    /**
+     * @dataProvider isAllowedAttributesDataProvider
+     */
+    public function testIsAllowedAttributes(?array $attributes, bool $expectedResult): void
+    {
+        $request = Request::create('http://test.com/test');
+        $request->attributes->set('foo', '');
+        $request->attributes->set('bar', 'baz-value');
+
+        $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
+            null,
+            null,
+            null,
+            [],
+            [],
+            [],
+            $attributes,
             false,
             $request
         );
 
-        self::assertEquals($expectedResult, $maintenanceRestrictionsChecker->isAllowedQuery());
+        self::assertEquals($expectedResult, $maintenanceRestrictionsChecker->isAllowedAttributes());
     }
 
-    public function queryFilterDataProvider(): array
+    public function isAllowedAttributesDataProvider(): array
+    {
+        return [
+            'null attributes' => [
+                'attributes' => null,
+                'expected' => false
+            ],
+            'empty attributes' => [
+                'attributes' => [],
+                'expected' => false
+            ],
+            'matching attributes' => [
+                'attributes' => ['bar' => '[\w-]+val'],
+                'expected' => true
+            ],
+            'non matching attributes' => [
+                'attributes' => ['bar' => '[\w-]+another'],
+                'expected' => false
+            ],
+            'empty attributes attribute value' => [
+                'attributes' => ['foo' => '[\w-]+val'],
+                'expected' => false
+            ],
+            'no attributes attribute' => [
+                'attributes' => ['another' => '[\w-]+val'],
+                'expected' => false
+            ],
+            'empty pattern' => [
+                'attributes' => ['bar' => ''],
+                'expected' => false
+            ],
+            'empty pattern, empty attributes attribute value' => [
+                'attributes' => ['foo' => ''],
+                'expected' => false
+            ]
+        ];
+    }
+
+    public function testIsAllowedPathWhenNoCurrentRequest(): void
+    {
+        $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
+            '/bar',
+            null,
+            null,
+            [],
+            [],
+            [],
+            [],
+            false,
+            null
+        );
+
+        self::assertFalse($maintenanceRestrictionsChecker->isAllowedPath());
+    }
+
+    /**
+     * @dataProvider isAllowedPathDataProvider
+     */
+    public function testIsAllowedPath(?string $path, bool $expectedResult): void
     {
         $request = Request::create('http://test.com/foo?bar=baz');
-        $postRequest = Request::create('http://test.com/foo?bar=baz', 'POST');
-
-        return [
-            'empty query' => [
-                'request' => $request,
-                'query' => [],
-                'expected' => false,
-            ],
-            'non matching query' => [
-                'request' => $request,
-                'query' => ['some' => 'attribute'],
-                'expected' => false,
-            ],
-            'matching query' => [
-                'request' => $request,
-                'query' => ['bar' => 'baz'],
-                'expected' => true,
-            ],
-            'matching post query' => [
-                'request' => $postRequest,
-                'query' => ['bar' => 'baz'],
-                'expected' => true,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider cookieFilterDataProvider
-     */
-    public function testCookieFilter(?array $cookies, bool $expectedResult): void
-    {
-        $request = Request::create('http://test.com/foo', 'GET', [], ['bar' => 'baz']);
 
         $maintenanceRestrictionsChecker = $this->getMaintenanceRestrictionsChecker(
-            '/barfoo',
-            'www.google.com',
+            $path,
             null,
-            ['8.8.4.4'],
-            ['bar' => 'baz'],
-            $cookies,
+            null,
+            [],
+            [],
+            [],
             [],
             false,
             $request
         );
 
-        self::assertEquals($expectedResult, $maintenanceRestrictionsChecker->isAllowedCookie());
+        self::assertEquals($expectedResult, $maintenanceRestrictionsChecker->isAllowedPath());
     }
 
-    public function cookieFilterDataProvider(): array
+    public function isAllowedPathDataProvider(): array
     {
         return [
-            'empty cookies' => [
-                'cookies' => [],
-                'expectedResult' => false,
+            'null path' => [
+                'path' => null,
+                'expectedResult' => false
             ],
-            'non matching cookie (array)' => [
-                'cookies' => ['some' => 'attribute'],
-                'expectedResult' => false,
+            'empty path' => [
+                'path' => '',
+                'expectedResult' => false
             ],
-            'non matching cookie (list)' => [
-                'cookies' => ['attribute'],
-                'expectedResult' => false,
+            'matching path' => [
+                'path' => '/foo',
+                'expectedResult' => true
             ],
-            'matching cookie' => [
-                'cookies' => ['bar' => 'baz'],
-                'expectedResult' => true,
-            ],
+            'non matching path' => [
+                'path' => '/bar',
+                'expectedResult' => false
+            ]
         ];
-    }
-    private function getMaintenanceRestrictionsChecker(
-        ?string $path = null,
-        ?string $host = null,
-        ?string $route = null,
-        array $ips = [],
-        array $query = [],
-        array $cookie = [],
-        array $attributes = [],
-        bool $debug = false,
-        ?Request $request = null,
-    ): MaintenanceRestrictionsChecker {
-        $requestStack = new RequestStack();
-        $requestStack->push($request);
-
-        return new MaintenanceRestrictionsChecker(
-            $requestStack,
-            $path,
-            $host,
-            $route,
-            $ips,
-            $query,
-            $cookie,
-            $attributes,
-            $debug
-        );
     }
 }
