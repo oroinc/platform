@@ -6,6 +6,8 @@
 $oro-breakpoints: (
     'desktop':
         '(min-width: #{$breakpoint-desktop})',
+    'desktop-small':
+        '(min-width: #{$breakpoint-desktop-small})',
     'tablet':
         '(max-width: #{$breakpoint-tablet})',
     'strict-tablet':
@@ -24,9 +26,6 @@ $oro-breakpoints: (
     'mobile':
         '(max-width: #{$breakpoint-mobile})',
     'print': 'print',
-    // Custom breakpoints
-    'product-datagrid-toolbar-narrow':
-        '(max-width: 1280px)',
     'popup-gallery-tablet':
         '(max-height: 730px), (max-width: #{$breakpoint-tablet-small})',
     'mega-menu-wide':
