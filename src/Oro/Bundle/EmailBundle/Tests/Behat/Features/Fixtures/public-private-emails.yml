@@ -10,15 +10,14 @@ Oro\Bundle\UserBundle\Entity\User:
     userCharlie:
         firstName: Charlie
         lastName: Sheen
-        username (unique): charlie.sheen123
+        username: charlie.sheen123
         organization: '@organization'
         organizations: ['@organization']
         userRoles: ['@adminRole']
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email (unique): <email()>
-        password: password
-        salt: salts
+        password: <userPassword(@userCharlie->username)>
 
 OroEntityProxy\OroEmailBundle\EmailAddressProxy:
     charlieAddress:

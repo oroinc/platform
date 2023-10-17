@@ -1287,9 +1287,6 @@ services:
             - '@oro_security.encoder.default'
             - '@oro_distribution.handler.application_status'
 
-    Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider:
-        alias: oro_email.provider.smtp_settings
-
     oro_email.listener.datagrid.user_email_grid_listener:
         class: Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener
         arguments:
@@ -1390,7 +1387,7 @@ services:
          class: 'Oro\Bundle\EmailBundle\Form\Handler\UserEmailConfigHandler'
          public: true
          arguments:
-             - '@doctrine.orm.entity_manager'
+             - '@doctrine'
 
     oro_email.validator.connection_configuration.smtp:
         class: Oro\Bundle\EmailBundle\Validator\Constraints\SmtpConnectionConfigurationValidator

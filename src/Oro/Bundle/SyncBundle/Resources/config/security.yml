@@ -33,7 +33,7 @@ services:
             - { name: kernel.event_listener, event: 'gos_web_socket.client_error', method: onClientError, priority: 100 }
 
     oro_sync.authentication.encoder:
-        class: Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder
+        class: Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher
         arguments:
             - 'sha512'
             - true

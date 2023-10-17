@@ -10,32 +10,34 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $manager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    private SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject $encryptor;
+    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $encryptor;
 
-    private ApplicationState|\PHPUnit\Framework\MockObject\MockObject $applicationState;
+    /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
+    private $applicationState;
 
-    private SmtpSettingsProvider $provider;
+    /** @var SmtpSettingsProvider */
+    private $provider;
 
     protected function setUp(): void
     {
+        $this->configManager = $this->createMock(ConfigManager::class);
         $this->encryptor = $this->createMock(SymmetricCrypterInterface::class);
-        $this->manager = $this->createMock(ConfigManager::class);
         $this->applicationState = $this->createMock(ApplicationState::class);
 
-        $this->provider = new SmtpSettingsProvider($this->manager, $this->encryptor, $this->applicationState);
+        $this->provider = new SmtpSettingsProvider($this->configManager, $this->encryptor, $this->applicationState);
     }
 
     public function testGetSmtpSettingsNotInstalled(): void
     {
-        $this->applicationState
-            ->expects(self::once())
+        $this->applicationState->expects(self::once())
             ->method('isInstalled')
             ->willReturn(false);
 
-        $this->manager
-            ->expects(self::never())
+        $this->configManager->expects(self::never())
             ->method(self::anything());
 
         self::assertEquals(new SmtpSettings(), $this->provider->getSmtpSettings());
@@ -43,29 +45,24 @@ class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSmtpSettings(): void
     {
-        $this->applicationState
-            ->expects(self::once())
+        $this->applicationState->expects(self::once())
             ->method('isInstalled')
             ->willReturn(true);
 
-        $this->encryptor
-            ->expects(self::once())
+        $this->encryptor->expects(self::once())
             ->method('decryptData')
             ->with('pass')
             ->willReturn('pass_decrypted');
 
-        $this->manager
-            ->expects(self::exactly(5))
+        $this->configManager->expects(self::exactly(5))
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['oro_email.smtp_settings_host', false, false, null, 'example.org'],
-                    ['oro_email.smtp_settings_port', false, false, null, 465],
-                    ['oro_email.smtp_settings_encryption', false, false, null, 'ssl'],
-                    ['oro_email.smtp_settings_username', false, false, null, 'user'],
-                    ['oro_email.smtp_settings_password', false, false, null, 'pass'],
-                ]
-            );
+            ->willReturnMap([
+                ['oro_email.smtp_settings_host', false, false, null, 'example.org'],
+                ['oro_email.smtp_settings_port', false, false, null, 465],
+                ['oro_email.smtp_settings_encryption', false, false, null, 'ssl'],
+                ['oro_email.smtp_settings_username', false, false, null, 'user'],
+                ['oro_email.smtp_settings_password', false, false, null, 'pass'],
+            ]);
 
         $smtpSettings = $this->provider->getSmtpSettings();
 
@@ -78,30 +75,25 @@ class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSmtpSettingsWithScopeIdentifier(): void
     {
-        $this->applicationState
-            ->expects(self::once())
+        $this->applicationState->expects(self::once())
             ->method('isInstalled')
             ->willReturn(true);
 
-        $this->encryptor
-            ->expects(self::once())
+        $this->encryptor->expects(self::once())
             ->method('decryptData')
             ->with('pass')
             ->willReturn('pass_decrypted');
 
         $scopeIdentifier = new \stdClass();
-        $this->manager
-            ->expects(self::exactly(5))
+        $this->configManager->expects(self::exactly(5))
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['oro_email.smtp_settings_host', false, false, $scopeIdentifier, 'example.org'],
-                    ['oro_email.smtp_settings_port', false, false, $scopeIdentifier, 465],
-                    ['oro_email.smtp_settings_encryption', false, false, $scopeIdentifier, 'ssl'],
-                    ['oro_email.smtp_settings_username', false, false, $scopeIdentifier, 'user'],
-                    ['oro_email.smtp_settings_password', false, false, $scopeIdentifier, 'pass'],
-                ]
-            );
+            ->willReturnMap([
+                ['oro_email.smtp_settings_host', false, false, $scopeIdentifier, 'example.org'],
+                ['oro_email.smtp_settings_port', false, false, $scopeIdentifier, 465],
+                ['oro_email.smtp_settings_encryption', false, false, $scopeIdentifier, 'ssl'],
+                ['oro_email.smtp_settings_username', false, false, $scopeIdentifier, 'user'],
+                ['oro_email.smtp_settings_password', false, false, $scopeIdentifier, 'pass'],
+            ]);
 
         $smtpSettings = $this->provider->getSmtpSettings($scopeIdentifier);
 

@@ -5,87 +5,68 @@ namespace Oro\Bundle\ConfigBundle\Event;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * The event that is fired when a configuration option value is retrieved.
+ * It allows to make an additional transformation of the configuration option value.
+ */
 class ConfigGetEvent extends Event
 {
-    const NAME = 'oro_config.get';
+    public const NAME = 'oro_config.get';
 
-    /** @var ConfigManager */
-    protected $configManager;
+    private ConfigManager $configManager;
+    private string $key;
+    private mixed $value;
+    private bool $full;
+    private string $scope;
+    private int $scopeId;
 
-    /** @var string */
-    protected $key;
-
-    /** @var array|string */
-    protected $value;
-
-    /** @var bool */
-    protected $full;
-
-    /**
-     * @var int
-     */
-    protected $scopeId;
-
-    /**
-     * @param ConfigManager $configManager
-     * @param string $key
-     * @param array|string $value
-     * @param bool $full
-     * @param int $scopeId
-     */
-    public function __construct(ConfigManager $configManager, $key, $value, $full, $scopeId)
-    {
+    public function __construct(
+        ConfigManager $configManager,
+        string $key,
+        mixed $value,
+        bool $full,
+        string $scope,
+        int $scopeId
+    ) {
         $this->configManager = $configManager;
         $this->key = $key;
         $this->value = $value;
         $this->full = $full;
+        $this->scope = $scope;
         $this->scopeId = $scopeId;
     }
 
-    /**
-     * @return ConfigManager
-     */
-    public function getConfigManager()
+    public function getConfigManager(): ConfigManager
     {
         return $this->configManager;
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
 
-    /**
-     * @return array|string
-     */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
 
-    /**
-     * @param array|string $value
-     */
-    public function setValue($value)
+    public function setValue(mixed $value): void
     {
         $this->value = $value;
     }
 
-    /**
-     * @return bool
-     */
-    public function isFull()
+    public function isFull(): bool
     {
         return $this->full;
     }
 
-    /**
-     * @return int
-     */
-    public function getScopeId()
+    public function getScope(): string
+    {
+        return $this->scope;
+    }
+
+    public function getScopeId(): int
     {
         return $this->scopeId;
     }

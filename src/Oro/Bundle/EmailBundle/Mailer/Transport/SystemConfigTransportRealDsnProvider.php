@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer\Transport;
 
-use Oro\Bundle\EmailBundle\Provider\AbstractSmtpSettingsProvider;
+use Oro\Bundle\EmailBundle\Provider\SmtpSettingsProviderInterface;
 use Symfony\Component\Mailer\Transport\Dsn;
 
 /**
@@ -13,12 +13,11 @@ use Symfony\Component\Mailer\Transport\Dsn;
  */
 class SystemConfigTransportRealDsnProvider
 {
-    private AbstractSmtpSettingsProvider $smtpSettingsProvider;
-
+    private SmtpSettingsProviderInterface $smtpSettingsProvider;
     private DsnFromSmtpSettingsFactory $dsnFromSmtpSettingsFactory;
 
     public function __construct(
-        AbstractSmtpSettingsProvider $smtpSettingsProvider,
+        SmtpSettingsProviderInterface $smtpSettingsProvider,
         DsnFromSmtpSettingsFactory $dsnFromSmtpSettingsFactory
     ) {
         $this->smtpSettingsProvider = $smtpSettingsProvider;

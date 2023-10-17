@@ -1,0 +1,7 @@
+{% set parts = formFieldPath|split('.') %}
+{% set form = parentContext %}
+{% for part in parts %}
+    {% set form = attribute(form, part) %}
+{% endfor %}
+
+{{ form_row(form) }}

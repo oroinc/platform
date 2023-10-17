@@ -4,87 +4,55 @@ namespace Oro\Bundle\EmailBundle\Form\Handler;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
 use Oro\Bundle\EmailBundle\Event\SmtpSettingsSaved;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Dispatches {@see SmtpSettingsSaved} event when email SMTP settings are changed.
+ */
 class EmailConfigurationHandler
 {
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var ConfigChangeSet $changeSet */
-    protected $changeSet;
-
-    /** @var FormInterface $form */
-    protected $form;
+    private EventDispatcherInterface $dispatcher;
 
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    public function process(ConfigManager $manager, ConfigChangeSet $changeSet, FormInterface $form)
+    public function process(ConfigManager $manager, ConfigChangeSet $changeSet, FormInterface $form): void
     {
-        $this->configManager = $manager;
-        $this->changeSet = $changeSet;
-        $this->form = $form;
-
-        $this->processSmtpSettings();
-    }
-
-    protected function processSmtpSettings()
-    {
-        if (!$this->changeSet->isChanged($this->getConfigKey(Config::KEY_SMTP_SETTINGS_HOST))
-            && !$this->changeSet->isChanged($this->getConfigKey(Config::KEY_SMTP_SETTINGS_PORT))
-            && !$this->changeSet->isChanged($this->getConfigKey(Config::KEY_SMTP_SETTINGS_ENC))
-            && !$this->changeSet->isChanged($this->getConfigKey(Config::KEY_SMTP_SETTINGS_USER))
-            && !$this->changeSet->isChanged($this->getConfigKey(Config::KEY_SMTP_SETTINGS_PASS))
+        if (!$changeSet->isChanged('oro_email.smtp_settings_host')
+            && !$changeSet->isChanged('oro_email.smtp_settings_port')
+            && !$changeSet->isChanged('oro_email.smtp_settings_encryption')
+            && !$changeSet->isChanged('oro_email.smtp_settings_username')
+            && !$changeSet->isChanged('oro_email.smtp_settings_password')
         ) {
             return;
         }
 
         if ($this->dispatcher->hasListeners(SmtpSettingsSaved::NAME)) {
-            $smtpSettings = new SmtpSettings(
-                $this->getFormFieldValue(Config::KEY_SMTP_SETTINGS_HOST),
-                $this->getFormFieldValue(Config::KEY_SMTP_SETTINGS_PORT),
-                $this->getFormFieldValue(Config::KEY_SMTP_SETTINGS_ENC),
-                $this->getFormFieldValue(Config::KEY_SMTP_SETTINGS_USER),
-                $this->getFormFieldValue(Config::KEY_SMTP_SETTINGS_PASS)
+            $this->dispatcher->dispatch(
+                new SmtpSettingsSaved(new SmtpSettings(
+                    $this->getFormFieldValue($form, 'smtp_settings_host'),
+                    $this->getFormFieldValue($form, 'smtp_settings_port'),
+                    $this->getFormFieldValue($form, 'smtp_settings_encryption'),
+                    $this->getFormFieldValue($form, 'smtp_settings_username'),
+                    $this->getFormFieldValue($form, 'smtp_settings_password')
+                )),
+                SmtpSettingsSaved::NAME
             );
-
-            $this->dispatcher->dispatch(new SmtpSettingsSaved($smtpSettings), SmtpSettingsSaved::NAME);
         }
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    protected function getConfigKey($name)
+    private function getFormFieldValue(FormInterface $form, string $field): mixed
     {
-        return Config::getConfigKeyByName($name);
-    }
-
-    /**
-     * @param string $field
-     *
-     * @return mixed
-     */
-    protected function getFormFieldValue($field)
-    {
-        $fieldName = Config::getConfigKeyByName($field, ConfigManager::SECTION_VIEW_SEPARATOR);
-
-        if (!$this->form->has($fieldName)) {
+        $fieldName = 'oro_email' . ConfigManager::SECTION_VIEW_SEPARATOR . $field;
+        if (!$form->has($fieldName)) {
             return null;
         }
 
-        return $this->form->get($fieldName)->getData()['value'];
+        return $form->get($fieldName)->getData()['value'];
     }
 }

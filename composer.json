@@ -155,7 +155,7 @@
         "symfony/var-exporter": "~5.4.17",
         "symfony/web-profiler-bundle": "~5.4.17",
         "friendsofphp/php-cs-fixer": "~3.13.1",
-        "oro/twig-inspector": "1.0.*"
+        "oro/twig-inspector": "1.1.*"
     },
     "provide": {
         "psr/http-factory-implementation": "^1.0"
@@ -207,7 +207,7 @@
             "@oroinc/bootstrap": "4.3.1-oro2",
             "popper.js": "1.16.1",
             "asap": "2.0.6",
-            "@oroinc/slick-carousel": "1.7.1-oro1",
+            "@oroinc/slick-carousel": "1.7.1-oro3",
             "xregexp": "^5.1.0",
             "scriptjs": "2.5.9",
             "focus-visible": "5.2.0",

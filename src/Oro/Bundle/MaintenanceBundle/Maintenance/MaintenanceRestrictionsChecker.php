@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class for checking is allow client access to app in maintenance mode
+ * Checks if an access to the application is granted in the maintenance mode.
  */
 class MaintenanceRestrictionsChecker
 {
@@ -25,49 +25,65 @@ class MaintenanceRestrictionsChecker
 
     public function isAllowedIp(): bool
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $requestedIp = $request?->getClientIp();
-
-        $valid = false;
-
-        if (is_array($this->ips)) {
-            $i = 0;
-            while ($i < count($this->ips) && !$valid) {
-                $valid = IpUtils::checkIp($requestedIp, $this->ips[$i]);
-                $i++;
-            }
-        }
-
-        return $valid;
-    }
-
-    public function isAllowedRoute(): bool
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        $route = $request?->get('_route');
-
-        if (!$route) {
+        if (!$this->ips) {
             return false;
         }
 
-        if ($this->route &&
-            (preg_match('{' . $this->route . '}', $route)) ||
-            ($this->debug && '_' === $route[0])) {
-            return true;
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return false;
+        }
+
+        $requestedIp = $request->getClientIp();
+        foreach ($this->ips as $ip) {
+            if (IpUtils::checkIp($requestedIp, $ip)) {
+                return true;
+            }
         }
 
         return false;
     }
 
+    public function isAllowedRoute(): bool
+    {
+        if (!$this->route) {
+            return false;
+        }
+
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return false;
+        }
+
+        $route = $request->get('_route');
+        if (!$route) {
+            return false;
+        }
+
+        return (preg_match('{' . $this->route . '}', $route)) || ($this->debug && '_' === $route[0]);
+    }
+
     public function isAllowedQuery(): bool
     {
-        $request = $this->requestStack->getCurrentRequest();
+        if (!$this->query) {
+            return false;
+        }
 
-        if (is_array($this->query)) {
-            foreach ($this->query as $key => $pattern) {
-                if (!empty($pattern) && preg_match('{' . $pattern . '}', $request?->get($key))) {
-                    return true;
-                }
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return false;
+        }
+
+        foreach ($this->query as $key => $pattern) {
+            if (!$pattern) {
+                continue;
+            }
+            $val = $request->get($key);
+            if (!$val) {
+                continue;
+            }
+            if (preg_match('{' . $pattern . '}', $val)) {
+                return true;
             }
         }
 
@@ -76,13 +92,25 @@ class MaintenanceRestrictionsChecker
 
     public function isAllowedCookie(): bool
     {
-        $request = $this->requestStack->getCurrentRequest();
+        if (!$this->cookie) {
+            return false;
+        }
 
-        if (is_array($this->cookie)) {
-            foreach ($this->cookie as $key => $pattern) {
-                if (!empty($pattern) && preg_match('{' . $pattern . '}', $request?->cookies->get($key))) {
-                    return true;
-                }
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return false;
+        }
+
+        foreach ($this->cookie as $key => $pattern) {
+            if (!$pattern) {
+                continue;
+            }
+            $val = $request->cookies->get($key);
+            if (!$val) {
+                continue;
+            }
+            if (preg_match('{' . $pattern . '}', $val)) {
+                return true;
             }
         }
 
@@ -91,20 +119,39 @@ class MaintenanceRestrictionsChecker
 
     public function isAllowedHost(): bool
     {
-        $request = $this->requestStack->getCurrentRequest();
+        if (!$this->host) {
+            return false;
+        }
 
-        return !empty($this->host) && preg_match('{' . $this->host . '}i', $request?->getHost());
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return false;
+        }
+
+        return preg_match('{' . $this->host . '}i', $request->getHost());
     }
 
     public function isAllowedAttributes(): bool
     {
-        $request = $this->requestStack->getCurrentRequest();
+        if (!$this->attributes) {
+            return false;
+        }
 
-        if (is_array($this->attributes)) {
-            foreach ($this->attributes as $key => $pattern) {
-                if (!empty($pattern) && preg_match('{' . $pattern . '}', $request?->attributes->get($key))) {
-                    return true;
-                }
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return false;
+        }
+
+        foreach ($this->attributes as $key => $pattern) {
+            if (!$pattern) {
+                continue;
+            }
+            $val = $request->attributes->get($key);
+            if (!$val) {
+                continue;
+            }
+            if (preg_match('{' . $pattern . '}', $val)) {
+                return true;
             }
         }
 
@@ -113,10 +160,16 @@ class MaintenanceRestrictionsChecker
 
     public function isAllowedPath(): bool
     {
-        $request = $this->requestStack->getCurrentRequest();
+        if (!$this->path) {
+            return false;
+        }
 
-        return !empty($this->path) &&
-            preg_match('{' . $this->path . '}', rawurldecode($request?->getPathInfo()));
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return false;
+        }
+
+        return preg_match('{' . $this->path . '}', rawurldecode($request->getPathInfo()));
     }
 
     public function isAllowed(): bool

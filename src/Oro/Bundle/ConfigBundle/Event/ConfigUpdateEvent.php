@@ -3,108 +3,70 @@
 namespace Oro\Bundle\ConfigBundle\Event;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
-use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * The event that is fired after system configuration form data are saved.
+ */
 class ConfigUpdateEvent extends Event
 {
-    const EVENT_NAME = 'oro_config.update_after';
+    public const EVENT_NAME = 'oro_config.update_after';
 
-    /** @var ConfigChangeSet */
-    protected $changeSet = [];
+    private ConfigChangeSet $changeSet;
+    private string $scope;
+    private int $scopeId;
 
-    /**
-     * @var string|null
-     */
-    protected $scope;
-
-    /**
-     * @var int|null
-     */
-    protected $scopeId;
-
-    /**
-     * @param ConfigChangeSet|array $changeSet
-     * @param string|null           $scope
-     * @param int|null              $scopeId
-     */
-    public function __construct($changeSet, $scope = null, $scopeId = null)
+    public function __construct(array $changeSet, string $scope, int $scopeId)
     {
-        if ($changeSet instanceof ConfigChangeSet) {
-            $this->changeSet = $changeSet;
-        } elseif (is_array($changeSet)) {
-            $this->changeSet = new ConfigChangeSet($changeSet);
-        } else {
-            throw new UnexpectedTypeException(
-                $changeSet,
-                'Oro\Bundle\ConfigBundle\Config\ConfigChangeSet or array'
-            );
-        }
-
-        $this->scope   = $scope;
+        $this->changeSet = new ConfigChangeSet($changeSet);
+        $this->scope = $scope;
         $this->scopeId = $scopeId;
     }
 
     /**
-     * Returns config change set
+     * Gets changed configuration values.
      *
      * @return array [name => ['new' => value, 'old' => value], ...]
      */
-    public function getChangeSet()
+    public function getChangeSet(): array
     {
         return $this->changeSet->getChanges();
     }
 
     /**
-     * Checks whenever configuration value is changed
-     *
-     * @param string $name
-     *
-     * @return bool
+     * Checks whenever configuration value is changed.
      */
-    public function isChanged($name)
+    public function isChanged(string $name): bool
     {
         return $this->changeSet->isChanged($name);
     }
 
     /**
-     * Retrieve new value from change set
+     * Gets a new value for the given configuration option.
      *
-     * @param string $name
-     *
-     * @return mixed
-     * @throws \LogicException
+     * @throws \LogicException when the given configuration option was not changed
      */
-    public function getNewValue($name)
+    public function getNewValue(string $name): mixed
     {
         return $this->changeSet->getNewValue($name);
     }
 
     /**
-     * Retrieve old value from change set
+     * Gets an old value for the given configuration option.
      *
-     * @param string $name
-     *
-     * @return mixed
-     * @throws \LogicException
+     * @throws \LogicException when the given configuration option was not changed
      */
-    public function getOldValue($name)
+    public function getOldValue(string $name): mixed
     {
         return $this->changeSet->getOldValue($name);
     }
 
-    /**
-     * @return null|string
-     */
-    public function getScope()
+    public function getScope(): string
     {
         return $this->scope;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getScopeId()
+    public function getScopeId(): int
     {
         return $this->scopeId;
     }
