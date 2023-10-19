@@ -19,6 +19,11 @@ class HwiConfigurationPass implements CompilerPassInterface
     {
         $container->getDefinition('hwi_oauth.authentication.provider.oauth')
             ->setClass(OAuthProvider::class)
+            ->setArguments([
+                new Reference('oro_sso.oauth_user_provider'),
+                new Reference('hwi_oauth.resource_ownermap.main'),
+                new Reference('security.user_checker'),
+            ])
             ->addMethodCall('setTokenFactory', [new Reference('oro_sso.token.factory.oauth')])
             ->addMethodCall(
                 'setOrganizationGuesser',

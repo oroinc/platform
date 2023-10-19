@@ -73,10 +73,7 @@ class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
 
     protected function createMetaPropertyMetadata(string $fieldName): MetaPropertyMetadata
     {
-        $fieldMetadata = new MetaPropertyMetadata();
-        $fieldMetadata->setName($fieldName);
-
-        return $fieldMetadata;
+        return new MetaPropertyMetadata($fieldName);
     }
 
     protected function createFieldMetadata(string $fieldName): FieldMetadata

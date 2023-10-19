@@ -34,10 +34,33 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
     public function testTargetAction()
     {
         self::assertNull($this->context->getTargetAction());
+        self::assertFalse($this->context->has('targetAction'));
 
         $this->context->setTargetAction('test');
         self::assertEquals('test', $this->context->getTargetAction());
+        self::assertTrue($this->context->has('targetAction'));
         self::assertEquals('test', $this->context->get('targetAction'));
+
+        $this->context->setTargetAction(null);
+        self::assertNull($this->context->getTargetAction());
+        self::assertFalse($this->context->has('targetAction'));
+    }
+
+    public function testParentAction()
+    {
+        self::assertNull($this->context->getParentAction());
+        self::assertTrue($this->context->has('parentAction'));
+        self::assertSame('', $this->context->get('parentAction'));
+
+        $this->context->setParentAction('test');
+        self::assertEquals('test', $this->context->getParentAction());
+        self::assertTrue($this->context->has('parentAction'));
+        self::assertEquals('test', $this->context->get('parentAction'));
+
+        $this->context->setParentAction(null);
+        self::assertNull($this->context->getParentAction());
+        self::assertTrue($this->context->has('parentAction'));
+        self::assertSame('', $this->context->get('parentAction'));
     }
 
     public function testConfig()

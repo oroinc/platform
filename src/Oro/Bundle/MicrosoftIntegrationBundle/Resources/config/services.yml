@@ -5,3 +5,6 @@ services:
             - '@oro_config.global'
         tags:
             - { name: form.type }
+
+    oro_microsoft_integration.resource_owner.factory:
+        class: Oro\Bundle\MicrosoftIntegrationBundle\OAuth\Office365ResourceOwnerFactory

@@ -7,6 +7,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -42,10 +43,14 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
         $user1 = $this->createUser($userManager, $organization, 'Richard', 'Bradley');
         $user2 = $this->createUser($userManager, $organization, 'Brenda', 'Brock');
         $user3 = $this->createUser($userManager, $organization, 'Shawn', 'Bryson');
+        $user4 = $this->createUser($userManager, $organization, 'Theodore', 'Knight');
+        $user5 = $this->createUser($userManager, $organization, 'Walter', 'Werner');
 
         $this->setReference('user_1', $user1);
         $this->setReference('user_2', $user2);
         $this->setReference('user_3', $user3);
+        $this->setReference('user_4', $user4);
+        $this->setReference('user_5', $user5);
 
         $email1 = $this->createEmail(
             $emailEntityBuilder,
@@ -60,6 +65,19 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
         $email1->addActivityTarget($user2);
         $email1->addActivityTarget($user3);
 
+        $email1_1 = $this->createEmail(
+            $emailEntityBuilder,
+            $emailOriginHelper,
+            $organization,
+            'Re: Test Email 1',
+            'email1_1@orocrm-pro.func-test',
+            'test2@example.com',
+            'test1@example.com'
+        );
+        $email1_1->addActivityTarget($user1);
+        $email1_1->addActivityTarget($user2);
+        $email1_1->addActivityTarget($user5);
+
         $email2 = $this->createEmail(
             $emailEntityBuilder,
             $emailOriginHelper,
@@ -72,11 +90,18 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
             'test4@example.com'
         );
         $email2->addActivityTarget($user1);
+        $email2->addActivityTarget($user4);
+
+        $thread1 = new EmailThread();
+        $email1->setThread($thread1);
+        $email1_1->setThread($thread1);
+        $manager->persist($thread1);
 
         $emailEntityBuilder->getBatch()->persist($manager);
         $manager->flush();
 
         $this->setReference('email_1', $email1);
+        $this->setReference('email_1_1', $email1_1);
         $this->setReference('email_2', $email2);
     }
 

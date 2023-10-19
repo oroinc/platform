@@ -32,6 +32,7 @@ class OAuthTokenTest extends \PHPUnit\Framework\TestCase
 
         $token = new OAuthToken($accessToken, [$role]);
         $token->setOrganization($organization);
+        $token->setResourceOwnerName('test');
 
         /** @var OAuthToken $newToken */
         $newToken = unserialize(serialize($token));

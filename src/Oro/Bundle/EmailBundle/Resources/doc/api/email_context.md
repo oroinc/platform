@@ -4,7 +4,7 @@
 
 ### get_list
 
-Retrieve a collection of records that can be added to the context of a specific email entity
+Retrieve a collection of records that can be added to the context of a specific email entities
 as well as records that are already added to the context.
 
 {@request:json_api}
@@ -37,7 +37,7 @@ An entity associated with an email context record.
 
 ### isContext
 
-Indicates whether a record is already added to the context of the email entity.
+Indicates whether a record is already added to the context of an email entity.
 
 ## FILTERS
 
@@ -51,7 +51,7 @@ A string to be searched.
 
 ### messageId
 
-The value of the 'Message-ID' header of the email message to be searched. It is required filter.
+The value of the 'Message-ID' header of an email message to be searched. Several values can be specified to search contexts of several email messages. It is required filter.
 
 ### searchText
 
@@ -59,15 +59,15 @@ A string to be searched. It cannot be specified together with 'from', 'to', 'cc'
 
 ### from
 
-The email address of the email message author.
+The email address of an email message author.
 
 ### to
 
-The email address(es) of the primary recipient(s) of the email message.
+The email address(es) of the primary recipient(s) of an email message.
 
 ### cc
 
-The email address(es) of other recipient(s) of the email message.
+The email address(es) of other recipient(s) of an email message.
 
 ### excludeCurrentUser
 

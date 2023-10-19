@@ -26,14 +26,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EmailModelBuilder */
-    private $emailModelBuilder;
-
     /** @var EmailModelBuilderHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $helper;
 
-    /** @var RequestStack */
-    private $requestStack;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
@@ -41,32 +38,35 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailActivityListProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $activityListProvider;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
     /** @var EmailAttachmentProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $emailAttachmentProvider;
 
-    /** @var Email|\PHPUnit\Framework\MockObject\MockObject */
-    private $email;
+    /** @var RequestStack */
+    private $requestStack;
 
     /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $htmlTagHelper;
 
-    /** @var FileConstraintsProvider */
+    /** @var FileConstraintsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fileConstraintsProvider;
+
+    /** @var Email|\PHPUnit\Framework\MockObject\MockObject */
+    private $email;
+
+    /** @var EmailModelBuilder */
+    private $emailModelBuilder;
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
         $this->helper = $this->createMock(EmailModelBuilderHelper::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->activityListProvider = $this->createMock(EmailActivityListProvider::class);
         $this->emailAttachmentProvider = $this->createMock(EmailAttachmentProvider::class);
+        $this->requestStack = new RequestStack();
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $this->fileConstraintsProvider = $this->createMock(FileConstraintsProvider::class);
         $this->email = $this->createMock(Email::class);
-        $this->requestStack = new RequestStack();
 
         $this->emailAttachmentProvider->expects($this->any())
             ->method('getThreadAttachments')
@@ -89,25 +89,63 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @dataProvider createEmailModelProvider
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function testCreateEmailModel(
-        ?string $entityClass,
-        ?int $entityId,
-        ?string $from,
-        ?string $to,
-        ?string $subject,
-        int $helperDecodeClassNameCalls,
-        int $emGetRepositoryCalls,
-        int $helperPreciseFullEmailAddressCalls,
-        int $helperGetUserCalls,
-        int $helperBuildFullEmailAddress
-    ) {
+    public function testCreateEmailModelWithEmptyData()
+    {
+        $request = new Request();
+        $request->setMethod('GET');
+        $this->requestStack->push($request);
+
+        $this->helper->expects($this->never())
+            ->method('decodeClassName');
+
+        $this->entityManager->expects($this->never())
+            ->method('getRepository');
+
+        $this->helper->expects($this->never())
+            ->method('preciseFullEmailAddress');
+
+        $this->helper->expects($this->once())
+            ->method('getUser')
+            ->willReturn($this->createMock(User::class));
+
+        $this->helper->expects($this->once())
+            ->method('buildFullEmailAddress');
+
+        $this->helper->expects(self::never())
+            ->method('getTargetEntity');
+
+        $this->configManager->expects($this->once())
+            ->method('get')
+            ->with('oro_email.signature')
+            ->willReturn('Signature');
+        $this->htmlTagHelper->expects($this->once())
+            ->method('sanitize')
+            ->with('Signature')
+            ->willReturn('Sanitized Signature');
+
         $emailModel = new EmailModel();
+        $result = $this->emailModelBuilder->createEmailModel($emailModel);
+
+        $this->assertSame($emailModel, $result);
+        $this->assertNull($result->getEntityClass());
+        $this->assertNull($result->getEntityId());
+        $this->assertNull($result->getSubject());
+        $this->assertNull($result->getFrom());
+        $this->assertSame([], $result->getTo());
+        $this->assertSame([], $result->getCc());
+        $this->assertSame([], $result->getBcc());
+        $this->assertEquals('Sanitized Signature', $result->getSignature());
+        $this->assertSame([], array_values($result->getAttachmentsAvailable()));
+        $this->assertCount(0, $result->getContexts());
+    }
+
+    public function testCreateEmailModel()
+    {
+        $entityClass = User::class;
+        $entityId = 1;
+        $from = 'from@example.com';
+        $to = 'to@example.com';
+        $subject = 'Subject';
 
         $request = new Request();
         $request->setMethod('GET');
@@ -120,63 +158,58 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $request->query->set('subject', $subject);
         $this->requestStack->push($request);
 
-        $this->helper->expects($this->exactly($helperDecodeClassNameCalls))
+        $this->helper->expects($this->once())
             ->method('decodeClassName')
             ->willReturn($entityClass);
 
         $repository = $this->createMock(EntityRepository::class);
-        $this->entityManager->expects($this->exactly($emGetRepositoryCalls))
+        $this->entityManager->expects($this->once())
             ->method('getRepository')
             ->willReturn($repository);
-        $expectedAttachments = [];
-        if ($emGetRepositoryCalls) {
-            $maxSize = 10 * AttachmentConfiguration::BYTES_MULTIPLIER;
-            $allowedMimeTypes = ['image/jpeg'];
-            $bigAttachment = new EmailAttachment();
-            $bigAttachment->setFileName('big.jpg');
-            $bigAttachment->setMimeType('image/jpeg');
-            $bigAttachment->setFileSize(20 * AttachmentConfiguration::BYTES_MULTIPLIER);
-            $unsupportedMimeTypeAttachment = new EmailAttachment();
-            $unsupportedMimeTypeAttachment->setFileName('image.webp');
-            $unsupportedMimeTypeAttachment->setMimeType('image/webp');
-            $unsupportedMimeTypeAttachment->setFileSize(2 * AttachmentConfiguration::BYTES_MULTIPLIER);
-            $allowedAttachment = new EmailAttachment();
-            $allowedAttachment->setFileName('image.jpg');
-            $allowedAttachment->setMimeType('image/jpeg');
-            $allowedAttachment->setFileSize(2 * AttachmentConfiguration::BYTES_MULTIPLIER);
-            $attachments = [
-                $bigAttachment,
-                $unsupportedMimeTypeAttachment,
-                $allowedAttachment
-            ];
-            $expectedAttachments = [$allowedAttachment];
-            $scopeEntity = new User();
-            $repository->expects($this->once())
-                ->method('find')
-                ->with($entityId)
-                ->willReturn($scopeEntity);
-            $this->emailAttachmentProvider->expects($this->once())
-                ->method('getScopeEntityAttachments')
-                ->with($scopeEntity)
-                ->willReturn($attachments);
-            $this->fileConstraintsProvider->expects($this->any())
-                ->method('getMaxSizeByConfigPath')
-                ->with('oro_email.attachment_max_size')
-                ->willReturn($maxSize);
-            $this->fileConstraintsProvider->expects($this->any())
-                ->method('getMimeTypes')
-                ->willReturn($allowedMimeTypes);
-        }
 
-        $this->helper->expects($this->exactly($helperPreciseFullEmailAddressCalls))
+        $bigAttachment = new EmailAttachment();
+        $bigAttachment->setFileName('big.jpg');
+        $bigAttachment->setMimeType('image/jpeg');
+        $bigAttachment->setFileSize(20 * AttachmentConfiguration::BYTES_MULTIPLIER);
+        $unsupportedMimeTypeAttachment = new EmailAttachment();
+        $unsupportedMimeTypeAttachment->setFileName('image.webp');
+        $unsupportedMimeTypeAttachment->setMimeType('image/webp');
+        $unsupportedMimeTypeAttachment->setFileSize(2 * AttachmentConfiguration::BYTES_MULTIPLIER);
+        $allowedAttachment = new EmailAttachment();
+        $allowedAttachment->setFileName('image.jpg');
+        $allowedAttachment->setMimeType('image/jpeg');
+        $allowedAttachment->setFileSize(2 * AttachmentConfiguration::BYTES_MULTIPLIER);
+        $scopeEntity = new User();
+        $repository->expects($this->once())
+            ->method('find')
+            ->with($entityId)
+            ->willReturn($scopeEntity);
+        $this->emailAttachmentProvider->expects($this->once())
+            ->method('getScopeEntityAttachments')
+            ->with($scopeEntity)
+            ->willReturn([$bigAttachment, $unsupportedMimeTypeAttachment, $allowedAttachment]);
+        $this->fileConstraintsProvider->expects($this->any())
+            ->method('getMaxSizeByConfigPath')
+            ->with('oro_email.attachment_max_size')
+            ->willReturn(10 * AttachmentConfiguration::BYTES_MULTIPLIER);
+        $this->fileConstraintsProvider->expects($this->any())
+            ->method('getMimeTypes')
+            ->willReturn(['image/jpeg']);
+
+        $this->helper->expects($this->exactly(4))
             ->method('preciseFullEmailAddress');
 
-        $this->helper->expects($this->exactly($helperGetUserCalls))
-            ->method('getUser')
-            ->willReturn($this->createMock(User::class));
+        $this->helper->expects($this->never())
+            ->method('getUser');
 
-        $this->helper->expects($this->exactly($helperBuildFullEmailAddress))
+        $this->helper->expects($this->never())
             ->method('buildFullEmailAddress');
+
+        $contextEntity = $this->createMock($entityClass);
+        $this->helper->expects(self::once())
+            ->method('getTargetEntity')
+            ->with($entityClass, $entityId)
+            ->willReturn($contextEntity);
 
         $this->configManager->expects($this->once())
             ->method('get')
@@ -187,50 +220,116 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
             ->with('Signature')
             ->willReturn('Sanitized Signature');
 
+        $emailModel = new EmailModel();
         $result = $this->emailModelBuilder->createEmailModel($emailModel);
-        $this->assertEquals($emailModel, $result);
 
+        $this->assertSame($emailModel, $result);
         $this->assertEquals($entityClass, $result->getEntityClass());
         $this->assertEquals($entityId, $result->getEntityId());
         $this->assertEquals($subject, $result->getSubject());
         $this->assertEquals($from, $result->getFrom());
-
-        $expected = $to ? [$to] : [];
-        $this->assertEquals($expected, $result->getTo());
-        $this->assertEquals($expected, $result->getCc());
-        $this->assertEquals($expected, $result->getBcc());
+        $this->assertEquals([$to], $result->getTo());
+        $this->assertEquals([$to], $result->getCc());
+        $this->assertEquals([$to], $result->getBcc());
         $this->assertEquals('Sanitized Signature', $result->getSignature());
-        $this->assertEquals($expectedAttachments, array_values($result->getAttachmentsAvailable()));
+        $this->assertEquals([$allowedAttachment], array_values($result->getAttachmentsAvailable()));
+        $this->assertCount(1, $result->getContexts());
+        $this->assertSame($contextEntity, $result->getContexts()->first());
     }
 
-    public function createEmailModelProvider(): array
+    public function testCreateEmailModelWhenEmptyContextsRequested()
     {
-        return [
-            [
-                'entityClass' => User::class,
-                'entityId' => 1,
-                'from' => 'from@example.com',
-                'to' => 'to@example.com',
-                'subject' => 'Subject',
-                'helperDecodeClassNameCalls' => 1,
-                'emGetRepositoryCalls' => 1,
-                'helperPreciseFullEmailAddressCalls' => 4,
-                'helperGetUserCalls' => 0,
-                'helperBuildFullEmailAddress' => 0,
-            ],
-            [
-                'entityClass' => null,
-                'entityId' => null,
-                'from' => null,
-                'to' => null,
-                'subject' => null,
-                'helperDecodeClassNameCalls' => 0,
-                'emGetRepositoryCalls' => 0,
-                'helperPreciseFullEmailAddressCalls' => 0,
-                'helperGetUserCalls' => 1,
-                'helperBuildFullEmailAddress' => 1,
-            ],
-        ];
+        $entityClass = User::class;
+        $entityId = 1;
+        $from = 'from@example.com';
+        $to = 'to@example.com';
+        $subject = 'Subject';
+
+        $request = new Request();
+        $request->setMethod('GET');
+        $request->query->set('entityClass', $entityClass);
+        $request->query->set('entityId', $entityId);
+        $request->query->set('emptyContexts', true);
+        $request->query->set('from', $from);
+        $request->query->set('to', $to);
+        $request->query->set('cc', $to);
+        $request->query->set('bcc', $to);
+        $request->query->set('subject', $subject);
+        $this->requestStack->push($request);
+
+        $this->helper->expects($this->once())
+            ->method('decodeClassName')
+            ->willReturn($entityClass);
+
+        $repository = $this->createMock(EntityRepository::class);
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repository);
+
+        $bigAttachment = new EmailAttachment();
+        $bigAttachment->setFileName('big.jpg');
+        $bigAttachment->setMimeType('image/jpeg');
+        $bigAttachment->setFileSize(20 * AttachmentConfiguration::BYTES_MULTIPLIER);
+        $unsupportedMimeTypeAttachment = new EmailAttachment();
+        $unsupportedMimeTypeAttachment->setFileName('image.webp');
+        $unsupportedMimeTypeAttachment->setMimeType('image/webp');
+        $unsupportedMimeTypeAttachment->setFileSize(2 * AttachmentConfiguration::BYTES_MULTIPLIER);
+        $allowedAttachment = new EmailAttachment();
+        $allowedAttachment->setFileName('image.jpg');
+        $allowedAttachment->setMimeType('image/jpeg');
+        $allowedAttachment->setFileSize(2 * AttachmentConfiguration::BYTES_MULTIPLIER);
+        $scopeEntity = new User();
+        $repository->expects($this->once())
+            ->method('find')
+            ->with($entityId)
+            ->willReturn($scopeEntity);
+        $this->emailAttachmentProvider->expects($this->once())
+            ->method('getScopeEntityAttachments')
+            ->with($scopeEntity)
+            ->willReturn([$bigAttachment, $unsupportedMimeTypeAttachment, $allowedAttachment]);
+        $this->fileConstraintsProvider->expects($this->any())
+            ->method('getMaxSizeByConfigPath')
+            ->with('oro_email.attachment_max_size')
+            ->willReturn(10 * AttachmentConfiguration::BYTES_MULTIPLIER);
+        $this->fileConstraintsProvider->expects($this->any())
+            ->method('getMimeTypes')
+            ->willReturn(['image/jpeg']);
+
+        $this->helper->expects($this->exactly(4))
+            ->method('preciseFullEmailAddress');
+
+        $this->helper->expects($this->never())
+            ->method('getUser');
+
+        $this->helper->expects($this->never())
+            ->method('buildFullEmailAddress');
+
+        $this->helper->expects(self::never())
+            ->method('getTargetEntity');
+
+        $this->configManager->expects($this->once())
+            ->method('get')
+            ->with('oro_email.signature')
+            ->willReturn('Signature');
+        $this->htmlTagHelper->expects($this->once())
+            ->method('sanitize')
+            ->with('Signature')
+            ->willReturn('Sanitized Signature');
+
+        $emailModel = new EmailModel();
+        $result = $this->emailModelBuilder->createEmailModel($emailModel);
+
+        $this->assertSame($emailModel, $result);
+        $this->assertEquals($entityClass, $result->getEntityClass());
+        $this->assertEquals($entityId, $result->getEntityId());
+        $this->assertEquals($subject, $result->getSubject());
+        $this->assertEquals($from, $result->getFrom());
+        $this->assertEquals([$to], $result->getTo());
+        $this->assertEquals([$to], $result->getCc());
+        $this->assertEquals([$to], $result->getBcc());
+        $this->assertEquals('Sanitized Signature', $result->getSignature());
+        $this->assertEquals([$allowedAttachment], array_values($result->getAttachmentsAvailable()));
+        $this->assertCount(0, $result->getContexts());
     }
 
     /**

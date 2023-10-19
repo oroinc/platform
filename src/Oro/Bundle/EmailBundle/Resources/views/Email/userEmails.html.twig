@@ -62,7 +62,8 @@
         <div class="btn-group">
             {{ EmailActions.createEmailButton({
                 entityClass: oro_class_name(app.user, true),
-                entityId: app.user.id})
+                entityId: app.user.id,
+                emptyContexts: true })
             }}
         </div>
     {% endif %}

@@ -74,7 +74,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             return $result;
         }
 
-        $targets = $entity->getActivityTargets();
+        $targets = $this->getActivityTargets($entity);
         $entityProvider = $this->configManager->getProvider('entity');
 
         foreach ($targets as $target) {
@@ -122,6 +122,11 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         );
 
         return $result;
+    }
+
+    protected function getActivityTargets(object $entity): array
+    {
+        return $entity->getActivityTargets();
     }
 
     /**

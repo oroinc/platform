@@ -109,6 +109,8 @@ class TestEntitiesMigration implements
             ['id'],
             ['onDelete' => 'SET NULL']
         );
+
+        $this->activityExtension->addActivityAssociation($schema, 'oro_email', 'test_api_department');
     }
 
     /**

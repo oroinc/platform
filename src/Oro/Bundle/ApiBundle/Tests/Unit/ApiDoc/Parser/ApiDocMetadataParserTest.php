@@ -209,8 +209,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
-        $field = $metadata->addMetaProperty(new MetaPropertyMetadata('property1'));
-        $field->setDataType('string');
+        $metadata->addMetaProperty(new MetaPropertyMetadata('property1', 'string'));
 
         $config = new EntityDefinitionConfig();
         $config->addField('property1')->setDescription('Property Description');
@@ -242,8 +241,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
-        $field = $metadata->addMetaProperty(new MetaPropertyMetadata(ConfigUtil::CLASS_NAME));
-        $field->setDataType('string');
+        $metadata->addMetaProperty(new MetaPropertyMetadata(ConfigUtil::CLASS_NAME, 'string'));
 
         $config = new EntityDefinitionConfig();
         $config->addField(ConfigUtil::CLASS_NAME);
@@ -265,9 +263,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
-        $field = $metadata->addMetaProperty(new MetaPropertyMetadata('renamedClassName'));
-        $field->setDataType('string');
-        $field->setPropertyPath(ConfigUtil::CLASS_NAME);
+        $metadata->addMetaProperty(new MetaPropertyMetadata('renamedClassName', 'string', ConfigUtil::CLASS_NAME));
 
         $config = new EntityDefinitionConfig();
         $config->addField('renamedClassName')->setPropertyPath(ConfigUtil::CLASS_NAME);

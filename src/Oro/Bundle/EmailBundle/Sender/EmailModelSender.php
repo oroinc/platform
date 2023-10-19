@@ -7,6 +7,7 @@ use Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesInEmailModelHandler;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\EventListener\EntityListener;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Mailer\Envelope\EmailOriginAwareEnvelope;
 use Oro\Bundle\EmailBundle\Tools\MessageIdHelper;
@@ -24,19 +25,22 @@ class EmailModelSender
     private EmailFactory $symfonyEmailFactory;
     private EmailUserFromEmailModelBuilder $emailUserFromEmailModelBuilder;
     private EventDispatcherInterface $eventDispatcher;
+    private EntityListener $emailEntityListener;
 
     public function __construct(
         MailerInterface $mailer,
         EmbeddedImagesInEmailModelHandler $embeddedImagesInEmailModelHandler,
         EmailFactory $symfonyEmailFactory,
         EmailUserFromEmailModelBuilder $emailUserFromEmailModelBuilder,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        EntityListener $emailEntityListener
     ) {
         $this->mailer = $mailer;
         $this->embeddedImagesInEmailModelHandler = $embeddedImagesInEmailModelHandler;
         $this->symfonyEmailFactory = $symfonyEmailFactory;
         $this->emailUserFromEmailModelBuilder = $emailUserFromEmailModelBuilder;
         $this->eventDispatcher = $eventDispatcher;
+        $this->emailEntityListener = $emailEntityListener;
     }
 
     /**
@@ -85,6 +89,9 @@ class EmailModelSender
 
         if ($persist) {
             $this->emailUserFromEmailModelBuilder->addActivityEntities($emailUser, $emailModel->getContexts());
+            if (!$emailModel->isUpdateEmptyContextsAllowed()) {
+                $this->emailEntityListener->skipUpdateActivities($emailUser->getEmail());
+            }
             $this->emailUserFromEmailModelBuilder->persistAndFlush();
         }
 

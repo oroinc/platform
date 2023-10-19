@@ -99,6 +99,11 @@ oro_behat_extension:
     Grid View Disabled Users:
       selector: '.grid-views-item span.grid-views-choice:contains("Disabled Users")'
 
+    Email View Delete Audrey Hepburn Context:
+      selector:
+        type: xpath
+        locator: '//div[@class="activity-context-activity-items"]//span[text()="Audrey Hepburn"]/parent::a/following-sibling::span'
+
   pages:
     Login:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\Login

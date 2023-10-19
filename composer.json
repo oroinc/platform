@@ -114,7 +114,7 @@
         "oro/doctrine-extensions": "~2.0.2",
         "ezyang/htmlpurifier": "~4.16.0",
         "xemlock/htmlpurifier-html5": "0.1.10",
-        "hwi/oauth-bundle": "~1.4.2",
+        "hwi/oauth-bundle": "2.0.0-BETA3",
         "kriswallsmith/buzz": "~1.2.0",
         "matomo/device-detector": "~6.0.6",
         "symfony/polyfill-php70": "1.*",

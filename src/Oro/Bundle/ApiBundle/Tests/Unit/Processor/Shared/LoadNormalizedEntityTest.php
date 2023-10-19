@@ -42,7 +42,17 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         $this->processor = new LoadNormalizedEntity($this->processorBag);
     }
 
-    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNormalizedResult()
+    public function testProcessWhenNormalizedEntityAlreadyLoaded(): void
+    {
+        $this->processorBag->expects(self::never())
+            ->method('getProcessor')
+            ->with('get');
+
+        $this->context->setProcessed(LoadNormalizedEntity::OPERATION_NAME);
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNormalizedResult(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $normalizedResult = ['key' => 'value'];
@@ -58,7 +68,7 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         self::assertTrue($this->context->isProcessed(LoadNormalizedEntity::OPERATION_NAME));
     }
 
-    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNotNormalizedResult()
+    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNotNormalizedResult(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 
@@ -73,7 +83,7 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         self::assertTrue($this->context->isProcessed(LoadNormalizedEntity::OPERATION_NAME));
     }
 
-    public function testProcessWhenEntityIdDoesNotExistInContextButEntityHasIdentifierFields()
+    public function testProcessWhenEntityIdDoesNotExistInContextButEntityHasIdentifierFields(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -89,21 +99,11 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         self::assertFalse($this->context->isProcessed(LoadNormalizedEntity::OPERATION_NAME));
     }
 
-    public function testProcessWhenNormalizedEntityAlreadyLoaded()
-    {
-        $this->processorBag->expects(self::never())
-            ->method('getProcessor')
-            ->with('get');
-
-        $this->context->setProcessed(LoadNormalizedEntity::OPERATION_NAME);
-        $this->processor->process($this->context);
-    }
-
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function testProcessWhenGetActionSuccess()
+    public function testProcessWhenGetActionSuccess(): void
     {
         $normalizedEntityConfigExtras = [
             new ExpandRelatedEntitiesConfigExtra(['association1'])
@@ -152,6 +152,7 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setSharedData($this->sharedData);
+        $expectedGetContext->setParentAction($this->context->getAction());
         $expectedGetContext->setClassName($this->context->getClassName());
         $expectedGetContext->setId($this->context->getId());
         $expectedGetContext->skipGroup(ApiActionGroup::SECURITY_CHECK);
@@ -205,8 +206,8 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         $expectedContext->setHateoas(true);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setSharedData($this->sharedData);
-        $expectedContext->setId($this->context->getId());
         $expectedContext->setClassName($this->context->getClassName());
+        $expectedContext->setId($this->context->getId());
         $expectedContext->setNormalizedEntityConfigExtras($normalizedEntityConfigExtras);
         foreach ($normalizedEntityConfigExtras as $extra) {
             $expectedContext->addConfigExtra($extra);
@@ -229,7 +230,7 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         self::assertEquals($expectedContext, $this->context);
     }
 
-    public function testProcessWhenGetActionHasErrors()
+    public function testProcessWhenGetActionHasErrors(): void
     {
         $getError = Error::create('test error');
 
