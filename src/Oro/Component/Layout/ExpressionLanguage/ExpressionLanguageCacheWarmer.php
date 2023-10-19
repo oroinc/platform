@@ -81,6 +81,10 @@ class ExpressionLanguageCacheWarmer
      */
     private function compile(string $expression): ?string
     {
+        $quotes = '\'';
+        if (str_contains($expression, "'")) {
+            $quotes = '"';
+        }
         $closureParamNames = ['data', 'context'];
         $parsedExpression = $this->expressionLanguage->parse($expression, $closureParamNames);
         if ($this->shouldBeSkipped($parsedExpression->getNodes())) {
@@ -90,9 +94,9 @@ class ExpressionLanguageCacheWarmer
 
         $compiled = $this->expressionLanguage->compile($parsedExpression, $closureParamNames);
 
-        return  '    \''
+        return  '    ' . $quotes
             . $expression
-            . '\' => static function ($context, $data) { return '
+            . $quotes . ' => static function ($context, $data) { return '
             . $compiled
             . "; },\n";
     }
