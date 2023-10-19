@@ -841,11 +841,16 @@ class Context extends NormalizeResultContext implements ContextInterface
                 || !$this->metadataExtras->hasMetadataExtra(ActionMetadataExtra::NAME)
             )
         ) {
-            $this->metadataExtras->addMetadataExtra(new ActionMetadataExtra($action));
+            $this->metadataExtras->addMetadataExtra($this->createActionMetadataExtra($action));
         }
         if ($this->isHateoasEnabled() && !$this->metadataExtras->hasMetadataExtra(HateoasMetadataExtra::NAME)) {
             $this->metadataExtras->addMetadataExtra(new HateoasMetadataExtra($this->getFilterValues()));
         }
+    }
+
+    protected function createActionMetadataExtra(string $action): ActionMetadataExtra
+    {
+        return new ActionMetadataExtra($action);
     }
 
     /**

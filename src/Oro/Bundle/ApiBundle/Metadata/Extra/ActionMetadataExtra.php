@@ -13,6 +13,7 @@ class ActionMetadataExtra implements MetadataExtraInterface
     public const NAME = 'action';
 
     private string $action;
+    private ?string $parentAction = null;
 
     /**
      * @param string $action The name of the action for which the metadata is requested
@@ -22,8 +23,13 @@ class ActionMetadataExtra implements MetadataExtraInterface
         $this->action = $action;
     }
 
+    public function setParentAction(?string $parentAction): void
+    {
+        $this->parentAction = $parentAction;
+    }
+
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getName(): string
     {
@@ -31,18 +37,26 @@ class ActionMetadataExtra implements MetadataExtraInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function configureContext(MetadataContext $context): void
     {
         $context->setTargetAction($this->action);
+        if ($this->parentAction) {
+            $context->setParentAction($this->parentAction);
+        }
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getCacheKeyPart(): ?string
     {
-        return self::NAME . ':' . $this->action;
+        $result = self::NAME . ':' . $this->action;
+        if ($this->parentAction) {
+            $result .= ':' . $this->parentAction;
+        }
+
+        return $result;
     }
 }

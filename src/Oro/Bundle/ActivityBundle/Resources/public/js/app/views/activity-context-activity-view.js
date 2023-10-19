@@ -15,7 +15,10 @@ define([
      * @export oroactivity/js/app/views/activity-context-activity-view
      */
     const ActivityContextActivityView = BaseView.extend({
-        options: {},
+        options: {
+            getRoute: 'oro_api_get_activity_context',
+            deleteRoute: 'oro_api_delete_activity_relation'
+        },
 
         events: {},
 
@@ -42,7 +45,7 @@ define([
                 this.collection.reset();
                 for (const i in this.options.contextTargets) {
                     if (this.options.contextTargets.hasOwnProperty(i)) {
-                        this.collection.add(this.options.contextTargets[i]);
+                        this.add(this.options.contextTargets[i]);
                     }
                 }
             }
@@ -62,11 +65,11 @@ define([
         },
 
         add: function(model) {
-            this.collection.add(model);
+            this.collection.add(model, {deleteRoute: this.options.deleteRoute});
         },
 
         doRefresh: function() {
-            const url = routing.generate('oro_api_get_activity_context', {
+            const url = routing.generate(this.options.getRoute, {
                 activity: this.options.activityClass,
                 id: this.options.entityId
             });
@@ -77,7 +80,7 @@ define([
                 url: url,
                 success: function(r) {
                     collection.reset();
-                    collection.add(r);
+                    self.add(r);
                 },
                 complete: function() {
                     self.render();

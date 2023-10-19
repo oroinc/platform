@@ -38,7 +38,7 @@ class LoadNormalizedEntity implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -74,6 +74,7 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getContext->setRequestHeaders($context->getRequestHeaders());
         $getContext->setSharedData($context->getSharedData());
         $getContext->setHateoas($context->isHateoasEnabled());
+        $getContext->setParentAction($context->getAction());
         $getContext->setClassName($context->getClassName());
         $getContext->setId($context->getId());
         if ($this->reuseExistingEntity && $context->hasResult()) {

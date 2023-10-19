@@ -45,7 +45,7 @@
 
     {# Display contexts targets in the activity view page #}
     <li class="context-data activity-context-activity-block">
-        {{ AC.activity_contexts(entity) }}
+        {{ AC.activity_contexts(entity, null, false, oro_config_value('oro_email.threads_grouping') ? 'oroemail/js/app/components/email-thread-context-component' : null) }}
     </li>
 {% endblock %}
 

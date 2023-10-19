@@ -219,3 +219,27 @@ oro_api_get_activity_email_suggestions:
         id: \d+
         _format: json
         version: latest|v1
+
+oro_api_get_activity_email_thread_context:
+    path: '/api/rest/{version}/activities/emailthreads/{id}/context.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailThreadActivityContextController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_delete_activity_email_thread_context:
+    path: '/api/rest/{version}/activities/emailthreads/{id}/{entity}/{entityId}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailThreadActivityContextController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1

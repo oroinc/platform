@@ -28,14 +28,11 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     protected function setUp(): void
     {
         $this->requestType = new RequestType([RequestType::REST]);
-        $valueNormalizer = $this->getValueNormalizer();
-        $entityIdTransformer = $this->getEntityIdTransformer();
-        $entityIdTransformerRegistry = $this->getEntityIdTransformerRegistry($entityIdTransformer);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->documentBuilder = new RestDocumentBuilder(
-            $valueNormalizer,
-            $entityIdTransformerRegistry,
+            $this->getValueNormalizer(),
+            $this->getEntityIdTransformerRegistry($this->getEntityIdTransformer()),
             $this->logger
         );
     }

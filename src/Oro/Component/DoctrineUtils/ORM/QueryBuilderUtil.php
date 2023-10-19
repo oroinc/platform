@@ -45,10 +45,14 @@ class QueryBuilderUtil
     {
         if (null === $criteria) {
             $criteria = new Criteria();
-        } elseif (is_array($criteria)) {
+        } elseif (\is_array($criteria)) {
             $newCriteria = new Criteria();
             foreach ($criteria as $fieldName => $value) {
-                $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
+                $newCriteria->andWhere(
+                    \is_array($value)
+                        ? Criteria::expr()->in($fieldName, $value)
+                        : Criteria::expr()->eq($fieldName, $value)
+                );
             }
 
             $criteria = $newCriteria;

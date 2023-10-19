@@ -9,15 +9,28 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * The execution context for processors for "customize_loaded_data" action.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CustomizeLoadedDataContext extends CustomizeDataContext
 {
     /** a flag indicates whether "customize_loaded_data" action is executed for a relationship */
     private const IDENTIFIER_ONLY = 'identifier_only';
 
+    /** the name of the action which causes this action, e.g. "create" or "update" */
+    private const PARENT_ACTION = 'parentAction';
+
     /** @var ConfigExtraInterface[] */
     private array $configExtras = [];
     private ?bool $isHateoasEnabled = null;
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function initialize(): void
+    {
+        parent::initialize();
+        $this->set(self::PARENT_ACTION, '');
+    }
 
     /**
      * Gets the response data.
@@ -303,6 +316,24 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     }
 
     /**
+     * Gets the name of the action which causes this action, e.g. "create" or "update".
+     */
+    public function getParentAction(): ?string
+    {
+        $action = $this->get(self::PARENT_ACTION);
+
+        return '' !== $action ? $action : null;
+    }
+
+    /**
+     * Sets the name of the action which causes this action, e.g. "create" or "update".
+     */
+    public function setParentAction(?string $action): void
+    {
+        $this->set(self::PARENT_ACTION, $action ?? '');
+    }
+
+    /**
      * Indicates whether HATEOAS is enabled.
      */
     public function isHateoasEnabled(): bool
@@ -317,5 +348,19 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
         }
 
         return $this->isHateoasEnabled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getNormalizationContext(): array
+    {
+        $normalizationContext = parent::getNormalizationContext();
+        $parentAction = $this->getParentAction();
+        if ($parentAction) {
+            $normalizationContext[self::PARENT_ACTION] = $parentAction;
+        }
+
+        return $normalizationContext;
     }
 }

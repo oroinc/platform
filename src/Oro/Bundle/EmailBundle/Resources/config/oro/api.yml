@@ -9,6 +9,9 @@ api:
         Oro\Bundle\EmailBundle\Api\Model\EmailContextItem:
             alias: emailcontext
             plural_alias: emailcontext
+        Oro\Bundle\EmailBundle\Api\Model\EmailThreadContextItem:
+            alias: emailthreadcontext
+            plural_alias: emailthreadcontext
         # need to define the alias manually because the EmailBody does not have system alias,
         # see "entity_alias_exclusions" section in EmailBundle/Resources/config/oro/entity.yml.
         # an entity without the alias are considered as not known in API even if the entity
@@ -129,6 +132,7 @@ api:
                         property_path: _
                     messageId:
                         data_type: string
+                        allow_array: true
                         operators: [ '=' ]
                         property_path: _
                     from:
@@ -160,6 +164,79 @@ api:
                 create: false
                 update: false
                 delete: false
+                delete_list: false
+                get_subresource: false
+                get_relationship: false
+
+        Oro\Bundle\EmailBundle\Api\Model\EmailThreadContextItem:
+            documentation_resource: '@OroEmailBundle/Resources/doc/api/email_thread_context.md'
+            identifier_field_names: [id]
+            disable_meta_properties: true
+            fields:
+                id:
+                    data_type: string
+                entityName:
+                    data_type: string
+                entity:
+                    data_type: nestedAssociation
+                    fields:
+                        __class__:
+                            property_path: entityClass
+                        id:
+                            property_path: entityId
+                entityClass:
+                    data_type: string
+                entityId:
+                    data_type: string
+                entityUrl:
+                    data_type: string
+                isContext:
+                    data_type: boolean
+            filters:
+                fields:
+                    entities:
+                        data_type: string
+                        allow_array: true
+                        operators: [ '=' ]
+                        property_path: _
+                    searchText:
+                        data_type: string
+                        operators: [ '=' ]
+                        property_path: _
+                    messageId:
+                        data_type: string
+                        allow_array: true
+                        operators: [ '=' ]
+                        property_path: _
+                    from:
+                        data_type: string
+                        operators: [ '=' ]
+                        property_path: _
+                    to:
+                        data_type: string
+                        allow_array: true
+                        operators: [ '=' ]
+                        property_path: _
+                    cc:
+                        data_type: string
+                        allow_array: true
+                        operators: [ '=' ]
+                        property_path: _
+                    isContext:
+                        data_type: boolean
+                        operators: [ '=' ]
+                        property_path: _
+                    excludeCurrentUser:
+                        data_type: boolean
+                        operators: [ '=' ]
+                        property_path: _
+            actions:
+                get_list:
+                    disable_sorting: true
+                get: false
+                create: false
+                update: false
+                delete: true # enable manually because this resource does not have "get" action
                 delete_list: false
                 get_subresource: false
                 get_relationship: false

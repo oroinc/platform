@@ -92,6 +92,15 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     private ?EntityMapper $entityMapper = null;
 
     /**
+     * {@inheritDoc}
+     */
+    protected function initialize(): void
+    {
+        parent::initialize();
+        $this->set(self::PARENT_ACTION, '');
+    }
+
+    /**
      * Checks if the context is already initialized.
      */
     public function isInitialized(): bool
@@ -126,7 +135,9 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
      */
     public function getParentAction(): ?string
     {
-        return $this->get(self::PARENT_ACTION);
+        $action = $this->get(self::PARENT_ACTION);
+
+        return '' !== $action ? $action : null;
     }
 
     /**
@@ -134,11 +145,7 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
      */
     public function setParentAction(?string $action): void
     {
-        if ($action) {
-            $this->set(self::PARENT_ACTION, $action);
-        } else {
-            $this->remove(self::PARENT_ACTION);
-        }
+        $this->set(self::PARENT_ACTION, $action ?? '');
     }
 
     /**
@@ -378,5 +385,19 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     public function removeResult(): void
     {
         throw new \BadMethodCallException('Not implemented.');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getNormalizationContext(): array
+    {
+        $normalizationContext = parent::getNormalizationContext();
+        $parentAction = $this->getParentAction();
+        if ($parentAction) {
+            $normalizationContext[self::PARENT_ACTION] = $parentAction;
+        }
+
+        return $normalizationContext;
     }
 }

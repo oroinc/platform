@@ -53,6 +53,7 @@ class EmailHandler
             $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {
+                $emailModel->setAllowToUpdateEmptyContexts(false);
                 try {
                     $this->emailModelSender->send($emailModel, $emailModel->getOrigin());
 

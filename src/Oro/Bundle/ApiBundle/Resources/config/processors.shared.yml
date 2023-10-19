@@ -1324,6 +1324,9 @@ services:
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: update_subresource, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: get_relationship, group: normalize_result, requestType: rest, priority: -30 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, priority: -30 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, priority: -30 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, priority: -30 }
 
@@ -1348,9 +1351,6 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, priority: -30 }
-            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, priority: -30 }
-            - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, priority: -30 }
-            - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, priority: -30 }
 
     oro_api.rest.set_http_response_status_code.not_allowed:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode

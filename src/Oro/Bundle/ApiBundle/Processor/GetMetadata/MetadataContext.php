@@ -19,6 +19,13 @@ class MetadataContext extends ApiContext
     /** the name of the action for which the metadata is built */
     private const TARGET_ACTION = 'targetAction';
 
+    /**
+     * the name of the action which causes the target action for which the metadata is built,
+     * e.g. the metadata can be built for "get" action (it is specifies as the target action)
+     * that was caused by "create" or "update" action
+     */
+    private const PARENT_ACTION = 'parentAction';
+
     /** a list of requests for additional metadata information that should be retrieved */
     private const EXTRA = 'extra';
 
@@ -35,6 +42,7 @@ class MetadataContext extends ApiContext
     protected function initialize(): void
     {
         parent::initialize();
+        $this->set(self::PARENT_ACTION, '');
         $this->set(self::EXTRA, []);
     }
 
@@ -55,7 +63,7 @@ class MetadataContext extends ApiContext
     }
 
     /**
-     * Gets the name of the action for which the metadata is built
+     * Gets the name of the action for which the metadata is built.
      */
     public function getTargetAction(): ?string
     {
@@ -63,15 +71,35 @@ class MetadataContext extends ApiContext
     }
 
     /**
-     * Sets the name of the action for which the metadata is built
+     * Sets the name of the action for which the metadata is built.
      */
-    public function setTargetAction(?string  $action): void
+    public function setTargetAction(?string $action): void
     {
         if ($action) {
             $this->set(self::TARGET_ACTION, $action);
         } else {
             $this->remove(self::TARGET_ACTION);
         }
+    }
+
+    /**
+     * Gets the name of the action which causes the target action for which the metadata is built,
+     * e.g. the metadata can be built for "get" action (it is specifies as the target action)
+     * that was caused by "create" or "update" action
+     */
+    public function getParentAction(): ?string
+    {
+        $action = $this->get(self::PARENT_ACTION);
+
+        return '' !== $action ? $action : null;
+    }
+
+    /**
+     * Sets the name of the action which causes the target action for which the metadata is built.
+     */
+    public function setParentAction(?string $action): void
+    {
+        $this->set(self::PARENT_ACTION, $action ?? '');
     }
 
     /**

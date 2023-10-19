@@ -15,6 +15,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * @group search
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class EmailContextTest extends RestJsonApiTestCase
 {
@@ -106,7 +107,7 @@ class EmailContextTest extends RestJsonApiTestCase
         ];
     }
 
-    public function testSearchWithMessageIdForExistingEmail(): void
+    public function testGetListWithMessageIdForExistingEmail(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -118,13 +119,13 @@ class EmailContextTest extends RestJsonApiTestCase
                 $this->getUserData('user_1', true),
                 $this->getUserData('user_2', true),
                 $this->getUserData('user_3', true),
-                $this->getUserData('user_5', false)
+                $this->getUserData('user_11', false)
             ]
         ];
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
-    public function testSearchWithMessageIdForNotExistingEmail(): void
+    public function testGetListWithMessageIdForNotExistingEmail(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -133,7 +134,26 @@ class EmailContextTest extends RestJsonApiTestCase
         self::assertResponseCount(0, $response);
     }
 
-    public function testSearchWithMessageIdForExistingEmailAndWithFromToAndCc(): void
+    public function testGetListWithSeveralMessageIds(): void
+    {
+        $response = $this->cget(
+            ['entity' => 'emailcontext'],
+            ['filter[messageId]' => 'email1@orocrm-pro.func-test,email2@orocrm-pro.func-test', 'page[size]' => -1]
+        );
+        $filteredResponseContent = self::filterResponseContent($response);
+        $expectedContent = [
+            'data' => [
+                $this->getUserData('user_1', true),
+                $this->getUserData('user_2', true),
+                $this->getUserData('user_3', true),
+                $this->getUserData('user_4', true),
+                $this->getUserData('user_11', false)
+            ]
+        ];
+        self::assertResponseContent($expectedContent, $filteredResponseContent);
+    }
+
+    public function testGetListWithMessageIdForExistingEmailAndWithFromToAndCc(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -152,14 +172,14 @@ class EmailContextTest extends RestJsonApiTestCase
                 $this->getUserData('user_1', true),
                 $this->getUserData('user_2', true),
                 $this->getUserData('user_3', true),
-                $this->getUserData('user_5', false),
-                $this->getUserData('user_4', false)
+                $this->getUserData('user_11', false),
+                $this->getUserData('user_10', false)
             ]
         ];
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
-    public function testSearchWithMessageIdForNotExistingEmailAndWithFromToAndCc(): void
+    public function testGetListWithMessageIdForNotExistingEmailAndWithFromToAndCc(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -175,7 +195,7 @@ class EmailContextTest extends RestJsonApiTestCase
         $filteredResponseContent = self::filterResponseContent($response);
         $expectedContent = [
             'data' => [
-                $this->getUserData('user_4', false),
+                $this->getUserData('user_10', false),
                 $this->getUserData('user_2', false),
                 $this->getUserData('user_1', false)
             ]
@@ -183,7 +203,34 @@ class EmailContextTest extends RestJsonApiTestCase
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
-    public function testSearchBySpecifiedEntityTypes(): void
+    public function testGetListWithSeveralMessageIdsAndWithFromToAndCc(): void
+    {
+        $response = $this->cget(
+            ['entity' => 'emailcontext'],
+            [
+                'filter' => [
+                    'messageId' => 'email1@orocrm-pro.func-test,email2@orocrm-pro.func-test',
+                    'from'      => 'email1@orocrm-pro.func-test',
+                    'to'        => 'richard_bradley@example.com',
+                    'cc'        => ['brenda_brock@example.com', 'lucas_thornton@example.com']
+                ]
+            ]
+        );
+        $filteredResponseContent = self::filterResponseContent($response);
+        $expectedContent = [
+            'data' => [
+                $this->getUserData('user_1', true),
+                $this->getUserData('user_2', true),
+                $this->getUserData('user_3', true),
+                $this->getUserData('user_4', true),
+                $this->getUserData('user_11', false),
+                $this->getUserData('user_10', false)
+            ]
+        ];
+        self::assertResponseContent($expectedContent, $filteredResponseContent);
+    }
+
+    public function testGetListBySpecifiedEntityTypes(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -195,13 +242,13 @@ class EmailContextTest extends RestJsonApiTestCase
                 $this->getUserData('user_1', true),
                 $this->getUserData('user_2', true),
                 $this->getUserData('user_3', true),
-                $this->getUserData('user_5', false)
+                $this->getUserData('user_11', false)
             ]
         ];
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
-    public function testSearchBySearchText(): void
+    public function testGetListBySearchTextWhenFoundEntityIsNotInContext(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -216,7 +263,22 @@ class EmailContextTest extends RestJsonApiTestCase
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
-    public function testSearchWithInclude(): void
+    public function testGetListBySearchTextWhenFoundEntityIsInContext(): void
+    {
+        $response = $this->cget(
+            ['entity' => 'emailcontext'],
+            ['filter' => ['messageId' => 'email1@orocrm-pro.func-test', 'searchText' => 'Bradley']]
+        );
+        $filteredResponseContent = self::filterResponseContent($response);
+        $expectedContent = [
+            'data' => [
+                $this->getUserData('user_1', true)
+            ]
+        ];
+        self::assertResponseContent($expectedContent, $filteredResponseContent);
+    }
+
+    public function testGetListWithInclude(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -228,19 +290,19 @@ class EmailContextTest extends RestJsonApiTestCase
                 $this->getUserData('user_1', true),
                 $this->getUserData('user_2', true),
                 $this->getUserData('user_3', true),
-                $this->getUserData('user_5', false)
+                $this->getUserData('user_11', false)
             ],
             'included' => [
                 $this->getUserIncludeData('user_1'),
                 $this->getUserIncludeData('user_2'),
                 $this->getUserIncludeData('user_3'),
-                $this->getUserIncludeData('user_5')
+                $this->getUserIncludeData('user_11')
             ]
         ];
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
-    public function testSearchWithIsContextFalse(): void
+    public function testGetListWithIsContextFalse(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -249,13 +311,13 @@ class EmailContextTest extends RestJsonApiTestCase
         $filteredResponseContent = self::filterResponseContent($response);
         $expectedContent = [
             'data' => [
-                $this->getUserData('user_5', false)
+                $this->getUserData('user_11', false)
             ]
         ];
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
-    public function testSearchWithIsContextTrue(): void
+    public function testGetListWithIsContextTrue(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -272,7 +334,7 @@ class EmailContextTest extends RestJsonApiTestCase
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
-    public function testSearchWithExcludeCurrentUserFalse(): void
+    public function testGetListWithExcludeCurrentUserFalse(): void
     {
         $currentUser = $this->getUser('user');
         $response = $this->cget(
@@ -296,7 +358,7 @@ class EmailContextTest extends RestJsonApiTestCase
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
-    public function testSearchWithExcludeCurrentUserTrue(): void
+    public function testGetListWithExcludeCurrentUserTrue(): void
     {
         $currentUser = $this->getUser('user');
         $response = $this->cget(
@@ -319,7 +381,7 @@ class EmailContextTest extends RestJsonApiTestCase
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
-    public function testSearchWithFromTonAndCc(): void
+    public function testGetListWithFromTonAndCc(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -335,13 +397,13 @@ class EmailContextTest extends RestJsonApiTestCase
                 $this->getUserData('user_1', true),
                 $this->getUserData('user_2', true),
                 $this->getUserData('user_3', true),
-                $this->getUserData('user_5', false)
+                $this->getUserData('user_11', false)
             ]
         ];
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
 
-    public function testTryToSearchWithoutMessageId(): void
+    public function testTryToGetListWithoutMessageId(): void
     {
         $response = $this->cget(['entity' => 'emailcontext'], [], [], false);
         $this->assertResponseValidationError(
@@ -354,7 +416,7 @@ class EmailContextTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTryToSearchBySearchTextAndFrom(): void
+    public function testTryToGetListBySearchTextAndFrom(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -373,7 +435,7 @@ class EmailContextTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTryToSearchBySearchTextAndTo(): void
+    public function testTryToGetListBySearchTextAndTo(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -392,7 +454,7 @@ class EmailContextTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTryToSearchBySearchTextAndCc(): void
+    public function testTryToGetListBySearchTextAndCc(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -411,7 +473,7 @@ class EmailContextTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTryToSearchBySearchTextAndIsContext(): void
+    public function testTryToGetListBySearchTextAndIsContext(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -430,7 +492,7 @@ class EmailContextTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTryToSearchBySearchTextAndExcludeCurrentUser(): void
+    public function testTryToGetListBySearchTextAndExcludeCurrentUser(): void
     {
         $response = $this->cget(
             ['entity' => 'emailcontext'],
@@ -453,5 +515,60 @@ class EmailContextTest extends RestJsonApiTestCase
             ],
             $response
         );
+    }
+
+    public function testTryToGet(): void
+    {
+        $response = $this->get(
+            ['entity' => 'emailcontext', 'id' => 'users-1'],
+            [],
+            [],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testTryToCreate(): void
+    {
+        $response = $this->post(
+            ['entity' => 'emailcontext'],
+            ['data' => ['type' => 'emailcontext', 'id' => 'users-1']],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
+    }
+
+    public function testTryToUpdate(): void
+    {
+        $response = $this->patch(
+            ['entity' => 'emailcontext', 'id' => 'users-1'],
+            ['data' => ['type' => 'emailcontext', 'id' => 'users-1']],
+            [],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testTryToDelete(): void
+    {
+        $response = $this->delete(
+            ['entity' => 'emailcontext', 'id' => 'users-1'],
+            [],
+            [],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testTryToDeleteList(): void
+    {
+        $response = $this->cdelete(
+            ['entity' => 'emailcontext'],
+            ['filter' => ['id' => 'users-1']],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 }

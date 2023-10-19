@@ -135,6 +135,16 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($version, $normalizationContext['version']);
         self::assertSame($requestType, $normalizationContext['requestType']);
         self::assertSame($sharedData, $normalizationContext['sharedData']);
+
+        $parentAction = 'test_parent_action';
+        $this->context->setParentAction($parentAction);
+        $normalizationContext = $this->context->getNormalizationContext();
+        self::assertCount(5, $normalizationContext);
+        self::assertSame($action, $normalizationContext['action']);
+        self::assertSame($version, $normalizationContext['version']);
+        self::assertSame($requestType, $normalizationContext['requestType']);
+        self::assertSame($sharedData, $normalizationContext['sharedData']);
+        self::assertSame($parentAction, $normalizationContext['parentAction']);
     }
 
     public function testIncludedEntities()
@@ -342,14 +352,20 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 
     public function testParentAction()
     {
-        self::assertNull($this->context->getPropertyPath());
+        self::assertNull($this->context->getParentAction());
+        self::assertTrue($this->context->has('parentAction'));
+        self::assertSame('', $this->context->get('parentAction'));
 
         $actionName = 'test_action';
         $this->context->setParentAction($actionName);
         self::assertEquals($actionName, $this->context->getParentAction());
+        self::assertTrue($this->context->has('parentAction'));
+        self::assertEquals($actionName, $this->context->get('parentAction'));
 
         $this->context->setParentAction(null);
-        self::assertNull($this->context->getPropertyPath());
+        self::assertNull($this->context->getParentAction());
+        self::assertTrue($this->context->has('parentAction'));
+        self::assertSame('', $this->context->get('parentAction'));
     }
 
     public function testForm()

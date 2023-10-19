@@ -71,6 +71,10 @@ class EntityHandler
             $this->isIdentifierOnlyRequested($customizationContext->getConfig())
         );
         $customizationContext->setSharedData($context['sharedData']);
+        $parentAction = $context['parentAction'] ?? null;
+        if ($parentAction) {
+            $customizationContext->setParentAction($parentAction);
+        }
 
         $group = $this->collection ? 'collection' : 'item';
         $customizationContext->setFirstGroup($group);

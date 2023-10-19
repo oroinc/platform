@@ -108,6 +108,17 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
+    public function testNormalizeCriteriaArrayValue()
+    {
+        $expectedCriteria = new Criteria();
+        $expectedCriteria->andWhere(Criteria::expr()->in('field', ['value']));
+
+        $this->assertEquals(
+            $expectedCriteria,
+            QueryBuilderUtil::normalizeCriteria(['field' => ['value']])
+        );
+    }
+
     /**
      * @dataProvider getSelectExprProvider
      */

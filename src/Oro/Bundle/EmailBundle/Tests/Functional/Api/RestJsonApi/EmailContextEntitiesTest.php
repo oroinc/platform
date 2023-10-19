@@ -103,4 +103,59 @@ class EmailContextEntitiesTest extends RestJsonApiTestCase
         ];
         self::assertResponseContent($expectedContent, $filteredResponseContent);
     }
+
+    public function testTryToGet(): void
+    {
+        $response = $this->get(
+            ['entity' => 'emailcontextentities', 'id' => 'users'],
+            [],
+            [],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testTryToCreate(): void
+    {
+        $response = $this->post(
+            ['entity' => 'emailcontextentities'],
+            ['data' => ['type' => 'emailcontextentities', 'id' => 'users']],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
+    }
+
+    public function testTryToUpdate(): void
+    {
+        $response = $this->patch(
+            ['entity' => 'emailcontextentities', 'id' => 'users'],
+            ['data' => ['type' => 'emailcontextentities', 'id' => 'users']],
+            [],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testTryToDelete(): void
+    {
+        $response = $this->delete(
+            ['entity' => 'emailcontextentities', 'id' => 'users'],
+            [],
+            [],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testTryToDeleteList(): void
+    {
+        $response = $this->cdelete(
+            ['entity' => 'emailcontextentities'],
+            ['filter' => ['id' => 'users']],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
+    }
 }

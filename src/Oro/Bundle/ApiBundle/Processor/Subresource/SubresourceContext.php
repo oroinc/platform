@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraCollection;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -311,7 +312,15 @@ class SubresourceContext extends Context
      */
     protected function createParentConfigExtras(): array
     {
-        $extras = [new EntityDefinitionConfigExtra($this->get(self::ACTION))];
+        $extras = [
+            new EntityDefinitionConfigExtra(
+                $this->get(self::ACTION),
+                $this->isCollection(),
+                $this->getParentClassName(),
+                $this->getAssociationName()
+            ),
+            new FilterFieldsConfigExtra([$this->getParentClassName() => [$this->getAssociationName()]])
+        ];
         if ($this->isHateoasEnabled()) {
             $extras[] = new HateoasConfigExtra();
         }

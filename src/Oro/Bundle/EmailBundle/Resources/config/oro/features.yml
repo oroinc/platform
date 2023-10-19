@@ -68,8 +68,9 @@ features:
         api_resources:
             - 'Oro\Bundle\EmailBundle\Entity\Email'
             - 'Oro\Bundle\EmailBundle\Api\Model\EmailContextEntity'
-            - 'Oro\Bundle\EmailBundle\Api\Model\EmailContextItem'
             - 'Oro\Bundle\EmailBundle\Api\Model\EmailContextSearchItem'
+            - 'Oro\Bundle\EmailBundle\Api\Model\EmailContextItem'
+            - 'Oro\Bundle\EmailBundle\Api\Model\EmailThreadContextItem'
         entities:
             - 'Oro\Bundle\EmailBundle\Entity\Email'
             - 'Oro\Bundle\EmailBundle\Entity\EmailUser'
