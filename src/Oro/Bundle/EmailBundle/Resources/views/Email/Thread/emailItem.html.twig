@@ -45,8 +45,7 @@
             {% if renderContexts is defined and renderContexts and thread|length > 0 %}
                 <div class="email-contexts-targets">
                     <div class="activity-context-activity-list">
-                        {% set checkTarget = target ? true : false %}
-                        {{ AC.activity_contexts(thread|first, target, checkTarget) }}
+                        {{ AC.activity_contexts(thread|first, target, target ? true : false) }}
                     </div>
                 </div>
             {% endif %}

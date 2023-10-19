@@ -48,11 +48,8 @@ class EntityMetadataFactory
         if (!$fieldType && $classMetadata->hasField($fieldName)) {
             $fieldType = $this->getFieldType($classMetadata->getFieldMapping($fieldName));
         }
-        $fieldMetadata = new MetaPropertyMetadata();
-        $fieldMetadata->setName($fieldName);
-        $fieldMetadata->setDataType($fieldType);
 
-        return $fieldMetadata;
+        return new MetaPropertyMetadata($fieldName, $fieldType);
     }
 
     public function createFieldMetadata(

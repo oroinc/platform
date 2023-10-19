@@ -102,9 +102,6 @@ services:
             - '@oro_email.sender.email_model_sender'
             - '@logger'
 
-    Oro\Bundle\EmailBundle\Form\Handler\EmailHandler:
-        alias: 'oro_email.form.handler.email'
-
     oro_email.form.email:
         class: Symfony\Component\Form\Form
         public: true

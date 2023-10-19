@@ -109,6 +109,8 @@ class EmailContextSearchTest extends RestJsonApiTestCase
         $filteredResponseContent = self::filterResponseContent($response);
         $expectedContent = [
             'data' => [
+                $this->getUserData('user_11'),
+                $this->getUserData('user_10'),
                 $this->getUserData('user_5'),
                 $this->getUserData('user_4'),
                 $this->getUserData('user_3'),
@@ -128,6 +130,8 @@ class EmailContextSearchTest extends RestJsonApiTestCase
         $filteredResponseContent = self::filterResponseContent($response);
         $expectedContent = [
             'data' => [
+                $this->getUserData('user_11'),
+                $this->getUserData('user_10'),
                 $this->getUserData('user_5'),
                 $this->getUserData('user_4'),
                 $this->getUserData('user_3'),
@@ -162,6 +166,8 @@ class EmailContextSearchTest extends RestJsonApiTestCase
         $filteredResponseContent = self::filterResponseContent($response);
         $expectedContent = [
             'data'     => [
+                $this->getUserData('user_11'),
+                $this->getUserData('user_10'),
                 $this->getUserData('user_5'),
                 $this->getUserData('user_4'),
                 $this->getUserData('user_3'),
@@ -172,6 +178,8 @@ class EmailContextSearchTest extends RestJsonApiTestCase
                 $this->getUserData('user')
             ],
             'included' => [
+                $this->getUserIncludeData('user_11'),
+                $this->getUserIncludeData('user_10'),
                 $this->getUserIncludeData('user_5'),
                 $this->getUserIncludeData('user_4'),
                 $this->getUserIncludeData('user_3'),
@@ -183,5 +191,60 @@ class EmailContextSearchTest extends RestJsonApiTestCase
             ]
         ];
         self::assertResponseContent($expectedContent, $filteredResponseContent);
+    }
+
+    public function testTryToGet(): void
+    {
+        $response = $this->get(
+            ['entity' => 'emailcontextsearch', 'id' => 'users-1'],
+            [],
+            [],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testTryToCreate(): void
+    {
+        $response = $this->post(
+            ['entity' => 'emailcontextsearch'],
+            ['data' => ['type' => 'emailcontextsearch', 'id' => 'users-1']],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
+    }
+
+    public function testTryToUpdate(): void
+    {
+        $response = $this->patch(
+            ['entity' => 'emailcontextsearch', 'id' => 'users-1'],
+            ['data' => ['type' => 'emailcontextsearch', 'id' => 'users-1']],
+            [],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testTryToDelete(): void
+    {
+        $response = $this->delete(
+            ['entity' => 'emailcontextsearch', 'id' => 'users-1'],
+            [],
+            [],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testTryToDeleteList(): void
+    {
+        $response = $this->cdelete(
+            ['entity' => 'emailcontextsearch'],
+            ['filter' => ['id' => 'users-1']],
+            [],
+            false
+        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 }

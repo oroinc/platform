@@ -150,7 +150,12 @@ class RelationshipsTest extends RestJsonApiTestCase
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
         self::assertUpdateApiResponseStatusCodeEquals(
             $response,
-            [Response::HTTP_NO_CONTENT, Response::HTTP_NOT_FOUND, Response::HTTP_METHOD_NOT_ALLOWED],
+            [
+                Response::HTTP_OK,
+                Response::HTTP_NO_CONTENT,
+                Response::HTTP_NOT_FOUND,
+                Response::HTTP_METHOD_NOT_ALLOWED
+            ],
             $resourceKey,
             'update relationship',
             $data
@@ -182,7 +187,12 @@ class RelationshipsTest extends RestJsonApiTestCase
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
         self::assertUpdateApiResponseStatusCodeEquals(
             $response,
-            [Response::HTTP_NO_CONTENT, Response::HTTP_NOT_FOUND, Response::HTTP_METHOD_NOT_ALLOWED],
+            [
+                Response::HTTP_OK,
+                Response::HTTP_NO_CONTENT,
+                Response::HTTP_NOT_FOUND,
+                Response::HTTP_METHOD_NOT_ALLOWED
+            ],
             $resourceKey,
             'add relationship',
             $data
@@ -214,6 +224,7 @@ class RelationshipsTest extends RestJsonApiTestCase
         self::assertApiResponseStatusCodeEquals(
             $response,
             [
+                Response::HTTP_OK,
                 Response::HTTP_NO_CONTENT,
                 Response::HTTP_BAD_REQUEST,
                 Response::HTTP_NOT_FOUND,

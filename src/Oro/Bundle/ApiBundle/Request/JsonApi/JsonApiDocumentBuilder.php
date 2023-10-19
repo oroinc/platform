@@ -274,6 +274,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     protected function addRelationships(
         array &$result,
         array $data,
@@ -317,16 +320,23 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                             $i
                         );
                         $this->addAssociationMeta($value[$i], $this->getAssociationMeta($association));
+                        if (\is_array($item)) {
+                            $this->addMeta($value[$i], $item, $association->getTargetMetadata());
+                        }
                         $this->addLinks($value[$i], $association->getLinks());
                         $i++;
                     }
                 }
             } elseif (null !== $value) {
+                $item = $data[$name] ?? null;
                 $this->resultDataAccessor->setAssociation(
                     $name,
-                    $this->getAssociationData($requestType, $data[$name] ?? null, $value[self::ID])
+                    $this->getAssociationData($requestType, $item, $value[self::ID])
                 );
                 $this->addAssociationMeta($value, $this->getAssociationMeta($association));
+                if (\is_array($item)) {
+                    $this->addMeta($value, $item, $association->getTargetMetadata());
+                }
                 $this->addLinks($value, $association->getLinks());
             }
             $relationshipValue[self::DATA] = $value;

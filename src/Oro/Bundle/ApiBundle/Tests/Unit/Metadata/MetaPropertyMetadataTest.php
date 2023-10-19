@@ -12,10 +12,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone()
     {
-        $propertyMetadata = new MetaPropertyMetadata();
-        $propertyMetadata->setName('testName');
-        $propertyMetadata->setPropertyPath('testPropertyPath');
-        $propertyMetadata->setDataType('testDataType');
+        $propertyMetadata = new MetaPropertyMetadata('testName', 'testDataType', 'testPropertyPath');
 
         $propertyMetadataClone = clone $propertyMetadata;
 
@@ -24,10 +21,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testToArray()
     {
-        $propertyMetadata = new MetaPropertyMetadata();
-        $propertyMetadata->setName('testName');
-        $propertyMetadata->setPropertyPath('testPropertyPath');
-        $propertyMetadata->setDataType('testDataType');
+        $propertyMetadata = new MetaPropertyMetadata('testName', 'testDataType', 'testPropertyPath');
 
         self::assertEquals(
             [
@@ -101,6 +95,21 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
     {
         $propertyMetadata = new MetaPropertyMetadata('name');
         self::assertEquals('name', $propertyMetadata->getName());
+    }
+
+    public function testNameAndDataTypeInConstructor()
+    {
+        $propertyMetadata = new MetaPropertyMetadata('name', 'string');
+        self::assertEquals('name', $propertyMetadata->getName());
+        self::assertEquals('string', $propertyMetadata->getDataType());
+    }
+
+    public function testNameAndDataTypeAndPropertyPathInConstructor()
+    {
+        $propertyMetadata = new MetaPropertyMetadata('name', 'string', 'property');
+        self::assertEquals('name', $propertyMetadata->getName());
+        self::assertEquals('string', $propertyMetadata->getDataType());
+        self::assertEquals('property', $propertyMetadata->getPropertyPath());
     }
 
     public function testName()

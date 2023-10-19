@@ -8,6 +8,8 @@ define(function(require) {
      * @export  oroactivity/js/app/models/activity-context-activity-model
      */
     const ActivityContextActivityModel = BaseModel.extend({
+        route: 'oro_api_delete_activity_relation',
+
         defaults: {
             entity: '',
             className: '',
@@ -22,6 +24,19 @@ define(function(require) {
             ActivityContextActivityModel.__super__.constructor.apply(this, args);
         },
 
+        /**
+         * @inheritdoc
+         */
+        initialize: function(data, options) {
+            if (typeof options.route !== 'undefined') {
+                this.route = options.route;
+            }
+            ActivityContextActivityModel.__super__.initialize.call(this, data, options);
+        },
+
+        /**
+         * @inheritdoc
+         */
         url: function() {
             const param = {
                 activity: this.get('activityClassAlias'),
@@ -30,7 +45,7 @@ define(function(require) {
                 entityId: this.get('targetId')
             };
 
-            return routing.generate('oro_api_delete_activity_relation', param);
+            return routing.generate(this.route, param);
         }
     });
 

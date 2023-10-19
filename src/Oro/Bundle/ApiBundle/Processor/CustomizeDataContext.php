@@ -19,9 +19,21 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
     /** FQCN of a customizing entity */
     private const CLASS_NAME = 'class';
 
+    /** the name of the action which causes this action, e.g. "create" or "update" */
+    private const PARENT_ACTION = 'parentAction';
+
     private ?EntityDefinitionConfig $rootConfig = null;
     private ?EntityDefinitionConfig $config = null;
     private ?ParameterBagInterface $sharedData = null;
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function initialize(): void
+    {
+        parent::initialize();
+        $this->set(self::PARENT_ACTION, '');
+    }
 
     /**
      * Gets FQCN of a root entity.
@@ -69,6 +81,24 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
     public function setClassName(string $className): void
     {
         $this->set(self::CLASS_NAME, $className);
+    }
+
+    /**
+     * Gets the name of the action which causes this action, e.g. "create" or "update".
+     */
+    public function getParentAction(): ?string
+    {
+        $action = $this->get(self::PARENT_ACTION);
+
+        return '' !== $action ? $action : null;
+    }
+
+    /**
+     * Sets the name of the action which causes this action, e.g. "create" or "update".
+     */
+    public function setParentAction(?string $action): void
+    {
+        $this->set(self::PARENT_ACTION, $action ?? '');
     }
 
     /**
@@ -128,11 +158,17 @@ abstract class CustomizeDataContext extends ApiContext implements SharedDataAwar
      */
     public function getNormalizationContext(): array
     {
-        return [
+        $normalizationContext = [
             self::ACTION       => $this->getAction(),
             self::VERSION      => $this->getVersion(),
             self::REQUEST_TYPE => $this->getRequestType(),
             'sharedData'       => $this->getSharedData()
         ];
+        $parentAction = $this->getParentAction();
+        if ($parentAction) {
+            $normalizationContext[self::PARENT_ACTION] = $parentAction;
+        }
+
+        return $normalizationContext;
     }
 }

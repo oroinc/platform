@@ -31,14 +31,14 @@ class EmailActivityControllerTest extends WebTestCase
             $this->baseUrl . '?from=test1@example.com&to=test2@example.com&bcc=test4@example.com'
         );
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(1, $entities);
+        $this->assertCount(2, $entities);
     }
 
     public function testGetEntitiesToFilterShouldWorkForToCcBcc()
     {
         $this->client->jsonRequest('GET', $this->baseUrl . '?to=test3@example.com');
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(1, $entities);
+        $this->assertCount(2, $entities);
     }
 
     public function testGetEntitiesWithPaging()

@@ -21,6 +21,7 @@ services:
         tags:
             - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: oro_entity_config.provider.attachment }
+            - { name: container.service_subscriber, id: oro_email.form.handler.email, key: Oro\Bundle\EmailBundle\Form\Handler\EmailHandler }
             - { name: container.service_subscriber, id: oro_email.provider.smtp_settings, key: Oro\Bundle\EmailBundle\Provider\SmtpSettingsProviderInterface }
 
     Oro\Bundle\EmailBundle\Controller\EmailTemplateController:

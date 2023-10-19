@@ -63,9 +63,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $objValue = new \stdClass();
         $objValue->someProp = 123;
         $entityMetadata->set('test_object', $objValue);
-        $metaProperty1 = new MetaPropertyMetadata('metaProperty1');
-        $metaProperty1->setDataType('testDataType');
-        $entityMetadata->addMetaProperty($metaProperty1);
+        $entityMetadata->addMetaProperty(new MetaPropertyMetadata('metaProperty1', 'testDataType'));
         $field1 = new FieldMetadata('field1');
         $field1->setDataType('testDataType');
         $entityMetadata->addField($field1);
@@ -289,18 +287,15 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
     public function testRenameMetaProperty()
     {
         $entityMetadata = new EntityMetadata('Test\Class');
-        $property1 = $entityMetadata->addMetaProperty(new MetaPropertyMetadata('property1'));
-        $property1->setDataType('string');
+        $entityMetadata->addMetaProperty(new MetaPropertyMetadata('property1', 'string'));
 
         $entityMetadata->renameMetaProperty('property1', 'newProperty1');
         self::assertFalse($entityMetadata->hasMetaProperty('property1'));
         self::assertFalse($entityMetadata->hasProperty('property1'));
         self::assertTrue($entityMetadata->hasMetaProperty('newProperty1'));
         self::assertTrue($entityMetadata->hasProperty('newProperty1'));
-        $expectedNewProperty1 = new MetaPropertyMetadata('newProperty1');
-        $expectedNewProperty1->setDataType('string');
         self::assertEquals(
-            $expectedNewProperty1,
+            new MetaPropertyMetadata('newProperty1', 'string'),
             $entityMetadata->getMetaProperty('newProperty1')
         );
     }
@@ -308,18 +303,15 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
     public function testRenameMetaPropertyViaProperty()
     {
         $entityMetadata = new EntityMetadata('Test\Class');
-        $property1 = $entityMetadata->addMetaProperty(new MetaPropertyMetadata('property1'));
-        $property1->setDataType('string');
+        $entityMetadata->addMetaProperty(new MetaPropertyMetadata('property1', 'string'));
 
         $entityMetadata->renameProperty('property1', 'newProperty1');
         self::assertFalse($entityMetadata->hasMetaProperty('property1'));
         self::assertFalse($entityMetadata->hasProperty('property1'));
         self::assertTrue($entityMetadata->hasMetaProperty('newProperty1'));
         self::assertTrue($entityMetadata->hasProperty('newProperty1'));
-        $expectedNewProperty1 = new MetaPropertyMetadata('newProperty1');
-        $expectedNewProperty1->setDataType('string');
         self::assertEquals(
-            $expectedNewProperty1,
+            new MetaPropertyMetadata('newProperty1', 'string'),
             $entityMetadata->getMetaProperty('newProperty1')
         );
     }
