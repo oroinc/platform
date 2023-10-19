@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ImapBundle\Provider;
 
-use Http\Client\Common\HttpMethodsClientInterface;
-use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
+use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMapInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Provides functionality to work with Google OAuth implementation.
@@ -16,8 +16,8 @@ class GoogleOAuthProvider extends AbstractOAuthProvider
     private SymmetricCrypterInterface $crypter;
 
     public function __construct(
-        HttpMethodsClientInterface $httpClient,
-        ResourceOwnerMap $resourceOwnerMap,
+        HttpClientInterface $httpClient,
+        ResourceOwnerMapInterface $resourceOwnerMap,
         ConfigManager $configManager,
         SymmetricCrypterInterface $crypter
     ) {
