@@ -54,7 +54,7 @@ class NormalizeResultContext extends ApiContext
 
     /**
      * Gets a value indicates whether errors and exceptions should just stop processing
-     * or an exception should be thrown is any error or exception occurred.
+     * or an exception should be thrown when any error or exception occurred.
      */
     public function isSoftErrorsHandling(): bool
     {
@@ -63,7 +63,7 @@ class NormalizeResultContext extends ApiContext
 
     /**
      * Sets a value indicates whether errors and exceptions should just stop processing
-     * or an exception should be thrown is any error or exception occurred.
+     * or an exception should be thrown when any error or exception occurred.
      */
     public function setSoftErrorsHandling(bool $softErrorsHandling): void
     {
