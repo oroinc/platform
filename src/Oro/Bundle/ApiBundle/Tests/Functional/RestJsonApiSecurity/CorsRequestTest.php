@@ -496,7 +496,7 @@ class CorsRequestTest extends RestJsonApiTestCase
         self::assertResponseHeader($response, 'Access-Control-Allow-Credentials', 'true');
     }
 
-    public function testCorsRequestWithUnauthorized()
+    public function testCorsRequestWithUnauthenticated()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->cget(

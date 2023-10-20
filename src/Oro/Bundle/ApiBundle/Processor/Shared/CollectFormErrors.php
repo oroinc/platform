@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -184,25 +185,90 @@ class CollectFormErrors implements ProcessorInterface
             if (null === $errorSource || !str_contains($errorSource->getPropertyPath(), ConfigUtil::PATH_DELIMITER)) {
                 continue;
             }
-            $path = ConfigUtil::explodePropertyPath($errorSource->getPropertyPath());
-            $fieldForm = FormUtil::findFormFieldByPropertyPath($parentForm, $path[0]);
-            if (null === $fieldForm) {
-                continue;
-            }
-            $fieldData = $fieldForm->getData();
-            if (!\is_object($fieldData)) {
-                continue;
-            }
-            if (!$fieldData instanceof Collection) {
-                $this->fixErrorPath($path[1], $error, $requestType, $includedEntities->getData($fieldData));
-            } elseif (\count($path) > 2) {
-                foreach ($fieldData as $key => $item) {
-                    if ($path[1] === (string)$key && \is_object($item)) {
-                        $this->fixErrorPath($path[2], $error, $requestType, $includedEntities->getData($item));
+
+            $this->fixErrorPathRecursively(
+                $parentForm,
+                $parentForm->getData(),
+                ConfigUtil::explodePropertyPath($error->getSource()->getPropertyPath()),
+                0,
+                $error,
+                $requestType,
+                $includedEntities
+            );
+        }
+    }
+
+    /**
+     * Recursively finds proper field with error and fixes it error path.
+     *
+     * @param FormInterface $form
+     * @param mixed $formData
+     * @param array $propertyPath Path to the error exploded by {@see ConfigUtil::PATH_DELIMITER}
+     * Example: ["fieldA", "0", "fieldB", "fieldC"]
+     * @param int $propertyPathKey Integer key of the current field from $propertyPath.
+     * Example: 2 for "fieldB" for $propertyPath from the example above.
+     * @param Error $error
+     * @param RequestType $requestType
+     * @param IncludedEntityCollection|null $includedEntities
+     *
+     * @return void
+     */
+    protected function fixErrorPathRecursively(
+        FormInterface $form,
+        $formData,
+        array $propertyPath,
+        int $propertyPathKey,
+        Error $error,
+        RequestType $requestType,
+        ?IncludedEntityCollection $includedEntities
+    ): void {
+        $max = \count($propertyPath);
+
+        if ($max - $propertyPathKey > 1) {
+            if ($formData instanceof Collection) {
+                foreach ($formData as $key => $item) {
+                    if ($propertyPath[$propertyPathKey] === (string)$key && \is_object($item)) {
+                        $fieldForm = $includedEntities->getData($item)?->getForm();
+                        if ($fieldForm) {
+                            $this->fixErrorPathRecursively(
+                                $fieldForm,
+                                $item,
+                                $propertyPath,
+                                ++$propertyPathKey,
+                                $error,
+                                $requestType,
+                                $includedEntities
+                            );
+
+                            return;
+                        }
                     }
+                }
+            } else {
+                $fieldForm = FormUtil::findFormFieldByPropertyPath($form, $propertyPath[$propertyPathKey]);
+                if ($fieldForm) {
+                    $this->fixErrorPathRecursively(
+                        $fieldForm,
+                        $fieldForm->getData(),
+                        $propertyPath,
+                        ++$propertyPathKey,
+                        $error,
+                        $requestType,
+                        $includedEntities
+                    );
+
+                    return;
                 }
             }
         }
+
+        $includedEntityData = $includedEntities->getData($formData);
+        if ($includedEntityData === null) {
+            $propertyPathKey--;
+            $includedEntityData = $includedEntities->getData($form->getParent()->getData());
+        }
+
+        $this->fixErrorPath($propertyPath[max($propertyPathKey, 0)], $error, $requestType, $includedEntityData);
     }
 
     protected function fixErrorPath(

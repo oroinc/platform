@@ -749,3 +749,9 @@ services:
     Oro\Bundle\EntityBundle\EntityConfig\FallbackFieldConfiguration:
         tags:
             - oro_entity_config.validation.entity_config
+
+    oro_entity.tools.entity_state_checker:
+        class: Oro\Bundle\EntityBundle\Tools\EntityStateChecker
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@property_accessor'

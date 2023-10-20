@@ -1,0 +1,15 @@
+/* @theme: admin.oro; */
+
+.product-kit-line-items {
+    display: flex;
+    flex-direction: column;
+    row-gap: $content-padding-xs;
+
+    &__item-quantity {
+        padding-right: $content-padding-small;
+    }
+
+    &__item-price {
+        font-weight: bold;
+    }
+}

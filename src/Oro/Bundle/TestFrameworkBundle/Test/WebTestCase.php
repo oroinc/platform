@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityExtendBundle\Test\EntityExtendTestInitializer;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
@@ -227,6 +228,10 @@ abstract class WebTestCase extends BaseWebTestCase
 
             self::$clientInstance = self::createClient($options, $server);
 
+            $this->checkRunEnvironment();
+            $this->checkUserCredentials();
+            $this->checkConfigurations();
+
             if (self::isClassHasAnnotation(get_called_class(), 'dbReindex')) {
                 throw new \RuntimeException(
                     sprintf(
@@ -240,6 +245,7 @@ abstract class WebTestCase extends BaseWebTestCase
             $this->startTransaction(self::hasNestTransactionsWithSavepoints());
         } else {
             self::$clientInstance->setServerParameters($server);
+            $this->checkRunEnvironment();
         }
 
         $hookMethods = self::getAfterInitClientMethods(\get_class($this));
@@ -972,19 +978,13 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Generate Basic  authorization header
-     *
-     * @param string $userName
-     * @param string $userPassword
-     * @param int $userOrganization
-     *
-     * @return array
+     * Generates Basic authorization header.
      */
     public static function generateBasicAuthHeader(
-        $userName = self::AUTH_USER,
-        $userPassword = self::AUTH_PW,
-        $userOrganization = self::AUTH_ORGANIZATION
-    ) {
+        string $userName = self::AUTH_USER,
+        string $userPassword = self::AUTH_PW,
+        int $userOrganization = self::AUTH_ORGANIZATION
+    ): array {
         return [
             'PHP_AUTH_USER' => $userName,
             'PHP_AUTH_PW' => $userPassword,
@@ -992,50 +992,26 @@ abstract class WebTestCase extends BaseWebTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function generateNoHashNavigationHeader()
+    public static function generateNoHashNavigationHeader(): array
     {
         return ['HTTP_' . strtoupper(ResponseHashnavListener::HASH_NAVIGATION_HEADER) => 0];
     }
 
     /**
-     * Convert value to array
-     *
-     * @param mixed $value
-     *
-     * @return array
+     * Converts a JSON string to an array.
      */
-    public static function valueToArray($value)
+    public static function jsonToArray(string $json): array
     {
-        return self::jsonToArray(json_encode($value));
+        return (array)json_decode($json, true, 512, JSON_THROW_ON_ERROR);
     }
 
     /**
-     * Convert json to array
-     *
-     * @param string $json
-     *
-     * @return array
+     * Checks JSON response status code and returns the response content as an array.
      */
-    public static function jsonToArray($json)
-    {
-        return (array)json_decode($json, true);
-    }
-
-    /**
-     * Checks json response status code and return content as array
-     *
-     * @param Response $response
-     * @param int $statusCode
-     * @param string $message
-     *
-     * @return array
-     */
-    public static function getJsonResponseContent(Response $response, $statusCode, string $message = '')
+    public static function getJsonResponseContent(Response $response, int $statusCode, string $message = ''): array
     {
         self::assertJsonResponseStatusCodeEquals($response, $statusCode, $message);
+
         return self::jsonToArray($response->getContent());
     }
 
@@ -1323,6 +1299,125 @@ abstract class WebTestCase extends BaseWebTestCase
 
             $cookie = new Cookie($session->getName(), $session->getId());
             self::getClientInstance()->getCookieJar()->set($cookie);
+        }
+    }
+
+    private function checkRunEnvironment(): void
+    {
+        if (!self::$clientInstance->getContainer()->get(ApplicationState::class)->isInstalled()) {
+            throw new \Exception(
+                "You must install an application in the test environment ".
+                "and try running the command in the test environment."
+            );
+        }
+    }
+
+    private function checkUserCredentials(): void
+    {
+        $container = self::$clientInstance->getContainer();
+        $user = $container->get('oro_user.manager')->findUserByEmail(self::AUTH_USER);
+
+        if ($this->getContainer()->hasParameter('optional_search_listeners')) {
+            $optionalSearchListeners = $this->getContainer()->getParameter('optional_search_listeners');
+            $this->getOptionalListenerManager()->enableListeners($optionalSearchListeners);
+        }
+
+        //Check changes password
+        $passwordHasher = $container->get('security.user_password_hasher');
+        if (!$passwordHasher->isPasswordValid($user, self::AUTH_PW)) {
+            throw new \Exception("User Password was changed after the application was installed");
+        }
+
+        //Check changes organization
+        $defaultOptionsProvider = $container->get('oro_test.provider.install_default_options');
+        $organizationName = $user->getOrganization()?->getName();
+        if ($organizationName !== $defaultOptionsProvider->getOrganizationName()) {
+            throw new \Exception(
+                sprintf(
+                    'User Organization Name was changed after the application was installed from "%s" to "%s"',
+                    $defaultOptionsProvider->getOrganizationName(),
+                    $organizationName
+                )
+            );
+        }
+
+        //Check changes user firsname
+        $userFirsname = $user->getFirstName();
+        if ($userFirsname !== $defaultOptionsProvider->getUserFirstName()) {
+            throw new \Exception(
+                sprintf(
+                    'User Firstname was changed after the application was installed from "%s" to "%s"',
+                    $defaultOptionsProvider->getUserFirstName(),
+                    $userFirsname
+                )
+            );
+        }
+
+        //Check changes user lastname
+        $userLastname = $user->getLastName();
+        if ($userLastname !== $defaultOptionsProvider->getUserLastName()) {
+            throw new \Exception(
+                sprintf(
+                    'User Lastname was changed after the application was installed from "%s" to "%s"',
+                    $defaultOptionsProvider->getUserLastName(),
+                    $userLastname
+                )
+            );
+        }
+
+        //Check changes user email
+        $userEmail = $user->getEmail();
+        if ($userEmail !== $defaultOptionsProvider->getUserEmail()) {
+            throw new \Exception(
+                sprintf(
+                    'User EMAIL was changed after the application was installed from "%s" to "%s"',
+                    $defaultOptionsProvider->getUserEmail(),
+                    $userEmail
+                )
+            );
+        }
+    }
+
+    private function checkConfigurations(): void
+    {
+        $container = self::$clientInstance->getContainer();
+        $defaultOptionsProvider = $container->get('oro_test.provider.install_default_options');
+
+        //Check changes application url
+        $url = $container->get('oro_config.manager')->get('oro_ui.application_url');
+        if (rtrim($url, '/') !== rtrim($defaultOptionsProvider->getApplicationUrl(), '/')) {
+            throw new \Exception(
+                sprintf(
+                    'Configuration "Application URL" was changed after the application was installed from "%s" to "%s"',
+                    $defaultOptionsProvider->getApplicationUrl(),
+                    $url
+                )
+            );
+        }
+
+        $defaultLocalization = $container->get('oro_locale.manager.localization')->getDefaultLocalization();
+        //Check changes language
+        $language = $defaultLocalization?->getLanguageCode();
+        if ($language !== $defaultOptionsProvider->getApplicationLanguage()) {
+            throw new \Exception(
+                sprintf(
+                    'Configuration "Language" was changed after the application was installed from "%s" to "%s"',
+                    $defaultOptionsProvider->getApplicationLanguage(),
+                    $language
+                )
+            );
+        }
+
+        //Check changes formatting code
+        $formattingCode = $defaultLocalization?->getFormattingCode();
+        if ($formattingCode !== $defaultOptionsProvider->getFormattingCode()) {
+            throw new \Exception(
+                sprintf(
+                    'Configuration "Formatting code" was changed after the application was installed from "%s" to "%s"',
+                    $defaultOptionsProvider->getFormattingCode(),
+                    $formattingCode
+                )
+            );
         }
     }
 }

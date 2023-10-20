@@ -69,10 +69,16 @@ services:
             - { name: oro.api.processor, action: update, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: update_list, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: get_relationship, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: not_allowed, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: unhandled_error, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: options, group: initialize, priority: 250 }
 
     oro_api.tests.request_type_logger:
         class: Oro\Component\Testing\Logger\BufferingLogger
