@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\Rest;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailTemplateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailTemplateControllerTest extends WebTestCase
 {
@@ -22,7 +23,7 @@ class EmailTemplateControllerTest extends WebTestCase
             $this->getUrl('oro_api_get_emailtemplates')
         );
 
-        $this->getJsonResponseContent($this->client->getResponse(), 404);
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), 404);
     }
 
     public function testGet()
@@ -30,9 +31,7 @@ class EmailTemplateControllerTest extends WebTestCase
         $entityName = str_replace('\\', '_', $this->getReference('emailTemplate3')->getEntityName());
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_emailtemplates', [
-                'entityName' => $entityName
-            ])
+            $this->getUrl('oro_api_get_emailtemplates', ['entityName' => $entityName])
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -131,13 +130,9 @@ class EmailTemplateControllerTest extends WebTestCase
     {
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
 
-        $emailTemplate = $em
-            ->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')
-            ->findOneBy(['name' => 'test_template']);
+        $emailTemplate = $em->getRepository(EmailTemplate::class)->findOneBy(['name' => 'test_template']);
 
-        $user = $em
-            ->getRepository('Oro\Bundle\UserBundle\Entity\User')
-            ->findOneBy(['username' => 'simple_user']);
+        $user = $em->getRepository(User::class)->findOneBy(['username' => 'simple_user']);
         $this->assertNotNull($user);
 
         $this->client->jsonRequest(
@@ -164,9 +159,7 @@ class EmailTemplateControllerTest extends WebTestCase
     {
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $emailTemplate = $this->getReference('emailTemplate1');
-        $user = $em
-            ->getRepository('Oro\Bundle\UserBundle\Entity\User')
-            ->findOneBy(['username' => 'simple_user']);
+        $user = $em->getRepository(User::class)->findOneBy(['username' => 'simple_user']);
         $this->assertNotNull($user);
 
         $this->client->jsonRequest(

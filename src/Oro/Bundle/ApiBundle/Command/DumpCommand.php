@@ -21,6 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Dumps all resources accessible through API.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DumpCommand extends AbstractDebugCommand
 {
@@ -56,6 +57,12 @@ class DumpCommand extends AbstractDebugCommand
                 'Shows sub-resources'
             )
             ->addOption(
+                'accessible',
+                null,
+                InputOption::VALUE_NONE,
+                'Show resources that are accessible through API'
+            )
+            ->addOption(
                 'not-accessible',
                 null,
                 InputOption::VALUE_NONE,
@@ -78,6 +85,11 @@ The <info>--sub-resources</info> option will include the sub-resources into the 
   <info>php %command.full_name% --sub-resources</info>
   <info>php %command.full_name% --sub-resources <entity></info>
 
+The <info>--accessible</info> option reverses the command behavior and
+displays a list of entity classes that are <options=bold>accessible</> through API:
+
+  <info>php %command.full_name% --accessible</info>
+
 The <info>--not-accessible</info> option reverses the command behavior and
 displays a list of entity classes that are <options=bold>not accessible</> through API:
 
@@ -87,6 +99,7 @@ HELP
             )
             ->addUsage('--sub-resources')
             ->addUsage('--sub-resources <entity>')
+            ->addUsage('--accessible')
             ->addUsage('--not-accessible')
         ;
 
@@ -96,14 +109,34 @@ HELP
     /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $isNotAccessible = $input->getOption('not-accessible');
-        if ($isNotAccessible) {
+        if ($input->getOption('accessible')) {
+            $this->dumpAccessibleEntities($input, $output);
+        } elseif ($input->getOption('not-accessible')) {
             $this->dumpNotAccessibleEntities($input, $output);
         } else {
             $this->dumpResources($input, $output);
         }
 
         return 0;
+    }
+
+    public function dumpAccessibleEntities(InputInterface $input, OutputInterface $output): void
+    {
+        $requestType = $this->getRequestType($input);
+        // API version is not supported for now
+        $version = Version::normalizeVersion(null);
+
+        $resources = $this->resourcesProvider->getResources($version, $requestType);
+        $accessibleEntities = [];
+        foreach ($resources as $resource) {
+            $accessibleEntities[] = $resource->getEntityClass();
+        }
+
+        sort($accessibleEntities);
+
+        foreach ($accessibleEntities as $entityClass) {
+            $output->writeln(sprintf('<info>%s</info>', $entityClass));
+        }
     }
 
     public function dumpNotAccessibleEntities(InputInterface $input, OutputInterface $output): void
