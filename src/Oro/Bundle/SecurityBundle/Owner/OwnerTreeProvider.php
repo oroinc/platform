@@ -3,9 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -52,34 +55,22 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         $businessUnitClass = $this->ownershipMetadataProvider->getBusinessUnitClass();
         $connection = $this->getManagerForClass($userClass)->getConnection();
 
-        list($businessUnits, $columnMap) = $this->executeQuery(
-            $connection,
-            $this
-                ->getRepository($businessUnitClass)
-                ->createQueryBuilder('bu')
-                ->select(
-                    'bu.id, IDENTITY(bu.organization) orgId, IDENTITY(bu.owner) parentId'
-                    . ', (CASE WHEN bu.owner IS NULL THEN 0 ELSE 1 END) AS HIDDEN ORD'
-                )
-                ->addOrderBy('ORD, parentId', 'ASC')
-                ->getQuery()
-        );
+        $businessUnits = $this->getRecursiveBuildTreeNativeQuery($businessUnitClass)->getResult();
 
         $businessUnitRelations = [];
 
         foreach ($businessUnits as $businessUnit) {
-            $orgId = $this->getId($businessUnit, $columnMap['orgId']);
+            $orgId = $this->getId($businessUnit, 'orgId');
             if (null !== $orgId) {
-                $buId = $this->getId($businessUnit, $columnMap['id']);
+                $buId = $this->getId($businessUnit, 'id');
                 $tree->addBusinessUnit($buId, $orgId);
-                $businessUnitRelations[$buId] = $this->getId($businessUnit, $columnMap['parentId']);
+                $businessUnitRelations[$buId] = $this->getId($businessUnit, 'parentId');
             }
         }
 
-        $businessUnitRelations = $this->rearrangeBusinessUnitRelations($businessUnitRelations);
         $this->setSubordinateBusinessUnitIds($tree, $this->buildTree($businessUnitRelations, $businessUnitClass));
 
-        list($users, $columnMap) = $this->executeQuery(
+        [$users, $columnMap] = $this->executeQuery(
             $connection,
             $this
                 ->getRepository($userClass)
@@ -150,24 +141,28 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         return $this->getManagerForClass($entityClass)->getRepository($entityClass);
     }
 
-    /**
-     * Moves parent business unit before child business unit, of needs.
-     */
-    private function rearrangeBusinessUnitRelations(array $businessUnitRelations): array
+    private function getRecursiveBuildTreeNativeQuery(string $businessUnitClass): NativeQuery
     {
-        $relations = [];
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('id', 'id', Types::INTEGER);
+        $rsm->addScalarResult('organization_id', 'orgId', Types::INTEGER);
+        $rsm->addScalarResult('business_unit_owner_id', 'parentId', Types::INTEGER);
 
-        foreach ($businessUnitRelations as $buId => $parentId) {
-            if ($parentId && !array_key_exists($parentId, $relations)
-                && array_key_exists($parentId, $businessUnitRelations)
-            ) {
-                $relations[$parentId] = $businessUnitRelations[$parentId];
-                unset($businessUnitRelations[$parentId]);
-            }
-
-            $relations[$buId] = $parentId;
-        }
-
-        return $relations;
+        return $this->getManagerForClass($businessUnitClass)->createNativeQuery('
+            WITH RECURSIVE q AS
+            (
+               SELECT id, business_unit_owner_id, organization_id, 0 as level, ARRAY[id] as path
+               FROM oro_business_unit c
+               WHERE c.business_unit_owner_id is null
+               UNION ALL
+               SELECT sub.id, sub.business_unit_owner_id, sub.organization_id, level + 1, path || sub.id
+               FROM q
+                 JOIN oro_business_unit sub
+                   ON sub.business_unit_owner_id = q.id
+            )
+            SELECT id, business_unit_owner_id, organization_id
+            FROM q
+            ORDER BY path
+        ', $rsm);
     }
 }
