@@ -65,9 +65,10 @@ abstract class AbstractBaseRequestDataValidator
         }
     }
 
-    protected function validateTypeAndIdAreRequiredNotBlankString(array $data, string $pointer): bool
+    protected function validateTypeAndIdAreRequiredNotBlankString($data, string $pointer): bool
     {
         $isValid = true;
+        $data = is_array($data) ? $data : [];
         if (!$this->validateRequiredNotBlankString($data, JsonApiDoc::TYPE, $pointer)) {
             $isValid = false;
         }
