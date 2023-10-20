@@ -10,3 +10,18 @@ doctrine:
         options: { ConnectionId: message_queue }
       search:
         options: { ConnectionId: search }
+
+oro_test_framework:
+  install_options:
+    user_name: admin
+    user_email: admin@example.com
+    user_firstname: John
+    user_lastname: Doe
+    user_password: admin
+    sample_data: false
+    organization_name: OroInc
+    application_url: http://localhost/
+    skip_translations: true
+    timeout: 600
+    language: en
+    formatting_code: en_US
