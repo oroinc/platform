@@ -6,3 +6,6 @@ services:
             - '@oro_config.global'
         tags:
             - { name: oro.sso.oauth_user_provider, resource_owner: google }
+
+    oro_google_integration.resource_owner.factory:
+        class: Oro\Bundle\GoogleIntegrationBundle\OAuth\GoogleResourceOwnerFactory

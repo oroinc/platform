@@ -8,6 +8,11 @@ parameters:
         dataType: 'string'
         required: true
         actualType: 'string'
+    activityEmails:
+        dataType: 'integer'
+        required: false
+        actualType: 'collection'
+        subType: 'emails'
     attachments:
         dataType: 'integer'
         required: false
@@ -38,6 +43,11 @@ response:
         dataType: 'string'
         required: true
         actualType: 'string'
+    activityEmails:
+        dataType: 'integer'
+        required: false
+        actualType: 'collection'
+        subType: 'emails'
     attachments:
         dataType: 'integer'
         required: false

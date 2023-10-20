@@ -38,9 +38,13 @@ data:
                 -
                     type: users
                     id: '<toString(@user1->id)>'
+                    meta:
+                        emailThreadContextItemId: '<("users-" . @user1->id . "-" . @createdEmail->id)>'
                 -
                     type: users
                     id: '<toString(@user->id)>'
+                    meta:
+                        emailThreadContextItemId: '<("users-" . @user->id . "-" . @createdEmail->id)>'
         emailAttachments:
             data: []
 included:

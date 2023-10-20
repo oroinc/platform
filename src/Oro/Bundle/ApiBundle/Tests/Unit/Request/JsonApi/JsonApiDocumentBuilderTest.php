@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi;
 
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder;
@@ -21,23 +22,20 @@ use Psr\Log\LoggerInterface;
  */
 class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
 {
-    /** @var JsonApiDocumentBuilder */
-    private $documentBuilder;
-
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
+
+    /** @var JsonApiDocumentBuilder */
+    private $documentBuilder;
 
     protected function setUp(): void
     {
         $this->requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
-        $valueNormalizer = $this->getValueNormalizer();
-        $entityIdTransformer = $this->getEntityIdTransformer();
-        $entityIdTransformerRegistry = $this->getEntityIdTransformerRegistry($entityIdTransformer);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->documentBuilder = new JsonApiDocumentBuilder(
-            $valueNormalizer,
-            $entityIdTransformerRegistry,
+            $this->getValueNormalizer(),
+            $this->getEntityIdTransformerRegistry($this->getEntityIdTransformer()),
             $this->logger
         );
     }
@@ -626,7 +624,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             'code'       => 123,
             'category'   => ['code' => 456, '_meta1' => 'category_meta1'],
             'categories' => [
-                ['code' => 456, '_meta1' => 'category_meta1_item1'],
+                ['code' => 456, '_meta1' => 'category_meta1_item1', 'meta2' => 'category_meta2_item1'],
                 ['code' => 457, '_meta1' => 'category_meta1_item2']
             ]
         ];
@@ -663,7 +661,72 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                                     'type' => 'test_category',
                                     'id'   => 'Test\Category::456',
                                     'meta' => [
-                                        'meta1' => 'category_meta1_item1'
+                                        'meta1' => 'category_meta1_item1',
+                                        'meta2' => 'category_meta2_item1'
+                                    ]
+                                ],
+                                [
+                                    'type' => 'test_category',
+                                    'id'   => 'Test\Category::457',
+                                    'meta' => [
+                                        'meta1' => 'category_meta1_item2'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testAssociationWithMetaPropertiesInTargetMetadata()
+    {
+        $object = [
+            'code'       => 123,
+            'category'   => ['code' => 456, '_meta1' => 'category_meta1'],
+            'categories' => [
+                ['code' => 456, '_meta1' => 'category_meta1_item1', 'meta2' => 'category_meta2_item1'],
+                ['code' => 457, '_meta1' => 'category_meta1_item2']
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['code']);
+        $metadata->addField($this->createFieldMetadata('code'));
+        $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category', false, ['code']));
+        $metadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true, ['code']));
+
+        foreach ($metadata->getAssociations() as $association) {
+            $associationTargetMetadata = $association->getTargetMetadata();
+            $associationTargetMetadata->addMetaProperty(new MetaPropertyMetadata('meta1', 'string', '_meta1'));
+            $associationTargetMetadata->addMetaProperty(new MetaPropertyMetadata('meta2', 'string'));
+        }
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'data' => [
+                    'type'          => 'test_entity',
+                    'id'            => 'Test\Entity::123',
+                    'relationships' => [
+                        'category'   => [
+                            'data' => [
+                                'type' => 'test_category',
+                                'id'   => 'Test\Category::456',
+                                'meta' => [
+                                    'meta1' => 'category_meta1'
+                                ]
+                            ]
+                        ],
+                        'categories' => [
+                            'data' => [
+                                [
+                                    'type' => 'test_category',
+                                    'id'   => 'Test\Category::456',
+                                    'meta' => [
+                                        'meta1' => 'category_meta1_item1',
+                                        'meta2' => 'category_meta2_item1'
                                     ]
                                 ],
                                 [

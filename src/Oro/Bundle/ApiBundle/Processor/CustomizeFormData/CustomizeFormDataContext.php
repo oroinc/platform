@@ -82,9 +82,6 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     /** the form event name */
     private const EVENT = 'event';
 
-    /** the name of the action which causes this action, e.g. "create" or "update" */
-    private const PARENT_ACTION = 'parentAction';
-
     private ?FormInterface $form = null;
     private mixed $data = null;
     private ?IncludedEntityCollection $includedEntities = null;
@@ -119,26 +116,6 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
         $this->set(self::EVENT, $event);
         $this->setFirstGroup($event);
         $this->setLastGroup($event);
-    }
-
-    /**
-     * Gets the name of the action which causes this action, e.g. "create" or "update".
-     */
-    public function getParentAction(): ?string
-    {
-        return $this->get(self::PARENT_ACTION);
-    }
-
-    /**
-     * Sets the name of the action which causes this action, e.g. "create" or "update".
-     */
-    public function setParentAction(?string $action): void
-    {
-        if ($action) {
-            $this->set(self::PARENT_ACTION, $action);
-        } else {
-            $this->remove(self::PARENT_ACTION);
-        }
     }
 
     /**

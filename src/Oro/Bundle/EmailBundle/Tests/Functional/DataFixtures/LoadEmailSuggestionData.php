@@ -39,11 +39,11 @@ class LoadEmailSuggestionData extends AbstractFixture implements ContainerAwareI
 
         $manager->persist($email);
 
-        $user4 = $this->createUser($userManager, $organization, 'Lucas', 'Thornton', $email);
-        $user5 = $this->createUser($userManager, $organization, 'Traci', 'Patric', $email);
+        $user10 = $this->createUser($userManager, $organization, 'Lucas', 'Thornton', $email);
+        $user11 = $this->createUser($userManager, $organization, 'Traci', 'Patric', $email);
 
-        $this->setReference('user_4', $user4);
-        $this->setReference('user_5', $user5);
+        $this->setReference('user_10', $user10);
+        $this->setReference('user_11', $user11);
 
         $manager->flush();
     }

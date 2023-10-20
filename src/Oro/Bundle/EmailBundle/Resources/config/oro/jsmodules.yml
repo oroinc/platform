@@ -15,6 +15,7 @@ dynamic-imports:
         - oro/select2-email-recipients-component
         - oroemail/js/app/views/email-attachment-context-view
         - oroemail/js/validator/email-address
+        - oroemail/js/app/components/email-thread-context-component
     orodatagrid:
         - oro/datagrid/action/mark-email-mass-action
         - oro/filter/email-string-filter

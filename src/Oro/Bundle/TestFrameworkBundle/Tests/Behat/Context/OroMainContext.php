@@ -759,7 +759,7 @@ class OroMainContext extends MinkContext implements
      *
      * @param string $loginAndPassword
      */
-    public function loginAsUserWithPassword($loginAndPassword = 'admin')
+    public function loginAsUserWithPassword($loginAndPassword = 'admin', bool $closeOrganizationNotice = true)
     {
         //quick way to logout user (delete all cookies)
         $driver = $this->getSession()->getDriver();
@@ -770,8 +770,10 @@ class OroMainContext extends MinkContext implements
         $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');
 
-        $this->waitForAjax();
-        $this->pressButtonIfPresent('Organization Notice Close');
+        if ($closeOrganizationNotice) {
+            $this->waitForAjax();
+            $this->pressButtonIfPresent('Organization Notice Close');
+        }
     }
 
     /**

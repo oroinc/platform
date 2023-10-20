@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Provider;
 
-use Http\Client\Common\HttpMethodsClientInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
-use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
+use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMapInterface;
 use Oro\Bundle\ImapBundle\Exception\OAuthAccessTokenFailureException;
 use Oro\Bundle\ImapBundle\Exception\RefreshOAuthAccessTokenFailureException;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * The base class for OAuth providers.
@@ -15,12 +15,12 @@ abstract class AbstractOAuthProvider implements OAuthProviderInterface
 {
     private const MAX_RETRY_ATTEMPTS = 3;
 
-    private HttpMethodsClientInterface $httpClient;
-    private ResourceOwnerMap $resourceOwnerMap;
+    private HttpClientInterface $httpClient;
+    private ResourceOwnerMapInterface $resourceOwnerMap;
 
     public function __construct(
-        HttpMethodsClientInterface $httpClient,
-        ResourceOwnerMap $resourceOwnerMap
+        HttpClientInterface $httpClient,
+        ResourceOwnerMapInterface $resourceOwnerMap
     ) {
         $this->httpClient = $httpClient;
         $this->resourceOwnerMap = $resourceOwnerMap;
@@ -119,13 +119,16 @@ abstract class AbstractOAuthProvider implements OAuthProviderInterface
             'user-agent'     => 'oro-oauth'
         ];
 
-        $response = $this->httpClient->post($this->getAccessTokenUrl(), $headers, $content);
-        $responseBody = $response->getBody();
-        if (!$responseBody) {
+        $response = $this->httpClient->request('POST', $this->getAccessTokenUrl(), [
+            'headers' => $headers,
+            'body' => $content,
+        ]);
+        $responseContent = $response->getContent();
+        if (!$responseContent) {
             return [];
         }
 
-        return json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
+        return json_decode($responseContent, true, 512, JSON_THROW_ON_ERROR);
     }
 
     private function doAccessTokenHttpRequest(array $parameters): array

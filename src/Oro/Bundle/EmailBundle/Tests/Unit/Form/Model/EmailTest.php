@@ -13,7 +13,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, mixed $value, mixed $expectedValue = null)
+    public function testSettersAndGetters(string $property, mixed $value, mixed $expectedValue = null): void
     {
         if (!$expectedValue) {
             $expectedValue = $value;
@@ -23,7 +23,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($obj, $property, $value);
-        $this->assertEquals($expectedValue, $accessor->getValue($obj, $property));
+        self::assertEquals($expectedValue, $accessor->getValue($obj, $property));
     }
 
     public function propertiesDataProvider(): array
@@ -47,27 +47,39 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetEmptyRecipients()
+    public function testGetEmptyRecipients(): void
     {
         $obj = new Email();
         $accessor = PropertyAccess::createPropertyAccessor();
-        $this->assertEquals([], $accessor->getValue($obj, 'to'));
-        $this->assertEquals([], $accessor->getValue($obj, 'cc'));
-        $this->assertEquals([], $accessor->getValue($obj, 'bcc'));
+        self::assertEquals([], $accessor->getValue($obj, 'to'));
+        self::assertEquals([], $accessor->getValue($obj, 'cc'));
+        self::assertEquals([], $accessor->getValue($obj, 'bcc'));
     }
 
-    public function testHasEntity()
+    public function testHasEntity(): void
     {
         $obj = new Email();
-        $this->assertFalse($obj->hasEntity());
+        self::assertFalse($obj->hasEntity());
 
         $obj->setEntityClass('Test\Entity');
-        $this->assertFalse($obj->hasEntity());
+        self::assertFalse($obj->hasEntity());
 
         $obj->setEntityId(123);
-        $this->assertTrue($obj->hasEntity());
+        self::assertTrue($obj->hasEntity());
 
         $obj->setEntityClass(null);
-        $this->assertFalse($obj->hasEntity());
+        self::assertFalse($obj->hasEntity());
+    }
+
+    public function testAllowToUpdateEmptyContexts(): void
+    {
+        $obj = new Email();
+        self::assertTrue($obj->isUpdateEmptyContextsAllowed());
+
+        $obj->setAllowToUpdateEmptyContexts(false);
+        self::assertFalse($obj->isUpdateEmptyContextsAllowed());
+
+        $obj->setAllowToUpdateEmptyContexts(true);
+        self::assertTrue($obj->isUpdateEmptyContextsAllowed());
     }
 }

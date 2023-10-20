@@ -6,7 +6,7 @@ use HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\Authentication\Token\OAuthToken as HWIOauthToken;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
-use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
+use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMapInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesser;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
@@ -26,7 +26,7 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|OAuthAwareUserProviderInterface */
     private $userProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceOwnerMap */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceOwnerMapInterface */
     private $resourceOwnerMap;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|UserCheckerInterface */
@@ -44,7 +44,7 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->userProvider = $this->createMock(OAuthAwareUserProviderInterface::class);
-        $this->resourceOwnerMap = $this->createMock(ResourceOwnerMap::class);
+        $this->resourceOwnerMap = $this->createMock(ResourceOwnerMapInterface::class);
         $this->userChecker = $this->createMock(UserCheckerInterface::class);
         $this->tokenFactory = new OAuthTokenFactory();
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
@@ -54,7 +54,6 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
             $this->userProvider,
             $this->resourceOwnerMap,
             $this->userChecker,
-            $this->tokenStorage
         );
     }
 

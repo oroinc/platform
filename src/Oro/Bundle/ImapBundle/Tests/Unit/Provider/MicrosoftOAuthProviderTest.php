@@ -6,13 +6,15 @@ use Http\Client\Common\HttpMethodsClientInterface;
 use HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
+use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMapInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Exception\OAuthAccessTokenFailureException;
 use Oro\Bundle\ImapBundle\Exception\RefreshOAuthAccessTokenFailureException;
 use Oro\Bundle\ImapBundle\Provider\MicrosoftOAuthProvider;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
-use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -38,8 +40,8 @@ class MicrosoftOAuthProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->httpClient = $this->createMock(HttpMethodsClientInterface::class);
-        $this->resourceOwnerMap = $this->createMock(ResourceOwnerMap::class);
+        $this->httpClient = $this->createMock(HttpClientInterface::class);
+        $this->resourceOwnerMap = $this->createMock(ResourceOwnerMapInterface::class);
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
 
@@ -75,7 +77,7 @@ class MicrosoftOAuthProviderTest extends \PHPUnit\Framework\TestCase
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects(self::once())
-            ->method('getBody')
+            ->method('getContent')
             ->willReturn(json_encode([
                 'access_token'  => 'sampleAccessToken',
                 'refresh_token' => 'sampleRefreshToken',
@@ -83,29 +85,20 @@ class MicrosoftOAuthProviderTest extends \PHPUnit\Framework\TestCase
             ], JSON_THROW_ON_ERROR));
 
         $this->httpClient->expects(self::once())
-            ->method('post')
+            ->method('request')
             ->with(
+                'POST',
                 'https://login.microsoftonline.com/sampleTenant/oauth2/v2.0/token',
-                self::isType('array'),
-                self::isType('string')
-            )
-            ->willReturnCallback(function ($url, $headers, $body) use ($parameters, $response) {
-                $bodyValues = [];
-                parse_str($body, $bodyValues);
-                self::assertEquals($parameters, $bodyValues);
-                $content = http_build_query($parameters);
-                self::assertEquals($content, $body);
-                self::assertEquals(
-                    [
-                        'Content-length' => strlen($content),
+                [
+                    'headers' => [
+                        'Content-length' => \strlen(http_build_query($parameters)),
                         'content-type'   => 'application/x-www-form-urlencoded',
                         'user-agent'     => 'oro-oauth'
                     ],
-                    $headers
-                );
-
-                return $response;
-            });
+                    'body' => http_build_query($parameters)
+                ]
+            )
+            ->willReturn($response);
     }
 
     public function testGetAuthorizationUrl(): void
@@ -228,12 +221,12 @@ class MicrosoftOAuthProviderTest extends \PHPUnit\Framework\TestCase
 
         $response1 = $this->createMock(ResponseInterface::class);
         $response1->expects(self::once())
-            ->method('getBody')
+            ->method('getContent')
             ->willReturn('');
 
         $response2 = $this->createMock(ResponseInterface::class);
         $response2->expects(self::once())
-            ->method('getBody')
+            ->method('getContent')
             ->willReturn(json_encode([
                 'access_token'  => 'sampleAccessToken',
                 'refresh_token' => 'sampleRefreshToken',
@@ -241,11 +234,11 @@ class MicrosoftOAuthProviderTest extends \PHPUnit\Framework\TestCase
             ], JSON_THROW_ON_ERROR));
 
         $this->httpClient->expects(self::exactly(2))
-            ->method('post')
+            ->method('request')
             ->with(
+                'POST',
                 'https://login.microsoftonline.com/sampleTenant/oauth2/v2.0/token',
                 self::isType('array'),
-                self::isType('string')
             )
             ->willReturnOnConsecutiveCalls($response1, $response2);
 
@@ -270,15 +263,15 @@ class MicrosoftOAuthProviderTest extends \PHPUnit\Framework\TestCase
 
         $response = $this->createMock(ResponseInterface::class);
         $response->expects(self::any())
-            ->method('getBody')
+            ->method('getContent')
             ->willReturn('');
 
         $this->httpClient->expects(self::exactly(4))
-            ->method('post')
+            ->method('request')
             ->with(
+                'POST',
                 'https://login.microsoftonline.com/sampleTenant/oauth2/v2.0/token',
                 self::isType('array'),
-                self::isType('string')
             )
             ->willReturn($response);
 
@@ -371,12 +364,12 @@ class MicrosoftOAuthProviderTest extends \PHPUnit\Framework\TestCase
 
         $response1 = $this->createMock(ResponseInterface::class);
         $response1->expects(self::once())
-            ->method('getBody')
+            ->method('getContent')
             ->willReturn('');
 
         $response2 = $this->createMock(ResponseInterface::class);
         $response2->expects(self::once())
-            ->method('getBody')
+            ->method('getContent')
             ->willReturn(json_encode([
                 'access_token'  => 'sampleAccessToken',
                 'refresh_token' => 'sampleRefreshToken',
@@ -384,11 +377,11 @@ class MicrosoftOAuthProviderTest extends \PHPUnit\Framework\TestCase
             ], JSON_THROW_ON_ERROR));
 
         $this->httpClient->expects(self::exactly(2))
-            ->method('post')
+            ->method('request')
             ->with(
+                'POST',
                 'https://login.microsoftonline.com/sampleTenant/oauth2/v2.0/token',
                 self::isType('array'),
-                self::isType('string')
             )
             ->willReturnOnConsecutiveCalls($response1, $response2);
 
@@ -408,15 +401,15 @@ class MicrosoftOAuthProviderTest extends \PHPUnit\Framework\TestCase
 
         $response = $this->createMock(ResponseInterface::class);
         $response->expects(self::any())
-            ->method('getBody')
+            ->method('getContent')
             ->willReturn('');
 
         $this->httpClient->expects(self::exactly(4))
-            ->method('post')
+            ->method('request')
             ->with(
+                'POST',
                 'https://login.microsoftonline.com/sampleTenant/oauth2/v2.0/token',
                 self::isType('array'),
-                self::isType('string')
             )
             ->willReturn($response);
 

@@ -36,9 +36,9 @@ class UpdateIncludedEmailAssociations implements ProcessorInterface
                 continue;
             }
             if (is_a($entityClass, EmailUser::class, true) && null === $entity->getEmail()) {
-                $entity->setEmail($email);
+                $email->addEmailUser($entity);
             } elseif (is_a($entityClass, EmailAttachment::class, true) && null === $entity->getEmailBody()) {
-                $entity->setEmailBody($email->getEmailBody());
+                $email->getEmailBody()->addAttachment($entity);
             }
         }
     }

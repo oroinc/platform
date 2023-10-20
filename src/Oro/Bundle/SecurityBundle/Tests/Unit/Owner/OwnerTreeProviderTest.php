@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Persistence\ManagerRegistry;
@@ -69,7 +69,7 @@ class OwnerTreeProviderTest extends OrmTestCase
     protected function setUp(): void
     {
         $conn = new ConnectionMock([], new DriverMock());
-        $conn->setDatabasePlatform(new MySqlPlatform());
+        $conn->setDatabasePlatform(new PostgreSQL100Platform());
         $this->em = $this->getTestEntityManager($conn);
         $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
@@ -143,18 +143,28 @@ class OwnerTreeProviderTest extends OrmTestCase
         $queryResult = [];
         foreach ($businessUnits as $item) {
             $queryResult[] = [
-                'id_0'   => $item['buId'],
-                'sclr_1' => $item['orgId'],
-                'sclr_2' => $item['parentBuId'],
+                'id'   => $item['buId'],
+                'organization_id' => $item['orgId'],
+                'business_unit_owner_id' => $item['parentBuId']
             ];
         }
-        $this->addQueryExpectation(
-            'SELECT o0_.id AS id_0, o0_.organization_id AS sclr_1, o0_.business_unit_owner_id AS sclr_2,'
-            . ' (CASE WHEN o0_.business_unit_owner_id IS NULL THEN 0 ELSE 1 END) AS sclr_3'
-            . ' FROM oro_business_unit o0_'
-            . ' ORDER BY sclr_3 ASC, sclr_2 ASC',
-            $queryResult
-        );
+
+        $this->addQueryExpectation('
+            WITH RECURSIVE q AS
+            (
+               SELECT id, business_unit_owner_id, organization_id, 0 as level, ARRAY[id] as path
+               FROM oro_business_unit c
+               WHERE c.business_unit_owner_id is null
+               UNION ALL
+               SELECT sub.id, sub.business_unit_owner_id, sub.organization_id, level + 1, path || sub.id
+               FROM q
+                 JOIN oro_business_unit sub
+                   ON sub.business_unit_owner_id = q.id
+            )
+            SELECT id, business_unit_owner_id, organization_id
+            FROM q
+            ORDER BY path
+        ', $queryResult);
     }
 
     private function addGetUsersExpectation(array $users)
@@ -328,11 +338,6 @@ class OwnerTreeProviderTest extends OrmTestCase
             [
                 [
                     'orgId'      => self::ORG_1,
-                    'parentBuId' => self::MAIN_BU_1,
-                    'buId'       => self::BU_2,
-                ],
-                [
-                    'orgId'      => self::ORG_1,
                     'parentBuId' => null,
                     'buId'       => self::MAIN_BU_1,
                 ],
@@ -340,6 +345,11 @@ class OwnerTreeProviderTest extends OrmTestCase
                     'orgId'      => self::ORG_1,
                     'parentBuId' => self::MAIN_BU_1,
                     'buId'       => self::BU_1,
+                ],
+                [
+                    'orgId'      => self::ORG_1,
+                    'parentBuId' => self::MAIN_BU_1,
+                    'buId'       => self::BU_2,
                 ],
                 [
                     'orgId'      => self::ORG_1,

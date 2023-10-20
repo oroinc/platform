@@ -54,6 +54,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
         $this
             ->addArgument('entity', InputArgument::REQUIRED, 'Entity class name or alias')
             ->addOption('action', null, InputOption::VALUE_REQUIRED, 'Action name', ApiAction::GET_LIST)
+            ->addOption('parentAction', null, InputOption::VALUE_REQUIRED, 'Parent action name')
             ->addOption('hateoas', null, InputOption::VALUE_NONE, 'Add HATEOAS links')
             ->setDescription('Dumps API entity metadata.')
             ->setHelp(
@@ -71,6 +72,11 @@ for which the metadata is requested. Accepted values are: <comment>options</comm
 
   <info>php %command.full_name% --action=<action> <entity></info>
 
+The <info>--parentAction</info> option can be used together with the <info>--action</info> option
+to get the metadata used for an action executed as part of another action.
+
+  <info>php %command.full_name% --action=<action> --parentAction=<parentAction> <entity></info>
+
 The <info>--hateoas</info> option can be used to include the HATEOAS links to the metadata:
 
   <info>php %command.full_name% --hateoas <entity></info>
@@ -81,6 +87,7 @@ HELP
             ->addUsage('--extra=definition --extra=<extra> <entity>')
             ->addUsage('--extra=definition --extra=<extra1> --extra=<extra2> --extra=<extraN> <entity>')
             ->addUsage('--action=<action> <entity>')
+            ->addUsage('--action=<action> --parentAction=<parentAction> <entity>')
             ->addUsage('--documentation-resources <entity>')
         ;
 
@@ -94,30 +101,32 @@ HELP
         // API version is not supported for now
         $version = Version::normalizeVersion(null);
         $action = $input->getOption('action');
+        $parentAction = $input->getOption('parentAction');
         $hateoas = $input->getOption('hateoas');
 
         $this->processorBag->addApplicableChecker(new Util\RequestTypeApplicableChecker());
 
         $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $version, $requestType);
 
-        $metadata = $this->getMetadata($entityClass, $version, $requestType, $action, $hateoas);
+        $metadata = $this->getMetadata($entityClass, $version, $requestType, $action, $parentAction, $hateoas);
         $output->write(Yaml::dump($metadata, 100, 4, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE | Yaml::DUMP_OBJECT));
 
         return Command::SUCCESS;
     }
 
-    protected function getMetadata(
+    private function getMetadata(
         string $entityClass,
         string $version,
         RequestType $requestType,
         string $action,
+        ?string $parentAction,
         bool $hateoas
     ): array {
         $configExtras = [
             new EntityDefinitionConfigExtra($action)
         ];
         $metadataExtras = [
-            new ActionMetadataExtra($action)
+            new ActionMetadataExtra($action, $parentAction)
         ];
         if ($hateoas) {
             $metadataExtras[] = new HateoasMetadataExtra(new FilterValueAccessor());

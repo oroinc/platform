@@ -40,7 +40,7 @@ data:
                 name: 'User 1'
                 email: user1@example.com
         shortTextBody: 'Test email body'
-        hasEmailAttachments: false
+        hasEmailAttachments: true
         body:
             content: 'Test <b>email</b> body'
             type: html
@@ -55,11 +55,16 @@ data:
                 -
                     type: users
                     id: '<toString(@user1->id)>'
+                    meta:
+                        emailThreadContextItemId: '<("users-" . @user1->id . "-" . @email_1->id)>'
                 -
                     type: users
                     id: '<toString(@user->id)>'
+                    meta:
+                        emailThreadContextItemId: '<("users-" . @user->id . "-" . @email_1->id)>'
         emailAttachments:
-            data: []
+            data:
+                - { type: emailattachments, id: '<toString(@createdEmail->emailBody->attachments->first->id)>' }
 included:
     -
         type: emailusers
@@ -83,6 +88,19 @@ included:
                 data:
                     type: users
                     id: '<toString(@user->id)>'
+            email:
+                data:
+                    type: emails
+                    id: '<toString(@createdEmail->id)>'
+    -
+        type: emailattachments
+        id: '<toString(@createdEmail->emailBody->attachments->first->id)>'
+        attributes:
+            fileName: 'test.jpg'
+            contentType: 'image/jpeg'
+            contentEncoding: 'base64'
+            content: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABHNCSVQICAgIfAhkiAAAAAtJREFUCJlj+A8EAAn7A/3jVfKcAAAAAElFTkSuQmCC'
+        relationships:
             email:
                 data:
                     type: emails

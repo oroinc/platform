@@ -28,9 +28,13 @@ define(function(require) {
         },
 
         initView: function() {
+            this.contextsView = new ActivityContextActivityView(this.getViewOptions());
+        },
+
+        getViewOptions: function() {
             const items = typeof this.options.contextTargets === 'undefined' ? false : this.options.contextTargets;
             const editable = typeof this.options.editable === 'undefined' ? false : this.options.editable;
-            this.contextsView = new ActivityContextActivityView({
+            return {
                 contextTargets: items,
                 entityId: this.options.entityId,
                 el: this.options._sourceElement,
@@ -38,7 +42,7 @@ define(function(require) {
                 target: this.options.target,
                 activityClass: this.options.activityClassAlias,
                 editable: editable
-            });
+            };
         }
     });
 
