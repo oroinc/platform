@@ -688,10 +688,12 @@ oro_api:
                     priority: -50
                 save_data:
                     priority: -60
-                finalize:
+                normalize_data:
                     priority: -70
-                normalize_result:
+                finalize:
                     priority: -80
+                normalize_result:
+                    priority: -90
         add_relationship:
             processor_service_id: oro_api.add_relationship.processor
             processing_groups:
@@ -711,10 +713,12 @@ oro_api:
                     priority: -50
                 save_data:
                     priority: -60
-                finalize:
+                normalize_data:
                     priority: -70
-                normalize_result:
+                finalize:
                     priority: -80
+                normalize_result:
+                    priority: -90
         update_relationship:
             processor_service_id: oro_api.update_relationship.processor
             processing_groups:
@@ -734,10 +738,12 @@ oro_api:
                     priority: -50
                 save_data:
                     priority: -60
-                finalize:
+                normalize_data:
                     priority: -70
-                normalize_result:
+                finalize:
                     priority: -80
+                normalize_result:
+                    priority: -90
         not_allowed:
             processing_groups:
                 initialize:

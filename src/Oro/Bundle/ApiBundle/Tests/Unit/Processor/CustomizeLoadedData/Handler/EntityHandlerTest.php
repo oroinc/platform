@@ -69,6 +69,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
                 ) {
                     self::assertEquals($version, $context->getVersion());
                     self::assertEquals($requestType, $context->getRequestType());
+                    self::assertNull($context->getParentAction());
                     self::assertEquals($entityClass, $context->getClassName());
                     self::assertSame($config, $context->getConfig());
                     self::assertSame($configExtras, $context->getConfigExtras());
@@ -586,6 +587,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
                 ) {
                     self::assertEquals($version, $context->getVersion());
                     self::assertEquals($requestType, $context->getRequestType());
+                    self::assertNull($context->getParentAction());
                     self::assertEquals($entityClass, $context->getClassName());
                     self::assertSame($config, $context->getConfig());
                     self::assertSame($configExtras, $context->getConfigExtras());
@@ -650,8 +652,71 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
                 ) {
                     self::assertEquals($version, $context->getVersion());
                     self::assertEquals($requestType, $context->getRequestType());
+                    self::assertNull($context->getParentAction());
                     self::assertEquals($entityClass, $context->getClassName());
                     self::assertSame($customConfig, $context->getConfig());
+                    self::assertSame($configExtras, $context->getConfigExtras());
+                    self::assertEquals($data, $context->getResult());
+                    self::assertEquals('item', $context->getFirstGroup());
+                    self::assertEquals('item', $context->getLastGroup());
+                    self::assertFalse($context->isIdentifierOnly());
+
+                    $contextData = $context->getResult();
+                    $contextData['anotherKey'] = 'anotherValue';
+                    $context->setResult($contextData);
+                }
+            );
+
+        $handledData = $handler($data, $context);
+        self::assertEquals(
+            ['key' => 'value', 'anotherKey' => 'anotherValue'],
+            $handledData
+        );
+    }
+
+    public function testWithParentAction()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $parentAction = 'create';
+        $entityClass = Entity\User::class;
+        $config = new EntityDefinitionConfig();
+        $configExtras = [new EntityDefinitionConfigExtra()];
+        $data = ['key' => 'value'];
+
+        $sharedData = $this->createMock(ParameterBagInterface::class);
+        $context = ['action' => 'get', 'sharedData' => $sharedData, 'parentAction' => $parentAction];
+
+        $handler = new EntityHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $entityClass,
+            $config,
+            $configExtras,
+            false
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) use (
+                    $version,
+                    $requestType,
+                    $parentAction,
+                    $entityClass,
+                    $config,
+                    $configExtras,
+                    $data
+                ) {
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals($parentAction, $context->getParentAction());
+                    self::assertEquals($entityClass, $context->getClassName());
+                    self::assertSame($config, $context->getConfig());
                     self::assertSame($configExtras, $context->getConfigExtras());
                     self::assertEquals($data, $context->getResult());
                     self::assertEquals('item', $context->getFirstGroup());

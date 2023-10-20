@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Handler;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -15,14 +16,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class ActivityEntityDeleteHandler
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var ActivityManager */
-    private $activityManager;
-
-    /** @var ActivityEntityDeleteHandlerExtensionInterface */
-    private $extension;
+    private ManagerRegistry $doctrine;
+    private ActivityManager $activityManager;
+    private ActivityEntityDeleteHandlerExtensionInterface $extension;
 
     public function __construct(
         ManagerRegistry $doctrine,
@@ -35,7 +31,7 @@ class ActivityEntityDeleteHandler
     }
 
     /**
-     * Deletes an activity entity associations that is represented by the given identifier.
+     * Deletes an activity entity association that is represented by the given identifier.
      *
      * @param RelationIdentifier $id    The activity entity association identifier
      * @param bool               $flush Whether to call flush() method of an entity manager
@@ -59,12 +55,33 @@ class ActivityEntityDeleteHandler
             throw new EntityNotFoundException();
         }
 
-        $this->extension->assertDeleteGranted($entity, $targetEntity);
+        $this->deleteActivityAssociation($entity, $targetEntity, $flush);
+    }
 
-        $this->activityManager->removeActivityTarget($entity, $targetEntity);
+    /**
+     * Deletes an association between the given activity entity and the given target entity.
+     *
+     * @param ActivityInterface $activityEntity The activity entity
+     * @param object            $targetEntity   The entity associated with the activity entity
+     * @param bool              $flush          Whether to call flush() method of an entity manager
+     *
+     * @return bool TRUE if the association was removed; otherwise, FALSE
+     *
+     * @throws AccessDeniedException if the delete operation is forbidden
+     */
+    public function deleteActivityAssociation(
+        ActivityInterface $activityEntity,
+        object $targetEntity,
+        bool $flush = true
+    ): bool {
+        $this->extension->assertDeleteGranted($activityEntity, $targetEntity);
+
+        $result = $this->activityManager->removeActivityTarget($activityEntity, $targetEntity);
 
         if ($flush) {
-            $em->flush();
+            $this->doctrine->getManagerForClass(ClassUtils::getClass($activityEntity))->flush();
         }
+
+        return $result;
     }
 }

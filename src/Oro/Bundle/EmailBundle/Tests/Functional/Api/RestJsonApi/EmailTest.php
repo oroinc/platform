@@ -2,7 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\RestJsonApi;
 
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -10,8 +14,10 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tests\Functional\Api\DataFixtures\LoadEmailData;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 
@@ -20,6 +26,8 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailTest extends RestJsonApiTestCase
 {
@@ -28,7 +36,7 @@ class EmailTest extends RestJsonApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->loadFixtures([LoadEmailData::class]);
+        $this->loadFixtures([LoadEmailData::class, LoadBusinessUnit::class]);
         $this->updateRolePermissions(
             'ROLE_ADMINISTRATOR',
             EmailUser::class,
@@ -43,6 +51,42 @@ class EmailTest extends RestJsonApiTestCase
         );
 
         $this->getOptionalListenerManager()->enableListener('oro_email.listener.entity_listener');
+    }
+
+    private function setAutoLinkAttachments(string $targetEntityClass, ?bool $value): ?bool
+    {
+        /** @var ConfigManager $configManager */
+        $configManager = self::getContainer()->get('oro_entity_config.config_manager');
+        $entityConfig = $configManager->getEntityConfig('attachment', $targetEntityClass);
+        $previousValue = $entityConfig->get('auto_link_attachments');
+        $entityConfig->set('auto_link_attachments', $value);
+        $configManager->persist($entityConfig);
+        $configManager->flush();
+
+        return $previousValue;
+    }
+
+    private function findLinkedAttachment(string $targetEntityClass, int $targetEntityId): ?Attachment
+    {
+        /** @var AttachmentManager $attachmentManager */
+        $attachmentManager = self::getContainer()->get('oro_attachment.manager');
+        $attachmentTargets = $attachmentManager->getAttachmentTargets();
+
+        return $this->getEntityManager()->getRepository(Attachment::class)->findOneBy([
+            $attachmentTargets[$targetEntityClass] => $targetEntityId
+        ]);
+    }
+
+    private function getActivityTargetIds(Email $email): array
+    {
+        $result = [];
+        $targets = $email->getActivityTargets();
+        foreach ($targets as $target) {
+            $result[] = $target->getId();
+        }
+        sort($result);
+
+        return $result;
     }
 
     public function testGetList(): void
@@ -67,58 +111,11 @@ class EmailTest extends RestJsonApiTestCase
             ['include' => 'emailUsers,emailAttachments']
         );
         $this->assertResponseContains('get_email.yml', $response);
-    }
 
-    public function testGetSubresourceForActivityTargets(): void
-    {
-        $response = $this->getSubresource(
-            ['entity' => 'emails', 'id' => '<toString(@email_1->id)>', 'association' => 'activityTargets']
-        );
-        $this->assertResponseContains(
-            [
-                'data' => [
-                    [
-                        'type'       => 'users',
-                        'id'         => '<toString(@user->id)>',
-                        'attributes' => [
-                            'username' => '<toString(@user->username)>'
-                        ]
-                    ]
-                ]
-            ],
-            $response
-        );
-    }
-
-    public function testGetSubresourceForActivityTargetsWithIncludeFilter(): void
-    {
-        $response = $this->getSubresource(
-            ['entity' => 'emails', 'id' => '<toString(@email_1->id)>', 'association' => 'activityTargets'],
-            ['include' => 'userRoles']
-        );
-        $this->assertResponseContains(
-            [
-                'data'     => [
-                    [
-                        'type'       => 'users',
-                        'id'         => '<toString(@user->id)>',
-                        'attributes' => [
-                            'username' => '<toString(@user->username)>'
-                        ]
-                    ]
-                ],
-                'included' => [
-                    [
-                        'type'       => 'userroles',
-                        'id'         => '<toString(@ROLE_ADMINISTRATOR->id)>',
-                        'attributes' => [
-                            'role' => '<toString(@ROLE_ADMINISTRATOR->role)>'
-                        ]
-                    ]
-                ]
-            ],
-            $response
-        );
+        // the "emailThreadContextItemId" meta property should be added to "activityTargets" for "create" action only
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertTrue(isset($responseContent['data']['relationships']['activityTargets']['data'][0]));
+        self::assertFalse(isset($responseContent['data']['relationships']['activityTargets']['data'][0]['meta']));
     }
 
     public function testTryToCreateWithEmptyData(): void
@@ -361,6 +358,49 @@ class EmailTest extends RestJsonApiTestCase
         $this->assertResponseContains($expectedData, $response);
     }
 
+    public function testCreateWithAttachmentWhenAutoLinkAttachmentsEnabled(): void
+    {
+        $em = $this->getEntityManager();
+        $department = new TestDepartment();
+        $department->setName('Test Department');
+        $department->setOwner($this->getReference(LoadBusinessUnit::BUSINESS_UNIT));
+        $em->persist($department);
+        $em->flush();
+
+        $data = $this->getRequestData('create_email.yml');
+        $data['data']['relationships']['activityTargets']['data'][] = [
+            'type' => $this->getEntityType(TestDepartment::class),
+            'id'   => (string)$department->getId()
+        ];
+
+        $originalAutoLinkAttachmentsForUser = $this->setAutoLinkAttachments(TestDepartment::class, true);
+        try {
+            $response = $this->post(['entity' => 'emails'], $data);
+        } finally {
+            $this->setAutoLinkAttachments(TestDepartment::class, $originalAutoLinkAttachmentsForUser);
+        }
+
+        $createdEmail = $this->getEntityManager()->find(Email::class, (int)$this->getResourceId($response));
+        $this->getReferenceRepository()->addReference('createdEmail', $createdEmail);
+        $expectedData = $this->getResponseData('create_email.yml');
+        $expectedData['data']['relationships']['activityTargets']['data'] = [
+            [
+                'type' => $this->getEntityType(TestDepartment::class),
+                'id'   => (string)$department->getId()
+            ]
+        ];
+        $this->assertResponseContains($expectedData, $response);
+
+        /** @var EmailAttachment $emailAttachment */
+        $emailAttachment = $createdEmail->getEmailBody()->getAttachments()->first();
+
+        $linkedAttachment = $this->findLinkedAttachment(TestDepartment::class, $department->getId());
+        self::assertNotNull($linkedAttachment);
+        self::assertEquals($emailAttachment->getFileName(), $linkedAttachment->getFile()->getOriginalFilename());
+        self::assertEquals($emailAttachment->getContentType(), $linkedAttachment->getFile()->getMimeType());
+        self::assertEquals($emailAttachment->getFile()->getId(), $linkedAttachment->getFile()->getId());
+    }
+
     public function testCreateWithAllDataWhenAttachmentHasRelationshipToEmail(): void
     {
         $data = $this->getRequestData('create_email.yml');
@@ -601,6 +641,37 @@ class EmailTest extends RestJsonApiTestCase
         $expectedData['data']['relationships']['emailAttachments']['data'][0]['id'] = (string)$attachment->getId();
         $expectedData['included'][0]['id'] = (string)$attachment->getId();
         $this->assertResponseContains($expectedData, $response);
+    }
+
+    public function testSetBodyWithAttachmentWhenAutoLinkAttachmentsEnabled(): void
+    {
+        /** @var Email $email */
+        $email = $this->getReference('email_2');
+        $em = $this->getEntityManager();
+        $department = new TestDepartment();
+        $department->setName('Test Department');
+        $department->setOwner($this->getReference(LoadBusinessUnit::BUSINESS_UNIT));
+        $em->persist($department);
+        /** @var ActivityManager $activityManager */
+        $activityManager = self::getContainer()->get('oro_activity.manager');
+        $activityManager->addActivityTarget($email, $department);
+        $em->flush();
+
+        $originalAutoLinkAttachmentsForUser = $this->setAutoLinkAttachments(TestDepartment::class, true);
+        try {
+            $this->testSetBodyWithAttachment();
+        } finally {
+            $this->setAutoLinkAttachments(TestDepartment::class, $originalAutoLinkAttachmentsForUser);
+        }
+
+        /** @var EmailAttachment $emailAttachment */
+        $emailAttachment = $email->getEmailBody()->getAttachments()->first();
+
+        $linkedAttachment = $this->findLinkedAttachment(TestDepartment::class, $department->getId());
+        self::assertNotNull($linkedAttachment);
+        self::assertEquals($emailAttachment->getFileName(), $linkedAttachment->getFile()->getOriginalFilename());
+        self::assertEquals($emailAttachment->getContentType(), $linkedAttachment->getFile()->getMimeType());
+        self::assertEquals($emailAttachment->getFile()->getId(), $linkedAttachment->getFile()->getId());
     }
 
     public function testSetBodyWithAttachmentWhenAttachmentHasRelationshipToEmail(): void
@@ -977,5 +1048,150 @@ class EmailTest extends RestJsonApiTestCase
         $this->assertResponseContains($data, $response);
         $email = $this->getEntityManager()->find(Email::class, $emailId);
         self::assertCount(2, $email->getActivityTargets());
+
+        // the "emailThreadContextItemId" meta property should be added to "activityTargets" for "create" action only
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertTrue(isset($responseContent['data']['relationships']['activityTargets']['data'][0]));
+        self::assertFalse(isset($responseContent['data']['relationships']['activityTargets']['data'][0]['meta']));
+    }
+
+    public function testGetSubresourceForActivityTargets(): void
+    {
+        $response = $this->getSubresource(
+            ['entity' => 'emails', 'id' => '<toString(@email_1->id)>', 'association' => 'activityTargets']
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'       => 'users',
+                        'id'         => '<toString(@user->id)>',
+                        'attributes' => [
+                            'username' => '<toString(@user->username)>'
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetSubresourceForActivityTargetsWithIncludeFilter(): void
+    {
+        $response = $this->getSubresource(
+            ['entity' => 'emails', 'id' => '<toString(@email_1->id)>', 'association' => 'activityTargets'],
+            ['include' => 'userRoles']
+        );
+        $this->assertResponseContains(
+            [
+                'data'     => [
+                    [
+                        'type'       => 'users',
+                        'id'         => '<toString(@user->id)>',
+                        'attributes' => [
+                            'username' => '<toString(@user->username)>'
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type'       => 'userroles',
+                        'id'         => '<toString(@ROLE_ADMINISTRATOR->id)>',
+                        'attributes' => [
+                            'role' => '<toString(@ROLE_ADMINISTRATOR->role)>'
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetRelationshipForActivityTargets(): void
+    {
+        $response = $this->getRelationship(
+            ['entity' => 'emails', 'id' => '<toString(@email_1->id)>', 'association' => 'activityTargets']
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => 'users', 'id' => '<toString(@user->id)>']
+                ]
+            ],
+            $response,
+            true
+        );
+    }
+
+    public function testUpdateRelationshipForActivityTargets(): void
+    {
+        $emailId = $this->getReference('email_1')->getId();
+        $targetEntityId = $this->getReference('user1')->getId();
+        $this->patchRelationship(
+            ['entity' => 'emails', 'id' => (string)$emailId, 'association' => 'activityTargets'],
+            [
+                'data' => [
+                    ['type' => 'users', 'id' => (string)$targetEntityId]
+                ]
+            ]
+        );
+        /** @var Email $email */
+        $email = $this->getEntityManager()->find(Email::class, $emailId);
+        self::assertEquals([$targetEntityId], $this->getActivityTargetIds($email));
+    }
+
+    public function testAddRelationshipForActivityTargets(): void
+    {
+        $emailId = $this->getReference('email_1')->getId();
+        $targetEntity1Id = $this->getReference('user')->getId();
+        $targetEntity2Id = $this->getReference('user1')->getId();
+        $response = $this->postRelationship(
+            ['entity' => 'emails', 'id' => (string)$emailId, 'association' => 'activityTargets'],
+            [
+                'data' => [
+                    ['type' => 'users', 'id' => (string)$targetEntity2Id]
+                ]
+            ]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => 'users',
+                        'id'   => (string)$targetEntity1Id,
+                        'meta' => [
+                            'emailThreadContextItemId' => 'users-' . $targetEntity1Id . '-' . $emailId
+                        ]
+                    ],
+                    [
+                        'type' => 'users',
+                        'id'   => (string)$targetEntity2Id,
+                        'meta' => [
+                            'emailThreadContextItemId' => 'users-' . $targetEntity2Id . '-' . $emailId
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+        /** @var Email $email */
+        $email = $this->getEntityManager()->find(Email::class, $emailId);
+        self::assertEquals([$targetEntity1Id, $targetEntity2Id], $this->getActivityTargetIds($email));
+    }
+
+    public function testDeleteRelationshipForActivityTargets(): void
+    {
+        $emailId = $this->getReference('email_1')->getId();
+        $this->deleteRelationship(
+            ['entity' => 'emails', 'id' => (string)$emailId, 'association' => 'activityTargets'],
+            [
+                'data' => [
+                    ['type' => 'users', 'id' => '<toString(@user->id)>']
+                ]
+            ]
+        );
+        /** @var Email $email */
+        $email = $this->getEntityManager()->find(Email::class, $emailId);
+        self::assertEquals([], $this->getActivityTargetIds($email));
     }
 }

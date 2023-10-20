@@ -972,19 +972,13 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Generate Basic  authorization header
-     *
-     * @param string $userName
-     * @param string $userPassword
-     * @param int $userOrganization
-     *
-     * @return array
+     * Generates Basic authorization header.
      */
     public static function generateBasicAuthHeader(
-        $userName = self::AUTH_USER,
-        $userPassword = self::AUTH_PW,
-        $userOrganization = self::AUTH_ORGANIZATION
-    ) {
+        string $userName = self::AUTH_USER,
+        string $userPassword = self::AUTH_PW,
+        int $userOrganization = self::AUTH_ORGANIZATION
+    ): array {
         return [
             'PHP_AUTH_USER' => $userName,
             'PHP_AUTH_PW' => $userPassword,
@@ -992,50 +986,26 @@ abstract class WebTestCase extends BaseWebTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function generateNoHashNavigationHeader()
+    public static function generateNoHashNavigationHeader(): array
     {
         return ['HTTP_' . strtoupper(ResponseHashnavListener::HASH_NAVIGATION_HEADER) => 0];
     }
 
     /**
-     * Convert value to array
-     *
-     * @param mixed $value
-     *
-     * @return array
+     * Converts a JSON string to an array.
      */
-    public static function valueToArray($value)
+    public static function jsonToArray(string $json): array
     {
-        return self::jsonToArray(json_encode($value));
+        return (array)json_decode($json, true, 512, JSON_THROW_ON_ERROR);
     }
 
     /**
-     * Convert json to array
-     *
-     * @param string $json
-     *
-     * @return array
+     * Checks JSON response status code and returns the response content as an array.
      */
-    public static function jsonToArray($json)
-    {
-        return (array)json_decode($json, true);
-    }
-
-    /**
-     * Checks json response status code and return content as array
-     *
-     * @param Response $response
-     * @param int $statusCode
-     * @param string $message
-     *
-     * @return array
-     */
-    public static function getJsonResponseContent(Response $response, $statusCode, string $message = '')
+    public static function getJsonResponseContent(Response $response, int $statusCode, string $message = ''): array
     {
         self::assertJsonResponseStatusCodeEquals($response, $statusCode, $message);
+
         return self::jsonToArray($response->getContent());
     }
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Controller\Api\Rest;
 
+use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailActivityData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailActivityTargetControllerTest extends WebTestCase
@@ -9,11 +10,7 @@ class EmailActivityTargetControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures(
-            [
-                'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailActivityData'
-            ]
-        );
+        $this->loadFixtures([LoadEmailActivityData::class]);
     }
 
     public function testGetAllActivityTargetTypes()
@@ -24,7 +21,7 @@ class EmailActivityTargetControllerTest extends WebTestCase
         );
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
         // at least User entity should be returned
-        $this->assertTrue(count($entities) >= 1);
+        $this->assertNotEmpty($entities);
     }
 
     public function testGetActivityTypes()
@@ -35,7 +32,7 @@ class EmailActivityTargetControllerTest extends WebTestCase
         );
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
         // at least email activity should be returned
-        $this->assertTrue(count($entities) >= 1);
+        $this->assertNotEmpty($entities);
     }
 
     public function testGetActivities()
@@ -48,6 +45,6 @@ class EmailActivityTargetControllerTest extends WebTestCase
             )
         );
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(2, $entities);
+        $this->assertCount(3, $entities);
     }
 }

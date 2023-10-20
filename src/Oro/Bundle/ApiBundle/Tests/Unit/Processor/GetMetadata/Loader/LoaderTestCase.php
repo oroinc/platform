@@ -31,11 +31,7 @@ class LoaderTestCase extends \PHPUnit\Framework\TestCase
 
     protected function createMetaPropertyMetadata(string $fieldName, string $dataType): MetaPropertyMetadata
     {
-        $metaPropertyMetadata = new MetaPropertyMetadata();
-        $metaPropertyMetadata->setName($fieldName);
-        $metaPropertyMetadata->setDataType($dataType);
-
-        return $metaPropertyMetadata;
+        return new MetaPropertyMetadata($fieldName, $dataType);
     }
 
     protected function createFieldMetadata(string $fieldName, string $dataType): FieldMetadata

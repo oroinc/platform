@@ -414,7 +414,7 @@ abstract class RestApiTestCase extends ApiTestCase
             $entityType = self::extractEntityType($routeParameters);
             self::assertApiResponseStatusCodeEquals(
                 $response,
-                Response::HTTP_NO_CONTENT,
+                $response->getContent() ? Response::HTTP_OK : Response::HTTP_NO_CONTENT,
                 $entityType,
                 'patch relationship'
             );
@@ -447,7 +447,7 @@ abstract class RestApiTestCase extends ApiTestCase
             $entityType = self::extractEntityType($routeParameters);
             self::assertApiResponseStatusCodeEquals(
                 $response,
-                Response::HTTP_NO_CONTENT,
+                $response->getContent() ? Response::HTTP_OK : Response::HTTP_NO_CONTENT,
                 $entityType,
                 'post relationship'
             );
@@ -480,7 +480,7 @@ abstract class RestApiTestCase extends ApiTestCase
             $entityType = self::extractEntityType($routeParameters);
             self::assertApiResponseStatusCodeEquals(
                 $response,
-                Response::HTTP_NO_CONTENT,
+                $response->getContent() ? Response::HTTP_OK : Response::HTTP_NO_CONTENT,
                 $entityType,
                 'delete relationship'
             );
@@ -547,7 +547,7 @@ abstract class RestApiTestCase extends ApiTestCase
             $entityType = self::extractEntityType($routeParameters);
             self::assertApiResponseStatusCodeEquals(
                 $response,
-                [Response::HTTP_OK, Response::HTTP_NO_CONTENT],
+                $response->getContent() ? Response::HTTP_OK : Response::HTTP_NO_CONTENT,
                 $entityType,
                 'patch subresource'
             );
@@ -613,7 +613,7 @@ abstract class RestApiTestCase extends ApiTestCase
             $entityType = self::extractEntityType($routeParameters);
             self::assertApiResponseStatusCodeEquals(
                 $response,
-                [Response::HTTP_OK, Response::HTTP_NO_CONTENT],
+                $response->getContent() ? Response::HTTP_OK : Response::HTTP_NO_CONTENT,
                 $entityType,
                 'delete subresource'
             );

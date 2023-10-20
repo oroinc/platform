@@ -107,6 +107,7 @@ define(function(require) {
             this.listenTo(this.model, 'change:isNew', this.onRowNewStatusChange);
             this.listenTo(this.dataCollection, 'add remove reset', this._updateAttributes);
             this.listenTo(this, 'visibilityChange', this.onVisibilityChange);
+            this.listenTo(this.model, 'change:availableActions', this.countActionsClassName);
 
             this.columnRenderer = new ColumnRendererComponent(options);
 
@@ -233,6 +234,19 @@ define(function(require) {
 
             this._cellsCountClassName = `row-${cellsCount}cells`;
             this.$el.addClass(this._cellsCountClassName);
+        },
+
+        /**
+         * @param {Object} model
+         * @param {array} [actionsCount]
+         */
+        countActionsClassName(model, actionsCount = []) {
+            if (this._actionsCountClassName) {
+                this.$el.removeClass(this._actionsCountClassName);
+            }
+
+            this._actionsCountClassName = `row-${actionsCount.length}actions`;
+            this.$el.addClass(this._actionsCountClassName);
         },
 
         className: function() {

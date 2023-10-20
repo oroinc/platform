@@ -7,13 +7,13 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Sets 200 OK response status code for success OPTIONS request.
- * This processor is required because by default 204 No Content is used for empty responses.
+ * Sets 200 (OK) response status code for success OPTIONS request.
+ * This processor is required because by default 204 (No Content) is used for empty responses.
  */
 class SetSuccessResponseStatusCode implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {

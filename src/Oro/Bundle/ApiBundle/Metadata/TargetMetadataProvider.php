@@ -56,8 +56,13 @@ class TargetMetadataProvider
 
     private function hasIdentifierFieldsOnly(mixed $object, EntityMetadata $entityMetadata): bool
     {
-        $identifierFieldNames = $entityMetadata->getIdentifierFieldNames();
         $properties = $this->objectAccessor->toArray($object);
+        $metaProperties = $entityMetadata->getMetaProperties();
+        foreach ($metaProperties as $metaProperty) {
+            unset($properties[$metaProperty->getPropertyPath() ?? $metaProperty->getName()]);
+        }
+
+        $identifierFieldNames = $entityMetadata->getIdentifierFieldNames();
         if (\count($properties) !== \count($identifierFieldNames)) {
             return false;
         }

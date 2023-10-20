@@ -23,6 +23,8 @@ filters:
         requirement: '.+'
     'fields[businessunits]':
         requirement: '.+'
+    'fields[emails]':
+        requirement: '.+'
     'fields[organizations]':
         requirement: '.+'
     'fields[testapibuyers]':

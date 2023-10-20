@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\EventListener\EntityListener;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Mailer\Envelope\EmailOriginAwareEnvelope;
 use Oro\Bundle\EmailBundle\Sender\EmailFactory;
@@ -19,17 +20,26 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
 {
-    private MailerInterface|\PHPUnit\Framework\MockObject\MockObject $mailer;
+    /** @var MailerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $mailer;
 
-    private EmbeddedImagesInEmailModelHandler|\PHPUnit\Framework\MockObject\MockObject $embeddedImagesHandler;
+    /** @var EmbeddedImagesInEmailModelHandler|\PHPUnit\Framework\MockObject\MockObject */
+    private $embeddedImagesHandler;
 
-    private EmailFactory|\PHPUnit\Framework\MockObject\MockObject $symfonyEmailFactory;
+    /** @var EmailFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $symfonyEmailFactory;
 
-    private EmailUserFromEmailModelBuilder|\PHPUnit\Framework\MockObject\MockObject $emailUserFromEmailModelBuilder;
+    /** @var EmailUserFromEmailModelBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailUserFromEmailModelBuilder;
 
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    private EmailModelSender $emailModelSender;
+    /** @var EntityListener|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailEntityListener;
+
+    /** @var EmailModelSender */
+    private $emailModelSender;
 
     protected function setUp(): void
     {
@@ -38,13 +48,15 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
         $this->symfonyEmailFactory = $this->createMock(EmailFactory::class);
         $this->emailUserFromEmailModelBuilder = $this->createMock(EmailUserFromEmailModelBuilder::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->emailEntityListener = $this->createMock(EntityListener::class);
 
         $this->emailModelSender = new EmailModelSender(
             $this->mailer,
             $this->embeddedImagesHandler,
             $this->symfonyEmailFactory,
             $this->emailUserFromEmailModelBuilder,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $this->emailEntityListener
         );
     }
 
@@ -59,14 +71,12 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
         $messageId = 'sample/message/id@example.org';
         $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
 
-        $this->symfonyEmailFactory
-            ->expects(self::once())
+        $this->symfonyEmailFactory->expects(self::once())
             ->method('createFromEmailModel')
             ->with($emailModel)
             ->willReturn($symfonyEmail);
 
-        $this->mailer
-            ->expects(self::once())
+        $this->mailer->expects(self::once())
             ->method('send')
             ->with($symfonyEmail);
 
@@ -74,23 +84,22 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
         $emailUser = (new EmailUser())
             ->setEmail($email);
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::once())
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
             ->method('createFromEmailModel')
             ->with($emailModel, '<' . $messageId . '>', $symfonyEmail->getDate())
             ->willReturn($emailUser);
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::never())
+        $this->emailUserFromEmailModelBuilder->expects(self::never())
             ->method('setEmailOrigin');
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::once())
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
             ->method('addActivityEntities')
             ->with($emailUser, $emailModel->getContexts());
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::once())
+        $this->emailEntityListener->expects(self::never())
+            ->method('skipUpdateActivities');
+
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
             ->method('persistAndFlush');
 
         $event = new EmailBodyAdded($email);
@@ -112,8 +121,7 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
         $messageId = 'sample/message/id@example.org';
         $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
 
-        $this->symfonyEmailFactory
-            ->expects(self::once())
+        $this->symfonyEmailFactory->expects(self::once())
             ->method('createFromEmailModel')
             ->with($emailModel)
             ->willReturn($symfonyEmail);
@@ -123,8 +131,7 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
         $envelope = EmailOriginAwareEnvelope::create($symfonyEmail);
         $envelope->setEmailOrigin($emailOrigin);
 
-        $this->mailer
-            ->expects(self::once())
+        $this->mailer->expects(self::once())
             ->method('send')
             ->with($symfonyEmail, $envelope);
 
@@ -132,24 +139,23 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
         $emailUser = (new EmailUser())
             ->setEmail($email);
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::once())
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
             ->method('createFromEmailModel')
             ->with($emailModel, '<' . $messageId . '>', $symfonyEmail->getDate())
             ->willReturn($emailUser);
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::once())
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
             ->method('setEmailOrigin')
             ->with($emailUser, $emailOrigin);
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::once())
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
             ->method('addActivityEntities')
             ->with($emailUser, $emailModel->getContexts());
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::once())
+        $this->emailEntityListener->expects(self::never())
+            ->method('skipUpdateActivities');
+
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
             ->method('persistAndFlush');
 
         $event = new EmailBodyAdded($email);
@@ -171,14 +177,12 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
         $messageId = 'sample/message/id@example.org';
         $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
 
-        $this->symfonyEmailFactory
-            ->expects(self::once())
+        $this->symfonyEmailFactory->expects(self::once())
             ->method('createFromEmailModel')
             ->with($emailModel)
             ->willReturn($symfonyEmail);
 
-        $this->mailer
-            ->expects(self::once())
+        $this->mailer->expects(self::once())
             ->method('send')
             ->with($symfonyEmail);
 
@@ -186,22 +190,21 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
         $emailUser = (new EmailUser())
             ->setEmail($email);
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::once())
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
             ->method('createFromEmailModel')
             ->with($emailModel, '<' . $messageId . '>', $symfonyEmail->getDate())
             ->willReturn($emailUser);
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::never())
+        $this->emailUserFromEmailModelBuilder->expects(self::never())
             ->method('setEmailOrigin');
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::never())
+        $this->emailUserFromEmailModelBuilder->expects(self::never())
             ->method('addActivityEntities');
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::never())
+        $this->emailEntityListener->expects(self::never())
+            ->method('skipUpdateActivities');
+
+        $this->emailUserFromEmailModelBuilder->expects(self::never())
             ->method('persistAndFlush');
 
         $event = new EmailBodyAdded($email);
@@ -224,19 +227,16 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
         $messageId = 'sample/message/id@example.org';
         $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
 
-        $this->embeddedImagesHandler
-            ->expects(self::once())
+        $this->embeddedImagesHandler->expects(self::once())
             ->method('handleEmbeddedImages')
             ->with($emailModel);
 
-        $this->symfonyEmailFactory
-            ->expects(self::once())
+        $this->symfonyEmailFactory->expects(self::once())
             ->method('createFromEmailModel')
             ->with($emailModel)
             ->willReturn($symfonyEmail);
 
-        $this->mailer
-            ->expects(self::once())
+        $this->mailer->expects(self::once())
             ->method('send')
             ->with($symfonyEmail);
 
@@ -244,23 +244,22 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
         $emailUser = (new EmailUser())
             ->setEmail($email);
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::once())
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
             ->method('createFromEmailModel')
             ->with($emailModel, '<' . $messageId . '>', $symfonyEmail->getDate())
             ->willReturn($emailUser);
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::never())
+        $this->emailUserFromEmailModelBuilder->expects(self::never())
             ->method('setEmailOrigin');
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::once())
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
             ->method('addActivityEntities')
             ->with($emailUser, $emailModel->getContexts());
 
-        $this->emailUserFromEmailModelBuilder
-            ->expects(self::once())
+        $this->emailEntityListener->expects(self::never())
+            ->method('skipUpdateActivities');
+
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
             ->method('persistAndFlush');
 
         $event = new EmailBodyAdded($email);
@@ -270,5 +269,63 @@ class EmailModelSenderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($event);
 
         self::assertEquals($emailUser, $this->emailModelSender->send($emailModel));
+    }
+
+    public function testSendWhenUpdateEmptyContextsIsNotAllowed(): void
+    {
+        $emailModel = new EmailModel();
+        $emailModel->setAllowToUpdateEmptyContexts(false);
+        $symfonyEmail = (new SymfonyEmail())
+            ->from('sender@example.org')
+            ->to('recipient@example.org')
+            ->date(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+        $messageId = 'sample/message/id@example.org';
+        $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
+
+        $this->symfonyEmailFactory->expects(self::once())
+            ->method('createFromEmailModel')
+            ->with($emailModel)
+            ->willReturn($symfonyEmail);
+
+        $emailOrigin = $this->createMock(EmailOrigin::class);
+
+        $envelope = EmailOriginAwareEnvelope::create($symfonyEmail);
+        $envelope->setEmailOrigin($emailOrigin);
+
+        $this->mailer->expects(self::once())
+            ->method('send')
+            ->with($symfonyEmail, $envelope);
+
+        $email = new EmailEntity();
+        $emailUser = (new EmailUser())
+            ->setEmail($email);
+
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
+            ->method('createFromEmailModel')
+            ->with($emailModel, '<' . $messageId . '>', $symfonyEmail->getDate())
+            ->willReturn($emailUser);
+
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
+            ->method('setEmailOrigin')
+            ->with($emailUser, $emailOrigin);
+
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
+            ->method('addActivityEntities')
+            ->with($emailUser, $emailModel->getContexts());
+
+        $this->emailEntityListener->expects(self::once())
+            ->method('skipUpdateActivities')
+            ->with(self::identicalTo($email));
+
+        $this->emailUserFromEmailModelBuilder->expects(self::once())
+            ->method('persistAndFlush');
+
+        $event = new EmailBodyAdded($email);
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with($event, EmailBodyAdded::NAME)
+            ->willReturn($event);
+
+        self::assertEquals($emailUser, $this->emailModelSender->send($emailModel, $emailOrigin, true));
     }
 }
