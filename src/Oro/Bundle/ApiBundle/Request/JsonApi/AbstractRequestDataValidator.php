@@ -155,6 +155,14 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
             if ($relationData) {
                 if (!ArrayUtil::isAssoc($relationData)) {
                     foreach ($relationData as $key => $value) {
+                        if (!\is_array($value)) {
+                            $this->addError(
+                                $this->buildPointer($relationDataPointer, $key),
+                                'The relationship should be an array'
+                            );
+                            $isValid = false;
+                            continue;
+                        }
                         if ($this->validateTypeAndIdAreRequiredNotBlankString(
                             $value,
                             $this->buildPointer($relationDataPointer, $key)

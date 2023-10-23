@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\PlatformBundle\Validator\Constraints;
 
+use Oro\Bundle\FormBundle\Utils\ValidationGroupUtils;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -31,6 +32,6 @@ class ValidEmbeddableValidator extends ConstraintValidator
         $this->context
             ->getValidator()
             ->inContext($this->context)
-            ->validate($value, null, $constraint->embeddedGroups);
+            ->validate($value, null, ValidationGroupUtils::resolveValidationGroups($constraint->embeddedGroups));
     }
 }

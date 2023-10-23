@@ -126,7 +126,7 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
         }
 
         foreach ($object[JsonApiDoc::RELATIONSHIPS] as $relationship) {
-            if (!\array_key_exists(JsonApiDoc::DATA, $relationship)) {
+            if (!is_array($relationship) || !\array_key_exists(JsonApiDoc::DATA, $relationship)) {
                 continue;
             }
             $data = $relationship[JsonApiDoc::DATA];
@@ -152,6 +152,8 @@ class ValidateIncludedDataDependencies implements ProcessorInterface
         if (\is_array($object)
             && \array_key_exists(JsonApiDoc::TYPE, $object)
             && \array_key_exists(JsonApiDoc::ID, $object)
+            && \is_string($object[JsonApiDoc::TYPE])
+            && \is_string($object[JsonApiDoc::ID])
         ) {
             return sprintf('%s::%s', $object[JsonApiDoc::TYPE], $object[JsonApiDoc::ID]);
         }

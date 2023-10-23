@@ -38,28 +38,30 @@ class RangeConstraintConverter implements ConstraintConverterInterface
     {
         // BC fallback.
         $form = func_get_args()[1] ?? null;
-        if ($constraint->maxPropertyPath || $constraint->minPropertyPath) {
+
+        $convertedConstraint = clone $constraint;
+        if ($convertedConstraint->maxPropertyPath !== null || $convertedConstraint->minPropertyPath !== null) {
             // Get the parent, because the current data is the numeric value
             $formData = $form?->getParent()?->getData();
             if (is_object($formData)) {
-                if ($constraint->maxPropertyPath && !$constraint->max) {
-                    $constraint->max = $this->getPropertyAccessor()->getValue(
+                if ($convertedConstraint->maxPropertyPath !== null && $convertedConstraint->max === null) {
+                    $convertedConstraint->max = $this->getPropertyAccessor()->getValue(
                         $formData,
-                        $constraint->maxPropertyPath
+                        $convertedConstraint->maxPropertyPath
                     );
-                    $constraint->maxPropertyPath = null;
+                    $convertedConstraint->maxPropertyPath = null;
                 }
-                if ($constraint->minPropertyPath && !$constraint->min) {
-                    $constraint->min = $this->getPropertyAccessor()->getValue(
+                if ($convertedConstraint->minPropertyPath !== null && $convertedConstraint->min === null) {
+                    $convertedConstraint->min = $this->getPropertyAccessor()->getValue(
                         $formData,
-                        $constraint->minPropertyPath
+                        $convertedConstraint->minPropertyPath
                     );
-                    $constraint->minPropertyPath = null;
+                    $convertedConstraint->minPropertyPath = null;
                 }
             }
         }
 
-        return $constraint;
+        return $convertedConstraint;
     }
 
     private function getPropertyAccessor(): PropertyAccessorInterface

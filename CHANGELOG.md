@@ -25,14 +25,18 @@ The current file describes significant changes in the code that may affect the u
 
 ## UNRELEASED
 
-## Added
+### Added
 
-### FormBundle
+#### ApiBundle
+* Added the ability to specify `\Symfony\Component\Validator\Constraints\GroupSequence` in validation groups of API config via nested arrays.
+
+#### FormBundle
 * Added the chain of constraint converters to `\Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverter` with basic implementation in `\Oro\Bundle\FormBundle\Form\Extension\JsValidation\GenericConstraintConverter`.
 * Added `\Oro\Bundle\FormBundle\Form\Extension\JsValidation\RangeConstraintConverter` for `Range` constraint with the ability to handle `minPropertyPath` and `maxPropertyPath`.
+* Added `\Oro\Bundle\FormBundle\Validator\Constraints\AdaptivelyValidCollection` validation constraint for validating a collection of entities with different validation groups for the new, updated and unchanged elements.
 
-### PlatformBundle
-* Added `\Oro\Bundle\PlatformBundle\Validator\Constraints\ValidEmbeddable` that allows to apply `Valid` constraint with explicit validation groups specified in `embeddedGroups` option.
+#### PlatformBundle
+* Added `\Oro\Bundle\PlatformBundle\Validator\Constraints\ValidEmbeddable` that allows to apply `Valid` constraint with explicit validation groups specified in `embeddedGroups` option. 
 
 
 ## 5.1.0 (2023-03-31)

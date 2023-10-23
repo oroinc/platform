@@ -395,3 +395,15 @@ services:
         class: Oro\Bundle\FormBundle\Form\Type\CheckboxType
         tags:
             - { name: form.type, alias: oro_checkbox }
+
+    oro_form.extension.validation_group_sequence:
+        class: Oro\Bundle\FormBundle\Form\Extension\ValidationGroupSequenceExtension
+        tags:
+            - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+
+    oro_form.validator.adaptively_valid_collection:
+        class: Oro\Bundle\FormBundle\Validator\Constraints\AdaptivelyValidCollectionValidator
+        arguments:
+            - '@oro_entity.tools.entity_state_checker'
+        tags:
+            - { name: validator.constraint_validator }
