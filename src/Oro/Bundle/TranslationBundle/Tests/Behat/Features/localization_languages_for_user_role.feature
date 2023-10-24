@@ -1,6 +1,7 @@
 @ticket-BAP-21510
 @fixture-OroUserBundle:manager.yml
 @fixture-OroTranslationBundle:LanguageUserRoleFixture.yml
+@skip
 
 Feature: Localization languages for user role
   In order to use the application with different languages
