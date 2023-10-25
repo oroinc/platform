@@ -1,5 +1,4 @@
 @fixture-OroTranslationBundle:FileBasedLanguage.yml
-@skip
 
 Feature: File-Based localization languages
   In order to use the application with file-based languages
