@@ -1,6 +1,5 @@
 @regression
 @ticket-BAP-20922
-@skip
 
 Feature: Export extend entity fields
   Сheck if the select and multi select fields are exported without problems with html symbols
