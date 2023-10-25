@@ -185,7 +185,7 @@ export default [{
 }, {
     name: 'yes',
     label: __('oro.form.expression_editor.operators.detail.yes'),
-    title: __('oro.form.expression_editor.operators.detail.no'),
+    title: __('oro.form.expression_editor.operators.detail.yes'),
     order: 170,
     enabled: true,
     handler(cm) {
