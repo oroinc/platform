@@ -4,11 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Builder;
 
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdatesApplyBeforeEvent;
 use Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Applies menu updates to the menu item
@@ -25,10 +27,20 @@ class MenuUpdateBuilder implements BuilderInterface
      */
     private $menuUpdateProvider;
 
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
     public function __construct(LocalizationHelper $localizationHelper, MenuUpdateProviderInterface $menuUpdateProvider)
     {
         $this->localizationHelper = $localizationHelper;
         $this->menuUpdateProvider = $menuUpdateProvider;
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -37,6 +49,7 @@ class MenuUpdateBuilder implements BuilderInterface
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $menuUpdates = $this->menuUpdateProvider->getMenuUpdatesForMenuItem($menu, $options);
+        $this->eventDispatcher?->dispatch(new MenuUpdatesApplyBeforeEvent($menuUpdates));
 
         foreach ($menuUpdates as $menuUpdate) {
             MenuUpdateUtils::updateMenuItem($menuUpdate, $menu, $this->localizationHelper, $options);
