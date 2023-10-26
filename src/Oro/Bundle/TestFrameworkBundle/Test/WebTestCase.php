@@ -1342,14 +1342,34 @@ abstract class WebTestCase extends BaseWebTestCase
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private function checkUserCredentials(): void
     {
         $container = self::$clientInstance->getContainer();
-        $user = $container->get('oro_user.manager')->findUserByEmail(self::AUTH_USER);
-
         if ($this->getContainer()->hasParameter('optional_search_listeners')) {
             $optionalSearchListeners = $this->getContainer()->getParameter('optional_search_listeners');
             $this->getOptionalListenerManager()->enableListeners($optionalSearchListeners);
+        }
+
+        $defaultOptionsProvider = $container->get('oro_test.provider.install_default_options');
+
+        $user = $container->get('oro_user.manager')->findUserByEmail(self::AUTH_USER);
+        if (!$user) {
+            $user = $container->get('oro_user.manager')->findUserByUsername(self::AUTH_PW);
+        }
+
+        //Check changes username
+        $userName = $user->getUsername();
+        if ($userName !== $defaultOptionsProvider->getUserName()) {
+            throw new \Exception(
+                sprintf(
+                    'Username was changed after the application was installed from "%s" to "%s"',
+                    $defaultOptionsProvider->getUserName(),
+                    $userName
+                )
+            );
         }
 
         //Check changes password
@@ -1359,7 +1379,6 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         //Check changes organization
-        $defaultOptionsProvider = $container->get('oro_test.provider.install_default_options');
         $organizationName = $user->getOrganization()?->getName();
         if ($organizationName !== $defaultOptionsProvider->getOrganizationName()) {
             throw new \Exception(
