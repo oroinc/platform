@@ -19,7 +19,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
@@ -184,10 +183,11 @@ class ClientEventListenerTest extends TestCase
         $this->decoratedListenerLogger->expects(self::never())
             ->method('error');
 
-        $closingResponse = new Response(403);
         $this->connection->expects(self::once())
             ->method('send')
-            ->with($closingResponse);
+            ->willReturnCallback(function (string $data) {
+                self::assertEquals(403, substr($data, -3));
+            });
         $this->connection->expects(self::once())
             ->method('close');
 
