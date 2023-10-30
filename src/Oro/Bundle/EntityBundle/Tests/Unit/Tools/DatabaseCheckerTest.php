@@ -13,7 +13,8 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    private ApplicationState $applicationState;
+    /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
+    private $applicationState;
 
     protected function setUp(): void
     {
@@ -23,7 +24,9 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckDatabaseForInstalledApplication()
     {
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(true);
         $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
 
         // test that the result is cached
@@ -40,7 +43,8 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects(self::never())
+            ->method('isInstalled');
         $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
         $databaseChecker->clearCheckDatabase();
         self::assertTrue($databaseChecker->checkDatabase());
@@ -57,7 +61,9 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $this->applicationState->method('isInstalled')->willReturn(false);
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(false);
         $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
         self::assertTrue($databaseChecker->checkDatabase());
         // test that the result is cached
@@ -73,7 +79,9 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $this->applicationState->method('isInstalled')->willReturn(false);
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(false);
 
         $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
         self::assertFalse($databaseChecker->checkDatabase());

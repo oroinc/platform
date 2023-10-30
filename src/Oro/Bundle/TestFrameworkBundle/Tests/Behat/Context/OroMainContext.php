@@ -799,6 +799,7 @@ class OroMainContext extends MinkContext implements
      * Example: Given I click My Calendar in user menu
      *
      * @Given /^(?:|I )click (?P<needle>[\w\s]+) in user menu$/
+     * @Given /^(?:|I )click "(?P<needle>.+)" in user menu$/
      */
     public function iClickLinkInUserMenu($needle)
     {
@@ -813,6 +814,7 @@ class OroMainContext extends MinkContext implements
      * Example: Given I click Websites in sidebar menu
      *
      * @Given /^(?:|I )click (?P<needle>[\w\s]+) in sidebar menu$/
+     *
      */
     public function iClickLinkInSidebarMenu($needle)
     {
@@ -825,6 +827,7 @@ class OroMainContext extends MinkContext implements
      * Example: When I click "Users" in "sidebar menu" element
      *
      * @Given /^(?:|I )click "(?P<needle>(?:[^"]|\\")*)" in "(?P<element>(?:[^"]|\\")*)" element$/
+     *
      */
     public function iClickOnSmthInElement(string $needle, string $element)
     {

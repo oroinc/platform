@@ -113,8 +113,10 @@ class GridRow extends TableRow
     {
         $this->setCellValue($header, $value);
 
-        $saveButton = $this->spin(function (GridRow $gridRow) {
-            return $gridRow->find('css', 'button[title="Save changes"]');
+        $element = $this->elementFactory->createElement('Grid Row Save Changes');
+
+        $saveButton = $this->spin(function (GridRow $gridRow) use ($element) {
+            return $gridRow->find('xpath', $element->getXpath());
         });
 
         self::assertNotNull($saveButton, sprintf('Save button for "%s" inline edit not found', $header));
@@ -161,6 +163,7 @@ class GridRow extends TableRow
     public function findActionLink($action)
     {
         if ($showMoreLink = $this->find('css', '.more-bar-holder .dropdown-toggle')) {
+            $showMoreLink->focus();
             $showMoreLink->mouseOver();
             $link = $this->spin(function () use ($action) {
                 $link = $this->elementFactory
