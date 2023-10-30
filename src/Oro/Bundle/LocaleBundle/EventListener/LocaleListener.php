@@ -17,22 +17,17 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Set current localization to all depended services
+ * Sets current localization to all depended services.
  */
 class LocaleListener implements EventSubscriberInterface
 {
     private LocaleSettings $localeSettings;
-
     private LocalizationProviderInterface $currentLocalizationProvider;
-
     private TranslatableListener $translatableListener;
-
     private TranslatorInterface $translator;
-
-    private ?RequestContextAwareInterface $router;
-
-    private bool $installed;
-
+    private RequestContextAwareInterface $router;
+    private ApplicationState $applicationState;
+    private ?bool $installed = null;
     private ?string $currentLanguage = null;
 
     public function __construct(
@@ -48,13 +43,13 @@ class LocaleListener implements EventSubscriberInterface
         $this->translatableListener = $translatableListener;
         $this->translator = $translator;
         $this->router = $router;
-        $this->installed = $applicationState->isInstalled();
+        $this->applicationState = $applicationState;
     }
 
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        if (!$request || !$this->installed) {
+        if (!$request || !$this->isInstalled()) {
             return;
         }
 
@@ -71,14 +66,14 @@ class LocaleListener implements EventSubscriberInterface
         $this->translator->setLocale($language);
     }
 
-    public function setPhpDefaultLocale(string $locale)
+    public function setPhpDefaultLocale(string $locale): void
     {
         \Locale::setDefault($locale);
     }
 
-    public function onConsoleCommand(ConsoleCommandEvent $event)
+    public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
-        if (!$this->installed) {
+        if (!$this->isInstalled()) {
             return;
         }
 
@@ -115,9 +110,6 @@ class LocaleListener implements EventSubscriberInterface
         $this->translatableListener->setTranslatableLocale($language);
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -137,5 +129,14 @@ class LocaleListener implements EventSubscriberInterface
         }
 
         return $this->currentLanguage;
+    }
+
+    private function isInstalled(): bool
+    {
+        if (null === $this->installed) {
+            $this->installed = $this->applicationState->isInstalled();
+        }
+
+        return $this->installed;
     }
 }

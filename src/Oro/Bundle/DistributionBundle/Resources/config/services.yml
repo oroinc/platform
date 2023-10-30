@@ -66,14 +66,14 @@ services:
         public: true
         class: Oro\Bundle\DistributionBundle\Handler\ApplicationState
         arguments:
-            - '@doctrine.dbal.config_connection'
+            - '@doctrine.dbal.default_connection'
 
     Oro\Bundle\DistributionBundle\Handler\ApplicationState:
         public: true
         alias: oro_distribution.handler.application_status
 
     oro_shipping.cache_warmer.set_is_installed:
-        class: 'Oro\Bundle\DistributionBundle\CacheWarmer\SetIsInstalledCacheWarmer'
+        class: Oro\Bundle\DistributionBundle\CacheWarmer\SetIsInstalledCacheWarmer
         arguments:
             - '@oro_distribution.handler.application_status'
         tags:

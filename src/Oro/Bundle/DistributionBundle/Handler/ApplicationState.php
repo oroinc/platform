@@ -4,16 +4,18 @@ namespace Oro\Bundle\DistributionBundle\Handler;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Types\Types;
 
 /**
- * Finds out if application was installed
+ * This service is used to find out whether the application was installed or not.
  */
 class ApplicationState
 {
     private bool $installed = false;
 
-    public function __construct(private Connection $connection)
-    {
+    public function __construct(
+        private Connection $connection
+    ) {
     }
 
     public function isInstalled(): bool
@@ -21,49 +23,56 @@ class ApplicationState
         if (!$this->installed) {
             try {
                 $this->installed = (bool)$this->connection->fetchOne(
-                    "SELECT text_value FROM oro_config_value " .
-                    "WHERE name = 'is_installed' AND section = 'oro_distribution'"
+                    'SELECT text_value FROM oro_config_value WHERE name = ? AND section = ?',
+                    ['is_installed', 'oro_distribution'],
+                    [Types::STRING, Types::STRING]
                 );
-            } catch (Exception $exception) {
+            } catch (Exception $e) {
                 $this->installed = false;
             }
         }
+
         return $this->installed;
     }
 
     public function setInstalled(): bool
     {
         if (!$this->isInstalled()) {
+            $date = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
+            $nullValue = base64_encode(serialize(null));
             try {
-                $date = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
-                $configId = $this->connection->fetchOne("SELECT id FROM oro_config WHERE entity = 'app'");
+                $configId = $this->connection->fetchOne(
+                    'SELECT id FROM oro_config WHERE entity = ?',
+                    ['app'],
+                    [Types::STRING]
+                );
                 $this->connection->insert(
                     'oro_config_value',
                     [
                         'config_id' => $configId,
                         'name' => 'is_installed',
                         'section' => 'oro_distribution',
-                        'text_value' => 1,
-                        'object_value' => 'Tjs=',
-                        'array_value' => 'Tjs=',
+                        'text_value' => '1',
+                        'object_value' => $nullValue,
+                        'array_value' => $nullValue,
                         'type' => 'scalar',
                         'created_at' => $date,
                         'updated_at' => $date
                     ],
                     [
-                        'config_id' => 'integer',
-                        'name' => 'string',
-                        'section' => 'string',
-                        'text_value' => 'string',
-                        'object_value' => 'string',
-                        'array_value' => 'string',
-                        'type' => 'string',
-                        'created_at' => 'string',
-                        'updated_at' => 'string'
+                        'config_id' => Types::INTEGER,
+                        'name' => Types::STRING,
+                        'section' => Types::STRING,
+                        'text_value' => Types::STRING,
+                        'object_value' => Types::STRING,
+                        'array_value' => Types::STRING,
+                        'type' => Types::STRING,
+                        'created_at' => Types::STRING,
+                        'updated_at' => Types::STRING
                     ]
                 );
                 $this->installed = true;
-            } catch (Exception $exception) {
+            } catch (Exception $e) {
                 $this->installed = false;
             }
         }
