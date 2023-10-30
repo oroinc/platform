@@ -26,7 +26,7 @@ class SetDefaultPaging implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -49,7 +49,7 @@ class SetDefaultPaging implements ProcessorInterface
         $this->addPageNumberFilter($filterNames->getPageNumberFilterName(), $filters);
     }
 
-    protected function addPageNumberFilter(string $filterName, FilterCollection $filters): void
+    private function addPageNumberFilter(string $filterName, FilterCollection $filters): void
     {
         /**
          * "page number" filter must be added after "page size" filter because it depends on this filter
@@ -69,7 +69,7 @@ class SetDefaultPaging implements ProcessorInterface
         $filters->add($filterName, $pageNumberFilter, false);
     }
 
-    protected function addPageSizeFilter(string $filterName, FilterCollection $filters, ?int $pageSize): void
+    private function addPageSizeFilter(string $filterName, FilterCollection $filters, ?int $pageSize): void
     {
         if (!$filters->has($filterName)) {
             $filters->add(
