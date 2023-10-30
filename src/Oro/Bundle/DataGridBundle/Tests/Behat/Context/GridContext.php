@@ -745,9 +745,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function sortGridBy($field, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
-        $grid->getElement($grid->getMappedChildElementName('GridHeader'))
-            ->findElementContains($grid->getMappedChildElementName('GridHeaderLink'), $field)
-            ->click();
+        $element = $grid->getElement($grid->getMappedChildElementName('GridHeader'))
+            ->findElementContains($grid->getMappedChildElementName('GridHeaderLink'), $field);
+        $element->focus();
+        $element->click();
     }
 
     //@codingStandardsIgnoreStart
