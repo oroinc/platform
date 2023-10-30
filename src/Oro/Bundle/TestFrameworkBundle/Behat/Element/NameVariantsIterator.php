@@ -36,12 +36,13 @@ class NameVariantsIterator implements \IteratorAggregate
     }
 
     /**
-     * @return \Generator
+     * @return \Generator|string[]
      */
     private function splitNameParts()
     {
-        //split by delimiters
         if (preg_match_all('/[_\- ]/', $this->name, $matches)) {
+            yield [str_replace('-', '_', $this->name)];
+            //split by delimiters
             $symbols = implode('', array_map('preg_quote', array_unique($matches[0])));
             yield preg_split(sprintf('/[%s]/', $symbols), $this->name);
         }

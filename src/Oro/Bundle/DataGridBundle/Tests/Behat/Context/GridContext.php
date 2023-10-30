@@ -204,6 +204,38 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Inline edit field
+     * Example: When I edit Status as "Open"
+     * Example: Given I edit Probability as "30"
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" DE$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" (?P<field>.+) as "(?P<value>.*)" DE$/
+     */
+    public function inlineEditFieldDE($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValueAndSave($field, $value);
+        $this->oroMainContext->iShouldSeeFlashMessage('Datensatz wurde erfolgreich aktualisiert');
+    }
+
+    /**
+     * Inline edit field
+     * Example: When I edit Status as "Open"
+     * Example: Given I edit Probability as "30"
+     *
+     * @When /^(?:|I )edit (?P<field>[^"]+) as "(?P<value>.*)" FR$/
+     * @When /^(?:|I )edit "(?P<entityTitle>[^"]+)" "(?P<field>.+)" as "(?P<value>.*)" FR$/
+     */
+    public function inlineEditFieldFR($field, $value, $entityTitle = null)
+    {
+        $row = $this->getGridRow($entityTitle);
+
+        $row->setCellValueAndSave($field, $value);
+        $this->oroMainContext->iShouldSeeFlashMessage('Mise à jour réussie');
+    }
+
+    /**
      * Inline edit field and don't save
      * Example: When I edit Status as "Open" without saving
      * Example: Given I edit Probability as "30" without saving
@@ -1106,6 +1138,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid$/
      * @When /^(?:|I )filter (?P<filterName>.+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid ?(?P<strictly>strictly)$/
      *
+     * Use these steps for UTF-8 chars
+     * @When /^(?:|I )filter "(?P<filterName>.+)" as "(?P<type>.+)" value "(?P<value>(?:[^"]|\\")*)"$/
+     *
      * @param string $filterName
      * @param string $type
      * @param string $value
@@ -1652,6 +1687,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
      * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in "(?P<gridName>[^"]+)"$/
      * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) "(?P<content>.+)" in grid$/
+     * Use these steps for UTF-8 chars
+     * @Given /^(?:|I )click "(?P<action>.+)" "(?P<content>.+)" in grid$/
+     *
      * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) "(?P<content>.+)" in "(?P<gridName>[^"]+)"$/
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in grid$/
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in "(?P<gridName>[^"]+)"$/
