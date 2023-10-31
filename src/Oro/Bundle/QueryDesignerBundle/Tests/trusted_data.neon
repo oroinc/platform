@@ -12,3 +12,6 @@ trusted_data:
                 join: true
                 joinAlias: true
                 joinCondition: true
+        Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper:
+            setLimit:
+                hook: true
