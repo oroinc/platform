@@ -166,7 +166,9 @@ class EmailAttachmentManager
         return new UploadedFile(
             $file->getPathname(),
             $emailAttachment->getFileName(),
-            $emailAttachment->getContentType()
+            $emailAttachment->getContentType(),
+            null,
+            true
         );
     }
 

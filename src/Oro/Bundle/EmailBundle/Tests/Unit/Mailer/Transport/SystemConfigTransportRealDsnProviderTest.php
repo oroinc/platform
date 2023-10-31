@@ -5,20 +5,23 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Transport;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\Transport\DsnFromSmtpSettingsFactory;
 use Oro\Bundle\EmailBundle\Mailer\Transport\SystemConfigTransportRealDsnProvider;
-use Oro\Bundle\EmailBundle\Provider\AbstractSmtpSettingsProvider;
+use Oro\Bundle\EmailBundle\Provider\SmtpSettingsProviderInterface;
 use Symfony\Component\Mailer\Transport\Dsn;
 
 class SystemConfigTransportRealDsnProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private AbstractSmtpSettingsProvider|\PHPUnit\Framework\MockObject\MockObject $smtpSettingsProvider;
+    /** @var SmtpSettingsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $smtpSettingsProvider;
 
-    private DsnFromSmtpSettingsFactory|\PHPUnit\Framework\MockObject\MockObject $dsnFromSmtpSettingsFactory;
+    /** @var DsnFromSmtpSettingsFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $dsnFromSmtpSettingsFactory;
 
-    private SystemConfigTransportRealDsnProvider $provider;
+    /** @var SystemConfigTransportRealDsnProvider */
+    private $provider;
 
     protected function setUp(): void
     {
-        $this->smtpSettingsProvider = $this->createMock(AbstractSmtpSettingsProvider::class);
+        $this->smtpSettingsProvider = $this->createMock(SmtpSettingsProviderInterface::class);
         $this->dsnFromSmtpSettingsFactory = $this->createMock(DsnFromSmtpSettingsFactory::class);
 
         $this->provider = new SystemConfigTransportRealDsnProvider(
@@ -29,8 +32,7 @@ class SystemConfigTransportRealDsnProviderTest extends \PHPUnit\Framework\TestCa
 
     public function testGetRealDsnWhenInvalidArgument(): void
     {
-        $this->smtpSettingsProvider
-            ->expects(self::never())
+        $this->smtpSettingsProvider->expects(self::never())
             ->method(self::anything());
 
         $this->expectExceptionObject(new \InvalidArgumentException('Dsn was expected to be "oro://system-config"'));
@@ -44,14 +46,12 @@ class SystemConfigTransportRealDsnProviderTest extends \PHPUnit\Framework\TestCa
             ->setHost('example.org')
             ->setPort(465)
             ->setEncryption('ssl');
-        $this->smtpSettingsProvider
-            ->expects(self::once())
+        $this->smtpSettingsProvider->expects(self::once())
             ->method('getSmtpSettings')
             ->willReturn($smtpSettings);
 
         $dsn = Dsn::fromString('smtp://example.org:465');
-        $this->dsnFromSmtpSettingsFactory
-            ->expects(self::once())
+        $this->dsnFromSmtpSettingsFactory->expects(self::once())
             ->method('create')
             ->with($smtpSettings)
             ->willReturn($dsn);
@@ -62,13 +62,11 @@ class SystemConfigTransportRealDsnProviderTest extends \PHPUnit\Framework\TestCa
     public function testGetRealDsnReturnsFallbackWhenSmtpSettingsNotEligible(): void
     {
         $smtpSettings = new SmtpSettings();
-        $this->smtpSettingsProvider
-            ->expects(self::once())
+        $this->smtpSettingsProvider->expects(self::once())
             ->method('getSmtpSettings')
             ->willReturn($smtpSettings);
 
-        $this->dsnFromSmtpSettingsFactory
-            ->expects(self::never())
+        $this->dsnFromSmtpSettingsFactory->expects(self::never())
             ->method(self::anything());
 
         self::assertEquals(
@@ -80,13 +78,11 @@ class SystemConfigTransportRealDsnProviderTest extends \PHPUnit\Framework\TestCa
     public function testGetRealDsnReturnsNativeWhenSmtpSettingsNotEligibleAndNoFallback(): void
     {
         $smtpSettings = new SmtpSettings();
-        $this->smtpSettingsProvider
-            ->expects(self::once())
+        $this->smtpSettingsProvider->expects(self::once())
             ->method('getSmtpSettings')
             ->willReturn($smtpSettings);
 
-        $this->dsnFromSmtpSettingsFactory
-            ->expects(self::never())
+        $this->dsnFromSmtpSettingsFactory->expects(self::never())
             ->method(self::anything());
 
         self::assertEquals(

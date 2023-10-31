@@ -38,13 +38,10 @@ class EntityMetadataFactoryTest extends LoaderTestCase
 
         $classMetadata = $this->getClassMetadataMock('Test\Class');
 
-        $metadata = new MetaPropertyMetadata('propertyPath');
-        $metadata->setDataType('integer');
-
         $this->metadataFactory->expects(self::once())
             ->method('createMetaPropertyMetadata')
             ->with(self::identicalTo($classMetadata), 'propertyPath', 'integer')
-            ->willReturn($metadata);
+            ->willReturn(new MetaPropertyMetadata('propertyPath', 'integer'));
 
         $expected = $this->createMetaPropertyMetadata('testField', 'integer');
         $expected->setPropertyPath('propertyPath');
@@ -69,13 +66,10 @@ class EntityMetadataFactoryTest extends LoaderTestCase
 
         $classMetadata = $this->getClassMetadataMock('Test\Class');
 
-        $metadata = new MetaPropertyMetadata('testField');
-        $metadata->setDataType('string');
-
         $this->metadataFactory->expects(self::once())
             ->method('createMetaPropertyMetadata')
             ->with(self::identicalTo($classMetadata), 'testField', 'string')
-            ->willReturn($metadata);
+            ->willReturn(new MetaPropertyMetadata('testField', 'string'));
 
         $expected = $this->createMetaPropertyMetadata('testField', 'string');
         $expected->setResultName('resultName');

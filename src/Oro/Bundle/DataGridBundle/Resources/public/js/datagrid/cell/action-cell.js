@@ -140,6 +140,7 @@ define(function(require, exports, module) {
 
             ActionCell.__super__.initialize.call(this, options);
             this.actions = this.createActions();
+            this.model.set('availableActions', this.actions);
             _.each(this.actions, function(action) {
                 this.listenTo(action, 'preExecute', this.onActionRun);
             }, this);
@@ -272,6 +273,7 @@ define(function(require, exports, module) {
 
             this.isLauncherListFilled = false;
             this.fillLauncherList();
+            this.model.set('availableActions', this.actions.filter(action => action.launcherInstance?.enabled));
         },
 
         /**

@@ -18,16 +18,21 @@ class SetIsInstalledCacheWarmer implements CacheWarmerInterface
         $this->applicationState = $applicationState;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function isOptional(): bool
     {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function warmUp($cacheDir): array
     {
-        if (!$this->applicationState->isInstalled()) {
-            $this->applicationState->setInstalled();
-        }
+        $this->applicationState->setInstalled();
+
         return [];
     }
 }

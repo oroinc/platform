@@ -26,7 +26,7 @@ class TimezoneChangeListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnConfigUpdateTimezoneNotChanged()
     {
-        $event = new ConfigUpdateEvent(['not.a.timezone' => ['old' => 1, 'new' => 2]]);
+        $event = new ConfigUpdateEvent(['not.a.timezone' => ['old' => 1, 'new' => 2]], 'global', 0);
 
         $this->calendarDateManager->expects($this->never())
             ->method('handleCalendarDates');
@@ -36,7 +36,7 @@ class TimezoneChangeListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnConfigUpdateTimezoneChanged()
     {
-        $event = new ConfigUpdateEvent(['oro_locale.timezone' => ['old' => 1, 'new' => 2]]);
+        $event = new ConfigUpdateEvent(['oro_locale.timezone' => ['old' => 1, 'new' => 2]], 'global', 0);
 
         $this->calendarDateManager->expects($this->once())
             ->method('handleCalendarDates')

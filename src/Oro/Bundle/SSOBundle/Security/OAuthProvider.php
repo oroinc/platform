@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\SSOBundle\Security;
 
-use HWI\Bundle\OAuthBundle\Security\Core\Authentication\Provider\OAuthProvider as HWIOAuthProvider;
+use HWI\Bundle\OAuthBundle\Security\Core\Authentication\Token\OAuthToken;
 use HWI\Bundle\OAuthBundle\Security\Core\Exception\OAuthAwareExceptionInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
-use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
+use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMapInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
 use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -18,30 +18,19 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 /**
  * Sets organization to the token.
  */
-class OAuthProvider extends HWIOAuthProvider
+class OAuthProvider implements AuthenticationProviderInterface
 {
-    /** @var ResourceOwnerMap */
-    private $resourceOwnerMap;
-
-    /** @var OAuthAwareUserProviderInterface */
-    private $userProvider;
-
-    /** @var UserCheckerInterface */
-    private $userChecker;
-
-    /** @var OAuthTokenFactoryInterface */
-    private $tokenFactory;
-
-    /** @var OrganizationGuesserInterface */
-    private $organizationGuesser;
+    private ResourceOwnerMapInterface $resourceOwnerMap;
+    private OAuthAwareUserProviderInterface $userProvider;
+    private UserCheckerInterface $userChecker;
+    private OAuthTokenFactoryInterface $tokenFactory;
+    private OrganizationGuesserInterface $organizationGuesser;
 
     public function __construct(
         OAuthAwareUserProviderInterface $userProvider,
-        ResourceOwnerMap $resourceOwnerMap,
-        UserCheckerInterface $userChecker,
-        TokenStorageInterface $tokenStorage
+        ResourceOwnerMapInterface $resourceOwnerMap,
+        UserCheckerInterface $userChecker
     ) {
-        parent::__construct($userProvider, $resourceOwnerMap, $userChecker, $tokenStorage);
         $this->userProvider = $userProvider;
         $this->resourceOwnerMap = $resourceOwnerMap;
         $this->userChecker = $userChecker;
@@ -57,15 +46,24 @@ class OAuthProvider extends HWIOAuthProvider
         $this->organizationGuesser = $organizationGuesser;
     }
 
+    public function supports(TokenInterface $token): bool
+    {
+        if (!$token instanceof OAuthToken) {
+            return false;
+        }
+
+        return $this->resourceOwnerMap->hasResourceOwnerByName($token->getResourceOwnerName());
+    }
+
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function authenticate(TokenInterface $token): ?TokenInterface
     {
-        if (null === $this->tokenFactory) {
+        if (!isset($this->tokenFactory)) {
             throw new AuthenticationException('Token Factory is not set in OAuthProvider.');
         }
-        if (null === $this->organizationGuesser) {
+        if (!isset($this->organizationGuesser)) {
             throw new AuthenticationException('Organization Guesser is not set in OAuthProvider.');
         }
 

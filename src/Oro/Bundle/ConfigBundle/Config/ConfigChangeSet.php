@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
+/**
+ * Represents a storage for changed configuration options.
+ */
 class ConfigChangeSet
 {
-    /** @var array */
-    protected $changeSet = [];
+    private array $changeSet;
 
     public function __construct(array $changeSet)
     {
@@ -13,58 +15,51 @@ class ConfigChangeSet
     }
 
     /**
-     * Returns config change set
+     * Gets config change set.
      *
      * @return array [name => ['new' => value, 'old' => value], ...]
      */
-    public function getChanges()
+    public function getChanges(): array
     {
         return $this->changeSet;
     }
 
     /**
-     * Checks whenever configuration value is changed
-     *
-     * @param string $name
-     *
-     * @return bool
+     * Checks whenever configuration value is changed.
      */
-    public function isChanged($name)
+    public function isChanged(string $name): bool
     {
         return !empty($this->changeSet[$name]);
     }
 
     /**
-     * Retrieve new value from change set
+     * Gets a new value for the given configuration option.
      *
-     * @param string $name
-     *
-     * @return mixed
-     * @throws \LogicException
+     * @throws \LogicException when the given configuration option was not changed
      */
-    public function getNewValue($name)
+    public function getNewValue(string $name): mixed
     {
-        if (!$this->isChanged($name)) {
-            throw new \LogicException('Could not retrieve value for given key');
-        }
+        $this->assertChanged($name);
 
         return $this->changeSet[$name]['new'];
     }
 
     /**
-     * Retrieve old value from change set
+     * Gets an old value for the given configuration option.
      *
-     * @param string $name
-     *
-     * @return mixed
-     * @throws \LogicException
+     * @throws \LogicException when the given configuration option was not changed
      */
-    public function getOldValue($name)
+    public function getOldValue(string $name): mixed
     {
-        if (!$this->isChanged($name)) {
-            throw new \LogicException('Could not retrieve value for given key');
-        }
+        $this->assertChanged($name);
 
         return $this->changeSet[$name]['old'];
+    }
+
+    private function assertChanged(string $name): void
+    {
+        if (!$this->isChanged($name)) {
+            throw new \LogicException(sprintf('Could not retrieve a value for "%s".', $name));
+        }
     }
 }

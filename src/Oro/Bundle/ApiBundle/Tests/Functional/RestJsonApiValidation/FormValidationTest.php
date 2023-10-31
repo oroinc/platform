@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiValidation;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Tests\Functional\CheckSkippedEntityTrait;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -14,10 +15,16 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FormValidationTest extends RestJsonApiTestCase
 {
+    use CheckSkippedEntityTrait;
+
     public function testCreateRequests()
     {
         $this->runForEntities(function (string $entityClass, array $excludedActions) {
             if (in_array(ApiAction::CREATE, $excludedActions, true)) {
+                return;
+            }
+
+            if ($this->isSkippedEntity($entityClass, ApiAction::CREATE)) {
                 return;
             }
 

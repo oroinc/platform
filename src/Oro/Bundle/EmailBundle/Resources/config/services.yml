@@ -136,6 +136,13 @@ services:
         tags:
             - { name: oro_entity.delete_handler_extension, entity: Oro\Bundle\EmailBundle\Entity\EmailUser }
 
+    oro_email.delete_handler.email_thread:
+        class: Oro\Bundle\EmailBundle\Handler\EmailThreadActivityEntityDeleteHandler
+        public: true
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_activity.activity_entity_delete_handler'
+
     oro_email.email.entity.batch_processor:
         class: Oro\Bundle\EmailBundle\Builder\EmailEntityBatchProcessor
         shared: false
@@ -357,6 +364,7 @@ services:
             - '@oro_email.sender.email_factory'
             - '@oro_email.builder.email_user_from_email_model_builder'
             - '@event_dispatcher'
+            - '@oro_email.listener.entity_listener'
 
     oro_email.builder.email_user_from_email_model_builder:
         class: Oro\Bundle\EmailBundle\Builder\EmailUserFromEmailModelBuilder
@@ -1021,6 +1029,20 @@ services:
             - '@oro_activity.manager'
             - '@oro_search.index'
 
+    oro_email.manager.email_thread_activity_context.api:
+        class: Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadActivityContextApiEntityManager
+        public: true
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_entity_config.config_manager'
+            - '@router'
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_featuretoggle.checker.feature_checker'
+            - '@security.authorization_checker'
+            - '@oro_activity.manager'
+
     oro_email.manager.email_activity_suggestion.api:
         class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySuggestionApiEntityManager
         public: true
@@ -1287,9 +1309,6 @@ services:
             - '@oro_security.encoder.default'
             - '@oro_distribution.handler.application_status'
 
-    Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider:
-        alias: oro_email.provider.smtp_settings
-
     oro_email.listener.datagrid.user_email_grid_listener:
         class: Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener
         arguments:
@@ -1390,7 +1409,7 @@ services:
          class: 'Oro\Bundle\EmailBundle\Form\Handler\UserEmailConfigHandler'
          public: true
          arguments:
-             - '@doctrine.orm.entity_manager'
+             - '@doctrine'
 
     oro_email.validator.connection_configuration.smtp:
         class: Oro\Bundle\EmailBundle\Validator\Constraints\SmtpConnectionConfigurationValidator

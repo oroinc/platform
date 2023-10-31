@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadBusinessUnitData;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
  * @dbIsolationPerTest
@@ -106,10 +106,10 @@ class UserTest extends RestJsonApiTestCase
         self::assertEmpty($user->getPlainPassword());
         self::assertNotEmpty($user->getPassword());
         self::assertNotEmpty($user->getSalt());
-        /** @var PasswordEncoderInterface $passwordEncoder */
-        $passwordEncoder = self::getContainer()->get('security.encoder_factory')->getEncoder($user);
+        /** @var PasswordHasherInterface $passwordHasher */
+        $passwordHasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
         self::assertTrue(
-            $passwordEncoder->isPasswordValid(
+            $passwordHasher->verify(
                 $user->getPassword(),
                 $data['data']['attributes']['password'],
                 $user->getSalt()

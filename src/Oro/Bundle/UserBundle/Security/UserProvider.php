@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Security;
 use Doctrine\ORM\ORMInvalidArgumentException;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -33,7 +33,7 @@ class UserProvider implements UserProviderInterface
     {
         $user = $this->userLoader->loadUser($username);
         if (null === $user) {
-            throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
+            throw new UserNotFoundException(sprintf('User "%s" not found.', $username));
         }
 
         return $user;
@@ -72,7 +72,7 @@ class UserProvider implements UserProviderInterface
         }
 
         if (null === $user) {
-            throw new UsernameNotFoundException('User can not be loaded.');
+            throw new UserNotFoundException('User can not be loaded.');
         }
 
         return $user;

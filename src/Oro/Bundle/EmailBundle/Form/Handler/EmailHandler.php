@@ -18,11 +18,8 @@ class EmailHandler
     use RequestHandlerTrait;
 
     private FormInterface $form;
-
     private RequestStack $requestStack;
-
     private EmailModelSender $emailModelSender;
-
     private LoggerInterface $logger;
 
     public function __construct(
@@ -37,22 +34,18 @@ class EmailHandler
         $this->logger = $logger;
     }
 
-    /**
-     * Process form
-     *
-     * @param Email $emailModel
-     * @return bool True on successful processing, false otherwise
-     */
-    public function process(Email $emailModel)
+    public function process(Email $emailModel): bool
     {
         $this->form->setData($emailModel);
 
         $request = $this->requestStack->getCurrentRequest();
-        if (in_array($request->getMethod(), ['POST', 'PUT'], true)
-            && !$request->request->get('_widgetInit')) {
+        if (\in_array($request->getMethod(), ['POST', 'PUT'], true)
+            && !$request->request->get('_widgetInit')
+        ) {
             $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {
+                $emailModel->setAllowToUpdateEmptyContexts(false);
                 try {
                     $this->emailModelSender->send($emailModel, $emailModel->getOrigin());
 

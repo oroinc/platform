@@ -8,6 +8,11 @@ class GridToolbarActions extends Element
 {
     public function getActionByTitle($title)
     {
-        return $this->find('css', '[title="'.$title.'"]');
+        $element = $this->elementFactory->createElement('Grid Toolbar Action ' . $title);
+        if ($element) {
+            $element = $this->find('xpath', $element->getXpath());
+        }
+
+        return $element;
     }
 }

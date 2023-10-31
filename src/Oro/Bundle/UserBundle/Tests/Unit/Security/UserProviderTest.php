@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Oro\Bundle\UserBundle\Security\UserProvider;
 use Oro\Bundle\UserBundle\Tests\Unit\Fixture\RegularUser;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
 class UserProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -55,7 +55,7 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadUserForNotExistingUsername()
     {
-        $this->expectException(UsernameNotFoundException::class);
+        $this->expectException(UserNotFoundException::class);
         $username = 'foobar';
         $this->userLoader->expects(self::once())
             ->method('loadUser')
@@ -67,7 +67,7 @@ class UserProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testRefreshUserNotFound()
     {
-        $this->expectException(UsernameNotFoundException::class);
+        $this->expectException(UserNotFoundException::class);
         $user = $this->createMock(self::USER_CLASS);
         $user->expects(self::any())
             ->method('getId')

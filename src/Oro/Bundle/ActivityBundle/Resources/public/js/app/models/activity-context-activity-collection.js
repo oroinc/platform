@@ -18,7 +18,13 @@ define(function(require) {
 
         url: null,
 
-        model: ActivityContextActivityModel,
+        model: function(attributes, options) {
+            if (typeof options.deleteRoute !== 'undefined') {
+                options.route = options.deleteRoute;
+                delete options.deleteRoute;
+            }
+            return new ActivityContextActivityModel(attributes, options);
+        },
 
         /**
          * @inheritdoc

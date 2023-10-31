@@ -13,7 +13,11 @@
             widget: {
                 message: 'oro.email.the_email_was_sent'|trans,
                 triggerSuccess: true,
-                trigger: ['datagrid:doRefresh:attachment-grid', 'widget:doRefresh:email-thread'],
+                trigger: [
+                    'datagrid:doRefresh:attachment-grid',
+                    'widget:doRefresh:email-thread',
+                    'widget:doRefresh:activity-thread-context'
+                ],
                 remove: true
             }
         } %}

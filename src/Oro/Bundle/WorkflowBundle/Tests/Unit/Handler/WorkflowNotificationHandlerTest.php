@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
-use Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -24,14 +22,8 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
     private const WORKFLOW_NAME = 'test_workflow_name';
     private const TRANSITION_NAME = 'transition_name';
 
-    /** @var \stdClass */
-    private $entity;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var WorkflowNotificationEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var EmailNotificationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
@@ -42,40 +34,34 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ChainAdditionalEmailAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $additionalEmailAssociationProvider;
 
-    /** @var WebsiteAwareEntityHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $websiteAwareHelper;
+    /** @var \stdClass */
+    private $entity;
+
+    /** @var WorkflowNotificationEvent|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
     /** @var WorkflowNotificationHandler */
     private $handler;
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
-        $this->entity = new \stdClass();
-
+        $this->manager = $this->createMock(EmailNotificationManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->additionalEmailAssociationProvider = $this->createMock(ChainAdditionalEmailAssociationProvider::class);
+
+        $this->entity = new \stdClass();
         $this->event = $this->createMock(WorkflowNotificationEvent::class);
         $this->event->expects($this->any())
             ->method('getEntity')
             ->willReturn($this->entity);
 
-        $this->manager = $this->createMock(EmailNotificationManager::class);
-        $this->websiteAwareHelper = $this->createMock(WebsiteAwareEntityHelper::class);
-
-        $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects(self::any())
-            ->method('getManager')
-            ->willReturn($this->em);
-
-        $this->additionalEmailAssociationProvider = $this->createMock(ChainAdditionalEmailAssociationProvider::class);
-
         $this->handler = new WorkflowNotificationHandler(
             $this->manager,
-            $doctrine,
+            $this->doctrine,
             PropertyAccess::createPropertyAccessor(),
             $this->eventDispatcher,
-            $this->additionalEmailAssociationProvider,
-            $this->websiteAwareHelper
+            $this->additionalEmailAssociationProvider
         );
     }
 
@@ -89,11 +75,10 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
                 return new TemplateEmailNotificationAdapter(
                     $this->entity,
                     $notification,
-                    $this->em,
+                    $this->doctrine,
                     PropertyAccess::createPropertyAccessor(),
                     $this->eventDispatcher,
-                    $this->additionalEmailAssociationProvider,
-                    $this->websiteAwareHelper
+                    $this->additionalEmailAssociationProvider
                 );
             },
             $expected

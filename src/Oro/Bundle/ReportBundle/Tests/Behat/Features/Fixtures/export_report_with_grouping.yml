@@ -14,8 +14,7 @@ Oro\Bundle\UserBundle\Entity\User:
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: charlie@example.com
-        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@charlie->username)>
 
     adam:
         firstName: Adam
@@ -27,8 +26,7 @@ Oro\Bundle\UserBundle\Entity\User:
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: adam@example.com
-        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@adam->username)>
 
     megan:
         firstName: Megan
@@ -40,8 +38,7 @@ Oro\Bundle\UserBundle\Entity\User:
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: megan@example.com
-        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@megan->username)>
 
     laura:
         firstName: Laura
@@ -53,8 +50,7 @@ Oro\Bundle\UserBundle\Entity\User:
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: laura@example.com
-        password: 7HzkZEngxFOPqyVmjsNi7nMeZzrZQPYtjQ6Q+tcB0l2KljQXdCoikRforvxj3NQD8v2wflpazoaZdk8FbrzJhw==
-        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        password: <userPassword(@laura->username)>
 
 Oro\Bundle\ReportBundle\Entity\Report:
     report:

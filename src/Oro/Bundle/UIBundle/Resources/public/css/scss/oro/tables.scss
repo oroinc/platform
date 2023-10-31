@@ -389,6 +389,18 @@
         }
     }
 
+    &.table-borderless {
+        tbody,
+        thead {
+            tr {
+                td,
+                th {
+                    border: none;
+                }
+            }
+        }
+    }
+
     &.table-fixed {
         table-layout: fixed;
     }

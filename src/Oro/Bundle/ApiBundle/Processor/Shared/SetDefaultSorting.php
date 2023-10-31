@@ -27,7 +27,7 @@ class SetDefaultSorting implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -45,30 +45,6 @@ class SetDefaultSorting implements ProcessorInterface
                 $context->getFilters(),
                 $config,
                 $context->getConfigOfSorters()
-            );
-        }
-    }
-
-    protected function addSortFilter(
-        string $filterName,
-        FilterCollection $filters,
-        EntityDefinitionConfig $config,
-        ?SortersConfig $configOfSorters
-    ): void {
-        if (!$filters->has($filterName)) {
-            $filters->add(
-                $filterName,
-                new SortFilter(
-                    DataType::ORDER_BY,
-                    $this->getSortFilterDescription(),
-                    function () use ($config, $configOfSorters) {
-                        return $this->getDefaultValue($config, $configOfSorters);
-                    },
-                    function ($value) {
-                        return $this->convertDefaultValueToString($value);
-                    }
-                ),
-                false
             );
         }
     }
@@ -129,5 +105,29 @@ class SetDefaultSorting implements ProcessorInterface
         }
 
         return implode(',', $result);
+    }
+
+    private function addSortFilter(
+        string $filterName,
+        FilterCollection $filters,
+        EntityDefinitionConfig $config,
+        ?SortersConfig $configOfSorters
+    ): void {
+        if (!$filters->has($filterName)) {
+            $filters->add(
+                $filterName,
+                new SortFilter(
+                    DataType::ORDER_BY,
+                    $this->getSortFilterDescription(),
+                    function () use ($config, $configOfSorters) {
+                        return $this->getDefaultValue($config, $configOfSorters);
+                    },
+                    function ($value) {
+                        return $this->convertDefaultValueToString($value);
+                    }
+                ),
+                false
+            );
+        }
     }
 }

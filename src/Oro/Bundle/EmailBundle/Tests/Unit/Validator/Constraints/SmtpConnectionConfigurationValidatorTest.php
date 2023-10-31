@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\DependencyInjection\Configuration;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
 use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
@@ -33,7 +32,10 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         parent::setUp();
     }
 
-    protected function createValidator()
+    /**
+     * {@inheritDoc}
+     */
+    protected function createValidator(): SmtpConnectionConfigurationValidator
     {
         return new SmtpConnectionConfigurationValidator(
             $this->checker,
@@ -95,26 +97,11 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
     private function getConfiguredSettings(string $encryptedPassword): array
     {
         return [
-            Configuration::getConfigKeyByName(
-                Configuration::KEY_SMTP_SETTINGS_HOST,
-                ConfigManager::SECTION_VIEW_SEPARATOR
-            ) => [ConfigManager::VALUE_KEY => 'smtp.host'],
-            Configuration::getConfigKeyByName(
-                Configuration::KEY_SMTP_SETTINGS_PORT,
-                ConfigManager::SECTION_VIEW_SEPARATOR
-            ) => [ConfigManager::VALUE_KEY => 123],
-            Configuration::getConfigKeyByName(
-                Configuration::KEY_SMTP_SETTINGS_ENC,
-                ConfigManager::SECTION_VIEW_SEPARATOR
-            ) => [ConfigManager::VALUE_KEY => 'ssl'],
-            Configuration::getConfigKeyByName(
-                Configuration::KEY_SMTP_SETTINGS_USER,
-                ConfigManager::SECTION_VIEW_SEPARATOR
-            ) => [ConfigManager::VALUE_KEY => 'user'],
-            Configuration::getConfigKeyByName(
-                Configuration::KEY_SMTP_SETTINGS_PASS,
-                ConfigManager::SECTION_VIEW_SEPARATOR
-            ) => [ConfigManager::VALUE_KEY => $encryptedPassword]
+            'oro_email___smtp_settings_host' => [ConfigManager::VALUE_KEY => 'smtp.host'],
+            'oro_email___smtp_settings_port' => [ConfigManager::VALUE_KEY => 123],
+            'oro_email___smtp_settings_encryption' => [ConfigManager::VALUE_KEY => 'ssl'],
+            'oro_email___smtp_settings_username' => [ConfigManager::VALUE_KEY => 'user'],
+            'oro_email___smtp_settings_password' => [ConfigManager::VALUE_KEY => $encryptedPassword]
         ];
     }
 

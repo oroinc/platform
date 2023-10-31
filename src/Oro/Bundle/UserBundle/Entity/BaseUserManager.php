@@ -6,7 +6,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\PasswordHasher\Hasher\MigratingPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 /**
  * The base class for work with a user entity.
@@ -21,17 +22,17 @@ class BaseUserManager
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /** @var EncoderFactoryInterface */
-    private $encoderFactory;
+    /** @var PasswordHasherFactoryInterface */
+    private $passwordHasherFactory;
 
     public function __construct(
         UserLoaderInterface $userLoader,
         ManagerRegistry $doctrine,
-        EncoderFactoryInterface $encoderFactory
+        PasswordHasherFactoryInterface $passwordHasherFactory
     ) {
         $this->userLoader = $userLoader;
         $this->doctrine = $doctrine;
-        $this->encoderFactory = $encoderFactory;
+        $this->passwordHasherFactory = $passwordHasherFactory;
     }
 
     /**
@@ -68,8 +69,9 @@ class BaseUserManager
     {
         $password = $user->getPlainPassword();
         if ($password !== null && 0 !== strlen($password)) {
-            $encoder = $this->encoderFactory->getEncoder($user);
-            $user->setPassword($encoder->encodePassword($password, $user->getSalt()));
+            /** @var MigratingPasswordHasher $passwordHasher */
+            $passwordHasher = $this->passwordHasherFactory->getPasswordHasher($user);
+            $user->setPassword($passwordHasher->hash($password, $user->getSalt()));
             $user->eraseCredentials();
         }
     }

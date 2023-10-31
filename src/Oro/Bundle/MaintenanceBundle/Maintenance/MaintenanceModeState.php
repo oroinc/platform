@@ -5,16 +5,19 @@ namespace Oro\Bundle\MaintenanceBundle\Maintenance;
 use Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory;
 
 /**
- * Class represents Maintenance Mode State.
+ * Represents the maintenance mode state.
  */
 class MaintenanceModeState
 {
-    public function __construct(protected DriverFactory $factory)
+    private DriverFactory $factory;
+
+    public function __construct(DriverFactory $factory)
     {
+        $this->factory = $factory;
     }
 
     /**
-     * Whether maintenance mode is on or not
+     * Checks whether the maintenance mode is on or not.
      */
     public function isOn(): bool
     {

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
@@ -12,7 +12,6 @@ use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository;
 use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationProcessRecipientsEvent;
-use Oro\Bundle\NotificationBundle\Helper\WebsiteAwareEntityHelper;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
@@ -30,11 +29,8 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var WebsiteAwareEntityHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $websiteAware;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var TemplateEmailNotificationAdapter */
     private $adapter;
@@ -44,9 +40,8 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         $this->entity = new EmailHolderStub();
         $this->emailNotification = $this->createMock(EmailNotification::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->em = $this->createMock(EntityManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
-        $this->websiteAware = $this->createMock(WebsiteAwareEntityHelper::class);
 
         $additionalEmailAssociationProvider = $this->createMock(ChainAdditionalEmailAssociationProvider::class);
         $additionalEmailAssociationProvider->expects($this->any())
@@ -58,11 +53,10 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         $this->adapter = new TemplateEmailNotificationAdapter(
             $this->entity,
             $this->emailNotification,
-            $this->em,
+            $this->doctrine,
             $propertyAccessor,
             $this->eventDispatcher,
-            $additionalEmailAssociationProvider,
-            $this->websiteAware
+            $additionalEmailAssociationProvider
         );
     }
 
@@ -85,7 +79,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         $recipients = [new EmailAddressWithContext('email1@mail.com')];
         $this->mockRecipients(new RecipientList(), $recipients);
 
-        $event = new NotificationProcessRecipientsEvent($this->entity, $recipients, $this->websiteAware);
+        $event = new NotificationProcessRecipientsEvent($this->entity, $recipients);
         $transformedRecipients = [new EmailHolderStub('email1@mail.com')];
 
         $this->eventDispatcher->expects($this->once())
@@ -244,7 +238,7 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
             ->with($recipientList)
             ->willReturn($recipients);
 
-        $this->em->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getRepository')
             ->with(RecipientList::class)
             ->willReturn($repository);

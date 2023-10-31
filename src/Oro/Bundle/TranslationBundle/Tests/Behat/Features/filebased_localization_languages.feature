@@ -1,4 +1,5 @@
 @fixture-OroTranslationBundle:FileBasedLanguage.yml
+
 Feature: File-Based localization languages
   In order to use the application with file-based languages
   As an Administrator

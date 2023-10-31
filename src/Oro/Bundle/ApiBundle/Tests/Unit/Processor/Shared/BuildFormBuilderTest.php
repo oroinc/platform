@@ -66,10 +66,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
     private function createMetaPropertyMetadata(string $fieldName): MetaPropertyMetadata
     {
-        $fieldMetadata = new MetaPropertyMetadata();
-        $fieldMetadata->setName($fieldName);
-
-        return $fieldMetadata;
+        return new MetaPropertyMetadata($fieldName);
     }
 
     private function createFieldMetadata(string $fieldName): FieldMetadata

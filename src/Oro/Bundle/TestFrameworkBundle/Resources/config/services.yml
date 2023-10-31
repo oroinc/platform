@@ -164,3 +164,23 @@ services:
     oro_test.mailer.message_logger_listener:
         decorates: mailer.message_logger_listener
         class: Oro\Bundle\TestFrameworkBundle\Mailer\EventListener\MessageLoggerListener
+
+    oro_test.event_listener.install_option_command:
+        class: Oro\Bundle\TestFrameworkBundle\EventListener\InstallOptionCommandEventListener
+        arguments:
+            - '@oro_test.provider.install_default_options'
+        tags:
+            - { name: kernel.event_listener, event: installer.initialize, method: onInitialize }
+
+    oro_test.provider.install_default_options:
+        class: Oro\Bundle\TestFrameworkBundle\Provider\InstallDefaultOptionsProvider
+        public: true
+        arguments:
+            - !abstract '$installOptions defined in Oro\Bundle\TestFrameworkBundle\DependencyInjection\OroTestFrameworkExtension'
+
+    oro_test.faker.provider.user_hash_password:
+        class: Oro\Bundle\TestFrameworkBundle\Faker\UserHashPasswordProvider
+        arguments:
+            - '@nelmio_alice.faker.generator'
+        tags:
+            - { name: nelmio_alice.faker.provider }

@@ -130,3 +130,8 @@ oro_behat_extension:
 
     TooltipInner:
       selector: '.tooltip-inner'
+
+    Tooltip Popover Content:
+      selector:
+        locator: '//div[@role="tooltip"]//div[contains(@class, "oro-popover-content")]'
+        type: xpath

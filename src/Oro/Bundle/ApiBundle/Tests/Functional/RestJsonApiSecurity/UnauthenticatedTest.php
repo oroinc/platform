@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiSecurity;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class UnauthorizedTest extends RestJsonApiTestCase
+class UnauthenticatedTest extends RestJsonApiTestCase
 {
     private const WWW_AUTHENTICATE_HEADER_VALUE = 'WSSE realm="Secured API", profile="UsernameToken"';
 

@@ -1,4 +1,5 @@
 @ticket-BAP-10957
+@ticket-BAP-22197
 @automatically-ticket-tagged
 
 Feature: User email activity
@@ -22,19 +23,28 @@ Scenario: Send email
     | To       | [Audrey, Pitt]                                                  |
     | Body     | Hi Man! We have new role for you, you will be happy, I promise! |
     | Contexts | [Audrey, Pitt]                                                  |
-# todo: Uncomment by resolve BAP-11089
-#  And add email attachments "email-attachment.jpg, email-attachment2.jpg, email-attachment3.jpg"
-#  And delete email-attachment2.jpg attachment
   When click "Send"
   Then I should see "The email was sent" flash message
 
-# todo: Uncomment by resolve BAP-11089
-#Scenario: View attachments
-#  Given I go to System/User Management/Users
-#  And click view Audrey in grid
-#  When I click on "Work for you" in activity list
-#  And I should see 2 attachments
-#  When I click on 1 attachment
-#  Then I should see view of 1 attachment
-#  When I click next attachment
-#  Then I should see view of 2 attachment
+Scenario: Check email activities
+  Given I click My Emails in user menu
+  When I click view "Work for you" in grid
+  Then I should see "Audrey Hepburn" in the "Email Page Contexts" element
+  And I should see "Brad Pitt" in the "Email Page Contexts" element
+
+Scenario: Check aggregated activities for threaded email
+  When I click "Reply"
+  And fill form with:
+    | Contexts | [Audrey, Bruce] |
+  And I click "Send"
+  Then I should see "The email was sent" flash message
+  And I should see "Audrey Hepburn" in the "Email Page Contexts" element
+  And I should see "Brad Pitt" in the "Email Page Contexts" element
+  And I should see "Bruce Willis" in the "Email Page Contexts" element
+
+Scenario: Remove activity that exists in several emails in the thread
+  When I press "Email View Delete Audrey Hepburn Context"
+  Then I should see "The context has been removed" flash message
+  And I should not see "Audrey Hepburn" in the "Email Page Contexts" element
+  And I should see "Brad Pitt" in the "Email Page Contexts" element
+  And I should see "Bruce Willis" in the "Email Page Contexts" element

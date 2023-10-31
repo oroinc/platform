@@ -759,7 +759,7 @@ class OroMainContext extends MinkContext implements
      *
      * @param string $loginAndPassword
      */
-    public function loginAsUserWithPassword($loginAndPassword = 'admin')
+    public function loginAsUserWithPassword($loginAndPassword = 'admin', bool $closeOrganizationNotice = true)
     {
         //quick way to logout user (delete all cookies)
         $driver = $this->getSession()->getDriver();
@@ -769,6 +769,11 @@ class OroMainContext extends MinkContext implements
         $this->fillField('_username', $loginAndPassword);
         $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');
+
+        if ($closeOrganizationNotice) {
+            $this->waitForAjax();
+            $this->pressButtonIfPresent('Organization Notice Close');
+        }
     }
 
     /**
@@ -794,6 +799,7 @@ class OroMainContext extends MinkContext implements
      * Example: Given I click My Calendar in user menu
      *
      * @Given /^(?:|I )click (?P<needle>[\w\s]+) in user menu$/
+     * @Given /^(?:|I )click "(?P<needle>.+)" in user menu$/
      */
     public function iClickLinkInUserMenu($needle)
     {
@@ -808,6 +814,7 @@ class OroMainContext extends MinkContext implements
      * Example: Given I click Websites in sidebar menu
      *
      * @Given /^(?:|I )click (?P<needle>[\w\s]+) in sidebar menu$/
+     *
      */
     public function iClickLinkInSidebarMenu($needle)
     {
@@ -820,6 +827,7 @@ class OroMainContext extends MinkContext implements
      * Example: When I click "Users" in "sidebar menu" element
      *
      * @Given /^(?:|I )click "(?P<needle>(?:[^"]|\\")*)" in "(?P<element>(?:[^"]|\\")*)" element$/
+     *
      */
     public function iClickOnSmthInElement(string $needle, string $element)
     {
@@ -3296,5 +3304,16 @@ JS;
                 break;
             }
         }
+    }
+
+    /**
+     * Example: And I remember element "Add" value as "my_data"
+     *
+     * @When /^(?:|I )remember element "(?P<fieldName>(?:[^"]|\\")*)" value as "(?P<alias>(?:[^"]|\\")*)"$/
+     */
+    public function rememberElementValue(string $elementName, string $alias)
+    {
+        $element = $this->createElement($elementName);
+        VariableStorage::storeData($alias, $element->getValue());
     }
 }

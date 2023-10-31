@@ -492,6 +492,12 @@
         .select2-selected {
             display: $select2-results-selected-disabled-display;
         }
+
+        .ghost-option {
+            .select2-result-label {
+                color: $select2-results-ghost-option-color;
+            }
+        }
     }
 
     &.select2-container-disabled {

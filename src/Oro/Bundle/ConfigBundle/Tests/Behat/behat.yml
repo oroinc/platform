@@ -76,10 +76,8 @@ oro_behat_extension:
         locator: '//em[text()="Recent Emails"]/../../..//button[@data-role="add-action"]'
         type: xpath
 
-    Close Organization info popup:
-      selector:
-        locator: '//strong[contains(text(),"Logged in to")]/../..//a[@title="Close"]'
-        type: xpath
+    Organization Notice Close:
+      selector: '.oropro-organization-notice-holder .popover-close'
 
   suites:
     OroConfigBundle:

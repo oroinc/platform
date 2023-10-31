@@ -93,6 +93,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setSharedData($this->sharedData);
+        $expectedGetContext->setParentAction($this->context->getAction());
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
         $expectedGetContext->setResult($includedEntity);
@@ -173,6 +174,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setSharedData($this->sharedData);
+        $expectedGetContext->setParentAction($this->context->getAction());
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
         $expectedGetContext->setResult($includedEntity);
@@ -252,6 +254,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setSharedData($this->sharedData);
+        $expectedGetContext->setParentAction($this->context->getAction());
         $expectedGetContext->setClassName($includedEntityClass);
         $expectedGetContext->setId($includedRealEntityId);
         $expectedGetContext->skipGroup(ApiActionGroup::SECURITY_CHECK);

@@ -17,6 +17,9 @@ use Psr\Log\NullLogger;
  * Overrides GosClient to add the ability to set socket transport and context options.
  * Overridden: connect.
  * Other methods are copied from original Gos\Component\WebSocketClient\Wamp\Client because of final.
+ *
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WampClient implements ClientInterface, LoggerAwareInterface
 {
@@ -90,14 +93,26 @@ class WampClient implements ClientInterface, LoggerAwareInterface
     private $gosClient;
 
     /**
-     * @var int Timeout to wait for data in a stream.
+     * @var int Time to wait when polling a stream for data, in microseconds.
+     *  1000 = 0.001 sec
      */
-    private int $streamWaitTimeoutSec = 1;
+    private int $streamWaitTimeoutInMicroseconds = 1000;
+
+    /**
+     * @var int Max time to wait for data in a stream, in microseconds.
+     *  1000000 = 1 sec
+     */
+    private int $maxWaitTimeoutInMicroseconds = 1000000;
+
+    /**
+     * @var int Maximum bytes to read from a stream a time.
+     */
+    private int $bufferSize = 65536;
 
     /**
      * User Agent connection header
      */
-    private ?string $userAgent = null;
+    private ?string $userAgent;
 
     public function __construct(
         string $host,
@@ -105,7 +120,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
         string $transport,
         array $contextOptions = [],
         ?string $origin = null,
-        ?string $userAgent = null,
+        ?string $userAgent = null
     ) {
         $this->serverHost = $host;
         $this->serverPort = $port;
@@ -117,6 +132,24 @@ class WampClient implements ClientInterface, LoggerAwareInterface
         $this->userAgent = $userAgent;
 
         $this->logger = new NullLogger();
+    }
+
+    /**
+     * @param int $maxWaitTimeoutInMicroseconds Max time to wait for data in a stream, in microseconds.
+     * @param int $streamWaitTimeoutInMicroseconds Time to wait when polling a stream for data, in microseconds.
+     */
+    public function setStreamTimeouts(int $maxWaitTimeoutInMicroseconds, int $streamWaitTimeoutInMicroseconds): void
+    {
+        $this->maxWaitTimeoutInMicroseconds = $maxWaitTimeoutInMicroseconds;
+        $this->streamWaitTimeoutInMicroseconds = $streamWaitTimeoutInMicroseconds;
+    }
+
+    /**
+     * @param int $bufferSize Maximum bytes to read from a stream a time.
+     */
+    public function setBufferSize(int $bufferSize): void
+    {
+        $this->bufferSize = $bufferSize;
     }
 
     /**
@@ -138,14 +171,13 @@ class WampClient implements ClientInterface, LoggerAwareInterface
 
         $this->verifyResponse($response);
 
-        $payload = json_decode($this->read(), true);
-        if (isset($payload[0], $payload[1])) {
-            if ((int)$payload[0] !== Protocol::MSG_WELCOME) {
-                throw new BadResponseException('WAMP Server did not send welcome message.');
-            }
+        $welcomeMessage = $this->getWelcomeMessage($response);
+        if ($welcomeMessage !== null) {
+            $this->sessionId = $this->verifyWelcomeMessage($welcomeMessage);
 
-            $this->sessionId = $payload[1];
-            $this->connected = true;
+            if ($this->sessionId !== null) {
+                $this->connected = true;
+            }
         }
 
         return (string)$this->sessionId;
@@ -298,48 +330,47 @@ class WampClient implements ClientInterface, LoggerAwareInterface
     }
 
     /**
-     * Taken from the 1.0 version of WAMP client of GeniusesOfSymfony/WebSocketPhpClient.
+     * @param int $maxWaitTimeoutInMicroseconds
+     * @param int $streamWaitTimeoutInMicroseconds
      *
-     * @throws BadResponseException
+     * @return string
      */
-    protected function read(): string
-    {
-        $streamBody = $this->streamGetContents($this->streamWaitTimeoutSec);
-        if (!$streamBody) {
-            throw new BadResponseException('The stream buffer could not be read.');
-        }
-
-        $startPos = strpos($streamBody, '[');
-        $endPos = strpos($streamBody, ']');
-
-        if (false === $startPos || false === $endPos) {
-            $this->logger->error(
-                'Could not extract response body from stream: {stream_body}',
-                [
-                    'stream_body' => $streamBody,
-                    'endpoint' => $this->endpoint,
-                    'context_options' => $this->contextOptions,
-                    'origin' => $this->origin,
-                    'user_agent' => $this->userAgent,
-                ]
-            );
-
-            throw new BadResponseException('Could not extract response body from stream.');
-        }
-
-        return substr($streamBody, $startPos, $endPos);
-    }
-
-    protected function streamGetContents(int $timeout): string
-    {
-        $read = [$this->socket];
-        $write = [];
-        $except = [];
+    protected function streamGetContents(
+        int $maxWaitTimeoutInMicroseconds,
+        int $streamWaitTimeoutInMicroseconds
+    ): string {
         $streamBody = '';
         try {
-            stream_set_blocking($this->socket, 0);
-            while (stream_select($read, $write, $except, $timeout) > 0) {
-                $streamBody .= stream_get_contents($this->socket);
+            $maxTimeoutInSeconds = $maxWaitTimeoutInMicroseconds / 1000000;
+            $start = microtime(true);
+            $ready = false;
+            // Polls the stream for data until it runs out or timeout elapses.
+            while (microtime(true) - $start < $maxTimeoutInSeconds) {
+                $read = [$this->socket];
+                $write = [];
+                $except = [];
+                $result = stream_select($read, $write, $except, 0, $streamWaitTimeoutInMicroseconds);
+                if ($result === false) {
+                    // Error happened. Should be logged in catch() block as \ErrorException.
+                    break;
+                }
+
+                if ($result > 0) {
+                    // Stream is ready to read.
+                    $contents = stream_get_contents($this->socket, $this->bufferSize);
+                    if ($contents === false) {
+                        // Error happened. Should be logged in catch() block as \ErrorException.
+                        break;
+                    }
+
+                    if ($contents !== '') {
+                        $streamBody .= $contents;
+                        $ready = true;
+                    }
+                } elseif ($ready === true) {
+                    // No more data to read.
+                    break;
+                }
             }
         } catch (\Throwable $throwable) {
             $this->logger->error(
@@ -353,8 +384,6 @@ class WampClient implements ClientInterface, LoggerAwareInterface
                     'user_agent' => $this->userAgent,
                 ]
             );
-        } finally {
-            stream_set_blocking($this->socket, 1);
         }
 
         return $streamBody;
@@ -402,6 +431,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
                 throw new BadResponseException('Could not open socket. Reason: ' . $errstr);
             }
 
+            stream_set_blocking($socket, false);
             stream_set_read_buffer($socket, 0);
             stream_set_write_buffer($socket, 0);
         } catch (\Throwable $throwable) {
@@ -462,9 +492,9 @@ class WampClient implements ClientInterface, LoggerAwareInterface
     }
 
     /**
-     * Copy of Client::upgradeProtocol
      * @param string $target
-     * @return string|false Response body from the request or boolean false on failure
+     *
+     * @return string Response body after the connection upgrade
      *
      * @throws WebsocketException if the target URI is invalid
      */
@@ -503,7 +533,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
 
         fwrite($this->socket, $out);
 
-        return fgets($this->socket);
+        return $this->streamGetContents($this->maxWaitTimeoutInMicroseconds, $this->streamWaitTimeoutInMicroseconds);
     }
 
     /**
@@ -522,27 +552,12 @@ class WampClient implements ClientInterface, LoggerAwareInterface
     }
 
     /**
-     * Copy of Client::verifyResponse
-     * @param string|false $response Response body from the upgrade request or boolean false on failure
+     * @param string $response Response body after the upgrade request.
      *
      * @throws BadResponseException if an invalid response was received
      */
-    private function verifyResponse($response): void
+    private function verifyResponse(string $response): void
     {
-        if (false === $response) {
-            $this->logger->error(
-                'WAMP Server did not respond properly',
-                [
-                    'endpoint' => $this->endpoint,
-                    'context_options' => $this->contextOptions,
-                    'origin' => $this->origin,
-                    'user_agent' => $this->userAgent,
-                ]
-            );
-
-            throw new BadResponseException('WAMP Server did not respond properly.');
-        }
-
         $responseStatus = substr($response, 0, 12);
 
         if ('HTTP/1.1 101' !== $responseStatus) {
@@ -565,5 +580,49 @@ class WampClient implements ClientInterface, LoggerAwareInterface
                 )
             );
         }
+    }
+
+    private function getWelcomeMessage(string $response): ?string
+    {
+        $startPos = strpos($response, '[');
+        $endPos = strpos($response, ']');
+
+        if (false === $startPos || false === $endPos) {
+            $this->logger->error(
+                'Could not extract a welcome message from stream: {stream_body}',
+                [
+                    'stream_body' => $response,
+                    'endpoint' => $this->endpoint,
+                    'context_options' => $this->contextOptions,
+                    'origin' => $this->origin,
+                    'user_agent' => $this->userAgent,
+                ]
+            );
+
+            throw new BadResponseException('Could not extract response body from stream.');
+        }
+
+        return substr($response, $startPos, $endPos) ?: null;
+    }
+
+    /**
+     * @param string $message A welcome message
+     *
+     * @return string|null Connection session ID or NULL on failure.
+     *
+     * @throws BadResponseException When $message is not a welcome message.
+     */
+    private function verifyWelcomeMessage(string $message): ?string
+    {
+        $payload = json_decode($message, true);
+        if (isset($payload[0], $payload[1])) {
+            if ((int)$payload[0] !== Protocol::MSG_WELCOME) {
+                throw new BadResponseException('WAMP Server did not send welcome message.');
+            }
+
+            return $payload[1];
+        }
+
+        return null;
     }
 }
