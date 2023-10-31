@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
 
-use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
@@ -32,10 +31,10 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);
         $this->deletedAttributeProvider = $this->createMock(DeletedAttributeProviderInterface::class);
+
         $this->listener = new DeletedAttributeRelationListener(
             $this->messageProducer,
-            $this->deletedAttributeProvider,
-            (new InflectorFactory())->build()
+            $this->deletedAttributeProvider
         );
     }
 
