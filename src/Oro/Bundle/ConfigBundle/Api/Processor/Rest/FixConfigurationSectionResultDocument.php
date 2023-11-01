@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ConfigBundle\Api\Processor\Get\Rest;
+namespace Oro\Bundle\ConfigBundle\Api\Processor\Rest;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -15,26 +15,24 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class FixConfigurationSectionResultDocument implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
         $data = $context->getResult();
-        if (empty($data) || !$context->isSuccessResponse()) {
+        if (!$data || !$context->isSuccessResponse()) {
             // no data or the result document contains info about errors
             return;
         }
 
-        $data = $context->getResult();
-        if (array_key_exists('options', $data)) {
+        if (\array_key_exists('options', $data)) {
             $result = [];
             $options = $data['options'];
             foreach ($options as $option) {
                 $option['type'] = $option['dataType'];
-                unset($option['dataType']);
-                unset($option['scope']);
+                unset($option['dataType'], $option['scope']);
                 $result[] = $option;
             }
             $context->setResult($result);

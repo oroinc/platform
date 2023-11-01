@@ -15,8 +15,15 @@ class AddScopeFilter implements ProcessorInterface
 {
     public const FILTER_KEY = 'scope';
 
+    private array $scopes;
+
+    public function __construct(array $scopes)
+    {
+        $this->scopes = $scopes;
+    }
+
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context)
     {
@@ -32,7 +39,7 @@ class AddScopeFilter implements ProcessorInterface
             self::FILTER_KEY,
             new StandaloneFilterWithDefaultValue(
                 DataType::STRING,
-                'Configuration Scope',
+                sprintf('The configuration scope. Possible values: %s.', implode(', ', $this->scopes)),
                 'user'
             )
         );

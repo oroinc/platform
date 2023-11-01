@@ -6,6 +6,9 @@ use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\ProviderInterface;
 
+/**
+ * The manager for API configuration tree.
+ */
 class ConfigApiManager
 {
     /** @var ProviderInterface */
@@ -87,6 +90,19 @@ class ConfigApiManager
     }
 
     /**
+     * Gets the list of keys of a configuration variables.
+     *
+     * @return string[]
+     */
+    public function getDataItemKeys()
+    {
+        $keys = [];
+        $this->extractDataItemKeys($keys, $this->configProvider->getApiTree());
+
+        return array_values(array_unique($keys));
+    }
+
+    /**
      * Gets all configuration data of the specified section
      *
      * @param string $path  The path to API section. For example: look-and-feel/grid
@@ -145,6 +161,23 @@ class ConfigApiManager
     }
 
     /**
+     * Gets the list of paths for all configuration sections to which the given configuration variable belongs.
+     * The result is sorted alphabetically.
+     *
+     * @param string $key The key of a configuration variable
+     *
+     * @return string[]
+     */
+    public function getDataItemSections(string $key)
+    {
+        $sections = [];
+        $this->extractSectionPathsForDataItem($sections, $key, $this->configProvider->getApiTree());
+        sort($sections, SORT_FLAG_CASE);
+
+        return $sections;
+    }
+
+    /**
      * Extracts paths of all sections in the given configuration tree
      *
      * @param array             $result
@@ -155,12 +188,53 @@ class ConfigApiManager
     {
         $subSections = $tree->getSubSections();
         foreach ($subSections as $subSection) {
-            $path     = empty($parentPath)
-                ? $subSection->getName()
-                : $parentPath . '/' . $subSection->getName();
+            $path = $this->getSectionPath($subSection, $parentPath);
             $result[] = $path;
             $this->extractSectionPaths($result, $subSection, $path);
         }
+    }
+
+    /**
+     * Extracts paths of all sections in the given configuration tree
+     * to which the given configuration variable belongs.
+     */
+    private function extractSectionPathsForDataItem(
+        array &$result,
+        string $dataItemKey,
+        SectionDefinition $tree,
+        ?string $parentPath = null
+    ): void {
+        $subSections = $tree->getSubSections();
+        foreach ($subSections as $subSection) {
+            $path = $this->getSectionPath($subSection, $parentPath);
+            $variable = $subSection->getVariable($dataItemKey);
+            if (null !== $variable) {
+                $result[] = $path;
+            }
+            $this->extractSectionPathsForDataItem($result, $dataItemKey, $subSection, $path);
+        }
+    }
+
+    /**
+     * Extracts keys of all sections in the given configuration tree.
+     */
+    private function extractDataItemKeys(array &$result, SectionDefinition $tree): void
+    {
+        $variables = $tree->getVariables();
+        foreach ($variables as $variable) {
+            $result[] = $variable->getKey();
+        }
+        $subSections = $tree->getSubSections();
+        foreach ($subSections as $subSection) {
+            $this->extractDataItemKeys($result, $subSection);
+        }
+    }
+
+    private function getSectionPath(SectionDefinition $subSection, ?string $parentPath): string
+    {
+        return $parentPath
+            ? $parentPath . '/' . $subSection->getName()
+            : $subSection->getName();
     }
 
     /**

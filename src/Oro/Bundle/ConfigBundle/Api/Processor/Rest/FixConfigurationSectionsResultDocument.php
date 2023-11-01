@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ConfigBundle\Api\Processor\GetList\Rest;
+namespace Oro\Bundle\ConfigBundle\Api\Processor\Rest;
 
 use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -14,14 +14,14 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class FixConfigurationSectionsResultDocument implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */
 
         $data = $context->getResult();
-        if (empty($data) || !$context->isSuccessResponse()) {
+        if (!$data || !$context->isSuccessResponse()) {
             // no data or the result document contains info about errors
             return;
         }

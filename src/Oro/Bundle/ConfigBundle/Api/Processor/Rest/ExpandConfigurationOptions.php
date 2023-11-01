@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ConfigBundle\Api\Processor\Get\Rest;
+namespace Oro\Bundle\ConfigBundle\Api\Processor\Rest;
 
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -13,7 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class ExpandConfigurationOptions implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context)
     {
