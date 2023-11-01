@@ -22,51 +22,53 @@ class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->configRepository = new ConfigurationRepository($this->configManager);
     }
 
-    public function testGetScopes()
+    public function testGetScopes(): void
     {
         $scopes = ['user', 'global'];
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getScopes')
             ->willReturn($scopes);
 
-        $this->assertEquals($scopes, $this->configRepository->getScopes());
+        self::assertEquals($scopes, $this->configRepository->getScopes());
     }
 
-    public function testGetSectionIds()
+    public function testGetSectionIds(): void
     {
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getSections')
             ->willReturn(['section', 'section/sub-section']);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['section', 'section.sub-section'],
             $this->configRepository->getSectionIds()
         );
     }
 
-    public function testGetUnknownSection()
+    public function testGetUnknownSection(): void
     {
-        $this->configManager->expects($this->once())
+        $sectionId = 'section';
+
+        $this->configManager->expects(self::once())
             ->method('hasSection')
-            ->with('section')
+            ->with($sectionId)
             ->willReturn(false);
 
-        $this->assertNull($this->configRepository->getSection('section', 'scope'));
+        self::assertNull($this->configRepository->getSection($sectionId, 'scope', 123));
     }
 
-    public function testGetSection()
+    public function testGetSection(): void
     {
         $scope = 'scope';
         $sectionId = 'section.sub-section';
         $decodedSectionId = 'section/sub-section';
         $datetime = new \DateTime();
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasSection')
             ->with($decodedSectionId)
             ->willReturn(true);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getData')
             ->with($decodedSectionId, $scope)
             ->willReturn(
@@ -76,7 +78,7 @@ class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
                         'type'      => 'string',
                         'value'     => 'test_value',
                         'createdAt' => $datetime,
-                        'updatedAt' => $datetime,
+                        'updatedAt' => $datetime
                     ]
                 ]
             );
@@ -88,20 +90,20 @@ class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
         $expectedConfigOption->setCreatedAt($datetime);
         $expectedConfigOption->setUpdatedAt($datetime);
         $expectedResult->setOptions([$expectedConfigOption]);
-        $this->assertEquals(
+        self::assertEquals(
             $expectedResult,
             $this->configRepository->getSection($sectionId, $scope)
         );
     }
 
-    public function testGetSectionOptions()
+    public function testGetSectionOptions(): void
     {
         $scope = 'scope';
         $sectionId = 'section.sub-section';
         $decodedSectionId = 'section/sub-section';
         $datetime = new \DateTime();
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getData')
             ->with($decodedSectionId, $scope)
             ->willReturn(
@@ -111,7 +113,7 @@ class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
                         'type'      => 'string',
                         'value'     => 'test_value',
                         'createdAt' => $datetime,
-                        'updatedAt' => $datetime,
+                        'updatedAt' => $datetime
                     ]
                 ]
             );
@@ -121,13 +123,13 @@ class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
         $expectedConfigOption->setValue('test_value');
         $expectedConfigOption->setCreatedAt($datetime);
         $expectedConfigOption->setUpdatedAt($datetime);
-        $this->assertEquals(
+        self::assertEquals(
             [$expectedConfigOption],
             $this->configRepository->getSectionOptions($sectionId, $scope)
         );
     }
 
-    public function testGetSectionOption()
+    public function testGetSectionOption(): void
     {
         $optionKey = 'key1';
         $scope = 'scope';
@@ -135,7 +137,7 @@ class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
         $decodedSectionId = 'section/sub-section';
         $datetime = new \DateTime();
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getDataItem')
             ->with($optionKey, $decodedSectionId, $scope)
             ->willReturn(
@@ -144,7 +146,7 @@ class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
                     'type'      => 'string',
                     'value'     => 'test_value',
                     'createdAt' => $datetime,
-                    'updatedAt' => $datetime,
+                    'updatedAt' => $datetime
                 ]
             );
 
@@ -153,9 +155,67 @@ class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
         $expectedConfigOption->setValue('test_value');
         $expectedConfigOption->setCreatedAt($datetime);
         $expectedConfigOption->setUpdatedAt($datetime);
-        $this->assertEquals(
+        self::assertEquals(
             $expectedConfigOption,
             $this->configRepository->getSectionOption($optionKey, $sectionId, $scope)
+        );
+    }
+
+    public function testGetOptionKeys(): void
+    {
+        $optionKeys = ['key1', 'key2'];
+
+        $this->configManager->expects(self::once())
+            ->method('getDataItemKeys')
+            ->willReturn($optionKeys);
+
+        self::assertEquals($optionKeys, $this->configRepository->getOptionKeys());
+    }
+
+    public function testGetUnknownOption(): void
+    {
+        $optionKey = 'key1';
+
+        $this->configManager->expects(self::once())
+            ->method('getDataItemSections')
+            ->with($optionKey)
+            ->willReturn([]);
+
+        self::assertNull($this->configRepository->getOption($optionKey, 'scope'));
+    }
+
+    public function testGetOption(): void
+    {
+        $optionKey = 'key1';
+        $scope = 'scope';
+        $sectionId = 'section.sub-section';
+        $datetime = new \DateTime();
+
+        $this->configManager->expects(self::once())
+            ->method('getDataItemSections')
+            ->with($optionKey)
+            ->willReturn([$sectionId, 'another_section']);
+        $this->configManager->expects(self::once())
+            ->method('getDataItem')
+            ->with($optionKey, $sectionId, $scope)
+            ->willReturn(
+                [
+                    'key'       => $optionKey,
+                    'type'      => 'string',
+                    'value'     => 'test_value',
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime
+                ]
+            );
+
+        $expectedConfigOption = new ConfigurationOption($scope, $optionKey);
+        $expectedConfigOption->setDataType('string');
+        $expectedConfigOption->setValue('test_value');
+        $expectedConfigOption->setCreatedAt($datetime);
+        $expectedConfigOption->setUpdatedAt($datetime);
+        self::assertEquals(
+            $expectedConfigOption,
+            $this->configRepository->getOption($optionKey, $scope)
         );
     }
 }

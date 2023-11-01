@@ -2,46 +2,60 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Contracts\Cache\CacheInterface;
 
 class GlobalScopeManagerTest extends AbstractScopeManagerTestCase
 {
-    /** @var GlobalScopeManager */
-    protected $manager;
-
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function createManager(
-        ManagerRegistry $doctrine,
-        CacheInterface $cache,
-        EventDispatcher $eventDispatcher,
-        ConfigBag $configBag,
-    ): GlobalScopeManager {
-        return new GlobalScopeManager($doctrine, $cache, $eventDispatcher, $configBag);
+    protected function createManager(): GlobalScopeManager
+    {
+        return new GlobalScopeManager($this->doctrine, $this->cache, $this->dispatcher, $this->configBag);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getScopedEntityName(): string
     {
         return 'app';
     }
 
-    public function testGetScopeIdFromEntity(): void
+    /**
+     * {@inheritDoc}
+     */
+    protected function getScopedEntity(): object
     {
-        $entity = $this->getScopedEntity();
-        $this->assertSame(0, $this->manager->getScopeIdFromEntity($entity));
+        return new \stdClass();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function testSetScopeId(): void
+    {
+        $this->dispatcher->expects(self::never())
+            ->method('dispatch');
+
+        $this->manager->setScopeId(123);
+
+        self::assertSame(0, $this->manager->getScopeId());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function testGetScopeIdFromEntity(): void
+    {
+        self::assertSame(0, $this->manager->getScopeIdFromEntity($this->getScopedEntity()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function testGetScopeIdFromUnsupportedEntity(): void
     {
-        $entity = new \stdClass();
-        $this->assertSame(0, $this->manager->getScopeIdFromEntity($entity));
+        self::assertSame(0, $this->manager->getScopeIdFromEntity(new \stdClass()));
     }
 }

@@ -1,9 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ConfigBundle\Api\Processor\GetList;
+namespace Oro\Bundle\ConfigBundle\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\ListContext;
-use Oro\Bundle\ConfigBundle\Api\Processor\GetScope;
 use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -26,7 +25,7 @@ class LoadConfigurationSections implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -37,27 +36,28 @@ class LoadConfigurationSections implements ProcessorInterface
             return;
         }
 
-        // Here we need to check if an access to system configuration is granted,
-        // because it is possible that some configuration sections will be accessible
-        // even if "Access system configuration" capability is disabled.
-        // So, such sections will be added by separate loaders in additional to existing sections.
-        $isAccessToSystemConfigurationGranted = true;
-        $aclResource = $context->getConfig()->getAclResource();
-        if ($aclResource && !$this->authorizationChecker->isGranted($aclResource)) {
-            $isAccessToSystemConfigurationGranted = false;
-        }
+        $config = $context->getConfig();
 
         $sections = [];
-        if ($isAccessToSystemConfigurationGranted) {
+        // Here we need to check if an access to system configuration is granted,
+        // because it is possible that some configuration sections can be accessible
+        // even if an access is denied by ACL.
+        // So, the "security_check" group can be skipped for such sections
+        // and them can be added by other API processors, in additional to existing sections.
+        if ($this->isSystemConfigurationAccessGranted($config->getAclResource())) {
+            $scope = $context->get(GetScope::CONTEXT_PARAM);
+            $withOptions = !$config->getField('options')->isExcluded();
             $sectionIds = $this->configRepository->getSectionIds();
             foreach ($sectionIds as $sectionId) {
-                $sections[] = $this->configRepository->getSection(
-                    $sectionId,
-                    $context->get(GetScope::CONTEXT_PARAM)
-                );
+                $sections[] = $this->configRepository->getSection($sectionId, $scope, $withOptions);
             }
         }
 
         $context->setResult($sections);
+    }
+
+    private function isSystemConfigurationAccessGranted(?string $aclResource): bool
+    {
+        return !$aclResource || $this->authorizationChecker->isGranted($aclResource);
     }
 }

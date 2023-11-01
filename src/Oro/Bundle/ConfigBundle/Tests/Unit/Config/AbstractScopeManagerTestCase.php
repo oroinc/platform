@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\AbstractScopeManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
@@ -10,22 +11,19 @@ use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository;
 use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Abstract test case for scope manager unit tests.
- *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
-    /** @var AbstractScopeManager */
-    protected $manager;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    protected $doctrine;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
@@ -33,68 +31,122 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
     /** @var ConfigRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repo;
 
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $cache;
+
     /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
     protected $dispatcher;
 
     /** @var ConfigBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $configBag;
 
-    /** @var CacheInterface */
-    protected $cache;
+    /** @var AbstractScopeManager */
+    protected $manager;
 
     protected function setUp(): void
     {
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->cache = $this->createMock(CacheInterface::class);
+        $this->dispatcher = $this->createMock(EventDispatcher::class);
+        $this->configBag = $this->createMock(ConfigBag::class);
+
         $this->repo = $this->createMock(ConfigRepository::class);
 
-        $this->em = $this->createMock(EntityManager::class);
-        $this->em->expects($this->any())
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->em->expects(self::any())
             ->method('getRepository')
             ->with(Config::class)
             ->willReturn($this->repo);
 
-        $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects($this->any())
+        $this->doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->with(Config::class)
             ->willReturn($this->em);
 
-        $this->cache = $this->createMock(CacheInterface::class);
+        $this->manager = $this->createManager();
+    }
 
-        $this->dispatcher = $this->createMock(EventDispatcher::class);
-        $this->configBag = $this->createMock(ConfigBag::class);
+    abstract protected function createManager(): AbstractScopeManager;
 
-        $this->manager = $this->createManager(
-            $doctrine,
-            $this->cache,
-            $this->dispatcher,
-            $this->configBag,
-        );
+    abstract protected function getScopedEntityName(): string;
+
+    abstract protected function getScopedEntity(): object;
+
+    protected function getEntityId(?object $entity): mixed
+    {
+        return null !== $entity && method_exists($entity, 'getId') ? $entity->getId() : null;
+    }
+
+    protected function getConfigValue(string $section, string $name, string $type, mixed $value): ConfigValue
+    {
+        $configValue = new ConfigValue();
+        $configValue->setSection($section);
+        $configValue->setName($name);
+        $configValue->setType($type);
+        $configValue->setValue($value);
+
+        return $configValue;
+    }
+
+    protected function getCachedConfig(Config $config): array
+    {
+        $cachedConfig = [];
+
+        foreach ($config->getValues() as $configValue) {
+            if (isset($cachedConfig[$configValue->getSection()])) {
+                $cachedConfig[$configValue->getSection()][$configValue->getName()] = [
+                    'value' => $configValue->getValue(),
+                    'use_parent_scope_value' => false,
+                    'createdAt' => $configValue->getCreatedAt(),
+                    'updatedAt' => $configValue->getUpdatedAt()
+                ];
+            } else {
+                $cachedConfig[$configValue->getSection()] = [
+                    $configValue->getName() => [
+                        'value' => $configValue->getValue(),
+                        'use_parent_scope_value' => false,
+                        'createdAt' => $configValue->getCreatedAt(),
+                        'updatedAt' => $configValue->getUpdatedAt()
+                    ]
+                ];
+            }
+        }
+
+        return $cachedConfig;
+    }
+
+    protected function prepareSave(Config $config, ?int $scopeId): void
+    {
+        $config->getValues()->add($this->getConfigValue('oro_user', 'update', 'scalar', 'old value'));
+        $config->getValues()->add($this->getConfigValue('oro_user', 'remove', 'scalar', 'test'));
+
+        $this->repo->expects(self::any())
+            ->method('findByEntity')
+            ->with($this->getScopedEntityName(), $scopeId)
+            ->willReturn($config);
+
+        $this->em->expects(self::once())
+            ->method('persist')
+            ->with($this->identicalTo($config));
+        $this->em->expects(self::once())
+            ->method('flush');
     }
 
     /**
      * Test get info from loaded settings
      */
-    public function testGetInfoLoaded()
+    public function testGetInfoLoaded(): void
     {
         $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        /** @var ConfigValue $configValue1 */
-        $configValue1 = $this->getEntity(
-            ConfigValue::class,
-            [
-                'section' => 'oro_user',
-                'name' => 'level',
-                'value' => 2000,
-                'type' => 'scalar',
-                'createdAt' => $datetime,
-                'updatedAt' => $datetime
-            ]
-        );
+        $configValue1 = $this->getConfigValue('oro_user', 'level', 'scalar', 2000);
+        $configValue1->setUpdatedAt($datetime);
+        ReflectionUtil::setPropertyValue($configValue1, 'createdAt', $datetime);
 
         $config = new Config();
         $config->getValues()->add($configValue1);
 
-        $this->repo->expects($this->exactly(4))
+        $this->repo->expects(self::exactly(4))
             ->method('findByEntity')
             ->with($this->getScopedEntityName(), 0)
             ->willReturn($config);
@@ -104,11 +156,10 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with($key)
             ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
+                return $callback($this->createMock(ItemInterface::class));
             });
 
-        $this->configBag->expects($this->any())
+        $this->configBag->expects(self::any())
             ->method('getConfig')
             ->willReturn([
                 'fields' => [],
@@ -116,32 +167,21 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
 
         [$created, $updated, $isNullValue] = $this->manager->getInfo('oro_user.level');
 
-        $this->assertEquals($configValue1->getCreatedAt(), $created);
-        $this->assertEquals($configValue1->getUpdatedAt(), $updated);
-        $this->assertFalse($isNullValue);
-        $this->assertNull($this->manager->getSettingValue('oro_user.greeting'));
-        $this->assertNull($this->manager->getSettingValue('oro_test.nosetting'));
-        $this->assertNull($this->manager->getSettingValue('noservice.nosetting'));
+        self::assertEquals($configValue1->getCreatedAt(), $created);
+        self::assertEquals($configValue1->getUpdatedAt(), $updated);
+        self::assertFalse($isNullValue);
+        self::assertNull($this->manager->getSettingValue('oro_user.greeting'));
+        self::assertNull($this->manager->getSettingValue('oro_test.nosetting'));
+        self::assertNull($this->manager->getSettingValue('noservice.nosetting'));
     }
 
     /**
      * @dataProvider getInfoLoadedWithNormalizationProvider
      */
-    public function testGetInfoLoadedWithNormalization(string $rawValue, string $dataType)
+    public function testGetInfoLoadedWithNormalization(string $rawValue, string $dataType): void
     {
-        /** @var ConfigValue $configValue1 */
-        $configValue1 = $this->getEntity(
-            ConfigValue::class,
-            [
-                'section' => 'oro_user',
-                'name' => 'level',
-                'value' => $rawValue,
-                'type' => 'scalar',
-            ]
-        );
-
         $config = new Config();
-        $config->getValues()->add($configValue1);
+        $config->getValues()->add($this->getConfigValue('oro_user', 'level', 'scalar', $rawValue));
 
         $key = $this->getScopedEntityName() . '_0';
         $this->cache->expects(self::once())
@@ -150,7 +190,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             ->willReturn($this->getCachedConfig($config));
 
         $settingPath = 'oro_user.level';
-        $this->configBag->expects($this->any())
+        $this->configBag->expects(self::any())
             ->method('getConfig')
             ->willReturn([
                 'fields' => [
@@ -159,6 +199,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ]);
+
         $this->manager->getInfo($settingPath);
     }
 
@@ -191,11 +232,13 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
     /**
      * Test flush settings
      */
-    public function testFlush()
+    public function testFlush(): void
     {
         $scopeId = 1;
+
         $config = new Config();
         $this->prepareSave($config, $scopeId);
+
         $this->manager->set('oro_user.update', 'updated value', $scopeId);
         $key = sprintf('%s_%s', $this->getScopedEntityName(), $scopeId);
 
@@ -206,29 +249,29 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with($key)
             ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
+                return $callback($this->createMock(ItemInterface::class));
             });
         $this->assertNotEmpty($this->manager->getChanges($scopeId));
 
-        $this->configBag->expects($this->any())
+        $this->configBag->expects(self::any())
             ->method('getConfig')
             ->willReturn([
                 'fields' => [],
             ]);
 
         $this->manager->flush($scopeId);
-        $this->assertEquals(
+
+        self::assertEquals(
             'updated value',
             $this->manager->getSettingValue('oro_user.update', false, $scopeId)
         );
-        $this->assertEmpty($this->manager->getChanges($scopeId));
+        self::assertEmpty($this->manager->getChanges($scopeId));
     }
 
     /**
      * Test saving settings
      */
-    public function testSave()
+    public function testSave(): void
     {
         $scopeId = null;
         $settings = [
@@ -244,6 +287,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
                 'use_parent_scope_value' => false
             ],
         ];
+
         $config = new Config();
         $this->prepareSave($config, $scopeId);
 
@@ -256,18 +300,18 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with($key)
             ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
+                return $callback($this->createMock(ItemInterface::class));
             });
 
-        $this->configBag->expects($this->any())
+        $this->configBag->expects(self::any())
             ->method('getConfig')
             ->willReturn([
                 'fields' => [],
             ]);
 
         $result = $this->manager->save($settings);
-        $this->assertEquals(
+
+        self::assertEquals(
             [
                 [
                     'oro_user.update' => 'updated value',
@@ -280,9 +324,9 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             $result
         );
 
-        $this->assertEquals('updated value', $this->manager->getSettingValue('oro_user.update'));
-        $this->assertNull($this->manager->getSettingValue('oro_user.remove'));
-        $this->assertEquals('new value', $this->manager->getSettingValue('oro_user.add'));
+        self::assertEquals('updated value', $this->manager->getSettingValue('oro_user.update'));
+        self::assertNull($this->manager->getSettingValue('oro_user.remove'));
+        self::assertEquals('new value', $this->manager->getSettingValue('oro_user.add'));
     }
 
     public function testCachedDataTypes(): void
@@ -294,7 +338,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             'oro_user.boolean' => ['value' => '1', 'use_parent_scope_value' => false],
         ];
 
-        $this->configBag->expects($this->once())
+        $this->configBag->expects(self::once())
             ->method('getConfig')
             ->willReturn([
                 'fields' => [
@@ -334,10 +378,11 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with($key)
             ->willReturn($cachedResult);
+
         $this->manager->save($settings);
     }
 
-    public function testSaveWithRemoveScopeEntity()
+    public function testSaveWithRemoveScopeEntity(): void
     {
         $scopeId = 0;
         $settings = [
@@ -345,143 +390,95 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
                 'use_parent_scope_value' => true
             ]
         ];
+
         $config = new Config();
+        $config->getValues()->add($this->getConfigValue('oro_user', 'update', 'scalar', 'old value'));
 
-        $configValue1 = new ConfigValue();
-        $configValue1->setSection('oro_user')->setName('update')->setValue('old value')->setType('scalar');
-
-        $config->getValues()->add($configValue1);
-
-        $this->repo->expects($this->any())
+        $this->repo->expects(self::any())
             ->method('findByEntity')
             ->with($this->getScopedEntityName(), $scopeId)
             ->willReturn($config);
 
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('remove')
             ->with($this->identicalTo($config));
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('flush');
 
-        $this->configBag->expects($this->any())
+        $this->configBag->expects(self::any())
             ->method('getConfig')
             ->willReturn(['fields' => []]);
 
         $result = $this->manager->save($settings);
-        $this->assertEquals([[], ['oro_user.update']], $result);
+
+        self::assertEquals([[], ['oro_user.update']], $result);
     }
 
-    public function testGetScopedEntityName()
+    public function testSetScopeId(): void
     {
-        $this->assertEquals($this->getScopedEntityName(), $this->manager->getScopedEntityName());
-    }
+        $entityId = 123;
 
-    public function testGetScopeIdFromEntity()
-    {
-        $entity = $this->getScopedEntity();
-        $entityId = $this->getEntityId($entity);
-        $this->assertSame($entityId, $this->manager->getScopeIdFromEntity($entity));
-    }
-
-    public function testGetScopeIdFromUnsupportedEntity()
-    {
-        $entity = new \stdClass();
-        $this->assertNull($this->manager->getScopeIdFromEntity($entity));
-    }
-
-    public function testSetScopeIdFromEntity()
-    {
-        $entity = $this->getScopedEntity();
-        $entityId = $this->getEntityId($entity);
-        $newScopeId = $entityId ?: $this->manager->getScopeId();
-        $this->dispatcher->expects($this->exactly($newScopeId ? 1 : 0))
+        $this->dispatcher->expects(self::once())
             ->method('dispatch')
-            ->with(self::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+            ->with(
+                self::isInstanceOf(ConfigManagerScopeIdUpdateEvent::class),
+                ConfigManagerScopeIdUpdateEvent::EVENT_NAME
+            );
+
+        $this->manager->setScopeId($entityId);
+
+        self::assertSame($entityId, $this->manager->getScopeId());
+    }
+
+    public function testGetScopedEntityName(): void
+    {
+        self::assertEquals($this->getScopedEntityName(), $this->manager->getScopedEntityName());
+    }
+
+    public function testGetScopeIdFromEntity(): void
+    {
+        $entity = $this->getScopedEntity();
+        $entityId = $this->getEntityId($entity);
+
+        self::assertSame($entityId, $this->manager->getScopeIdFromEntity($entity));
+    }
+
+    public function testGetScopeIdFromUnsupportedEntity(): void
+    {
+        self::assertNull($this->manager->getScopeIdFromEntity(new \stdClass()));
+    }
+
+    public function testSetScopeIdFromEntity(): void
+    {
+        $entity = $this->getScopedEntity();
+        $entityId = $this->getEntityId($entity);
+
+        $newScopeId = $entityId ?: $this->manager->getScopeId();
+        $this->dispatcher->expects(self::exactly($newScopeId ? 1 : 0))
+            ->method('dispatch')
+            ->with(
+                self::isInstanceOf(ConfigManagerScopeIdUpdateEvent::class),
+                ConfigManagerScopeIdUpdateEvent::EVENT_NAME
+            );
 
         $this->manager->setScopeIdFromEntity($entity);
-        $this->assertEquals($newScopeId, $this->manager->getScopeId());
+
+        self::assertSame($newScopeId, $this->manager->getScopeId());
     }
 
-    public function testSetScopeIdFromUnsupportedEntity()
+    public function testSetScopeIdFromUnsupportedEntity(): void
     {
         $this->manager->setScopeIdFromEntity($this->getScopedEntity());
         $oldScopeId = $this->manager->getScopeId();
-        $this->dispatcher->expects($this->exactly(0))
+        $this->dispatcher->expects(self::exactly(0))
             ->method('dispatch')
-            ->with(self::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+            ->with(
+                self::isInstanceOf(ConfigManagerScopeIdUpdateEvent::class),
+                ConfigManagerScopeIdUpdateEvent::EVENT_NAME
+            );
 
-        $entity = new \stdClass();
-        $this->manager->setScopeIdFromEntity($entity);
+        $this->manager->setScopeIdFromEntity(new \stdClass());
 
-        $this->assertSame($oldScopeId, $this->manager->getScopeId());
+        self::assertSame($oldScopeId, $this->manager->getScopeId());
     }
-
-    protected function prepareSave(Config $config, ?int $scopeId): void
-    {
-        $configValue1 = new ConfigValue();
-        $configValue1->setSection('oro_user')->setName('update')->setValue('old value')->setType('scalar');
-
-        $configValue2 = new ConfigValue();
-        $configValue2->setSection('oro_user')->setName('remove')->setValue('test')->setType('scalar');
-
-        $config->getValues()->add($configValue1);
-        $config->getValues()->add($configValue2);
-
-        $this->repo->expects($this->any())
-            ->method('findByEntity')
-            ->with($this->getScopedEntityName(), $scopeId)
-            ->willReturn($config);
-
-        $this->em->expects($this->once())
-            ->method('persist')
-            ->with($this->identicalTo($config));
-        $this->em->expects($this->once())
-            ->method('flush');
-    }
-
-    protected function getCachedConfig(Config $config): array
-    {
-        $cachedConfig = [];
-
-        foreach ($config->getValues() as $configValue) {
-            if (isset($cachedConfig[$configValue->getSection()])) {
-                $cachedConfig[$configValue->getSection()][$configValue->getName()] = [
-                    'value' => $configValue->getValue(),
-                    'use_parent_scope_value' => false,
-                    'createdAt' => $configValue->getCreatedAt(),
-                    'updatedAt' => $configValue->getUpdatedAt()
-                ];
-            } else {
-                $cachedConfig[$configValue->getSection()] = [
-                    $configValue->getName() => [
-                        'value' => $configValue->getValue(),
-                        'use_parent_scope_value' => false,
-                        'createdAt' => $configValue->getCreatedAt(),
-                        'updatedAt' => $configValue->getUpdatedAt()
-                    ]
-                ];
-            }
-        }
-
-        return $cachedConfig;
-    }
-
-    protected function getScopedEntity(): ?object
-    {
-        return null;
-    }
-
-    protected function getEntityId(?object $entity): mixed
-    {
-        return $entity && method_exists($entity, 'getId') ? $entity->getId() : null;
-    }
-
-    abstract protected function createManager(
-        ManagerRegistry $doctrine,
-        CacheInterface $cache,
-        EventDispatcher $eventDispatcher,
-        ConfigBag $configBag,
-    ): AbstractScopeManager;
-
-    abstract protected function getScopedEntityName(): string;
 }
