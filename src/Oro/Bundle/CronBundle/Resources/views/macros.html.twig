@@ -22,7 +22,7 @@
                 {% if not schedule.deactivateAt or schedule.deactivateAt > now %}
                     {% set activityShown = true %}
                     <li>
-                        {{ labels.activeNow|trans }}
+                        <strong>{{ labels.activeNow|trans }}</strong>
                     </li>
                 {% endif %}
             {% endif %}
@@ -31,7 +31,7 @@
                 {% if not activityShown %}
                     {% set activityShown = true %}
                     <li>
-                        {{ labels.notActiveNow|trans }}
+                        <strong>{{ labels.notActiveNow|trans }}</strong>
                     </li>
                 {% endif %}
                 <li>
@@ -54,7 +54,7 @@
 
         {% if not activityShown %}
             <li>
-                {{ labels.notActiveNow|trans }}
+                <strong>{{ labels.notActiveNow|trans }}</strong>
             </li>
         {% endif %}
     </ul>
