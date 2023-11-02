@@ -46,6 +46,7 @@ Feature: Export extend entity fields
     And check "Carte d'identité"
     And save and close form
     Then should see "Call saved" flash message
+    And I take screenshot
     And I should see call with:
       | Subject             | Call to Someone                           |
       | Additional comments | Offered $40 discount on her next purchase |
@@ -57,6 +58,7 @@ Feature: Export extend entity fields
 
   Scenario: Export call and check fields
     Given go to Activities/ Calls
+    And I take screenshot
     And should see "Export Grid"
     When I click "Export Grid"
     And click "CSV"
