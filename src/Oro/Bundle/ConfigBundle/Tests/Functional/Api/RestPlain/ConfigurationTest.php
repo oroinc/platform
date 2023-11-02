@@ -3,19 +3,13 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Functional\Api\RestPlain;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestPlainApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class ConfigurationTest extends RestPlainApiTestCase
 {
-    public function testGetConfigurationSections()
+    public function testGetList(): void
     {
-        $entityType = 'configuration';
-
-        $response = $this->request(
-            'GET',
-            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
-        );
-        $requestInfo = 'get_list';
-        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);
+        $response = $this->cget(['entity' => 'configuration']);
 
         // check that the result is a list of configuration section ids
         // check that each returned section is accessible
@@ -24,30 +18,64 @@ class ConfigurationTest extends RestPlainApiTestCase
             self::assertIsString(
                 $sectionId,
                 sprintf(
-                    '%s. expected a string, got "%s". item index: %s',
-                    $requestInfo,
-                    is_object($sectionId) ? get_class($sectionId) : gettype($sectionId),
-                    $key
+                    'get_list. item index: %s. expected a string, got "%s"',
+                    $key,
+                    get_debug_type($sectionId)
                 )
             );
-            $this->checkGetConfigurationSection($sectionId);
+            $this->checkGet($sectionId);
         }
     }
 
-    private function checkGetConfigurationSection(string $sectionId)
+    private function checkGet(string $sectionId): void
     {
-        $entityType = 'configuration';
+        $response = $this->get(['entity' => 'configuration', 'id' => $sectionId]);
 
-        $response = $this->request(
-            'GET',
-            $this->getUrl($this->getItemRouteName(), ['entity' => $entityType, 'id' => $sectionId])
-        );
-        $requestInfo = sprintf('get->%s', $sectionId);
-        self::assertApiResponseStatusCodeEquals($response, 200, $entityType, $requestInfo);
         $content = self::jsonToArray($response->getContent());
         // check that the result is a list of configuration options
         foreach ($content as $key => $item) {
-            self::assertArrayHasKey('key', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertArrayHasKey('key', $item, sprintf('get->%s. item index: %s', $sectionId, $key));
         }
+    }
+
+    public function testTryToGetListWithSorting(): void
+    {
+        $response = $this->cget(
+            ['entity' => 'configuration'],
+            ['sort' => 'id'],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => 'sort'
+            ],
+            $response
+        );
+    }
+
+    public function testTryToGetUnknown(): void
+    {
+        $response = $this->get(
+            ['entity' => 'configuration', 'id' => 'unknown.section'],
+            [],
+            [],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testGetListWithScope(): void
+    {
+        $response = $this->cget(['entity' => 'configuration'], ['scope' => 'global']);
+        self::assertNotEmpty(self::jsonToArray($response->getContent()));
+    }
+
+    public function testGetWithScope(): void
+    {
+        $response = $this->get(['entity' => 'configuration', 'id' => 'application'], ['scope' => 'global']);
+        self::assertNotEmpty(self::jsonToArray($response->getContent()));
     }
 }

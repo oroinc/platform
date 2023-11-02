@@ -28,7 +28,6 @@ class OroLocaleExtensionTest extends \PHPUnit\Framework\TestCase
                         'currency' => ['value' => '@oro_locale.provider.default_value.currency', 'scope' => 'app'],
                         'timezone' => ['value' => \date_default_timezone_get(), 'scope' => 'app'],
                         'format_address_by_address_country' => ['value' => true, 'scope' => 'app'],
-                        'qwerty' => ['value' => [], 'scope' => 'app'],
                         'quarter_start' => ['value' => ['month' => '1', 'day' => '1'], 'scope' => 'app'],
                         'temperature_unit' => ['value' => 'fahrenheit', 'scope' => 'app'],
                         'wind_speed_unit' => ['value' => 'miles_per_hour', 'scope' => 'app'],

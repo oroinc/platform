@@ -19,41 +19,34 @@ class ConfigurationRepository
     }
 
     /**
-     * Gets all configuration scopes.
-     *
-     * @return string[]
-     */
-    public function getScopes(): array
-    {
-        return $this->configManager->getScopes();
-    }
-
-    /**
      * Gets IDs of all configuration sections.
      *
      * @return string[]
      */
     public function getSectionIds(): array
     {
-        return array_map(
-            function ($sectionId) {
-                return $this->encodeSectionId($sectionId);
-            },
-            $this->configManager->getSections()
-        );
+        $result = [];
+        $sectionIds = $this->configManager->getSections();
+        foreach ($sectionIds as $sectionId) {
+            $result[] = $this->encodeSectionId($sectionId);
+        }
+
+        return $result;
     }
 
     /**
      * Finds a configuration section by its ID.
      */
-    public function getSection(string $sectionId, string $scope): ?ConfigurationSection
+    public function getSection(string $sectionId, string $scope, bool $withOptions = true): ?ConfigurationSection
     {
         if (!$this->configManager->hasSection($this->decodeSectionId($sectionId))) {
             return null;
         }
 
         $section = new ConfigurationSection($sectionId);
-        $section->setOptions($this->getSectionOptions($sectionId, $scope));
+        if ($withOptions) {
+            $section->setOptions($this->getSectionOptions($sectionId, $scope));
+        }
 
         return $section;
     }
@@ -71,13 +64,7 @@ class ConfigurationRepository
         $result = [];
         $data = $this->configManager->getData($this->decodeSectionId($sectionId), $scope);
         foreach ($data as $item) {
-            $option = new ConfigurationOption($scope, $item['key']);
-            $option->setDataType($item['type']);
-            $option->setValue($item['value']);
-            $option->setCreatedAt($item['createdAt']);
-            $option->setUpdatedAt($item['updatedAt']);
-
-            $result[] = $option;
+            $result[] = $this->createOption($item, $scope);
         }
 
         return $result;
@@ -89,6 +76,37 @@ class ConfigurationRepository
     public function getSectionOption(string $key, string $sectionId, string $scope): ConfigurationOption
     {
         $item = $this->configManager->getDataItem($key, $this->decodeSectionId($sectionId), $scope);
+
+        return $this->createOption($item, $scope);
+    }
+
+    /**
+     * Gets keys of all configuration options.
+     *
+     * @return string[]
+     */
+    public function getOptionKeys(): array
+    {
+        return $this->configManager->getDataItemKeys();
+    }
+
+    /**
+     * Gets a configuration option.
+     */
+    public function getOption(string $key, string $scope): ?ConfigurationOption
+    {
+        $sections = $this->configManager->getDataItemSections($key);
+        if (!$sections) {
+            return null;
+        }
+
+        $item = $this->configManager->getDataItem($key, $sections[0], $scope);
+
+        return $this->createOption($item, $scope);
+    }
+
+    private function createOption(array $item, string $scope): ConfigurationOption
+    {
         $option = new ConfigurationOption($scope, $item['key']);
         $option->setDataType($item['type']);
         $option->setValue($item['value']);

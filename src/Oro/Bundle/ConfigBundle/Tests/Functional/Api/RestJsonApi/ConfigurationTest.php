@@ -3,14 +3,13 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class ConfigurationTest extends RestJsonApiTestCase
 {
-    public function testGetConfigurationSections()
+    public function testGetList(): void
     {
-        $entityType = 'configuration';
-
-        $response = $this->cget(['entity' => $entityType]);
+        $response = $this->cget(['entity' => 'configuration']);
 
         // check that the result is a list of configuration section identity objects
         // check that each returned section is accessible
@@ -22,22 +21,25 @@ class ConfigurationTest extends RestJsonApiTestCase
             self::assertArrayHasKey('id', $item, sprintf('%s. item index: %s', $requestInfo, $key));
             self::assertArrayHasKey('type', $item, sprintf('%s. item index: %s', $requestInfo, $key));
             self::assertEquals(
-                $entityType,
+                'configuration',
                 $item['type'],
                 sprintf('%s. unexpected entity type. item index: %s', $requestInfo, $key)
             );
             self::assertArrayNotHasKey('attributes', $item, sprintf('%s. item index: %s', $requestInfo, $key));
-            self::assertArrayNotHasKey('relationships', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertArrayHasKey('relationships', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertArrayHasKey(
+                'data',
+                $item['relationships']['options'],
+                sprintf('%s. item index: %s', $requestInfo, $key)
+            );
             $sectionId = $item['id'];
-            $this->checkGetConfigurationSection($sectionId);
+            $this->checkGet($sectionId);
         }
     }
 
-    private function checkGetConfigurationSection(string $sectionId)
+    private function checkGet(string $sectionId): void
     {
-        $entityType = 'configuration';
-
-        $response = $this->get(['entity' => $entityType, 'id' => $sectionId]);
+        $response = $this->get(['entity' => 'configuration', 'id' => $sectionId]);
 
         $requestInfo = sprintf('get->%s', $sectionId);
         $content = self::jsonToArray($response->getContent());
@@ -48,12 +50,33 @@ class ConfigurationTest extends RestJsonApiTestCase
         self::assertArrayHasKey('data', $content['data']['relationships']['options'], $requestInfo);
     }
 
-    public function testGetExpandedConfigurationSections()
+    public function testGetListWhenOnlyIdsRequested(): void
     {
-        $entityType = 'configuration';
+        $response = $this->cget(['entity' => 'configuration'], ['fields[configuration]' => 'id']);
 
+        // check that the result is a list of configuration section identity objects
+        // check that each returned section is accessible
+        $requestInfo = 'get_list';
+        $content = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('data', $content, $requestInfo);
+        self::assertArrayNotHasKey('included', $content, $requestInfo);
+        foreach ($content['data'] as $key => $item) {
+            self::assertArrayHasKey('id', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertArrayHasKey('type', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertEquals(
+                'configuration',
+                $item['type'],
+                sprintf('%s. unexpected entity type. item index: %s', $requestInfo, $key)
+            );
+            self::assertArrayNotHasKey('attributes', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertArrayNotHasKey('relationships', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+        }
+    }
+
+    public function testGetListWithExpandedOptions(): void
+    {
         $response = $this->cget([
-            'entity'                => $entityType,
+            'entity'                => 'configuration',
             'fields[configuration]' => 'options',
             'include'               => 'options'
         ]);
@@ -68,7 +91,7 @@ class ConfigurationTest extends RestJsonApiTestCase
             self::assertArrayHasKey('id', $item, sprintf('%s. item index: %s', $requestInfo, $key));
             self::assertArrayHasKey('type', $item, sprintf('%s. item index: %s', $requestInfo, $key));
             self::assertEquals(
-                $entityType,
+                'configuration',
                 $item['type'],
                 sprintf('%s. unexpected entity type. item index: %s', $requestInfo, $key)
             );
@@ -88,35 +111,34 @@ class ConfigurationTest extends RestJsonApiTestCase
                 sprintf('%s. item index: %s', $requestInfo, $key)
             );
             $sectionId = $item['id'];
-            $this->checkGetExpandedConfigurationSection($sectionId);
+            $this->checkGetWithExpandedOptions($sectionId);
         }
         foreach ($content['included'] as $key => $item) {
-            self::assertArrayHasKey('id', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
-            self::assertArrayHasKey('type', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
+            $itemRequestInfo = sprintf('%s. item index: %s. included', $requestInfo, $key);
+            self::assertArrayHasKey('id', $item, $itemRequestInfo);
+            self::assertArrayHasKey('type', $item, $itemRequestInfo);
             self::assertEquals(
                 'configurationoptions',
                 $item['type'],
-                sprintf('%s. included. unexpected entity type. item index: %s', $requestInfo, $key)
+                sprintf('%s. unexpected entity type', $itemRequestInfo)
             );
             self::assertArrayHasKey(
                 'attributes',
                 $item,
-                sprintf('%s. included. item index: %s', $requestInfo, $key)
+                $itemRequestInfo
             );
             self::assertArrayHasKey(
                 'value',
                 $item['attributes'],
-                sprintf('%s. included. item index: %s', $requestInfo, $key)
+                $itemRequestInfo
             );
         }
     }
 
-    private function checkGetExpandedConfigurationSection(string $sectionId)
+    private function checkGetWithExpandedOptions(string $sectionId): void
     {
-        $entityType = 'configuration';
-
         $response = $this->get([
-            'entity'                => $entityType,
+            'entity'                => 'configuration',
             'id'                    => $sectionId,
             'fields[configuration]' => 'options',
             'include'               => 'options'
@@ -130,27 +152,45 @@ class ConfigurationTest extends RestJsonApiTestCase
         self::assertArrayHasKey('options', $content['data']['relationships'], $requestInfo);
         self::assertArrayHasKey('data', $content['data']['relationships']['options'], $requestInfo);
         foreach ($content['included'] as $key => $item) {
-            self::assertArrayHasKey('id', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
-            self::assertArrayHasKey('type', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
+            $itemRequestInfo = sprintf('%s. item index: %s. included', $requestInfo, $key);
+            self::assertArrayHasKey('id', $item, $itemRequestInfo);
+            self::assertArrayHasKey('type', $item, $itemRequestInfo);
             self::assertEquals(
                 'configurationoptions',
                 $item['type'],
-                sprintf('%s. included. unexpected entity type. item index: %s', $requestInfo, $key)
+                sprintf('%s. unexpected entity type', $itemRequestInfo)
             );
-            self::assertArrayHasKey(
-                'attributes',
-                $item,
-                sprintf('%s. included. item index: %s', $requestInfo, $key)
-            );
-            self::assertArrayHasKey(
-                'value',
-                $item['attributes'],
-                sprintf('%s. included. item index: %s', $requestInfo, $key)
-            );
+            self::assertArrayHasKey('attributes', $item, $itemRequestInfo);
+            self::assertArrayHasKey('value', $item['attributes'], $itemRequestInfo);
+            $attributes = $item['attributes'];
+            self::assertArrayHasKey('scope', $attributes, $itemRequestInfo);
+            self::assertArrayHasKey('value', $attributes, $itemRequestInfo);
+            self::assertArrayHasKey('dataType', $attributes, $itemRequestInfo);
+            self::assertArrayHasKey('createdAt', $attributes, $itemRequestInfo);
+            self::assertArrayHasKey('updatedAt', $attributes, $itemRequestInfo);
+            self::assertEquals('user', $attributes['scope'], $itemRequestInfo);
         }
     }
 
-    public function testTryToGetTitle()
+    public function testTryToGetListWithSorting(): void
+    {
+        $response = $this->cget(
+            ['entity' => 'configuration'],
+            ['sort' => 'id'],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'sort']
+            ],
+            $response
+        );
+    }
+
+    public function testTryToGetListWithTitle(): void
     {
         $response = $this->cget(
             ['entity' => 'configuration'],
@@ -166,5 +206,30 @@ class ConfigurationTest extends RestJsonApiTestCase
             ],
             $response
         );
+    }
+
+    public function testTryToGetUnknown(): void
+    {
+        $response = $this->get(
+            ['entity' => 'configuration', 'id' => 'unknown.section'],
+            [],
+            [],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
+    }
+
+    public function testGetListWithScope(): void
+    {
+        $response = $this->cget(['entity' => 'configuration'], ['scope' => 'global']);
+        $content = self::jsonToArray($response->getContent());
+        self::assertNotEmpty($content['data']);
+    }
+
+    public function testGetWithScope(): void
+    {
+        $response = $this->get(['entity' => 'configuration', 'id' => 'application'], ['scope' => 'global']);
+        $content = self::jsonToArray($response->getContent());
+        self::assertNotEmpty($content['data']);
     }
 }
