@@ -1,6 +1,8 @@
 import Node from './node';
 
 class GetAttrNode extends Node {
+    static name = 'GetAttrNode';
+
     static PROPERTY_CALL = 1;
     static METHOD_CALL = 2;
     static ARRAY_CALL = 3;

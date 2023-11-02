@@ -1,6 +1,8 @@
 import Node from './node';
 
 class FunctionNode extends Node {
+    static name = 'FunctionNode';
+
     /**
      * @param {string} name a name of function
      * @param {Node} args arguments of function

@@ -1,6 +1,8 @@
 import Node from './node';
 
 class NameNode extends Node {
+    static name = 'NameNode';
+
     /**
      * @param {string} name a name of variable
      */

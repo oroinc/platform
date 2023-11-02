@@ -14,6 +14,8 @@ const operatorsMap = {
 };
 
 class BinaryNode extends Node {
+    static name = 'BinaryNode';
+
     /**
      * @param {string} operator
      * @param {Node} left

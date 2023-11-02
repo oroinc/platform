@@ -1,6 +1,8 @@
 import Node from './node';
 
 class ConditionalNode extends Node {
+    static name = 'ConditionalNode';
+
     /**
      * @param {Node} expr1 condition expression
      * @param {Node} expr2 then expression

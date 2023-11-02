@@ -1,6 +1,8 @@
 import ArrayNode from './array-node';
 
 class ArgumentsNode extends ArrayNode {
+    static name = 'ArgumentsNode';
+
     /**
      * @inheritDoc
      */

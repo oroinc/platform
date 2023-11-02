@@ -2,6 +2,8 @@ import Node from './node';
 import ConstantNode from './constant-node';
 
 class ArrayNode extends Node {
+    static name = 'ArrayNode';
+
     constructor() {
         super();
         this.index = -1;

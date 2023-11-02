@@ -1,6 +1,8 @@
 import Node from './node';
 
 class ConstantNode extends Node {
+    static name = 'ConstantNode';
+
     /**
      * @param {*} value a constant value
      */

@@ -1,6 +1,8 @@
 import Node from './node';
 
 class UnaryNode extends Node {
+    static name = 'UnaryNode';
+
     static OPERATORS = {
         '!': '!',
         'not': '!',
