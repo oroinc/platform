@@ -80,6 +80,7 @@ oro_form:
                     attributes:
                         - data-title
                         - data-type
+                        - style
                 ul:
                     attributes:
                         - type
@@ -108,6 +109,7 @@ oro_form:
                         - width
                         - height
                         - alt
+                        - loading
                     hasClosingTag: false
                 h1: ~
                 h2: ~
