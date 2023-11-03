@@ -15,34 +15,32 @@ use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Oro\Component\DependencyInjection\ServiceLink;
 
 class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ImportStrategyListener */
-    private $listener;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $metadataProvider;
+
+    /** @var ImportStrategyListener */
+    private $listener;
 
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-
         $this->metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
-        $metadataProviderLink = $this->createMock(ServiceLink::class);
-        $metadataProviderLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->metadataProvider);
 
-        $this->listener = new ImportStrategyListener($this->doctrine, $this->tokenAccessor, $metadataProviderLink);
+        $this->listener = new ImportStrategyListener(
+            $this->doctrine,
+            $this->tokenAccessor,
+            $this->metadataProvider
+        );
     }
 
     public function testOnProcessAfterWithNonSupportedEntity()

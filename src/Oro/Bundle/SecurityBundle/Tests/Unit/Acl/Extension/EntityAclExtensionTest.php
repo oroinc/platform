@@ -24,7 +24,7 @@ use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit;
@@ -321,7 +321,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testValidateMaskForRootWithoutSystemAccessLevel(int $mask)
     {
-        $metadataProvider = $this->createMock(OwnershipMetadataProvider::class);
+        $metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $metadataProvider->expects($this->any())
             ->method('getMaxAccessLevel')
             ->willReturn(AccessLevel::GLOBAL_LEVEL);
@@ -350,7 +350,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider, $this->inflector);
 
-        $metadataProvider = $this->createMock(OwnershipMetadataProvider::class);
+        $metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $metadataProvider->expects($this->any())
             ->method('getMaxAccessLevel')
             ->willReturn(AccessLevel::GLOBAL_LEVEL);
