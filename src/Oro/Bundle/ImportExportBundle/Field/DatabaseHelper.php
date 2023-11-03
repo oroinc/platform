@@ -14,55 +14,41 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Provides interface for encapsulated operations with persistent layer for import/export handlers.
  * Adds additional cache to avoid redundant repository operations.
  */
-class DatabaseHelper
+class DatabaseHelper implements ServiceSubscriberInterface
 {
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
-    /**
-     * @var ServiceLink
-     */
-    protected $fieldHelperLink;
-
-    /**
-     * @var array
-     */
-    protected $entities = [];
-
-    /**
-     * @var TokenAccessorInterface
-     */
-    protected $tokenAccessor;
-
-    /**
-     * @var ServiceLink
-     */
-    protected $ownershipMetadataProviderLink;
-
-    /**
-     * @var array
-     */
-    protected $organizationLimitsByEntity = [];
+    protected DoctrineHelper $doctrineHelper;
+    protected TokenAccessorInterface $tokenAccessor;
+    protected OwnershipMetadataProviderInterface $ownershipMetadataProvider;
+    protected ContainerInterface $container;
+    protected array $entities = [];
+    protected array $organizationLimitsByEntity = [];
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        ServiceLink $fieldHelperLink,
         TokenAccessorInterface $tokenAccessor,
-        ServiceLink $ownershipMetadataProviderLink
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider,
+        ContainerInterface $container
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->fieldHelperLink = $fieldHelperLink;
         $this->tokenAccessor = $tokenAccessor;
-        $this->ownershipMetadataProviderLink = $ownershipMetadataProviderLink;
+        $this->ownershipMetadataProvider = $ownershipMetadataProvider;
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [FieldHelper::class];
     }
 
     /**
@@ -100,9 +86,7 @@ class DatabaseHelper
                 ->setMaxResults(1);
 
             if ($this->shouldBeAddedOrganizationLimits($entityName)) {
-                /** @var OwnershipMetadataProvider $ownershipMetadataProvider */
-                $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
-                $metadata = $ownershipMetadataProvider->getMetadata($entityName);
+                $metadata = $this->ownershipMetadataProvider->getMetadata($entityName);
                 $organizationField = $metadata->getOrganizationFieldName();
                 $organization = $this->getEntityOrganizations($metadata);
                 if (\is_array($organization)) {
@@ -137,9 +121,7 @@ class DatabaseHelper
 
         // find by identity fields
         if (!$existingEntity) {
-            /** @var FieldHelper $fieldHelper */
-            $fieldHelper = $this->fieldHelperLink->getService();
-            $identityValues = $fieldHelper->getIdentityValues($entity);
+            $identityValues = $this->getFieldHelper()->getIdentityValues($entity);
 
             // search only by existing identities
             foreach ($identityValues as $value) {
@@ -184,12 +166,9 @@ class DatabaseHelper
         $entity = $this->doctrineHelper->getEntity($entityName, $identifier);
 
         if ($entity && $withLimitations && $this->shouldBeAddedOrganizationLimits($entityName)) {
-            $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
-            $metadata = $ownershipMetadataProvider->getMetadata($entityName);
+            $metadata = $this->ownershipMetadataProvider->getMetadata($entityName);
             $organizationField = $metadata->getOrganizationFieldName();
-            /** @var FieldHelper $fieldHelper */
-            $fieldHelper = $this->fieldHelperLink->getService();
-            $entityOrganization = $fieldHelper->getObjectValue($entity, $organizationField);
+            $entityOrganization = $this->getFieldHelper()->getObjectValue($entity, $organizationField);
             $organization = $this->getEntityOrganizations($metadata);
             $checkOrganizations = [];
             if (\is_array($organization)) {
@@ -314,10 +293,7 @@ class DatabaseHelper
 
     public function getOwnerFieldName($entityName): ?string
     {
-        /** @var OwnershipMetadataProvider $ownershipMetadataProvider */
-        $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
-
-        return $ownershipMetadataProvider->getMetadata($entityName)->getOwnerFieldName();
+        return $this->ownershipMetadataProvider->getMetadata($entityName)->getOwnerFieldName();
     }
 
     /**
@@ -338,11 +314,9 @@ class DatabaseHelper
     protected function shouldBeAddedOrganizationLimits($entityName)
     {
         if (!array_key_exists($entityName, $this->organizationLimitsByEntity)) {
-            $this->organizationLimitsByEntity[$entityName] = $this->tokenAccessor->getOrganization()
-                && $this->ownershipMetadataProviderLink
-                    ->getService()
-                    ->getMetadata($entityName)
-                    ->getOrganizationFieldName();
+            $this->organizationLimitsByEntity[$entityName] =
+                $this->tokenAccessor->getOrganization()
+                && $this->ownershipMetadataProvider->getMetadata($entityName)->getOrganizationFieldName();
         }
 
         return $this->organizationLimitsByEntity[$entityName];
@@ -351,5 +325,10 @@ class DatabaseHelper
     protected function getEntityOrganizations(OwnershipMetadataInterface $metadata): Organization|array
     {
         return $this->tokenAccessor->getOrganization();
+    }
+
+    protected function getFieldHelper(): FieldHelper
+    {
+        return $this->container->get(FieldHelper::class);
     }
 }
