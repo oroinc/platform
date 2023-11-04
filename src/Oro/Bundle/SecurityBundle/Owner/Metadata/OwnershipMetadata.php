@@ -5,157 +5,124 @@ namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 
 /**
- * This class represents the entity ownership metadata
+ * Represents the entity ownership metadata.
+ * Supported owner types: "NONE", "ORGANIZATION", "BUSINESS_UNIT" or "USER".
  */
 class OwnershipMetadata implements OwnershipMetadataInterface
 {
-    const OWNER_TYPE_NONE          = 0;
-    const OWNER_TYPE_ORGANIZATION  = 1;
-    const OWNER_TYPE_BUSINESS_UNIT = 2;
-    const OWNER_TYPE_USER          = 3;
+    public const OWNER_TYPE_NONE = 0;
+    public const OWNER_TYPE_ORGANIZATION = 1;
+    public const OWNER_TYPE_BUSINESS_UNIT = 2;
+    public const OWNER_TYPE_USER = 3;
 
-    /** @var integer */
-    protected $ownerType;
+    protected int $ownerType;
+    protected string $ownerFieldName;
+    protected string $ownerColumnName;
+    protected string $organizationFieldName;
+    protected string $organizationColumnName;
 
-    /** @var string */
-    protected $ownerFieldName;
-
-    /** @var string */
-    protected $ownerColumnName;
-
-    /** @var string */
-    protected $organizationFieldName;
-
-    /** @var string */
-    protected $organizationColumnName;
-
-    /**
-     * @param string $ownerType Can be one of ORGANIZATION, BUSINESS_UNIT or USER
-     * @param string $ownerFieldName
-     * @param string $ownerColumnName
-     * @param string $organizationFieldName
-     * @param string $organizationColumnName
-     *
-     * @throws \InvalidArgumentException
-     */
     public function __construct(
-        $ownerType = '',
-        $ownerFieldName = '',
-        $ownerColumnName = '',
-        $organizationFieldName = '',
-        $organizationColumnName = ''
+        string $ownerType = '',
+        string $ownerFieldName = '',
+        string $ownerColumnName = '',
+        string $organizationFieldName = '',
+        string $organizationColumnName = ''
     ) {
-        $constantName = $this->getConstantName((string)$ownerType);
+        $this->ownerType = $this->resolveOwnerType($ownerType);
 
-        if (defined($constantName)) {
-            $this->ownerType = constant($constantName);
-        } else {
-            if (!empty($ownerType)) {
-                throw new \InvalidArgumentException(sprintf('Unknown owner type: %s.', $ownerType));
+        if (self::OWNER_TYPE_NONE !== $this->ownerType) {
+            if (!$ownerFieldName) {
+                throw new \InvalidArgumentException('The owner field name must not be empty.');
             }
-            $this->ownerType = self::OWNER_TYPE_NONE;
+            if (!$ownerColumnName) {
+                throw new \InvalidArgumentException('The owner column name must not be empty.');
+            }
         }
 
         $this->ownerFieldName = $ownerFieldName;
-        if ($this->ownerType !== self::OWNER_TYPE_NONE && empty($this->ownerFieldName)) {
-            throw new \InvalidArgumentException('The owner field name must not be empty.');
-        }
-
         $this->ownerColumnName = $ownerColumnName;
-        if ($this->ownerType !== self::OWNER_TYPE_NONE && empty($this->ownerColumnName)) {
-            throw new \InvalidArgumentException('The owner column name must not be empty.');
-        }
-
         $this->organizationColumnName = $organizationColumnName;
         $this->organizationFieldName = $organizationFieldName;
+
+        $this->initialize();
     }
 
     /**
-     * @param string $ownerType
-     *
-     * @return string
+     * {@inheritDoc}
      */
-    protected function getConstantName(string $ownerType)
-    {
-        return sprintf('static::OWNER_TYPE_%s', strtoupper($ownerType));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOwnerType()
+    public function getOwnerType(): int
     {
         return $this->ownerType;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function hasOwner()
+    public function hasOwner(): bool
     {
         return self::OWNER_TYPE_NONE !== $this->ownerType;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isOrganizationOwned()
+    public function isOrganizationOwned(): bool
     {
         return self::OWNER_TYPE_ORGANIZATION === $this->ownerType;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isBusinessUnitOwned()
+    public function isBusinessUnitOwned(): bool
     {
         return self::OWNER_TYPE_BUSINESS_UNIT === $this->ownerType;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isUserOwned()
+    public function isUserOwned(): bool
     {
         return self::OWNER_TYPE_USER === $this->ownerType;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOwnerFieldName()
+    public function getOwnerFieldName(): string
     {
         return $this->ownerFieldName;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOwnerColumnName()
+    public function getOwnerColumnName(): string
     {
         return $this->ownerColumnName;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOrganizationFieldName()
+    public function getOrganizationFieldName(): string
     {
         return $this->organizationFieldName;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOrganizationColumnName()
+    public function getOrganizationColumnName(): string
     {
         return $this->organizationColumnName;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getAccessLevelNames()
+    public function getAccessLevelNames(): array
     {
         if (!$this->hasOwner()) {
             return [
@@ -166,9 +133,7 @@ class OwnershipMetadata implements OwnershipMetadataInterface
 
         $minLevel = AccessLevel::BASIC_LEVEL;
         $maxLevel = AccessLevel::SYSTEM_LEVEL;
-
         if ($this->isUserOwned()) {
-            $minLevel = AccessLevel::BASIC_LEVEL;
             $maxLevel = AccessLevel::GLOBAL_LEVEL;
         } elseif ($this->isBusinessUnitOwned()) {
             $minLevel = AccessLevel::LOCAL_LEVEL;
@@ -204,8 +169,6 @@ class OwnershipMetadata implements OwnershipMetadataInterface
     }
 
     /**
-     * The __set_state handler
-     *
      * @param array $data Initialization array
      *
      * @return OwnershipMetadataInterface A new instance of a OwnershipMetadataInterface object
@@ -223,4 +186,26 @@ class OwnershipMetadata implements OwnershipMetadataInterface
         return $result;
     }
     // @codingStandardsIgnoreEnd
+
+    protected function resolveOwnerType(string $ownerType): int
+    {
+        if ($ownerType) {
+            $constantName = sprintf('static::OWNER_TYPE_%s', strtoupper($ownerType));
+            if (!\defined($constantName)) {
+                throw new \InvalidArgumentException(sprintf('Unknown owner type: %s.', $ownerType));
+            }
+
+            return \constant($constantName);
+        }
+
+        return self::OWNER_TYPE_NONE;
+    }
+
+    protected function initialize(): void
+    {
+        if (self::OWNER_TYPE_ORGANIZATION === $this->ownerType && !$this->organizationFieldName) {
+            $this->organizationFieldName = $this->ownerFieldName;
+            $this->organizationColumnName = $this->ownerColumnName;
+        }
+    }
 }

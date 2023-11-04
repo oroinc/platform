@@ -59,12 +59,8 @@ final class AccessLevel
 
     /**
      * Gets the name of an access level by the given value of the constant.
-     *
-     * @param int $value
-     *
-     * @return string|null
      */
-    public static function getAccessLevelName($value)
+    public static function getAccessLevelName(int $value): ?string
     {
         if ($value > self::NONE_LEVEL) {
             return self::$allAccessLevelNames[$value - 1];
@@ -74,19 +70,19 @@ final class AccessLevel
     }
 
     /**
-     * Get array with access levels from $minLevel to the System level + None level.
+     * Gets an array with access levels from $minLevel to $maxLevel + None level.
      *
-     * @param int   $minLevel      The min level to find names from. The default value is BASIC_LEVEL
-     * @param int   $maxLevel      The max level to find names to. The default value is SYSTEM_LEVEL
-     * @param array $excludeLevels Levels to exclude
+     * @param int   $minLevel      The min level to find names from
+     * @param int   $maxLevel      The max level to find names to
+     * @param int[] $excludeLevels Levels to exclude
      *
      * @return array [access level code => access level name, ...]
      */
     public static function getAccessLevelNames(
-        $minLevel = self::BASIC_LEVEL,
-        $maxLevel = self::SYSTEM_LEVEL,
+        int $minLevel = self::BASIC_LEVEL,
+        int $maxLevel = self::SYSTEM_LEVEL,
         array $excludeLevels = []
-    ) {
+    ): array {
         $names = [self::NONE_LEVEL => self::NONE_LEVEL_NAME];
         for ($level = $minLevel; $level <= $maxLevel; $level++) {
             if (!\in_array($level, $excludeLevels, true)) {
