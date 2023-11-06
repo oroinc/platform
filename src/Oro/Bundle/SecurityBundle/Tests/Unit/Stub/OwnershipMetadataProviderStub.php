@@ -5,7 +5,6 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Stub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity;
@@ -30,6 +29,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
         $this->configManagerMock = $testCase->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
+        /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject $entityClassResolverMock */
         $entityClassResolverMock = $testCase->getMockBuilder(EntityClassResolver::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -63,26 +63,22 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     /**
      * {@inheritDoc}
      */
-    public function getMetadata($className): OwnershipMetadataInterface
+    public function getMetadata(?string $className): OwnershipMetadataInterface
     {
         return $this->metadata[$className] ?? parent::getMetadata($className);
     }
 
     /**
-     * @param string            $className
-     * @param OwnershipMetadata $metadata
-     */
-    public function setMetadata($className, OwnershipMetadata $metadata)
-    {
-        $this->metadata[$className] = $metadata;
-    }
-
-    /**
      * {@inheritDoc}
      */
-    public function getMaxAccessLevel($accessLevel, $className = null): int
+    public function getMaxAccessLevel(int $accessLevel, string $className = null): int
     {
         return $accessLevel;
+    }
+
+    public function setMetadata(string $className, OwnershipMetadataInterface $metadata): void
+    {
+        $this->metadata[$className] = $metadata;
     }
 
     /**
@@ -111,9 +107,8 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
 
     /**
      * @param AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject $mockObject
-     * @return void
      */
-    public function setCacheMock($mockObject)
+    public function setCacheMock($mockObject): void
     {
         $this->cacheMock = $mockObject;
     }

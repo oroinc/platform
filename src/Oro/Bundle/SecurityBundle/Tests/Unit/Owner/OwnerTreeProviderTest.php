@@ -1015,8 +1015,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         $this->cache->expects(self::once())
             ->method('get')
             ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
+                return $callback($this->createMock(ItemInterface::class));
             });
     }
 }
