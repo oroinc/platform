@@ -3,9 +3,10 @@
 namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -14,25 +15,25 @@ use Twig\TwigFunction;
  *   - oro_is_hash_navigation
  *   - oro_hash_navigation_header
  */
-class HashNavExtension extends AbstractExtension
+class HashNavExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var Request */
-    protected $request;
+    private ContainerInterface $container;
 
-    /**
-     * Listen to the 'kernel.request' event to get the main request.
-     * The request can not be injected directly into a Twig extension,
-     * this causes a ScopeWideningInjectionException
-     */
-    public function onKernelRequest(RequestEvent $event): void
+    public function __construct(ContainerInterface $container)
     {
-        if ($event->getRequestType() === HttpKernel::MASTER_REQUEST) {
-            $this->request = $event->getRequest();
-        }
+        $this->container = $container;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [RequestStack::class];
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function getFunctions(): array
     {
@@ -48,24 +49,25 @@ class HashNavExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * Check for hash navigation
-     */
     public function checkIsHashNavigation(): bool
     {
+        $masterRequest = $this->getMasterRequest();
+
         return
-            is_object($this->request)
+            null !== $masterRequest
             && (
-                $this->request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER)
-                || $this->request->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER)
+                $masterRequest->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER)
+                || $masterRequest->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER)
             );
     }
 
-    /**
-     * Get hash navigation header string
-     */
     public function getHashNavigationHeaderConst(): string
     {
         return ResponseHashnavListener::HASH_NAVIGATION_HEADER;
+    }
+
+    private function getMasterRequest(): ?Request
+    {
+        return $this->container->get(RequestStack::class)->getMainRequest();
     }
 }

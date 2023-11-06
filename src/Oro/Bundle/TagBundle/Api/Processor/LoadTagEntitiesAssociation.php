@@ -49,7 +49,7 @@ class LoadTagEntitiesAssociation implements ProcessorInterface
         $context->skipGroup(ApiActionGroup::NORMALIZE_DATA);
     }
 
-    protected function loadData(SubresourceContext $context): array
+    private function loadData(SubresourceContext $context): array
     {
         $parentClassName = $context->getParentClassName();
         $associationName = $context->getAssociationName();

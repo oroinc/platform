@@ -1,8 +1,4 @@
 services:
-    oro_importexport.field.field_helper.link:
-        tags:
-            - { name: oro_service_link, service: oro_entity.helper.field_helper }
-
     oro_importexport.field.related_entity_state_helper:
         class: Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper
         arguments:
@@ -13,8 +9,9 @@ services:
         class: Oro\Bundle\ImportExportBundle\Field\DatabaseHelper
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_importexport.field.field_helper.link'
             - '@oro_security.token_accessor'
-            - '@oro_security.owner.ownership_metadata_provider.link'
+            - '@oro_security.owner.ownership_metadata_provider'
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: doctrine.event_listener, event: onClear }
+            - { name: container.service_subscriber, id: oro_entity.helper.field_helper, key: Oro\Bundle\EntityBundle\Helper\FieldHelper }

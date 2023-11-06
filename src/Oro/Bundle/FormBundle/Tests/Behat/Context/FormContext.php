@@ -771,6 +771,43 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * @Then /^(?:|I )should see the "(?P<elementName>[^"]*)" element in "(?P<fieldName>[^"]*)" select$/
+     * @Then /^(?:|I )should see the "(?P<elementName>[^"]*)" element in "(?P<fieldName>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)"$/
+     *
+     * @param string $elementName
+     * @param string $fieldName
+     * @param string $formName
+     *
+     * @throws ElementNotFoundException
+     */
+    //@codingStandardsIgnoreEnd
+    public function shouldSeeTheFollowingElementInSelect(
+        string $elementName,
+        string $fieldName,
+        string $formName = 'OroForm'
+    ): void {
+        $fieldElement = $this->getFieldInForm($fieldName, $formName);
+        if ($fieldElement instanceof Select2Entity) {
+            $needleElement = null;
+            $suggestions = $fieldElement->getSuggestions();
+            if ($suggestions) {
+                $resultsContainer = $suggestions[0]->getParent();
+                $needleElement = $this->createElement($elementName, $resultsContainer);
+            }
+
+            self::assertTrue(
+                $needleElement?->isValid(),
+                sprintf('Element %s was not found in %s', $elementName, $fieldName)
+            );
+
+            $fieldElement->close();
+        } else {
+            self::fail(sprintf('Element %s is not supported', get_debug_type($fieldElement)));
+        }
+    }
+
     /**
      * @Then /^I should see "([^"]*)" for "([^"]*)" select$/
      * @param string $label
@@ -839,13 +876,19 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be disabled$/
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be disabled in form "(?P<formElement>(?:[^"]|\\")*)"$/
      */
-    public function fieldShouldBeDisabled(string $fieldName): void
+    public function fieldShouldBeDisabled(string $fieldName, ?string $formElement = null): void
     {
-        $field = $this->getSession()->getPage()->findField($fieldName);
-        if (null === $field) {
-            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        if ($formElement === null) {
+            $field = $this->getSession()->getPage()->findField($fieldName);
+            if (null === $field) {
+                $field = $this->getFieldInForm($fieldName, 'OroForm');
+            }
+        } else {
+            $field = $this->getFieldInForm($fieldName, $formElement);
         }
+
         self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
         self::assertTrue($field->hasAttribute('disabled'), sprintf('Field "%s" is enabled', $fieldName));
     }

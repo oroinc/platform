@@ -5,148 +5,187 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OwnershipMetadataTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConstructorWithoutParameters()
+    public function testConstructWithoutParameters(): void
     {
         $metadata = new OwnershipMetadata();
-        $this->assertFalse($metadata->hasOwner());
-        $this->assertFalse($metadata->isOrganizationOwned());
-        $this->assertFalse($metadata->isBusinessUnitOwned());
-        $this->assertFalse($metadata->isUserOwned());
-        $this->assertEquals('', $metadata->getOwnerFieldName());
-        $this->assertEquals('', $metadata->getOwnerColumnName());
+        self::assertEquals(OwnershipMetadata::OWNER_TYPE_NONE, $metadata->getOwnerType());
+        self::assertFalse($metadata->hasOwner());
+        self::assertFalse($metadata->isOrganizationOwned());
+        self::assertFalse($metadata->isBusinessUnitOwned());
+        self::assertFalse($metadata->isUserOwned());
+        self::assertSame('', $metadata->getOrganizationFieldName());
+        self::assertSame('', $metadata->getOrganizationColumnName());
+        self::assertSame('', $metadata->getOwnerFieldName());
+        self::assertSame('', $metadata->getOwnerColumnName());
     }
 
-    public function testConstructorWithInvalidOwnerType()
+    public function testConstructWithNoneOwnership(): void
+    {
+        $metadata = new OwnershipMetadata('NONE');
+        self::assertEquals(OwnershipMetadata::OWNER_TYPE_NONE, $metadata->getOwnerType());
+        self::assertFalse($metadata->hasOwner());
+        self::assertFalse($metadata->isOrganizationOwned());
+        self::assertFalse($metadata->isBusinessUnitOwned());
+        self::assertFalse($metadata->isUserOwned());
+        self::assertSame('', $metadata->getOrganizationFieldName());
+        self::assertSame('', $metadata->getOrganizationColumnName());
+        self::assertSame('', $metadata->getOwnerFieldName());
+        self::assertSame('', $metadata->getOwnerColumnName());
+    }
+
+    public function testConstructWithOrganizationOwnership(): void
+    {
+        $metadata = new OwnershipMetadata('ORGANIZATION', 'org', 'org_id');
+        self::assertEquals(OwnershipMetadata::OWNER_TYPE_ORGANIZATION, $metadata->getOwnerType());
+        self::assertTrue($metadata->hasOwner());
+        self::assertTrue($metadata->isOrganizationOwned());
+        self::assertFalse($metadata->isBusinessUnitOwned());
+        self::assertFalse($metadata->isUserOwned());
+        self::assertSame('org', $metadata->getOrganizationFieldName());
+        self::assertSame('org_id', $metadata->getOrganizationColumnName());
+        self::assertSame('org', $metadata->getOwnerFieldName());
+        self::assertSame('org_id', $metadata->getOwnerColumnName());
+    }
+
+    public function testConstructWithBusinessUnitOwnership(): void
+    {
+        $metadata = new OwnershipMetadata('BUSINESS_UNIT', 'bu', 'bu_id', 'org', 'org_id');
+        self::assertEquals(OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT, $metadata->getOwnerType());
+        self::assertTrue($metadata->hasOwner());
+        self::assertFalse($metadata->isOrganizationOwned());
+        self::assertTrue($metadata->isBusinessUnitOwned());
+        self::assertFalse($metadata->isUserOwned());
+        self::assertSame('org', $metadata->getOrganizationFieldName());
+        self::assertSame('org_id', $metadata->getOrganizationColumnName());
+        self::assertSame('bu', $metadata->getOwnerFieldName());
+        self::assertSame('bu_id', $metadata->getOwnerColumnName());
+    }
+
+    public function testConstructWithUserOwnership(): void
+    {
+        $metadata = new OwnershipMetadata('USER', 'usr', 'user_id', 'org', 'org_id');
+        self::assertEquals(OwnershipMetadata::OWNER_TYPE_USER, $metadata->getOwnerType());
+        self::assertTrue($metadata->hasOwner());
+        self::assertFalse($metadata->isOrganizationOwned());
+        self::assertFalse($metadata->isBusinessUnitOwned());
+        self::assertTrue($metadata->isUserOwned());
+        self::assertSame('org', $metadata->getOrganizationFieldName());
+        self::assertSame('org_id', $metadata->getOrganizationColumnName());
+        self::assertSame('usr', $metadata->getOwnerFieldName());
+        self::assertSame('user_id', $metadata->getOwnerColumnName());
+    }
+
+    public function testConstructWithInvalidOwnerType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown owner type: test.');
+
         new OwnershipMetadata('test');
     }
 
-    public function testConstructorWithoutOwnerFieldName()
+    public function testConstructWithoutOwnerFieldName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The owner field name must not be empty.');
+
         new OwnershipMetadata('ORGANIZATION');
     }
 
-    public function testConstructorWithoutOwnerIdColumnName()
+    public function testConstructWithoutOwnerIdColumnName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The owner column name must not be empty.');
+
         new OwnershipMetadata('ORGANIZATION', 'org');
     }
 
-    public function testOrganizationOwnership()
+    public function testSerialization(): void
     {
-        $metadata = new OwnershipMetadata('ORGANIZATION', 'org', 'org_id');
-        $this->assertEquals(OwnershipMetadata::OWNER_TYPE_ORGANIZATION, $metadata->getOwnerType());
-        $this->assertTrue($metadata->hasOwner());
-        $this->assertTrue($metadata->isOrganizationOwned());
-        $this->assertFalse($metadata->isBusinessUnitOwned());
-        $this->assertFalse($metadata->isUserOwned());
-        $this->assertEquals('org', $metadata->getOwnerFieldName());
-        $this->assertEquals('org_id', $metadata->getOwnerColumnName());
+        $metadata = new OwnershipMetadata(
+            'USER',
+            'owner',
+            'owner_id',
+            'org',
+            'org_id'
+        );
+
+        $unserializedMetadata = unserialize(serialize($metadata));
+
+        self::assertEquals($metadata, $unserializedMetadata);
+        self::assertNotSame($metadata, $unserializedMetadata);
     }
 
-    public function testBusinessUnitOwnership()
+    public function testSetState(): void
     {
-        $metadata = new OwnershipMetadata('BUSINESS_UNIT', 'bu', 'bu_id');
-        $this->assertEquals(OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT, $metadata->getOwnerType());
-        $this->assertTrue($metadata->hasOwner());
-        $this->assertFalse($metadata->isOrganizationOwned());
-        $this->assertTrue($metadata->isBusinessUnitOwned());
-        $this->assertFalse($metadata->isUserOwned());
-        $this->assertEquals('bu', $metadata->getOwnerFieldName());
-        $this->assertEquals('bu_id', $metadata->getOwnerColumnName());
-    }
+        $metadata = new OwnershipMetadata('USER', 'org', 'org_id', 'owner', 'owner_id');
 
-    public function testUserOwnership()
-    {
-        $metadata = new OwnershipMetadata('USER', 'usr', 'user_id');
-        $this->assertEquals(OwnershipMetadata::OWNER_TYPE_USER, $metadata->getOwnerType());
-        $this->assertTrue($metadata->hasOwner());
-        $this->assertFalse($metadata->isOrganizationOwned());
-        $this->assertFalse($metadata->isBusinessUnitOwned());
-        $this->assertTrue($metadata->isUserOwned());
-        $this->assertEquals('usr', $metadata->getOwnerFieldName());
-        $this->assertEquals('user_id', $metadata->getOwnerColumnName());
-    }
-
-    public function testSerialization()
-    {
-        $metadata = new OwnershipMetadata('ORGANIZATION', 'org', 'org_id');
-        $data = serialize($metadata);
-        $metadata = new OwnershipMetadata();
-        $this->assertFalse($metadata->isOrganizationOwned());
-        $this->assertEquals('', $metadata->getOwnerFieldName());
-        $this->assertEquals('', $metadata->getOwnerColumnName());
-        $metadata = unserialize($data);
-        $this->assertTrue($metadata->isOrganizationOwned());
-        $this->assertEquals('org', $metadata->getOwnerFieldName());
-        $this->assertEquals('org_id', $metadata->getOwnerColumnName());
-    }
-
-    public function testSetState()
-    {
-        $metadata = new OwnershipMetadata('ORGANIZATION', 'org', 'org_id');
-        $restoredMetadata = $metadata->__set_state(
+        $restoredMetadata = OwnershipMetadata::__set_state(
             [
                 'ownerType' => $metadata->getOwnerType(),
+                'organizationFieldName' => $metadata->getOrganizationFieldName(),
+                'organizationColumnName' => $metadata->getOrganizationColumnName(),
                 'ownerFieldName' => $metadata->getOwnerFieldName(),
                 'ownerColumnName' => $metadata->getOwnerColumnName(),
                 'not_exists' => true
             ]
         );
-        $this->assertEquals($metadata, $restoredMetadata);
+
+        self::assertEquals($metadata, $restoredMetadata);
+        self::assertNotSame($metadata, $restoredMetadata);
     }
 
     /**
      * @dataProvider getAccessLevelNamesDataProvider
      */
-    public function testGetAccessLevelNames(array $arguments, array $levels)
+    public function testGetAccessLevelNames(array $params, array $levels): void
     {
-        $reflection = new \ReflectionClass(OwnershipMetadata::class);
-        /** @var OwnershipMetadata $metadata */
-        $metadata = $reflection->newInstanceArgs($arguments);
-        $this->assertEquals($levels, $metadata->getAccessLevelNames());
+        [$ownerType, $ownerFieldName, $ownerColumnName] = $params;
+        $metadata = new OwnershipMetadata($ownerType, $ownerFieldName, $ownerColumnName);
+
+        self::assertEquals($levels, $metadata->getAccessLevelNames());
     }
 
     public function getAccessLevelNamesDataProvider(): array
     {
         return [
             'no owner' => [
-                'arguments' => [],
-                'levels' => [
-                    0 => AccessLevel::NONE_LEVEL_NAME,
-                    5 => AccessLevel::getAccessLevelName(5),
-                ],
+                ['NONE', '', ''],
+                [
+                    AccessLevel::NONE_LEVEL => AccessLevel::NONE_LEVEL_NAME,
+                    AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
+                ]
             ],
             'basic level owned' => [
-                'arguments' => ['USER', 'owner', 'owner_id'],
-                'levels' => [
-                    0 => AccessLevel::NONE_LEVEL_NAME,
-                    1 => AccessLevel::getAccessLevelName(1),
-                    2 => AccessLevel::getAccessLevelName(2),
-                    3 => AccessLevel::getAccessLevelName(3),
-                    4 => AccessLevel::getAccessLevelName(4),
-                ],
+                ['USER', 'owner', 'owner_id'],
+                [
+                    AccessLevel::NONE_LEVEL => AccessLevel::NONE_LEVEL_NAME,
+                    AccessLevel::BASIC_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::BASIC_LEVEL),
+                    AccessLevel::LOCAL_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::LOCAL_LEVEL),
+                    AccessLevel::DEEP_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::DEEP_LEVEL),
+                    AccessLevel::GLOBAL_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::GLOBAL_LEVEL)
+                ]
             ],
             'local level owned' => [
-                'arguments' => ['BUSINESS_UNIT', 'owner', 'owner_id'],
-                'levels' => [
-                    0 => AccessLevel::NONE_LEVEL_NAME,
-                    2 => AccessLevel::getAccessLevelName(2),
-                    3 => AccessLevel::getAccessLevelName(3),
-                    4 => AccessLevel::getAccessLevelName(4),
-                ],
+                ['BUSINESS_UNIT', 'owner', 'owner_id'],
+                [
+                    AccessLevel::NONE_LEVEL => AccessLevel::NONE_LEVEL_NAME,
+                    AccessLevel::LOCAL_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::LOCAL_LEVEL),
+                    AccessLevel::DEEP_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::DEEP_LEVEL),
+                    AccessLevel::GLOBAL_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::GLOBAL_LEVEL)
+                ]
             ],
             'global level owned' => [
-                'arguments' => ['ORGANIZATION', 'owner', 'owner_id'],
-                'levels' => [
-                    0 => AccessLevel::NONE_LEVEL_NAME,
-                    4 => AccessLevel::getAccessLevelName(4),
-                ],
-            ],
+                ['ORGANIZATION', 'owner', 'owner_id'],
+                [
+                    AccessLevel::NONE_LEVEL => AccessLevel::NONE_LEVEL_NAME,
+                    AccessLevel::GLOBAL_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::GLOBAL_LEVEL)
+                ]
+            ]
         ];
     }
 }

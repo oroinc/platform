@@ -111,11 +111,11 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.token_accessor'
             - '@security.authorization_checker'
+            - '@oro_security.owner.ownership_metadata_provider'
             - '@Psr\Container\ContainerInterface'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
             - { name: container.service_subscriber, id: security.acl.voter.basic_permissions }
-            - { name: container.service_subscriber, id: oro_security.owner.ownership_metadata_provider }
             - { name: container.service_subscriber, id: oro_security.owner.entity_owner_accessor }
             - { name: container.service_subscriber, id: oro_security.ownership_tree_provider }
             - { name: container.service_subscriber, id: oro_organization.business_unit_manager }
@@ -123,9 +123,9 @@ services:
     oro_organization.form.extension.organization:
         class: Oro\Bundle\OrganizationBundle\Form\Extension\OrganizationFormExtension
         arguments:
-            - '@doctrine'
+            - '@form.property_accessor'
             - '@oro_security.token_accessor'
-            - '@oro_security.owner.ownership_metadata_provider.link'
+            - '@oro_security.owner.ownership_metadata_provider'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 

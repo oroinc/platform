@@ -93,9 +93,9 @@ abstract class AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getApiTree(?string $path = null): ?SectionDefinition
+    public function getApiTree(?string $path = null): SectionDefinition
     {
-        $sections = empty($path) ? [] : explode('/', $path);
+        $sections = $path ? explode('/', $path) : [];
         array_unshift($sections, ProcessorDecorator::API_TREE_ROOT);
 
         $tree = $this->configBag->getConfig();
@@ -104,7 +104,7 @@ abstract class AbstractProvider implements ProviderInterface
             if (!isset($tree[$section])) {
                 throw new ItemNotFoundException(sprintf('Config API section "%s" is not defined.', $path));
             }
-            $tree            = & $tree[$section];
+            $tree = &$tree[$section];
             $rootSectionName = $section;
         }
 

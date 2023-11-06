@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\DataTransformerInterface;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
+use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Symfony\Component\Form\FormInterface;
 
 /**
@@ -15,8 +16,10 @@ interface ProviderInterface
 {
     /**
      * Gets the configuration tree that is used to build API data.
+     *
+     * @throws ItemNotFoundException when the requested tree does not exist
      */
-    public function getApiTree(?string $path = null): ?SectionDefinition;
+    public function getApiTree(?string $path = null): SectionDefinition;
 
     /**
      * Gets the configuration tree.

@@ -59,17 +59,19 @@ abstract class OroKernel extends Kernel
 
         parent::initializeBundles();
 
-        // initialize CumulativeResourceManager
-        $bundles = [];
-        foreach ($this->bundles as $name => $bundle) {
-            $bundles[$name] = get_class($bundle);
-        }
-        if (class_exists('AppKernel')) {
-            $bundles['app.kernel'] = \AppKernel::class;
-        }
+        // set CumulativeResourceManager initializer
         CumulativeResourceManager::getInstance()
-            ->setBundles($bundles)
-            ->setAppRootDir($this->getProjectDir());
+            ->setInitializer(function (CumulativeResourceManager $manager): void {
+                $bundles = [];
+                foreach ($this->bundles as $name => $bundle) {
+                    $bundles[$name] = \get_class($bundle);
+                }
+                if (class_exists('AppKernel')) {
+                    $bundles['app.kernel'] = \AppKernel::class;
+                }
+                $manager->setBundles($bundles);
+                $manager->setAppRootDir($this->getProjectDir());
+            });
     }
 
     /**

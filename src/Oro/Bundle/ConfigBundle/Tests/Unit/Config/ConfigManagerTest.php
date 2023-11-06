@@ -376,23 +376,25 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
     {
         $itemName = 'oro_test.someValue';
         $itemValue = 111;
+        $resolvedScopeId = 10;
 
         $this->userScopeManager->expects(self::exactly(2))
             ->method('getScopedEntityName')
             ->willReturn('user');
         $this->userScopeManager->expects(self::exactly(2))
             ->method('resolveIdentifier')
-            ->willReturn(0);
+            ->with(self::isNull())
+            ->willReturn($resolvedScopeId);
         $this->userScopeManager->expects(self::once())
             ->method('getScopeId')
-            ->willReturn(0);
+            ->willReturn($resolvedScopeId);
 
         $this->userScopeManager->expects(self::once())
             ->method('getSettingValue')
             ->with($itemName, self::isTrue(), self::isNull())
             ->willReturn(['value' => $itemValue]);
 
-        $loadEvent = new ConfigGetEvent($this->manager, $itemName, $itemValue, false, 'user', 0);
+        $loadEvent = new ConfigGetEvent($this->manager, $itemName, $itemValue, false, 'user', $resolvedScopeId);
         $this->dispatcher->expects(self::exactly(2))
             ->method('dispatch')
             ->withConsecutive(
@@ -417,9 +419,43 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->userScopeManager->expects(self::exactly(2))
             ->method('getScopedEntityName')
             ->willReturn('user');
+        $this->userScopeManager->expects(self::never())
+            ->method('resolveIdentifier');
+        $this->userScopeManager->expects(self::never())
+            ->method('getScopeId');
+
+        $this->userScopeManager->expects(self::once())
+            ->method('getSettingValue')
+            ->with($itemName, self::isTrue(), $scopeIdentifier)
+            ->willReturn(['value' => $itemValue]);
+
+        $loadEvent = new ConfigGetEvent($this->manager, $itemName, $itemValue, false, 'user', $scopeIdentifier);
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$loadEvent, ConfigGetEvent::NAME],
+                [$loadEvent, ConfigGetEvent::NAME . '.' . $itemName]
+            );
+
+        $this->globalScopeManager->expects(self::never())
+            ->method('getSettingValue');
+
+        self::assertSame($itemValue, $this->manager->get($itemName, false, false, $scopeIdentifier));
+        // check cache
+        self::assertSame($itemValue, $this->manager->get($itemName, false, false, $scopeIdentifier));
+    }
+
+    public function testGetWithZeroIntScopeIdentifier(): void
+    {
+        $itemName = 'oro_test.someValue';
+        $itemValue = 111;
+        $scopeIdentifier = 0;
+
         $this->userScopeManager->expects(self::exactly(2))
-            ->method('resolveIdentifier')
-            ->willReturn($scopeIdentifier);
+            ->method('getScopedEntityName')
+            ->willReturn('user');
+        $this->userScopeManager->expects(self::never())
+            ->method('resolveIdentifier');
         $this->userScopeManager->expects(self::never())
             ->method('getScopeId');
 

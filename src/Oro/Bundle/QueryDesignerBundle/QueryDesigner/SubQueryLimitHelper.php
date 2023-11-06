@@ -3,7 +3,6 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Doctrine\ORM\QueryBuilder;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * This class makes possible to apply subquery with limit to query builder.
@@ -14,33 +13,24 @@ class SubQueryLimitHelper
 {
     /**
      * @param QueryBuilder $queryBuilder
-     * @param int $limit
-     * @param string $fieldName Identifier which will be used in Select part
+     * @param int          $limit
+     * @param string       $fieldName Identifier which will be used in SELECT part
+     *
      * @return QueryBuilder
      */
-    public function setLimit(QueryBuilder $queryBuilder, $limit, $fieldName)
+    public function setLimit(QueryBuilder $queryBuilder, int $limit, string $fieldName): QueryBuilder
     {
-        $uniqueIdentifier = QueryBuilderUtil::generateParameterName(
-            SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_KEY
+        $config = $queryBuilder->getEntityManager()->getConfiguration();
+        $hooks = $config->getDefaultQueryHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_KEY) ?: [];
+
+        $hook = sprintf(
+            '\'%1$s\' = \'%1$s\'',
+            SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_KEY . \count($hooks)
         );
+        $queryBuilder->andWhere($hook);
 
-        $walkerHook = "'$uniqueIdentifier' = '$uniqueIdentifier'";
-        $queryBuilder->andWhere($walkerHook);
-
-        $queryBuilder
-            ->getEntityManager()
-            ->getConfiguration()
-            ->setDefaultQueryHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_KEY, $walkerHook);
-
-        $queryBuilder
-            ->getEntityManager()
-            ->getConfiguration()
-            ->setDefaultQueryHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_VALUE, $limit);
-
-        $queryBuilder
-            ->getEntityManager()
-            ->getConfiguration()
-            ->setDefaultQueryHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_ID, $fieldName);
+        $hooks[] = [$hook, $limit, $fieldName];
+        $config->setDefaultQueryHint(SubQueryLimitOutputResultModifier::WALKER_HOOK_LIMIT_KEY, $hooks);
 
         return $queryBuilder;
     }

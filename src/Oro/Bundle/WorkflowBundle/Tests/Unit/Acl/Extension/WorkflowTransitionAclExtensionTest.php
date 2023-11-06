@@ -250,7 +250,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
     public function testDecideIsGrantingForDomainObjectReference()
     {
         $object = new DomainObjectReference('workflow1', 123, 1, 2);
-        $relatedEntity = new \stdClass();
+        $relatedEntity = \stdClass::class;
         $securityToken = $this->createMock(TokenInterface::class);
 
         $workflow = $this->createMock(Workflow::class);
@@ -264,7 +264,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
-            ->with(self::identicalTo($relatedEntity))
+            ->with($relatedEntity)
             ->willReturn(new OwnershipMetadata());
         $this->workflowManager->expects(self::once())
             ->method('getWorkflow')

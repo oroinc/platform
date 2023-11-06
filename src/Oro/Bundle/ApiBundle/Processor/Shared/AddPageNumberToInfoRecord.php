@@ -22,7 +22,7 @@ class AddPageNumberToInfoRecord implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -45,7 +45,7 @@ class AddPageNumberToInfoRecord implements ProcessorInterface
         $context->setInfoRecords($infoRecords);
     }
 
-    protected function getPageNumber(FilterValueAccessorInterface $filterValues, string $pageNumberFilterName): int
+    private function getPageNumber(FilterValueAccessorInterface $filterValues, string $pageNumberFilterName): int
     {
         $pageNumber = $filterValues->get($pageNumberFilterName)?->getValue();
         if (null === $pageNumber) {

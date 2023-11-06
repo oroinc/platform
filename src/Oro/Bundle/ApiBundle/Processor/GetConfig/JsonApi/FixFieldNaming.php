@@ -17,7 +17,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class FixFieldNaming implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(ContextInterface $context): void
     {
@@ -52,10 +52,7 @@ class FixFieldNaming implements ProcessorInterface
         }
     }
 
-    /**
-     * @throws \RuntimeException if a field cannot be renamed
-     */
-    protected function renameReservedField(
+    private function renameReservedField(
         EntityDefinitionConfig $definition,
         ?string $entityClass,
         string $fieldName
@@ -86,7 +83,7 @@ class FixFieldNaming implements ProcessorInterface
         }
     }
 
-    protected function renameIdField(EntityDefinitionConfig $definition, string $fieldName, string $newFieldName): void
+    private function renameIdField(EntityDefinitionConfig $definition, string $fieldName, string $newFieldName): void
     {
         $field = $definition->getField($fieldName);
         if (null !== $field && !$field->hasPropertyPath()) {
@@ -100,7 +97,7 @@ class FixFieldNaming implements ProcessorInterface
     /**
      * Gets the short name of the class, the part without the namespace
      */
-    protected function getShortClassName(string $className): string
+    private function getShortClassName(string $className): string
     {
         $lastDelimiter = strrpos($className, '\\');
 

@@ -2,52 +2,42 @@
 
 namespace Oro\Bundle\EntityBundle\Tools;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 
 /**
- * Check if required tables exists in database
+ * Checks if required tables exists in the database.
  */
 class DatabaseChecker
 {
-    protected ManagerRegistry $doctrine;
-
+    private ManagerRegistry $doctrine;
     /** @var string[] */
     private array $requiredTables;
-
-    private bool $installed;
-
+    private ApplicationState $applicationState;
+    private ?bool $installed = null;
     private ?bool $dbCheck = null;
 
-    /**
-     * @param ManagerRegistry $doctrine The instance of Doctrine ManagerRegistry object
-     * @param string[] $requiredTables The list of tables that should exist in the database
-     * @param ApplicationState $applicationState The flag indicates that the application is already installed
-     */
     public function __construct(
         ManagerRegistry $doctrine,
-        array  $requiredTables,
+        array $requiredTables,
         ApplicationState $applicationState
     ) {
         $this->doctrine = $doctrine;
         $this->requiredTables = $requiredTables;
-        $this->installed = $applicationState->isInstalled();
+        $this->applicationState = $applicationState;
     }
 
     /**
      * Checks whether the database is ready to work.
-     *
-     * @return bool
      */
-    public function checkDatabase()
+    public function checkDatabase(): bool
     {
         $isChecked = $this->isDatabaseChecked();
         if (null !== $isChecked) {
             return $isChecked;
         }
 
-        $this->dbCheck = SafeDatabaseChecker::tablesExist($this->getConnection(), $this->requiredTables);
+        $this->dbCheck = SafeDatabaseChecker::tablesExist($this->doctrine->getConnection(), $this->requiredTables);
 
         return $this->dbCheck;
     }
@@ -56,7 +46,7 @@ class DatabaseChecker
      * Clears the state of this checker.
      * It means that the next call of checkDatabase() will do retest the database state.
      */
-    public function clearCheckDatabase()
+    public function clearCheckDatabase(): void
     {
         $this->dbCheck = null;
         // force the check even if the application is already installed
@@ -66,27 +56,22 @@ class DatabaseChecker
 
     /**
      * Indicates whether the database state is already checked.
-     *
-     * @return bool|null
      */
-    protected function isDatabaseChecked()
+    protected function isDatabaseChecked(): ?bool
     {
-        if ($this->installed) {
+        if ($this->isInstalled()) {
             return true;
         }
 
-        if (null !== $this->dbCheck) {
-            return $this->dbCheck;
-        }
-
-        return null;
+        return $this->dbCheck ?? null;
     }
 
-    /**
-     * @return Connection
-     */
-    protected function getConnection()
+    private function isInstalled(): bool
     {
-        return $this->doctrine->getConnection();
+        if (null === $this->installed) {
+            $this->installed = $this->applicationState->isInstalled();
+        }
+
+        return $this->installed;
     }
 }

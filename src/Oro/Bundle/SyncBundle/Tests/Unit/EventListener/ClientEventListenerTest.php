@@ -14,7 +14,6 @@ use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
@@ -141,10 +140,11 @@ class ClientEventListenerTest extends TestCase
         $clientErrorEvent = new ClientErrorEvent($this->connection);
         $clientErrorEvent->setException(new BadCredentialsException());
 
-        $closingResponse = new Response(403);
         $this->connection->expects(self::once())
             ->method('send')
-            ->with($closingResponse);
+            ->willReturnCallback(function (string $data) {
+                self::assertEquals(403, substr($data, -3));
+            });
         $this->connection->expects(self::once())
             ->method('close');
 
