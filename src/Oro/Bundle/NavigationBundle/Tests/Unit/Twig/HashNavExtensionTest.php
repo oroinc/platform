@@ -5,51 +5,73 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Bundle\NavigationBundle\Twig\HashNavExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class HashNavExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private HashNavExtension $extension;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
+
+    /** @var HashNavExtension */
+    private $extension;
 
     protected function setUp(): void
     {
-        $this->extension = new HashNavExtension();
+        $this->requestStack = $this->createMock(RequestStack::class);
+
+        $container = self::getContainerBuilder()
+            ->add(RequestStack::class, $this->requestStack)
+            ->getContainer($this);
+
+        $this->extension = new HashNavExtension($container);
     }
 
-    public function testCheckIsHashNavigation(): void
+    public function testCheckIsHashNavigationWhenNoMainRequest(): void
     {
-        $event = $this->createMock(RequestEvent::class);
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
+            ->willReturn(null);
 
-        $event->expects(self::once())
-            ->method('getRequestType')
-            ->willReturn(HttpKernel::MASTER_REQUEST);
+        self::assertFalse(self::callTwigFunction($this->extension, 'oro_is_hash_navigation', []));
+    }
 
-        $request = $this->createMock(Request::class);
+    public function testCheckIsHashNavigationWhenNoHashNavigationHeader(): void
+    {
+        $mainRequest = Request::create('http://example.com');
 
-        $event->expects(self::once())
-            ->method('getRequest')
-            ->willReturn($request);
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
+            ->willReturn($mainRequest);
 
-        $request->headers = $this->createMock(HeaderBag::class);
+        self::assertFalse(self::callTwigFunction($this->extension, 'oro_is_hash_navigation', []));
+    }
 
-        $request->headers->expects(self::once())
-            ->method('get')
-            ->willReturn(false);
+    public function testCheckIsHashNavigationWhenHashNavigationHeaderExistsInHeaders(): void
+    {
+        $mainRequest = Request::create('http://example.com');
+        $mainRequest->headers->set(ResponseHashnavListener::HASH_NAVIGATION_HEADER, true);
 
-        $request->expects(self::once())
-            ->method('get')
-            ->willReturn(true);
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
+            ->willReturn($mainRequest);
 
-        $this->extension->onKernelRequest($event);
+        self::assertTrue(self::callTwigFunction($this->extension, 'oro_is_hash_navigation', []));
+    }
 
-        self::assertTrue(
-            self::callTwigFunction($this->extension, 'oro_is_hash_navigation', [])
-        );
+    public function testCheckIsHashNavigationWhenHashNavigationHeaderExistsInQueryString(): void
+    {
+        $mainRequest = Request::create('http://example.com');
+        $mainRequest->headers->set(ResponseHashnavListener::HASH_NAVIGATION_HEADER, false);
+        $mainRequest->query->set(ResponseHashnavListener::HASH_NAVIGATION_HEADER, true);
+
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
+            ->willReturn($mainRequest);
+
+        self::assertTrue(self::callTwigFunction($this->extension, 'oro_is_hash_navigation', []));
     }
 
     public function testGetHashNavigationHeaderConst(): void

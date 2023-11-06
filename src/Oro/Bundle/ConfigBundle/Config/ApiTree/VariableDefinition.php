@@ -2,48 +2,35 @@
 
 namespace Oro\Bundle\ConfigBundle\Config\ApiTree;
 
+/**
+ * The definition of a variable in API configuration tree.
+ */
 class VariableDefinition
 {
-    /** @var string */
-    protected $key;
+    private string $key;
+    private string $type;
 
-    /** @var string */
-    protected $type;
-
-    /**
-     * @param string $key
-     * @param string $type
-     */
-    public function __construct($key, $type)
+    public function __construct(string $key, string $type)
     {
-        $this->key  = $key;
+        $this->key = $key;
         $this->type = $type;
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'key'  => $this->key,
-            'type' => $this->type,
+            'type' => $this->type
         ];
     }
 }

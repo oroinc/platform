@@ -341,9 +341,10 @@ services:
 
     oro_navigation.twig.hash_nav_extension:
         class: Oro\Bundle\NavigationBundle\Twig\HashNavExtension
+        arguments:
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_navigation.breadcrumb_manager.default:
         class: Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager

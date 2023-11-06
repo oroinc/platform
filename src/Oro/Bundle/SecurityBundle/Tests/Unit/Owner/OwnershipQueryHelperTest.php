@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
@@ -17,10 +17,10 @@ use Oro\Component\Testing\Unit\ORM\OrmTestCase;
  */
 class OwnershipQueryHelperTest extends OrmTestCase
 {
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ownershipMetadataProvider;
 
     /** @var OwnershipQueryHelper */
@@ -49,13 +49,13 @@ class OwnershipQueryHelperTest extends OrmTestCase
     }
 
     private function getOwnershipMetadata(
-        string $organizationFieldName = null,
-        string $ownerFieldName = null
+        string $organizationFieldName,
+        string $ownerFieldName
     ): OwnershipMetadataInterface {
         $metadata = $this->createMock(OwnershipMetadataInterface::class);
         $metadata->expects(self::any())
             ->method('hasOwner')
-            ->willReturn(null !== $organizationFieldName || null !== $ownerFieldName);
+            ->willReturn($organizationFieldName || $ownerFieldName);
         $metadata->expects(self::any())
             ->method('getOrganizationFieldName')
             ->willReturn($organizationFieldName);
@@ -488,7 +488,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with($entityClass)
-            ->willReturn($this->getOwnershipMetadata('organization', null));
+            ->willReturn($this->getOwnershipMetadata('organization', ''));
 
         $result = $this->ownershipQueryHelper->addOwnershipFields($qb);
         self::assertEquals(
@@ -516,7 +516,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with($entityClass)
-            ->willReturn($this->getOwnershipMetadata(null, 'owner'));
+            ->willReturn($this->getOwnershipMetadata('', 'owner'));
 
         $result = $this->ownershipQueryHelper->addOwnershipFields($qb);
         self::assertEquals(
@@ -544,7 +544,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with($entityClass)
-            ->willReturn($this->getOwnershipMetadata(null, null));
+            ->willReturn($this->getOwnershipMetadata('', ''));
 
         $result = $this->ownershipQueryHelper->addOwnershipFields($qb);
         self::assertEquals(

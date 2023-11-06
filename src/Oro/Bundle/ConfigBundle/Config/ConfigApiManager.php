@@ -3,83 +3,72 @@
 namespace Oro\Bundle\ConfigBundle\Config;
 
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
+use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\ProviderInterface;
 
+/**
+ * The manager for API configuration tree.
+ */
 class ConfigApiManager
 {
-    /** @var ProviderInterface */
-    protected $configProvider;
-
+    private ProviderInterface $configProvider;
     /** @var ConfigManager[] */
-    protected $configManagers;
+    private array $configManagers;
 
     public function __construct(ProviderInterface $configProvider)
     {
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * @param string        $scope
-     * @param ConfigManager $manager
-     */
-    public function addConfigManager($scope, ConfigManager $manager)
+    public function addConfigManager(string $scope, ConfigManager $manager): void
     {
         $this->configManagers[$scope] = $manager;
     }
 
-    /**
-     * @param string $scope
-     *
-     * @return ConfigManager|null
-     */
-    public function getConfigManager($scope)
+    public function getConfigManager(string $scope): ?ConfigManager
     {
-        return isset($this->configManagers[$scope])
-            ? $this->configManagers[$scope]
-            : null;
+        return $this->configManagers[$scope] ?? null;
     }
 
     /**
-     * Gets all configuration scopes
+     * Gets all configuration scopes.
      *
      * @return string[]
      */
-    public function getScopes()
+    public function getScopes(): array
     {
         return array_keys($this->configManagers);
     }
 
     /**
-     * Gets the list of paths for all configuration sections
-     * The result is sorted alphabetically
+     * Gets the list of paths for all configuration sections.
+     * The result is sorted alphabetically.
      *
      * @return string[]
      */
-    public function getSections()
+    public function getSections(): array
     {
         $sections = [];
-
-        $tree = $this->configProvider->getApiTree();
-        $this->extractSectionPaths($sections, $tree, null);
+        $this->extractSectionPaths($sections, $this->configProvider->getApiTree());
         sort($sections, SORT_FLAG_CASE);
 
         return $sections;
     }
 
     /**
-     * Checks whether a section with a given path exists
+     * Checks whether a section with a given path exists.
      *
      * @param string $path The path to API section. For example: look-and-feel/grid
      *
      * @return bool
      */
-    public function hasSection($path)
+    public function hasSection(string $path): bool
     {
         $section = null;
         try {
             $section = $this->configProvider->getApiTree($path);
-        } catch (ItemNotFoundException $e) {
+        } catch (ItemNotFoundException) {
             // ignore this exception
         }
 
@@ -87,98 +76,176 @@ class ConfigApiManager
     }
 
     /**
-     * Gets all configuration data of the specified section
+     * Gets the list of keys of a configuration variables.
      *
-     * @param string $path  The path to API section. For example: look-and-feel/grid
-     * @param string $scope The configuration scope
+     * @return string[]
+     */
+    public function getDataItemKeys(): array
+    {
+        $keys = [];
+        $this->extractDataItemKeys($keys, $this->configProvider->getApiTree());
+
+        return array_values(array_unique($keys));
+    }
+
+    /**
+     * Gets all configuration data of the specified section.
+     *
+     * @param string   $path    The path to API section. For example: look-and-feel/grid
+     * @param string   $scope   The configuration scope
+     * @param int|null $scopeId The configuration scope identifier
      *
      * @return array
+     *
+     * @throws ItemNotFoundException when the given path is invalid
      */
-    public function getData($path, $scope = 'user')
+    public function getData(string $path, string $scope = 'user', int $scopeId = null): array
     {
-        /** @var ConfigManager $configManager */
+        $variables = [];
+        $this->extractVariables($variables, $this->configProvider->getApiTree($path));
+
+        $result = [];
         $configManager = $this->configManagers[$scope];
-        $variables = $this->configProvider->getApiTree($path)->getVariables(true);
-        $result    = [];
+        /** @var VariableDefinition $variable */
         foreach ($variables as $variable) {
-            $value = $configManager->get($variable->getKey());
-            $dataTransformer = $this->configProvider->getDataTransformer($variable->getKey());
-            if ($dataTransformer !== null) {
-                $value = $dataTransformer->transform($value);
-            }
-            $var          = $variable->toArray();
-            $var['value'] = $this->getTypedValue($variable->getType(), $value);
-            $var          = array_merge($var, $configManager->getInfo($variable->getKey()));
-            $result[]     = $var;
+            $result[] = $this->getVariableValue($variable, $configManager, $scopeId);
         }
 
         return $result;
     }
 
     /**
-     * Gets a configuration variable data from the specified section
+     * Gets a configuration variable data from the specified section.
      *
-     * @param string $key   The key of a configuration variable
-     * @param string $path  The path to API section. For example: look-and-feel/grid
-     * @param string $scope The configuration scope
+     * @param string   $key     The key of a configuration variable
+     * @param string   $path    The path to API section. For example: look-and-feel/grid
+     * @param string   $scope   The configuration scope
+     * @param int|null $scopeId The configuration scope identifier
      *
      * @return array|null
+     *
+     * @throws ItemNotFoundException when the given path is invalid
      */
-    public function getDataItem($key, $path, $scope = 'user')
+    public function getDataItem(string $key, string $path, string $scope = 'user', int $scopeId = null): ?array
     {
         $variable = $this->configProvider->getApiTree($path)->getVariable($key);
         if (null === $variable) {
             return null;
         }
 
-        $configManager = $this->configManagers[$scope];
-        $value = $configManager->get($variable->getKey());
-        $dataTransformer = $this->configProvider->getDataTransformer($variable->getKey());
-        if ($dataTransformer !== null) {
-            $value = $dataTransformer->transform($value);
-        }
-        $var          = $variable->toArray();
-        $var['value'] = $this->getTypedValue($variable->getType(), $value);
-        $var          = array_merge($var, $configManager->getInfo($variable->getKey()));
-
-        return $var;
+        return $this->getVariableValue($variable, $this->configManagers[$scope], $scopeId);
     }
 
     /**
-     * Extracts paths of all sections in the given configuration tree
+     * Gets the list of paths for all configuration sections to which the given configuration variable belongs.
+     * The result is sorted alphabetically.
      *
-     * @param array             $result
-     * @param SectionDefinition $tree
-     * @param string            $parentPath
+     * @param string $key The key of a configuration variable
+     *
+     * @return string[]
      */
-    protected function extractSectionPaths(array &$result, SectionDefinition $tree, $parentPath)
+    public function getDataItemSections(string $key): array
+    {
+        $sections = [];
+        $this->extractSectionPathsForDataItem($sections, $key, $this->configProvider->getApiTree());
+        sort($sections, SORT_FLAG_CASE);
+
+        return $sections;
+    }
+
+    /**
+     * Extracts paths of all sections in the given configuration tree.
+     */
+    private function extractSectionPaths(array &$result, SectionDefinition $tree, ?string $parentPath = null): void
     {
         $subSections = $tree->getSubSections();
         foreach ($subSections as $subSection) {
-            $path     = empty($parentPath)
-                ? $subSection->getName()
-                : $parentPath . '/' . $subSection->getName();
+            $path = $this->getSectionPath($subSection, $parentPath);
             $result[] = $path;
             $this->extractSectionPaths($result, $subSection, $path);
         }
     }
 
     /**
-     * @param string $type
-     * @param mixed  $value
-     *
-     * @return mixed
+     * Extracts paths of all sections in the given configuration tree
+     * to which the given configuration variable belongs.
      */
-    protected function getTypedValue($type, $value)
+    private function extractSectionPathsForDataItem(
+        array &$result,
+        string $dataItemKey,
+        SectionDefinition $tree,
+        ?string $parentPath = null
+    ): void {
+        $subSections = $tree->getSubSections();
+        foreach ($subSections as $subSection) {
+            $path = $this->getSectionPath($subSection, $parentPath);
+            $variable = $subSection->getVariable($dataItemKey);
+            if (null !== $variable) {
+                $result[] = $path;
+            }
+            $this->extractSectionPathsForDataItem($result, $dataItemKey, $subSection, $path);
+        }
+    }
+
+    /**
+     * Extracts keys of all sections in the given configuration tree.
+     */
+    private function extractDataItemKeys(array &$result, SectionDefinition $tree): void
     {
-        if ($value !== null) {
-            switch ($type) {
-                case 'boolean':
-                    $value = (bool)$value;
-                    break;
-                case 'integer':
-                    $value = (int)$value;
-                    break;
+        $variables = $tree->getVariables();
+        foreach ($variables as $variable) {
+            $result[] = $variable->getKey();
+        }
+        $subSections = $tree->getSubSections();
+        foreach ($subSections as $subSection) {
+            $this->extractDataItemKeys($result, $subSection);
+        }
+    }
+
+    /**
+     * Extracts keys of all sections in the given configuration tree.
+     */
+    private function extractVariables(array &$result, SectionDefinition $tree): void
+    {
+        $variables = $tree->getVariables();
+        foreach ($variables as $variable) {
+            $result[$variable->getKey()] = $variable;
+        }
+        $subSections = $tree->getSubSections();
+        foreach ($subSections as $subSection) {
+            $this->extractVariables($result, $subSection);
+        }
+    }
+
+    private function getSectionPath(SectionDefinition $subSection, ?string $parentPath): string
+    {
+        return $parentPath
+            ? $parentPath . '/' . $subSection->getName()
+            : $subSection->getName();
+    }
+
+    private function getVariableValue(VariableDefinition $variable, ConfigManager $configManager, ?int $scopeId): array
+    {
+        $value = $configManager->get($variable->getKey(), false, false, $scopeId);
+        $dataTransformer = $this->configProvider->getDataTransformer($variable->getKey());
+        if ($dataTransformer !== null) {
+            $value = $dataTransformer->transform($value);
+        }
+
+        $result = $variable->toArray();
+        $result['value'] = $this->getTypedValue($variable->getType(), $value);
+
+        return array_merge($result, $configManager->getInfo($variable->getKey(), $scopeId));
+    }
+
+    private function getTypedValue(string $type, mixed $value): mixed
+    {
+        if (null !== $value) {
+            if ('boolean' === $type) {
+                return (bool)$value;
+            }
+            if ('integer' === $type) {
+                return (int)$value;
             }
         }
 

@@ -24,7 +24,8 @@ class TableHeader extends Element
 
         /** @var \DOMElement $th */
         foreach ($crawler->filter('th') as $th) {
-            $currentHeader = preg_replace('/[\\n\\r]+/', ' ', trim($th->textContent));
+            $currentHeader = str_replace("\xC2\xA0", ' ', $th->textContent);
+            $currentHeader = preg_replace('/[\\n\\r]+/', ' ', trim($currentHeader));
             if (strtolower($currentHeader) === strtolower($headerText)) {
                 return $i;
             }

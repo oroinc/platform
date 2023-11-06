@@ -70,10 +70,6 @@ services:
             - "@translator"
             - "@oro_entity.routing_helper"
             - "@oro_security.token_accessor"
-            - "@oro_activity_list.factory"
-
-    oro_activity_list.factory:
-        class: Oro\Bundle\ActivityListBundle\Entity\Factory\ActivityListFactory
 
     oro_activity_list.provider.email_recipients:
         class: Oro\Bundle\ActivityListBundle\Provider\EmailRecipientsProvider

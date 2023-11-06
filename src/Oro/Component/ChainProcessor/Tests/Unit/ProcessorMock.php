@@ -22,6 +22,11 @@ class ProcessorMock implements ProcessorInterface
         return $this->processorId;
     }
 
+    public function getCallback(): ?callable
+    {
+        return $this->callback;
+    }
+
     /**
      * {@inheritDoc}
      */

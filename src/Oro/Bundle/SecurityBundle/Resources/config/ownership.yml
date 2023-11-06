@@ -32,10 +32,6 @@ services:
         tags:
             - { name: oro_security.owner.metadata_provider, alias: default }
 
-    oro_security.owner.ownership_metadata_provider.link:
-        tags:
-            - { name: oro_service_link, service: oro_security.owner.ownership_metadata_provider }
-
     oro_security.owner.ownership_metadata_provider.cache:
         parent: oro.data.cache
         public: false

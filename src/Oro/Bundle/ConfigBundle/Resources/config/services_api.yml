@@ -1,24 +1,14 @@
+parameters:
+    oro_config.api.scopes: ['user', 'global']
+
 services:
     oro_config.api.repository:
         class: Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository
         arguments:
             - '@oro_config.manager.api'
 
-    oro_config.api.handle_default_value_for_fields_filter:
-        class: Oro\Bundle\ConfigBundle\Api\Processor\GetList\HandleDefaultValueForFieldsFilter
-        tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, priority: -25 }
-
-    oro_config.api.set_default_value_for_fields_filter:
-        class: Oro\Bundle\ConfigBundle\Api\Processor\GetList\SetDefaultValueForFieldsFilter
-        arguments:
-            - '@oro_api.filter_names_registry'
-            - '@oro_api.value_normalizer'
-        tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, priority: -205 }
-
     oro_config.api.load_configuration_sections:
-        class: Oro\Bundle\ConfigBundle\Api\Processor\GetList\LoadConfigurationSections
+        class: Oro\Bundle\ConfigBundle\Api\Processor\LoadConfigurationSections
         arguments:
             - '@oro_config.api.repository'
             - '@security.authorization_checker'
@@ -26,37 +16,92 @@ services:
             - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection }
 
     oro_config.api.rest.fix_configuration_sections_result_document:
-        class: Oro\Bundle\ConfigBundle\Api\Processor\GetList\Rest\FixConfigurationSectionsResultDocument
+        class: Oro\Bundle\ConfigBundle\Api\Processor\Rest\FixConfigurationSectionsResultDocument
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest&!json_api, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, priority: -240 }
 
+    oro_config.api.rest.remove_configuration_options:
+        class: Oro\Bundle\ConfigBundle\Api\Processor\Rest\RemoveConfigurationOptions
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection }
+
     oro_config.api.rest.expand_configuration_options:
-        class: Oro\Bundle\ConfigBundle\Api\Processor\Get\Rest\ExpandConfigurationOptions
+        class: Oro\Bundle\ConfigBundle\Api\Processor\Rest\ExpandConfigurationOptions
         tags:
             - { name: oro.api.processor, action: get, group: initialize, requestType: rest&!json_api, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection }
 
     oro_config.api.load_configuration_section:
-        class: Oro\Bundle\ConfigBundle\Api\Processor\Get\LoadConfigurationSection
+        class: Oro\Bundle\ConfigBundle\Api\Processor\LoadConfigurationSection
         arguments:
             - '@oro_config.api.repository'
+            - '@security.authorization_checker'
         tags:
             - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection }
 
     oro_config.api.rest.fix_configuration_section_result_document:
-        class: Oro\Bundle\ConfigBundle\Api\Processor\Get\Rest\FixConfigurationSectionResultDocument
+        class: Oro\Bundle\ConfigBundle\Api\Processor\Rest\FixConfigurationSectionResultDocument
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest&!json_api, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection, priority: -240 }
 
+    oro_config.api.load_configuration_option_keys:
+        class: Oro\Bundle\ConfigBundle\Api\Processor\LoadConfigurationOptionKeys
+        arguments:
+            - '@oro_config.api.repository'
+            - '@security.authorization_checker'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption, priority: 110 }
+
+    oro_config.api.slice_configuration_option_keys:
+        class: Oro\Bundle\ConfigBundle\Api\Processor\SliceConfigurationOptionKeys
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption, priority: 50 }
+
+    oro_config.api.load_configuration_options:
+        class: Oro\Bundle\ConfigBundle\Api\Processor\LoadConfigurationOptions
+        arguments:
+            - '@oro_config.api.repository'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption, priority: 10 }
+
+    oro_config.api.sort_loaded_configuration_options:
+        class: Oro\Bundle\ConfigBundle\Api\Processor\SortLoadedConfigurationOptions
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption, priority: -50 }
+
+    oro_config.api.rest.fix_configuration_options_result_document:
+        class: Oro\Bundle\ConfigBundle\Api\Processor\Rest\FixConfigurationOptionsResultDocument
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest&!json_api, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption, priority: -240 }
+
+    oro_config.api.load_configuration_option:
+        class: Oro\Bundle\ConfigBundle\Api\Processor\LoadConfigurationOption
+        arguments:
+            - '@oro_config.api.repository'
+            - '@security.authorization_checker'
+        tags:
+            - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption }
+
+    oro_config.api.rest.fix_configuration_option_result_document:
+        class: Oro\Bundle\ConfigBundle\Api\Processor\Rest\FixConfigurationOptionResultDocument
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest&!json_api, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption, priority: -240 }
+
     oro_config.api.add_scope_filter:
         class: Oro\Bundle\ConfigBundle\Api\Processor\AddScopeFilter
+        arguments:
+            - '%oro_config.api.scopes%'
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection }
             - { name: oro.api.processor, action: get, group: initialize, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection }
+            - { name: oro.api.processor, action: get_list, group: initialize, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption }
+            - { name: oro.api.processor, action: get, group: initialize, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption }
 
     oro_config.api.get_scope:
         class: Oro\Bundle\ConfigBundle\Api\Processor\GetScope
         arguments:
-            - '@oro_config.api.repository'
+            - '%oro_config.api.scopes%'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection }
             - { name: oro.api.processor, action: get, group: normalize_input, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection }
+            - { name: oro.api.processor, action: get_list, group: normalize_input, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption }
+            - { name: oro.api.processor, action: get, group: normalize_input, class: Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption }

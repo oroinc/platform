@@ -8,29 +8,27 @@ use Oro\Bundle\ApiBundle\Util\FieldVisitor;
 
 class FieldVisitorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FieldVisitor */
-    private $fieldVisitor;
+    private FieldVisitor $visitor;
 
     protected function setUp(): void
     {
-        $this->fieldVisitor = new FieldVisitor();
+        $this->visitor = new FieldVisitor();
     }
 
-    public function testWalkComparison()
+    public function testWalkComparison(): void
     {
-        self::assertEmpty($this->fieldVisitor->getFields());
+        self::assertSame([], $this->visitor->getFields());
 
-        $this->fieldVisitor->walkComparison(new Comparison('fieldName', Comparison::EQ, 'value'));
+        $this->visitor->walkComparison(new Comparison('fieldName', Comparison::EQ, 'value'));
 
-        self::assertCount(1, $this->fieldVisitor->getFields());
-        self::assertSame(['fieldName'], $this->fieldVisitor->getFields());
+        self::assertSame(['fieldName'], $this->visitor->getFields());
     }
 
-    public function testWalkCompositeExpression()
+    public function testWalkCompositeExpression(): void
     {
-        self::assertEmpty($this->fieldVisitor->getFields());
+        self::assertSame([], $this->visitor->getFields());
 
-        $this->fieldVisitor->walkCompositeExpression(
+        $this->visitor->walkCompositeExpression(
             new CompositeExpression(
                 CompositeExpression::TYPE_AND,
                 [
@@ -40,9 +38,6 @@ class FieldVisitorTest extends \PHPUnit\Framework\TestCase
             )
         );
 
-        $fields = $this->fieldVisitor->getFields();
-
-        self::assertCount(2, $fields);
-        self::assertSame(['fieldName1', 'fieldName2'], $fields);
+        self::assertSame(['fieldName1', 'fieldName2'], $this->visitor->getFields());
     }
 }

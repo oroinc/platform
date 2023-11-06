@@ -17,60 +17,59 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
     private const SOME_CLASS = \stdClass::class;
     private const UNDEFINED_CLASS = 'UndefinedClass';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
     /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    /** @var OwnershipMetadataProviderStub */
-    private $provider;
-
     /** @var Config */
     private $config;
+
+    /** @var OwnershipMetadataProviderStub */
+    private $provider;
 
     protected function setUp(): void
     {
         $this->provider = new OwnershipMetadataProviderStub($this);
         $this->configManager = $this->provider->getConfigManagerMock();
         $this->cache = $this->provider->getCacheMock();
-
         $this->config = new Config(new EntityConfigId('ownership', self::SOME_CLASS));
     }
 
-    public function testClearCacheForClassName()
+    public function testClearCacheForClassName(): void
     {
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('delete')
             ->with(self::SOME_CLASS);
 
         $this->provider->clearCache(self::SOME_CLASS);
     }
 
-    public function testClearCacheForEntityProxyClassName()
+    public function testClearCacheForEntityProxyClassName(): void
     {
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('delete')
             ->with(self::SOME_CLASS);
 
         $this->provider->clearCache('\\' . Proxy::MARKER . '\\' . self::SOME_CLASS);
     }
 
-    public function testClearCacheAll()
+    public function testClearCacheAll(): void
     {
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('clear');
 
         $this->provider->clearCache();
     }
 
-    public function testGetMetadataWithoutCache()
+    public function testGetMetadataWithoutCache(): void
     {
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with(self::SOME_CLASS)
             ->willReturn(true);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
             ->with('ownership', self::SOME_CLASS)
             ->willReturn($this->config);
@@ -78,20 +77,19 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects(self::once())
             ->method('get')
             ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
+                return $callback($this->createMock(ItemInterface::class));
             });
 
-        $this->assertEquals(new OwnershipMetadata(), $this->provider->getMetadata(self::SOME_CLASS));
+        self::assertEquals(new OwnershipMetadata(), $this->provider->getMetadata(self::SOME_CLASS));
     }
 
-    public function testGetMetadataForEntityProxy()
+    public function testGetMetadataForEntityProxy(): void
     {
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with(self::SOME_CLASS)
             ->willReturn(true);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
             ->with('ownership', self::SOME_CLASS)
             ->willReturn($this->config);
@@ -99,43 +97,41 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects(self::once())
             ->method('get')
             ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
+                return $callback($this->createMock(ItemInterface::class));
             });
 
-        $this->assertEquals(
+        self::assertEquals(
             new OwnershipMetadata(),
             $this->provider->getMetadata('\\' . Proxy::MARKER . '\\' . self::SOME_CLASS)
         );
     }
 
-    public function testGetMetadataForNull()
+    public function testGetMetadataForNull(): void
     {
-        $this->configManager->expects($this->never())
+        $this->configManager->expects(self::never())
             ->method($this->anything());
 
-        $this->cache->expects($this->never())
+        $this->cache->expects(self::never())
             ->method($this->anything());
 
         $metadata = new OwnershipMetadata();
-        $this->assertEquals($metadata, $this->provider->getMetadata(null));
+        self::assertEquals($metadata, $this->provider->getMetadata(null));
     }
 
-    public function testGetMetadataUndefinedClassWithCache()
+    public function testGetMetadataUndefinedClassWithCache(): void
     {
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with(self::UNDEFINED_CLASS)
             ->willReturn(false);
-        $this->configManager->expects($this->never())
+        $this->configManager->expects(self::never())
             ->method('getEntityConfig');
         $this->cache->expects(self::exactly(2))
             ->method('get')
             ->with(self::UNDEFINED_CLASS)
             ->willReturnOnConsecutiveCalls(
                 new ReturnCallback(function ($cacheKey, $callback) {
-                    $item = $this->createMock(ItemInterface::class);
-                    return $callback($item);
+                    return $callback($this->createMock(ItemInterface::class));
                 }),
                 true
             );
@@ -144,25 +140,25 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $providerWithCleanCache = clone $this->provider;
 
         // no cache
-        $this->assertEquals($metadata, $this->provider->getMetadata(self::UNDEFINED_CLASS));
+        self::assertEquals($metadata, $this->provider->getMetadata(self::UNDEFINED_CLASS));
         // local cache
-        $this->assertEquals($metadata, $this->provider->getMetadata(self::UNDEFINED_CLASS));
+        self::assertEquals($metadata, $this->provider->getMetadata(self::UNDEFINED_CLASS));
         // cache
-        $this->assertEquals($metadata, $providerWithCleanCache->getMetadata(self::UNDEFINED_CLASS));
+        self::assertEquals($metadata, $providerWithCleanCache->getMetadata(self::UNDEFINED_CLASS));
     }
 
-    public function testWarmUpCacheWithoutClassName()
+    public function testWarmUpCacheWithoutClassName(): void
     {
         $configs = [$this->config];
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getConfigs')
             ->willReturn($configs);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with(self::SOME_CLASS)
             ->willReturn(true);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
             ->with('ownership', self::SOME_CLASS)
             ->willReturn($this->config);
@@ -170,20 +166,19 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with(self::SOME_CLASS)
             ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
+                return $callback($this->createMock(ItemInterface::class));
             });
 
         $this->provider->warmUpCache();
     }
 
-    public function testWarmUpCacheWithClassName()
+    public function testWarmUpCacheWithClassName(): void
     {
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with(self::SOME_CLASS)
             ->willReturn(true);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
             ->with('ownership', self::SOME_CLASS)
             ->willReturn($this->config);
@@ -191,20 +186,19 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with(self::SOME_CLASS)
             ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
+                return $callback($this->createMock(ItemInterface::class));
             });
 
         $this->provider->warmUpCache(self::SOME_CLASS);
     }
 
-    public function testWarmUpCacheWithEntityProxyClassName()
+    public function testWarmUpCacheWithEntityProxyClassName(): void
     {
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with(self::SOME_CLASS)
             ->willReturn(true);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
             ->with('ownership', self::SOME_CLASS)
             ->willReturn($this->config);
@@ -212,8 +206,7 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with(self::SOME_CLASS)
             ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
+                return $callback($this->createMock(ItemInterface::class));
             });
 
         $this->provider->warmUpCache('\\' . Proxy::MARKER . '\\' . self::SOME_CLASS);
