@@ -104,6 +104,15 @@ class EmailTest extends RestJsonApiTestCase
         $this->assertResponseContains('cget_email_filter_by_id.yml', $response);
     }
 
+    public function testGetListFilterBySeveralIds(): void
+    {
+        $response = $this->cget(
+            ['entity' => 'emails'],
+            ['filter' => ['id' => ['<toString(@email_1->id)>', '<toString(@email_3->id)>']]]
+        );
+        $this->assertResponseContains('cget_email_filter_by_several_ids.yml', $response);
+    }
+
     public function testGet(): void
     {
         $response = $this->get(
