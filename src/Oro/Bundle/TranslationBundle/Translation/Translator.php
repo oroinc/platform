@@ -108,7 +108,7 @@ class Translator extends BaseTranslator
 
         /** @var MessageCatalogueInterface[] $fallbackCatalogues */
         $fallbackCatalogues = [];
-        $catalogue = $this->getCatalogue($locale);
+        $catalogue = parent::getCatalogue($locale);
         while (null !== $catalogue) {
             $fallbackCatalogues[] = $catalogue;
             $catalogue = $catalogue->getFallbackCatalogue();
@@ -152,20 +152,22 @@ class Translator extends BaseTranslator
             $domain = 'messages';
         }
 
-        $catalogue = $this->getCatalogue($locale);
-        while (null !== $catalogue) {
-            $catalogueLocale = $catalogue->getLocale();
+        $catalogueLocale = $locale;
+        while (null !== $catalogueLocale) {
             if ($this->dynamicTranslationProvider->hasTranslation($id, $domain, $catalogueLocale)) {
-                return $this->messageFormatter->format(
-                    $this->dynamicTranslationProvider->getTranslation($id, $domain, $catalogueLocale),
-                    $catalogueLocale,
-                    $parameters
-                );
+                $translation = $this->dynamicTranslationProvider->getTranslation($id, $domain, $catalogueLocale);
+
+                return $this->messageFormatter->format($translation, $catalogueLocale, $parameters);
             }
+
+            $catalogue = $this->getCatalogue($catalogueLocale);
             if ($catalogue->defines($id, $domain)) {
+                $locale = $catalogueLocale;
+
                 break;
             }
-            $catalogue = $catalogue->getFallbackCatalogue();
+
+            $catalogueLocale = $catalogue?->getFallbackCatalogue()?->getLocale();
         }
 
         try {
@@ -200,15 +202,30 @@ class Translator extends BaseTranslator
         }
 
         $result = false;
-        $catalogue = $this->getCatalogue($locale);
-        while (null !== $catalogue) {
-            if ($this->dynamicTranslationProvider->hasTranslation($id, $domain, $catalogue->getLocale())
-                || $catalogue->defines($id, $domain)
-            ) {
+        $catalogueLocale = $locale;
+
+        /**
+         * Please note that should first load translations from the dynamic cache, and if it does not exist,
+         * try to load translations from the file cache or generate them from the application resources.
+         * Retrieving translations from the file cache can lead to a significant performance problem.
+         * Steps:
+         *  - Load translation from dynamic cache.
+         *  - Load translation from file cache (using OPCache).
+         *  - Load translation from application resources (lead to a significant performance problem).
+         */
+        while (null !== $catalogueLocale) {
+            if ($this->dynamicTranslationProvider->hasTranslation($id, $domain, $catalogueLocale)) {
                 $result = true;
                 break;
             }
-            $catalogue = $catalogue->getFallbackCatalogue();
+
+            $catalogue = $this->getCatalogue($catalogueLocale);
+            if ($catalogue->defines($id, $domain)) {
+                $result = true;
+                break;
+            }
+
+            $catalogueLocale = $catalogue?->getFallbackCatalogue()?->getLocale();
         }
 
         return $result;
@@ -250,7 +267,17 @@ class Translator extends BaseTranslator
     {
         $this->applyFallbackLocales($locale);
 
-        return parent::getCatalogue($locale);
+        if (!$locale) {
+            $locale = $this->getLocale();
+        } else {
+            $this->assertValidLocale($locale);
+        }
+
+        if (!isset($this->catalogues[$locale])) {
+            $this->loadInitializedCatalogue($locale);
+        }
+
+        return $this->catalogues[$locale];
     }
 
     /**
@@ -314,8 +341,8 @@ class Translator extends BaseTranslator
         foreach ($locales as $locale) {
             $this->newTranslator($locale, $options)->loadCatalogues();
         }
-        $this->dynamicTranslationProvider->warmUp($locales);
         $this->moveCatalogueFiles($options['cache_dir'], $cacheDir);
+        $this->dynamicTranslationProvider->warmUp($locales);
     }
 
     private function newTranslator(string $locale, array $options): static
@@ -393,6 +420,13 @@ class Translator extends BaseTranslator
         return $this->loadedFallbackLocales[$strategyName][$locale];
     }
 
+    protected function getFallbackLocale($locale): string
+    {
+        $locales = $this->computeFallbackLocales($locale);
+
+        return reset($locales);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -401,25 +435,32 @@ class Translator extends BaseTranslator
         if ($this->enableDumpCatalogue || $this->isCatalogueCacheFileExits($this->getCatalogueCachePath($locale))) {
             parent::loadCatalogue($locale);
         } else {
-            // make sure that all fallback catalogues are loaded
-            // to avoid re-initialization of already dumped catalogues
-            $fallbackLocales = $this->computeFallbackLocales($locale);
-            if ($fallbackLocales) {
-                $currentLocale = $this->getLocale();
-                $this->disableResetCatalogues = true;
-                try {
-                    foreach ($fallbackLocales as $fallbackLocale) {
-                        if ($fallbackLocale !== $locale) {
-                            $this->getCatalogue($fallbackLocale);
-                        }
-                    }
-                    $this->applyFallbackLocales($currentLocale);
-                } finally {
-                    $this->disableResetCatalogues = false;
-                }
-            }
-            // initialize empty catalogue
             $this->initializeCatalogue($locale);
+        }
+    }
+
+    private function loadInitializedCatalogue(string $locale): void
+    {
+        $cataloguePath = $this->getCatalogueCachePath($locale);
+        if ($this->isCatalogueCacheFileExits($cataloguePath)) {
+            $this->catalogues[$locale] = include $cataloguePath;
+        } else {
+            // In this case, the dynamic cache and file cache do not have a catalogue, which means that the caches
+            // need to be rebuilt or this catalogue is not in the application's resources, so try to take the
+            // translation from the fallback catalogue.
+            $catalog = new MessageCatalogue($locale, []);
+            $fallback = $this->getFallbackLocale($locale);
+            if ($fallback) {
+                $catalog->addFallbackCatalogue(new MessageCatalogue($fallback));
+                $this->catalogues[$locale] = $catalog;
+
+                return;
+            }
+
+            // In this case, there are performance issues because all catalogues are loaded from application resources.
+            // This means that all caches are missing catalogue, which is a problem.
+            // Refresh the caches and reload all translations.
+            parent::getCatalogue($locale);
         }
     }
 
