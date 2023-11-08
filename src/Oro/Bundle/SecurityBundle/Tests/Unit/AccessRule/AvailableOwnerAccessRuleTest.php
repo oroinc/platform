@@ -12,7 +12,7 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Value;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
 
@@ -28,7 +28,7 @@ class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
     {
         $this->builder = $this->createMock(AclConditionDataBuilderInterface::class);
 
-        $ownershipMetadataProvider = $this->createMock(OwnershipMetadataProvider::class);
+        $ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $ownershipMetadataProvider->expects($this->any())
             ->method('getMetadata')
             ->with(CmsUser::class)

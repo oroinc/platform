@@ -11,7 +11,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Contracts\Cache\CacheInterface;
 
 /**
- * Abstract class for providers which provide ownership metadata for entities
+ * The base class for providers which provide ownership metadata for entities.
  */
 abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataProviderInterface
 {
@@ -25,9 +25,12 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
         $this->configManager = $configManager;
     }
 
-    public function getMetadata($className): OwnershipMetadataInterface
+    /**
+     * {@inheritDoc}
+     */
+    public function getMetadata(?string $className): OwnershipMetadataInterface
     {
-        if ($className === null) {
+        if (null === $className) {
             return $this->getNoOwnershipMetadata();
         }
 
@@ -42,6 +45,9 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
         return $result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function warmUpCache(?string $className = null): void
     {
         if ($className === null) {
@@ -54,6 +60,9 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function clearCache(?string $className = null): void
     {
         if ($this->getCache()) {
@@ -74,7 +83,7 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
     abstract protected function createNoOwnershipMetadata(): OwnershipMetadataInterface;
 
     /**
-     * Gets an instance of OwnershipMetadataInterface that represents an entity that does not have an owner
+     * Gets an instance of OwnershipMetadataInterface that represents an entity that does not have an owner.
      */
     protected function getNoOwnershipMetadata(): OwnershipMetadataInterface
     {
@@ -86,27 +95,31 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
     }
 
     /**
-     * Gets an instance of OwnershipMetadataInterface that represents a "root" ACL entry
+     * Gets an ownership metadata that represents a "root" ACL entry.
      */
     protected function getRootMetadata(): OwnershipMetadataInterface
     {
         return $this->createRootMetadata();
     }
 
+    /**
+     * Creates a new instance of ownership metadata that represents a "root" ACL entry.
+     */
     protected function createRootMetadata(): OwnershipMetadataInterface
     {
         return new RootOwnershipMetadata();
     }
 
-    protected function getOwnershipConfigs(): array #ConfigInterface[]
+    /**
+     * @return ConfigInterface[]
+     */
+    protected function getOwnershipConfigs(): array
     {
         return $this->configManager->getConfigs('ownership');
     }
 
     /**
-     * Makes sure that metadata for the given class are loaded
-     *
-     * @throws InvalidConfigurationException
+     * Makes sure that metadata for the given class are loaded.
      */
     protected function ensureMetadataLoaded(string $className): void
     {

@@ -17,7 +17,8 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var LockObject|\PHPUnit\Framework\MockObject\MockObject */
     private $lockObject;
 
-    private ApplicationState $applicationState;
+    /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
+    private $applicationState;
 
     protected function setUp(): void
     {
@@ -28,7 +29,9 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckDatabaseForInstalledApplication()
     {
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(true);
         $databaseChecker = new ConfigDatabaseChecker(
             $this->lockObject,
             $this->doctrine,
@@ -53,7 +56,8 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('isLocked')
             ->willReturn(false);
 
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects(self::never())
+            ->method('isInstalled');
         $databaseChecker = new ConfigDatabaseChecker(
             $this->lockObject,
             $this->doctrine,
@@ -77,7 +81,8 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('isLocked')
             ->willReturn(true);
 
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects(self::never())
+            ->method('isInstalled');
 
         $databaseChecker = new ConfigDatabaseChecker(
             $this->lockObject,
@@ -104,7 +109,9 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('isLocked')
             ->willReturn(false);
 
-        $this->applicationState->method('isInstalled')->willReturn(false);
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(false);
 
         $databaseChecker = new ConfigDatabaseChecker(
             $this->lockObject,
@@ -128,7 +135,9 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('isLocked')
             ->willReturn(true);
 
-        $this->applicationState->method('isInstalled')->willReturn(false);
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(false);
 
         $databaseChecker = new ConfigDatabaseChecker(
             $this->lockObject,
@@ -157,7 +166,9 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('isLocked')
             ->willReturn(false);
 
-        $this->applicationState->method('isInstalled')->willReturn(false);
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(false);
 
         $databaseChecker = new ConfigDatabaseChecker(
             $this->lockObject,

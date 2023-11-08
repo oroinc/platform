@@ -2,108 +2,59 @@
 
 namespace Oro\Bundle\ConfigBundle\Config\ApiTree;
 
+/**
+ * The definition of a section in API configuration tree.
+ */
 class SectionDefinition
 {
-    /** @var string */
-    protected $name;
+    private string $name;
+    /** @var VariableDefinition[] [variable key => variable definition, ...] */
+    private array $variables = [];
+    /** @var SectionDefinition[] [section name => section definition, ...] */
+    private array $subSections = [];
 
-    /** @var VariableDefinition[] */
-    protected $variables = [];
-
-    /** @var SectionDefinition[] */
-    protected $subSections = [];
-
-    /**
-     * @param string $name
-     */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $key
-     *
-     * @return VariableDefinition|null
-     */
-    public function getVariable($key)
+    public function getVariable(string $key): ?VariableDefinition
     {
-        if (!isset($this->variables[$key])) {
-            return null;
-        }
-
-        return $this->variables[$key];
+        return $this->variables[$key] ?? null;
     }
 
     /**
-     * @param boolean $deep
-     * @param boolean $useVariableKeyAsArrayKey
-     *
      * @return VariableDefinition[]
      */
-    public function getVariables($deep = false, $useVariableKeyAsArrayKey = false)
+    public function getVariables(): array
     {
-        /** @var VariableDefinition[] $variables */
-        $variables = $this->variables;
-
-        if ($deep) {
-            foreach ($this->subSections as $subSection) {
-                $variables = array_merge($variables, $subSection->getVariables($deep, true));
-            }
-        }
-
-        return $useVariableKeyAsArrayKey
-            ? $variables
-            : array_values($variables);
+        return array_values($this->variables);
     }
 
-    public function addVariable(VariableDefinition $variable)
+    public function addVariable(VariableDefinition $variable): void
     {
         $this->variables[$variable->getKey()] = $variable;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return SectionDefinition|null
-     */
-    public function getSubSection($name)
+    public function getSubSection(string $name): ?SectionDefinition
     {
-        if (!isset($this->subSections[$name])) {
-            return null;
-        }
-
-        return $this->subSections[$name];
+        return $this->subSections[$name] ?? null;
     }
 
     /**
-     * @param boolean $deep
-     *
      * @return SectionDefinition[]
      */
-    public function getSubSections($deep = false)
+    public function getSubSections(): array
     {
-        /** @var SectionDefinition[] $result */
-        $result = array_values($this->subSections);
-
-        if ($deep) {
-            foreach ($this->subSections as $subSection) {
-                $result = array_merge($result, $subSection->getSubSections($deep));
-            }
-        }
-
-        return $result;
+        return array_values($this->subSections);
     }
 
-    public function addSubSection(SectionDefinition $subSection)
+    public function addSubSection(SectionDefinition $subSection): void
     {
         $this->subSections[$subSection->getName()] = $subSection;
     }

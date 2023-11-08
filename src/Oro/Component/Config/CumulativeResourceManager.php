@@ -5,25 +5,16 @@ namespace Oro\Component\Config;
 /**
  * Represents a state for cumulative resource loaders.
  */
-class CumulativeResourceManager
+final class CumulativeResourceManager
 {
-    /** @var CumulativeResourceManager */
-    private static $instance;
-
-    /** @var string */
-    private $appRootDir;
-
-    /** @var array */
-    private $bundles = [];
-
-    /** @var array */
-    private $bundleDirs = [];
-
-    /** @var array */
-    private $bundleAppDirs = [];
-
-    /** @var array */
-    private $dirs = [];
+    private static ?CumulativeResourceManager $instance = null;
+    /** @var callable|null */
+    private $initializer;
+    private ?string $appRootDir = null;
+    private array $bundles = [];
+    private array $bundleDirs = [];
+    private array $bundleAppDirs = [];
+    private array $dirs = [];
 
     /**
      * Gets a singleton instance of the cumulative resource manager.
@@ -49,11 +40,22 @@ class CumulativeResourceManager
      */
     public function clear(): CumulativeResourceManager
     {
+        $this->initializer = null;
         $this->appRootDir = null;
         $this->bundles = [];
         $this->bundleDirs = [];
         $this->bundleAppDirs = [];
         $this->dirs = [];
+
+        return $this;
+    }
+
+    /**
+     * Sets a function that should be called to initialize this manager.
+     */
+    public function setInitializer(callable $initializer): CumulativeResourceManager
+    {
+        $this->initializer = $initializer;
 
         return $this;
     }
@@ -65,6 +67,8 @@ class CumulativeResourceManager
      */
     public function getBundles(): array
     {
+        $this->ensureInitialized();
+
         return $this->bundles;
     }
 
@@ -77,6 +81,8 @@ class CumulativeResourceManager
      */
     public function setBundles(array $bundles): CumulativeResourceManager
     {
+        $this->ensureInitialized();
+
         $this->bundles = $bundles;
 
         return $this;
@@ -87,6 +93,8 @@ class CumulativeResourceManager
      */
     public function getAppRootDir(): ?string
     {
+        $this->ensureInitialized();
+
         return $this->appRootDir;
     }
 
@@ -95,6 +103,8 @@ class CumulativeResourceManager
      */
     public function setAppRootDir(?string $appRootDir): CumulativeResourceManager
     {
+        $this->ensureInitialized();
+
         $this->appRootDir = $appRootDir;
 
         return $this;
@@ -105,6 +115,8 @@ class CumulativeResourceManager
      */
     public function getBundleDir(string $bundleClass): string
     {
+        $this->ensureInitialized();
+
         if (isset($this->bundleDirs[$bundleClass])) {
             return $this->bundleDirs[$bundleClass];
         }
@@ -120,13 +132,14 @@ class CumulativeResourceManager
      */
     public function getBundleAppDir(string $bundleName): string
     {
+        $this->ensureInitialized();
+
         if (isset($this->bundleAppDirs[$bundleName])) {
             return $this->bundleAppDirs[$bundleName];
         }
 
-        $appRootDir = $this->getAppRootDir();
-        $bundleAppDir = $this->appRootDir && $this->isDir($this->appRootDir)
-            ? $appRootDir . '/Resources/' . $bundleName
+        $bundleAppDir = $this->appRootDir && $this->isDirectory($this->appRootDir)
+            ? $this->appRootDir . '/Resources/' . $bundleName
             : '';
         $this->bundleAppDirs[$bundleName] = $bundleAppDir;
 
@@ -142,6 +155,13 @@ class CumulativeResourceManager
             return false;
         }
 
+        $this->ensureInitialized();
+
+        return $this->isDirectory($path);
+    }
+
+    private function isDirectory(string $path): bool
+    {
         if (isset($this->dirs[$path])) {
             return $this->dirs[$path];
         }
@@ -150,5 +170,14 @@ class CumulativeResourceManager
         $this->dirs[$path] = $isDir;
 
         return $isDir;
+    }
+
+    private function ensureInitialized(): void
+    {
+        if (null !== $this->initializer) {
+            $initializer = $this->initializer;
+            $this->initializer = null;
+            $initializer($this);
+        }
     }
 }

@@ -245,6 +245,12 @@ oro_behat_extension:
     Close Fullscreen Popup:
       selector: '.fullscreen-popup .close-dialog'
 
+    Grid Toolbar Action Filter Toggle:
+      selector: '.btn .fa-filter'
+
+    Grid Row Save Changes:
+      selector: '.inline-editor__action-item[type="submit"]'
+
   suites:
     OroDataGridBundle:
       contexts:

@@ -1,10 +1,10 @@
 api:
     entity_aliases:
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection:
-            alias:        configuration
+            alias: configuration
             plural_alias: configuration
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption:
-            alias:        configurationoption
+            alias: configurationoption
             plural_alias: configurationoptions
 
     entities:
@@ -20,10 +20,7 @@ api:
                     target_type: collection
                     max_results: -1 # no limit for the number of configuration options
             actions:
-                get:
-                    acl_resource: oro_config_system
                 get_list:
-                    acl_resource: oro_config_system
                     page_size: -1 # disable paging
                     disable_sorting: true
                 create: false
@@ -34,6 +31,7 @@ api:
                 get_relationship: false
 
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption:
+            documentation_resource: '@OroConfigBundle/Resources/doc/api/configuration_option.md'
             disable_meta_properties: true
             identifier_field_names: [key]
             fields:
@@ -49,5 +47,16 @@ api:
                     data_type: datetime
                 updatedAt:
                     data_type: datetime
-            # this entity does not have own API resource
-            actions: false
+            filters:
+                fields:
+                    key:
+                        data_type: string
+                        allow_array: true
+                        operators: [ '=' ]
+            actions:
+                get_list:
+                    disable_sorting: true
+                create: false
+                update: false
+                delete: false
+                delete_list: false
