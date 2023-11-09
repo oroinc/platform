@@ -18,7 +18,15 @@ class RecalculateEmailVisibilityTopicTest extends AbstractTopicTestCase
     public function validBodyDataProvider(): array
     {
         return [
-            'has email' => [
+            'has email array' => [
+                'body' => [
+                    'email' => ['test@example.com']
+                ],
+                'expectedBody' => [
+                    'email' => ['test@example.com']
+                ]
+            ],
+            'has email string' => [
                 'body' => [
                     'email' => 'test@example.com'
                 ],
@@ -37,16 +45,17 @@ class RecalculateEmailVisibilityTopicTest extends AbstractTopicTestCase
                 'exceptionClass' => MissingOptionsException::class,
                 'exceptionMessage' => '/The required option "email" is missing./'
             ],
-            'empty email' => [
-                'body' => ['email' => ''],
+            'empty emails' => [
+                'body' => ['email' => []],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The "email" was expected to be not empty./'
+                'exceptionMessage' => '/At least one email should be provided./'
             ],
             'invalid email type' => [
-                'body' => ['email' => 1],
+                'body' => ['email' => [1]],
                 'exceptionClass' => InvalidOptionsException::class,
-                'exceptionMessage' => '/The option "email" with value 1 is expected to be of type "string",'
-                    . ' but is of type "int"./'
+                'exceptionMessage' => '/The option "email" with value array'
+                    . ' is expected to be of type "string\[\]" or "string",'
+                    . ' but one of the elements is of type "int"./'
             ]
         ];
     }
@@ -56,6 +65,14 @@ class RecalculateEmailVisibilityTopicTest extends AbstractTopicTestCase
         self::assertSame(
             'oro.email.recalculate_email_visibility:' . md5('test@test.com'),
             $this->getTopic()->createJobName(['email' => 'test@test.com'])
+        );
+    }
+
+    public function testCreateJobNameWithEmailsParameter(): void
+    {
+        self::assertSame(
+            'oro.email.recalculate_email_visibility:' . md5('test@test.com,test1@test.com'),
+            $this->getTopic()->createJobName(['email' => ['test@test.com', 'test1@test.com']])
         );
     }
 }

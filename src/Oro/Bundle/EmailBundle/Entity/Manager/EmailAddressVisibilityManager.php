@@ -63,6 +63,8 @@ class EmailAddressVisibilityManager
         foreach ($emails as $email) {
             $this->collectEmailAddressOnUpdate($email);
         }
+
+        $this->producer->send(RecalculateEmailVisibilityTopic::getName(), ['email' => $emails]);
     }
 
     /**
@@ -134,8 +136,6 @@ class EmailAddressVisibilityManager
         foreach ($visibilityPerOrganizations as $organizationId => $visible) {
             $this->updateEmailAddressVisibility($emailAddress, $organizationId, $visible);
         }
-
-        $this->producer->send(RecalculateEmailVisibilityTopic::getName(), ['email' => $emailAddress]);
     }
 
     private function isEmailPublic(array $emailAddresses, int $organizationId): bool

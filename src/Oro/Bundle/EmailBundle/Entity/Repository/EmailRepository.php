@@ -313,6 +313,22 @@ class EmailRepository extends EntityRepository
         return $qb;
     }
 
+    public function getEmailUserIdsByEmailAddressesQb(array $emailAddresses): QueryBuilder
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('eu.id')
+            ->distinct()
+            ->from(EmailUser::class, 'eu')
+            ->join('eu.email', 'e')
+            ->join('e.recipients', 'r')
+            ->join('r.emailAddress', 'rea')
+            ->join('e.fromEmailAddress', 'fea')
+            ->where('fea.email IN (:emails) OR rea.email IN (:emails)')
+            ->setParameter('emails', $emailAddresses);
+
+        return $qb;
+    }
+
     public function isEmailPublic(int $emailId): bool
     {
         $rows = $this->_em->createQueryBuilder()
