@@ -292,7 +292,7 @@ class EmailAddressVisibilityManagerTest extends \PHPUnit\Framework\TestCase
             );
         $this->producer->expects(self::once())
             ->method('send')
-            ->with(RecalculateEmailVisibilityTopic::getName(), ['email' => $emailAddress]);
+            ->with(RecalculateEmailVisibilityTopic::getName(), ['email' => [$emailAddress]]);
 
         $this->manager->collectEmailAddresses([$emailAddress]);
     }
@@ -331,7 +331,7 @@ class EmailAddressVisibilityManagerTest extends \PHPUnit\Framework\TestCase
             );
         $this->producer->expects(self::once())
             ->method('send')
-            ->with(RecalculateEmailVisibilityTopic::getName(), ['email' => $emailAddress]);
+            ->with(RecalculateEmailVisibilityTopic::getName(), ['email' => [$emailAddress]]);
 
         $this->manager->collectEmailAddresses([$emailAddress]);
     }
@@ -368,7 +368,7 @@ class EmailAddressVisibilityManagerTest extends \PHPUnit\Framework\TestCase
             );
         $this->producer->expects(self::once())
             ->method('send')
-            ->with(RecalculateEmailVisibilityTopic::getName(), ['email' => $emailAddress]);
+            ->with(RecalculateEmailVisibilityTopic::getName(), ['email' => [$emailAddress]]);
 
         $this->manager->collectEmailAddresses([$emailAddress]);
     }

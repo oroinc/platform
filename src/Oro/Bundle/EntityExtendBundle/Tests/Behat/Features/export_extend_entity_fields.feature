@@ -44,6 +44,7 @@ Feature: Export extend entity fields
       | Select Field        | Carte d'identité                          |
       | Call date & time    | <DateTime:2016-10-31 08:00:00>            |
     And check "Carte d'identité"
+    And I take screenshot
     And save and close form
     Then should see "Call saved" flash message
     And I take screenshot
@@ -58,7 +59,6 @@ Feature: Export extend entity fields
 
   Scenario: Export call and check fields
     Given go to Activities/ Calls
-    And I take screenshot
     And should see "Export Grid"
     When I click "Export Grid"
     And click "CSV"
