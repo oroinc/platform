@@ -1012,7 +1012,7 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
             if ($flashMessage->isValid() && $flashMessage->isVisible()) {
                 /** @var NodeElement $closeButton */
                 $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
-                if ($closeButton->isValid() && $closeButton->isVisible()) {
+                if ($closeButton && $closeButton->isValid() && $closeButton->isVisible()) {
                     $closeButton->press();
                 }
             }
