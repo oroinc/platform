@@ -119,6 +119,9 @@ $icon-font: 'FontAwesome';
 // Fonts sizes
 $root-font-size: 14px !default;
 $base-font-size: 14px !default;
+$base-font-size--large: 16px !default;
+$base-font-size--s: 13px !default;
+$base-font-size--xs: 12px !default;
 $base-line-height: 1.5 !default;
 $base-font-weight: font-weight('normal') !default;
 
@@ -126,9 +129,7 @@ $base-font-weight: font-weight('normal') !default;
 $global-font-smoothing: true !default;
 
 // Old variables
-$base-font-size--large: 16px !default;
-$base-font-size--xs: 11px !default;
-$base-font-size--s: 13px !default;
+
 $base-font-size--m: 20px !default;
 $base-font-size--l: 23px !default;
 $base-font-size--xl: 26px !default;
