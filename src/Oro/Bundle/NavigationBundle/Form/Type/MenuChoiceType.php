@@ -28,8 +28,13 @@ class MenuChoiceType extends AbstractType
 
         $resolver->setDefault('choices', function (Options $options) {
             $menuNames = $this->menuNamesProvider->getMenuNames($options['scope_type']);
+            $choices = array_combine($menuNames, $menuNames);
 
-            return array_combine($menuNames, $menuNames);
+            if (array_key_exists('allowClear', $options['configs']) && $options['configs']['allowClear']) {
+                array_unshift($choices, '');
+            }
+
+            return $choices;
         });
 
         $resolver->setDefault('translatable_options', false);
