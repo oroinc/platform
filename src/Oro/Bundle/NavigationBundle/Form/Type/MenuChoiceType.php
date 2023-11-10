@@ -5,8 +5,13 @@ namespace Oro\Bundle\NavigationBundle\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\NavigationBundle\Provider\MenuNamesProvider;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Choice form type for menu names.
@@ -30,15 +35,17 @@ class MenuChoiceType extends AbstractType
             $menuNames = $this->menuNamesProvider->getMenuNames($options['scope_type']);
             $choices = array_combine($menuNames, $menuNames);
 
-            if (array_key_exists('allowClear', $options['configs']) && $options['configs']['allowClear']) {
+            if($options['configs']['allowClear'] ?? false){
                 array_unshift($choices, '');
             }
-
             return $choices;
         });
 
         $resolver->setDefault('translatable_options', false);
         $resolver->setDefault('multiple', false);
+        $resolver->setDefault('configs', [
+            'allowClear' => false
+        ]);
     }
 
     public function getParent(): string
