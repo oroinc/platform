@@ -3,21 +3,16 @@
 .oro-toolbar {
     position: relative;
 
-    display: inline-block;
-    vertical-align: top;
-
     &__icon {
-        display: inline-block;
-        vertical-align: top;
-
         margin-left: $oro-toolbar-icon-offset;
     }
 
     &__content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         min-width: $oro-toolbar-content-min-width;
-
         padding: $oro-toolbar-content-inner-offset;
-
         line-height: $oro-toolbar-content-line-height;
         text-align: $oro-toolbar-content-text-align;
 
