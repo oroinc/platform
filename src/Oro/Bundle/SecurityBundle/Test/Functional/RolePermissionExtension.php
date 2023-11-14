@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Test\Functional;
 
-use Doctrine\Common\Cache\ApcCache;
-use Doctrine\Common\Cache\XcacheCache;
-use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
@@ -25,13 +22,8 @@ trait RolePermissionExtension
      */
     public static function clearAclCache(): void
     {
-        /** @var EntityManagerInterface $em */
-        $em = self::getContainer()->get('doctrine')->getManager();
-        $cacheDriver = $em->getConfiguration()->getQueryCacheImpl();
-        if ($cacheDriver && !($cacheDriver instanceof ApcCache && $cacheDriver instanceof XcacheCache)) {
-            $cacheDriver->deleteAll();
-        }
         $container = self::getContainer();
+        $container->get('oro_security.acl_query.cache_provider')->clear();
         $container->get('oro_security.tests.security.acl.cache.doctrine')->clearCache();
 
         if ($container->has('oro_customer.security.acl.visitor.cache')) {
@@ -164,12 +156,7 @@ trait RolePermissionExtension
         $aclManager->flush();
 
         if (!self::isDbIsolationPerTest()) {
-            /** @var EntityManagerInterface $em */
-            $em = self::getContainer()->get('doctrine')->getManager();
-            $cacheDriver = $em->getConfiguration()->getQueryCacheImpl();
-            if ($cacheDriver && !($cacheDriver instanceof ApcCache && $cacheDriver instanceof XcacheCache)) {
-                $cacheDriver->deleteAll();
-            }
+            self::getContainer()->get('oro_security.acl_query.cache_provider')->clear();
         }
     }
 

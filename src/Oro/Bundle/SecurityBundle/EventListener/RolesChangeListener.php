@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Doctrine\Common\Cache\ApcCache;
-use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
  * Listener that clears the doctrine query caches if user roles list was changed.
+ * @deprecated The 'oro_security.roles_change_listener' service was removed. The listener now processed in scope of
+ * CustomerUserDoctrineAclCacheListener.
  */
 class RolesChangeListener
 {
@@ -38,8 +39,8 @@ class RolesChangeListener
             return;
         }
 
-        $cacheDriver = $args->getEntityManager()->getConfiguration()->getQueryCacheImpl();
-        if (!$cacheDriver || $cacheDriver instanceof ApcCache || $cacheDriver instanceof XcacheCache) {
+        $cacheDriver = $args->getEntityManager()->getConfiguration()->getQueryCache();
+        if (!$cacheDriver) {
             return;
         }
 
@@ -47,8 +48,8 @@ class RolesChangeListener
         $this->isCacheOutdated = $this->checkRolesRelations($uow->getScheduledCollectionUpdates())
             || $this->checkRolesRelations($uow->getScheduledCollectionDeletions());
 
-        if ($this->isCacheOutdated) {
-            $cacheDriver->deleteAll();
+        if ($this->isCacheOutdated && $cacheDriver instanceof AdapterInterface) {
+            $cacheDriver->clear();
         }
     }
 
