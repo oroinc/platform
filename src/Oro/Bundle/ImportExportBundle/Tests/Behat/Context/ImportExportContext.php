@@ -23,6 +23,7 @@ use PHPUnit\Framework\ExpectationFailedException;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class ImportExportContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -712,6 +713,17 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
     {
         $this->importFile = $this->template;
         $this->iImportFile();
+    }
+
+    /**
+     * Validate downloaded template file without changes
+     *
+     * @When /^(?:|I )validate downloaded template file$/
+     */
+    public function iValidateDownloadedTemplate()
+    {
+        $this->importFile = $this->template;
+        $this->iValidateFile();
     }
 
     /**
