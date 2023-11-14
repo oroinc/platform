@@ -106,6 +106,9 @@ class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
         $uow->expects($this->once())
             ->method('removeFromIdentityMap')
             ->with($businessUnit);
+        $uow->expects($this->once())
+            ->method('cancelOrphanRemoval')
+            ->with($businessUnit);
 
         $this->helper->rememberAlteredCollectionsItems($organization);
         $this->helper->revertRelations();
