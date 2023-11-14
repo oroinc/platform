@@ -10,6 +10,7 @@ use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
+use Oro\Bundle\SecurityBundle\Cache\DoctrineAclCacheProvider;
 use Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilter;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
@@ -18,7 +19,6 @@ use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,58 +31,22 @@ use Symfony\Component\Security\Acl\Model\AclCacheInterface;
  */
 class AclRoleHandler
 {
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var FormFactory
-     */
-    protected $formFactory;
-
-    /**
-     * @var FormInterface
-     */
-    protected $form;
-
-    /**
-     * @var ManagerRegistry
-     */
-    protected $managerRegistry;
-
-    /**
-     * @var AclManager
-     */
-    protected $aclManager;
-
-    /**
-     * @var AclPrivilegeRepository
-     */
-    protected $privilegeRepository;
-
-    /**
-     * @var AclCacheInterface
-     */
-    protected $aclCache;
-
-    /**
-     * @var array
-     */
-    protected $privilegeConfig;
+    protected Request $request;
+    protected FormFactory $formFactory;
+    protected FormInterface $form;
+    protected ManagerRegistry $managerRegistry;
+    protected AclManager $aclManager;
+    protected AclPrivilegeRepository $privilegeRepository;
+    protected AclCacheInterface $aclCache;
+    protected array $privilegeConfig;
 
     /**
      * ['<extension_key>' => ['<allowed_group>', ...], ...]
-     *
-     * @var array
      */
-    protected $extensionFilters = [];
-
-    /** @var string */
-    protected $configurableName;
-
-    /** @var AclPrivilegeConfigurableFilter */
-    protected $configurableFilter;
+    protected array $extensionFilters = [];
+    protected string $configurableName;
+    protected AclPrivilegeConfigurableFilter $configurableFilter;
+    protected DoctrineAclCacheProvider $queryCacheProvider;
 
     public function __construct(FormFactory $formFactory, AclCacheInterface $aclCache, array $privilegeConfig)
     {
@@ -90,6 +54,11 @@ class AclRoleHandler
         $this->aclCache = $aclCache;
         $this->privilegeConfig = $privilegeConfig;
         $this->configurableName = ConfigurablePermissionProvider::DEFAULT_CONFIGURABLE_NAME;
+    }
+
+    public function setQueryCacheProvider(DoctrineAclCacheProvider $queryCacheProvider): void
+    {
+        $this->queryCacheProvider = $queryCacheProvider;
     }
 
     public function setAclManager(AclManager $aclManager)
@@ -327,9 +296,12 @@ class AclRoleHandler
 
         // Clear doctrine query cache to be sure that queries will process hints
         // again with updated security information.
-        $cacheDriver = $this->managerRegistry->getManager()->getConfiguration()->getQueryCache();
-        if ($cacheDriver instanceof AdapterInterface) {
-            $cacheDriver->clear();
+        $roleUsers = [];
+        foreach ($role->getUsers() as $user) {
+            $roleUsers[] = $user->getId();
+        }
+        if (count($roleUsers)) {
+            $this->queryCacheProvider->clearForEntities(User::class, $roleUsers);
         }
     }
 

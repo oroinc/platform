@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
+use Oro\Bundle\SecurityBundle\Cache\DoctrineAclCacheProvider;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
@@ -27,6 +28,7 @@ class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        $queryCacheProvider = $this->createMock(DoctrineAclCacheProvider::class);
         $factory = $this->createMock(FormFactory::class);
         $aclCache = $this->createMock(AclCacheInterface::class);
         $this->privilegeRepository = $this->createMock(AclPrivilegeRepository::class);
@@ -35,6 +37,7 @@ class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new AclRoleHandler($factory, $aclCache, []);
         $this->handler->setAclPrivilegeRepository($this->privilegeRepository);
         $this->handler->setAclManager($this->aclManager);
+        $this->handler->setQueryCacheProvider($queryCacheProvider);
     }
 
     public function testAddExtensionFilter()
