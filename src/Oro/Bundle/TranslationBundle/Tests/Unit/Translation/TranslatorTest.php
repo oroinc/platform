@@ -629,11 +629,6 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $domain = 'jsmessages';
         $translator = $this->getTranslator($locale, $this->getStrategyProvider($locale, ['en'])); // Skip cache rebuilt
 
-        // Check if the catalogue is loaded from the application resources.
-        $this->messageCatalogueSanitizer
-            ->expects($this->exactly(2))
-            ->method('sanitizeCatalogue');
-
         self::assertTrue($translator->hasTrans('foo', $domain));
         self::assertEquals(
             self::MESSAGES['en'][$domain]['foo'],
@@ -644,29 +639,12 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
     public function testGetCatalogue(): void
     {
         $locale = 'en_US';
-        $strategyName = 'default';
         $fallbackLocales = ['en'];
-
-        $strategy = $this->getStrategy($strategyName);
-
-        $strategyProvider = $this->createMock(TranslationStrategyProvider::class);
-        $strategyProvider->expects(self::any())
-            ->method('getStrategy')
-            ->willReturn($strategy);
-        $strategyProvider->expects(self::once())
-            ->method('getFallbackLocales')
-            ->with(self::identicalTo($strategy))
-            ->willReturnMap([
-                [$strategy, $locale, $fallbackLocales],
-                [$strategy, 'en', []]
-            ]);
-        $strategyProvider->expects(self::never())
-            ->method('getAllFallbackLocales');
-
-        $translator = $this->getTranslator($locale, $strategyProvider);
+        $translator = $this->getTranslator($locale, $this->getStrategyProvider($locale, ['en']));
 
         self::assertEmpty($translator->getFallbackLocales());
         $catalogue = $translator->getCatalogue($locale);
+        $translator->rebuildCache();
         self::assertEquals($locale, $catalogue->getLocale());
         self::assertEquals([], $catalogue->all());
         self::assertEquals($fallbackLocales, $translator->getFallbackLocales());

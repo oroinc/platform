@@ -147,7 +147,9 @@ class RelatedEntityStateHelper
     {
         foreach ($this->collectionSnapshotItems as $collection) {
             foreach ($collection as $item) {
-                $this->doctrineHelper->getEntityManager($item)->getUnitOfWork()->removeFromIdentityMap($item);
+                $unitOfWork = $this->doctrineHelper->getEntityManager($item)->getUnitOfWork();
+                $unitOfWork->removeFromIdentityMap($item);
+                $unitOfWork->cancelOrphanRemoval($item);
             }
         }
     }
