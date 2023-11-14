@@ -255,6 +255,7 @@ services:
             - [setManagerRegistry, ["@doctrine"]]
             - [setConfigurableName, ['default']]
             - [setConfigurableFilter, ["@oro_security.filter.configurable_permission_filter"]]
+            - [setQueryCacheProvider, ['@oro_security.acl_query.cache_provider']]
 
     oro_user.form.handler.acl_role:
         parent: oro_user.form.handler.abstract.acl_role

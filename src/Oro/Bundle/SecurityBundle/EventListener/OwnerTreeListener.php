@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Doctrine\Common\Cache\ApcCache;
-use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
@@ -55,16 +53,13 @@ class OwnerTreeListener
             || $this->checkUpdatedEntities($uow)
             || $this->checkToManyRelations($uow->getScheduledCollectionUpdates())
             || $this->checkToManyRelations($uow->getScheduledCollectionDeletions());
+    }
 
+    public function postFlush(): void
+    {
         if ($this->isCacheOutdated) {
             $this->treeProvider->clearCache();
-
-            // Clear doctrine query cache to be sure that queries will process hints
-            // again with updated security information.
-            $cacheDriver = $args->getEntityManager()->getConfiguration()->getQueryCacheImpl();
-            if ($cacheDriver && !($cacheDriver instanceof ApcCache && $cacheDriver instanceof XcacheCache)) {
-                $cacheDriver->deleteAll();
-            }
+            $this->isCacheOutdated = false;
         }
     }
 

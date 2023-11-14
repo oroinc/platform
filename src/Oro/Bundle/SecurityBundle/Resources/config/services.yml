@@ -363,6 +363,8 @@ services:
         public: true
         arguments:
             - '@oro_security.access_rule_walker_context_factory'
+        calls:
+            - [setQueryCacheProvider, ['@oro_security.acl_query.cache_provider']]
 
     Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper:
         alias: oro_security.acl_helper
@@ -449,11 +451,13 @@ services:
             - ['addSupportedClass', ['Oro\Bundle\OrganizationBundle\Entity\Organization']]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
 
-    oro_security.roles_change_listener:
-        class: Oro\Bundle\SecurityBundle\EventListener\RolesChangeListener
-        calls:
-            - [ 'addSupportedClass', [ 'Oro\Bundle\UserBundle\Entity\User'] ]
+    oro_security.doctrine_acl_cache_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\DoctrineAclCacheListener
+        arguments:
+            - '@oro_security.acl_query.cache_provider'
+            - '@oro_security.ownership_tree_provider'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
@@ -867,3 +871,20 @@ services:
     Oro\Bundle\SecurityBundle\Util\SameSiteUrlHelper:
         alias: oro_security.util.same_site_url_helper
         public: true
+
+    oro_security.acl_query.cache_instantiator:
+        class: Oro\Bundle\SecurityBundle\Cache\CacheInstantiator
+        arguments:
+            - '%kernel.cache_dir%/oro_data'
+            - '@?snc_redis.doctrine'
+
+    oro_security.acl_query.cache_user_info_provider:
+        class: Oro\Bundle\SecurityBundle\Cache\DoctrineAclCacheUserInfoProvider
+        arguments:
+            - '@oro_security.token_accessor'
+
+    oro_security.acl_query.cache_provider:
+        class: Oro\Bundle\SecurityBundle\Cache\DoctrineAclCacheProvider
+        arguments:
+            - '@oro_security.acl_query.cache_instantiator'
+            - '@oro_security.acl_query.cache_user_info_provider'

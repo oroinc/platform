@@ -12,9 +12,6 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
     /** @var iterable|OwnerTreeProviderInterface[] */
     private $providers;
 
-    /**
-     * @param iterable|OwnerTreeProviderInterface[] $providers
-     */
     public function __construct(iterable $providers)
     {
         $this->providers = $providers;
@@ -46,7 +43,7 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function clearCache(): void
     {
@@ -56,7 +53,7 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function warmUpCache(): void
     {

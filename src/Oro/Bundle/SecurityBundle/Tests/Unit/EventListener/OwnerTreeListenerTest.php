@@ -53,6 +53,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->listener = new OwnerTreeListener($this->treeProvider);
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestOrganization');
         $this->em->getEventManager()->addEventListener('onFlush', $this->listener);
+        $this->em->getEventManager()->addEventListener('postFlush', $this->listener);
     }
 
     private function setInsertQueryExpectation()
