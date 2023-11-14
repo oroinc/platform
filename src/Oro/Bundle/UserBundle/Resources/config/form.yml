@@ -237,6 +237,7 @@ services:
         arguments:
             - '@form.factory'
             - '@security.acl.cache.doctrine'
+            - '@oro_security.acl_query.cache_provider'
             - '%oro_user.privileges%'
         calls:
             - [setAclManager, ["@oro_security.acl.manager"]]

@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Test\Functional;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 
 /**
  * This trait can be used in functional tests where you need to change permissions for security roles.
@@ -24,13 +22,8 @@ trait RolePermissionExtension
      */
     public static function clearAclCache(): void
     {
-        /** @var EntityManagerInterface $em */
-        $em = self::getContainer()->get('doctrine')->getManager();
-        $cacheDriver = $em->getConfiguration()->getQueryCache();
-        if ($cacheDriver instanceof AdapterInterface) {
-            $cacheDriver->clear();
-        }
         $container = self::getContainer();
+        $container->get('oro_security.acl_query.cache_provider')->clear();
         $container->get('oro_security.tests.security.acl.cache.doctrine')->clearCache();
 
         if ($container->has('oro_customer.security.acl.visitor.cache')) {
@@ -163,12 +156,7 @@ trait RolePermissionExtension
         $aclManager->flush();
 
         if (!self::isDbIsolationPerTest()) {
-            /** @var EntityManagerInterface $em */
-            $em = self::getContainer()->get('doctrine')->getManager();
-            $cacheDriver = $em->getConfiguration()->getQueryCache();
-            if ($cacheDriver instanceof AdapterInterface) {
-                $cacheDriver->clear();
-            }
+            self::getContainer()->get('oro_security.acl_query.cache_provider')->clear();
         }
     }
 
