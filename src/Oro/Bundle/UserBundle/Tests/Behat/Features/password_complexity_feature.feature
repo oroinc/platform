@@ -107,7 +107,8 @@ Feature: Password complexity feature
       | Email Address | AmandaRCole1@example.org |
       | Password      | AAAAa1!                  |
     And click "Sign In"
-    Then should see "Signed in as: Amanda Cole"
+    Then should see "Amanda Cole"
+    And I click "Account Dropdown"
     And click "Sign Out"
 
   Scenario: Uncheck all user password complexity options (dashboard user)
@@ -202,5 +203,6 @@ Feature: Password complexity feature
       | Email Address | EllenRRowel1@example.org |
       | Password      | 1111                     |
     And click "Sign In"
-    Then should see "Signed in as: Ellen Rowel"
+    Then should see "Ellen Rowel"
+    And I click "Account Dropdown"
     And click "Sign Out"
