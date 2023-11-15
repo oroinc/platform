@@ -3,6 +3,9 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\LayoutBundle\Command\DebugCommand;
+use Oro\Bundle\LayoutBundle\Command\DebugDataProviderSignatureCommand;
+use Oro\Bundle\LayoutBundle\Command\DebugLayoutBlockTypeSignatureCommand;
+use Oro\Bundle\LayoutBundle\Command\DebugLayoutContextConfiguratorsSignatureCommand;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -38,6 +41,21 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
                 new Reference('oro_layout.method_phpdoc_extractor'),
                 [],
                 []
+            ]);
+
+        $container->register(DebugDataProviderSignatureCommand::class)
+            ->setArguments([
+                new Reference('oro_layout.layout_manager'),
+                new Reference('oro_layout.method_phpdoc_extractor'),
+                [],
+            ]);
+        $container->register(DebugLayoutContextConfiguratorsSignatureCommand::class)
+            ->setArguments([
+                [],
+            ]);
+        $container->register(DebugLayoutBlockTypeSignatureCommand::class)
+            ->setArguments([
+                [],
             ]);
 
         return $container;
