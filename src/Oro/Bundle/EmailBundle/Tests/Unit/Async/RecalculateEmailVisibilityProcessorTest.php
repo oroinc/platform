@@ -96,7 +96,7 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
             . ' INNER JOIN oro_email_recipient o2_ ON o1_.id = o2_.email_id'
             . ' INNER JOIN EmailAddress e3_ ON o2_.email_address_id = e3_.id'
             . ' INNER JOIN EmailAddress e4_ ON o1_.from_email_address_id = e4_.id'
-            . ' WHERE e4_.email = ? OR e3_.email = ?',
+            . ' WHERE e4_.email IN (?) OR e3_.email IN (?)',
             [['sclr_0' => $count]],
             [1 => $email, 2 => $email],
             [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR]
@@ -111,7 +111,7 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
             . ' INNER JOIN oro_email_recipient o2_ ON o1_.id = o2_.email_id'
             . ' INNER JOIN EmailAddress e3_ ON o2_.email_address_id = e3_.id'
             . ' INNER JOIN EmailAddress e4_ ON o1_.from_email_address_id = e4_.id'
-            . ' WHERE e4_.email = ? OR e3_.email = ?'
+            . ' WHERE e4_.email IN (?) OR e3_.email IN (?)'
             . ' ORDER BY o0_.id ASC'
             . ' LIMIT ' . self::CHUNK_SIZE;
         if (null !== $offset) {
@@ -122,6 +122,44 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
             $data,
             [1 => $email, 2 => $email],
             [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR]
+        );
+    }
+
+    private function addCountQueryExpectationForArray(array $emails, int $count): void
+    {
+        $this->addQueryExpectation(
+            'SELECT DISTINCT count(DISTINCT o0_.id) AS sclr_0'
+            . ' FROM oro_email_user o0_'
+            . ' INNER JOIN oro_email o1_ ON o0_.email_id = o1_.id'
+            . ' INNER JOIN oro_email_recipient o2_ ON o1_.id = o2_.email_id'
+            . ' INNER JOIN EmailAddress e3_ ON o2_.email_address_id = e3_.id'
+            . ' INNER JOIN EmailAddress e4_ ON o1_.from_email_address_id = e4_.id'
+            . ' WHERE e4_.email IN (?, ?) OR e3_.email IN (?, ?)',
+            [['sclr_0' => $count]],
+            [1 => $emails[0], 2 => $emails[1], 3 => $emails[0], 4 => $emails[1]],
+            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR, 3 => \PDO::PARAM_STR, 4 => \PDO::PARAM_STR]
+        );
+    }
+
+    private function addDataQueryExpectationForArray(array $emails, array $data, int $offset = null): void
+    {
+        $sql = 'SELECT DISTINCT o0_.id AS id_0'
+            . ' FROM oro_email_user o0_'
+            . ' INNER JOIN oro_email o1_ ON o0_.email_id = o1_.id'
+            . ' INNER JOIN oro_email_recipient o2_ ON o1_.id = o2_.email_id'
+            . ' INNER JOIN EmailAddress e3_ ON o2_.email_address_id = e3_.id'
+            . ' INNER JOIN EmailAddress e4_ ON o1_.from_email_address_id = e4_.id'
+            . ' WHERE e4_.email IN (?, ?) OR e3_.email IN (?, ?)'
+            . ' ORDER BY o0_.id ASC'
+            . ' LIMIT ' . self::CHUNK_SIZE;
+        if (null !== $offset) {
+            $sql .= ' OFFSET ' . $offset;
+        }
+        $this->addQueryExpectation(
+            $sql,
+            $data,
+            [1 => $emails[0], 2 => $emails[1], 3 => $emails[0], 4 => $emails[1]],
+            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR, 3 => \PDO::PARAM_STR, 4 => \PDO::PARAM_STR]
         );
     }
 
@@ -262,6 +300,47 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
                     'jobId'=> $job2Id,
                     'ids'  => $expected2Data,
                 ]
+            ]
+        );
+    }
+
+    public function testProcessForSeveralEmails(): void
+    {
+        $email1 = 'tes31@test.com';
+        $email2 = 'tes32@test.com';
+        $jobName = self::JOB_NAME;
+
+        $messageId = 'test_message';
+        $message = $this->getMessage(['email' => [$email1, $email2]], $messageId);
+
+        $jobId = 123;
+        $job = new Job();
+
+        $this->addCountQueryExpectationForArray([$email1, $email2], 1);
+        $this->addDataQueryExpectationForArray([$email1, $email2], [['id_0' => 148]]);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $this->expectsRunUnique($message);
+        $this->jobRunner->expects(self::once())
+            ->method('createDelayed')
+            ->with(sprintf('%s:1', $jobName))
+            ->willReturnCallback(function ($name, $startCallback) use ($job, $jobId) {
+                $job->setId($jobId);
+
+                return $startCallback($this->jobRunner, $job);
+            });
+
+        $result = $this->processor->process(
+            $message,
+            $this->createMock(SessionInterface::class)
+        );
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
+
+        self::assertMessageSent(
+            RecalculateEmailVisibilityChunkTopic::getName(),
+            [
+                'jobId' => $jobId,
+                'ids'   => [148]
             ]
         );
     }

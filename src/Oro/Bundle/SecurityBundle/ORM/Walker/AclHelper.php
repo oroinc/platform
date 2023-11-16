@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\SecurityBundle\Cache\DoctrineAclCacheProvider;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 
 /**
@@ -16,12 +17,15 @@ class AclHelper
     public const CHECK_ROOT_ENTITY = 'checkRootEntity';
     public const CHECK_RELATIONS   = 'checkRelations';
 
-    /** @var AccessRuleWalkerContextFactoryInterface */
-    private $contextFactory;
+    private AccessRuleWalkerContextFactoryInterface $contextFactory;
+    private DoctrineAclCacheProvider $queryCacheProvider;
 
-    public function __construct(AccessRuleWalkerContextFactoryInterface $contextFactory)
-    {
+    public function __construct(
+        AccessRuleWalkerContextFactoryInterface $contextFactory,
+        DoctrineAclCacheProvider $queryCacheProvider
+    ) {
         $this->contextFactory = $contextFactory;
+        $this->queryCacheProvider = $queryCacheProvider;
     }
 
     /**
@@ -53,6 +57,7 @@ class AclHelper
 
         QueryUtil::addTreeWalker($query, AccessRuleWalker::class);
         $query->setHint(AccessRuleWalker::CONTEXT, $context);
+        $query->setQueryCache($this->queryCacheProvider->getCurrentUserCache());
 
         return $query;
     }

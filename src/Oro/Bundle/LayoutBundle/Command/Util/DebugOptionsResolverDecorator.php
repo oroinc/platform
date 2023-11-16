@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Command\Util;
 
-use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\PhpUtils\ReflectionUtil;
+use Symfony\Component\OptionsResolver\Options;
 
 /**
  * Decorator for layout option resolver that helps to get information about all registered options.
@@ -13,16 +13,16 @@ class DebugOptionsResolverDecorator
     public const NO_VALUE = 'NO_VALUE';
 
     /**
-     * @var OptionsResolver
+     * @var Options
      */
     protected $optionsResolver;
 
-    public function __construct(OptionsResolver $optionsResolver)
+    public function __construct(Options $optionsResolver)
     {
         $this->optionsResolver = $optionsResolver;
     }
 
-    public function getOptionResolver(): OptionsResolver
+    public function getOptionResolver(): Options
     {
         return $this->optionsResolver;
     }
@@ -80,7 +80,7 @@ class DebugOptionsResolverDecorator
      * @return mixed
      * @throws \ReflectionException
      */
-    private function getOptionPropertyValue($optionResolver, $propertyName)
+    protected function getOptionPropertyValue($optionResolver, $propertyName)
     {
         $baseOptionsResolver = $this->getPrivatePropertyValue($optionResolver, 'optionsResolver');
 
@@ -88,13 +88,13 @@ class DebugOptionsResolverDecorator
     }
 
     /**
-     * @param OptionsResolver $object
+     * @param Options $object
      * @param string                             $propertyName
      *
      * @return mixed
      * @throws \ReflectionException
      */
-    private function getPrivatePropertyValue($object, $propertyName)
+    protected function getPrivatePropertyValue($object, $propertyName)
     {
         $property = ReflectionUtil::getProperty(new \ReflectionClass($object), $propertyName);
         if (!$property) {
