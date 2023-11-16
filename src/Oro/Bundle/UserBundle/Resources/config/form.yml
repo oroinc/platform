@@ -251,7 +251,7 @@ services:
         public: true
         shared: false
         calls:
-            - [setRequest, ["@=service('request_stack').getCurrentRequest()"]]
+            - [setRequestStack, ['@request_stack']]
             - [addExtensionFilter, ['action', '']]    # only default group actions are allowed
 
     Oro\Bundle\UserBundle\Form\Handler\SetPasswordHandler:

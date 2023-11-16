@@ -22,6 +22,7 @@ use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
 /**
@@ -31,7 +32,7 @@ use Symfony\Component\Security\Acl\Model\AclCacheInterface;
  */
 class AclRoleHandler
 {
-    protected Request $request;
+    protected RequestStack $requestStack;
     protected FormFactory $formFactory;
     protected FormInterface $form;
     protected ManagerRegistry $managerRegistry;
@@ -76,9 +77,17 @@ class AclRoleHandler
         $this->managerRegistry = $registry;
     }
 
-    public function setRequest(Request $request)
+    /**
+     * @param RequestStack $requestStack
+     */
+    public function setRequestStack($requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
+    }
+
+    protected function getRequest(): Request
+    {
+        return $this->requestStack->getCurrentRequest();
     }
 
     /**
@@ -158,8 +167,8 @@ class AclRoleHandler
      */
     public function process(AbstractRole $role)
     {
-        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
-            $data = $this->request->request->get($this->form->getName(), []);
+        if (in_array($this->getRequest()->getMethod(), ['POST', 'PUT'])) {
+            $data = $this->getRequest()->request->get($this->form->getName(), []);
             $this->form->submit($data);
             if ($this->form->isValid()) {
                 $appendUsers = $this->form->get('appendUsers')->getData();
