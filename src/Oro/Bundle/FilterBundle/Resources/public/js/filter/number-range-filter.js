@@ -323,9 +323,18 @@ define(function(require) {
 
             if (!validValueEnd) {
                 return false;
-            } else {
-                return NumberRangeFilter.__super__._isValid.call(this);
             }
+
+            if (_.isNumber(this.min) && this.min > rawValue) {
+                this._showMinWarning();
+                return false;
+            }
+            if (_.isNumber(this.max) && this.max < rawValue) {
+                this._showMaxWarning();
+                return false;
+            }
+
+            return NumberRangeFilter.__super__._isValid.call(this);
         },
 
         getTemplateDataProps() {

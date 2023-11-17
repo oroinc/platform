@@ -18,14 +18,31 @@ class DefaultColumnFilteringOptionsGuesser extends AbstractColumnOptionsGuesser
     public function guessFilter($class, $property, $type)
     {
         switch ($type) {
-            case 'integer':
             case 'smallint':
-            case 'bigint':
-            case 'number':
                 $options = [
                     'type'    => 'number-range',
                     'options' => [
-                        'data_type' => NumberFilterType::DATA_INTEGER
+                        'data_type' => NumberFilterType::DATA_SMALLINT,
+                        'source_type' => $type
+                    ]
+                ];
+                break;
+            case 'number':
+            case 'bigint':
+                $options = [
+                    'type'    => 'number-range',
+                    'options' => [
+                        'data_type' => NumberFilterType::DATA_BIGINT,
+                        'source_type' => $type
+                    ]
+                ];
+                break;
+            case 'integer':
+                $options = [
+                    'type'    => 'number-range',
+                    'options' => [
+                        'data_type' => NumberFilterType::DATA_INTEGER,
+                        'source_type' => $type
                     ]
                 ];
                 break;
@@ -34,7 +51,8 @@ class DefaultColumnFilteringOptionsGuesser extends AbstractColumnOptionsGuesser
                 $options = [
                     'type'    => 'number-range',
                     'options' => [
-                        'data_type' => NumberFilterType::DATA_DECIMAL
+                        'data_type' => NumberFilterType::DATA_DECIMAL,
+                        'source_type' => $type
                     ]
                 ];
                 break;
@@ -55,12 +73,14 @@ class DefaultColumnFilteringOptionsGuesser extends AbstractColumnOptionsGuesser
                 break;
             case 'money':
                 $options = [
-                    'type' => 'number-range'
+                    'type' => 'number-range',
+                    'source_type' => $type
                 ];
                 break;
             case 'percent':
                 $options = [
-                    'type' => 'percent'
+                    'type' => 'percent',
+                    'source_type' => $type
                 ];
                 break;
             default:
