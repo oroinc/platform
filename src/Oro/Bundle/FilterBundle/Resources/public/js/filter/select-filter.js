@@ -178,7 +178,7 @@ define(function(require, exports, module) {
 
             SelectFilter.__super__.initialize.call(this, options);
 
-            if (this.lazy) {
+            if (this.lazy && this.renderableByDefault) {
                 this.loadedMetadata = false;
                 this.loader(
                     metadata => {
