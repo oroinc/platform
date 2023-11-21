@@ -34,6 +34,7 @@ expected:
             name:
                 name: name
                 target_type: text
+                target_fulltext: true
                 relation_fields: {}
                 target_fields:
                     - name
@@ -41,6 +42,7 @@ expected:
             subject:
                 name: subject
                 target_type: text
+                target_fulltext: true
                 relation_fields: {}
                 target_fields:
                     - subject

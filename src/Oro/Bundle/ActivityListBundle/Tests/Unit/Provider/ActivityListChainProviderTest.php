@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ActivityBundle\Tests\Unit\Stub\TestTarget;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\ActivityListBundle\Entity\Factory\ActivityListFactory;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\EntityStub;
@@ -17,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Test\ExtendedEntityTestTrait;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
@@ -24,9 +24,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
 {
+    use ExtendedEntityTestTrait;
+
     private const TEST_ACTIVITY_CLASS = EntityStub::class;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
@@ -44,9 +47,6 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var ActivityListFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityListFactory;
-
     /** @var TestActivityProvider */
     private $testActivityProvider;
 
@@ -57,10 +57,6 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->routeHelper = $this->createMock(EntityRoutingHelper::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-
-        $this->activityListFactory = $this->getMockBuilder(ActivityListFactory::class)
-            ->onlyMethods(['createActivityList'])
-            ->getMock();
 
         $this->testActivityProvider = new TestActivityProvider();
     }
@@ -84,8 +80,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
             $this->configManager,
             $this->translator,
             $this->routeHelper,
-            $this->tokenAccessor,
-            $this->activityListFactory
+            $this->tokenAccessor
         );
     }
 
@@ -274,7 +269,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['Acme\DemoBundle\Entity\CorrectEntity'], $provider->getTargetEntityClasses());
     }
 
-    public function getTargetEntityClassesOnEmptyTargetList()
+    public function testGetTargetEntityClassesOnEmptyTargetList()
     {
         $this->configManager->expects($this->once())
             ->method('getIds')
@@ -292,8 +287,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetActivityListOption()
     {
         $entityConfigProvider = $this->createMock(ConfigProvider::class);
-        $configId = new EntityConfigId('entity', self::TEST_ACTIVITY_CLASS);
-        $entityConfig = new Config($configId);
+        $entityConfig = new Config(new EntityConfigId('entity', self::TEST_ACTIVITY_CLASS));
         $userConfig = $this->createMock(UserConfig::class);
 
         $entityConfig->set('icon', 'test_icon');
@@ -332,10 +326,28 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(ActivityListRepository::class);
 
-        $activityEntity = $this->getMockBuilder(ActivityList::class)
-            ->addMethods(['getActivityListTargets', 'supportActivityListTarget'])
-            ->getMock();
-        $activityEntity->expects($this->once())->method('getActivityListTargets')->willReturn([]);
+        $activityEntity = new ActivityList();
+        $this->entityFieldTestExtension->addExpectation(
+            ActivityList::class,
+            'getActivityListTargets',
+            function (array $arguments, object $object, mixed &$result) use ($activityEntity) {
+                self::assertSame($activityEntity, $object);
+                $result = [];
+
+                return true;
+            }
+        );
+        $this->entityFieldTestExtension->addExpectation(
+            ActivityList::class,
+            'supportActivityListTarget',
+            function (array $arguments, object $object, mixed &$result) use ($activityEntity) {
+                self::assertSame($activityEntity, $object);
+                $result = false;
+
+                return true;
+            }
+        );
+
         $repo->expects($this->once())
             ->method('findOneBy')
             ->willReturn($activityEntity);
@@ -375,11 +387,16 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $testEntity->owner = new User();
         $testEntity->updatedBy = new User();
 
-        $activityEntity = $this->getMockBuilder(ActivityList::class)
-            ->addMethods(['getActivityListTargets', 'supportActivityListTarget'])
-            ->getMock();
-        $activityEntity->expects($this->once())->method('supportActivityListTarget');
-        $activityEntity->expects($this->never())->method('getActivityListTargets');
+        $this->entityFieldTestExtension->addExpectation(
+            ActivityList::class,
+            'supportActivityListTarget',
+            function (array $arguments, object $object, mixed &$result) {
+                $result = false;
+
+                return true;
+            }
+        );
+
         $targetEntity = new \stdClass();
         $this->testActivityProvider->setTargets([$targetEntity]);
         $this->doctrineHelper->expects(self::exactly(3))
@@ -398,12 +415,10 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getSingleEntityIdentifier')
             ->with(self::identicalTo($testEntity))
             ->willReturn($testEntity->id);
-        $this->activityListFactory->expects($this->once())
-            ->method('createActivityList')
-            ->willReturn($activityEntity);
 
         $provider = $this->getActivityListChainProvider();
         $result = $provider->getNewActivityList($testEntity);
+
         $this->assertEquals(ActivityList::VERB_CREATE, $result->getVerb());
         $this->assertEquals($testEntity->subject, $result->getSubject());
         $this->assertEquals($testEntity->description, $result->getDescription());

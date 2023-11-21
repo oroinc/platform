@@ -10,6 +10,9 @@ use Oro\Bundle\ConfigBundle\Config\DataTransformerInterface;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\ProviderInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -30,18 +33,18 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->addConfigManager('user', $this->configManager);
     }
 
-    public function testGetConfigManager()
+    public function testGetConfigManager(): void
     {
-        $this->assertSame($this->configManager, $this->manager->getConfigManager('user'));
-        $this->assertNull($this->manager->getConfigManager('unknown'));
+        self::assertSame($this->configManager, $this->manager->getConfigManager('user'));
+        self::assertNull($this->manager->getConfigManager('unknown'));
     }
 
-    public function testGetScopes()
+    public function testGetScopes(): void
     {
-        $this->assertEquals(['user'], $this->manager->getScopes());
+        self::assertEquals(['user'], $this->manager->getScopes());
     }
 
-    public function testGetSections()
+    public function testGetSections(): void
     {
         $apiTree = new SectionDefinition('');
         $testSection = new SectionDefinition('test_section');
@@ -57,11 +60,12 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
         $apiTree->addSubSection($section2);
         $section2->addVariable(new VariableDefinition('acme.item3', 'string'));
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getApiTree')
             ->with(null)
             ->willReturn($apiTree);
-        $this->assertSame(
+
+        self::assertSame(
             [
                 'section2',
                 'test_section',
@@ -72,43 +76,66 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasSectionForKnownSection()
+    public function testHasSectionForKnownSection(): void
     {
         $path = 'test_section';
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getApiTree')
             ->with($path)
             ->willReturn(new SectionDefinition($path));
 
-        $this->assertTrue($this->manager->hasSection($path));
+        self::assertTrue($this->manager->hasSection($path));
     }
 
-    public function testHasSectionForUnknownSection()
+    public function testHasSectionForUnknownSection(): void
     {
         $path = 'test_section';
 
-        $this->configProvider->expects($this->once())
-            ->method('getApiTree')
-            ->with($path)
-            ->willReturn(null);
-
-        $this->assertFalse($this->manager->hasSection($path));
-    }
-
-    public function testHasSectionForUnknownSectionWhenConfigProviderThrowsItemNotFoundException()
-    {
-        $path = 'test_section';
-
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getApiTree')
             ->with($path)
             ->willThrowException(new ItemNotFoundException());
 
-        $this->assertFalse($this->manager->hasSection($path));
+        self::assertFalse($this->manager->hasSection($path));
     }
 
-    public function testGetData()
+    public function testHasSectionForUnknownSectionWhenConfigProviderThrowsItemNotFoundException(): void
+    {
+        $path = 'test_section';
+
+        $this->configProvider->expects(self::once())
+            ->method('getApiTree')
+            ->with($path)
+            ->willThrowException(new ItemNotFoundException());
+
+        self::assertFalse($this->manager->hasSection($path));
+    }
+
+    public function testGetDataItemKeys(): void
+    {
+        $apiTree = new SectionDefinition('');
+        $apiTree->addVariable(new VariableDefinition('acme.item1', 'string'));
+        $subSection1 = new SectionDefinition('sub_section1');
+        $apiTree->addSubSection($subSection1);
+        $subSection1->addVariable(new VariableDefinition('acme.item2', 'string'));
+        $subSection11 = new SectionDefinition('sub_section11');
+        $subSection1->addSubSection($subSection11);
+        $subSection11->addVariable(new VariableDefinition('acme.item2', 'string'));
+        $subSection11->addVariable(new VariableDefinition('acme.item3', 'string'));
+
+        $this->configProvider->expects(self::once())
+            ->method('getApiTree')
+            ->with(self::isNull())
+            ->willReturn($apiTree);
+
+        self::assertEquals(
+            ['acme.item1', 'acme.item2', 'acme.item3'],
+            $this->manager->getDataItemKeys()
+        );
+    }
+
+    public function testGetData(): void
     {
         $path = 'section1/section11';
 
@@ -125,11 +152,11 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
         $subSection11->addVariable(new VariableDefinition('acme.item5', 'boolean'));
         $subSection11->addVariable(new VariableDefinition('acme.item6', 'integer'));
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getApiTree')
             ->with($path)
             ->willReturn($apiTree);
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('get')
             ->willReturnMap([
                 ['acme.item1', false, false, null, 'val1'],
@@ -140,11 +167,11 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
                 ['acme.item6', false, false, null, '123'],
             ]);
         $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('getInfo')
             ->willReturn(['createdAt' => $datetime, 'updatedAt' => $datetime]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 [
                     'key' => 'acme.item1',
@@ -187,25 +214,61 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
                     'value' => 123,
                     'createdAt' => $datetime,
                     'updatedAt' => $datetime,
-                ],
+                ]
             ],
             $this->manager->getData($path)
         );
     }
 
-    public function testGetDataItemForUnknownVariable()
+    public function testGetDataWithScopeId(): void
+    {
+        $path = 'section1/section11';
+        $scopeId = 123;
+
+        $apiTree = new SectionDefinition('section11');
+        $apiTree->addVariable(new VariableDefinition('acme.item1', 'string'));
+
+        $this->configProvider->expects(self::once())
+            ->method('getApiTree')
+            ->with($path)
+            ->willReturn($apiTree);
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with('acme.item1', false, false, $scopeId)
+            ->willReturn('val1');
+        $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->configManager->expects(self::once())
+            ->method('getInfo')
+            ->with('acme.item1', $scopeId)
+            ->willReturn(['createdAt' => $datetime, 'updatedAt' => $datetime]);
+
+        self::assertEquals(
+            [
+                [
+                    'key' => 'acme.item1',
+                    'type' => 'string',
+                    'value' => 'val1',
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime,
+                ]
+            ],
+            $this->manager->getData($path, 'user', $scopeId)
+        );
+    }
+
+    public function testGetDataItemForUnknownVariable(): void
     {
         $path = 'test_section';
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getApiTree')
             ->with($path)
             ->willReturn(new SectionDefinition($path));
 
-        $this->assertNull($this->manager->getDataItem('unknown', $path));
+        self::assertNull($this->manager->getDataItem('unknown', $path));
     }
 
-    public function testGetDataItemForKnownVariableWithoutDataTransformer()
+    public function testGetDataItemForKnownVariableWithoutDataTransformer(): void
     {
         $path = 'test_section';
         $key = 'test_variable';
@@ -215,19 +278,20 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
         $apiTree = new SectionDefinition($path);
         $apiTree->addVariable(new VariableDefinition($key, $dataType));
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getApiTree')
             ->with($path)
             ->willReturn($apiTree);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('get')
-            ->with($key)
+            ->with($key, false, false, null)
             ->willReturn($value);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getInfo')
+            ->with($key, null)
             ->willReturn(['createdAt' => $datetime, 'updatedAt' => $datetime]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'key'       => $key,
                 'type'      => $dataType,
@@ -235,11 +299,11 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
                 'createdAt' => $datetime,
                 'updatedAt' => $datetime,
             ],
-            $this->manager->getDataItem($key, $path, 'user')
+            $this->manager->getDataItem($key, $path)
         );
     }
 
-    public function testGetDataItemForKnownVariableWithDataTransformer()
+    public function testGetDataItemForKnownVariableWithDataTransformer(): void
     {
         $path = 'test_section';
         $key = 'test_variable';
@@ -251,27 +315,28 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
         $apiTree->addVariable(new VariableDefinition($key, $dataType));
         $dataTransformer = $this->createMock(DataTransformerInterface::class);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getApiTree')
             ->with($path)
             ->willReturn($apiTree);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('get')
-            ->with($key)
+            ->with($key, false, false, null)
             ->willReturn($value);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getInfo')
+            ->with($key, null)
             ->willReturn(['createdAt' => $datetime, 'updatedAt' => $datetime]);
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getDataTransformer')
             ->with($key)
             ->willReturn($dataTransformer);
-        $dataTransformer->expects($this->once())
+        $dataTransformer->expects(self::once())
             ->method('transform')
             ->with($value)
             ->willReturn($transformedValue);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'key'       => $key,
                 'type'      => $dataType,
@@ -279,7 +344,83 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
                 'createdAt' => $datetime,
                 'updatedAt' => $datetime,
             ],
-            $this->manager->getDataItem($key, $path, 'user')
+            $this->manager->getDataItem($key, $path)
         );
+    }
+
+    public function testGetDataItemWithScopeId(): void
+    {
+        $scopeId = 123;
+        $path = 'test_section';
+        $key = 'test_variable';
+        $dataType = 'string';
+        $value = 'test_value';
+        $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $apiTree = new SectionDefinition($path);
+        $apiTree->addVariable(new VariableDefinition($key, $dataType));
+
+        $this->configProvider->expects(self::once())
+            ->method('getApiTree')
+            ->with($path)
+            ->willReturn($apiTree);
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with($key, false, false, $scopeId)
+            ->willReturn($value);
+        $this->configManager->expects(self::once())
+            ->method('getInfo')
+            ->with($key, $scopeId)
+            ->willReturn(['createdAt' => $datetime, 'updatedAt' => $datetime]);
+
+        self::assertEquals(
+            [
+                'key'       => $key,
+                'type'      => $dataType,
+                'value'     => $value,
+                'createdAt' => $datetime,
+                'updatedAt' => $datetime,
+            ],
+            $this->manager->getDataItem($key, $path, 'user', $scopeId)
+        );
+    }
+
+    public function testGetDataItemSectionsForUnknownVariable(): void
+    {
+        $this->configProvider->expects(self::once())
+            ->method('getApiTree')
+            ->willReturn(new SectionDefinition(''));
+
+        self::assertEquals([], $this->manager->getDataItemSections('unknown'));
+    }
+
+    public function testGetDataItemSections(): void
+    {
+        $apiTree = new SectionDefinition('');
+
+        $section1 = new SectionDefinition('foo');
+        $section1->addVariable(new VariableDefinition('variable1', 'string'));
+        $apiTree->addSubSection($section1);
+
+        $section2 = new SectionDefinition('buz');
+        $section2->addVariable(new VariableDefinition('variable2', 'string'));
+        $section2->addVariable(new VariableDefinition('variable3', 'string'));
+        $apiTree->addSubSection($section2);
+
+        $section3 = new SectionDefinition('bar');
+        $section3->addVariable(new VariableDefinition('variable4', 'string'));
+        $apiTree->addSubSection($section3);
+        $section31 = new SectionDefinition('bat');
+        $section31->addVariable(new VariableDefinition('variable2', 'string'));
+        $section3->addSubSection($section31);
+
+        $this->configProvider->expects(self::any())
+            ->method('getApiTree')
+            ->willReturn($apiTree);
+
+        self::assertEquals(['foo'], $this->manager->getDataItemSections('variable1'));
+        self::assertEquals(['bar/bat', 'buz'], $this->manager->getDataItemSections('variable2'));
+        self::assertEquals(['buz'], $this->manager->getDataItemSections('variable3'));
+        self::assertEquals(['bar'], $this->manager->getDataItemSections('variable4'));
+        self::assertEquals([], $this->manager->getDataItemSections('unknown'));
     }
 }

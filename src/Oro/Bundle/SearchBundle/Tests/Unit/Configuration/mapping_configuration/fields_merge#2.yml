@@ -7,6 +7,7 @@ configs:
                 -
                     name: some_field_1
                     target_type: text
+                    target_fulltext: true
                     target_fields:
                         - id
                         - name
@@ -30,6 +31,7 @@ expected:
                 name: some_field_1
                 relation_fields: {}
                 target_type: integer
+                target_fulltext: true
                 target_fields:
                     - id
                     - name

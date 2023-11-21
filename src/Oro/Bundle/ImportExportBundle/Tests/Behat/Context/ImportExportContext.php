@@ -23,6 +23,7 @@ use PHPUnit\Framework\ExpectationFailedException;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class ImportExportContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -715,6 +716,17 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
     }
 
     /**
+     * Validate downloaded template file without changes
+     *
+     * @When /^(?:|I )validate downloaded template file$/
+     */
+    public function iValidateDownloadedTemplate()
+    {
+        $this->importFile = $this->template;
+        $this->iValidateFile();
+    }
+
+    /**
      * Import filled file
      *
      * @When /^(?:|I )import file$/
@@ -1012,7 +1024,9 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
             if ($flashMessage->isValid() && $flashMessage->isVisible()) {
                 /** @var NodeElement $closeButton */
                 $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
-                $closeButton->press();
+                if ($closeButton && $closeButton->isValid() && $closeButton->isVisible()) {
+                    $closeButton->press();
+                }
             }
         }
     }

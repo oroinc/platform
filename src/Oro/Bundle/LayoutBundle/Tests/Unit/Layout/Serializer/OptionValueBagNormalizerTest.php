@@ -9,14 +9,12 @@ use Symfony\Component\Serializer\Serializer;
 
 class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OptionValueBagNormalizer */
-    private $normalizer;
+    private OptionValueBagNormalizer $normalizer;
 
     protected function setUp(): void
     {
         $this->normalizer = new OptionValueBagNormalizer();
-        $serializer = new Serializer([$this->normalizer], [new JsonEncoder()]);
-        $this->normalizer->setSerializer($serializer);
+        $this->normalizer->setSerializer(new Serializer([$this->normalizer], [new JsonEncoder()]));
     }
 
     public function testSupportsNormalization()

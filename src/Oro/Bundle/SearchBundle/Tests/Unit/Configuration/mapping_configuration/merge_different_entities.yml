@@ -43,6 +43,7 @@ expected:
             name:
                 name: name
                 target_type: text
+                target_fulltext: true
                 relation_fields: {}
                 target_fields:
                     - name
@@ -63,14 +64,18 @@ expected:
                             id:
                                 name: id
                                 target_type: integer
+                                target_fulltext: true
                                 target_fields:
                                     - id
                                 relation_fields: {}
+                        target_fulltext: true
                         target_fields: {}
                     lastName:
                         name: lastName
                         target_type: text
+                        target_fulltext: true
                         target_fields:
                             - lastName
                         relation_fields: {}
+                target_fulltext: true
                 target_fields: {}

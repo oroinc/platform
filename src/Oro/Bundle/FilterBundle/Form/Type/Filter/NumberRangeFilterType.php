@@ -4,11 +4,13 @@ namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Number range filter form type.
+ */
 class NumberRangeFilterType extends AbstractType implements NumberRangeFilterTypeInterface
 {
     const NAME = 'oro_type_number_range_filter';
@@ -52,9 +54,12 @@ class NumberRangeFilterType extends AbstractType implements NumberRangeFilterTyp
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('value_end', HiddenType::class) // range end
-        ;
+        $builder->add('value_end', $options['field_type'], $this->createFieldOptions($options));
+    }
+
+    protected function createFieldOptions(array $options): array
+    {
+        return array_merge(array('required' => false), $options['field_options']);
     }
 
     /**

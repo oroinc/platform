@@ -137,6 +137,12 @@ abstract class WebTestCase extends BaseWebTestCase
         $this->client = null;
 
         if (self::isDbIsolationPerTest()) {
+            if (self::$kernel) {
+                self::$kernel->getContainer()->get('test.service_container')
+                    ->get('oro_security.acl_query.cache_provider')
+                    ->clear();
+            }
+
             self::$loadedFixtures = [];
             self::$referenceRepository = null;
 

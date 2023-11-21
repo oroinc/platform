@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Field;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
@@ -15,7 +15,7 @@ use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestOrganization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -24,7 +24,19 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_CLASS = 'stdClass';
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
+
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
+
+    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldHelper;
+
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownershipMetadataProvider;
+
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
     /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
@@ -33,30 +45,18 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     private $metadata;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldHelperService;
-
     /** @var DatabaseHelper */
     private $helper;
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $this->repository = $this->createMock(EntityRepository::class);
-        $this->metadata = $this->createMock(ClassMetadata::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->fieldHelper = $this->createMock(FieldHelper::class);
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
-        $this->fieldHelperService = $this->createMock(FieldHelper::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->repository = $this->createMock(EntityRepository::class);
+        $this->metadata = $this->createMock(ClassMetadata::class);
 
         $this->entityManager->expects($this->any())
             ->method('getClassMetadata')
@@ -71,21 +71,15 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
             ->with(self::TEST_CLASS)
             ->willReturn($this->repository);
 
-        $fieldHelper = $this->createMock(ServiceLink::class);
-        $fieldHelper->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->fieldHelperService);
-
-        $ownershipMetadataProviderLink = $this->createMock(ServiceLink::class);
-        $ownershipMetadataProviderLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->ownershipMetadataProvider);
+        $container = TestContainerBuilder::create()
+            ->add(FieldHelper::class, $this->fieldHelper)
+            ->getContainer($this);
 
         $this->helper = new DatabaseHelper(
             $this->doctrineHelper,
-            $fieldHelper,
             $this->tokenAccessor,
-            $ownershipMetadataProviderLink
+            $this->ownershipMetadataProvider,
+            $container
         );
     }
 
@@ -136,7 +130,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
             'organization'
         );
 
-        $this->fieldHelperService->expects($this->once())
+        $this->fieldHelper->expects($this->once())
             ->method('getObjectValue')
             ->willReturn($entity->getOrganization());
 
@@ -169,7 +163,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor->expects($this->never())
             ->method($this->anything());
 
-        $this->fieldHelperService->expects($this->never())
+        $this->fieldHelper->expects($this->never())
             ->method('getObjectValue');
 
         $this->ownershipMetadataProvider->expects($this->never())
