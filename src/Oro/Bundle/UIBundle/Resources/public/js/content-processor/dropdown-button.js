@@ -152,7 +152,7 @@ define(function(require, exports, module) {
 
             if (this.options.moreButtonIcon) {
                 $button.append(_.macros('orofrontend::renderIcon')({
-                    'id': this.options.moreButtonIcon,
+                    'name': this.options.moreButtonIcon,
                     'class': 'theme-icon theme-icon--medium'
                 }));
             }
