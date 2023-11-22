@@ -34,7 +34,8 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCa
                 [
                     'type'    => 'number-range',
                     'options' => [
-                        'data_type' => NumberFilterType::DATA_INTEGER
+                        'data_type' => NumberFilterType::DATA_INTEGER,
+                        'source_type' => 'integer'
                     ]
                 ]
             ],
@@ -43,7 +44,8 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCa
                 [
                     'type'    => 'number-range',
                     'options' => [
-                        'data_type' => NumberFilterType::DATA_INTEGER
+                        'data_type' => NumberFilterType::DATA_SMALLINT,
+                        'source_type' => 'smallint'
                     ]
                 ]
             ],
@@ -52,7 +54,8 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCa
                 [
                     'type'    => 'number-range',
                     'options' => [
-                        'data_type' => NumberFilterType::DATA_INTEGER
+                        'data_type' => NumberFilterType::DATA_BIGINT,
+                        'source_type' => 'bigint'
                     ]
                 ]
             ],
@@ -61,7 +64,8 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCa
                 [
                     'type'    => 'number-range',
                     'options' => [
-                        'data_type' => NumberFilterType::DATA_DECIMAL
+                        'data_type' => NumberFilterType::DATA_DECIMAL,
+                        'source_type' => 'decimal'
                     ]
                 ]
             ],
@@ -70,7 +74,8 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCa
                 [
                     'type'    => 'number-range',
                     'options' => [
-                        'data_type' => NumberFilterType::DATA_DECIMAL
+                        'data_type' => NumberFilterType::DATA_DECIMAL,
+                        'source_type' => 'float'
                     ]
                 ]
             ],
@@ -95,13 +100,15 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCa
             [
                 'money',
                 [
-                    'type' => 'number-range'
+                    'type' => 'number-range',
+                    'source_type' => 'money'
                 ]
             ],
             [
                 'percent',
                 [
-                    'type' => 'percent'
+                    'type' => 'percent',
+                    'source_type' => 'percent'
                 ]
             ],
             [

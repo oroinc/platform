@@ -465,7 +465,6 @@ services:
         arguments:
             - '@oro_message_queue.message_producer'
             - '@oro_entity_config.provider.deleted_attribute'
-            - '@Doctrine\Inflector\Inflector'
         calls:
             - [setTopic, [!php/const Oro\Bundle\EntityConfigBundle\Async\Topic\AttributeRemovedFromFamilyTopic::NAME]]
         tags:
@@ -577,6 +576,7 @@ services:
         class: Oro\Bundle\EntityConfigBundle\EventListener\InvalidateTranslationCacheListener
         arguments:
             - '@doctrine'
+            - '@oro_security.acl_query.cache_provider'
         tags:
             - { name: kernel.event_listener, event: oro_translation.invalidate_dynamic_translation_cache, method: onInvalidateDynamicTranslationCache }
 

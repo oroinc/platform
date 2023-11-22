@@ -8,59 +8,46 @@ namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 interface OwnershipMetadataProviderInterface
 {
     /**
-     * @return bool
+     * Checks whether this provider can be used in the current security context.
      */
-    public function supports();
+    public function supports(): bool;
 
     /**
-     * Get the ownership related metadata for the given entity
-     *
-     * @param string|null $className
-     *
-     * @return OwnershipMetadataInterface
+     * Gets the ownership related metadata for the given entity.
      */
-    public function getMetadata($className);
+    public function getMetadata(?string $className): OwnershipMetadataInterface;
 
     /**
-     * Gets the class name of the user entity
-     *
-     * @return string
+     * Gets the class name of the user entity.
      */
-    public function getUserClass();
+    public function getUserClass(): string;
 
     /**
-     * Gets the class name of the business unit entity
-     *
-     * @return string
+     * Gets the class name of the business unit entity.
      */
-    public function getBusinessUnitClass();
+    public function getBusinessUnitClass(): string;
 
     /**
-     * Gets the class name of the organization entity
-     *
-     * @return string
+     * Gets the class name of the organization entity.
      */
-    public function getOrganizationClass();
+    public function getOrganizationClass(): ?string;
 
     /**
-     * @param int    $accessLevel Current object access level
-     * @param string $className   Class name to test
-     *
-     * @return int
+     * Gets the maximum access level this provider supports.
      */
-    public function getMaxAccessLevel($accessLevel, $className = null);
+    public function getMaxAccessLevel(int $accessLevel, string $className = null): int;
 
     /**
-     * Clears the ownership metadata cache
-     *
-     * If the class name is not specified this method clears all cached data
+     * Clears the ownership metadata cache.
+     * When the class name is specified this method clears cached data for this class only;
+     * otherwise, this method clears all cached data.
      */
-    public function clearCache(?string $className = null);
+    public function clearCache(?string $className = null): void;
 
     /**
-     * Warms up the cache
-     *
-     * If the class name is specified this method warms up cache for this class only
+     * Warms up the cache.
+     * When the class name is specified this method warms up cache for this class only;
+     * otherwise, this method warms up cache for all classes.
      */
     public function warmUpCache(?string $className = null);
 }

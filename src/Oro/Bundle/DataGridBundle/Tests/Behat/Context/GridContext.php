@@ -2134,39 +2134,39 @@ TEXT;
     }
 
     /**
-     * Check filter is not present in grid
+     * Check filter is present in grid
      * Example: Then I should see Example filter in grid
      *
      * @Then /^(?:|I )should see "(?P<filterName>(?:[^"]|\\")*)" filter in grid$/
      * @Then /^(?:|I )should see "(?P<filterName>(?:[^"]|\\")*)" filter in "(?P<gridName>[^"]+)"$/
-     * @param string $filterName
-     * @param null|string $gridName
      */
-    public function iShouldSeeFilterInGrid($filterName, $gridName = 'Grid')
+    public function iShouldSeeFilterInGrid(string $filterName, ?string $gridName = 'Grid'): void
     {
-        self::assertTrue(
-            $this->getGridFilters($gridName)
-                ->hasFilterItem($gridName . 'FilterItem', $filterName),
-            sprintf('"%s" filter is in grid', $filterName)
-        );
+        $msg = sprintf('"%s" filter is not present in grid', $filterName);
+        $filters = $this->getGridFilters($gridName);
+        if ($filters->hasFilterItem($gridName . 'FilterItem', $filterName)) {
+            $filter = $filters->getFilterItem($gridName . 'FilterItem', $filterName);
+            self::assertTrue($filter->isVisible(), $msg);
+        } else {
+            self::fail($msg);
+        }
     }
 
     /**
-     * Check filter is present in grid
+     * Check filter is not present in grid
      * Example: Then I should not see Example filter in grid
      *
      * @Then /^(?:|I )should not see "(?P<filterName>(?:[^"]|\\")*)" filter in grid$/
      * @Then /^(?:|I )should not see "(?P<filterName>(?:[^"]|\\")*)" filter in "(?P<gridName>[^"]+)"$/
-     * @param string $filterName
-     * @param null|string $gridName
      */
-    public function iShouldNotSeeFilterInGrid($filterName, $gridName = 'Grid')
+    public function iShouldNotSeeFilterInGrid(string $filterName, ?string $gridName = 'Grid'): void
     {
-        self::assertFalse(
-            $this->getGridFilters($gridName)
-                ->hasFilterItem($gridName . 'FilterItem', $filterName),
-            sprintf('"%s" filter is in grid', $filterName)
-        );
+        $msg = sprintf('"%s" filter is present in grid', $filterName);
+        $filters = $this->getGridFilters($gridName);
+        if ($filters->hasFilterItem($gridName . 'FilterItem', $filterName)) {
+            $filter = $filters->getFilterItem($gridName . 'FilterItem', $filterName);
+            self::assertFalse($filter->isVisible(), $msg);
+        }
     }
 
     /**

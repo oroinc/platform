@@ -3,17 +3,14 @@
 namespace Oro\Bundle\OrganizationBundle\Form\Extension;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Sets organization for entity if such field exists
@@ -22,32 +19,24 @@ class OrganizationFormExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
-    /** @var ManagerRegistry */
-    protected $registry;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var ServiceLink */
-    protected $metadataProviderLink;
-
-    /** @var PropertyAccessor */
-    protected $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
+    protected TokenAccessorInterface $tokenAccessor;
+    protected OwnershipMetadataProviderInterface $ownershipMetadataProvider;
 
     public function __construct(
-        ManagerRegistry $registry,
+        PropertyAccessorInterface $propertyAccessor,
         TokenAccessorInterface $tokenAccessor,
-        ServiceLink $metadataProviderLink
+        OwnershipMetadataProviderInterface $ownershipMetadataProvider
     ) {
-        $this->registry = $registry;
+        $this->propertyAccessor = $propertyAccessor;
         $this->tokenAccessor = $tokenAccessor;
-        $this->metadataProviderLink = $metadataProviderLink;
+        $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         //PRE_SUBMIT needed to set correct organization before other form extensions executes their logic
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPostSubmit'], 128);
@@ -55,35 +44,30 @@ class OrganizationFormExtension extends AbstractTypeExtension
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onPostSubmit'], 128);
     }
 
-    public function onPostSubmit(FormEvent $event)
+    public function onPostSubmit(FormEvent $event): void
     {
         $data = $event->getForm()->getData();
-
-        if (is_array($data) || $data instanceof \Traversable) {
+        if (is_iterable($data)) {
             foreach ($data as $value) {
-                if (is_object($value)) {
+                if (\is_object($value)) {
                     $this->updateOrganization($value);
                 }
             }
-        } elseif (is_object($data)) {
+        } elseif (\is_object($data)) {
             $this->updateOrganization($data);
         }
     }
 
-    /**
-     * @param object $entity
-     */
-    protected function updateOrganization($entity)
+    protected function updateOrganization(object $entity): void
     {
-        /** @var OwnershipMetadataProviderInterface $metadataProvider */
-        $metadataProvider = $this->metadataProviderLink->getService();
-
-        $organizationField = $metadataProvider->getMetadata(ClassUtils::getClass($entity))->getOrganizationFieldName();
+        $organizationField = $this->ownershipMetadataProvider
+            ->getMetadata(ClassUtils::getClass($entity))
+            ->getOrganizationFieldName();
         if (!$organizationField) {
             return;
         }
 
-        $organization = $this->getPropertyAccessor()->getValue($entity, $organizationField);
+        $organization = $this->propertyAccessor->getValue($entity, $organizationField);
         if ($organization) {
             return;
         }
@@ -93,18 +77,6 @@ class OrganizationFormExtension extends AbstractTypeExtension
             return;
         }
 
-        $this->getPropertyAccessor()->setValue($entity, $organizationField, $organization);
-    }
-
-    /**
-     * @return PropertyAccessor
-     */
-    protected function getPropertyAccessor()
-    {
-        if (!$this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
+        $this->propertyAccessor->setValue($entity, $organizationField, $organization);
     }
 }

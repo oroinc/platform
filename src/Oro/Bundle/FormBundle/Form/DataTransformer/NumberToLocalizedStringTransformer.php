@@ -106,4 +106,14 @@ class NumberToLocalizedStringTransformer extends BaseTransformer
 
         return $formattedValue;
     }
+
+    /**
+     * @param $value
+     *
+     * @return int|float
+     */
+    protected function castParsedValue($value)
+    {
+        return $value;
+    }
 }

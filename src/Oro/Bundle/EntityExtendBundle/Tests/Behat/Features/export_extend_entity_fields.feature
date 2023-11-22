@@ -44,8 +44,10 @@ Feature: Export extend entity fields
       | Select Field        | Carte d'identité                          |
       | Call date & time    | <DateTime:2016-10-31 08:00:00>            |
     And check "Carte d'identité"
+    And I take screenshot
     And save and close form
     Then should see "Call saved" flash message
+    And I take screenshot
     And I should see call with:
       | Subject             | Call to Someone                           |
       | Additional comments | Offered $40 discount on her next purchase |

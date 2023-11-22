@@ -52,13 +52,16 @@ class RecalculateEmailVisibilityProcessor implements MessageProcessorInterface, 
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $data = $message->getBody();
-        $emailAddress = $data['email'];
+        $emailAddresses = $data['email'];
+        if (!\is_array($emailAddresses)) {
+            $emailAddresses = [$emailAddresses];
+        }
 
         $result = $this->jobRunner->runUniqueByMessage(
             $message,
-            function (JobRunner $jobRunner, Job $job) use ($emailAddress) {
+            function (JobRunner $jobRunner, Job $job) use ($emailAddresses) {
                 $chunkNumber = 1;
-                $chunks = $this->getChunks($emailAddress);
+                $chunks = $this->getChunks($emailAddresses);
                 $jobName = $job->getName();
                 foreach ($chunks as $ids) {
                     $this->scheduleRecalculateVisibilities(
@@ -97,11 +100,11 @@ class RecalculateEmailVisibilityProcessor implements MessageProcessorInterface, 
         );
     }
 
-    private function getChunks(string $emailAddress): iterable
+    private function getChunks(array $emailAddresses): iterable
     {
         /** @var EntityManagerInterface $em */
         $iterator = new BufferedQueryResultIterator(
-            $this->doctrine->getRepository(Email::class)->getEmailUserIdsByEmailAddressQb($emailAddress)
+            $this->doctrine->getRepository(Email::class)->getEmailUserIdsByEmailAddressesQb($emailAddresses)
         );
         $iterator->setBufferSize(self::CHUNK_SIZE);
         $rowNumber = 0;

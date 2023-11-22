@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Value;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
 
 class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
@@ -19,7 +19,7 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
     /** @var AclConditionDataBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $builder;
 
-    /** @var OwnershipMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ownershipMetadataProvider;
 
     /** @var AclAccessRule */
@@ -28,7 +28,7 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->builder = $this->createMock(AclConditionDataBuilderInterface::class);
-        $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProvider::class);
+        $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
 
         $this->accessRule = new AclAccessRule($this->builder, $this->ownershipMetadataProvider);
     }

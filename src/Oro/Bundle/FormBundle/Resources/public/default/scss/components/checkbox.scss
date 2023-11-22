@@ -201,13 +201,3 @@
         }
     }
 }
-
-.checkbox-round {
-    --checkbox-size: #{$checkbox-round-size};
-
-    border-radius: $checkbox-round-border-radius;
-
-    &::before {
-        font-size: $checkbox-round-icon-size;
-    }
-}

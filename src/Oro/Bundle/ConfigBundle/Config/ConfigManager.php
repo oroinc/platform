@@ -422,8 +422,8 @@ class ConfigManager
         $scopeManager = $this->getScopeManager();
         $scope = $scopeManager->getScopedEntityName();
         $resolvedScope = null;
+        $resolvedScopeId = null;
         if (\is_object($scopeIdentifier)) {
-            $resolvedScopeId = null;
             $managers = $this->getScopeManagersToGetValue($default);
             foreach ($managers as $scopeNam => $manager) {
                 $resolvedScopeId = $manager->getScopeIdFromEntity($scopeIdentifier);
@@ -432,7 +432,7 @@ class ConfigManager
                     break;
                 }
             }
-        } else {
+        } elseif (null === $scopeIdentifier) {
             $resolvedScopeId = $scopeManager->resolveIdentifier($scopeIdentifier);
         }
 

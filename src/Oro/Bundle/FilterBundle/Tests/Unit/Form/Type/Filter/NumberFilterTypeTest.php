@@ -102,7 +102,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     ],
                     'data_type' => NumberFilterType::DATA_INTEGER,
                     'formatter_options' => [],
-                    'enable_int_restrictions' => true,
+                    'source_type' => 'integer'
                 ]
             ]
         ];

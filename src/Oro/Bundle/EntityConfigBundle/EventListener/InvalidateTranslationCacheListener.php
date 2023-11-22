@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\SecurityBundle\Cache\DoctrineAclCacheProvider;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 
 /**
@@ -14,10 +15,12 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 class InvalidateTranslationCacheListener
 {
     private ManagerRegistry $doctrine;
+    private DoctrineAclCacheProvider $queryCacheProvider;
 
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, DoctrineAclCacheProvider $queryCacheProvider)
     {
         $this->doctrine = $doctrine;
+        $this->queryCacheProvider = $queryCacheProvider;
     }
 
     public function onInvalidateDynamicTranslationCache(): void
@@ -28,5 +31,6 @@ class InvalidateTranslationCacheListener
         if ($cacheProvider instanceof AdapterInterface) {
             $cacheProvider->clear();
         }
+        $this->queryCacheProvider->clear();
     }
 }

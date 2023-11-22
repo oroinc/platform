@@ -26,7 +26,7 @@ class BeforeMapObjectSearchListener
         'percent'                  => 'decimal',
         'enum'                     => 'text',
         'multiEnum'                => Indexer::RELATION_MANY_TO_MANY,
-        'bigint'                   => 'text',
+        'bigint'                   => 'integer',
         'integer'                  => 'integer',
         'smallint'                 => 'integer',
         'datetime'                 => 'datetime',

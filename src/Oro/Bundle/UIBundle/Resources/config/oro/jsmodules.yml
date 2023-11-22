@@ -85,6 +85,7 @@ configs:
     oroui/js/app/views/tab-collection-view: {}
     oroui/js/app/views/tab-item-view: {}
     oroui/js/component-shortcuts-manager: {}
+    oroui/js/content-processor/dropdown-button: {}
     oroui/js/delete-confirmation: {}
     oroui/js/error: {}
     oroui/js/extend/bootstrap/bootstrap-dropdown: {}

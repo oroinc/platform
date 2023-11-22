@@ -150,7 +150,6 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 
         $container = TestContainerBuilder::create()
             ->add('security.acl.voter.basic_permissions', $aclVoter)
-            ->add('oro_security.owner.ownership_metadata_provider', $this->ownershipMetadataProvider)
             ->add('oro_security.owner.entity_owner_accessor', $this->entityOwnerAccessor)
             ->add('oro_security.ownership_tree_provider', $treeProvider)
             ->add('oro_organization.business_unit_manager', $this->businessUnitManager)
@@ -160,6 +159,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             $this->doctrineHelper,
             $this->tokenAccessor,
             $this->authorizationChecker,
+            $this->ownershipMetadataProvider,
             $container
         );
     }
@@ -300,7 +300,6 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 
         $container = TestContainerBuilder::create()
             ->add('security.acl.voter.basic_permissions', $aclVoter)
-            ->add('oro_security.owner.ownership_metadata_provider', $this->ownershipMetadataProvider)
             ->add('oro_security.owner.entity_owner_accessor', $this->entityOwnerAccessor)
             ->add('oro_security.ownership_tree_provider', $treeProvider)
             ->add('oro_organization.business_unit_manager', $this->businessUnitManager)
@@ -310,6 +309,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             $this->doctrineHelper,
             $this->tokenAccessor,
             $this->authorizationChecker,
+            $this->ownershipMetadataProvider,
             $container
         );
 
@@ -438,7 +438,6 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 
         $container = TestContainerBuilder::create()
             ->add('security.acl.voter.basic_permissions', $aclVoter)
-            ->add('oro_security.owner.ownership_metadata_provider', $this->ownershipMetadataProvider)
             ->add('oro_security.owner.entity_owner_accessor', $this->entityOwnerAccessor)
             ->add('oro_security.ownership_tree_provider', $treeProvider)
             ->add('oro_organization.business_unit_manager', $this->businessUnitManager)
@@ -448,6 +447,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             $this->doctrineHelper,
             $this->tokenAccessor,
             $this->authorizationChecker,
+            $this->ownershipMetadataProvider,
             $container
         );
     }
@@ -568,7 +568,6 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 
         $container = TestContainerBuilder::create()
             ->add('security.acl.voter.basic_permissions', $aclVoter)
-            ->add('oro_security.owner.ownership_metadata_provider', $this->ownershipMetadataProvider)
             ->add('oro_security.owner.entity_owner_accessor', $this->entityOwnerAccessor)
             ->add('oro_security.ownership_tree_provider', $treeProvider)
             ->add('oro_organization.business_unit_manager', $this->businessUnitManager)
@@ -578,6 +577,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             $this->doctrineHelper,
             $this->tokenAccessor,
             $this->authorizationChecker,
+            $this->ownershipMetadataProvider,
             $container
         );
 
