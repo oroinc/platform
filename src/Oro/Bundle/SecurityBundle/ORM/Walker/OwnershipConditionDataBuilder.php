@@ -303,9 +303,11 @@ class OwnershipConditionDataBuilder implements AclConditionDataBuilderInterface
     ): ?array {
         $organizationField = null;
         $organizationValue = null;
-        if ($metadata->getOrganizationColumnName() && $this->getOrganizationId($permissions, $metadata)) {
-            $organizationField = $metadata->getOrganizationFieldName();
+        if ($metadata->getOrganizationColumnName()) {
             $organizationValue = $this->getOrganizationId($permissions, $metadata);
+            if ($organizationValue) {
+                $organizationField = $metadata->getOrganizationFieldName();
+            }
         }
 
         if (!$ignoreOwner && !empty($idOrIds)) {
