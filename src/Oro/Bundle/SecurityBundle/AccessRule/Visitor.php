@@ -14,7 +14,7 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Subquery;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Value;
 
 /**
- * The base class to for classes that converts access rule expressions to more concrete expressions,
+ * The base class for classes that convert access rule expressions to more concrete expressions,
  * e.g. Doctrine AST expressions.
  */
 abstract class Visitor
