@@ -15,6 +15,7 @@ configs:
                                 -
                                     name: email
                                     target_type: text
+                                    target_fulltext: false
                                     target_fields:
                                         - email
                         -
@@ -62,26 +63,32 @@ expected:
                             id:
                                 name: id
                                 target_type: integer
+                                target_fulltext: true
                                 target_fields:
                                     - id
                                 relation_fields: {}
                             email:
                                 name: email
                                 target_type: text
+                                target_fulltext: false
                                 target_fields:
                                     - email
                                 relation_fields: {}
+                        target_fulltext: true
                         target_fields: {}
                     firstName:
                         name: firstName
                         target_type: text
+                        target_fulltext: true
                         target_fields:
                             - firstName
                         relation_fields: {}
                     lastName:
                         name: lastName
                         target_type: text
+                        target_fulltext: true
                         target_fields:
                             - lastName
                         relation_fields: {}
+                target_fulltext: true
                 target_fields: {}

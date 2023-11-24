@@ -48,9 +48,6 @@ define(function(require) {
          */
         _pushState: function() {
             const enabledState = this._getEnabledState();
-            if (_.haveEqualSet(this.defaultState, enabledState)) {
-                return;
-            }
 
             mediator.trigger('filters:update', enabledState);
         },

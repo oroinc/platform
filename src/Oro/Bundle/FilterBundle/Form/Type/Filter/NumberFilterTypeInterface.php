@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
+/**
+ * Interface of numeric filters. Stores filter metadata such as available filter types and number types.
+ */
 interface NumberFilterTypeInterface
 {
     const TYPE_GREATER_EQUAL = 1;
@@ -14,7 +17,9 @@ interface NumberFilterTypeInterface
     const TYPE_IN            = 9; // 7 and 8 are already taken by number range filter
     const TYPE_NOT_IN        = 10;
 
+    const DATA_SMALLINT = 'data_smallint';
     const DATA_INTEGER = 'data_integer';
+    const DATA_BIGINT = 'data_bigint';
     const DATA_DECIMAL = 'data_decimal';
     const PERCENT      = 'percent';
 

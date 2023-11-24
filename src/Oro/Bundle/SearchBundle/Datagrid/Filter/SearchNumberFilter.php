@@ -15,6 +15,15 @@ use Oro\Component\Exception\UnexpectedTypeException;
  */
 class SearchNumberFilter extends AbstractFilter
 {
+    public function init($name, array $params)
+    {
+        if (isset($params['field_options']['type'])) {
+            $params[FilterUtility::FORM_OPTIONS_KEY]['source_type'] = $params['field_options']['type'];
+        }
+
+        parent::init($name, $params);
+    }
+
     /**
      * {@inheritDoc}
      */

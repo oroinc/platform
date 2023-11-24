@@ -26,8 +26,16 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
     public const ARRAY_SEPARATOR = ',';
     public const OPTION_KEY_FORMATTER_OPTION = 'formatter_options';
 
-    private const INT_MIN = -2147483647;
-    private const INT_MAX = 2147483647;
+    /**
+     * Please note that there are restrictions for bigint on the frontend.
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER.
+     * MAX_SAFE_INTEGER = 9007199254740991
+     */
+    public const DATA_INTEGERS = [
+        'smallint' => ['min' => -32768, 'max' => 32767],
+        'integer' => ['min' => -2147483648, 'max' => 2147483647],
+        'bigint' => ['min' => -9007199254740991, 'max' => 9007199254740991] # JS support (MIN, MAX safe integers).
+    ];
 
     /**
      * @var TranslatorInterface
@@ -109,24 +117,24 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
             $this->translator->trans('oro.filter.form.label_type_not_empty') => FilterUtility::TYPE_NOT_EMPTY,
         ];
 
-        $resolver->setDefaults(
-            [
-                'field_type' => NumberType::class,
-                'operator_choices' => $operatorChoices,
-                'data_type' => self::DATA_INTEGER,
-                self::OPTION_KEY_FORMATTER_OPTION => [],
-                'enable_int_restrictions' => true,
-            ]
-        );
+        $resolver->setDefined(['data_type', 'source_type']);
+        $resolver->setAllowedTypes('source_type', ['string']);
+        $resolver->setDefaults([
+            'field_type' => NumberType::class,
+            'operator_choices' => $operatorChoices,
+            'data_type' => self::DATA_INTEGER,
+            'source_type' => 'integer', // database field type.
+            self::OPTION_KEY_FORMATTER_OPTION => []
+        ]);
         $resolver->setNormalizer('field_options', function (Options $options, $fieldOptions) {
             if ($options['data_type'] !== self::DATA_INTEGER && $options['field_type'] === NumberType::class) {
                 $fieldOptions['limit_decimals'] = false;
             }
 
-            if ($options['enable_int_restrictions'] && self::DATA_INTEGER === $options['data_type']) {
+            if (in_array($options['source_type'], array_keys(self::DATA_INTEGERS))) {
                 $fieldOptions['constraints'] = \array_merge(
                     $fieldOptions['constraints'] ?? [],
-                    [new Range(['min' => self::INT_MIN, 'max' => self::INT_MAX])]
+                    [new Range(self::DATA_INTEGERS[$options['source_type']])]
                 );
             }
 
@@ -141,6 +149,11 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
             $dataType = $options['data_type'];
         }
 
+        $sourceType = 'integer';
+        if (isset($options['source_type'])) {
+            $sourceType = $options['source_type'];
+        }
+
         $formatterOptions = [];
         switch ($dataType) {
             case self::PERCENT:
@@ -153,7 +166,6 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
                     $formatterOptions['decimals'] = $options['field_options']['scale'];
                 }
                 break;
-            case self::DATA_INTEGER:
             default:
                 $formatterOptions['decimals'] = 0;
                 $formatterOptions['grouping'] = false;
@@ -174,9 +186,9 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
         $view->vars['data_type'] = $dataType;
         $view->vars['limit_decimals'] = $options['field_options']['limit_decimals'] ?? false;
 
-        if ($options['enable_int_restrictions'] && self::DATA_INTEGER === $dataType) {
-            $view->vars['min'] = self::INT_MIN;
-            $view->vars['max'] = self::INT_MAX;
+        if (in_array($sourceType, array_keys(self::DATA_INTEGERS))) {
+            $view->vars['min'] = self::DATA_INTEGERS[$sourceType]['min'];
+            $view->vars['max'] = self::DATA_INTEGERS[$sourceType]['max'];
         }
     }
 }

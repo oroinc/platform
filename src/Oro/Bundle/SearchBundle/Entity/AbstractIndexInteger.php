@@ -5,6 +5,8 @@ namespace Oro\Bundle\SearchBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Base entity for integer index.
+ *
  * @ORM\MappedSuperclass
  */
 abstract class AbstractIndexInteger implements ItemFieldInterface
@@ -28,7 +30,7 @@ abstract class AbstractIndexInteger implements ItemFieldInterface
     /**
      * @var integer
      *
-     * @ORM\Column(name="value", type="integer", nullable=false)
+     * @ORM\Column(name="value", type="bigint", nullable=false)
      */
     protected $value;
 
