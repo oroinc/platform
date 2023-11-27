@@ -154,7 +154,7 @@ class PagestateController extends AbstractFOSRestController
      */
     public function getCheckidAction()
     {
-        $hash = AbstractPageState::generateHash(
+        $hash = AbstractPageState::generateHashUsingUser(
             $this->get('request_stack')->getCurrentRequest()->get('pageId'),
             $this->getUser()->getId(),
         );

@@ -72,7 +72,7 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf('DateTime', $item->getCreatedAt());
         $this->assertInstanceOf('DateTime', $item->getUpdatedAt());
         $this->assertEquals($item->getCreatedAt(), $item->getUpdatedAt());
-        $this->assertEquals(PageState::generateHash($pageId, $userId), $item->getPageHash());
+        $this->assertEquals(PageState::generateHashUsingUser($pageId, $userId), $item->getPageHash());
     }
 
     public function testDoPreUpdate()
