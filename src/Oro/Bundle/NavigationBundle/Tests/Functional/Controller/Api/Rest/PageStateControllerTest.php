@@ -98,7 +98,7 @@ class PageStateControllerTest extends WebTestCase
             [
                 'data' => '["test"]',
                 'page_id' => 'dGVzdDE=',
-                'page_hash' => 'd134a05c9bcd7ff16921f5267748513b'
+                'page_hash' => '3a815b1f56c757786b4237b5a33c0fe9'
             ],
             $resultJson
         );
