@@ -1,3 +1,4 @@
+@regression
 @ticket-BB-23057
 @fixture-OroUserBundle:second-admin.yml
 
