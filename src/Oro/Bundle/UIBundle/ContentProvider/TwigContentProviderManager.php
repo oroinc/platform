@@ -7,6 +7,8 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * The content provider that is intended to be injected in TWIG.
+ *
+ * @deprecated since 5.1, use {@see ContentProviderManager} instead.
  */
 class TwigContentProviderManager implements ServiceSubscriberInterface
 {
