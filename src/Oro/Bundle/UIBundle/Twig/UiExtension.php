@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Oro\Bundle\UIBundle\ContentProvider\TwigContentProviderManager;
+use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
@@ -413,7 +413,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      */
     public function getContent(array $additionalContent = null, array $keys = null)
     {
-        $content = $this->getTwigContentProviderManager()->getContent($keys);
+        $content = $this->getContentProviderManager()->getContent($keys);
         if ($additionalContent) {
             $content = array_merge($content, $additionalContent);
         }
@@ -666,7 +666,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_ui.content_provider.manager.twig' => TwigContentProviderManager::class,
+            'oro_ui.content_provider.manager' => ContentProviderManager::class,
             'oro_ui.user_agent_provider' => UserAgentProviderInterface::class,
             EventDispatcherInterface::class,
             RouterInterface::class,
@@ -674,9 +674,9 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         ];
     }
 
-    protected function getTwigContentProviderManager(): TwigContentProviderManager
+    protected function getContentProviderManager(): ContentProviderManager
     {
-        return $this->container->get('oro_ui.content_provider.manager.twig');
+        return $this->container->get('oro_ui.content_provider.manager');
     }
 
     protected function getUserAgent(): UserAgent
