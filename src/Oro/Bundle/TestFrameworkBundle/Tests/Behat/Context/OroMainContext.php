@@ -1338,6 +1338,24 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Click on button in hamburger menu
+     * Example: When I click "Category 1" in hamburger menu
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" in hamburger menu$/
+     */
+    public function pressButtonInHamburgerMenu($button)
+    {
+        $mainMenuTrigger = $this->createElement('Main Menu Button');
+        $sidebarMainMenuPopup = $this->createElement('Sidebar Main Menu Popup');
+        if ($mainMenuTrigger->isIsset() && !$sidebarMainMenuPopup->isIsset()) {
+            $mainMenuTrigger->click();
+        }
+
+        $this->spin(function () use ($button) {
+            $this->pressButtonInModalWindow($button);
+        }, 5);
+    }
+
+    /**
      * When I scroll modal window to bottom
      *
      * @When /I scroll modal window to bottom/
