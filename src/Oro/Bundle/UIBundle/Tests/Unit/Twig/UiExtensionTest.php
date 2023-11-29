@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\UIBundle\ContentProvider\TwigContentProviderManager;
+use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\Event\Events;
@@ -29,7 +29,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
 
     private Environment|\PHPUnit\Framework\MockObject\MockObject $environment;
 
-    private TwigContentProviderManager|\PHPUnit\Framework\MockObject\MockObject $contentProviderManager;
+    private ContentProviderManager|\PHPUnit\Framework\MockObject\MockObject $contentProviderManager;
 
     private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
@@ -42,14 +42,14 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
-        $this->contentProviderManager = $this->createMock(TwigContentProviderManager::class);
+        $this->contentProviderManager = $this->createMock(ContentProviderManager::class);
         $userAgentProvider = $this->createMock(UserAgentProviderInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->router = $this->createMock(RouterInterface::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_ui.content_provider.manager.twig', $this->contentProviderManager)
+            ->add('oro_ui.content_provider.manager', $this->contentProviderManager)
             ->add('oro_ui.user_agent_provider', $userAgentProvider)
             ->add(EventDispatcherInterface::class, $this->eventDispatcher)
             ->add(RequestStack::class, $this->requestStack)
@@ -204,13 +204,13 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     public function contentDataProvider(): array
     {
         return [
-            [
+            'with additional content and keys' => [
                 'content' => ['b' => 'c'],
                 'additionalContent' => ['a' => 'b'],
                 'keys' => ['a', 'b', 'c'],
                 'expected' => ['a' => 'b', 'b' => 'c'],
             ],
-            [
+            'without additional content and keys' => [
                 'content' => ['b' => 'c'],
                 'additionalContent' => null,
                 'keys' => null,

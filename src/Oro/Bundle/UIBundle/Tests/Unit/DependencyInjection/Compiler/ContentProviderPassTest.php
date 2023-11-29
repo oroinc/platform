@@ -28,7 +28,7 @@ class ContentProviderPassTest extends \PHPUnit\Framework\TestCase
         $container->setDefinition('tagged_service_3', new Definition())
             ->addTag('oro_ui.content_provider', ['alias' => 'provider3']);
 
-        $pass = new ContentProviderPass();
+        $pass = new ContentProviderPass('oro_ui.content_provider.manager', 'oro_ui.content_provider');
         $pass->process($container);
 
         self::assertEquals(['provider1', 'provider2', 'provider3'], $manager->getArgument('$providerNames'));
