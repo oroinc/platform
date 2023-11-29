@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional;
 
 use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
@@ -16,6 +17,11 @@ trait SearchExtensionTrait
     protected static function getSearchIndexer(): IndexerInterface
     {
         return self::getContainer()->get('oro_search.search.engine.indexer');
+    }
+
+    protected static function getSearchEngine(): EngineInterface
+    {
+        return self::getContainer()->get('oro_search.search.engine');
     }
 
     /**
