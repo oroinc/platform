@@ -23,17 +23,23 @@ class OroUIBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new GroupingWidgetProviderPass(
-            'oro_ui.widget_provider.view_actions',
-            'oro_ui.view_action_provider',
-            ActivityScope::VIEW_PAGE
-        ));
-        $container->addCompilerPass(new GroupingWidgetProviderPass(
-            'oro_ui.widget_provider.update_actions',
-            'oro_ui.update_action_provider',
-            ActivityScope::UPDATE_PAGE
-        ));
-        $container->addCompilerPass(new ContentProviderPass());
+        $container->addCompilerPass(
+            new GroupingWidgetProviderPass(
+                'oro_ui.widget_provider.view_actions',
+                'oro_ui.view_action_provider',
+                ActivityScope::VIEW_PAGE
+            )
+        );
+        $container->addCompilerPass(
+            new GroupingWidgetProviderPass(
+                'oro_ui.widget_provider.update_actions',
+                'oro_ui.update_action_provider',
+                ActivityScope::UPDATE_PAGE
+            )
+        );
+        $container->addCompilerPass(
+            new ContentProviderPass('oro_ui.content_provider.manager', 'oro_ui.content_provider')
+        );
         $container->addCompilerPass(new ReplaceTwigEnvironmentPass());
         $container->addCompilerPass(new TwigSandboxConfigurationPass());
         $container->addCompilerPass(new FormattersPass());
