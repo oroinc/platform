@@ -9,23 +9,34 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Registers all content providers and adds the content provider manager to TWIG.
+ * Registers all content providers in the content provider manager.
  */
 class ContentProviderPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
+    private string $contentProviderManagerId;
+
+    private string $contentProviderTagName;
+
+    public function __construct(
+        string $contentProviderManagerId = 'oro_ui.content_provider.manager',
+        string $contentProviderTagName = 'oro_ui.content_provider'
+    ) {
+        $this->contentProviderManagerId = $contentProviderManagerId;
+        $this->contentProviderTagName = $contentProviderTagName;
+    }
+
     public function process(ContainerBuilder $container)
     {
         $items = [];
-        $tagName = 'oro_ui.content_provider';
-        $taggedServices = $container->findTaggedServiceIds($tagName);
+        $taggedServices = $container->findTaggedServiceIds($this->contentProviderTagName);
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $attributes) {
                 $items[$this->getPriorityAttribute($attributes)][] = [
                     $id,
-                    $this->getRequiredAttribute($attributes, 'alias', $id, $tagName),
-                    $this->getAttribute($attributes, 'enabled', true)
+                    $this->getRequiredAttribute($attributes, 'alias', $id, $this->contentProviderTagName),
+                    $this->getAttribute($attributes, 'enabled', true),
                 ];
             }
         }
@@ -46,7 +57,7 @@ class ContentProviderPass implements CompilerPassInterface
             }
         }
 
-        $container->getDefinition('oro_ui.content_provider.manager')
+        $container->getDefinition($this->contentProviderManagerId)
             ->setArgument(0, $providers)
             ->setArgument(1, ServiceLocatorTagPass::register($container, $services))
             ->setArgument(2, $enabledProviders);

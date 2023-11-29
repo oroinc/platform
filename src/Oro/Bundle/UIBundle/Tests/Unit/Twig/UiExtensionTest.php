@@ -214,13 +214,13 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     public function contentDataProvider()
     {
         return [
-            [
+            'with additional content and keys' => [
                 'content' => ['b' => 'c'],
                 'additionalContent' => ['a' => 'b'],
                 'keys' => ['a', 'b', 'c'],
                 'expected' => ['a' => 'b', 'b' => 'c']
             ],
-            [
+            'without additional content and keys' => [
                 'content' => ['b' => 'c'],
                 'additionalContent' => null,
                 'keys' => null,
