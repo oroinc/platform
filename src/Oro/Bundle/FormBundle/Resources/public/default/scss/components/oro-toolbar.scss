@@ -4,38 +4,12 @@
     position: relative;
 
     &__icon {
-        margin-left: $oro-toolbar-icon-offset;
+        color: $oro-toolbar-icon-color;
     }
 
     &__content {
         display: flex;
         align-items: center;
-        gap: 8px;
-        min-width: $oro-toolbar-content-min-width;
-        padding: $oro-toolbar-content-inner-offset;
-        line-height: $oro-toolbar-content-line-height;
-        text-align: $oro-toolbar-content-text-align;
-
-        cursor: pointer;
-    }
-
-    &__dropdown {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        left: auto;
-        margin: 0;
-        padding: $oro-toolbar-dropdown-inner-offset;
-        z-index: $oro-toolbar-dropdown-z-index;
-
-        display: none;
-        min-width: $oro-toolbar-toolbar-min-width;
-
-        font-size: $base-font-size;
-
-        background: $base-ui-popup-background;
-        border-radius: $base-ui-popup-border-radius;
-        box-shadow: $base-ui-popup-box-shadow;
     }
 
     &__list {
@@ -57,7 +31,7 @@
     &__link {
         display: block;
         line-height: 2;
-
+        padding: $oro-toolbar-padding;
         color: $oro-toolbar-link-color;
 
         &:hover {
@@ -66,6 +40,23 @@
 
         &--active {
             font-weight: font-weight('bold');
+        }
+
+        &--divider {
+            &:not(:last-child) {
+                position: relative;
+
+                &:before {
+                    content: '';
+                    position: absolute;
+                    height: 14px;
+                    top: 50%;
+                    margin-top: -7px;
+                    right: 0;
+                    width: 1px;
+                    background-color: $oro-toolbar-divider-color;
+                }
+            }
         }
     }
 
