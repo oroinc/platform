@@ -247,6 +247,29 @@ class EmailContext extends OroFeatureContext
     }
 
     /**
+     * This method makes non-strict comparison of data from the file downloaded from email.
+     * Checks whether the listed rows (in any order) with given columns and corresponding data is present.
+     *
+     * @Given /^Downloaded export file should contain following rows in any order:$/
+     */
+    public function downloadedExportFileContainsFollowingRowsInAnyOrder(TableNode $expectedEntities): void
+    {
+        self::assertNotEmpty($this->downloadedFile, 'File from email not loaded.');
+        self::assertFileExists($this->downloadedFile, 'File does not exist');
+
+        $exportedFile = new \SplFileObject($this->downloadedFile, 'rb');
+        $exportedFile->setFlags(\SplFileObject::READ_CSV
+            | \SplFileObject::READ_AHEAD
+            | \SplFileObject::SKIP_EMPTY
+            | \SplFileObject::DROP_NEW_LINE);
+
+        $expectedRows = $expectedEntities->getRows();
+
+        static::assertCount(iterator_count($exportedFile), $expectedEntities->getRows());
+        static::assertEqualsCanonicalizing(iterator_to_array($exportedFile), $expectedRows);
+    }
+
+    /**
      * Example: And the downloaded file from email contains at least the following data:
      *          | SKU   | Related SKUs {{ "type": "array", "separator": ";" }} |
      *          | PSKU2 | PSKU5;PSKU4;PSKU3;PSKU1                              |
