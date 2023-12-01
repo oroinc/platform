@@ -8,6 +8,9 @@ layout:
                     blockType: container
                     siblingId: ~
                     prepend: true
+                    options:
+                        vars:
+                            searchType: '=data["system_config_provider"].getValue("oro_frontend.search_on_smaller_screens")'
                 middle_bar_logo:
                     blockType: container
                 middle_bar_center:

@@ -1,6 +1,6 @@
 {% block _middle_bar_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' middlebar'
+        '~class': ' middlebar middlebar--' ~ searchType
     }) %}
     <div {{ block('block_attributes') }}>
         {{ block_widget(block) }}
