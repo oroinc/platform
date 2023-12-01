@@ -242,6 +242,8 @@ class FileControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
+        self::assertTrue($result->headers->getCacheControlDirective('public'));
+        self::assertTrue($result->headers->hasCacheControlDirective('max-age'));
         self::assertResponseContentTypeEquals($result, $file->getMimeType());
         self::assertResponseStatusCodeEquals($result, 200);
     }
@@ -255,6 +257,8 @@ class FileControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
+        self::assertTrue($result->headers->getCacheControlDirective('public'));
+        self::assertTrue($result->headers->hasCacheControlDirective('max-age'));
         self::assertResponseContentTypeEquals($result, 'image/webp');
         self::assertResponseStatusCodeEquals($result, 200);
     }
@@ -275,6 +279,8 @@ class FileControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
+        self::assertTrue($result->headers->getCacheControlDirective('public'));
+        self::assertTrue($result->headers->hasCacheControlDirective('max-age'));
         self::assertResponseContentTypeEquals($result, 'image/png');
         self::assertResponseStatusCodeEquals($result, 200);
     }
@@ -295,6 +301,8 @@ class FileControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
+        self::assertTrue($result->headers->getCacheControlDirective('public'));
+        self::assertTrue($result->headers->hasCacheControlDirective('max-age'));
         self::assertResponseContentTypeEquals($result, 'image/webp');
         self::assertResponseStatusCodeEquals($result, 200);
     }
