@@ -5,3 +5,15 @@ services:
         decorates: oro_cron.cron_helper
         arguments:
             - '@.inner'
+
+    Oro\Bundle\CronBundle\Tests\Functional\Stub\TestCronCommand:
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\CronBundle\Tests\Functional\Stub\LazyTestCronCommand:
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\CronBundle\Tests\Functional\Stub\NoScheduleDefinitionTestCronCommand:
+        tags:
+            - { name: console.command }
