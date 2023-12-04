@@ -22,30 +22,22 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
         $scheduleRepository = self::getContainer()->get('doctrine')->getRepository(Schedule::class);
         $scheduleRepository->createQueryBuilder('d')->delete()->getQuery()->execute();
 
+        // guard
         $schedules = $scheduleRepository->findAll();
+        self::assertCount(0, $schedules);
 
-        //guard
-        $this->assertCount(0, $schedules);
-
-        $result = $this->runCommand('oro:cron:definitions:load');
+        $result = self::runCommand('oro:cron:definitions:load');
 
         self::assertStringContainsString('Removing all previously loaded commands...', $result);
-        self::assertStringContainsString('Processing command ', $result);
-        self::assertStringContainsString(' setting up schedule..', $result);
-
-        $schedules = $scheduleRepository->findAll();
-        $this->assertGreaterThan(0, count($schedules));
-    }
-
-    public function testShouldNotLoadCommandDefinitionFromApplicationIfNotImplement()
-    {
-        $this->markTestIncomplete('Requires a proper test stub as it now excludes itself from the list');
-        $result = $this->runCommand('oro:cron:definitions:load');
-
+        self::assertStringContainsString('Processing command "oro:cron:test:usual": setting up schedule.', $result);
+        self::assertStringContainsString('Processing command "oro:cron:test:lazy": setting up schedule.', $result);
         self::assertStringContainsString(
-            'Processing command "oro:cron:definitions:load": '.
-            'Skipping, the command does not implement CronCommandScheduleDefinitionInterface',
+            'Processing command "oro:cron:test:no_schedule_definition":'
+            . ' Skipping, the command does not implement CronCommandScheduleDefinitionInterface.',
             $result
         );
+
+        $schedules = $scheduleRepository->findAll();
+        self::assertGreaterThan(0, count($schedules));
     }
 }
