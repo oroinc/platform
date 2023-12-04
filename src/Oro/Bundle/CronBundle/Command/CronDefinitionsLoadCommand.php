@@ -7,6 +7,7 @@ namespace Oro\Bundle\CronBundle\Command;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -53,16 +54,20 @@ HELP
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>Removing all previously loaded commands...</info>');
-        $this->doctrine->getRepository('OroCronBundle:Schedule')
-            ->createQueryBuilder('d')
+
+        $em = $this->doctrine->getManagerForClass(Schedule::class);
+        $em->createQueryBuilder()
+            ->from(Schedule::class, 'd')
             ->delete()
             ->getQuery()
             ->execute();
 
         $applicationCommands = $this->getApplication()->all('oro:cron');
-        $em = $this->doctrine->getManagerForClass('OroCronBundle:Schedule');
 
         foreach ($applicationCommands as $name => $command) {
+            if ($command instanceof LazyCommand) {
+                $command = $command->getCommand();
+            }
             if ($this === $command) {
                 continue;
             }
@@ -84,7 +89,7 @@ HELP
         string $name,
         array $arguments = []
     ): Schedule {
-        $output->writeln('<comment>setting up schedule..</comment>');
+        $output->writeln('<comment>setting up schedule.</comment>');
 
         $schedule = new Schedule();
         $schedule
@@ -99,14 +104,14 @@ HELP
     {
         if (!$command instanceof CronCommandScheduleDefinitionInterface) {
             $output->writeln(
-                '<info>Skipping, the command does not implement CronCommandScheduleDefinitionInterface</info>'
+                '<info>Skipping, the command does not implement CronCommandScheduleDefinitionInterface.</info>'
             );
 
             return false;
         }
 
         if (!$command->getDefaultDefinition()) {
-            $output->writeln('<error>no cron definition found, check command</error>');
+            $output->writeln('<error>no cron definition found, check command.</error>');
 
             return false;
         }
