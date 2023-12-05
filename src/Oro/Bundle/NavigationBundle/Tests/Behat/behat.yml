@@ -126,5 +126,6 @@ oro_behat_extension:
         - OroFormBundle::FormContext
         - OroConfigBundle::FeatureContext
         - OroUIBundle::BreadcrumbContext
+        - OroSecurityBundle::ACLContext
       paths:
         - '@OroNavigationBundle/Tests/Behat/Features'
