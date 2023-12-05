@@ -24,6 +24,7 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
 
         //guard
         $this->assertCount(0, $schedules);
+        $nonCronSchedules = $this->loadNonCronSchedules();
 
         $result = $this->runCommand('oro:cron:definitions:load');
 
@@ -32,8 +33,62 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
         self::assertStringContainsString(' setting up schedule..', $result);
 
         $schedules = $this->getScheduleRepository()->findAll();
-
         $this->assertGreaterThan(0, count($schedules));
+
+        /** @var Schedule $expected */
+        foreach ($nonCronSchedules as $expected) {
+            $actual = $this->getScheduleRepository()->find($expected->getId());
+
+            self::assertInstanceOf(Schedule::class, $actual);
+            self::assertEquals($expected->getId(), $actual->getId());
+            self::assertEquals($expected->getCommand(), $actual->getCommand());
+            self::assertEquals($expected->getDefinition(), $actual->getDefinition());
+            self::assertEquals($expected->getArguments(), $actual->getArguments());
+        }
+    }
+
+    private function loadNonCronSchedules(): array
+    {
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(Schedule::class);
+
+        $item1 = $this->createSchedule(
+            'oro:process:handle-trigger',
+            '10 * * * *',
+            ['--id=1', '--name=test_1']
+        );
+        $em->persist($item1);
+
+        $item2 = $this->createSchedule(
+            'oro:process:handle-trigger',
+            '20 * * * *'
+        );
+        $em->persist($item2);
+
+        $item3 = $this->createSchedule(
+            'app:command',
+            '30 * * * *',
+            ['arg1', '--arg2', '--arg3=test']
+        );
+        $em->persist($item3);
+
+        $item4 = $this->createSchedule(
+            'app:command',
+            '40 * * * *',
+        );
+        $em->persist($item4);
+        $em->flush();
+
+        return [$item1, $item2, $item3, $item4];
+    }
+
+    private function createSchedule(string $command, string $definition, array $arguments = []): Schedule
+    {
+        $entity = new Schedule();
+        $entity->setCommand($command);
+        $entity->setDefinition($definition);
+        $entity->setArguments($arguments);
+
+        return $entity;
     }
 
     public function testShouldNotLoadCommandDefinitionFromApplicationIfNotImplement()
