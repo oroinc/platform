@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Extension;
 
+use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamilyAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
@@ -14,6 +16,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * Form extension that adds attributeFamily field to forms.
+ */
 class AttributeFamilyExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
@@ -23,9 +28,16 @@ class AttributeFamilyExtension extends AbstractTypeExtension
      */
     protected $attributeConfigProvider;
 
+    private EntityNameResolver $entityNameResolver;
+
     public function __construct(ConfigProvider $attributeConfigProvider)
     {
         $this->attributeConfigProvider = $attributeConfigProvider;
+    }
+
+    public function setEntityNameResolver(EntityNameResolver $entityNameResolver): void
+    {
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -60,7 +72,10 @@ class AttributeFamilyExtension extends AbstractTypeExtension
                 'required' => true,
                 'constraints' => [
                     new NotBlank(),
-                ]
+                ],
+                'choice_label' => function (AttributeFamily $attributeFamily) {
+                    return $this->entityNameResolver->getName($attributeFamily, EntityNameProviderInterface::FULL);
+                }
             ]
         );
     }

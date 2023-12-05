@@ -343,6 +343,8 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFamilyExtension
         arguments:
             - '@oro_entity_config.provider.attribute'
+        calls:
+            - [setEntityNameResolver, ['@oro_entity.entity_name_resolver']]
         tags:
             - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 

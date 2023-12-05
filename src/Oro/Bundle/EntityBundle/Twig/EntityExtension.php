@@ -59,7 +59,9 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
     public function getFilters()
     {
         return [
-            new TwigFilter('oro_format_name', [$this, 'getEntityName'])
+            new TwigFilter('oro_format_name', [$this, 'getEntityName']),
+            //@deprecated. will be removed. getEntityName will have Format parameter
+            new TwigFilter('oro_format_name_format', [$this, 'getEntityNameWithFormat'])
         ];
     }
 
@@ -156,6 +158,14 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
     public function getEntityName($object, $locale = null)
     {
         return $this->getEntityNameResolver()->getName($object, null, $locale);
+    }
+
+    /**
+     * @deprecated. Will be deleted and getEntityName will have $format parameter.
+     */
+    public function getEntityNameWithFormat(object $object, ?string $locale = null, ?string $format = null): string
+    {
+        return $this->getEntityNameResolver()->getName($object, $format, $locale);
     }
 
     /**

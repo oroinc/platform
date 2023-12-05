@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Extension;
 
+use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFamilyExtension;
@@ -22,6 +24,9 @@ class AttributeFamilyExtensionTest extends TypeTestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeConfigProvider;
 
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityNameResolver;
+
     /** @var AttributeFamilyExtension */
     private $extension;
 
@@ -30,8 +35,10 @@ class AttributeFamilyExtensionTest extends TypeTestCase
         parent::setUp();
 
         $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
 
         $this->extension = new AttributeFamilyExtension($this->attributeConfigProvider);
+        $this->extension->setEntityNameResolver($this->entityNameResolver);
     }
 
     public function notApplicableDataProvider(): array
@@ -54,11 +61,11 @@ class AttributeFamilyExtensionTest extends TypeTestCase
      */
     public function testBuildFormWhenNotApplicable(array $options)
     {
-        $this->attributeConfigProvider->expects($this->never())
+        $this->attributeConfigProvider->expects(self::never())
             ->method('hasConfig');
-        $this->attributeConfigProvider->expects($this->never())
+        $this->attributeConfigProvider->expects(self::never())
             ->method('getConfig');
-        $this->dispatcher->expects($this->never())
+        $this->dispatcher->expects(self::never())
             ->method('addListener');
 
         $this->extension->buildForm($this->builder, $options);
@@ -66,13 +73,13 @@ class AttributeFamilyExtensionTest extends TypeTestCase
 
     public function testBuildFormWithoutConfig()
     {
-        $this->attributeConfigProvider->expects($this->once())
+        $this->attributeConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with(self::DATA_CLASS)
             ->willReturn(false);
-        $this->attributeConfigProvider->expects($this->never())
+        $this->attributeConfigProvider->expects(self::never())
             ->method('getConfig');
-        $this->dispatcher->expects($this->never())
+        $this->dispatcher->expects(self::never())
             ->method('addListener');
 
         $this->extension->buildForm(
@@ -83,21 +90,21 @@ class AttributeFamilyExtensionTest extends TypeTestCase
 
     public function testBuildFormHasNotAttributes()
     {
-        $this->attributeConfigProvider->expects($this->once())
+        $this->attributeConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with(self::DATA_CLASS)
             ->willReturn(true);
 
         $attributeConfig = $this->createMock(ConfigInterface::class);
-        $attributeConfig->expects($this->once())
+        $attributeConfig->expects(self::once())
             ->method('is')
             ->with('has_attributes')
             ->willReturn(false);
-        $this->attributeConfigProvider->expects($this->once())
+        $this->attributeConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with(self::DATA_CLASS)
             ->willReturn($attributeConfig);
-        $this->dispatcher->expects($this->never())
+        $this->dispatcher->expects(self::never())
             ->method('addListener');
 
         $this->extension->buildForm(
@@ -108,21 +115,21 @@ class AttributeFamilyExtensionTest extends TypeTestCase
 
     public function testBuildForm()
     {
-        $this->attributeConfigProvider->expects($this->once())
+        $this->attributeConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with(self::DATA_CLASS)
             ->willReturn(true);
 
         $attributeConfig = $this->createMock(ConfigInterface::class);
-        $attributeConfig->expects($this->once())
+        $attributeConfig->expects(self::once())
             ->method('is')
             ->with('has_attributes')
             ->willReturn(true);
-        $this->attributeConfigProvider->expects($this->once())
+        $this->attributeConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with(self::DATA_CLASS)
             ->willReturn($attributeConfig);
-        $this->dispatcher->expects($this->once())
+        $this->dispatcher->expects(self::once())
             ->method('addListener')
             ->with(FormEvents::PRE_SET_DATA, [$this->extension, 'onPreSetData'], 0);
 
@@ -150,15 +157,15 @@ class AttributeFamilyExtensionTest extends TypeTestCase
     public function testOnPreSetData(?TestActivityTarget $entity)
     {
         $formConfig = $this->createMock(FormConfigInterface::class);
-        $formConfig->expects($this->once())
+        $formConfig->expects(self::once())
             ->method('getOptions')
             ->willReturn(['data_class' => self::DATA_CLASS]);
 
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('add')
             ->with(
                 'attributeFamily',
@@ -169,7 +176,10 @@ class AttributeFamilyExtensionTest extends TypeTestCase
                     'query_builder' => function () {
                     },
                     'required' => true,
-                    'constraints' => [new NotBlank()]
+                    'constraints' => [new NotBlank()],
+                    'choice_label' => function (AttributeFamily $attributeFamily) {
+                        return $this->entityNameResolver->getName($attributeFamily, EntityNameProviderInterface::FULL);
+                    }
                 ]
             );
 
