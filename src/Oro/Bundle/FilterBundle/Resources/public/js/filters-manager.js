@@ -202,7 +202,8 @@ define(function(require, exports, module) {
                 update: this._onFilterUpdated,
                 change: this._onFilterChanged,
                 disable: this._onFilterDisabled,
-                showCriteria: this._onFilterShowCriteria
+                showCriteria: this._onFilterShowCriteria,
+                update_criteria_label: this._resetHintContainer
             };
 
             if (tools.isMobile()) {
