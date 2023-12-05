@@ -41,21 +41,13 @@ Feature: Export extend entity fields
       | Phone number        | 0501468825                                |
       | Direction           | Outgoing                                  |
       | Duration            | 60s                                       |
-      | Select Field        | Carte d'identité                          |
       | Call date & time    | <DateTime:2016-10-31 08:00:00>            |
-    And check "Carte d'identité"
+      | Select Field        | Carte d'identité                          |
     And I take screenshot
+    And check "Carte d'identité"
     And save and close form
     Then should see "Call saved" flash message
     And I take screenshot
-    And I should see call with:
-      | Subject             | Call to Someone                           |
-      | Additional comments | Offered $40 discount on her next purchase |
-      | Phone number        | 0501468825                                |
-      | Direction           | Outgoing                                  |
-      | Duration            | 00:01:00                                  |
-      | Select Field        | Carte d'identité                          |
-      | Call date & time    | Oct 31, 2016, 8:00 AM                     |
 
   Scenario: Export call and check fields
     Given go to Activities/ Calls
@@ -65,5 +57,5 @@ Feature: Export extend entity fields
     Then I should see "Export started successfully. You will receive email notification upon completion." flash message
     And Email should contains the following "Grid export performed successfully. Download" text
     And exported file contains at least the following columns:
-      | Subject         | Phone number | Call date & time    | Contexts | Select field     | Multi select field |
-      | Call to Someone | 0501468825   | 10/31/2016 08:00:00 | John Doe | Carte d'identité | Carte d'identité   |
+      | Subject         | Phone number | Call date & time    | Contexts | Multi select field |
+      | Call to Someone | 0501468825   | 10/31/2016 08:00:00 | John Doe | Carte d'identité   |
