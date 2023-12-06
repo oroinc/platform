@@ -6,6 +6,7 @@ use Oro\Bundle\AttachmentBundle\EventListener\MultiFileBlockListener;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Stub\Entity\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
@@ -26,6 +27,9 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeManager;
+
     /** @var MultiFileBlockListener */
     private $listener;
 
@@ -33,8 +37,13 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->attributeManager = $this->createMock(AttributeManager::class);
 
-        $this->listener = new MultiFileBlockListener($this->configProvider, $this->translator);
+        $this->listener = new MultiFileBlockListener(
+            $this->configProvider,
+            $this->translator,
+        );
+        $this->listener->setAttributeManager($this->attributeManager);
     }
 
     public function testOnBeforeValueRender()

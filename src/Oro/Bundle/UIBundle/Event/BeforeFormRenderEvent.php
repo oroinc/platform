@@ -34,6 +34,8 @@ class BeforeFormRenderEvent extends Event
      */
     protected $twigEnvironment;
 
+    protected ?string $pageId = null;
+
     /**
      * @param FormView          $form
      * @param array             $formData
@@ -46,6 +48,11 @@ class BeforeFormRenderEvent extends Event
         $this->formData = $formData;
         $this->twigEnvironment = $twigEnvironment;
         $this->entity = $entity;
+    }
+
+    public function setPageId(?string $pageId = null): void
+    {
+        $this->pageId = $pageId;
     }
 
     /**
@@ -83,5 +90,10 @@ class BeforeFormRenderEvent extends Event
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    public function getPageId(): ?string
+    {
+        return $this->pageId;
     }
 }
