@@ -1,4 +1,20 @@
-{% macro scheduleIntervalsInfo(schedules, labels) %}
+{% macro scheduleIntervalsInfoItem(label, date, date_in_translate = true) %}
+    <span class="schedule-list-item">
+        {% if date is not null %}
+            {% if date_in_translate %}
+                {{ label|trans({'%date%': date|oro_format_datetime}) }}
+            {% else %}
+                {{ label|trans }} <strong>{{ date|oro_format_datetime }}</strong>
+            {% endif %}
+        {% else %}
+            <strong>{{ label|trans }}</strong>
+        {% endif %}
+    </span>
+{% endmacro %}
+
+{% macro scheduleIntervalsInfo(schedules, labels, date_in_translate = true) %}
+    {% import _self as scheduleUI %}
+
     {% set defaultLabels = {
         wasActivated: 'oro.cron.schedule_interval.was_activated',
         activeNow: 'oro.cron.schedule_interval.active_now',
@@ -15,14 +31,18 @@
             {% if schedule.activeAt < now %}
                 {% if schedule.activeAt %}
                     <li>
-                        {{ labels.wasActivated|trans({'%date%': schedule.activeAt|oro_format_datetime}) }}
+                        {{ scheduleUI.scheduleIntervalsInfoItem(
+                            labels.wasActivated,
+                            schedule.activeAt,
+                            date_in_translate
+                        ) }}
                     </li>
                 {% endif %}
 
                 {% if not schedule.deactivateAt or schedule.deactivateAt > now %}
                     {% set activityShown = true %}
                     <li>
-                        <strong>{{ labels.activeNow|trans }}</strong>
+                        {{ scheduleUI.scheduleIntervalsInfoItem(labels.activeNow) }}
                     </li>
                 {% endif %}
             {% endif %}
@@ -31,22 +51,34 @@
                 {% if not activityShown %}
                     {% set activityShown = true %}
                     <li>
-                        <strong>{{ labels.notActiveNow|trans }}</strong>
+                        {{ scheduleUI.scheduleIntervalsInfoItem(labels.notActiveNow) }}
                     </li>
                 {% endif %}
                 <li>
-                    {{ labels.willBeActivated|trans({'%date%': schedule.activeAt|oro_format_datetime}) }}
+                    {{ scheduleUI.scheduleIntervalsInfoItem(
+                        labels.willBeActivated,
+                        schedule.activeAt,
+                        date_in_translate
+                    ) }}
                 </li>
             {% endif %}
 
             {% if schedule.deactivateAt %}
                 {% if schedule.deactivateAt < now %}
                     <li>
-                        {{ labels.wasDeactivated|trans({'%date%': schedule.deactivateAt|oro_format_datetime}) }}
+                        {{ scheduleUI.scheduleIntervalsInfoItem(
+                            labels.wasDeactivated,
+                            schedule.deactivateAt,
+                            date_in_translate
+                        ) }}
                     </li>
                 {% else %}
                     <li>
-                        {{ labels.willBeDeactivated|trans({'%date%': schedule.deactivateAt|oro_format_datetime}) }}
+                        {{ scheduleUI.scheduleIntervalsInfoItem(
+                            labels.willBeDeactivated,
+                            schedule.deactivateAt,
+                            date_in_translate
+                        ) }}
                     </li>
                 {% endif %}
             {% endif %}
@@ -54,7 +86,7 @@
 
         {% if not activityShown %}
             <li>
-                <strong>{{ labels.notActiveNow|trans }}</strong>
+                {{ scheduleUI.scheduleIntervalsInfoItem(labels.notActiveNow) }}
             </li>
         {% endif %}
     </ul>

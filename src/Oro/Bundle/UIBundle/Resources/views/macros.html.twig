@@ -1183,7 +1183,7 @@
 
     {% set cols = subblocks|length %}
     <div class="responsive-section"{% if options.initSectionInstantly is defined and options.initSectionInstantly %} data-init-section-instantly{% endif %}>
-        <h4 class="scrollspy-title">{{ title }}{% if headerLinkContent is defined %}{{ headerLinkContent }}{% endif %}</h4>
+        {% if title is defined %}<h4 class="scrollspy-title">{{ title }}{% if headerLinkContent is defined %}{{ headerLinkContent }}{% endif %}</h4>{% endif %}
         <div id="{{ blockId }}" class="scrollspy-nav-target"></div>
         <div class="section-content">
             <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ UIMacro.attributes(contentAttributes, ['class']) }}>

@@ -20,6 +20,7 @@
         .attribute-item {
             &__term {
                 width: 100%;
+                max-width: 100%;
                 margin-bottom: $attribute-item-full-description-offset-bottom;
             }
 
