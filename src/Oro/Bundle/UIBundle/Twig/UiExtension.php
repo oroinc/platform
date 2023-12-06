@@ -136,6 +136,11 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
                 ['needs_environment' => true]
             ),
             new TwigFunction(
+                'oro_form_process_with_page_identifier',
+                [$this, 'processFormWithPageIdentifier'],
+                ['needs_environment' => true]
+            ),
+            new TwigFunction(
                 'oro_form_additional_data',
                 [$this, 'renderAdditionalData'],
                 ['needs_environment' => true]
@@ -213,7 +218,19 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     {
         $event = new BeforeFormRenderEvent($form, $data, $environment, $entity);
         $this->getEventDispatcher()->dispatch($event, Events::BEFORE_UPDATE_FORM_RENDER);
+        return $event->getFormData();
+    }
 
+    public function processFormWithPageIdentifier(
+        TwigEnvironment $environment,
+        array $data,
+        FormView $form,
+        ?object $entity = null,
+        ?string $pageId = null
+    ): array {
+        $event = new BeforeFormRenderEvent($form, $data, $environment, $entity);
+        $event->setPageId($pageId);
+        $this->getEventDispatcher()->dispatch($event, Events::BEFORE_UPDATE_FORM_RENDER);
         return $event->getFormData();
     }
 

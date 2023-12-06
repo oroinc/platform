@@ -4,6 +4,10 @@ namespace Oro\Bundle\AttachmentBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamilyAwareInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
@@ -20,6 +24,9 @@ class MultiFileBlockListener
     // default priority for view pages
     const ADDITIONAL_SECTION_PRIORITY = 1200;
 
+    /** @var AttributeManager */
+    private $attributeManager;
+
     /** @var ConfigProvider */
     private $entityConfigProvider;
 
@@ -30,6 +37,11 @@ class MultiFileBlockListener
     {
         $this->entityConfigProvider = $configProvider;
         $this->translator = $translator;
+    }
+
+    public function setAttributeManager(AttributeManager $attributeManager): void
+    {
+        $this->attributeManager = $attributeManager;
     }
 
     public function onBeforeValueRender(ValueRenderEvent $event)
@@ -53,8 +65,7 @@ class MultiFileBlockListener
         }
 
         $className = ClassUtils::getClass($event->getEntity());
-
-        $fieldConfigs = $this->entityConfigProvider->getIds($className);
+        $fieldConfigs = $this->getConfigs($event->getEntity());
         if (!$fieldConfigs) {
             return;
         }
@@ -66,9 +77,6 @@ class MultiFileBlockListener
 
         foreach ($fieldConfigs as $fieldConfig) {
             $fieldName = $fieldConfig->getFieldName();
-            if (!FieldConfigHelper::isMultiField($fieldConfig)) {
-                continue;
-            }
             $config = $this->entityConfigProvider->getConfig($className, $fieldName);
 
             $blockKey = $fieldName . '_block_section';
@@ -103,7 +111,7 @@ class MultiFileBlockListener
 
         $className = ClassUtils::getClass($event->getEntity());
 
-        $fieldConfigs = $this->entityConfigProvider->getIds($className);
+        $fieldConfigs = $this->getConfigs($event->getEntity());
         if (!$fieldConfigs) {
             return;
         }
@@ -115,9 +123,6 @@ class MultiFileBlockListener
 
         foreach ($fieldConfigs as $fieldConfig) {
             $fieldName = $fieldConfig->getFieldName();
-            if (!FieldConfigHelper::isMultiField($fieldConfig)) {
-                continue;
-            }
             $config = $this->entityConfigProvider->getConfig($className, $fieldName);
             $newBlockKey = $fieldName . '_block_section';
 
@@ -137,6 +142,35 @@ class MultiFileBlockListener
         }
 
         $event->setFormData($scrollData->getData());
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return FieldConfigModel[]
+     */
+    private function getConfigs(object $entity): array
+    {
+        $configManager = $this->entityConfigProvider->getConfigManager();
+        $className = ClassUtils::getClass($entity);
+
+        $ids = $this->entityConfigProvider->getIds($className);
+        $multiIds = array_filter($ids, fn (FieldConfigId $id) => FieldConfigHelper::isMultiField($id));
+
+        if ($entity instanceof AttributeFamilyAwareInterface && $entity->getAttributeFamily()) {
+            $family = $entity->getAttributeFamily();
+            $familyFilter = function (FieldConfigId $id) use ($configManager, $family, $className) {
+                $config = $configManager->getFieldConfig('attribute', $className, $id->getFieldName());
+
+                return $config->get('is_attribute')
+                    ? $this->attributeManager->getAttributeByFamilyAndName($family, $id->getFieldName())
+                    : true;
+            };
+
+            $multiIds = array_filter($multiIds, $familyFilter);
+        }
+
+        return $multiIds;
     }
 
     private function isFileOrImageField(string $type): bool
