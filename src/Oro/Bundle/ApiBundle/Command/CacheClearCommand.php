@@ -61,9 +61,11 @@ HELP
 
         if ($noWarmup) {
             $io->comment('Clearing API cache...');
+            $this->cacheManager->warmUpConfigCache();
             $this->cacheManager->clearCaches();
         } else {
             $io->comment('Warming up API cache...');
+            $this->cacheManager->warmUpConfigCache();
             $this->cacheManager->warmUpCaches();
         }
 
