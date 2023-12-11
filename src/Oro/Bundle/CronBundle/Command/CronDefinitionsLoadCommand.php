@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\CronBundle\Command;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Symfony\Component\Console\Command\Command;
@@ -56,8 +57,14 @@ HELP
         $output->writeln('<info>Removing all previously loaded commands...</info>');
 
         $em = $this->doctrine->getManagerForClass(Schedule::class);
-        $em->createQueryBuilder()
-            ->from(Schedule::class, 'd')
+        /** @var QueryBuilder $qb */
+        $qb = $em->createQueryBuilder()
+            ->from(Schedule::class, 'd');
+        $qb
+            ->where(
+                $qb->expr()->like('d.command', ':cron')
+            )
+            ->setParameter('cron', 'oro:cron:%')
             ->delete()
             ->getQuery()
             ->execute();
