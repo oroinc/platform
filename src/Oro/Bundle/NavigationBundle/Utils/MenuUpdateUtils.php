@@ -40,9 +40,7 @@ class MenuUpdateUtils
             $item->setExtra($key, $extra);
         }
 
-        foreach ($update->getLinkAttributes() as $key => $linkAttribute) {
-            $item->setLinkAttribute($key, $linkAttribute);
-        }
+        $item->setLinkAttributes($update->getLinkAttributes());
 
         if ($update->getDescriptions()->count()) {
             $description = (string)$update->getDescription($localizationHelper->getCurrentLocalization());
