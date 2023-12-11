@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -18,17 +17,17 @@ class GetScope implements ProcessorInterface
 {
     public const CONTEXT_PARAM = '_scope';
 
-    private ConfigurationRepository $configRepository;
+    private array $scopes;
 
-    public function __construct(ConfigurationRepository $configRepository)
+    public function __construct(array $scopes)
     {
-        $this->configRepository = $configRepository;
+        $this->scopes = $scopes;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
@@ -37,12 +36,11 @@ class GetScope implements ProcessorInterface
         $scopeFilterValue = $context->getFilterValues()->get(AddScopeFilter::FILTER_KEY);
         if ($scopeFilterValue) {
             $scope = $scopeFilterValue->getValue();
-            $scopes = $this->configRepository->getScopes();
-            if (!in_array($scope, $scopes, true)) {
+            if (!\in_array($scope, $this->scopes, true)) {
                 $context->addError(
                     Error::createValidationError(
                         Constraint::FILTER,
-                        sprintf('Unknown configuration scope. Permissible values: %s.', implode(', ', $scopes))
+                        sprintf('Unknown configuration scope. Permissible values: %s.', implode(', ', $this->scopes))
                     )->setSource(ErrorSource::createByParameter(AddScopeFilter::FILTER_KEY))
                 );
             }

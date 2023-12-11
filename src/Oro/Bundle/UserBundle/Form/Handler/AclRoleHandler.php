@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
-use Doctrine\Common\Cache\ApcCache;
-use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,6 +10,7 @@ use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
+use Oro\Bundle\SecurityBundle\Cache\DoctrineAclCacheProvider;
 use Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilter;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
@@ -85,12 +84,19 @@ class AclRoleHandler
     /** @var AclPrivilegeConfigurableFilter */
     protected $configurableFilter;
 
+    protected DoctrineAclCacheProvider $queryCacheProvider;
+
     public function __construct(FormFactory $formFactory, AclCacheInterface $aclCache, array $privilegeConfig)
     {
         $this->formFactory = $formFactory;
         $this->aclCache = $aclCache;
         $this->privilegeConfig = $privilegeConfig;
         $this->configurableName = ConfigurablePermissionProvider::DEFAULT_CONFIGURABLE_NAME;
+    }
+
+    public function setQueryCacheProvider(DoctrineAclCacheProvider $queryCacheProvider): void
+    {
+        $this->queryCacheProvider = $queryCacheProvider;
     }
 
     public function setAclManager(AclManager $aclManager)
@@ -328,9 +334,12 @@ class AclRoleHandler
 
         // Clear doctrine query cache to be sure that queries will process hints
         // again with updated security information.
-        $cacheDriver = $this->managerRegistry->getManager()->getConfiguration()->getQueryCacheImpl();
-        if ($cacheDriver && !($cacheDriver instanceof ApcCache && $cacheDriver instanceof XcacheCache)) {
-            $cacheDriver->deleteAll();
+        $roleUsers = [];
+        foreach ($role->getUsers() as $user) {
+            $roleUsers[] = $user->getId();
+        }
+        if (count($roleUsers)) {
+            $this->queryCacheProvider->clearForEntities(User::class, $roleUsers);
         }
     }
 

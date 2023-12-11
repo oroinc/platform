@@ -5,8 +5,11 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Builder;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdatesApplyBeforeEvent;
 use Oro\Bundle\NavigationBundle\Exception\MaxNestingLevelExceededException;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
 {
@@ -54,23 +57,23 @@ class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnOnConsecutiveCalls(false, 10);
 
-        $childItem->expects($this->once())
+        $childItem->expects(self::once())
             ->method('getLevel')
             ->willReturn(11);
 
-        $childItem->expects($this->once())
+        $childItem->expects(self::once())
             ->method('getChildren')
             ->willReturn([]);
 
-        $childItem->expects($this->once())
+        $childItem->expects(self::once())
             ->method('getLabel')
             ->willReturn('ChildMenuItem');
 
-        $this->menuItem->expects($this->exactly(2))
+        $this->menuItem->expects(self::exactly(2))
             ->method('getChildren')
             ->willReturnOnConsecutiveCalls([$childItem], [$childItem]);
 
-        $this->menuItem->expects($this->once())
+        $this->menuItem->expects(self::once())
             ->method('getLabel')
             ->willReturn('MainMenuItem');
 
@@ -84,10 +87,33 @@ class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
             ->with($this->menuItem)
             ->willReturn([]);
 
-        $this->menuItem->expects($this->exactly(2))
+        $this->menuItem->expects(self::exactly(2))
             ->method('getChildren')
             ->willReturn([]);
 
+        $this->menuUpdateBuilder->build($this->menuItem);
+    }
+
+    public function testBuildWithMenuUpdates(): void
+    {
+        $menuUpdate = new MenuUpdate();
+        $menuUpdate->setUri('/test-page');
+
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
+        $eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(new MenuUpdatesApplyBeforeEvent([$menuUpdate]), null);
+
+        $this->menuUpdateProvider->expects(self::once())
+            ->method('getMenuUpdatesForMenuItem')
+            ->with($this->menuItem)
+            ->willReturn([$menuUpdate]);
+
+        $this->menuItem->expects(self::exactly(2))
+            ->method('getChildren')
+            ->willReturn([]);
+
+        $this->menuUpdateBuilder->setEventDispatcher($eventDispatcher);
         $this->menuUpdateBuilder->build($this->menuItem);
     }
 }
