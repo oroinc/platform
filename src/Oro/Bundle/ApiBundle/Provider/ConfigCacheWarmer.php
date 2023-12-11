@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration as Config;
 use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\FolderYamlCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
@@ -18,7 +19,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class ConfigCacheWarmer
+class ConfigCacheWarmer implements WarmableConfigCacheInterface
 {
     public const CONFIG_KEY = 'configKey';
     public const CONFIG = 'config';
@@ -53,6 +54,14 @@ class ConfigCacheWarmer
         $this->configCacheFactory = $configCacheFactory;
         $this->debug = $debug;
         $this->environment = $environment;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function warmUpCache(): void
+    {
+        $this->warmUp();
     }
 
     public function warmUp(string $configKey = null): void

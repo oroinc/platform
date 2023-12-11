@@ -154,9 +154,12 @@ class PagestateController extends AbstractFOSRestController
      */
     public function getCheckidAction()
     {
-        $entity = $this->getPageStateRepository()->findOneByPageHash(
-            AbstractPageState::generateHash($this->get('request_stack')->getCurrentRequest()->get('pageId'))
+        $hash = AbstractPageState::generateHash(
+            $this->get('request_stack')->getCurrentRequest()->get('pageId'),
+            $this->getUser()->getId(),
         );
+
+        $entity = $this->getPageStateRepository()->findOneByPageHash($hash);
 
         return $this->handleView($this->view($this->getState($entity), Response::HTTP_OK));
     }

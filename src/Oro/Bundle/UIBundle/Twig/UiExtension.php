@@ -201,19 +201,15 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         return $templateWrapper->renderBlock($block, array_merge($context, $extraContext));
     }
 
-    /**
-     * @param TwigEnvironment   $environment
-     * @param array             $data
-     * @param FormView          $form
-     * @param object|null       $entity
-     *
-     * @return array
-     */
-    public function processForm(TwigEnvironment $environment, array $data, FormView $form, $entity = null)
-    {
-        $event = new BeforeFormRenderEvent($form, $data, $environment, $entity);
+    public function processForm(
+        TwigEnvironment $environment,
+        array $data,
+        FormView $form,
+        ?object $entity = null,
+        ?string $pageId = null
+    ): array {
+        $event = new BeforeFormRenderEvent($form, $data, $environment, $entity, $pageId);
         $this->getEventDispatcher()->dispatch($event, Events::BEFORE_UPDATE_FORM_RENDER);
-
         return $event->getFormData();
     }
 

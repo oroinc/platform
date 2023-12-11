@@ -12,6 +12,7 @@ use Oro\Bundle\CronBundle\Tools\CronHelper;
 use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -75,6 +76,7 @@ HELP
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -110,6 +112,9 @@ HELP
             }
 
             $command = $this->getApplication()->get($schedule->getCommand());
+            if ($command instanceof LazyCommand) {
+                $command = $command->getCommand();
+            }
             if (($command instanceof CronCommandActivationInterface && !$command->isActive())
                 || !$command->isEnabled()
             ) {

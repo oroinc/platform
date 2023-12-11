@@ -1329,8 +1329,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
 
         self::assertServiceExists($container, 'oro_api.cache_manager');
-        self::assertSame(['default' => []], $container->getDefinition('oro_api.cache_manager')->getArgument(0));
-        self::assertSame([], $container->getDefinition('oro_api.cache_manager')->getArgument(1));
+        self::assertSame([], $container->getDefinition('oro_api.cache_manager')->getArgument(0));
     }
 
     public function testRegisterConfigParameters()
@@ -1392,18 +1391,10 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertServiceExists($container, 'oro_api.cache_manager');
         self::assertEquals(
             [
-                'first'   => ['first'],
-                'second'  => ['second'],
-                'default' => []
-            ],
-            $container->getDefinition('oro_api.cache_manager')->getArgument(0)
-        );
-        self::assertEquals(
-            [
                 'view_1'       => ['first', 'rest'],
                 'default_view' => []
             ],
-            $container->getDefinition('oro_api.cache_manager')->getArgument(1)
+            $container->getDefinition('oro_api.cache_manager')->getArgument(0)
         );
     }
 

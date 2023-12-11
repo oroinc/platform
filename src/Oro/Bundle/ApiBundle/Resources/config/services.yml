@@ -215,6 +215,14 @@ services:
         tags:
             - { name: oro.api.object_normalizer, class: DateTimeInterface }
 
+    oro_api.system.cache_warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        arguments:
+            - '@oro_api.config_cache_warmer'
+            - false
+        tags:
+            - { name: kernel.cache_warmer }
+
     oro_api.entity_alias.cache_warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer
         arguments:
@@ -379,10 +387,7 @@ services:
     oro_api.cache_manager:
         class: Oro\Bundle\ApiBundle\Provider\CacheManager
         arguments:
-            - [] # config keys. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
             - [] # api doc views. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
-            - '@oro_api.request_expression_matcher'
-            - '@oro_api.config_cache_factory'
             - '@oro_api.config_cache_warmer'
             - '@oro_api.entity_alias_resolver_registry'
             - '@oro_api.resources.cache_warmer'
