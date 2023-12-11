@@ -65,12 +65,12 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
     {
         $cacheManager = $this->getCacheManager([], [], $this->createMock(ApiDocExtractor::class));
 
-        $this->configCacheWarmer->expects(self::once())
-            ->method('warmUp');
         $this->entityAliasResolverRegistry->expects(self::once())
             ->method('clearCache');
         $this->resourcesCacheWarmer->expects(self::once())
             ->method('clearCache');
+        $this->configCacheWarmer->expects(self::never())
+            ->method(self::anything());
 
         $cacheManager->clearCaches();
     }
@@ -79,12 +79,12 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
     {
         $cacheManager = $this->getCacheManager([], [], $this->createMock(ApiDocExtractor::class));
 
-        $this->configCacheWarmer->expects(self::once())
-            ->method('warmUp');
         $this->entityAliasResolverRegistry->expects(self::once())
             ->method('warmUpCache');
         $this->resourcesCacheWarmer->expects(self::once())
             ->method('warmUpCache');
+        $this->configCacheWarmer->expects(self::never())
+            ->method(self::anything());
 
         $cacheManager->warmUpCaches();
     }
@@ -258,6 +258,20 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(['view1'], ['view2'], ['view4'], ['view3']);
 
         $cacheManager->warmUpDirtyCaches();
+    }
+
+    public function testWarmUpConfigCache()
+    {
+        $cacheManager = $this->getCacheManager([], [], $this->createMock(ApiDocExtractor::class));
+
+        $this->configCacheWarmer->expects(self::once())
+            ->method('warmUpCache');
+        $this->entityAliasResolverRegistry->expects(self::never())
+            ->method(self::anything());
+        $this->resourcesCacheWarmer->expects(self::never())
+            ->method(self::anything());
+
+        $cacheManager->warmUpConfigCache();
     }
 
     public function testIsApiDocCacheEnabledForNonCachingApiDocExtractor()

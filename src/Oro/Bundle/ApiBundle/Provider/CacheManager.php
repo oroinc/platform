@@ -50,23 +50,23 @@ class CacheManager
     }
 
     /**
-     * Clears all API caches except API documentation cache.
-     * To clear API documentation cache the clearApiDocCache() method should be used.
+     * Clears all API caches except API system cache and API documentation cache.
+     * To rebuild API system cache the {@see warmUpConfigCache()} method should be used.
+     * To clear API documentation cache the {@see clearApiDocCache()} method should be used.
      */
     public function clearCaches(): void
     {
-        $this->configCacheWarmer->warmUp();
         $this->entityAliasResolverRegistry->clearCache();
         $this->resourcesCacheWarmer->clearCache();
     }
 
     /**
-     * Warms up all API caches except API documentation cache.
-     * To warm up API documentation cache the warmUpApiDocCache() method should be used.
+     * Warms up all API caches except API system cache and API documentation cache.
+     * To warm up API system cache the {@see warmUpConfigCache()} method should be used.
+     * To warm up API documentation cache the {@see warmUpApiDocCache()} method should be used.
      */
     public function warmUpCaches(): void
     {
-        $this->configCacheWarmer->warmUp();
         $this->entityAliasResolverRegistry->warmUpCache();
         $this->resourcesCacheWarmer->warmUpCache();
     }
@@ -103,6 +103,14 @@ class CacheManager
                 }
             }
         }
+    }
+
+    /**
+     * Warms up API system cache.
+     */
+    public function warmUpConfigCache(): void
+    {
+        $this->configCacheWarmer->warmUpCache();
     }
 
     /**

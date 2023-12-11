@@ -215,6 +215,14 @@ services:
         tags:
             - { name: oro.api.object_normalizer, class: DateTimeInterface }
 
+    oro_api.system.cache_warmer:
+        class: Oro\Component\Config\Cache\ConfigCacheWarmer
+        arguments:
+            - '@oro_api.config_cache_warmer'
+            - false
+        tags:
+            - { name: kernel.cache_warmer }
+
     oro_api.entity_alias.cache_warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer
         arguments:
