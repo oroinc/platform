@@ -49,7 +49,9 @@ class EmailBodySyncCommand extends Command implements CronCommandInterface
      */
     public function isActive()
     {
-        return $this->featureChecker->isResourceEnabled(self::getDefaultName(), 'cron_jobs');
+        return
+            $this->featureChecker->isResourceEnabled(self::getDefaultName(), 'cron_jobs')
+            && $this->featureChecker->isFeatureEnabled('email');
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -97,12 +99,6 @@ HELP
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->featureChecker->isFeatureEnabled('email')) {
-            $output->writeln('The email feature is disabled. The command will not run.');
-
-            return 0;
-        }
-
         $store = new SemaphoreStore();
         $lockFactory = new LockFactory($store);
 

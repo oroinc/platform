@@ -69,6 +69,11 @@ services:
         tags:
             - {name: doctrine.event_listener, event: onSchemaColumnDefinition }
 
+    oro_cron.event_listener.cron_command:
+        class: Oro\Bundle\CronBundle\EventListener\CronCommandListener
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand}
+
     oro_cron.repository.schedule:
         class: Oro\Bundle\CronBundle\Entity\Repository\ScheduleRepository
         public: true

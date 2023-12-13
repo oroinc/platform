@@ -55,7 +55,9 @@ class EmailSyncCommand extends Command implements CronCommandInterface
 
     public function isActive()
     {
-        return $this->featureChecker->isResourceEnabled(self::$defaultName, 'cron_jobs');
+        return
+            $this->featureChecker->isResourceEnabled(self::$defaultName, 'cron_jobs')
+            && $this->featureChecker->isFeatureEnabled('email');
     }
 
     /**
@@ -171,12 +173,6 @@ HELP
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->featureChecker->isFeatureEnabled('email')) {
-            $output->writeln('The email feature is disabled. The command will not run.');
-
-            return 0;
-        }
-
         $this->imapEmailSynchronizer->setLogger(new OutputLogger($output));
 
         $force = $input->getOption('force');

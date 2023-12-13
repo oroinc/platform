@@ -89,14 +89,6 @@ class EmailSyncCommandTest extends WebTestCase
         }
     }
 
-    public function testCommandOutputWithEmailFeatureDisabled()
-    {
-        $this->disableEmailFeature();
-        $result = $this->runCommand('oro:cron:imap-sync', []);
-
-        self::assertStringContainsString('The email feature is disabled. The command will not run.', $result);
-    }
-
     /**
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
