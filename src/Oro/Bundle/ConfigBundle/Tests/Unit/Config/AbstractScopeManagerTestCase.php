@@ -238,6 +238,16 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $config = new Config();
         $this->prepareSave($config, $scopeId);
 
+        $this->configBag->expects(self::any())
+            ->method('getConfig')
+            ->willReturn([
+                'fields' => [
+                    'oro_user.update' => [
+                        'data_type' => 'string'
+                    ]
+                ],
+            ]);
+
         $this->manager->set('oro_user.update', 'updated value', $scopeId);
         $key = sprintf('%s_%s', $this->getScopedEntityName(), $scopeId);
 
@@ -251,12 +261,6 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
                 return $callback($this->createMock(ItemInterface::class));
             });
         $this->assertNotEmpty($this->manager->getChanges($scopeId));
-
-        $this->configBag->expects(self::any())
-            ->method('getConfig')
-            ->willReturn([
-                'fields' => [],
-            ]);
 
         $this->manager->flush($scopeId);
 

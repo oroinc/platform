@@ -4,6 +4,7 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\CronBundle\Command\CronCommandFeatureCheckerInterface;
 use Oro\Bundle\CronBundle\EventListener\CronCommandListener;
+use Oro\Bundle\CronBundle\Tests\Unit\Stub\ActivableCronCommandStub;
 use Oro\Bundle\CronBundle\Tests\Unit\Stub\CronCommandStub;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -72,5 +73,38 @@ class CronCommandListenerTest extends \PHPUnit\Framework\TestCase
             'The feature that enables this CRON command is turned off.',
             str_replace(PHP_EOL, '', $output->fetch())
         );
+    }
+
+    public function testWhenCommandFeatureEnabledAndCommandActive(): void
+    {
+        $this->commandFeatureChecker->expects(self::once())
+            ->method('isFeatureEnabled')
+            ->with('oro:cron:test')
+            ->willReturn(true);
+
+        $command = new ActivableCronCommandStub('oro:cron:test');
+        $output = new BufferedOutput();
+        $event = new ConsoleCommandEvent($command, $this->createMock(InputInterface::class), $output);
+        $this->listener->onConsoleCommand($event);
+
+        $this->assertTrue($event->commandShouldRun());
+        $this->assertEquals('', $output->fetch());
+    }
+
+    public function testWhenCommandFeatureEnabledAndCommandNotActive(): void
+    {
+        $this->commandFeatureChecker->expects(self::once())
+            ->method('isFeatureEnabled')
+            ->with('oro:cron:test')
+            ->willReturn(true);
+
+        $command = new ActivableCronCommandStub('oro:cron:test');
+        $command->setActive(false);
+        $output = new BufferedOutput();
+        $event = new ConsoleCommandEvent($command, $this->createMock(InputInterface::class), $output);
+        $this->listener->onConsoleCommand($event);
+
+        $this->assertFalse($event->commandShouldRun());
+        $this->assertStringContainsString('This CRON command is disabled.', $output->fetch());
     }
 }

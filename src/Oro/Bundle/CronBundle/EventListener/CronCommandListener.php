@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CronBundle\EventListener;
 
+use Oro\Bundle\CronBundle\Command\CronCommandActivationInterface;
 use Oro\Bundle\CronBundle\Command\CronCommandFeatureCheckerInterface;
 use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -21,11 +22,16 @@ class CronCommandListener
     public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
-        if ($command instanceof CronCommandScheduleDefinitionInterface
-            && !$this->commandFeatureChecker->isFeatureEnabled($command->getName())
-        ) {
+        if (!$command instanceof CronCommandScheduleDefinitionInterface) {
+            return;
+        }
+
+        if (!$this->commandFeatureChecker->isFeatureEnabled($command->getName())) {
             $event->disableCommand();
             $event->getOutput()->writeln('<error>The feature that enables this CRON command is turned off.</error>');
+        } elseif ($command instanceof CronCommandActivationInterface && !$command->isActive()) {
+            $event->disableCommand();
+            $event->getOutput()->writeln('<error>This CRON command is disabled.</error>');
         }
     }
 }
