@@ -31,6 +31,7 @@ Feature: Export extend entity fields
 
   Scenario: Update schema
     Given I click update schema
+    And I should see Schema updated flash message
 
   Scenario: Create a call record in the Calls grid
     Given go to Activities/ Calls
