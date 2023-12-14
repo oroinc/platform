@@ -23,6 +23,8 @@ $base-ui-element-arrow-color: var(--base-ui-element-arrow-color, get-color('text
 $base-ui-element-border-color-hover: get-var-color('primary', 'hover') !default;
 $base-ui-element-border-color-focus: $base-ui-element-border-color-hover !default;
 
+$base-ui-element-focus-visible-outline: 2px solid get-color('neutral', 'focus') !default;
+$base-ui-element-focus-visible-outline-offset: 1px !default;
 $base-ui-element-focus-visible-style: 0 0 0 1px get-color('neutral', 'white-100'),
                               0 0 0 3px get-color('neutral', 'focus') !default;
 
