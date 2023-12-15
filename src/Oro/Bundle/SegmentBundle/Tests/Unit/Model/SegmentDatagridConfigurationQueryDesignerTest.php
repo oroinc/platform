@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
-use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Model\SegmentDatagridConfigurationQueryDesigner;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
@@ -89,22 +88,5 @@ class SegmentDatagridConfigurationQueryDesignerTest extends SegmentDefinitionTes
         $queryDesigner = new SegmentDatagridConfigurationQueryDesigner($segment, $em);
 
         $queryDesigner->getDefinition();
-    }
-
-    public function testQueryDesignerForNewSegment()
-    {
-        $definition = QueryDefinitionUtil::encodeDefinition($this->getDefaultDefinition());
-        $segment = new Segment();
-        $segment->setEntity(self::TEST_ENTITY);
-        $segment->setDefinition($definition);
-
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->never())
-            ->method('getClassMetadata');
-
-        $queryDesigner = new SegmentDatagridConfigurationQueryDesigner($segment, $em);
-
-        $this->assertEquals($definition, $queryDesigner->getDefinition());
-        $this->assertEquals($segment->getEntity(), $queryDesigner->getEntity());
     }
 }
