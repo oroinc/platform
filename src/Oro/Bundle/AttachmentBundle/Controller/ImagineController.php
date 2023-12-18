@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
-use Imagine\Exception\RuntimeException;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
-use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
 use Liip\ImagineBundle\Imagine\Cache\Helper\PathHelper;
 use Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService;
 use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Serves requests to filter local images.
@@ -26,24 +24,17 @@ class ImagineController extends AbstractController
 
         try {
             $url = $this->getUrlOfFilteredImage($path, $filter);
-        } catch (NotLoadableException $exception) {
-            throw new NotFoundHttpException(
-                sprintf('Source image for path "%s" could not be found', $path),
-                $exception
+        } catch (\Exception $exception) {
+            $this->getLogger()->error(
+                'Unable to get filtered image',
+                [
+                    'exception' => $exception,
+                    'filter' => $filter,
+                    'path' => $path
+                ]
             );
-        } catch (NonExistingFilterException $exception) {
-            throw new NotFoundHttpException(sprintf('Requested non-existing filter "%s"', $filter), $exception);
-        } catch (RuntimeException $exception) {
-            throw new \RuntimeException(
-                sprintf(
-                    'Unable to create image for path "%s" and filter "%s". Message was "%s"',
-                    $path,
-                    $filter,
-                    $exception->getMessage()
-                ),
-                0,
-                $exception
-            );
+
+            throw $this->createNotFoundException('Not Found', $exception);
         }
 
         return new RedirectResponse($url);
@@ -90,6 +81,11 @@ class ImagineController extends AbstractController
         return $this->container->get(WebpConfiguration::class);
     }
 
+    private function getLogger(): LoggerInterface
+    {
+        return $this->container->get(LoggerInterface::class);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -100,6 +96,7 @@ class ImagineController extends AbstractController
             [
                 ImagineFilterService::class,
                 WebpConfiguration::class,
+                LoggerInterface::class
             ]
         );
     }
