@@ -50,6 +50,13 @@ class ImagineControllerTest extends WebTestCase
         self::assertHtmlResponseStatusCodeEquals($result, 404);
     }
 
+    public function testGetFilteredImageReturns404WhenImageNotExist(): void
+    {
+        $this->client->request('GET', '/media/cache/resolve/product_large/bundles/oroproduct/images');
+        $result = $this->client->getResponse();
+        self::assertHtmlResponseStatusCodeEquals($result, 404);
+    }
+
     public function testGetFilteredImageReturns404WhenFilterNotExists(): void
     {
         $this->client->request(
