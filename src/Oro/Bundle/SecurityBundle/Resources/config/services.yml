@@ -583,6 +583,12 @@ services:
             - '%kernel.cache_dir%/oro/configurable_permissions.php'
             - '%kernel.debug%'
 
+    oro_security.permission_policy_header_provider:
+        class: Oro\Bundle\SecurityBundle\Provider\PermissionsPolicyHeaderProvider
+        arguments:
+            - !abstract '$enabled defined in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension'
+            - !abstract '$directives defined in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension'
+
     oro_security.configuration.builder.permission_configuration:
         class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
         arguments:
@@ -764,6 +770,13 @@ services:
             - '@oro_security.csrf_token_manager'
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -10 }
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    oro_security.event_listener.permissions_policy_header_request_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\PermissionsPolicyHeaderRequestListener
+        arguments:
+            - '@oro_security.permission_policy_header_provider'
+        tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
     oro_security.access_rule_executor:

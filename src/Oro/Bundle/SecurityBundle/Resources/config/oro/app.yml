@@ -15,6 +15,84 @@ doctrine:
         types:
             crypted_string: Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType
 
+oro_security:
+    permissions_policy:
+        enable: true
+        directives:
+            accelerometer: deny
+            autoplay: allow_self
+            battery: deny
+            camera: deny
+            fullscreen: allow_self
+            gamepad: deny
+            gyroscope: deny
+            hid: deny
+            idle-detection: deny
+            local-fonts: deny
+            magnetometer: deny
+            microphone: deny
+            midi: deny
+            screen-wake-lock: deny
+            serial: deny
+            usb: deny
+            window-management: deny
+#            ambient-light-sensor: deny
+#            attribution-reporting: deny
+#            browsing-topics: deny
+#            ch-device-memory: deny
+#            ch-downlink: deny
+#            ch-dpr: deny
+#            ch-ect: deny
+#            ch-prefers-color-scheme: deny
+#            ch-prefers-reduced-motion: deny
+#            ch-prefers-reduced-transparency: deny
+#            ch-rtt: deny
+#            ch-save-data: deny
+#            ch-ua-arch: deny
+#            ch-ua-bitness: deny
+#            ch-ua-form-factor: deny
+#            ch-ua-full-version-list: deny
+#            ch-ua-full-version: deny
+#            ch-ua-mobile: deny
+#            ch-ua-model: deny
+#            ch-ua-platform-version: deny
+#            ch-ua-platform: deny
+#            ch-ua-wow64: deny
+#            ch-ua: deny
+#            ch-viewport-height: deny
+#            ch-viewport-width: deny
+#            ch-width: deny
+#            clipboard-read: allow_self
+#            clipboard-write: allow_self
+#            cross-origin-isolated: deny
+#            display-capture: deny
+#            document-domain: deny
+#            encrypted-media: deny
+#            execution-while-not-rendered: deny
+#            execution-while-out-of-viewport: deny
+#            geolocation: deny
+#            identity-credentials-get: deny
+#            interest-cohort: deny
+#            join-ad-interest-group: deny
+#            keyboard-map: deny
+#            otp-credentials: deny
+#            payment: deny
+#            picture-in-picture: deny
+#            private-aggregation: deny
+#            private-state-token-issuance: deny
+#            private-state-token-redemption: deny
+#            publickey-credentials-create: deny
+#            publickey-credentials-get: deny
+#            run-ad-auction: deny
+#            shared-storage-select-url: deny
+#            shared-storage: deny
+#            speaker-selection: deny
+#            storage-access: deny
+#            sync-xhr: deny
+#            unload: deny
+#            web-share: deny
+#            xr-spatial-tracking: deny
+
 nelmio_security:
     # prevents framing of the entire site
     clickjacking:
