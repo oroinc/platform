@@ -43,10 +43,23 @@ class Configuration implements ConfigurationInterface
                 ->normalizeKeys(false)
                 ->defaultValue([])
                 ->prototype('variable')
+                ->end()
                 ->info(
                     "List of routes that must not be used as a redirect path after log in. ".
                     "See \Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener."
                 )
+            ->end()
+            ->arrayNode('permissions_policy')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->booleanNode('enable')->defaultFalse()->end()
+                    ->arrayNode('directives')
+                        ->useAttributeAsKey('name')
+                        ->prototype('variable')
+                            ->beforeNormalization()->castToArray()->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ->end();
 

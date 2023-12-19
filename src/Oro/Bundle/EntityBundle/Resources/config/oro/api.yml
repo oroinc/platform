@@ -50,6 +50,8 @@ api:
                             data_type: string
                         relatedEntityName:
                             data_type: string
+                        relatedEntityType:
+                            data_type: string
                         options:
                             data_type: object
                 options:

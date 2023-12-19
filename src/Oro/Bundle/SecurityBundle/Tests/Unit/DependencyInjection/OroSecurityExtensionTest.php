@@ -33,5 +33,9 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('lax', $cookieTokenStorageDef->getArgument(2));
 
         self::assertSame([], $container->getParameter('oro_security.login_target_path_excludes'));
+
+        $permissionsPolicyProviderDef = $container->getDefinition('oro_security.permission_policy_header_provider');
+        self::assertFalse($permissionsPolicyProviderDef->getArgument(0));
+        self::assertEquals([], $permissionsPolicyProviderDef->getArgument(1));
     }
 }
