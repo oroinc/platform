@@ -14,22 +14,19 @@ class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var SystemConfigFallbackProvider */
-    private $systemConfigFallbackProvider;
-
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
-    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $configInterface;
+    /** @var SystemConfigFallbackProvider */
+    private $systemConfigFallbackProvider;
 
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->systemConfigFallbackProvider = new SystemConfigFallbackProvider($this->configManager);
         $this->configProvider = $this->createMock(ConfigProvider::class);
+
+        $this->systemConfigFallbackProvider = new SystemConfigFallbackProvider($this->configManager);
         $this->systemConfigFallbackProvider->setConfigProvider($this->configProvider);
-        $this->configInterface = $this->createMock(ConfigInterface::class);
     }
 
     public function testIsFallbackSupportedReturnsTrue()
@@ -66,12 +63,13 @@ class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->systemConfigFallbackProvider->getFallbackEntityClass());
     }
 
-    private function setUpFallbackConfig($entityConfig)
+    private function setUpFallbackConfig($entityConfig): void
     {
+        $config = $this->createMock(ConfigInterface::class);
         $this->configProvider->expects($this->once())
             ->method('getConfig')
-            ->willReturn($this->configInterface);
-        $this->configInterface->expects($this->once())
+            ->willReturn($config);
+        $config->expects($this->once())
             ->method('getValues')
             ->willReturn($entityConfig);
     }
