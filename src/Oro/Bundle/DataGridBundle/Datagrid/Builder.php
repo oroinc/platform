@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
 use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderAwareInterface;
-use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderAwareTrait;
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
@@ -18,10 +18,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Provides a functionality to build datagrids.
  */
-class Builder implements MemoryCacheProviderAwareInterface
+class Builder
 {
-    use MemoryCacheProviderAwareTrait;
-
     /** @var string */
     private $baseDatagridClass;
 
@@ -37,25 +35,31 @@ class Builder implements MemoryCacheProviderAwareInterface
     /** @var iterable|ExtensionVisitorInterface[] */
     private $extensions;
 
+    /** @var MemoryCacheProviderInterface */
+    private $memoryCacheProvider;
+
     /**
      * @param string                               $baseDatagridClass
      * @param string                               $acceptorClass
      * @param EventDispatcherInterface             $eventDispatcher
      * @param ContainerInterface                   $dataSources
      * @param iterable|ExtensionVisitorInterface[] $extensions
+     * @param MemoryCacheProviderInterface         $memoryCacheProvider
      */
     public function __construct(
         string $baseDatagridClass,
         string $acceptorClass,
         EventDispatcherInterface $eventDispatcher,
         ContainerInterface $dataSources,
-        iterable $extensions
+        iterable $extensions,
+        MemoryCacheProviderInterface $memoryCacheProvider
     ) {
         $this->baseDatagridClass = $baseDatagridClass;
         $this->acceptorClass = $acceptorClass;
         $this->eventDispatcher = $eventDispatcher;
         $this->dataSources = $dataSources;
         $this->extensions = $extensions;
+        $this->memoryCacheProvider = $memoryCacheProvider;
     }
 
     /**
@@ -89,7 +93,7 @@ class Builder implements MemoryCacheProviderAwareInterface
         /** @var DatagridInterface $datagrid */
         $datagrid = new $class($name, $config, $parameters);
         if ($datagrid instanceof MemoryCacheProviderAwareInterface) {
-            $datagrid->setMemoryCacheProvider($this->getMemoryCacheProvider());
+            $datagrid->setMemoryCacheProvider($this->memoryCacheProvider);
         }
         $datagrid->setScope($config->offsetGetOr('scope'));
 

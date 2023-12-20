@@ -13,9 +13,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 class DataSourcesPassTest extends \PHPUnit\Framework\TestCase
 {
     private ContainerBuilder $container;
-
     private Definition $builder;
-
     private DataSourcesPass $compiler;
 
     protected function setUp(): void
