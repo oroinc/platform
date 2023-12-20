@@ -33,3 +33,12 @@
         {{ block_widget(block) }}
     </div>
 {% endblock %}
+
+{% block _middle_bar_right_menus_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' middlebar__menus'
+    }) %}
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}

@@ -78,11 +78,20 @@
 
 {% block logo_widget %}
     {% import '@OroUI/macros.html.twig' as UI %}
+    {% set searchType = oro_config_value('oro_frontend.search_on_smaller_screens') %}
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' logo'
     }) %}
 
     {% set src = src|default(asset('bundles/orofrontend/default/images/logo/demob2b-logo.svg')) %}
+    {% set srcSmall = logo_small|default(asset('bundles/orofrontend/default/images/logo/demob2b-logo-small.svg')) %}
+
+    {% set attr_img_small = attr_img|default({}) %}
+    {% set attr_img_small = layout_attr_defaults(attr_img_small, {
+        'srcset': srcSmall,
+        'type': 'image/svg+xml',
+        'media': '(max-width: 767px)'
+    }) %}
 
     {% set attr_img = attr_img|default({}) %}
     {% set attr_img = layout_attr_defaults(attr_img, {
@@ -105,11 +114,21 @@
 
     {% if renderLink and app.request.attributes.get('_route') != route %}
         <a href="{{ path(route) }}" {{ block('block_attributes') }} aria-label="{{ 'oro_frontend.logo.aria_label'|trans }}">
-            <img {{ UI.attributes(attr_img) }}>
+            <picture>
+                {% if searchType == 'integrated' %}
+                    <source {{ UI.attributes(attr_img_small) }}>
+                {% endif %}
+                <img {{ UI.attributes(attr_img) }}>
+            </picture>
         </a>
     {% else %}
         <div {{ block('block_attributes') }}>
-            <img {{ UI.attributes(attr_img) }}>
+            <picture>
+                {% if searchType == 'integrated' %}
+                    <source {{ UI.attributes(attr_img_small) }}>
+                {% endif %}
+                <img {{ UI.attributes(attr_img) }}>
+            </picture>
         </div>
     {% endif %}
 {% endblock %}
