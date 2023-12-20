@@ -44,8 +44,7 @@ services:
             - '@oro_datagrid.event.dispatcher'
             - !abstract '$dataSources defined in Oro\Bundle\DataGridBundle\DependencyInjection\Compiler\DataSourcesPass'
             - !abstract '$extensions defined in Oro\Bundle\DataGridBundle\DependencyInjection\Compiler\ExtensionsPass'
-        calls:
-            - ['setMemoryCacheProvider', ['@oro_datagrid.results.cache']]
+            - '@oro_datagrid.results.cache'
         lazy: true
 
     oro_datagrid.datagrid.request_parameters_factory:

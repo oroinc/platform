@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Fallback\Provider;
 
-use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderAwareTrait;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
@@ -12,15 +11,10 @@ use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissing
  */
 class SystemConfigFallbackProvider extends AbstractEntityFallbackProvider
 {
-    use MemoryCacheProviderAwareTrait;
-
     const CONFIG_NAME_KEY = 'configName';
     const FALLBACK_ID = 'systemConfig';
 
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
+    protected ConfigManager $configManager;
 
     public function __construct(ConfigManager $configManager)
     {
