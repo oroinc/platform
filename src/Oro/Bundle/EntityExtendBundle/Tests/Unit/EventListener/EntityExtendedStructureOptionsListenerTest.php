@@ -9,12 +9,9 @@ use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\EventListener\EntityExtendedStructureOptionsListener;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     private const CURRENT_RELATION_TYPE = 'CurrentType';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
@@ -26,26 +23,33 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\Test
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+
         $this->listener = new EntityExtendedStructureOptionsListener($this->doctrineHelper);
     }
 
+    private function getEntityStructure(string $fieldName, string $relationType): EntityStructure
+    {
+        $entityStructure = new EntityStructure();
+        $entityStructure->setClassName(\stdClass::class);
+
+        $entityFieldStructure = new EntityFieldStructure();
+        $entityFieldStructure->setName($fieldName);
+        $entityFieldStructure->setRelationType($relationType);
+        $entityStructure->addField($entityFieldStructure);
+
+        return $entityStructure;
+    }
+
     /**
-     * @param string $expectedClass
-     * @param string $expectedFieldName
-     * @param string $expectedRelationType
-     * @param string $fieldName
-     * @param string $type
-     * @param bool $hasAssociation
-     *
      * @dataProvider dataProvider
      */
     public function testOnOptionsRequest(
-        $expectedClass,
-        $expectedFieldName,
-        $expectedRelationType,
-        $fieldName,
-        $type,
-        $hasAssociation
+        string $expectedClass,
+        string $expectedFieldName,
+        ?string $expectedRelationType,
+        string $fieldName,
+        string|int $type,
+        bool $hasAssociation
     ) {
         $entityMetadata = $this->createMock(ClassMetadata::class);
 
@@ -65,7 +69,7 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\Test
             ->willReturn(true);
 
         $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadata')
+            ->method('getEntityMetadataForClass')
             ->with($expectedClass)
             ->willReturn($entityMetadata);
 
@@ -158,29 +162,5 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\Test
         $this->listener->onOptionsRequest($event);
 
         $this->assertEquals([$this->getEntityStructure('field1', 'currentType')], $event->getData());
-    }
-
-    /**
-     * @param string $fieldName
-     * @param string $relationType
-     * @return EntityStructure
-     */
-    private function getEntityStructure($fieldName, $relationType)
-    {
-        return $this->getEntity(
-            EntityStructure::class,
-            [
-                'className' => \stdClass::class,
-                'fields' => [
-                    $this->getEntity(
-                        EntityFieldStructure::class,
-                        [
-                            'name' => $fieldName,
-                            'relationType' => $relationType
-                        ]
-                    )
-                ]
-            ]
-        );
     }
 }

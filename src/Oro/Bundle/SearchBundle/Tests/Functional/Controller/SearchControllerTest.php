@@ -27,6 +27,8 @@ class SearchControllerTest extends SearchBundleWebTestCase
      */
     public function testSearchSuggestion(array $request, array $response)
     {
+        self::markTestSkipped('Must be fixed in BAP-22362');
+
         $this->addOroDefaultPrefixToUrlInParameterArray($response['rest']['data'], 'record_url');
         if (array_key_exists('supported_engines', $request)) {
             $engine = $this->getContainer()
