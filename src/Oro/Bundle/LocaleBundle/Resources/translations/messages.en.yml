@@ -120,6 +120,7 @@ oro.locale:
             locale_settings.title: 'Location options'
             map_settings.title: 'Map options'
             localization_settings.title: 'Localization settings'
+            email_template_editor_settings.title: 'Email Template Editor Settings'
         fields:
             locale.label: 'Locale'
             country.label: 'Primary Location'
@@ -142,6 +143,9 @@ oro.locale:
                     meters_per_second: 'Meters per second'
             enabled_localizations.label: 'Enabled Localizations'
             default_localization.label: 'Default Localization'
+            use_localization_names_in_email_template_editor:
+                label: 'Use Localization Names in Email Template Editor'
+                tooltip: 'If this option is enabled, the email template editor will use localization names instead of localization titles on the form tabs, which will allow users to easily distinguish localizations when there are more than one localization with the same title. It will become the default email editor behavior in future versions.'
     formatter:
         datetime:
             default: N/A

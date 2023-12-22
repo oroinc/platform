@@ -34,6 +34,7 @@ class OroLocaleExtensionTest extends \PHPUnit\Framework\TestCase
                         'wind_speed_unit' => ['value' => 'miles_per_hour', 'scope' => 'app'],
                         'enabled_localizations' => ['value' => [], 'scope' => 'app'],
                         'default_localization' => ['value' => null, 'scope' => 'app'],
+                        'use_localization_names_in_email_template_editor' => ['value' => false, 'scope' => 'app'],
                     ]
                 ]
             ],

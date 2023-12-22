@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -38,10 +39,17 @@ class EmailTemplateTranslationType extends AbstractType
     /** @var LocalizationManager */
     private $localizationManager;
 
+    private ?ConfigManager $configManager = null;
+
     public function __construct(TranslatorInterface $translator, LocalizationManager $localizationManager)
     {
         $this->translator = $translator;
         $this->localizationManager = $localizationManager;
+    }
+
+    public function setConfigManager(ConfigManager $configManager): void
+    {
+        $this->configManager = $configManager;
     }
 
     /**
@@ -110,9 +118,15 @@ class EmailTemplateTranslationType extends AbstractType
             /** @var Localization $localization */
             $localization = $options['localization'];
             $view->vars['localization_id'] = $localization->getId();
-            $view->vars['localization_title'] = $localization->getTitle(
-                $this->localizationManager->getDefaultLocalization()
-            );
+            if (null !== $this->configManager
+                && $this->configManager->get('oro_locale.use_localization_names_in_email_template_editor')
+            ) {
+                $view->vars['localization_title'] = $localization->getName();
+            } else {
+                $view->vars['localization_title'] = $localization->getTitle(
+                    $this->localizationManager->getDefaultLocalization()
+                );
+            }
 
             if ($localization->getParentLocalization()) {
                 $view->vars['localization_parent_id'] = $localization->getParentLocalization()->getId();

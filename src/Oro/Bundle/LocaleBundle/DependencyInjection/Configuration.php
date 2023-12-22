@@ -49,7 +49,8 @@ class Configuration implements ConfigurationInterface
                 'temperature_unit' => ['value' => 'fahrenheit'],
                 'wind_speed_unit' => ['value' => 'miles_per_hour'],
                 self::ENABLED_LOCALIZATIONS => ['value' => [], 'type' => 'array'],
-                self::DEFAULT_LOCALIZATION => ['value' => null]
+                self::DEFAULT_LOCALIZATION => ['value' => null],
+                'use_localization_names_in_email_template_editor' => ['value' => false, 'type' => 'boolean'],
             ]
         );
 
