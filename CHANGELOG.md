@@ -54,6 +54,9 @@ api:
 #### SearchBundle
 * Added `\Oro\Bundle\SearchBundle\Event\BeforeIndexEntitiesEvent` that is dispatched in `\Oro\Bundle\SearchBundle\EventListener\IndexListener` in postFlush method after changing or updating indexing entities.
 
+#### DataGridBundle
+* Added postponed delete entities logic to `\Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionHandler`.
+
 ## 5.1.0 (2023-03-31)
 
 [Show detailed list of changes](incompatibilities-5-1.md)
