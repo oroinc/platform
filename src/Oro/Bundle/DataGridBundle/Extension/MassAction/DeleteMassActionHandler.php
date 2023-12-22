@@ -3,12 +3,16 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -37,6 +41,9 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
 
     /** @var string */
     protected $responseMessage = 'oro.grid.mass_action.delete.success_message';
+
+    /** @var int[]  */
+    protected array $postponedIds = [];
 
     public function __construct(
         ManagerRegistry $registry,
@@ -184,19 +191,37 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      */
     protected function doDelete(MassActionHandlerArgs $args)
     {
-        $iteration    = 0;
-        $entityName   = $this->getEntityName($args);
+        $iteration = 0;
+        $entityName = $this->getEntityName($args);
         $queryBuilder = $args->getResults()->getSource();
-        $results      = new DeletionIterableResult($queryBuilder);
-        $results->setBufferSize(self::FLUSH_BATCH_SIZE);
         // if huge amount data must be deleted
         set_time_limit(0);
         $entityIdentifiedField = $this->getEntityIdentifierField($args);
-        /** @var EntityManager $manager */
+
+        $this->doIterate($queryBuilder, $entityName, $entityIdentifiedField, $iteration);
+        if ($this->postponedIds) {
+            $qb = $this->getPostponedEntitiesQB($entityName, $entityIdentifiedField);
+            $this->doIterate($qb, $entityName, $entityIdentifiedField, $iteration);
+            $this->postponedIds = [];
+        }
+
+        return $this->getDeleteResponse($args, $iteration);
+    }
+
+    protected function doIterate(
+        Query|QueryBuilder $queryBuilder,
+        string $entityName,
+        string $entityIdentifiedField,
+        int &$iteration
+    ): void {
+        $results = new DeletionIterableResult($queryBuilder);
+        $results->setBufferSize(self::FLUSH_BATCH_SIZE);
+
+        /** @var EntityManagerInterface $manager */
         $manager = $this->registry->getManagerForClass($entityName);
+        /** @var ResultRecordInterface $result */
         foreach ($results as $result) {
-            /** @var $result ResultRecordInterface */
-            $entity          = $result->getRootEntity();
+            $entity = $result->getRootEntity();
             $identifierValue = $result->getValue($entityIdentifiedField);
             if (!$entity) {
                 // no entity in result record, it should be extracted from DB
@@ -204,9 +229,15 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
             }
 
             if ($entity) {
+                if ($this->isPostponed($entity)) {
+                    $this->postponedIds[] = $entity->getId();
+                    continue;
+                }
+
                 if (!$this->isDeleteAllowed($entity)) {
                     continue;
                 }
+
                 $this->processDelete($entity, $manager);
                 $iteration++;
 
@@ -219,8 +250,11 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
             $this->finishBatch($manager);
         }
+    }
 
-        return $this->getDeleteResponse($args, $iteration);
+    protected function isPostponed(object $entity): bool
+    {
+        return false;
     }
 
     /**
@@ -243,5 +277,17 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         $manager->remove($entity);
 
         return $this;
+    }
+
+    protected function getPostponedEntitiesQB(string $entityName, string $entityIdentifiedField): QueryBuilder
+    {
+        $qb = $this->registry
+            ->getRepository($entityName)
+            ->createQueryBuilder('e');
+
+        $qb->where($qb->expr()->in(QueryBuilderUtil::getField('e', $entityIdentifiedField), ':ids'))
+            ->setParameter('ids', $this->postponedIds);
+
+        return $qb;
     }
 }
