@@ -11,6 +11,8 @@ system_configuration:
             title: oro.locale.system_configuration.groups.map_settings.title
         localization_settings:
             title: oro.locale.system_configuration.groups.localization_settings.title
+        email_template_editor_settings:
+            title: oro.locale.system_configuration.groups.email_template_editor_settings.title
 
     fields:
         oro_locale.country:
@@ -120,6 +122,15 @@ system_configuration:
                     - Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalization: ~
                     - NotBlank: ~
 
+        oro_locale.use_localization_names_in_email_template_editor:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            priority: 100
+            options:
+                label: oro.locale.system_configuration.fields.use_localization_names_in_email_template_editor.label
+                tooltip: oro.locale.system_configuration.fields.use_localization_names_in_email_template_editor.tooltip
+                required: false
+
     tree:
         system_configuration:
             platform:
@@ -146,6 +157,12 @@ system_configuration:
                                         children:
                                             - oro_locale.enabled_localizations
                                             - oro_locale.default_localization
+                            look_and_feel:
+                                children:
+                                    email_template_editor_settings:
+                                        priority: -9999
+                                        children:
+                                            - oro_locale.use_localization_names_in_email_template_editor
 
         user_configuration:
             platform:

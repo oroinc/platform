@@ -61,6 +61,8 @@ services:
         arguments:
             - '@translator'
             - '@oro_locale.manager.localization'
+        calls:
+            - ['setConfigManager', ['@oro_config.manager']]
         tags:
             - { name: form.type }
 
