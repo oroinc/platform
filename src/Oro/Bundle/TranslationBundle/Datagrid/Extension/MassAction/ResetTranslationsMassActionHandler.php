@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponseInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Async\Topic\DumpJsTranslationsTopic;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -43,7 +44,7 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(MassActionHandlerArgs $args)
+    public function handle(MassActionHandlerArgs $args): MassActionResponseInterface
     {
         $datasource = $args->getDatagrid()->getDatasource();
         if (!$datasource instanceof OrmDatasource) {

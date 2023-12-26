@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
+/**
+ * Abstraction for handling datagrid mass action logic.
+ */
 interface MassActionHandlerInterface
 {
     /**
      * Handle mass action
-     *
-     * @param MassActionHandlerArgs $args
-     *
-     * @return MassActionResponseInterface
      */
-    public function handle(MassActionHandlerArgs $args);
+    public function handle(MassActionHandlerArgs $args): MassActionResponseInterface;
 }

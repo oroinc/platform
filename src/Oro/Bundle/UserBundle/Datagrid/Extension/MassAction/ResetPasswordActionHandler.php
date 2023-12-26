@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponseInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
@@ -41,7 +42,7 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function handle(MassActionHandlerArgs $args)
+    public function handle(MassActionHandlerArgs $args): MassActionResponseInterface
     {
         $currentUser = $this->tokenAccessor->getUser();
         $currentUserId = $currentUser ? $currentUser->getId() : null;
