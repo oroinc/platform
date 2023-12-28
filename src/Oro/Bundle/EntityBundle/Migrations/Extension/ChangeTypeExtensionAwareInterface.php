@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Migrations\Extension;
 
+/**
+ * This interface should be implemented by migrations that depend on {@see ChangeTypeExtension}.
+ */
 interface ChangeTypeExtensionAwareInterface
 {
-    /**
-     * @param ChangeTypeExtension $changeTypeExtension
-     *
-     * @return void
-     */
     public function setChangeTypeExtension(ChangeTypeExtension $changeTypeExtension);
 }
