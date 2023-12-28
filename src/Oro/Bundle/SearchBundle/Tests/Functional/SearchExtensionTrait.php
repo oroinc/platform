@@ -89,6 +89,14 @@ trait SearchExtensionTrait
             ->getEntityAlias($className);
     }
 
+    protected static function clearIndex(string $class, array $context = []): void
+    {
+        static::getSearchIndexer()->resetIndex($class);
+
+        $alias = static::getIndexAlias($class, $context);
+        static::ensureItemsLoaded($alias, 0);
+    }
+
     /**
      * Remove all data added in fixtures
      */
