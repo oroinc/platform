@@ -4,8 +4,8 @@ namespace Oro\Bundle\UserBundle\Migrations\Schema\v2_10;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
@@ -14,15 +14,7 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class UpdateResetAuthStatus implements Migration, ExtendExtensionAwareInterface
 {
-    private ExtendExtension $extendExtension;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension)
-    {
-        $this->extendExtension = $extendExtension;
-    }
+    use ExtendExtensionAwareTrait;
 
     /**
      * {@inheritDoc}

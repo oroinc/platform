@@ -7,8 +7,6 @@ use Psr\Container\ContainerInterface;
 
 /**
  * Check MySQL Full Text compatibility compatible with ContainerAwareTrait
- *
- * @property ContainerInterface $container
  */
 trait MysqlVersionCheckTrait
 {

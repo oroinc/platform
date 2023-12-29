@@ -2,43 +2,30 @@
 
 namespace Oro\Bundle\EntityBundle\Migrations\Extension;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
+/**
+ * Provides an ability to change data type for a table primary key.
+ */
 class ChangeTypeExtension implements DatabasePlatformAwareInterface
 {
-    /**
-     * @var AbstractPlatform
-     */
-    protected $platform;
+    use DatabasePlatformAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDatabasePlatform(AbstractPlatform $platform)
-    {
-        $this->platform = $platform;
-    }
-
-    /**
-     * @param Schema   $schema
-     * @param QueryBag $queries
-     * @param string   $tableName
-     * @param string   $columnName
-     * @param string   $type
-     *
-     * @throws \Exception
-     */
-    public function changePrimaryKeyType(Schema $schema, QueryBag $queries, $tableName, $columnName, $type)
-    {
+    public function changePrimaryKeyType(
+        Schema $schema,
+        QueryBag $queries,
+        string $tableName,
+        string $columnName,
+        string $typeName
+    ): void {
         $targetColumn = $schema->getTable($tableName)->getColumn($columnName);
-        $type         = Type::getType($type);
-
+        $type = Type::getType($typeName);
         if ($targetColumn->getType() === $type) {
             return;
         }
@@ -47,7 +34,6 @@ class ChangeTypeExtension implements DatabasePlatformAwareInterface
         $foreignKeys = [];
 
         foreach ($schema->getTables() as $table) {
-            /** @var ForeignKeyConstraint[] $tableForeignKeys */
             $tableForeignKeys = array_filter(
                 $table->getForeignKeys(),
                 function (ForeignKeyConstraint $tableForeignKey) use ($tableName, $columnName) {

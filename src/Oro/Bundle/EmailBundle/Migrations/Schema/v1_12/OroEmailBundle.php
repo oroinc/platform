@@ -11,7 +11,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroEmailBundle implements Migration, OrderedMigrationInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getOrder()
     {
@@ -29,9 +29,6 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
         self::addPostQueries($queries);
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
     public static function changeEmailToEmailBodyRelation(Schema $schema)
     {
         $emailTable = $schema->getTable('oro_email');
@@ -48,9 +45,6 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
         $emailTable->addUniqueIndex(['email_body_id'], 'UNIQ_2A30C17126A2754B');
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
     public static function splitEmailEntity(Schema $schema)
     {
         $emailUserTable = $schema->createTable('oro_email_user');

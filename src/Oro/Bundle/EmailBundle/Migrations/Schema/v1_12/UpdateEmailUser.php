@@ -25,9 +25,6 @@ class UpdateEmailUser implements Migration, OrderedMigrationInterface
         self::updateEmailUser($schema);
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
     public static function updateEmailUser(Schema $schema)
     {
         self::updateEmailUserTableFields($schema);

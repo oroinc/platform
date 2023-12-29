@@ -3,16 +3,16 @@
 namespace Oro\Bundle\TestFrameworkBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareTrait;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
-use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtension;
 use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtensionAwareInterface;
+use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareInterface;
@@ -34,46 +34,16 @@ class OroTestFrameworkBundleInstaller implements
     SerializedFieldsExtensionAwareInterface,
     AttachmentExtensionAwareInterface
 {
+    use ActivityExtensionAwareTrait;
+    use ExtendExtensionAwareTrait;
     use ScopeExtensionAwareTrait;
+    use SerializedFieldsExtensionAwareTrait;
     use AttachmentExtensionAwareTrait;
 
     public const ENUM_FIELD_NAME = 'testEnumField';
     public const ENUM_FIELD_CODE = 'test_enum_code';
     public const MULTIENUM_FIELD_NAME = 'testMultienumField';
     public const MULTIENUM_FIELD_CODE = 'test_multienum_code';
-
-    /** @var ActivityExtension */
-    protected $activityExtension;
-
-    /** @var ExtendExtension */
-    protected $extendExtension;
-
-    /** @var SerializedFieldsExtension */
-    private $serializedFieldsExtension;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setSerializedFieldsExtension(SerializedFieldsExtension $serializedFieldsExtension)
-    {
-        $this->serializedFieldsExtension = $serializedFieldsExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setActivityExtension(ActivityExtension $activityExtension)
-    {
-        $this->activityExtension = $activityExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension)
-    {
-        $this->extendExtension = $extendExtension;
-    }
 
     /**
      * {@inheritdoc}

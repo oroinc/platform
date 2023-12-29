@@ -8,12 +8,12 @@ use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
- * Add event name columnt to email notification table and populate it with the data
+ * Add event name column to email notification table and populate it with the data
  */
 class AddEventNameColumn implements Migration, OrderedMigrationInterface
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
@@ -24,7 +24,7 @@ class AddEventNameColumn implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getOrder()
     {

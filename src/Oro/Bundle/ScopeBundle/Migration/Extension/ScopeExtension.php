@@ -5,22 +5,16 @@ namespace Oro\Bundle\ScopeBundle\Migration\Extension;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
 
+/**
+ * Provides an ability to create scope related associations.
+ */
 class ScopeExtension implements ExtendExtensionAwareInterface
 {
-    /** @var ExtendExtension */
-    protected $extendExtension;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension)
-    {
-        $this->extendExtension = $extendExtension;
-    }
+    use ExtendExtensionAwareTrait;
 
     /**
      * Adds the association between the target table and the scope table

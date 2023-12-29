@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\PlatformBundle\Migrations\Schema;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 
 class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareInterface
 {
-    /** @var AbstractPlatform */
-    protected $platform;
+    use DatabasePlatformAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -23,14 +22,6 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
     public function getMigrationVersion()
     {
         return 'v1_2';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDatabasePlatform(AbstractPlatform $platform)
-    {
-        $this->platform = $platform;
     }
 
     /**

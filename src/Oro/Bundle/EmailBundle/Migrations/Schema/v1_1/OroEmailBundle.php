@@ -2,17 +2,24 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_1;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, OrderedMigrationInterface
 {
-    /** @var AbstractPlatform */
-    protected $platform;
+    use DatabasePlatformAwareTrait;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 1;
+    }
 
     /**
      * {@inheritdoc}
@@ -66,21 +73,5 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
-    }
-
-    /**
-     * Sets the database platform
-     */
-    public function setDatabasePlatform(AbstractPlatform $platform)
-    {
-        $this->platform = $platform;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOrder()
-    {
-        return 1;
     }
 }

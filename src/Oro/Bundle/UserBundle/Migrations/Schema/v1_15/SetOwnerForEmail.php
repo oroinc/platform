@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_15;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\SchemaException;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -21,9 +20,6 @@ class SetOwnerForEmail implements Migration, OrderedMigrationInterface
         self::addOwnerToOroEmail($schema);
     }
 
-    /**
-     * @throws SchemaException
-     */
     public static function addOwnerToOroEmail(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');

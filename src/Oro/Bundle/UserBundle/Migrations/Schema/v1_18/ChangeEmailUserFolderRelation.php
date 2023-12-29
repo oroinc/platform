@@ -7,12 +7,6 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-/**
- * Depends to the UserBundle
- *
- * Class ChangeEmailUserFolderRelation
- * @package Oro\Bundle\UserBundle\Migrations\Schema\v1_18
- */
 class ChangeEmailUserFolderRelation implements Migration, OrderedMigrationInterface
 {
     /**
@@ -35,8 +29,6 @@ class ChangeEmailUserFolderRelation implements Migration, OrderedMigrationInterf
 
     /**
      * Add many to many relation table
-     *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function createOroEmailUserFoldersTable(Schema $schema)
     {
@@ -55,8 +47,6 @@ class ChangeEmailUserFolderRelation implements Migration, OrderedMigrationInterf
 
     /**
      * Add foreign keys
-     *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addOroEmailUserFoldersForeignKeys(Schema $schema)
     {
@@ -77,8 +67,6 @@ class ChangeEmailUserFolderRelation implements Migration, OrderedMigrationInterf
 
     /**
      * Add origin to EmailUser
-     *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function updateOroEmailUserTable(Schema $schema)
     {

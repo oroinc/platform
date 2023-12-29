@@ -7,12 +7,6 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-/**
- * Depends to the UserBundle
- *
- * Class AddEmailUserColumn
- * @package Oro\Bundle\UserBundle\Migrations\Schema\v1_18
- */
 class AddEmailUserColumn implements Migration, OrderedMigrationInterface
 {
     /**
@@ -33,8 +27,6 @@ class AddEmailUserColumn implements Migration, OrderedMigrationInterface
 
     /**
      * Add origin to EmailUser
-     *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function updateOroEmailUserTable(Schema $schema)
     {

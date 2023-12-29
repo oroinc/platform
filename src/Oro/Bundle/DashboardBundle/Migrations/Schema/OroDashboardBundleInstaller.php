@@ -6,8 +6,8 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
@@ -19,7 +19,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareInterface
 {
-    private ExtendExtension $extendExtension;
+    use ExtendExtensionAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -27,14 +27,6 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
     public function getMigrationVersion()
     {
         return 'v1_8';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension): void
-    {
-        $this->extendExtension = $extendExtension;
     }
 
     /**
