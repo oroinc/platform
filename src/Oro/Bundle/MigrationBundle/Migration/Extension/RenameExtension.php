@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration\Extension;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
@@ -12,48 +11,23 @@ use Doctrine\DBAL\Schema\TableDiff;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\Schema\Column;
 use Oro\Bundle\MigrationBundle\Migration\SqlSchemaUpdateMigrationQuery;
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
+/**
+ * Provides an ability to rename tables and columns,
+ * and to create indexes and foreign key constraints without check of a table and columns existence.
+ */
 class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAwareInterface
 {
-    /**
-     * @var AbstractPlatform
-     */
-    protected $platform;
+    use DatabasePlatformAwareTrait;
+    use NameGeneratorAwareTrait;
 
     /**
-     * @var DbIdentifierNameGenerator
+     * Renames a table.
      */
-    protected $nameGenerator;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDatabasePlatform(AbstractPlatform $platform)
+    public function renameTable(Schema $schema, QueryBag $queries, string $oldTableName, string $newTableName): void
     {
-        $this->platform = $platform;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
-    {
-        $this->nameGenerator = $nameGenerator;
-    }
-
-    /**
-     * Renames a table
-     *
-     * @param Schema   $schema
-     * @param QueryBag $queries
-     * @param string   $oldTableName
-     * @param string   $newTableName
-     */
-    public function renameTable(Schema $schema, QueryBag $queries, $oldTableName, $newTableName)
-    {
-        $table         = $schema->getTable($oldTableName);
-        $diff          = new TableDiff($table->getName());
+        $table = $schema->getTable($oldTableName);
+        $diff = new TableDiff($table->getName());
         $diff->newName = $newTableName;
 
         $renameQuery = new SqlSchemaUpdateMigrationQuery(
@@ -80,19 +54,18 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
     }
 
     /**
-     * Renames a column
-     *
-     * @param Schema   $schema
-     * @param QueryBag $queries
-     * @param Table    $table
-     * @param string   $oldColumnName
-     * @param string   $newColumnName
+     * Renames a column.
      */
-    public function renameColumn(Schema $schema, QueryBag $queries, Table $table, $oldColumnName, $newColumnName)
-    {
+    public function renameColumn(
+        Schema $schema,
+        QueryBag $queries,
+        Table $table,
+        string $oldColumnName,
+        string $newColumnName
+    ): void {
         $column = new Column(['column' => $table->getColumn($oldColumnName)]);
         $column->changeName($newColumnName);
-        $diff                 = new TableDiff($table->getName());
+        $diff = new TableDiff($table->getName());
         $diff->renamedColumns = [$oldColumnName => $column];
 
         $renameQuery = new SqlSchemaUpdateMigrationQuery(
@@ -102,8 +75,8 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
     }
 
     /**
-     * Create an index without check of table and columns existence.
-     * This method can be helpful when you need to create an index for renamed table or column
+     * Creates an index without check of table and columns existence.
+     * This method can be helpful when you need to create an index for renamed table or column.
      *
      * @param Schema      $schema
      * @param QueryBag    $queries
@@ -114,15 +87,15 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
     public function addIndex(
         Schema $schema,
         QueryBag $queries,
-        $tableName,
+        string $tableName,
         array $columnNames,
-        $indexName = null
+        ?string $indexName = null
     ) {
         if (!$indexName) {
             $indexName = $this->nameGenerator->generateIndexName($tableName, $columnNames);
         }
-        $index              = new Index($indexName, $columnNames);
-        $diff               = new TableDiff($tableName);
+        $index = new Index($indexName, $columnNames);
+        $diff = new TableDiff($tableName);
         $diff->addedIndexes = [$indexName => $index];
 
         $renameQuery = new SqlSchemaUpdateMigrationQuery(
@@ -133,8 +106,8 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
     }
 
     /**
-     * Create an unique index without check of table and columns existence.
-     * This method can be helpful when you need to create an index for renamed table or column
+     * Creates an unique index without check of table and columns existence.
+     * This method can be helpful when you need to create an index for renamed table or column.
      *
      * @param Schema      $schema
      * @param QueryBag    $queries
@@ -145,15 +118,15 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
     public function addUniqueIndex(
         Schema $schema,
         QueryBag $queries,
-        $tableName,
+        string $tableName,
         array $columnNames,
-        $indexName = null
+        ?string $indexName = null
     ) {
         if (!$indexName) {
             $indexName = $this->nameGenerator->generateIndexName($tableName, $columnNames, true);
         }
-        $index              = new Index($indexName, $columnNames, true);
-        $diff               = new TableDiff($tableName);
+        $index = new Index($indexName, $columnNames, true);
+        $diff = new TableDiff($tableName);
         $diff->addedIndexes = [$indexName => $index];
 
         $renameQuery = new SqlSchemaUpdateMigrationQuery(
@@ -164,8 +137,8 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
     }
 
     /**
-     * Create a foreign key constraint without check of table and columns existence.
-     * This method can be helpful when you need to create a constraint for renamed table or column
+     * Creates a foreign key constraint without check of table and columns existence.
+     * This method can be helpful when you need to create a constraint for renamed table or column.
      *
      * @param Schema      $schema
      * @param QueryBag    $queries
@@ -179,27 +152,27 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
     public function addForeignKeyConstraint(
         Schema $schema,
         QueryBag $queries,
-        $tableName,
-        $foreignTable,
+        string $tableName,
+        string $foreignTable,
         array $localColumnNames,
         array $foreignColumnNames,
         array $options = [],
-        $constraintName = null
-    ) {
+        ?string $constraintName = null
+    ): void {
         if (!$constraintName) {
             $constraintName = $this->nameGenerator->generateForeignKeyConstraintName(
                 $tableName,
                 $localColumnNames
             );
         }
-        $constraint             = new ForeignKeyConstraint(
+        $constraint = new ForeignKeyConstraint(
             $localColumnNames,
             $foreignTable,
             $foreignColumnNames,
             $constraintName,
             $options
         );
-        $diff                   = new TableDiff($tableName);
+        $diff = new TableDiff($tableName);
         $diff->addedForeignKeys = [$constraintName => $constraint];
 
         $renameQuery = new SqlSchemaUpdateMigrationQuery(

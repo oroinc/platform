@@ -4,38 +4,21 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Environment;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
-use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendNameGeneratorAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class TestEntitiesMigration implements
     Migration,
     AttachmentExtensionAwareInterface,
     NameGeneratorAwareInterface
 {
-    private AttachmentExtension $attachmentExtension;
-    private ExtendDbIdentifierNameGenerator $nameGenerator;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setAttachmentExtension(AttachmentExtension $attachmentExtension): void
-    {
-        $this->attachmentExtension = $attachmentExtension;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator): void
-    {
-        $this->nameGenerator = $nameGenerator;
-    }
+    use AttachmentExtensionAwareTrait;
+    use ExtendNameGeneratorAwareTrait;
 
     /**
      * {@inheritdoc}

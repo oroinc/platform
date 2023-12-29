@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
@@ -17,6 +17,9 @@ class UpdateEntityConfigEntityValueQuery implements
     ConnectionAwareInterface,
     ConfigurationHandlerAwareInterface
 {
+    use ConnectionAwareTrait;
+    use ConfigurationHandlerAwareTrait;
+
     /**
      * @var string
      */
@@ -38,16 +41,9 @@ class UpdateEntityConfigEntityValueQuery implements
     protected $value;
 
     /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
      * @var null|string
      */
     protected $replaceValue;
-
-    protected ConfigurationHandler $configurationHandler;
 
     /**
      * @param string $entityName
@@ -63,19 +59,6 @@ class UpdateEntityConfigEntityValueQuery implements
         $this->code = $code;
         $this->value = $value;
         $this->replaceValue = $replaceValue;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
-
-    public function setConfigurationHandler(ConfigurationHandler $configurationHandler): void
-    {
-        $this->configurationHandler = $configurationHandler;
     }
 
     /**

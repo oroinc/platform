@@ -2,27 +2,18 @@
 
 namespace Oro\Bundle\DataAuditBundle\Migrations\Schema\v2_0;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\InstallerBundle\Migration\UpdateTableFieldQuery;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedMigrationInterface
 {
-    /** @var Connection */
-    private $connection;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
+    use ConnectionAwareTrait;
 
     /**
      * {@inheritdoc}

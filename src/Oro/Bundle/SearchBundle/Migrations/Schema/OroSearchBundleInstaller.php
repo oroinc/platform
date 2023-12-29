@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Migrations\Schema;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
@@ -20,12 +20,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 class OroSearchBundleInstaller implements Installation, ContainerAwareInterface, DatabasePlatformAwareInterface
 {
     use ContainerAwareTrait;
+    use DatabasePlatformAwareTrait;
     use MysqlVersionCheckTrait;
-
-    /**
-     * @var AbstractPlatform
-     */
-    protected $platform;
 
     /**
      * {@inheritdoc}
@@ -33,14 +29,6 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
     public function getMigrationVersion()
     {
         return 'v1_10';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDatabasePlatform(AbstractPlatform $platform)
-    {
-        $this->platform = $platform;
     }
 
     /**

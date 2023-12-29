@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Migrations\Schema;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Symfony\Component\Lock\Store\StoreFactory;
@@ -15,7 +15,7 @@ use Symfony\Component\Lock\Store\StoreFactory;
  */
 class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
 {
-    private Connection $connection;
+    use ConnectionAwareTrait;
 
     /**
      * {@inheritDoc}
@@ -23,14 +23,6 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
     public function getMigrationVersion(): string
     {
         return 'v1_1';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setConnection(Connection $connection): void
-    {
-        $this->connection = $connection;
     }
 
     /**

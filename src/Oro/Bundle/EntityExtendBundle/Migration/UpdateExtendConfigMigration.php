@@ -5,17 +5,19 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
-use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtensionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\ResetContainerMigration;
 
 /**
- * Update Extend Config Migration
+ * The migration to update extend configuration.
  */
 class UpdateExtendConfigMigration implements Migration, ResetContainerMigration, DataStorageExtensionAwareInterface
 {
+    use DataStorageExtensionAwareTrait;
+
     /** @var CommandExecutor */
     protected $commandExecutor;
 
@@ -24,9 +26,6 @@ class UpdateExtendConfigMigration implements Migration, ResetContainerMigration,
 
     /** @var string */
     protected $initialEntityConfigStatePath;
-
-    /** @var DataStorageExtension */
-    protected $dataStorageExtension;
 
     /**
      * @param CommandExecutor $commandExecutor
@@ -41,14 +40,6 @@ class UpdateExtendConfigMigration implements Migration, ResetContainerMigration,
         $this->commandExecutor              = $commandExecutor;
         $this->configProcessorOptionsPath   = $configProcessorOptionsPath;
         $this->initialEntityConfigStatePath = $initialEntityConfigStatePath;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDataStorageExtension(DataStorageExtension $dataStorageExtension)
-    {
-        $this->dataStorageExtension = $dataStorageExtension;
     }
 
     /**

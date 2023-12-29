@@ -9,20 +9,14 @@ use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInte
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 use Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension;
 use Oro\Bundle\CommentBundle\Migration\Extension\CommentExtensionAwareInterface;
+use Oro\Bundle\CommentBundle\Migration\Extension\CommentExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroCommentBundle implements Migration, CommentExtensionAwareInterface, AttachmentExtensionAwareInterface
 {
+    use CommentExtensionAwareTrait;
     use AttachmentExtensionAwareTrait;
-
-    /** @var CommentExtension */
-    protected $comment;
-
-    public function setCommentExtension(CommentExtension $commentExtension)
-    {
-        $this->comment = $commentExtension;
-    }
 
     /**
      * {@inheritdoc}
@@ -30,8 +24,8 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
     public function up(Schema $schema, QueryBag $queries)
     {
         self::createCommentTable($schema);
-        self::addCommentToEmail($schema, $this->comment);
-        self::addCommentToNote($schema, $this->comment);
+        self::addCommentToEmail($schema, $this->commentExtension);
+        self::addCommentToNote($schema, $this->commentExtension);
         self::addAttachment($schema, $this->attachmentExtension);
     }
 

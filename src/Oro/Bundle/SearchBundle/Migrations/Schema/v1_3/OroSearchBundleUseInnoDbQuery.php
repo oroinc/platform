@@ -2,31 +2,17 @@
 
 namespace Oro\Bundle\SearchBundle\Migrations\Schema\v1_3;
 
-use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
 class OroSearchBundleUseInnoDbQuery implements MigrationQuery, ConnectionAwareInterface
 {
-    /**
-     * @var Connection
-     */
-    protected $connection;
+    use ConnectionAwareTrait;
 
     /**
-     * @inheritdoc
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
-
-    /**
-     * Gets a query description
-     * If this query has several sub queries you can return an array of descriptions for each sub query
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function getDescription()
     {
@@ -34,9 +20,7 @@ class OroSearchBundleUseInnoDbQuery implements MigrationQuery, ConnectionAwareIn
     }
 
     /**
-     * Executes a query
-     *
-     * @param LoggerInterface $logger A logger which can be used to log details of an execution process
+     * {@inheritDoc}
      */
     public function execute(LoggerInterface $logger)
     {
@@ -51,10 +35,7 @@ class OroSearchBundleUseInnoDbQuery implements MigrationQuery, ConnectionAwareIn
         }
     }
 
-    /**
-     * @return string
-     */
-    protected function getTableName()
+    protected function getTableName(): string
     {
         return 'oro_search_index_text';
     }

@@ -5,8 +5,8 @@ namespace Oro\Bundle\AttachmentBundle\Migration\Extension;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -15,20 +15,11 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class AttachmentExtension implements ExtendExtensionAwareInterface
 {
+    use ExtendExtensionAwareTrait;
+
     const FILE_TABLE_NAME       = 'oro_attachment_file';
     const ATTACHMENT_TABLE_NAME = 'oro_attachment';
     const ATTACHMENT_FILE_ITEM_TABLE = 'oro_attachment_file_item';
-
-    /** @var ExtendExtension */
-    protected $extendExtension;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension)
-    {
-        $this->extendExtension = $extendExtension;
-    }
 
     /**
      * @param Schema $schema

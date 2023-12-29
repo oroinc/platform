@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\AttachmentBundle\Migrations\Schema\v1_5;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendNameGeneratorAwareTrait;
 use Oro\Bundle\InstallerBundle\Migration\RenameExtendedManyToOneAssociation20;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
-use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class RenameAttachmentAssociation implements
     Migration,
@@ -23,49 +22,10 @@ class RenameAttachmentAssociation implements
     ConnectionAwareInterface,
     NameGeneratorAwareInterface
 {
-    /** @var RenameExtension */
-    private $renameExtension;
-
-    /** @var ExtendExtension */
-    private $extendExtension;
-
-    /** @var Connection */
-    private $connection;
-
-    /** @var ExtendDbIdentifierNameGenerator */
-    private $nameGenerator;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRenameExtension(RenameExtension $renameExtension)
-    {
-        $this->renameExtension = $renameExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension)
-    {
-        $this->extendExtension = $extendExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
-    {
-        $this->nameGenerator = $nameGenerator;
-    }
+    use ConnectionAwareTrait;
+    use ExtendExtensionAwareTrait;
+    use RenameExtensionAwareTrait;
+    use ExtendNameGeneratorAwareTrait;
 
     /**
      * {@inheritdoc}

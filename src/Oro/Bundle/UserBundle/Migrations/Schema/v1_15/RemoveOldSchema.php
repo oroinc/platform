@@ -19,9 +19,6 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
         self::execute($schema);
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
     public static function execute(Schema $schema)
     {
         $schema->dropTable('oro_email_to_folder');

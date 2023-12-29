@@ -10,7 +10,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class RemoveOldSchema implements Migration, OrderedMigrationInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getOrder()
     {
@@ -25,9 +25,6 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
         self::removeOldSchema($schema);
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
     public static function removeOldSchema(Schema $schema)
     {
         self::removeOldRelations($schema);

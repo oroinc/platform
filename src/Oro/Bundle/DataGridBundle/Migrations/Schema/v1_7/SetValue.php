@@ -11,7 +11,9 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class SetValue implements Migration, OrderedMigrationInterface
 {
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function getOrder()
     {
         return 20;
