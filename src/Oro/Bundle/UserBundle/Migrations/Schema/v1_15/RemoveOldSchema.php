@@ -12,27 +12,21 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
     /**
      * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function getOrder(): int
     {
-        $schema->dropTable('oro_user_email_origin');
-
-        self::execute($schema);
-    }
-
-    public static function execute(Schema $schema)
-    {
-        $schema->dropTable('oro_email_to_folder');
-
-        $emailTable = $schema->getTable('oro_email');
-        $emailTable->dropColumn('is_seen');
-        $emailTable->dropColumn('received');
+        return 2;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getOrder()
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        return 2;
+        $schema->dropTable('oro_user_email_origin');
+        $schema->dropTable('oro_email_to_folder');
+
+        $emailTable = $schema->getTable('oro_email');
+        $emailTable->dropColumn('is_seen');
+        $emailTable->dropColumn('received');
     }
 }

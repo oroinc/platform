@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActivityBundle\Migrations\Schema\v1_0;
+namespace Oro\Bundle\ActivityBundle\Migrations\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;

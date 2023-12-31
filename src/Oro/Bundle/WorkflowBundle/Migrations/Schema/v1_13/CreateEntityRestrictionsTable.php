@@ -9,14 +9,15 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class CreateEntityRestrictionsTable implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::createOroWorkflowEntityRestrictionsTable($schema);
+        $this->createWorkflowRestrictionTable($schema);
+        $this->createWorkflowRestrictionIdentTable($schema);
     }
 
-    public static function createOroWorkflowEntityRestrictionsTable(Schema $schema)
+    private function createWorkflowRestrictionTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_workflow_restriction');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -32,7 +33,6 @@ class CreateEntityRestrictionsTable implements Migration
             ['workflow_name', 'workflow_step_id', 'field', 'entity_class', 'mode'],
             'oro_workflow_restriction_idx'
         );
-
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_workflow_step'),
             ['workflow_step_id'],
@@ -45,19 +45,21 @@ class CreateEntityRestrictionsTable implements Migration
             ['name'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
+    }
 
+    private function createWorkflowRestrictionIdentTable(Schema $schema): void
+    {
         $table = $schema->createTable('oro_workflow_restriction_ident');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('workflow_restriction_id', 'integer', ['notnull' => false]);
         $table->addColumn('workflow_item_id', 'integer');
         $table->addColumn('entity_id', 'integer', []);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['entity_id'], 'oro_workflow_restr_ident_idx', []);
+        $table->addIndex(['entity_id'], 'oro_workflow_restr_ident_idx');
         $table->addUniqueIndex(
             ['workflow_restriction_id', 'entity_id', 'workflow_item_id'],
             'oro_workflow_restr_ident_unique_idx'
         );
-
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_workflow_restriction'),
             ['workflow_restriction_id'],

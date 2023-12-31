@@ -11,50 +11,62 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\TestExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\TestExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 
 class MigrationWithTestExtension implements
     Migration,
     TestExtensionAwareInterface,
     DatabasePlatformAwareInterface,
-    NameGeneratorAwareInterface
+    NameGeneratorAwareInterface,
+    LoggerAwareInterface
 {
-    protected $testExtension;
+    private ?TestExtension $testExtension = null;
+    private ?AbstractPlatform $platform = null;
+    private ?DbIdentifierNameGenerator $nameGenerator = null;
+    private ?LoggerInterface $logger = null;
 
-    protected $platform;
-
-    protected $nameGenerator;
-
-    public function setTestExtension(TestExtension $testExtension)
+    public function setTestExtension(TestExtension $testExtension): void
     {
         $this->testExtension = $testExtension;
     }
 
-    public function getTestExtension()
+    public function getTestExtension(): ?TestExtension
     {
         return $this->testExtension;
     }
 
-    public function setDatabasePlatform(AbstractPlatform $platform)
+    public function setDatabasePlatform(AbstractPlatform $platform): void
     {
         $this->platform = $platform;
     }
 
-    public function getDatabasePlatform()
+    public function getDatabasePlatform(): ?AbstractPlatform
     {
         return $this->platform;
     }
 
-    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
+    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator): void
     {
         $this->nameGenerator = $nameGenerator;
     }
 
-    public function getNameGenerator()
+    public function getNameGenerator(): ?DbIdentifierNameGenerator
     {
         return $this->nameGenerator;
     }
 
-    public function up(Schema $schema, QueryBag $queries)
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
+
+    public function getLogger(): ?LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    public function up(Schema $schema, QueryBag $queries): void
     {
     }
 }

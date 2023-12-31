@@ -3,14 +3,14 @@
 namespace Oro\Bundle\DashboardBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
+use Oro\Bundle\EntityExtendBundle\Migration\Query\EnumDataValue;
+use Oro\Bundle\EntityExtendBundle\Migration\Query\InsertEnumValuesQuery;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
-use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
@@ -22,9 +22,9 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
     use ExtendExtensionAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_8';
     }
@@ -52,23 +52,23 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
     /**
      * Create oro_dashboard_active table
      */
-    protected function createOroDashboardActiveTable(Schema $schema): void
+    private function createOroDashboardActiveTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_dashboard_active');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('dashboard_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['organization_id'], 'idx_858ba17e32c8a3de', []);
-        $table->addIndex(['dashboard_id'], 'idx_858ba17eb9d04d2b', []);
-        $table->addIndex(['user_id'], 'idx_858ba17ea76ed395', []);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['organization_id'], 'idx_858ba17e32c8a3de');
+        $table->addIndex(['dashboard_id'], 'idx_858ba17eb9d04d2b');
+        $table->addIndex(['user_id'], 'idx_858ba17ea76ed395');
     }
 
     /**
      * Create oro_dashboard table
      */
-    protected function createOroDashboardTable(Schema $schema): void
+    private function createOroDashboardTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_dashboard');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -79,16 +79,16 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
         $table->addColumn('is_default', 'boolean', ['default' => false]);
         $table->addColumn('createdat', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updatedat', 'datetime', ['notnull' => false, 'comment' => '(DC2Type:datetime)']);
-        $table->addIndex(['is_default'], 'dashboard_is_default_idx', []);
-        $table->addIndex(['user_owner_id'], 'idx_df2802ef9eb185f9', []);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['organization_id'], 'idx_df2802ef32c8a3de', []);
+        $table->addIndex(['is_default'], 'dashboard_is_default_idx');
+        $table->addIndex(['user_owner_id'], 'idx_df2802ef9eb185f9');
+        $table->addIndex(['organization_id'], 'idx_df2802ef32c8a3de');
     }
 
     /**
      * Create oro_dashboard_widget table
      */
-    protected function createOroDashboardWidgetTable(Schema $schema): void
+    private function createOroDashboardWidgetTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_dashboard_widget');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -97,28 +97,28 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
         $table->addColumn('layout_position', 'simple_array', ['comment' => '(DC2Type:simple_array)']);
         $table->addColumn('options', 'array', ['comment' => '(DC2Type:array)', 'notnull' => false]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['dashboard_id'], 'idx_4b6c43acb9d04d2b', []);
+        $table->addIndex(['dashboard_id'], 'idx_4b6c43acb9d04d2b');
     }
 
     /**
      * Create oro_dashboard_widget_state table
      */
-    protected function createOroDashboardWidgetStateTable(Schema $schema): void
+    private function createOroDashboardWidgetStateTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_dashboard_widget_state');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('widget_id', 'integer', ['notnull' => false]);
-        $table->addColumn('is_expanded', 'boolean', []);
-        $table->addIndex(['user_owner_id'], 'idx_4b4f5f879eb185f9', []);
-        $table->addIndex(['widget_id'], 'idx_4b4f5f87fbe885e2', []);
+        $table->addColumn('is_expanded', 'boolean');
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['user_owner_id'], 'idx_4b4f5f879eb185f9');
+        $table->addIndex(['widget_id'], 'idx_4b4f5f87fbe885e2');
     }
 
     /**
      * Add oro_dashboard_active foreign keys.
      */
-    protected function addOroDashboardActiveForeignKeys(Schema $schema): void
+    private function addOroDashboardActiveForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_dashboard_active');
         $table->addForeignKeyConstraint(
@@ -144,7 +144,7 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
     /**
      * Add oro_dashboard foreign keys.
      */
-    protected function addOroDashboardForeignKeys(Schema $schema): void
+    private function addOroDashboardForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_dashboard');
         $table->addForeignKeyConstraint(
@@ -164,7 +164,7 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
     /**
      * Add oro_dashboard_widget foreign keys.
      */
-    protected function addOroDashboardWidgetForeignKeys(Schema $schema): void
+    private function addOroDashboardWidgetForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_dashboard_widget');
         $table->addForeignKeyConstraint(
@@ -178,7 +178,7 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
     /**
      * Add oro_dashboard_widget_state foreign keys.
      */
-    protected function addOroDashboardWidgetStateForeignKeys(Schema $schema): void
+    private function addOroDashboardWidgetStateForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_dashboard_widget_state');
         $table->addForeignKeyConstraint(
@@ -198,7 +198,7 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
     /**
      * Add dashboard_type enum field to the oro_dashboard table and adds widgets default dashboard type.
      */
-    protected function addDashboardTypeEnumField(Schema $schema, QueryBag $queries): void
+    private function addDashboardTypeEnumField(Schema $schema, QueryBag $queries): void
     {
         $enumTable = $this->extendExtension->addEnumField(
             $schema,
@@ -221,23 +221,8 @@ class OroDashboardBundleInstaller implements Installation, ExtendExtensionAwareI
         $options->set('enum', 'immutable_codes', ['widgets']);
         $enumTable->addOption(OroOptions::KEY, $options);
 
-        $queries->addPostQuery(new ParametrizedSqlMigrationQuery(
-            sprintf(
-                'INSERT INTO %s (id, name, priority, is_default) VALUES (:id, :name, :priority, :is_default)',
-                $enumTable->getName()
-            ),
-            [
-                'id' => 'widgets',
-                'name' => 'Widgets',
-                'priority' => 1,
-                'is_default' => true
-            ],
-            [
-                'id' => Types::STRING,
-                'name' => Types::STRING,
-                'priority' => Types::INTEGER,
-                'is_default' => Types::BOOLEAN
-            ]
-        ));
+        $queries->addPostQuery(new InsertEnumValuesQuery($this->extendExtension, 'dashboard_type', [
+            new EnumDataValue('widgets', 'Widgets', 1, true)
+        ]));
     }
 }

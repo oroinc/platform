@@ -9,29 +9,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class AddImpersonationIpColumn implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addColumn($schema);
-    }
-
-    /**
-     * Add ip_address to Impersonation
-     *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public static function addColumn(Schema $schema)
-    {
-        $table = $schema->getTable('oro_user_impersonation');
-        $table->addColumn(
-            'ip_address',
-            'string',
-            [
-                'length' => 255,
-                'nullable' => false,
-                'default' => '127.0.0.1'
-            ]
-        );
+        $schema->getTable('oro_user_impersonation')
+            ->addColumn('ip_address', 'string', ['length' => 255, 'nullable' => false, 'default' => '127.0.0.1']);
     }
 }

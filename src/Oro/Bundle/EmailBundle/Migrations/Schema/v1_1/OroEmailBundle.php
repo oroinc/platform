@@ -14,17 +14,17 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
     use DatabasePlatformAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 1;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         // update data in accordance with new column requirement
         $queries->addPreQuery(
@@ -35,32 +35,27 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
             )
         );
 
-        self::oroEmailToFolderRelationTable($schema);
+        $this->createOroEmailToFolderRelationTable($schema);
 
         // make message_id not null & add index
         $table = $schema->getTable('oro_email');
         $table->changeColumn('message_id', ['notnull' => true]);
-        $table->addIndex(['message_id'], 'IDX_email_message_id', []);
+        $table->addIndex(['message_id'], 'IDX_email_message_id');
 
         // migrate existing email-folder relations
         $queries->addPostQuery(
-            "INSERT INTO oro_email_to_folder (email_id, emailfolder_id) SELECT id, folder_id FROM oro_email"
+            'INSERT INTO oro_email_to_folder (email_id, emailfolder_id) SELECT id, folder_id FROM oro_email'
         );
     }
 
-    /**
-     * Create many-to-many relation table
-     */
-    public static function oroEmailToFolderRelationTable(Schema $schema)
+    private function createOroEmailToFolderRelationTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_to_folder');
-        $table->addColumn('email_id', 'integer', []);
-        $table->addColumn('emailfolder_id', 'integer', []);
-        $table->addIndex(['email_id'], 'oro_folder_email_idx', []);
-        $table->addIndex(['emailfolder_id'], 'oro_email_folder_idx', []);
-
+        $table->addColumn('email_id', 'integer');
+        $table->addColumn('emailfolder_id', 'integer');
+        $table->addIndex(['email_id'], 'oro_folder_email_idx');
+        $table->addIndex(['emailfolder_id'], 'oro_email_folder_idx');
         $table->setPrimaryKey(['email_id', 'emailfolder_id']);
-
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email'),
             ['email_id'],

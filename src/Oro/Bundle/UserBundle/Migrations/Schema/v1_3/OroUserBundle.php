@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
-use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
@@ -26,35 +25,21 @@ class OroUserBundle implements
     use ActivityExtensionAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addActivityAssociations($schema, $this->activityExtension);
+        $this->activityExtension->addActivityAssociation($schema, 'oro_email', 'oro_user', true);
 
         $this->assignActivities('oro_email', 'oro_user', 'owner_user_id', $queries);
     }
 
-    /**
-     * Enables Email activity for User entity
-     */
-    public static function addActivityAssociations(Schema $schema, ActivityExtension $activityExtension)
-    {
-        $activityExtension->addActivityAssociation($schema, 'oro_email', 'oro_user', true);
-    }
-
-    /**
-     * @param string   $sourceTableName
-     * @param string   $targetTableName
-     * @param string   $ownerColumnName
-     * @param QueryBag $queries
-     */
-    public function assignActivities(
-        $sourceTableName,
-        $targetTableName,
-        $ownerColumnName,
+    private function assignActivities(
+        string $sourceTableName,
+        string $targetTableName,
+        string $ownerColumnName,
         QueryBag $queries
-    ) {
+    ): void {
         // prepare select email_id:contact_id sql
         $fromAndRecipients = '
             SELECT DISTINCT email_id, owner_id FROM (

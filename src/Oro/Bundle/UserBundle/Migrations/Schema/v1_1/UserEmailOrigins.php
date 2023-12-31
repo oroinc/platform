@@ -10,44 +10,24 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class UserEmailOrigins implements Migration, OrderedMigrationInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 1;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::oroUserEmailOriginTable($schema);
-        self::oroUserEmailOriginForeignKeys($schema);
-    }
-
-    /**
-     * Generate table oro_user_email_origin
-     */
-    public static function oroUserEmailOriginTable(Schema $schema)
-    {
-        /** Generate table oro_user_email_origin **/
         $table = $schema->createTable('oro_user_email_origin');
-        $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('origin_id', 'integer', []);
+        $table->addColumn('user_id', 'integer');
+        $table->addColumn('origin_id', 'integer');
         $table->setPrimaryKey(['user_id', 'origin_id']);
-        $table->addIndex(['user_id'], 'IDX_CB3E838BA76ED395', []);
-        $table->addIndex(['origin_id'], 'IDX_CB3E838B56A273CC', []);
-        /** End of generate table oro_user_email_origin **/
-    }
-
-    /**
-     * Generate foreign keys for table oro_user_email_origin
-     */
-    public static function oroUserEmailOriginForeignKeys(Schema $schema)
-    {
-        /** Generate foreign keys for table oro_user_email_origin **/
-        $table = $schema->getTable('oro_user_email_origin');
+        $table->addIndex(['user_id'], 'IDX_CB3E838BA76ED395');
+        $table->addIndex(['origin_id'], 'IDX_CB3E838B56A273CC');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email_origin'),
             ['origin_id'],
@@ -60,6 +40,5 @@ class UserEmailOrigins implements Migration, OrderedMigrationInterface
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
-        /** End of generate foreign keys for table oro_user_email_origin **/
     }
 }

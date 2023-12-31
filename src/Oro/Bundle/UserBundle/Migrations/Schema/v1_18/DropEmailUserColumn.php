@@ -10,28 +10,21 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class DropEmailUserColumn implements Migration, OrderedMigrationInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 4;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::updateOroEmailUserTable($schema);
-    }
-
-    /**
-     * Add origin to EmailUser
-     */
-    public static function updateOroEmailUserTable(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_email_user');
         $table->dropColumn('folder_id');
+
         $table = $schema->getTable('oro_email_user_folders');
         $table->dropIndex('IDX_origin');
         $table->dropColumn('origin_id');

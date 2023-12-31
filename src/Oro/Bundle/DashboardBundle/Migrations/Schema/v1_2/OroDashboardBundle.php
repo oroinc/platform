@@ -10,12 +10,12 @@ use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
 class OroDashboardBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addOrganizationDashboardTable($schema);
-        self::dropOroDashboardActiveTableIndexes($schema);
+        $this->addOrganizationDashboardTable($schema);
+        $this->dropOroDashboardActiveTableIndexes($schema);
 
         //Add organization fields to ownership entity config
         $queries->addQuery(
@@ -29,14 +29,11 @@ class OroDashboardBundle implements Migration
         );
     }
 
-    /**
-     * Adds organization_id into oro_dashboard
-     */
-    public static function addOrganizationDashboardTable(Schema $schema)
+    private function addOrganizationDashboardTable(Schema $schema): void
     {
         $table = $schema->getTable('oro_dashboard');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['organization_id'], 'IDX_DF2802EF32C8A3DE', []);
+        $table->addIndex(['organization_id'], 'IDX_DF2802EF32C8A3DE');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],
@@ -45,10 +42,7 @@ class OroDashboardBundle implements Migration
         );
     }
 
-    /**
-     * Drop oro_dashboard_active table indexes
-     */
-    protected function dropOroDashboardActiveTableIndexes(Schema $schema)
+    private function dropOroDashboardActiveTableIndexes(Schema $schema): void
     {
         $table = $schema->getTable('oro_dashboard_active');
         if ($table->hasIndex('IDX_858BA17EB9D04D2B')) {

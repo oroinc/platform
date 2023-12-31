@@ -9,24 +9,24 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroDataGridBundleInstaller implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_7';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $this->createAppearanceTypeTable($schema);
         $this->createOroGridViewTable($schema);
         $this->createOroGridViewUserTable($schema);
     }
 
-    protected function createAppearanceTypeTable(Schema $schema)
+    private function createAppearanceTypeTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_grid_appearance_type');
         $table->addColumn('name', 'string', ['length' => 32]);
@@ -35,7 +35,7 @@ class OroDataGridBundleInstaller implements Installation
         $table->setPrimaryKey(['name']);
     }
 
-    protected function createOroGridViewTable(Schema $schema)
+    private function createOroGridViewTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_grid_view');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -51,18 +51,16 @@ class OroDataGridBundleInstaller implements Installation
         $table->addColumn('appearanceData', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->addColumn('discr_type', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['user_owner_id'], 'IDX_5B73FBCB9EB185F9', []);
-        $table->addIndex(['organization_id'], 'IDX_5B73FBCB32C8A3DE', []);
-        $table->addIndex(['appearanceType'], 'IDX_ORO_GRID_VIEW_APPEARANCE_TYPE', []);
+        $table->addIndex(['user_owner_id'], 'IDX_5B73FBCB9EB185F9');
+        $table->addIndex(['organization_id'], 'IDX_5B73FBCB32C8A3DE');
+        $table->addIndex(['appearanceType'], 'IDX_ORO_GRID_VIEW_APPEARANCE_TYPE');
         $table->addIndex(['discr_type'], 'idx_oro_grid_view_discr_type');
-
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_grid_appearance_type'),
             ['appearanceType'],
             ['name'],
             ['onDelete' => null, 'onUpdate' => null]
         );
-
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],
@@ -77,7 +75,7 @@ class OroDataGridBundleInstaller implements Installation
         );
     }
 
-    protected function createOroGridViewUserTable(Schema $schema)
+    private function createOroGridViewUserTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_grid_view_user_rel');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -87,10 +85,9 @@ class OroDataGridBundleInstaller implements Installation
         $table->addColumn('grid_name', 'string', ['length' => 255]);
         $table->addColumn('type', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['user_id'], 'IDX_USER_ID_GRID', []);
-        $table->addIndex(['grid_view_id'], 'IDX_GRID_VIEW_GRID', []);
+        $table->addIndex(['user_id'], 'IDX_USER_ID_GRID');
+        $table->addIndex(['grid_view_id'], 'IDX_GRID_VIEW_GRID');
         $table->addIndex(['type'], 'idx_oro_grid_view_user_rel_type');
-
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_id'],

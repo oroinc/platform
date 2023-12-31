@@ -15,7 +15,7 @@ use Oro\Bundle\MigrationBundle\Migration\SqlSchemaUpdateMigrationQuery;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\IndexMigration;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema\Test1BundleInstallation;
 
-class MigrationExecutorTest extends AbstractTestMigrationExecutor
+class MigrationExecutorTest extends MigrationExecutorTestCase
 {
     private const TEST_PACKAGE_NAMESPACE = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\\';
 
@@ -30,18 +30,18 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
         $this->executor->setLogger($this->logger);
     }
 
-    public function testIndexesSuccessful()
+    public function testIndexesSuccessful(): void
     {
         $migrations = [
             new MigrationState(new IndexMigration()),
         ];
-        $this->cacheManager->expects($this->once())
+        $this->cacheManager->expects(self::once())
             ->method('clear');
 
         $this->executor->executeUp($migrations);
     }
 
-    public function testIndexFailed()
+    public function testIndexFailed(): void
     {
         $migrations = ['InvalidIndexMigration'];
         $migrationsToExecute = [];
@@ -54,15 +54,15 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
         $this->expectExceptionMessage(
             'Failed migrations: Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration.'
         );
-        $this->cacheManager->expects($this->never())
+        $this->cacheManager->expects(self::never())
             ->method('clear');
 
         $this->executor->executeUp($migrationsToExecute);
-        $this->assertEquals(
+        self::assertEquals(
             '> Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration',
             $this->logger->getMessages()[0]
         );
-        $this->assertEquals(
+        self::assertEquals(
             '  ERROR: Could not create index for column with length more than 255.'
             . ' Please correct "key" column length "index_table" in table in'
             . ' "Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration" migration',
@@ -70,7 +70,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
         );
     }
 
-    public function testUpdatedColumnIndexFailed()
+    public function testUpdatedColumnIndexFailed(): void
     {
         $migrations = ['IndexMigration', 'UpdatedColumnIndexMigration'];
         $migrationsToExecute = [];
@@ -84,28 +84,28 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
         $this->expectExceptionMessage(
             'Failed migrations: Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration.'
         );
-        $this->cacheManager->expects($this->never())
+        $this->cacheManager->expects(self::never())
             ->method('clear');
 
         $this->executor->executeUp($migrationsToExecute);
-        $this->assertEquals(
+        self::assertEquals(
             '> Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration',
             $this->logger->getMessages()[2]
         );
-        $this->assertEquals(
+        self::assertEquals(
             '  ERROR: Could not create index for column with length more than 255.'
             . ' Please correct "key" column length "index_table2" in table in'
             . ' "Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration" migration',
             $this->logger->getMessages()[3]
         );
-        $this->assertEquals(
+        self::assertEquals(
             '> Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema'
             . '\Test1BundleInstallation - skipped',
             $this->logger->getMessages()[4]
         );
     }
 
-    public function testExecuteUpMigrationWithSchemaUpdate()
+    public function testExecuteUpMigrationWithSchemaUpdate(): void
     {
         $schema = new Schema();
 
@@ -114,15 +114,15 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
         $schemaUpdateQuery = new SqlSchemaUpdateMigrationQuery('ALTER TABLE');
 
         $migration = $this->createMock(Migration::class);
-        $migration->expects($this->once())
+        $migration->expects(self::once())
             ->method('up')
             ->willReturnCallback(function (Schema $schema, QueryBag $queries) use ($schemaUpdateQuery) {
                 $queries->addQuery($schemaUpdateQuery);
             });
 
-        $this->assertEmpty($schema->getTables());
+        self::assertEmpty($schema->getTables());
         $this->executor->executeUpMigration($schema, $platform, $migration);
-        $this->assertNotEmpty($schema->getTables()); // schema was updated
+        self::assertNotEmpty($schema->getTables()); // schema was updated
     }
 
     /**
