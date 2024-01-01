@@ -7,7 +7,6 @@ use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
-use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
 
 /**
  * Provides an ability to create scope related associations.
@@ -17,18 +16,17 @@ class ScopeExtension implements ExtendExtensionAwareInterface
     use ExtendExtensionAwareTrait;
 
     /**
-     * Adds the association between the target table and the scope table
-     *
-     * @param Schema $schema
-     * @param string $scopeAssociationName
-     * @param string $targetTableName Target entity table name
-     * @param string $targetAssociationName
+     * Adds the association between the target table and the scope table.
      */
-    public function addScopeAssociation(Schema $schema, $scopeAssociationName, $targetTableName, $targetAssociationName)
-    {
+    public function addScopeAssociation(
+        Schema $schema,
+        string $scopeAssociationName,
+        string $targetTableName,
+        string $targetAssociationName
+    ): void {
         $this->extendExtension->addManyToOneRelation(
             $schema,
-            OroScopeBundleInstaller::ORO_SCOPE,
+            'oro_scope',
             $scopeAssociationName,
             $targetTableName,
             $targetAssociationName,

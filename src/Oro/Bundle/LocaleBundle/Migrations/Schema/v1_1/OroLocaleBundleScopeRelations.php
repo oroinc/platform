@@ -9,7 +9,6 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterf
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
 
 class OroLocaleBundleScopeRelations implements Migration, ExtendExtensionAwareInterface
 {
@@ -27,7 +26,7 @@ class OroLocaleBundleScopeRelations implements Migration, ExtendExtensionAwareIn
     {
         $this->extendExtension->addManyToOneRelation(
             $schema,
-            OroScopeBundleInstaller::ORO_SCOPE,
+            'oro_scope',
             'localization',
             'oro_localization',
             'id',

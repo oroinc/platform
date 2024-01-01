@@ -55,6 +55,7 @@ class OroDataGridBundleInstaller implements Installation
         $table->addIndex(['organization_id'], 'IDX_5B73FBCB32C8A3DE');
         $table->addIndex(['appearanceType'], 'IDX_ORO_GRID_VIEW_APPEARANCE_TYPE');
         $table->addIndex(['discr_type'], 'idx_oro_grid_view_discr_type');
+
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_grid_appearance_type'),
             ['appearanceType'],
@@ -88,6 +89,7 @@ class OroDataGridBundleInstaller implements Installation
         $table->addIndex(['user_id'], 'IDX_USER_ID_GRID');
         $table->addIndex(['grid_view_id'], 'IDX_GRID_VIEW_GRID');
         $table->addIndex(['type'], 'idx_oro_grid_view_user_rel_type');
+
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_id'],

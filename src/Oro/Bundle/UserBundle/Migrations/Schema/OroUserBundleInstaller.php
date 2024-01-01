@@ -111,8 +111,8 @@ class OroUserBundleInstaller implements
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
         $table->addColumn('user_id', 'integer', ['notnull' => false]);
         $table->addColumn('email', 'string', ['length' => 255, 'precision' => 0]);
-        $table->addIndex(['user_id'], 'IDX_8600BE16A76ED395');
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['user_id'], 'IDX_8600BE16A76ED395');
         $table->addIndex(['email'], 'idx_user_email');
 
         if ($this->platform instanceof PostgreSqlPlatform) {
