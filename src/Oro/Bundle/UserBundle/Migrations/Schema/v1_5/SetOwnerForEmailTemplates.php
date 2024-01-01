@@ -9,25 +9,19 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class SetOwnerForEmailTemplates implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addOwnerToOroEmailTemplate($schema);
+        $this->addOwnerToEmailTemplateTable($schema);
         $queries->addQuery(new SetOwnerForEmailTemplatesQuery());
     }
 
-    /**
-     * Add owner to table oro_email_template
-     */
-    public static function addOwnerToOroEmailTemplate(Schema $schema)
+    private function addOwnerToEmailTemplateTable(Schema $schema): void
     {
-        /** Add user as owner to oro_email_template table **/
         $table = $schema->getTable('oro_email_template');
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['user_owner_id'], 'IDX_E62049DE9EB185F9', []);
-
-        /** Generate foreign keys for table oro_email_template **/
+        $table->addIndex(['user_owner_id'], 'IDX_E62049DE9EB185F9');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_owner_id'],

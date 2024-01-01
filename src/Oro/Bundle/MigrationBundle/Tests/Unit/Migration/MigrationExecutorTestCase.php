@@ -10,7 +10,7 @@ use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
 
-class AbstractTestMigrationExecutor extends \PHPUnit\Framework\TestCase
+abstract class MigrationExecutorTestCase extends \PHPUnit\Framework\TestCase
 {
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     protected $connection;
@@ -28,20 +28,19 @@ class AbstractTestMigrationExecutor extends \PHPUnit\Framework\TestCase
     {
         $this->connection = $this->createMock(Connection::class);
 
-        $platform = new MySqlPlatform();
         $sm = $this->createMock(AbstractSchemaManager::class);
-        $sm->expects($this->once())
+        $sm->expects(self::once())
             ->method('listTables')
             ->willReturn($this->getTables());
-        $sm->expects($this->once())
+        $sm->expects(self::once())
             ->method('createSchemaConfig')
             ->willReturn(null);
-        $this->connection->expects($this->atLeastOnce())
+        $this->connection->expects(self::atLeastOnce())
             ->method('getSchemaManager')
             ->willReturn($sm);
-        $this->connection->expects($this->atLeastOnce())
+        $this->connection->expects(self::atLeastOnce())
             ->method('getDatabasePlatform')
-            ->willReturn($platform);
+            ->willReturn(new MySqlPlatform());
 
         $this->logger = new ArrayLogger();
 

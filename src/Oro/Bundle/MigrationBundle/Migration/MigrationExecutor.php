@@ -19,17 +19,15 @@ use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Event\PostUpMigrationLifeCycleEvent;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Migrations query executor
+ * Migrations query executor.
  */
 class MigrationExecutor
 {
-    /**
-     * @var MigrationQueryExecutor
-     */
-    protected $queryExecutor;
+    protected MigrationQueryExecutorInterface $queryExecutor;
     protected OroDataCacheManager $cacheManager;
     protected LoggerInterface $logger;
     protected ?MigrationExtensionManager $extensionManager = null;
@@ -39,51 +37,57 @@ class MigrationExecutor
     {
         $this->queryExecutor = $queryExecutor;
         $this->cacheManager = $cacheManager;
+        $this->logger = new NullLogger();
     }
 
     /**
-     * Sets a logger
+     * Sets a logger.
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
+        if (null !== $this->extensionManager) {
+            $this->extensionManager->setLogger($this->logger);
+        }
     }
 
     /**
      * Gets a query executor object this migration executor works with
-     *
-     * @return MigrationQueryExecutor
      */
-    public function getQueryExecutor()
+    public function getQueryExecutor(): MigrationQueryExecutorInterface
     {
         return $this->queryExecutor;
     }
 
     /**
-     * Sets extension manager
+     * Sets an extension manager.
      */
-    public function setExtensionManager(MigrationExtensionManager $extensionManager)
+    public function setExtensionManager(MigrationExtensionManager $extensionManager): void
     {
         $this->extensionManager = $extensionManager;
         $connection = $this->queryExecutor->getConnection();
         $this->extensionManager->setConnection($connection);
         $this->extensionManager->setDatabasePlatform($connection->getDatabasePlatform());
+        $this->extensionManager->setLogger($this->logger);
     }
 
-    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    /**
+     * Sets an event dispatcher.
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void
     {
         $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
-     * Executes UP method for the given migrations
+     * Executes UP method for the given migrations.
      *
      * @param MigrationState[] $migrations
      * @param bool             $dryRun
      *
      * @throws \RuntimeException if at lease one migration failed
      */
-    public function executeUp(array $migrations, $dryRun = false)
+    public function executeUp(array $migrations, bool $dryRun = false): void
     {
         $platform = $this->queryExecutor->getConnection()->getDatabasePlatform();
         $schema = $this->getActualSchema();
@@ -92,7 +96,7 @@ class MigrationExecutor
         foreach ($migrations as $item) {
             $migration = $item->getMigration();
             if (!empty($failedMigrations) && !$migration instanceof FailIndependentMigration) {
-                $this->logger->info(sprintf('> %s - skipped', get_class($migration)));
+                $this->logger->info(sprintf('> %s - skipped', \get_class($migration)));
                 continue;
             }
 
@@ -100,7 +104,7 @@ class MigrationExecutor
                 $item->setSuccessful();
             } else {
                 $item->setFailed();
-                $failedMigrations[] = get_class($migration);
+                $failedMigrations[] = \get_class($migration);
             }
 
             $this->onPostUp($item);
@@ -113,23 +117,15 @@ class MigrationExecutor
         $this->cacheManager->clear();
     }
 
-    /**
-     * @param Schema           $schema
-     * @param AbstractPlatform $platform
-     * @param Migration        $migration
-     * @param bool             $dryRun
-     *
-     * @return bool
-     */
     public function executeUpMigration(
         Schema &$schema,
         AbstractPlatform $platform,
         Migration $migration,
-        $dryRun = false
-    ) {
+        bool $dryRun = false
+    ): bool {
         $result = true;
 
-        $this->logger->info(sprintf('> %s', get_class($migration)));
+        $this->logger->info(sprintf('> %s', \get_class($migration)));
         $toSchema = clone $schema;
         $this->setExtensions($migration);
         try {
@@ -153,11 +149,8 @@ class MigrationExecutor
             $isSchemaUpdateRequired = false;
             foreach ($queries as $query) {
                 $this->queryExecutor->execute($query, $dryRun);
-                if (is_object($query) && $query instanceof SchemaUpdateQuery) {
-                    // check if schema update required
-                    if (!$isSchemaUpdateRequired && $query->isUpdateRequired()) {
-                        $isSchemaUpdateRequired = true;
-                    }
+                if ($query instanceof SchemaUpdateQuery && !$isSchemaUpdateRequired && $query->isUpdateRequired()) {
+                    $isSchemaUpdateRequired = true;
                 }
             }
 
@@ -173,7 +166,7 @@ class MigrationExecutor
     }
 
     /**
-     * Creates a database schema object
+     * Creates a database schema object.
      *
      * @param Table[]           $tables
      * @param Sequence[]        $sequences
@@ -181,15 +174,18 @@ class MigrationExecutor
      *
      * @return Schema
      */
-    protected function createSchemaObject(array $tables = [], array $sequences = [], $schemaConfig = null)
-    {
+    protected function createSchemaObject(
+        array $tables = [],
+        array $sequences = [],
+        ?SchemaConfig $schemaConfig = null
+    ): Schema {
         return new Schema($tables, $sequences, $schemaConfig);
     }
 
     /**
-     * Sets extensions for the given migration
+     * Sets extensions for the given migration.
      */
-    protected function setExtensions(Migration $migration)
+    protected function setExtensions(Migration $migration): void
     {
         if ($this->extensionManager) {
             $this->extensionManager->applyExtensions($migration);
@@ -197,11 +193,11 @@ class MigrationExecutor
     }
 
     /**
-     * Validates the given tables from SchemaDiff
+     * Validates the given tables from SchemaDiff.
      *
      * @throws InvalidNameException if invalid table or column name is detected
      */
-    protected function checkTables(SchemaDiff $schemaDiff, Migration $migration)
+    protected function checkTables(SchemaDiff $schemaDiff, Migration $migration): void
     {
         foreach ($schemaDiff->newTables as $table) {
             $this->checkTableName($table->getName(), $migration);
@@ -218,7 +214,7 @@ class MigrationExecutor
     }
 
     /**
-     * Validates the given columns
+     * Validates the given columns.
      *
      * @param string    $tableName
      * @param Column[]  $columns
@@ -226,7 +222,7 @@ class MigrationExecutor
      *
      * @throws InvalidNameException if invalid column name is detected
      */
-    protected function checkColumnNames($tableName, $columns, Migration $migration)
+    protected function checkColumnNames(string $tableName, array $columns, Migration $migration): void
     {
         foreach ($columns as $column) {
             $this->checkColumnName($tableName, $column->getName(), $migration);
@@ -234,27 +230,20 @@ class MigrationExecutor
     }
 
     /**
-     * Validates table name
-     *
-     * @param string    $tableName
-     * @param Migration $migration
+     * Validates a table name.
      *
      * @throws InvalidNameException if table name is invalid
      */
-    protected function checkTableName($tableName, Migration $migration)
+    protected function checkTableName(string $tableName, Migration $migration): void
     {
     }
 
     /**
-     * Validates column name
-     *
-     * @param string    $tableName
-     * @param string    $columnName
-     * @param Migration $migration
+     * Validates a column name.
      *
      * @throws InvalidNameException if column name is invalid
      */
-    protected function checkColumnName($tableName, $columnName, Migration $migration)
+    protected function checkColumnName(string $tableName, string $columnName, Migration $migration): void
     {
     }
 
@@ -278,9 +267,9 @@ class MigrationExecutor
     }
 
     /**
-     * @throws InvalidNameException
+     * @throws InvalidNameException if index name is invalid
      */
-    protected function checkIndex(Table $table, Index $index, Migration $migration)
+    protected function checkIndex(Table $table, Index $index, Migration $migration): void
     {
         $columns = $index->getColumns();
         foreach ($columns as $columnName) {
@@ -292,19 +281,14 @@ class MigrationExecutor
                         MySqlPlatform::LENGTH_LIMIT_TINYTEXT,
                         $columnName,
                         $table->getName(),
-                        get_class($migration)
+                        \get_class($migration)
                     )
                 );
             }
         }
     }
 
-    /**
-     * @param TableDiff $diff
-     *
-     * @return Table
-     */
-    protected function getTableFromDiff(TableDiff $diff)
+    protected function getTableFromDiff(TableDiff $diff): Table
     {
         $changedColumns = array_map(
             function (ColumnDiff $columnDiff) {
@@ -313,18 +297,13 @@ class MigrationExecutor
             $diff->changedColumns
         );
 
-        $table = new Table(
+        return new Table(
             $diff->fromTable->getName(),
             array_merge($diff->fromTable->getColumns(), $diff->addedColumns, $changedColumns)
         );
-
-        return $table;
     }
 
-    /**
-     * @return Schema
-     */
-    protected function getActualSchema()
+    protected function getActualSchema(): Schema
     {
         $platform = $this->queryExecutor->getConnection()->getDatabasePlatform();
         $sm = $this->queryExecutor->getConnection()->getSchemaManager();
@@ -338,7 +317,7 @@ class MigrationExecutor
 
     protected function onPostUp(MigrationState $state): void
     {
-        if ($this->eventDispatcher) {
+        if (null !== $this->eventDispatcher) {
             $this->eventDispatcher->dispatch(
                 new PostUpMigrationLifeCycleEvent($state),
                 MigrationEvents::MIGRATION_POST_UP

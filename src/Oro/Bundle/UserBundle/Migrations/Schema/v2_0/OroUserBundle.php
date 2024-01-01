@@ -9,21 +9,15 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroUserBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::addEmailUserIndexes($schema);
-    }
-
-    public static function addEmailUserIndexes(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_email_user');
         if (!$table->hasIndex('user_owner_id_mailbox_owner_id_organization_id')) {
             $table->addIndex(
                 ['user_owner_id', 'mailbox_owner_id', 'organization_id'],
-                'user_owner_id_mailbox_owner_id_organization_id',
-                []
+                'user_owner_id_mailbox_owner_id_organization_id'
             );
         }
     }

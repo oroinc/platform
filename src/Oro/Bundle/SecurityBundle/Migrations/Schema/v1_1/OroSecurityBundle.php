@@ -7,33 +7,16 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\LoadBasePermissionsQuery;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class OroSecurityBundle implements Migration, ContainerAwareInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    use ContainerAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
-    {
-        return 'v1_1';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroSecurityPermApplyEntityTable($schema);
@@ -60,7 +43,7 @@ class OroSecurityBundle implements Migration, ContainerAwareInterface
     /**
      * Create oro_security_perm_apply_entity table
      */
-    protected function createOroSecurityPermApplyEntityTable(Schema $schema)
+    private function createOroSecurityPermApplyEntityTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_security_perm_apply_entity');
         $table->addColumn('permission_id', 'integer', []);
@@ -71,7 +54,7 @@ class OroSecurityBundle implements Migration, ContainerAwareInterface
     /**
      * Create oro_security_perm_excl_entity table
      */
-    protected function createOroSecurityPermExclEntityTable(Schema $schema)
+    private function createOroSecurityPermExclEntityTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_security_perm_excl_entity');
         $table->addColumn('permission_id', 'integer', []);
@@ -82,7 +65,7 @@ class OroSecurityBundle implements Migration, ContainerAwareInterface
     /**
      * Create oro_security_permission table
      */
-    protected function createOroSecurityPermissionTable(Schema $schema)
+    private function createOroSecurityPermissionTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_security_permission');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -98,7 +81,7 @@ class OroSecurityBundle implements Migration, ContainerAwareInterface
     /**
      * Create oro_security_permission_entity table
      */
-    protected function createOroSecurityPermissionEntityTable(Schema $schema)
+    private function createOroSecurityPermissionEntityTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_security_permission_entity');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -110,7 +93,7 @@ class OroSecurityBundle implements Migration, ContainerAwareInterface
     /**
      * Add oro_security_perm_apply_entity foreign keys.
      */
-    protected function addOroSecurityPermApplyEntityForeignKeys(Schema $schema)
+    private function addOroSecurityPermApplyEntityForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_security_perm_apply_entity');
         $table->addForeignKeyConstraint(
@@ -130,7 +113,7 @@ class OroSecurityBundle implements Migration, ContainerAwareInterface
     /**
      * Add oro_security_perm_excl_entity foreign keys.
      */
-    protected function addOroSecurityPermExclEntityForeignKeys(Schema $schema)
+    private function addOroSecurityPermExclEntityForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_security_perm_excl_entity');
         $table->addForeignKeyConstraint(

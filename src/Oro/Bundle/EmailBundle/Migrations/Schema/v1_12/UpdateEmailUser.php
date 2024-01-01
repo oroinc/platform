@@ -10,43 +10,29 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class UpdateEmailUser implements Migration, OrderedMigrationInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 3;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::updateEmailUser($schema);
-    }
-
-    public static function updateEmailUser(Schema $schema)
-    {
-        self::updateEmailUserTableFields($schema);
-    }
-
-    protected static function updateEmailUserTableFields(Schema $schema)
-    {
-        $emailUserTable = $schema->getTable('oro_email_user');
-
-        /** Update columns */
-        $emailUserTable->changeColumn('folder_id', ['notnull' => true]);
-        $emailUserTable->changeColumn('email_id', ['notnull' => true]);
-
-        /** Add indexes */
-        $emailUserTable->addForeignKeyConstraint(
+        $table = $schema->getTable('oro_email_user');
+        $table->changeColumn('folder_id', ['notnull' => true]);
+        $table->changeColumn('email_id', ['notnull' => true]);
+        $table->addForeignKeyConstraint(
             $schema->getTable('oro_email'),
             ['email_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null],
             'FK_91F5CFF6A832C1C9'
         );
-        $emailUserTable->addForeignKeyConstraint(
+        $table->addForeignKeyConstraint(
             $schema->getTable('oro_email_folder'),
             ['folder_id'],
             ['id'],

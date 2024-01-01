@@ -6,31 +6,18 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class OroSearchBundle implements Migration, ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    use ContainerAwareTrait;
 
     /**
-     * @inheritdoc
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @inheritdoc
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        // @codingStandardsIgnoreStart
-
         /** Generate table oro_search_index_datetime **/
         $table = $schema->createTable('oro_search_index_datetime');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -89,17 +76,32 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
 
         /** Generate foreign keys for table oro_search_index_datetime **/
         $table = $schema->getTable('oro_search_index_datetime');
-        $table->addForeignKeyConstraint($schema->getTable('oro_search_item'), ['item_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_search_item'),
+            ['item_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
         /** End of generate foreign keys for table oro_search_index_datetime **/
 
         /** Generate foreign keys for table oro_search_index_decimal **/
         $table = $schema->getTable('oro_search_index_decimal');
-        $table->addForeignKeyConstraint($schema->getTable('oro_search_item'), ['item_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_search_item'),
+            ['item_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
         /** End of generate foreign keys for table oro_search_index_decimal **/
 
         /** Generate foreign keys for table oro_search_index_integer **/
         $table = $schema->getTable('oro_search_index_integer');
-        $table->addForeignKeyConstraint($schema->getTable('oro_search_item'), ['item_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_search_item'),
+            ['item_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
         /** End of generate foreign keys for table oro_search_index_integer **/
 
         /** Generate table oro_search_index_text **/
@@ -112,8 +114,6 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
         $table->setPrimaryKey(['id']);
         $table->addIndex(['item_id'], 'IDX_A0243539126F525E', []);
         /** End of generate table oro_search_index_text **/
-
-        // @codingStandardsIgnoreEnd
 
         // add search fulltext index query (only for ORM search engine)
         if ($this->container->has('oro_search.fulltext_index_manager')) {

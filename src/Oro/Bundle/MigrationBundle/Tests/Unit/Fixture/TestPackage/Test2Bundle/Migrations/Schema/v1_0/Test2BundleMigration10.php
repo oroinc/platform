@@ -7,17 +7,16 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class Test2BundleMigration10 implements Migration, ContainerAwareInterface, OrderedMigrationInterface
 {
+    use ContainerAwareTrait;
+
     public function getOrder()
     {
         return 1;
     }
-
-    /** @var ContainerInterface */
-    protected $container;
 
     public function up(Schema $schema, QueryBag $queries)
     {
@@ -25,10 +24,5 @@ class Test2BundleMigration10 implements Migration, ContainerAwareInterface, Orde
         foreach ($sqls as $sql) {
             $queries->addQuery($sql);
         }
-    }
-
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
     }
 }

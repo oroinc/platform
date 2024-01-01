@@ -9,19 +9,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroSegmentBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addColumns($schema);
-    }
-
-    /**
-     * Add recordsLimit to segment
-     */
-    public static function addColumns(Schema $schema)
-    {
-        $table = $schema->getTable('oro_segment');
-        $table->addColumn('records_limit', 'integer', ['notnull' => false]);
+        $schema->getTable('oro_segment')
+            ->addColumn('records_limit', 'integer', ['notnull' => false]);
     }
 }

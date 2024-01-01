@@ -9,21 +9,14 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class AddFileUuidColumn implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::addUuidColumn($schema);
-    }
-
-    public static function addUuidColumn(Schema $schema): void
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_attachment_file');
-        if ($table->hasColumn('uuid')) {
-            return;
+        if (!$table->hasColumn('uuid')) {
+            $table->addColumn('uuid', 'guid', ['notnull' => false]);
+            $table->addIndex(['uuid'], 'att_file_uuid_idx');
         }
-
-        $table->addColumn('uuid', 'guid', ['notnull' => false]);
-        $table->addIndex(['uuid'], 'att_file_uuid_idx', []);
     }
 }

@@ -15,17 +15,17 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroIntegrationBundleInstaller implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_16';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroIntegrationFieldsChangesTable($schema);
@@ -38,18 +38,18 @@ class OroIntegrationBundleInstaller implements Installation
         $this->addOroIntegrationChannelStatusForeignKeys($schema);
     }
 
-    protected function createOroIntegrationFieldsChangesTable(Schema $schema): void
+    private function createOroIntegrationFieldsChangesTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_integration_fields_changes');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('entity_class', 'string', ['length' => 255]);
-        $table->addColumn('entity_id', 'integer', []);
+        $table->addColumn('entity_id', 'integer');
         $table->addColumn('changed_fields', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['entity_id', 'entity_class'], 'oro_integration_fields_changes_idx', []);
+        $table->addIndex(['entity_id', 'entity_class'], 'oro_integration_fields_changes_idx');
     }
 
-    protected function createOroIntegrationChannelTable(Schema $schema): void
+    private function createOroIntegrationChannelTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_integration_channel');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -66,39 +66,39 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('default_business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['transport_id'], 'UNIQ_55B9B9C59909C13F');
-        $table->addIndex(['default_user_owner_id'], 'IDX_55B9B9C5A89019EA', []);
-        $table->addIndex(['organization_id'], 'IDX_55B9B9C532C8A3DE', []);
-        $table->addIndex(['name'], 'oro_integration_channel_name_idx', []);
-        $table->addIndex(['default_business_unit_owner_id'], 'IDX_55B9B9C5FA248E2', []);
+        $table->addIndex(['default_user_owner_id'], 'IDX_55B9B9C5A89019EA');
+        $table->addIndex(['organization_id'], 'IDX_55B9B9C532C8A3DE');
+        $table->addIndex(['name'], 'oro_integration_channel_name_idx');
+        $table->addIndex(['default_business_unit_owner_id'], 'IDX_55B9B9C5FA248E2');
         $table->addColumn('previously_enabled', 'boolean', ['notnull' => false]);
     }
 
-    protected function createOroIntegrationChannelStatusTable(Schema $schema): void
+    private function createOroIntegrationChannelStatusTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_integration_channel_status');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('channel_id', 'integer', []);
+        $table->addColumn('channel_id', 'integer');
         $table->addColumn('code', 'string', ['length' => 255]);
         $table->addColumn('connector', 'string', ['length' => 255]);
-        $table->addColumn('message', 'text', []);
-        $table->addColumn('date', 'datetime', []);
+        $table->addColumn('message', 'text');
+        $table->addColumn('date', 'datetime');
         $table->addColumn('data', Types::JSON_ARRAY, ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['channel_id'], 'IDX_C0D7E5FB72F5A1AA', []);
-        $table->addIndex(['date'], 'oro_intch_date_idx', []);
-        $table->addIndex(['connector', 'code'], 'oro_intch_con_state_idx', []);
+        $table->addIndex(['channel_id'], 'IDX_C0D7E5FB72F5A1AA');
+        $table->addIndex(['date'], 'oro_intch_date_idx');
+        $table->addIndex(['connector', 'code'], 'oro_intch_con_state_idx');
     }
 
-    protected function createOroIntegrationTransportTable(Schema $schema): void
+    private function createOroIntegrationTransportTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_integration_transport');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('type', 'string', ['length' => 30]);
-        $table->addIndex(['type'], 'oro_int_trans_type_idx', []);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['type'], 'oro_int_trans_type_idx');
     }
 
-    protected function addOroIntegrationChannelForeignKeys(Schema $schema): void
+    private function addOroIntegrationChannelForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_integration_channel');
         $table->addForeignKeyConstraint(
@@ -127,7 +127,7 @@ class OroIntegrationBundleInstaller implements Installation
         );
     }
 
-    protected function addOroIntegrationChannelStatusForeignKeys(Schema $schema): void
+    private function addOroIntegrationChannelStatusForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_integration_channel_status');
         $table->addForeignKeyConstraint(
