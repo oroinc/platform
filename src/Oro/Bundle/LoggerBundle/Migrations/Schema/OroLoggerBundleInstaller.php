@@ -12,17 +12,17 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroLoggerBundleInstaller implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_0';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $this->createOroLoggerLogEntryTable($schema);
     }
@@ -30,7 +30,7 @@ class OroLoggerBundleInstaller implements Installation
     /**
      * Create oro_logger_log_entry table
      */
-    protected function createOroLoggerLogEntryTable(Schema $schema)
+    private function createOroLoggerLogEntryTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_logger_log_entry');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);

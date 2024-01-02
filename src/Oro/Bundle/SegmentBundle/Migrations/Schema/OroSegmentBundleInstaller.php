@@ -88,8 +88,8 @@ class OroSegmentBundleInstaller implements Installation
         $table->addColumn('updatedat', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('last_run', 'datetime', ['notnull' => false, 'comment' => '(DC2Type:datetime)']);
         $table->addColumn('records_limit', 'integer', ['notnull' => false]);
-        $table->addIndex(['organization_id'], 'idx_d02603b332c8a3de');
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['organization_id'], 'idx_d02603b332c8a3de');
         $table->addUniqueIndex(['name_lowercase'], 'uniq_d02603b37edd63ff');
         $table->addIndex(['business_unit_owner_id'], 'idx_d02603b359294170');
         $table->addIndex(['type'], 'idx_d02603b38cde5729');

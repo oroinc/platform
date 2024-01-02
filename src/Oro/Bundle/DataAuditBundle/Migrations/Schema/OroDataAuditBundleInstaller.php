@@ -7,9 +7,6 @@ use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-/**
- * Handles all migrations logic executed during installation
- */
 class OroDataAuditBundleInstaller implements Installation
 {
     /**
@@ -55,13 +52,13 @@ class OroDataAuditBundleInstaller implements Installation
         $table->addColumn('additional_fields', 'array', ['notnull' => false]);
         $table->addColumn('impersonation_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['user_id'], 'IDX_5FBA427CA76ED395', []);
+        $table->addIndex(['user_id'], 'IDX_5FBA427CA76ED395');
         $table->addIndex(['type'], 'idx_oro_audit_type');
-        $table->addIndex(['logged_at'], 'idx_oro_audit_logged_at', []);
-        $table->addIndex(['object_class'], 'idx_oro_audit_object_class', []);
-        $table->addIndex(['object_id', 'object_class', 'type'], 'idx_oro_audit_obj_by_type', []);
-        $table->addIndex(['owner_description'], 'idx_oro_audit_owner_descr', []);
-        $table->addIndex(['organization_id'], 'idx_oro_audit_organization_id', []);
+        $table->addIndex(['logged_at'], 'idx_oro_audit_logged_at');
+        $table->addIndex(['object_class'], 'idx_oro_audit_object_class');
+        $table->addIndex(['object_id', 'object_class', 'type'], 'idx_oro_audit_obj_by_type');
+        $table->addIndex(['owner_description'], 'idx_oro_audit_owner_descr');
+        $table->addIndex(['organization_id'], 'idx_oro_audit_organization_id');
         $table->addUniqueIndex(['object_id', 'object_class', 'version', 'type'], 'idx_oro_audit_version');
         $table->addUniqueIndex(['object_id', 'object_class', 'transaction_id', 'type'], 'idx_oro_audit_transaction');
     }
@@ -70,7 +67,7 @@ class OroDataAuditBundleInstaller implements Installation
     {
         $table = $schema->createTable('oro_audit_field');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('audit_id', 'integer', []);
+        $table->addColumn('audit_id', 'integer');
         $table->addColumn('field', 'string', ['length' => 255]);
         $table->addColumn('data_type', 'string', ['length' => 255]);
         $table->addColumn('old_integer', 'bigint', ['notnull' => false]);
@@ -116,7 +113,7 @@ class OroDataAuditBundleInstaller implements Installation
         ]);
         $table->addColumn('translation_domain', 'string', ['length' => 100, 'notnull' => false]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['audit_id'], 'IDX_9A31A824BD29F359', []);
+        $table->addIndex(['audit_id'], 'IDX_9A31A824BD29F359');
     }
 
     private function addAuditForeignKeys(Schema $schema): void
