@@ -1,18 +1,14 @@
-{% macro scheduleIntervalsInfoItem(label, date, date_in_translate = true) %}
+{% macro scheduleIntervalsInfoItem(label, date) %}
     <span class="schedule-list-item">
         {% if date is not null %}
-            {% if date_in_translate %}
-                {{ label|trans({'%date%': date|oro_format_datetime}) }}
-            {% else %}
-                {{ label|trans }} <strong>{{ date|oro_format_datetime }}</strong>
-            {% endif %}
+            {{ label|trans({'%date%': date|oro_format_datetime})|oro_html_sanitize }}
         {% else %}
             <strong>{{ label|trans }}</strong>
         {% endif %}
     </span>
 {% endmacro %}
 
-{% macro scheduleIntervalsInfo(schedules, labels, date_in_translate = true) %}
+{% macro scheduleIntervalsInfo(schedules, labels) %}
     {% import _self as scheduleUI %}
 
     {% set defaultLabels = {
@@ -33,8 +29,7 @@
                     <li>
                         {{ scheduleUI.scheduleIntervalsInfoItem(
                             labels.wasActivated,
-                            schedule.activeAt,
-                            date_in_translate
+                            schedule.activeAt
                         ) }}
                     </li>
                 {% endif %}
@@ -57,8 +52,7 @@
                 <li>
                     {{ scheduleUI.scheduleIntervalsInfoItem(
                         labels.willBeActivated,
-                        schedule.activeAt,
-                        date_in_translate
+                        schedule.activeAt
                     ) }}
                 </li>
             {% endif %}
@@ -68,16 +62,14 @@
                     <li>
                         {{ scheduleUI.scheduleIntervalsInfoItem(
                             labels.wasDeactivated,
-                            schedule.deactivateAt,
-                            date_in_translate
+                            schedule.deactivateAt
                         ) }}
                     </li>
                 {% else %}
                     <li>
                         {{ scheduleUI.scheduleIntervalsInfoItem(
                             labels.willBeDeactivated,
-                            schedule.deactivateAt,
-                            date_in_translate
+                            schedule.deactivateAt
                         ) }}
                     </li>
                 {% endif %}
