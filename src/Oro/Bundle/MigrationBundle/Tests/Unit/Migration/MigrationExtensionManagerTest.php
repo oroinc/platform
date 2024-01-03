@@ -13,106 +13,129 @@ use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\TestExten
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\MigrationWithTestExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\MigrationWithTestExtensionDepended;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use Psr\Log\LoggerInterface;
 
 class MigrationExtensionManagerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testValidExtension()
+    public function testValidExtension(): void
     {
         $migration = new MigrationWithTestExtension();
         $extension = new TestExtension();
         $platform = new MySqlPlatform();
         $nameGenerator = new DbIdentifierNameGenerator();
+        $logger = $this->createMock(LoggerInterface::class);
 
         $manager = new MigrationExtensionManager();
         $manager->addExtension('test', $extension);
         $manager->applyExtensions($migration);
 
-        $this->assertSame($extension, $migration->getTestExtension());
-        $this->assertNull($extension->getDatabasePlatform());
-        $this->assertNull($extension->getNameGenerator());
+        self::assertSame($extension, $migration->getTestExtension());
+        self::assertNull($extension->getDatabasePlatform());
+        self::assertNull($extension->getNameGenerator());
+        self::assertNull($extension->getLogger());
 
         $manager->setDatabasePlatform($platform);
-        $this->assertSame($platform, $extension->getDatabasePlatform());
+        self::assertSame($platform, $extension->getDatabasePlatform());
 
         $manager->setNameGenerator($nameGenerator);
-        $this->assertSame($nameGenerator, $extension->getNameGenerator());
+        self::assertSame($nameGenerator, $extension->getNameGenerator());
 
-        $this->assertNull($migration->getDatabasePlatform());
-        $this->assertNull($migration->getNameGenerator());
+        $manager->setLogger($logger);
+        self::assertSame($logger, $extension->getLogger());
+
+        self::assertNull($migration->getDatabasePlatform());
+        self::assertNull($migration->getNameGenerator());
+        self::assertNull($migration->getLogger());
         $manager->applyExtensions($migration);
-        $this->assertSame($platform, $migration->getDatabasePlatform());
-        $this->assertSame($nameGenerator, $migration->getNameGenerator());
+        self::assertSame($platform, $migration->getDatabasePlatform());
+        self::assertSame($nameGenerator, $migration->getNameGenerator());
+        self::assertSame($logger, $migration->getLogger());
     }
 
-    public function testAnotherValidExtension()
+    public function testAnotherValidExtension(): void
     {
         $migration = new MigrationWithTestExtension();
         $extension = new AnotherTestExtension();
         $platform = new MySqlPlatform();
         $nameGenerator = new DbIdentifierNameGenerator();
+        $logger = $this->createMock(LoggerInterface::class);
 
         $manager = new MigrationExtensionManager();
         $manager->addExtension('test', $extension);
         $manager->applyExtensions($migration);
 
-        $this->assertSame($extension, $migration->getTestExtension());
-        $this->assertNull($extension->getDatabasePlatform());
-        $this->assertNull($extension->getNameGenerator());
+        self::assertSame($extension, $migration->getTestExtension());
+        self::assertNull($extension->getDatabasePlatform());
+        self::assertNull($extension->getNameGenerator());
+        self::assertNull($extension->getLogger());
 
         $manager->setDatabasePlatform($platform);
-        $this->assertSame($platform, $extension->getDatabasePlatform());
+        self::assertSame($platform, $extension->getDatabasePlatform());
 
         $manager->setNameGenerator($nameGenerator);
-        $this->assertSame($nameGenerator, $extension->getNameGenerator());
+        self::assertSame($nameGenerator, $extension->getNameGenerator());
 
-        $this->assertNull($migration->getDatabasePlatform());
-        $this->assertNull($migration->getNameGenerator());
+        $manager->setLogger($logger);
+        self::assertSame($logger, $extension->getLogger());
+
+        self::assertNull($migration->getDatabasePlatform());
+        self::assertNull($migration->getNameGenerator());
+        self::assertNull($migration->getLogger());
         $manager->applyExtensions($migration);
-        $this->assertSame($platform, $migration->getDatabasePlatform());
-        $this->assertSame($nameGenerator, $migration->getNameGenerator());
+        self::assertSame($platform, $migration->getDatabasePlatform());
+        self::assertSame($nameGenerator, $migration->getNameGenerator());
+        self::assertSame($logger, $migration->getLogger());
     }
 
-    public function testValidExtensionWithDependencies()
+    public function testValidExtensionWithDependencies(): void
     {
         $migration = new MigrationWithTestExtension();
         $extension = new TestExtension();
         $platform = new MySqlPlatform();
         $nameGenerator = new DbIdentifierNameGenerator();
+        $logger = $this->createMock(LoggerInterface::class);
 
         $manager = new MigrationExtensionManager();
         $manager->setDatabasePlatform($platform);
         $manager->setNameGenerator($nameGenerator);
+        $manager->setLogger($logger);
         $manager->addExtension('test', $extension);
         $manager->applyExtensions($migration);
 
-        $this->assertSame($extension, $migration->getTestExtension());
-        $this->assertSame($platform, $extension->getDatabasePlatform());
-        $this->assertSame($nameGenerator, $extension->getNameGenerator());
-        $this->assertSame($platform, $migration->getDatabasePlatform());
-        $this->assertSame($nameGenerator, $migration->getNameGenerator());
+        self::assertSame($extension, $migration->getTestExtension());
+        self::assertSame($platform, $extension->getDatabasePlatform());
+        self::assertSame($nameGenerator, $extension->getNameGenerator());
+        self::assertSame($logger, $extension->getLogger());
+        self::assertSame($platform, $migration->getDatabasePlatform());
+        self::assertSame($nameGenerator, $migration->getNameGenerator());
+        self::assertSame($logger, $migration->getLogger());
     }
 
-    public function testAnotherValidExtensionWithDependencies()
+    public function testAnotherValidExtensionWithDependencies(): void
     {
         $migration = new MigrationWithTestExtension();
         $extension = new AnotherTestExtension();
         $platform = new MySqlPlatform();
         $nameGenerator = new DbIdentifierNameGenerator();
+        $logger = $this->createMock(LoggerInterface::class);
 
         $manager = new MigrationExtensionManager();
         $manager->setDatabasePlatform($platform);
         $manager->setNameGenerator($nameGenerator);
+        $manager->setLogger($logger);
         $manager->addExtension('test', $extension);
         $manager->applyExtensions($migration);
 
-        $this->assertSame($extension, $migration->getTestExtension());
-        $this->assertSame($platform, $extension->getDatabasePlatform());
-        $this->assertSame($nameGenerator, $extension->getNameGenerator());
-        $this->assertSame($platform, $migration->getDatabasePlatform());
-        $this->assertSame($nameGenerator, $migration->getNameGenerator());
+        self::assertSame($extension, $migration->getTestExtension());
+        self::assertSame($platform, $extension->getDatabasePlatform());
+        self::assertSame($nameGenerator, $extension->getNameGenerator());
+        self::assertSame($logger, $extension->getLogger());
+        self::assertSame($platform, $migration->getDatabasePlatform());
+        self::assertSame($nameGenerator, $migration->getNameGenerator());
+        self::assertSame($logger, $migration->getLogger());
     }
 
-    public function testExtensionDependedToOtherExtension()
+    public function testExtensionDependedToOtherExtension(): void
     {
         $migration = new MigrationWithTestExtensionDepended();
         $otherExtension = new TestExtension();
@@ -123,54 +146,48 @@ class MigrationExtensionManagerTest extends \PHPUnit\Framework\TestCase
         $manager->addExtension('other', $otherExtension);
         $manager->applyExtensions($migration);
 
-        $this->assertSame($extension, $migration->getTestExtensionDepended());
-        $this->assertSame($otherExtension, $migration->getTestExtensionDepended()->getTestExtension());
+        self::assertSame($extension, $migration->getTestExtensionDepended());
+        self::assertSame($otherExtension, $migration->getTestExtensionDepended()->getTestExtension());
     }
 
-    public function testExtensionWithNoAwareInterface()
+    public function testExtensionWithNoAwareInterface(): void
     {
         $dir = 'Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension';
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'The extension aware interface for "%s\NoAwareInterfaceExtension" was not found. '
-                . 'Make sure that "%s\NoAwareInterfaceExtensionAwareInterface" interface is declared.',
-                $dir,
-                $dir
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'The extension aware interface for "%s\NoAwareInterfaceExtension" was not found. '
+            . 'Make sure that "%s\NoAwareInterfaceExtensionAwareInterface" interface is declared.',
+            $dir,
+            $dir
+        ));
 
         $manager = new MigrationExtensionManager();
         $manager->addExtension('test', new NoAwareInterfaceExtension());
     }
 
-    public function testAnotherExtensionWithNoAwareInterface()
+    public function testAnotherExtensionWithNoAwareInterface(): void
     {
         $dir = 'Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension';
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'The extension aware interface for neither "%s\AnotherNoAwareInterfaceExtension"'
-                . ' not one of its parent classes was not found.',
-                $dir
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'The extension aware interface for neither "%s\AnotherNoAwareInterfaceExtension"'
+            . ' not one of its parent classes was not found.',
+            $dir
+        ));
 
         $manager = new MigrationExtensionManager();
         $manager->addExtension('test', new AnotherNoAwareInterfaceExtension());
     }
 
-    public function testExtensionWithInvalidAwareInterface()
+    public function testExtensionWithInvalidAwareInterface(): void
     {
         $dir = 'Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension';
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'The method "%s\InvalidAwareInterfaceExtensionAwareInterface::setInvalidAwareInterfaceExtension"'
-                . ' was not found.',
-                $dir
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'The method "%s\InvalidAwareInterfaceExtensionAwareInterface::setInvalidAwareInterfaceExtension"'
+            . ' was not found.',
+            $dir
+        ));
 
         $manager = new MigrationExtensionManager();
         $manager->addExtension('test', new InvalidAwareInterfaceExtension());

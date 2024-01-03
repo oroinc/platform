@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 /**
- * This interface can be implemented by classes that depends on a RestDocViewDetector.
+ * This interface can be implemented by classes that depend on a RestDocViewDetector.
  */
 interface RestDocViewDetectorAwareInterface
 {

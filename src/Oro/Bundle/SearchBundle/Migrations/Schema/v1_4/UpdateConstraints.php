@@ -9,19 +9,16 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class UpdateConstraints implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::changeConstraintDecimalFk($schema);
-        self::changeConstraintIntegerFk($schema);
-        self::changeConstraintDatetimeFk($schema);
+        $this->changeConstraintDecimalFk($schema);
+        $this->changeConstraintIntegerFk($schema);
+        $this->changeConstraintDatetimeFk($schema);
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public static function changeConstraintDecimalFk(Schema $schema)
+    private function changeConstraintDecimalFk(Schema $schema): void
     {
         $table = $schema->getTable('oro_search_index_decimal');
 
@@ -36,10 +33,7 @@ class UpdateConstraints implements Migration
         }
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public static function changeConstraintIntegerFk(Schema $schema)
+    private function changeConstraintIntegerFk(Schema $schema): void
     {
         $table = $schema->getTable('oro_search_index_integer');
         if ($table->getForeignKey('FK_E04BA3AB126F525E')) {
@@ -53,10 +47,7 @@ class UpdateConstraints implements Migration
         }
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public static function changeConstraintDatetimeFk(Schema $schema)
+    private function changeConstraintDatetimeFk(Schema $schema): void
     {
         $table = $schema->getTable('oro_search_index_datetime');
         if ($table->getForeignKey('FK_459F212A126F525E')) {

@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_8;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
 class RemoveInvalidEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
 {
-    const LIMIT = 100;
+    use ConnectionAwareTrait;
 
-    /** @var Connection */
-    protected $connection;
+    const LIMIT = 100;
 
     /** @var array */
     protected $invalidExtendConfigs = [
@@ -23,14 +22,6 @@ class RemoveInvalidEntityConfigQuery implements MigrationQuery, ConnectionAwareI
         'length'    => null,
         'precision' => null,
     ];
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
 
     /**
      * {@inheritdoc}

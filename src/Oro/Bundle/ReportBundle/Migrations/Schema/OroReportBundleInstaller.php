@@ -6,54 +6,46 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-/**
- * Handles all migrations logic executed during installation
- *
- * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PHPMD.ExcessiveClassLength)
- */
 class OroReportBundleInstaller implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v2_4';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroReportTypeTable($schema);
         $this->createOroReportTable($schema);
+        $this->createOroCalendarDateTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroReportForeignKeys($schema);
-
-        /** Create calendar table */
-        $this->createOroCalendarDateTable($schema);
     }
 
     /**
      * Create oro_report_type table
      */
-    protected function createOroReportTypeTable(Schema $schema)
+    private function createOroReportTypeTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_report_type');
         $table->addColumn('name', 'string', ['length' => 32]);
         $table->addColumn('label', 'string', ['length' => 255]);
-        $table->addUniqueIndex(['label'], 'uniq_397d3359ea750e8');
         $table->setPrimaryKey(['name']);
+        $table->addUniqueIndex(['label'], 'uniq_397d3359ea750e8');
     }
 
     /**
      * Create oro_report table
      */
-    protected function createOroReportTable(Schema $schema)
+    private function createOroReportTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_report');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -63,20 +55,32 @@ class OroReportBundleInstaller implements Installation
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('description', 'text', ['notnull' => false]);
         $table->addColumn('entity', 'string', ['length' => 255]);
-        $table->addColumn('definition', 'text', []);
+        $table->addColumn('definition', 'text');
         $table->addColumn('createdat', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updatedat', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('chart_options', 'json_array', ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
-        $table->addIndex(['business_unit_owner_id'], 'idx_b48821b659294170', []);
-        $table->addIndex(['organization_id'], 'idx_b48821b632c8a3de', []);
-        $table->addIndex(['type'], 'idx_b48821b68cde5729', []);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['business_unit_owner_id'], 'idx_b48821b659294170');
+        $table->addIndex(['organization_id'], 'idx_b48821b632c8a3de');
+        $table->addIndex(['type'], 'idx_b48821b68cde5729');
+    }
+
+    /**
+     * Create oro_calendar_date table
+     */
+    private function createOroCalendarDateTable(Schema $schema): void
+    {
+        $table = $schema->createTable('oro_calendar_date');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('date', 'date', ['comment' => '(DC2Type:date)']);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['date'], 'oro_calendar_date_date_unique_idx');
     }
 
     /**
      * Add oro_report foreign keys.
      */
-    protected function addOroReportForeignKeys(Schema $schema)
+    private function addOroReportForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_report');
         $table->addForeignKeyConstraint(
@@ -97,17 +101,5 @@ class OroReportBundleInstaller implements Installation
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'SET NULL']
         );
-    }
-
-    /**
-     * Create oro_calendar_date table
-     */
-    protected function createOroCalendarDateTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_calendar_date');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('date', 'date', ['comment' => '(DC2Type:date)']);
-        $table->addUniqueIndex(['date'], 'oro_calendar_date_date_unique_idx');
-        $table->setPrimaryKey(['id']);
     }
 }

@@ -9,17 +9,9 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroEmailBundle implements Migration
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::addColumns($schema);
-    }
-
-    /**
-     * Add fields
-     */
-    public static function addColumns(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_email_folder');
         $table->addColumn('outdated_at', 'datetime', ['notnull' => false]);

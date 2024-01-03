@@ -6,14 +6,14 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Log\LoggerInterface;
 
 class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, ConnectionAwareInterface
 {
-    /** @var Connection */
-    protected $connection;
+    use ConnectionAwareTrait;
 
     const LIMIT = 100;
 
@@ -45,11 +45,6 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
     public function getDescription()
     {
         return 'Migrates data from table "oro_email_response_rule_cond" into "oro_email_auto_response_rule"';
-    }
-
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
     }
 
     /**

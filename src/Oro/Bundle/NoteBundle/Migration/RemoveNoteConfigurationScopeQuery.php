@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NoteBundle\Migration;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -13,11 +12,6 @@ use Psr\Log\LoggerInterface;
  */
 class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
 {
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
     /**
      * {@inheritdoc}
      */

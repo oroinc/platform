@@ -11,11 +11,10 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroImapBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        /** Update Email Origin Name */
         $queries->addPreQuery(
             new ParametrizedSqlMigrationQuery(
                 'UPDATE oro_email_origin SET name = :new_name WHERE name = :old_name',
@@ -24,15 +23,6 @@ class OroImapBundle implements Migration
             )
         );
 
-        /** Tables generation **/
-        self::addSmtpFieldsToOroEmailOriginTable($schema);
-    }
-
-    /**
-     * Add Smtp fields to the oro_email_origin table
-     */
-    public static function addSmtpFieldsToOroEmailOriginTable(Schema $schema)
-    {
         $table = $schema->getTable('oro_email_origin');
         $table->addColumn('smtp_host', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('smtp_port', 'integer', ['notnull' => false]);

@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\SegmentBundle\Migrations\Schema\v1_5;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
 class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterface
 {
-    const LIMIT = 100;
+    use ConnectionAwareTrait;
 
-    /** @var Connection */
-    protected $connection;
+    const LIMIT = 100;
 
     /** @var string */
     protected $segmentTable;
@@ -33,14 +32,6 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
     public function getDescription()
     {
         return 'Fixes month variables to use new format';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
     }
 
     /**

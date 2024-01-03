@@ -13,17 +13,17 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
     use ContainerAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_5';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         // create symfony acl tables
         $this->container->get('security.acl.dbal.schema')->addToSchema($schema);
@@ -48,36 +48,36 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
     /**
      * Create oro_security_perm_apply_entity table
      */
-    protected function createOroSecurityPermApplyEntityTable(Schema $schema)
+    private function createOroSecurityPermApplyEntityTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_security_perm_apply_entity');
-        $table->addColumn('permission_id', 'integer', []);
-        $table->addColumn('permission_entity_id', 'integer', []);
+        $table->addColumn('permission_id', 'integer');
+        $table->addColumn('permission_entity_id', 'integer');
         $table->setPrimaryKey(['permission_id', 'permission_entity_id']);
     }
 
     /**
      * Create oro_security_perm_excl_entity table
      */
-    protected function createOroSecurityPermExclEntityTable(Schema $schema)
+    private function createOroSecurityPermExclEntityTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_security_perm_excl_entity');
-        $table->addColumn('permission_id', 'integer', []);
-        $table->addColumn('permission_entity_id', 'integer', []);
+        $table->addColumn('permission_id', 'integer');
+        $table->addColumn('permission_entity_id', 'integer');
         $table->setPrimaryKey(['permission_id', 'permission_entity_id']);
     }
 
     /**
      * Create oro_security_permission table
      */
-    protected function createOroSecurityPermissionTable(Schema $schema)
+    private function createOroSecurityPermissionTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_security_permission');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('label', 'string', ['length' => 255]);
         $table->addColumn('description', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('is_apply_to_all', 'boolean', []);
+        $table->addColumn('is_apply_to_all', 'boolean');
         $table->addColumn('group_names', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name']);
@@ -86,7 +86,7 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
     /**
      * Create oro_security_permission_entity table
      */
-    protected function createOroSecurityPermissionEntityTable(Schema $schema)
+    private function createOroSecurityPermissionEntityTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_security_permission_entity');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -98,12 +98,12 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
     /**
      * Create rememberme_token table
      */
-    private function createRememberMeTokenTable(Schema $schema)
+    private function createRememberMeTokenTable(Schema $schema): void
     {
         $table = $schema->createTable('rememberme_token');
         $table->addColumn('series', 'string', ['fixed' => true, 'length' => 88]);
         $table->addColumn('value', 'string', ['length' => 88]);
-        $table->addColumn('lastUsed', 'datetime', []);
+        $table->addColumn('lastUsed', 'datetime');
         $table->addColumn('class', 'string', ['length' => 255]);
         $table->addColumn('username', 'string', ['length' => 255]);
         $table->setPrimaryKey(['series']);
@@ -112,7 +112,7 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
     /**
      * Add oro_security_perm_apply_entity foreign keys.
      */
-    protected function addOroSecurityPermApplyEntityForeignKeys(Schema $schema)
+    private function addOroSecurityPermApplyEntityForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_security_perm_apply_entity');
         $table->addForeignKeyConstraint(
@@ -132,7 +132,7 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
     /**
      * Add oro_security_perm_excl_entity foreign keys.
      */
-    protected function addOroSecurityPermExclEntityForeignKeys(Schema $schema)
+    private function addOroSecurityPermExclEntityForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_security_perm_excl_entity');
         $table->addForeignKeyConstraint(

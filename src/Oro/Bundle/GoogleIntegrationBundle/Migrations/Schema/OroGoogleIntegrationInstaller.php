@@ -18,7 +18,7 @@ class OroGoogleIntegrationInstaller implements Installation, ContainerAwareInter
     /**
      * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_0';
     }
@@ -26,7 +26,7 @@ class OroGoogleIntegrationInstaller implements Installation, ContainerAwareInter
     /**
      * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $this->updateUserEntity($schema);
         if ($this->container->get(ApplicationState::class)->isInstalled()) {

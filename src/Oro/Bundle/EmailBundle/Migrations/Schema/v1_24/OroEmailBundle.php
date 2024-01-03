@@ -9,16 +9,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroEmailBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        static::removeIndex($schema);
-    }
-
-    public static function removeIndex(Schema $schema)
-    {
-        $emailRecipientTable = $schema->getTable('oro_email_recipient');
-        $emailRecipientTable->dropIndex('IDX_7DAF9656A832C1C9');
+        $schema->getTable('oro_email_recipient')
+            ->dropIndex('IDX_7DAF9656A832C1C9');
     }
 }

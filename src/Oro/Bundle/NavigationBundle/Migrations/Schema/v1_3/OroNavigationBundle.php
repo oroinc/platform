@@ -9,21 +9,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroNavigationBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::addOrganization($schema);
-    }
-
-    /**
-     * Adds organization_id into account
-     */
-    public static function addOrganization(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_navigation_item');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['organization_id'], 'IDX_323B025832C8A3DE', []);
+        $table->addIndex(['organization_id'], 'IDX_323B025832C8A3DE');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],
@@ -33,7 +25,7 @@ class OroNavigationBundle implements Migration
 
         $table = $schema->getTable('oro_navigation_history');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['organization_id'], 'IDX_B20613B932C8A3DE', []);
+        $table->addIndex(['organization_id'], 'IDX_B20613B932C8A3DE');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],

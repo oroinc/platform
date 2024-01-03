@@ -9,15 +9,15 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class AddAppearanceType implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addAppearanceTypeTable($schema);
+        $this->createAppearanceTypeTable($schema);
 
         $table = $schema->getTable('oro_grid_view');
         $table->addColumn('appearanceType', 'string', ['notnull' => false, 'length' => 32]);
-        $table->addIndex(['appearanceType'], 'IDX_ORO_GRID_VIEW_APPEARANCE_TYPE', []);
+        $table->addIndex(['appearanceType'], 'IDX_ORO_GRID_VIEW_APPEARANCE_TYPE');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_grid_appearance_type'),
             ['appearanceType'],
@@ -27,7 +27,7 @@ class AddAppearanceType implements Migration
         $table->addColumn('appearanceData', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
     }
 
-    public static function addAppearanceTypeTable(Schema $schema)
+    private function createAppearanceTypeTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_grid_appearance_type');
         $table->addColumn('name', 'string', ['length' => 32]);

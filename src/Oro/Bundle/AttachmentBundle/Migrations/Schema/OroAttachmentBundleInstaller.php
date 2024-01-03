@@ -9,17 +9,17 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroAttachmentBundleInstaller implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_11';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroAttachmentTable($schema);
@@ -34,7 +34,7 @@ class OroAttachmentBundleInstaller implements Installation
     /**
      * Create oro_attachment table
      */
-    protected function createOroAttachmentTable(Schema $schema)
+    private function createOroAttachmentTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_attachment');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -43,29 +43,26 @@ class OroAttachmentBundleInstaller implements Installation
         $table->addColumn('created_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updated_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('comment', 'text', ['notnull' => false]);
-
         $table->setPrimaryKey(['id']);
     }
 
     /**
      * Create oro_attachment_file_item table
      */
-    protected function createOroAttachmentFileItemTable(Schema $schema)
+    private function createOroAttachmentFileItemTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_attachment_file_item');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('file_id', 'integer', ['notnull' => false]);
         $table->addColumn('sort_order', 'integer', ['default' => '0']);
-
         $table->setPrimaryKey(['id']);
-
         $table->addUniqueIndex(['file_id']);
     }
 
     /**
      * Create oro_attachment_file table
      */
-    protected function createOroAttachmentFileTable(Schema $schema)
+    private function createOroAttachmentFileTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_attachment_file');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -82,15 +79,14 @@ class OroAttachmentBundleInstaller implements Installation
         $table->addColumn('updated_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('external_url', 'string', ['length' => 1024, 'notnull' => false]);
         $table->setPrimaryKey(['id']);
-
-        $table->addIndex(['original_filename'], 'att_file_orig_filename_idx', []);
-        $table->addIndex(['uuid'], 'att_file_uuid_idx', []);
+        $table->addIndex(['original_filename'], 'att_file_orig_filename_idx');
+        $table->addIndex(['uuid'], 'att_file_uuid_idx');
     }
 
     /**
      * Add oro_attachment foreign keys.
      */
-    protected function addOroAttachmentForeignKeys(Schema $schema)
+    private function addOroAttachmentForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_attachment');
         $table->addForeignKeyConstraint(
@@ -110,7 +106,7 @@ class OroAttachmentBundleInstaller implements Installation
     /**
      * Add oro_attachment_file_item foreign keys.
      */
-    protected function addOroAttachmentFileItemForeignKeys(Schema $schema)
+    private function addOroAttachmentFileItemForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_attachment_file_item');
         $table->addForeignKeyConstraint(

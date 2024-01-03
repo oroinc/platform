@@ -6,27 +6,18 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class OroEntityExtendBundle implements Migration, ContainerAwareInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    use ContainerAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::oroEnumValueTransTable($schema);
+        $this->createOroEnumValueTransTable($schema);
 
         $queries->addQuery(
             new AdjustRelationKeyAndIsExtendForFieldQuery(
@@ -35,12 +26,8 @@ class OroEntityExtendBundle implements Migration, ContainerAwareInterface
         );
     }
 
-    /**
-     * Generate table oro_enum_value_trans
-     */
-    public static function oroEnumValueTransTable(Schema $schema)
+    private function createOroEnumValueTransTable(Schema $schema): void
     {
-        /** Generate table oro_enum_value_trans **/
         $table = $schema->createTable('oro_enum_value_trans');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('foreign_key', 'string', ['length' => 32]);
@@ -49,7 +36,6 @@ class OroEntityExtendBundle implements Migration, ContainerAwareInterface
         $table->addColumn('object_class', 'string', ['length' => 255]);
         $table->addColumn('field', 'string', ['length' => 4]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'oro_enum_value_trans_idx', []);
-        /** End of generate table oro_enum_value_trans **/
+        $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'oro_enum_value_trans_idx');
     }
 }

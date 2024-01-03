@@ -5,12 +5,9 @@ namespace Oro\Bundle\MigrationBundle\Migration\Extension;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
- * DatabasePlatformAwareInterface should be implemented by extensions that depends on a database platform.
+ * This interface should be implemented by migrations that depend on a database platform.
  */
 interface DatabasePlatformAwareInterface
 {
-    /**
-     * Sets the database platform
-     */
     public function setDatabasePlatform(AbstractPlatform $platform);
 }

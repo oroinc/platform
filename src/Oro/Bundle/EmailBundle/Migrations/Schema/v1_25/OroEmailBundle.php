@@ -9,16 +9,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroEmailBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        static::addEmailUserMailboxOwnerSeenIndex($schema);
-    }
-
-    public static function addEmailUserMailboxOwnerSeenIndex(Schema $schema)
-    {
-        $table = $schema->getTable('oro_email_user');
-        $table->addIndex(['mailbox_owner_id', 'is_seen'], 'mailbox_seen_idx');
+        $schema->getTable('oro_email_user')
+            ->addIndex(['mailbox_owner_id', 'is_seen'], 'mailbox_seen_idx');
     }
 }

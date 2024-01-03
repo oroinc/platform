@@ -3,12 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Migration\Extension;
 
 /**
- * AttachmentExtensionAwareInterface should be implemented by migrations that depends on a AttachmentExtension.
+ * This interface should be implemented by migrations that depend on {@see AttachmentExtension}.
  */
 interface AttachmentExtensionAwareInterface
 {
-    /**
-     * Sets the AttachmentExtension
-     */
     public function setAttachmentExtension(AttachmentExtension $attachmentExtension);
 }

@@ -18,7 +18,7 @@ class UpdateTranslationColumns implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
