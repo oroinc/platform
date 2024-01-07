@@ -8,91 +8,45 @@ use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 use Oro\Bundle\TranslationBundle\DataFixtures\AbstractTranslatableEntityFixture;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
  * Imports country and regions data into the application. Includes translations for the English language.
  */
-class LoadCountryData extends AbstractTranslatableEntityFixture implements
-    VersionedFixtureInterface,
-    ContainerAwareInterface
+class LoadCountryData extends AbstractTranslatableEntityFixture implements VersionedFixtureInterface
 {
-    const COUNTRY_PREFIX = 'country';
-    const REGION_PREFIX  = 'region';
+    private const COUNTRY_PREFIX = 'country';
+    private const REGION_PREFIX  = 'region';
 
     /**
-     * @var EntityRepository
+     * {@inheritDoc}
      */
-    protected $countryRepository;
-
-    /**
-     * @var EntityRepository
-     */
-    protected $regionRepository;
-
-    /**
-     * @var string
-     */
-    protected $structureFileName = '/data/countries.yml';
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVersion()
+    public function getVersion(): string
     {
         return '1.5';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function loadEntities(ObjectManager $manager)
+    protected function loadEntities(ObjectManager $manager): void
     {
-        $fileName = $this->getFileName();
-        $countries = $this->getDataFromFile($fileName);
-        $this->loadCountriesAndRegions($manager, $countries);
+        $this->loadCountriesAndRegions($manager, $this->getDataFromFile($this->getFileName()));
     }
 
-    /**
-     * @return string
-     */
-    protected function getFileName()
+    private function getFileName(): string
     {
         return $this->container
             ->get('kernel')
-            ->locateResource('@OroAddressBundle/Migrations/Data/ORM' . $this->structureFileName);
+            ->locateResource('@OroAddressBundle/Migrations/Data/ORM/data/countries.yml');
     }
 
-    /**
-     * @param string $fileName
-     * @return bool
-     */
-    protected function isFileAvailable($fileName)
+    private function isFileAvailable(string $fileName): bool
     {
         return is_file($fileName) && is_readable($fileName);
     }
 
-    /**
-     * @param string $fileName
-     * @return array
-     * @throws \LogicException
-     */
-    protected function getDataFromFile($fileName)
+    private function getDataFromFile(string $fileName): array
     {
         if (!$this->isFileAvailable($fileName)) {
             throw new \LogicException('File ' . $fileName . 'is not available');
@@ -103,73 +57,57 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
         return Yaml::parse(file_get_contents($fileName));
     }
 
-    /**
-     * @param string $locale
-     * @param array $countryData
-     * @return null|Country
-     */
-    protected function getCountry($locale, array $countryData)
+    private function getCountry(EntityRepository $countryRepository, string $locale, array $countryData): ?Country
     {
         if (empty($countryData['iso2Code']) || empty($countryData['iso3Code'])) {
             return null;
         }
 
-        /** @var $country Country */
-        $country = $this->countryRepository->findOneBy(array('iso2Code' => $countryData['iso2Code']));
+        /** @var Country $country */
+        $country = $countryRepository->findOneBy(['iso2Code' => $countryData['iso2Code']]);
         if (!$country) {
             $country = new Country($countryData['iso2Code']);
             $country->setIso3Code($countryData['iso3Code']);
         }
 
-        $countryName = $this->translate($countryData['iso2Code'], static::COUNTRY_PREFIX, $locale);
-
-        $country->setLocale($locale)
-            ->setName($countryName);
+        $country->setLocale($locale);
+        $country->setName($this->translate($countryData['iso2Code'], self::COUNTRY_PREFIX, $locale));
 
         return $country;
     }
 
-    /**
-     * @param string $locale
-     * @param Country $country
-     * @param array $regionData
-     * @return null|Region
-     */
-    protected function getRegion($locale, Country $country, array $regionData)
-    {
+    private function getRegion(
+        EntityRepository $regionRepository,
+        string $locale,
+        Country $country,
+        array $regionData
+    ): ?Region {
         if (empty($regionData['combinedCode']) || empty($regionData['code'])) {
             return null;
         }
 
-        /** @var $region Region */
-        $region = $this->regionRepository->findOneBy(array('combinedCode' => $regionData['combinedCode']));
+        /** @var Region $region */
+        $region = $regionRepository->findOneBy(['combinedCode' => $regionData['combinedCode']]);
         if (!$region) {
             $region = new Region($regionData['combinedCode']);
-            $region->setCode($regionData['code'])
-                ->setCountry($country);
+            $region->setCode($regionData['code']);
+            $region->setCountry($country);
         }
 
-        $regionName = $this->translate($regionData['combinedCode'], static::REGION_PREFIX, $locale);
-
-        $region->setLocale($locale)
-            ->setName($regionName);
+        $region->setLocale($locale);
+        $region->setName($this->translate($regionData['combinedCode'], self::REGION_PREFIX, $locale));
 
         return $region;
     }
 
-    /**
-     * Load countries and regions to DB
-     */
-    protected function loadCountriesAndRegions(ObjectManager $manager, array $countries)
+    private function loadCountriesAndRegions(ObjectManager $manager, array $countries): void
     {
-        $this->countryRepository = $manager->getRepository(Country::class);
-        $this->regionRepository  = $manager->getRepository(Region::class);
-
+        $countryRepository = $manager->getRepository(Country::class);
+        $regionRepository = $manager->getRepository(Region::class);
         $translationLocales = $this->getTranslationLocales();
-
         foreach ($translationLocales as $locale) {
             foreach ($countries as $countryData) {
-                $country = $this->getCountry($locale, $countryData);
+                $country = $this->getCountry($countryRepository, $locale, $countryData);
                 if (!$country) {
                     continue;
                 }
@@ -178,7 +116,7 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
 
                 if (!empty($countryData['regions'])) {
                     foreach ($countryData['regions'] as $regionData) {
-                        $region = $this->getRegion($locale, $country, $regionData);
+                        $region = $this->getRegion($regionRepository, $locale, $country, $regionData);
                         if (!$region) {
                             continue;
                         }
@@ -187,7 +125,6 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
                     }
                 }
             }
-
             $manager->flush();
             $manager->clear();
         }

@@ -8,20 +8,21 @@ use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 /**
- * Loads organizations for NavigationItem and NavigationHistoryItem entities.
+ * Sets a default organization to NavigationItem and NavigationHistoryItem entities.
  */
 class UpdateNavigationWithOrganization extends UpdateWithOrganization implements
     DependentFixtureInterface,
     RenamedFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return ['Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData'];
+        return [LoadAdminUserData::class];
     }
 
     /**
@@ -33,10 +34,11 @@ class UpdateNavigationWithOrganization extends UpdateWithOrganization implements
             'Oro\\Bundle\\UserBundle\\Migrations\\Data\\ORM\\UpdateNavigationWithOrganization',
         ];
     }
+
     /**
-     * Update navigation with organization
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $this->update($manager, NavigationItem::class);
         $this->update($manager, NavigationHistoryItem::class);

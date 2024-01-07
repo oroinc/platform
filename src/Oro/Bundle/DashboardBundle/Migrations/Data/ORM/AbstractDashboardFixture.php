@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Factory;
@@ -16,152 +15,94 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
- * Abstract class for dashboard fixtures.
+ * The base class for fixtures that load dashboard widgets.
  */
 abstract class AbstractDashboardFixture extends AbstractFixture implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    use ContainerAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * Creates a dashboard.
      */
-    public function setContainer(ContainerInterface $container = null)
+    protected function createAdminDashboardModel(ObjectManager $manager, string $dashboardName): DashboardModel
     {
-        $this->container = $container;
-    }
-
-    /**
-     * Create dashboard entity with admin user
-     *
-     * @param ObjectManager $manager
-     * @param string $dashboardName
-     * @return DashboardModel
-     */
-    protected function createAdminDashboardModel(ObjectManager $manager, $dashboardName)
-    {
-        $adminUser = $this->getAdminUser($manager);
-        $enumRepo = $manager->getRepository(
-            ExtendHelper::buildEnumValueClassName('dashboard_type')
-        );
-        $type = $enumRepo->findOneBy(['id' => 'widgets']);
-
-        $dashboard = $this->getDashboardManager()
-            ->createDashboardModel()
+        $dashboardManager = $this->getDashboardManager();
+        $user = $this->getAdminUser($manager);
+        $dashboard = $dashboardManager->createDashboardModel()
             ->setName($dashboardName)
             ->setLabel($dashboardName)
-            ->setOwner($adminUser)
-            ->setOrganization($adminUser->getOrganization());
-        $dashboard->getEntity()->setDashboardType($type);
+            ->setOwner($user)
+            ->setOrganization($user->getOrganization());
+        $dashboard->getEntity()->setDashboardType(
+            $manager->getRepository(ExtendHelper::buildEnumValueClassName('dashboard_type'))
+                ->findOneBy(['id' => 'widgets'])
+        );
 
-        $this->getDashboardManager()->save($dashboard);
+        $dashboardManager->save($dashboard);
 
         return $dashboard;
     }
 
     /**
-     * Create dashboard entity with admin user
-     *
-     * @param string $widgetName
-     * @param array|null $layoutPosition
-     * @return WidgetModel
+     * Creates a dashboard widget.
      */
-    protected function createWidgetModel($widgetName, array $layoutPosition = null)
+    protected function createWidgetModel(string  $widgetName, array $layoutPosition = null): WidgetModel
     {
-        $widget = $this->getDashboardManager()
-            ->createWidgetModel($widgetName);
-
+        $dashboardManager = $this->getDashboardManager();
+        $widget = $dashboardManager->createWidgetModel($widgetName);
         if (null !== $layoutPosition) {
             $widget->setLayoutPosition($layoutPosition);
         }
-
-        $this->getDashboardManager()->save($widget);
+        $dashboardManager->save($widget);
 
         return $widget;
     }
 
     /**
-     * Find dashboard of administrator
-     *
-     * @param ObjectManager $manager
-     * @param string $dashboardName
-     * @return DashboardModel|null
+     * Finds a dashboard.
      */
-    protected function findAdminDashboardModel(ObjectManager $manager, $dashboardName)
+    protected function findAdminDashboardModel(ObjectManager $manager, string $dashboardName): ?DashboardModel
     {
-        $dashboard = $this->getDashboardRepository()
+        $dashboard = $this->container->get('doctrine')->getRepository(Dashboard::class)
             ->findOneBy(['name' => $dashboardName, 'owner' => $this->getAdminUser($manager)]);
-
-        if ($dashboard) {
-            $widgets = new ArrayCollection();
-            foreach ($dashboard->getWidgets() as $widget) {
-                $model = $this->getFactory()->createWidgetModel($widget);
-                $widgets->add($model);
-            }
-
-            return new DashboardModel(
-                $dashboard,
-                $widgets,
-                []
-            );
+        if (null === $dashboard) {
+            return null;
         }
 
-        return null;
+        $widgets = new ArrayCollection();
+        foreach ($dashboard->getWidgets() as $widget) {
+            $widgets->add($this->getFactory()->createWidgetModel($widget));
+        }
+
+        return new DashboardModel($dashboard, $widgets, []);
     }
 
-    /**
-     * Get administrator user
-     *
-     * @param ObjectManager $manager
-     * @return User
-     * @throws InvalidArgumentException
-     */
-    protected function getAdminUser(ObjectManager $manager)
+    private function getAdminUser(ObjectManager $manager): User
     {
         $repository = $manager->getRepository(Role::class);
-        $role       = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
-
+        $role = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
         if (!$role) {
             throw new InvalidArgumentException('Administrator role should exist.');
         }
 
         $user = $repository->getFirstMatchedUser($role);
-
         if (!$user) {
-            throw new InvalidArgumentException(
-                'Administrator user should exist to load dashboard configuration.'
-            );
+            throw new InvalidArgumentException('Administrator user should exist to load dashboard configuration.');
         }
 
         return $user;
     }
 
-    /**
-     * @return Factory
-     */
-    protected function getFactory()
+    private function getFactory(): Factory
     {
         return $this->container->get('oro_dashboard.factory');
     }
 
-    /**
-     * @return Manager
-     */
-    protected function getDashboardManager()
+    private function getDashboardManager(): Manager
     {
         return $this->container->get('oro_dashboard.manager');
-    }
-
-    /**
-     * @return DashboardRepository
-     */
-    protected function getDashboardRepository()
-    {
-        return $this->container->get('doctrine')->getRepository(Dashboard::class);
     }
 }

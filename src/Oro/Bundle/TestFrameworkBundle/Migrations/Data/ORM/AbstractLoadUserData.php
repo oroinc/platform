@@ -6,10 +6,11 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
-use Oro\Bundle\UserBundle\Entity;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserApi;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -21,11 +22,11 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Container
     use ContainerAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        /** @var Entity\UserManager $userManager */
+        /** @var UserManager $userManager */
         $userManager = $this->container->get('oro_user.manager');
 
         /** @var User $admin */
@@ -52,7 +53,7 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Container
             /** @var OrganizationRepository $organizationRepo */
             $organizationRepo = $manager->getRepository(Organization::class);
             $organization = $organizationRepo->getFirst();
-            $api = new Entity\UserApi();
+            $api = new UserApi();
             $api->setApiKey('admin_api_key')
                 ->setUser($admin)
                 ->setOrganization($organization);

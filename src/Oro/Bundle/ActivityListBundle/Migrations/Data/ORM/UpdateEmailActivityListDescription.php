@@ -9,38 +9,26 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Updates descriptions for Email related activity list records.
  */
 class UpdateEmailActivityListDescription extends AbstractFixture implements ContainerAwareInterface
 {
-    const BATCH_SIZE = 500;
+    use ContainerAwareTrait;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
+    private const BATCH_SIZE = 500;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $this->updateEmailActivityDescription($manager);
     }
 
-    /**
-     * Update activity
-     */
-    public function updateEmailActivityDescription(ObjectManager $manager)
+    private function updateEmailActivityDescription(ObjectManager $manager): void
     {
         /** @var QueryBuilder $activityListBuilder */
         $activityListBuilder = $manager->getRepository(ActivityList::class)->createQueryBuilder('e');
@@ -71,7 +59,7 @@ class UpdateEmailActivityListDescription extends AbstractFixture implements Cont
         }
     }
 
-    protected function saveEntities(ObjectManager $manager, array $entities)
+    private function saveEntities(ObjectManager $manager, array $entities): void
     {
         foreach ($entities as $activity) {
             $manager->persist($activity);

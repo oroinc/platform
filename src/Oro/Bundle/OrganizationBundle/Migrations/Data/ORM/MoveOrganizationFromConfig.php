@@ -6,47 +6,33 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
- * Moves organization name from config to organization entity.
+ * Makes the main organization name equal to the name specified in system config.
  */
 class MoveOrganizationFromConfig extends AbstractFixture implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    use ContainerAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $configManager   = $this->container->get('oro_config.global');
-        $applicationName = $configManager->get('oro_ui.application_name');
-
+        $applicationName = $this->container->get('oro_config.global')->get('oro_ui.application_name');
         if (!$applicationName) {
             return;
         }
 
-        $repo = $manager->getRepository(Organization::class);
-        /** @var Organization $organization */
-        $organization = $repo->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION]);
-
+        /** @var Organization|null $organization */
+        $organization = $manager->getRepository(Organization::class)
+            ->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION]);
         if (!$organization) {
             return;
         }
 
         $organization->setName($applicationName);
         $manager->flush();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
     }
 }

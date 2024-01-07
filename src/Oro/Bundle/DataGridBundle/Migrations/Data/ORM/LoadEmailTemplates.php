@@ -13,31 +13,31 @@ use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 class LoadEmailTemplates extends AbstractEmailFixture implements VersionedFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return '1.1';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function findExistingTemplate(ObjectManager $manager, array $template)
+    protected function findExistingTemplate(ObjectManager $manager, array $template): ?EmailTemplate
     {
         if (empty($template['params']['name'])) {
             return null;
         }
 
         return $manager->getRepository(EmailTemplate::class)->findOneBy([
-            'name' => $template['params']['name'],
+            'name' => $template['params']['name']
         ]);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getEmailsDir()
+    public function getEmailsDir(): string
     {
         return $this->container
             ->get('kernel')

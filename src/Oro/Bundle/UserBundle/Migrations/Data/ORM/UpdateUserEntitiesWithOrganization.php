@@ -12,35 +12,35 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 
 /**
- * Assign exists users and groups to the default organization
+ * Sets a default organization to User, Group and UserApi entities.
  */
 class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
-    const BATCH_SIZE = 200;
+    private const BATCH_SIZE = 200;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [
-            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData',
-            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadGroupData'
+            LoadAdminUserData::class,
+            LoadGroupData::class
         ];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $this->update($manager, User::class);
         $this->update($manager, Group::class);
         $this->update($manager, UserApi::class);
 
         $organization = $manager->getRepository(Organization::class)->getFirst();
-        $usersQB      = $manager->getRepository(User::class)->createQueryBuilder('u');
-        $users        = new BufferedIdentityQueryResultIterator($usersQB);
+        $usersQB = $manager->getRepository(User::class)->createQueryBuilder('u');
+        $users = new BufferedIdentityQueryResultIterator($usersQB);
 
         $iteration = 0;
         /** @var User $user */

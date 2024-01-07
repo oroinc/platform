@@ -94,14 +94,12 @@ abstract class AbstractDigitalAssetFixture extends AbstractFixture implements Co
 
     protected function setSecurityContext(TokenStorageInterface $tokenStorage, User $user): void
     {
-        $tokenStorage->setToken(
-            new UsernamePasswordOrganizationToken(
-                $user,
-                'main',
-                $user->getOrganization(),
-                $user->getUserRoles()
-            )
-        );
+        $tokenStorage->setToken(new UsernamePasswordOrganizationToken(
+            $user,
+            'main',
+            $user->getOrganization(),
+            $user->getUserRoles()
+        ));
     }
 
     protected function createDigitalAsset(array $data, User $user): DigitalAsset

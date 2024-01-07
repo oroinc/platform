@@ -8,44 +8,30 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Update all custom entities with ownership types User and Business unit.
  * Add default organization to the field organization.
- *
- * Class UpdateCustomFieldsWithOrganization
- * @package Oro\Bundle\OrganizationBundle\Migrations\Data\ORM
  */
 class UpdateCustomEntitiesWithOrganization extends UpdateWithOrganization implements
     DependentFixtureInterface,
     ContainerAwareInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    use ContainerAwareTrait;
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function getDependencies(): array
     {
-        $this->container = $container;
+        return [LoadOrganizationAndBusinessUnitData::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
-    {
-        return [
-            'Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData'
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         /** @var ConfigManager $configManager */
         $configManager = $this->container->get('oro_entity_config.config_manager');

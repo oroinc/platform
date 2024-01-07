@@ -6,21 +6,22 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
+use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
 /**
- * Adds organizations to embedded forms.
+ * Sets a default organization to EmbeddedForm entity.
  */
 class UpdateEmbeddedFormWithOrganization extends UpdateWithOrganization implements
     DependentFixtureInterface,
     RenamedFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return ['Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData'];
+        return [LoadOrganizationAndBusinessUnitData::class];
     }
 
     /**
@@ -34,9 +35,9 @@ class UpdateEmbeddedFormWithOrganization extends UpdateWithOrganization implemen
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $this->update($manager, EmbeddedForm::class, 'owner');
     }

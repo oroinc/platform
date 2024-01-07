@@ -16,41 +16,28 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 class UpdateLanguageOwner extends AbstractFixture implements DependentFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return [
-            LoadLanguageData::class
-        ];
+        return [LoadLanguageData::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $user = $this->getUser($manager);
-
-        /* @var $languages Language[] */
+        /* @var Language[] $languages */
         $languages = $manager->getRepository(Language::class)->findAll();
-
         foreach ($languages as $language) {
-            $language
-                ->setOrganization($user->getOrganization());
+            $language->setOrganization($user->getOrganization());
         }
-
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     *
-     * @throws \RuntimeException
-     *
-     * @return User
-     */
-    protected function getUser(ObjectManager $manager)
+    protected function getUser(ObjectManager $manager): User
     {
         $role = $manager->getRepository(Role::class)->findOneBy(['role' => LoadRolesData::ROLE_ADMINISTRATOR]);
         if (!$role) {

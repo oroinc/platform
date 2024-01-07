@@ -6,27 +6,28 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityListBundle\Migrations\Data\ORM\AddActivityListsData;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateUserEntitiesWithOrganization;
 
 /**
- * Add activity lists for Email entity.
+ * Adds activity lists for Email entity.
  */
 class AddEmailActivityLists extends AddActivityListsData implements DependentFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [
-            'Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateUserEntitiesWithOrganization',
-            'Oro\Bundle\EmailBundle\Migrations\Data\ORM\UpdateEmailTemplateWithOrganization'
+            UpdateUserEntitiesWithOrganization::class,
+            UpdateEmailTemplateWithOrganization::class
         ];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $this->addActivityListsForActivityClass(
             $manager,

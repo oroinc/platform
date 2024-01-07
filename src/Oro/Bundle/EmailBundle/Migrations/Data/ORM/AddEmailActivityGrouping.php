@@ -16,22 +16,20 @@ use Oro\Bundle\EmailBundle\Entity\EmailThread;
  */
 class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtureInterface
 {
-    const BATCH_SIZE = 100;
+    private const BATCH_SIZE = 100;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return [
-            'Oro\Bundle\EmailBundle\Migrations\Data\ORM\AddEmailActivityLists',
-        ];
+        return [AddEmailActivityLists::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $criteria = new Criteria();
         $criteria->where($criteria->expr()->neq('xThreadId', null));
@@ -88,7 +86,7 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
         }
     }
 
-    protected function saveEntities(ObjectManager $manager, array $entities)
+    private function saveEntities(ObjectManager $manager, array $entities)
     {
         foreach ($entities as $email) {
             $manager->persist($email);
