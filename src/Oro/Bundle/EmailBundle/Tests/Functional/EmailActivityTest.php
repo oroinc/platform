@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadAdminOwnerEmailData
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadUserWithUserRoleData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -44,13 +45,12 @@ class EmailActivityTest extends WebTestCase
     {
         $this->loadFixtures([LoadEmailData::class]);
 
-        $emailOwner = $this->getReference('simple_user');
         $routingHelper = $this->getContainer()->get('oro_entity.routing_helper');
         $url = $this->getUrl(
             'oro_activity_list_api_get_list',
             [
                 'entityClass' => $routingHelper->getUrlSafeClassName(User::class),
-                'entityId'    => $emailOwner->getId()
+                'entityId'    => $this->getReference('simple_user')->getId()
             ]
         );
         $this->client->request('GET', $url);
@@ -64,13 +64,12 @@ class EmailActivityTest extends WebTestCase
         $this->loadFixtures([LoadEmailData::class]);
         $this->initClient([], $this->generateWsseAuthHeader('simple_user', 'simple_password'));
 
-        $user = $this->getReference('simple_user');
         $routingHelper = $this->getContainer()->get('oro_entity.routing_helper');
         $url = $this->getUrl(
             'oro_activity_list_api_get_list',
             [
                 'entityClass' => $routingHelper->getUrlSafeClassName(User::class),
-                'entityId'    => $user->getId()
+                'entityId'    => $this->getReference('simple_user')->getId()
             ]
         );
         $this->client->request('GET', $url);
@@ -81,16 +80,15 @@ class EmailActivityTest extends WebTestCase
 
     public function testGetAdminActivityListByRestrictedUser()
     {
-        $this->loadFixtures([LoadAdminOwnerEmailData::class]);
+        $this->loadFixtures([LoadAdminOwnerEmailData::class, LoadUserWithUserRoleData::class, LoadUser::class]);
         $this->loadFixtures([LoadUserWithUserRoleData::class]);
 
-        $admin = $this->getContainer()->get('doctrine')->getRepository(User::class)->findOneByUsername('admin');
         $routingHelper = $this->getContainer()->get('oro_entity.routing_helper');
         $url = $this->getUrl(
             'oro_activity_list_api_get_list',
             [
                 'entityClass' => $routingHelper->getUrlSafeClassName(User::class),
-                'entityId'    => $admin->getId()
+                'entityId'    => $this->getReference(LoadUser::USER)->getId()
             ]
         );
 

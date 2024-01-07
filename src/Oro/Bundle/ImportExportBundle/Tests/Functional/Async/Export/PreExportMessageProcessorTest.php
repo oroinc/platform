@@ -9,8 +9,8 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\JobsAwareTestTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Component\MessageQueue\Client\Config as MessageQueueConfig;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -29,7 +29,20 @@ class PreExportMessageProcessorTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
+        $this->loadFixtures([LoadUser::class]);
         $this->setSecurityToken();
+    }
+
+    private function getCurrentUser(): User
+    {
+        return $this->getReference(LoadUser::USER);
+    }
+
+    private function setSecurityToken(): void
+    {
+        $user = $this->getCurrentUser();
+        self::getContainer()->get('security.token_storage')
+            ->setToken(new UsernamePasswordToken($user, 'k', $user->getRoles()));
     }
 
     public function testProcess(): void
@@ -96,19 +109,5 @@ class PreExportMessageProcessorTest extends WebTestCase
             ],
             $dependentJobs
         );
-    }
-
-    private function getCurrentUser(): User
-    {
-        return self::getContainer()->get('doctrine')
-            ->getRepository(User::class)
-            ->findOneBy(['username' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME]);
-    }
-
-    private function setSecurityToken(): void
-    {
-        $user = $this->getCurrentUser();
-        $token = new UsernamePasswordToken($user, 'k', $user->getRoles());
-        self::getContainer()->get('security.token_storage')->setToken($token);
     }
 }

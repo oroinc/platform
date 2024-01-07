@@ -8,6 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -16,45 +17,38 @@ use Oro\Bundle\UserBundle\Entity\UserApi;
 abstract class AbstractLoadUserData extends AbstractFixture implements DependentFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return [LoadBusinessUnit::class];
+        return [LoadBusinessUnit::class, LoadOrganization::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        /** @var \Oro\Bundle\UserBundle\Entity\UserManager $userManager */
         $userManager = $this->container->get('oro_user.manager');
-
         foreach ($this->getUsersData() as $userData) {
-            $role = $manager->getRepository(Role::class)
-                ->findOneBy(['role' => $userData['role']]);
-
-            $group = $manager->getRepository(Group::class)
-                ->findOneBy(['name' => $userData['group']]);
-
+            $role = $manager->getRepository(Role::class)->findOneBy(['role' => $userData['role']]);
             /** @var User $user */
             $user = $userManager->createUser();
-            $organization = $manager->getRepository(Organization::class)->getFirst();
+            /** @var Organization $organization */
+            $organization = $this->getReference(LoadOrganization::ORGANIZATION);
 
             $api = new UserApi();
             $api->setApiKey($userData['apiKey'])
                 ->setOrganization($organization)
                 ->setUser($user);
-
             $user
                 ->setUsername($userData['username'])
                 ->setPlainPassword($userData['plainPassword'])
                 ->setFirstName($userData['firstName'])
                 ->setLastName($userData['lastName'])
-                ->addGroup($group)
+                ->addGroup($manager->getRepository(Group::class)->findOneBy(['name' => $userData['group']]))
                 ->setEmail($userData['email'])
-                ->setOwner($this->getReference('business_unit'))
+                ->setOwner($this->getReference(LoadBusinessUnit::BUSINESS_UNIT))
                 ->setOrganization($organization)
                 ->setOrganizations(new ArrayCollection([$organization]))
                 ->addApiKey($api)
@@ -64,15 +58,10 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Dependent
             }
 
             $userManager->updateUser($user, false);
-
             $this->setReference($userData['reference'], $user);
         }
-
         $manager->flush();
     }
 
-    /**
-     * return array
-     */
-    abstract protected function getUsersData();
+    abstract protected function getUsersData(): array;
 }

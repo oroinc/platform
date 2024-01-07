@@ -5,11 +5,10 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -17,38 +16,28 @@ class LoadTranslationUsers extends AbstractFixture implements ContainerAwareInte
 {
     use ContainerAwareTrait;
 
-    const TRANSLATOR_USERNAME = 'translator';
-    const TRANSLATOR_EMAIL = 'translator@example.com';
+    public const TRANSLATOR_USERNAME = 'translator';
+    public const TRANSLATOR_EMAIL = 'translator@example.com';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return [
-            LoadTranslationRoles::class, LoadBusinessUnit::class
-        ];
+        return [LoadTranslationRoles::class, LoadBusinessUnit::class, LoadOrganization::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $this->loadTranslator($manager, $this->container->get('oro_user.manager'));
-    }
-
-    public function loadTranslator(ObjectManager $manager, UserManager $userManager)
-    {
-        $role = $manager->getRepository(Role::class)
-            ->findOneBy(['role' => LoadTranslationRoles::ROLE_TRANSLATOR]);
-
-        $organization = $manager->getRepository(Organization::class)->findOneBy([]);
-
+        $userManager = $this->container->get('oro_user.manager');
+        $role = $manager->getRepository(Role::class)->findOneBy(['role' => LoadTranslationRoles::ROLE_TRANSLATOR]);
         /* @var User $user */
         $user = $userManager->createUser();
         $user
-            ->setOwner($this->getReference('business_unit'))
+            ->setOwner($this->getReference(LoadBusinessUnit::BUSINESS_UNIT))
             ->setFirstName('Demo')
             ->setLastName('Translator')
             ->setEmail(self::TRANSLATOR_EMAIL)
@@ -56,9 +45,8 @@ class LoadTranslationUsers extends AbstractFixture implements ContainerAwareInte
             ->addUserRole($role)
             ->setEnabled(true)
             ->setUsername(self::TRANSLATOR_USERNAME)
-            ->setOrganization($organization)
-            ->addOrganization($organization);
-
+            ->setOrganization($this->getReference(LoadOrganization::ORGANIZATION))
+            ->addOrganization($this->getReference(LoadOrganization::ORGANIZATION));
         $userManager->updateUser($user);
     }
 }

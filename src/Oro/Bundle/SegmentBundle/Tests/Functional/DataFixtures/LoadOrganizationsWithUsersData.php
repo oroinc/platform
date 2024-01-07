@@ -3,18 +3,29 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class LoadOrganizationsWithUsersData extends AbstractFixture
+class LoadOrganizationsWithUsersData extends AbstractFixture implements DependentFixtureInterface
 {
     /**
      * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function getDependencies(): array
     {
-        $defaultOrg = $manager->getRepository(Organization::class)->getFirst();
+        return [LoadOrganization::class];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function load(ObjectManager $manager): void
+    {
+        /** @var Organization $defaultOrg */
+        $defaultOrg = $this->getReference(LoadOrganization::ORGANIZATION);
 
         $org1 = $this->createOrganization($manager, 'segment.organization.1');
         $org2 = $this->createOrganization($manager, 'segment.organization.2');
@@ -26,12 +37,7 @@ class LoadOrganizationsWithUsersData extends AbstractFixture
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param string $name
-     * @return Organization
-     */
-    protected function createOrganization(ObjectManager $manager, $name): Organization
+    private function createOrganization(ObjectManager $manager, string $name): Organization
     {
         $organization = new Organization();
         $organization->setName($name);
@@ -42,13 +48,13 @@ class LoadOrganizationsWithUsersData extends AbstractFixture
         return $organization;
     }
 
-    protected function createUser(
+    private function createUser(
         ObjectManager $manager,
         Organization $defaultOrg,
         Organization $organization,
         string $firstName,
         string $lastName
-    ): User {
+    ): void {
         $userName = 'segment.user.' . $firstName . '.' . $lastName;
         $user = new User();
         $user->setFirstName($firstName);
@@ -60,7 +66,5 @@ class LoadOrganizationsWithUsersData extends AbstractFixture
         $user->addOrganization($organization);
         $manager->persist($user);
         $this->addReference($user->getUserIdentifier(), $user);
-
-        return $user;
     }
 }

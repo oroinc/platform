@@ -6,9 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TagBundle\Entity\Tag;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -17,35 +18,39 @@ class LoadUserTags extends AbstractFixture implements DependentFixtureInterface,
 {
     use ContainerAwareTrait;
 
-    /** @var array */
-    private static $tags = [
+    private static array $tags = [
         'u1@example.com' => ['Friends'],
         'u2@example.com' => ['Developer', 'Wholesale'],
         'u3@example.com' => [],
     ];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return [LoadUserWithBUAndOrganization::class];
+        return [LoadUserWithBUAndOrganization::class, LoadOrganization::class, LoadUser::class];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $this->initToken($manager);
-
+        $tokenStorage = $this->container->get('security.token_storage');
+        /** @var User $user */
+        $user = $this->getReference(LoadUser::USER);
+        $tokenStorage->setToken(new UsernamePasswordOrganizationToken(
+            $user,
+            'main',
+            $this->getReference(LoadOrganization::ORGANIZATION),
+            $user->getUserRoles()
+        ));
         $tagEntities = $this->buildTagEntities($manager);
         $tagManager = $this->container->get('oro_tag.tag.manager');
-
         foreach (self::$tags as $reference => $tags) {
             /** @var User $user */
             $user = $this->getReference($reference);
-
             $tagManager->setTags(
                 $user,
                 new ArrayCollection(
@@ -59,44 +64,19 @@ class LoadUserTags extends AbstractFixture implements DependentFixtureInterface,
             );
             $tagManager->saveTagging($user, false);
         }
-
         $manager->flush();
-    }
-
-    private function initToken(ObjectManager $manager): void
-    {
-        /** @var Organization $organization */
-        $organization = $manager->getRepository(Organization::class)->getFirst();
-
-        /** @var User $user */
-        $user = $manager->getRepository(User::class)->findOneBy([], ['id' => 'ASC']);
-
-        $tokenStorage = $this->container->get('security.token_storage');
-        $tokenStorage->setToken(
-            new UsernamePasswordOrganizationToken(
-                $user,
-                'main',
-                $organization,
-                $user->getUserRoles()
-            )
-        );
+        $tokenStorage->setToken(null);
     }
 
     private function buildTagEntities(ObjectManager $manager): array
     {
-        /** @var Organization $organization */
-        $organization = $manager->getRepository(Organization::class)->getFirst();
-
-        $tags = array_unique(array_merge(...array_values(self::$tags)));
-
         $tagEntities = [];
+        $tags = array_unique(array_merge(...array_values(self::$tags)));
         foreach ($tags as $tag) {
             $tagEntity = new Tag($tag);
-            $tagEntity->setOrganization($organization);
+            $tagEntity->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
             $tagEntities[$tag] = $tagEntity;
-
             $manager->persist($tagEntity);
-
             $this->setReference('tag.' . $tag, $tagEntity);
         }
 

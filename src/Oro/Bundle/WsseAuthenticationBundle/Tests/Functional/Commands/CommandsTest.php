@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Functional\Commands;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\WsseAuthenticationBundle\Command\DeleteNoncesCommand;
 use Oro\Bundle\WsseAuthenticationBundle\Command\GenerateWsseHeaderCommand;
@@ -20,28 +21,27 @@ class CommandsTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
+        $this->loadFixtures([LoadUser::class]);
     }
 
     public function testGenerateWsse(): array
     {
         /** @var Kernel $kernel */
         $kernel = $this->client->getKernel();
-        $container = $this->client->getContainer();
         $application = new Application($kernel);
         $application->setAutoExit(false);
-        $doctrine = $container->get('doctrine');
+        $doctrine = self::getContainer()->get('doctrine');
 
-        /** @var Organization $organization */
-        $organization = $doctrine->getRepository(Organization::class)->getFirst();
-        $user = $container->get('oro_user.manager')->findUserByUsername('admin');
+        /** @var User $user */
+        $user = $this->getReference(LoadUser::USER);
         $apiKey = $doctrine->getRepository(UserApi::class)
-            ->findOneBy(['user' => $user, 'organization' => $organization]);
+            ->findOneBy(['user' => $user, 'organization' => $user->getOrganization()]);
 
         self::assertInstanceOf(UserApi::class, $apiKey, '$apiKey is not an object');
 
         $command = new GenerateWSSEHeaderCommand(
             $doctrine,
-            $this->getContainer()->get('oro_wsse_authentication.service_locator.hasher')
+            self::getContainer()->get('oro_wsse_authentication.service_locator.hasher')
         );
         $command->setApplication($application);
         $commandTester = new CommandTester($command);
@@ -115,7 +115,7 @@ class CommandsTest extends WebTestCase
         $application = new Application($kernel);
         $application->setAutoExit(false);
         $command = new DeleteNoncesCommand(
-            $this->getContainer()->get('oro_wsse_authentication.service_locator.nonce_cache')
+            self::getContainer()->get('oro_wsse_authentication.service_locator.nonce_cache')
         );
         $command->setApplication($application);
         $commandTester = new CommandTester($command);
@@ -132,7 +132,7 @@ class CommandsTest extends WebTestCase
 
     private function getNonceCache(string $firewallName): AdapterInterface
     {
-        $nonceCacheServiceLocator = $this->getContainer()->get('oro_wsse_authentication.service_locator.nonce_cache');
+        $nonceCacheServiceLocator = self::getContainer()->get('oro_wsse_authentication.service_locator.nonce_cache');
 
         return $nonceCacheServiceLocator->get('oro_wsse_authentication.nonce_cache.' . $firewallName);
     }
