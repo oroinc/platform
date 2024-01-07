@@ -58,11 +58,14 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getData')
             ->willReturn($report);
 
-        $this->dateForm->expects($this->once())
+        $dateForm = $this->dateForm;
+        $dateForm->expects($this->once())
             ->method('setData')
             ->willReturnCallback(
-                function (DateGrouping $dateModel) {
+                function (DateGrouping $dateModel) use ($dateForm) {
                     $this->assertFalse($dateModel->getUseDateGroupFilter());
+
+                    return $dateForm;
                 }
             );
         $this->dateGroupingFormSubscriber->onPostSetData($this->event);
@@ -81,13 +84,16 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getData')
             ->willReturn($report);
 
-        $this->dateForm->expects($this->once())
+        $dateForm = $this->dateForm;
+        $dateForm->expects($this->once())
             ->method('setData')
             ->willReturnCallback(
-                function (DateGrouping $dateModel) {
+                function (DateGrouping $dateModel) use ($dateForm) {
                     $this->assertTrue($dateModel->getUseDateGroupFilter());
                     $this->assertTrue($dateModel->getUseSkipEmptyPeriodsFilter());
                     $this->assertEquals('testFieldName', $dateModel->getFieldName());
+
+                    return $dateForm;
                 }
             );
         $this->dateGroupingFormSubscriber->onPostSetData($this->event);
@@ -113,14 +119,17 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getData')
             ->willReturn($originalDateModel);
 
-        $this->dateForm->expects($this->once())
+        $dateForm = $this->dateForm;
+        $dateForm->expects($this->once())
             ->method('setData')
             ->willReturnCallback(
-                function (DateGrouping $dateModel) use ($originalDateModel) {
+                function (DateGrouping $dateModel) use ($originalDateModel, $dateForm) {
                     $this->assertSame($originalDateModel, $dateModel);
                     $this->assertTrue($dateModel->getUseDateGroupFilter());
                     $this->assertFalse($dateModel->getUseSkipEmptyPeriodsFilter());
                     $this->assertEquals('newValue', $dateModel->getFieldName());
+
+                    return $dateForm;
                 }
             );
         $this->dateGroupingFormSubscriber->onPostSetData($this->event);

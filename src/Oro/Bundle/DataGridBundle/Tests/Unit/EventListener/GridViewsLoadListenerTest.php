@@ -16,26 +16,28 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
+class GridViewsLoadListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject */
     private $gridViewRepository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject */
     private $registry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject */
     private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject */
     private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject */
     private $appearanceTypeManager;
 
     /** @var GridViewsLoadListener */
@@ -54,7 +56,7 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->registry->expects($this->any())
             ->method('getRepository')
-            ->with('OroDataGridBundle:GridView')
+            ->with(GridView::class)
             ->willReturn($this->gridViewRepository);
 
         $this->authorizationChecker->expects($this->any())

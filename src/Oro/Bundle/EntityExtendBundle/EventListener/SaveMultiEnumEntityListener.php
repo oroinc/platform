@@ -26,7 +26,7 @@ class SaveMultiEnumEntityListener
 
     public function onFlush(OnFlushEventArgs $event): void
     {
-        $em = $event->getEntityManager();
+        $em = $event->getObjectManager();
         $uow = $em->getUnitOfWork();
         $this->processCollections($uow->getScheduledCollectionUpdates(), $em, $uow);
         $this->processCollections($uow->getScheduledCollectionDeletions(), $em, $uow);

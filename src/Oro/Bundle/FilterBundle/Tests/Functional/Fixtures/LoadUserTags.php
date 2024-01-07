@@ -75,7 +75,6 @@ class LoadUserTags extends AbstractFixture implements DependentFixtureInterface,
         $tokenStorage->setToken(
             new UsernamePasswordOrganizationToken(
                 $user,
-                $user->getUsername(),
                 'main',
                 $organization,
                 $user->getUserRoles()

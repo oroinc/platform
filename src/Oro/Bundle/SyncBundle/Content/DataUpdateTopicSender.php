@@ -63,7 +63,7 @@ class DataUpdateTopicSender
         if (null !== $token) {
             $user = $token->getUser();
             if ($user instanceof UserInterface) {
-                $userName = $user->getUserName();
+                $userName = $user->getUserIdentifier();
             }
         }
 

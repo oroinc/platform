@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
@@ -46,7 +47,7 @@ class EmbedFormController extends AbstractController
 
         $isInline = $request->query->getBoolean('inline');
 
-        $formManager = $this->get(EmbeddedFormManager::class);
+        $formManager = $this->container->get(EmbeddedFormManager::class);
         $form = $formManager->createForm($formEntity->getFormType());
 
         if (in_array($request->getMethod(), ['POST', 'PUT'])) {
@@ -63,7 +64,7 @@ class EmbedFormController extends AbstractController
                 $data = [];
             }
             $event = new EmbeddedFormSubmitBeforeEvent($data, $formEntity);
-            $eventDispatcher = $this->get(EventDispatcherInterface::class);
+            $eventDispatcher = $this->container->get(EventDispatcherInterface::class);
             $eventDispatcher->dispatch($event, EmbeddedFormSubmitBeforeEvent::EVENT_NAME);
             $this->submitPostPutRequest($form, $request);
 
@@ -77,7 +78,7 @@ class EmbedFormController extends AbstractController
             /**
              * Set owner ID (current organization) to concrete form entity
              */
-            $configProvider = $this->get(ConfigProvider::class);
+            $configProvider = $this->container->get(ConfigProvider::class);
             $entityConfig = $configProvider->getConfig(get_class($entity));
             $formEntityConfig = $configProvider->getConfig(get_class($formEntity));
 
@@ -89,7 +90,7 @@ class EmbedFormController extends AbstractController
                     $accessor->getValue($formEntity, $formEntityConfig->get('owner_field_name'))
                 );
             }
-            $em = $this->get('doctrine')->getManagerForClass(get_class($entity));
+            $em = $this->container->get(ManagerRegistry::class)->getManagerForClass(get_class($entity));
             $em->persist($entity);
             $em->flush();
 
@@ -104,7 +105,7 @@ class EmbedFormController extends AbstractController
             return $redirectResponse;
         }
 
-        $layoutManager = $this->get(EmbedFormLayoutManager::class);
+        $layoutManager = $this->container->get(EmbedFormLayoutManager::class);
 
         $layoutManager->setInline($isInline);
 
@@ -129,7 +130,7 @@ class EmbedFormController extends AbstractController
         );
         $this->setCorsHeaders($formEntity, $request, $response);
 
-        $layoutManager = $this->get(EmbedFormLayoutManager::class);
+        $layoutManager = $this->container->get(EmbedFormLayoutManager::class);
 
         $layoutManager->setInline($request->query->getBoolean('inline'));
 
@@ -184,6 +185,7 @@ class EmbedFormController extends AbstractController
                 EventDispatcherInterface::class,
                 EmbedFormLayoutManager::class,
                 ConfigProvider::class,
+                ManagerRegistry::class,
             ]
         );
     }

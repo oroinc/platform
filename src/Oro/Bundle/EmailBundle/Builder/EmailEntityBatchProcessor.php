@@ -243,7 +243,7 @@ class EmailEntityBatchProcessor
             return [];
         }
 
-        return $em->getRepository('OroEmailBundle:Email')
+        return $em->getRepository(Email::class)
             ->findBy(['messageId' => array_values($messageIds)]);
     }
 
@@ -310,7 +310,7 @@ class EmailEntityBatchProcessor
     protected function persistFolders(EntityManagerInterface $em, bool $dryRun): array
     {
         $persistedEntities = [];
-        $repository = $em->getRepository('OroEmailBundle:EmailFolder');
+        $repository = $em->getRepository(EmailFolder::class);
         foreach ($this->folders as $key => $obj) {
             if ($obj->getId() !== null) {
                 continue;

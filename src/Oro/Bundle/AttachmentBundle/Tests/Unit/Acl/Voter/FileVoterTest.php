@@ -8,6 +8,7 @@ use Oro\Bundle\AttachmentBundle\Acl\Voter\FileVoter;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -261,7 +262,7 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
             ->method('getEntity')
             ->willReturnMap([
                 [File::class, self::FILE_ID, $file],
-                [self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_ID, $parentEntity = new \stdClass()],
+                [self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_ID, $parentEntity = new User()],
             ]);
 
         $this->token->expects(self::once())
@@ -313,7 +314,7 @@ class FileVoterTest extends \PHPUnit\Framework\TestCase
 
         $this->token->expects(self::once())
             ->method('getUser')
-            ->willReturn(new \stdClass());
+            ->willReturn(new User());
 
         $this->fileAccessControlChecker->expects(self::once())
             ->method('isCoveredByAcl')

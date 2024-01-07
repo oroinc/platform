@@ -38,7 +38,7 @@ class WorkflowStartListener
      */
     public function postPersist(LifecycleEventArgs $args)
     {
-        $entity = $args->getEntity();
+        $entity = $args->getObject();
 
         if (!$this->cache->hasRelatedActiveWorkflows($entity)) {
             return;

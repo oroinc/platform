@@ -7,6 +7,7 @@ use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -24,7 +25,7 @@ class CommentLifecycleListener
 
     public function preUpdate(Comment $entity, LifecycleEventArgs $args)
     {
-        $this->setUpdatedProperties($entity, $args->getEntityManager(), true);
+        $this->setUpdatedProperties($entity, $args->getObjectManager(), true);
     }
 
     protected function setUpdatedProperties(
@@ -49,7 +50,7 @@ class CommentLifecycleListener
         if (null !== $user
             && $entityManager->getUnitOfWork()->getEntityState($user) === UnitOfWork::STATE_DETACHED
         ) {
-            $user = $entityManager->find('OroUserBundle:User', $user->getId());
+            $user = $entityManager->find(User::class, $user->getId());
         }
 
         return $user;

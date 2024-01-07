@@ -11,6 +11,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+/**
+ * Adds search reindex job to queue if it's not already added.
+ */
 class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
@@ -24,7 +27,7 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
         $em = $this->container->get('doctrine')->getManager();
 
         /** @var User $user */
-        $user = $em->getRepository('OroUserBundle:User')->createQueryBuilder('user')
+        $user = $em->getRepository(User::class)->createQueryBuilder('user')
             ->select('user')
             ->setMaxResults(1)
             ->orderBy('user.id')
@@ -39,7 +42,7 @@ class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInter
         $searchResult = $this->getIndexer()->advancedSearch(
             sprintf(
                 'from oro_user where username ~ %s and integer oro_user_owner = %d',
-                $user->getUsername(),
+                $user->getUserIdentifier(),
                 $user->getOwner()->getId()
             )
         );

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Imagine\Exception\RuntimeException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -233,6 +234,7 @@ class FileController extends AbstractController
             ImageResizeManagerInterface::class,
             FileNameProviderInterface::class,
             WebpConfiguration::class,
+            'doctrine' => ManagerRegistry::class,
         ]);
     }
 }

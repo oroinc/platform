@@ -72,7 +72,6 @@ abstract class AbstractDataGridRepositoryTest extends WebTestCase
     {
         $token = new UsernamePasswordOrganizationToken(
             $user,
-            false,
             'main',
             $user->getOrganization(),
             $user->getUserRoles()

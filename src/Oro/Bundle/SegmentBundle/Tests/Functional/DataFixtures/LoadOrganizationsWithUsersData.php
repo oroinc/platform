@@ -59,7 +59,7 @@ class LoadOrganizationsWithUsersData extends AbstractFixture
         $user->setOrganization($defaultOrg);
         $user->addOrganization($organization);
         $manager->persist($user);
-        $this->addReference($user->getUsername(), $user);
+        $this->addReference($user->getUserIdentifier(), $user);
 
         return $user;
     }

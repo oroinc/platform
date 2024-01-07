@@ -9,132 +9,74 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Http\Firewall\RememberMeListener as OrigRememberMeListener;
+use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 
 class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
 {
     private const SESSION_NAME = 'TEST_SESSION_ID';
     private const SESSION_ID = 'o595fqdg5214u4e4nfcs3uc923';
 
-    public function testShouldCallInnerAuthenticateForAnyRequestWithAjaxCsrfModeOff(): void
+    private RememberMeAuthenticator $innerRememberMeAuthenticator;
+    private CsrfProtectedRequestHelper $csrfProtectedRequestHelper;
+    private RememberMeListener $listener;
+
+    protected function setUp(): void
     {
-        $event = $this->createMasterRequestEvent();
-
-        $innerListener = $this->createMock(OrigRememberMeListener::class);
-        $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
-
-        $innerListener->expects(self::once())
-            ->method('authenticate')
-            ->with($event);
-        $csrfRequestManager->expects(self::never())
-            ->method('isRequestTokenValid')
-            ->with($event->getRequest(), false);
-
-        $listener = $this->getListener($innerListener);
-        $listener->setCsrfProtectedRequestHelper(new CsrfProtectedRequestHelper($csrfRequestManager));
-
-        $listener($event);
+        $this->innerRememberMeAuthenticator = $this->createMock(RememberMeAuthenticator::class);
+        $this->csrfProtectedRequestHelper = $this->createMock(CsrfProtectedRequestHelper::class);
+        $this->listener = new RememberMeListener(
+            $this->innerRememberMeAuthenticator,
+            $this->csrfProtectedRequestHelper,
+            true // Assuming CSRF protected Ajax only mode is turned on for testing
+        );
     }
 
-    public function testShouldCallInnerAuthenticateForGetCsrfProtectedRequest(): void
+    public function testSupportsCsrfProtectedAjaxRequest(): void
     {
-        $event = $this->createMasterRequestEvent();
-        $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
-        $event->getRequest()->headers->add([CsrfRequestManager::CSRF_HEADER => '_stub_value']);
-        $event->getRequest()->setMethod('GET');
-
-        $innerListener = $this->createMock(OrigRememberMeListener::class);
-        $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
-
-        $innerListener->expects(self::once())
-            ->method('authenticate')
-            ->with($event);
-        $csrfRequestManager->expects(self::never())
-            ->method('isRequestTokenValid')
-            ->with($event->getRequest(), false);
-
-        $listener = $this->getListener($innerListener);
-        $listener->setCsrfProtectedRequestHelper(new CsrfProtectedRequestHelper($csrfRequestManager));
-        $listener->switchToProcessAjaxCsrfOnlyRequest();
-
-        $listener($event);
-    }
-
-    public function testShouldCallInnerAuthenticateForPostCsrfProtectedRequest(): void
-    {
-        $event = $this->createMasterRequestEvent();
-        $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
-        $event->getRequest()->headers->add([CsrfRequestManager::CSRF_HEADER => '_stub_value']);
-        $event->getRequest()->setMethod('POST');
-
-        $innerListener = $this->createMock(OrigRememberMeListener::class);
-        $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
-
-        $innerListener->expects(self::once())
-            ->method('authenticate')
-            ->with($event);
-        $csrfRequestManager->expects(self::once())
-            ->method('isRequestTokenValid')
-            ->with($event->getRequest(), false)
+        $request = $this->createRequestWithCsrfToken('XMLHttpRequest');
+        $this->csrfProtectedRequestHelper->method('isCsrfProtectedRequest')
             ->willReturn(true);
 
-        $listener = $this->getListener($innerListener);
-        $listener->setCsrfProtectedRequestHelper(new CsrfProtectedRequestHelper($csrfRequestManager));
-        $listener->switchToProcessAjaxCsrfOnlyRequest();
+        $this->innerRememberMeAuthenticator->expects(self::once())
+            ->method('supports')
+            ->with($request)
+            ->willReturn(true);
 
-        $listener($event);
+        $this->assertTrue($this->listener->supports($request));
     }
 
-    public function testShouldNotCallInnerAuthenticateForGetNoneCsrfProtectedRequest(): void
+    public function testDoesNotSupportNonCsrfProtectedAjaxRequest(): void
     {
-        $event = $this->createMasterRequestEvent();
-        $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
-        $event->getRequest()->setMethod('GET');
-
-        $innerListener = $this->createMock(OrigRememberMeListener::class);
-        $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
-
-        $innerListener->expects(self::never())
-            ->method('authenticate')
-            ->with($event);
-        $csrfRequestManager->expects(self::never())
-            ->method('isRequestTokenValid')
-            ->with($event->getRequest(), false);
-
-        $listener = $this->getListener($innerListener);
-        $listener->setCsrfProtectedRequestHelper(new CsrfProtectedRequestHelper($csrfRequestManager));
-        $listener->switchToProcessAjaxCsrfOnlyRequest();
-
-        $listener($event);
-    }
-
-    public function testShouldNotCallInnerAuthenticateForPostNoneCsrfProtectedRequest(): void
-    {
-        $event = $this->createMasterRequestEvent();
-        $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
-        $event->getRequest()->setMethod('POST');
-
-        $innerListener = $this->createMock(OrigRememberMeListener::class);
-        $csrfRequestManager = $this->createMock(CsrfRequestManager::class);
-
-        $innerListener->expects(self::never())
-            ->method('authenticate')
-            ->with($event);
-        $csrfRequestManager->expects(self::once())
-            ->method('isRequestTokenValid')
-            ->with($event->getRequest(), false)
+        $request = $this->createRequestWithCsrfToken('XMLHttpRequest');
+        $this->csrfProtectedRequestHelper->method('isCsrfProtectedRequest')
             ->willReturn(false);
 
-        $listener = $this->getListener($innerListener);
-        $listener->setCsrfProtectedRequestHelper(new CsrfProtectedRequestHelper($csrfRequestManager));
-        $listener->switchToProcessAjaxCsrfOnlyRequest();
-
-        $listener($event);
+        $this->assertFalse($this->listener->supports($request));
     }
 
-    private function getListener(OrigRememberMeListener $innerListener): RememberMeListener
+    public function testAuthenticate(): void
     {
-        return new RememberMeListener($innerListener);
+        $event = $this->createMasterRequestEvent(true);
+        $request = $event->getRequest();
+        $request->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
+
+        $this->innerRememberMeAuthenticator->expects(self::once())
+            ->method('authenticate')
+            ->with($request);
+
+        $this->listener->authenticate($event);
+    }
+
+    private function createRequestWithCsrfToken(string $requestType): Request
+    {
+        $request = new Request();
+        $request->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
+        $request->headers->add([CsrfRequestManager::CSRF_HEADER => '_stub_value']);
+        $request->setMethod($requestType === 'XMLHttpRequest' ? 'POST' : 'GET');
+        if ($requestType === 'XMLHttpRequest') {
+            $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+        }
+        return $request;
     }
 
     private function createMasterRequestEvent(bool $isXmlHttpRequest = false): RequestEvent
@@ -154,7 +96,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         return new RequestEvent(
             $kernel,
             $request,
-            HttpKernelInterface::MASTER_REQUEST
+            HttpKernelInterface::MAIN_REQUEST
         );
     }
 }

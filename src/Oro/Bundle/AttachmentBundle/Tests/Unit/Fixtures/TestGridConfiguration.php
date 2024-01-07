@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures;
 
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 class TestGridConfiguration extends DatagridConfiguration
@@ -17,7 +18,7 @@ class TestGridConfiguration extends DatagridConfiguration
                     ],
                     'from' => [
                         [
-                            'table' => 'OroAttachmentBundle:Attachment',
+                            'table' => Attachment::class,
                             'alias' => 'attachment'
                         ]
                     ]

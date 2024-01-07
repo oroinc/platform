@@ -27,7 +27,7 @@ class SearchReindexUsers extends AbstractFixture implements ContainerAwareInterf
         $em = $this->container->get('doctrine')->getManager();
 
         /** @var User $user */
-        $user = $em->getRepository('OroUserBundle:User')->createQueryBuilder('user')
+        $user = $em->getRepository(User::class)->createQueryBuilder('user')
             ->select('user')
             ->setMaxResults(1)
             ->orderBy('user.id')

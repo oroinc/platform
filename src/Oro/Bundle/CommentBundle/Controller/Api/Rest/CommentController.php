@@ -209,7 +209,7 @@ class CommentController extends RestController
      *      id="oro_comment_delete",
      *      type="entity",
      *      permission="DELETE",
-     *      class="OroCommentBundle:Comment"
+     *      class="Oro\Bundle\CommentBundle\Entity\Comment"
      * )
      * @return Response
      */
@@ -223,7 +223,7 @@ class CommentController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_comment.form.comment.api');
+        return $this->container->get('oro_comment.form.comment.api');
     }
 
     /**
@@ -233,7 +233,7 @@ class CommentController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_comment.comment.api_manager');
+        return $this->container->get('oro_comment.comment.api_manager');
     }
 
     /**
@@ -241,7 +241,7 @@ class CommentController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_comment.api.form.handler');
+        return $this->container->get('oro_comment.api.form.handler');
     }
 
     /**

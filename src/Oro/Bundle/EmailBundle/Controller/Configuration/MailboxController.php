@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
@@ -12,6 +13,7 @@ use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +42,7 @@ class MailboxController extends AbstractController
      * )
      * @ParamConverter(
      *      "mailbox",
-     *      class="OroEmailBundle:Mailbox"
+     *      class="Oro\Bundle\EmailBundle\Entity\Mailbox"
      * )
      * @Template("@OroEmail/Configuration/Mailbox/update.html.twig")
      */
@@ -54,21 +56,21 @@ class MailboxController extends AbstractController
      */
     private function update(Mailbox $mailbox, Request $request): array|RedirectResponse
     {
-        $provider = $this->get(SystemConfigurationFormProvider::class);
+        $provider = $this->container->get(SystemConfigurationFormProvider::class);
         [$activeGroup, $activeSubGroup] = $provider->chooseActiveGroups(self::ACTIVE_GROUP, self::ACTIVE_SUBGROUP);
         $jsTree = $provider->getJsTree();
-        $handler = $this->get(MailboxHandler::class);
+        $handler = $this->container->get(MailboxHandler::class);
 
         if ($handler->process($mailbox)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans(
+                $this->container->get(TranslatorInterface::class)->trans(
                     'oro.email.mailbox.action.saved',
                     ['%mailbox%' => $mailbox->getLabel()]
                 )
             );
 
-            return $this->get(Router::class)->redirect([
+            return $this->container->get(Router::class)->redirect([
                 'route' => 'oro_email_mailbox_update',
                 'id'    => $mailbox->getId()
             ]);
@@ -96,12 +98,12 @@ class MailboxController extends AbstractController
      * @Route("/mailbox/delete/{id}", name="oro_email_mailbox_delete", methods={"DELETE"})
      * @ParamConverter(
      *      "mailbox",
-     *      class="OroEmailBundle:Mailbox"
+     *      class="Oro\Bundle\EmailBundle\Entity\Mailbox"
      * )
      */
     public function deleteAction(Mailbox $mailbox): Response
     {
-        $mailboxManager = $this->getDoctrine()->getManagerForClass('OroEmailBundle:Mailbox');
+        $mailboxManager = $this->container->get('doctrine')->getManagerForClass(Mailbox::class);
         $mailboxManager->remove($mailbox);
         $mailboxManager->flush();
 
@@ -125,12 +127,12 @@ class MailboxController extends AbstractController
             'errors'  => []
         ];
 
-        $violations = $this->get(ValidatorInterface::class)->validate($autocompleteRequest);
+        $violations = $this->container->get(ValidatorInterface::class)->validate($autocompleteRequest);
         foreach ($violations as $violation) {
             $result['errors'][] = $violation->getMessage();
         }
 
-        if (!$this->get(Security::class)->isAutocompleteGranted($autocompleteRequest->getName())) {
+        if (!$this->container->get(Security::class)->isAutocompleteGranted($autocompleteRequest->getName())) {
             $result['errors'][] = 'Access denied.';
         }
 
@@ -142,7 +144,7 @@ class MailboxController extends AbstractController
             throw new HttpException(Response::HTTP_OK, implode(', ', $result['errors']));
         }
 
-        $searchHandler = $this->get(MailboxUserSearchHandler::class);
+        $searchHandler = $this->container->get(MailboxUserSearchHandler::class);
         $searchHandler->setOrganizationId($organizationId);
 
         return new JsonResponse(
@@ -157,16 +159,18 @@ class MailboxController extends AbstractController
 
     protected function getRedirectData(Request $request): array
     {
-        return $request->query->get(
-            'redirectData',
-            [
-                'route' => 'oro_config_configuration_system',
-                'parameters' => [
-                    'activeGroup' => self::ACTIVE_GROUP,
-                    'activeSubGroup' => self::ACTIVE_SUBGROUP,
-                ]
-            ]
-        );
+        try {
+            return $request->query->all('redirectData');
+        } catch (BadRequestException $e) {
+            return
+                [
+                    'route' => 'oro_config_configuration_system',
+                    'parameters' => [
+                        'activeGroup' => self::ACTIVE_GROUP,
+                        'activeSubGroup' => self::ACTIVE_SUBGROUP,
+                    ]
+                ];
+        }
     }
 
     /**
@@ -184,6 +188,7 @@ class MailboxController extends AbstractController
                 MailboxUserSearchHandler::class,
                 MailboxHandler::class,
                 SystemConfigurationFormProvider::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

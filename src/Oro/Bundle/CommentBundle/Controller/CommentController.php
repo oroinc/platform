@@ -26,7 +26,7 @@ class CommentController extends AbstractController
      */
     public function getFormAction()
     {
-        $form = $this->get(CommentTypeApi::class);
+        $form = $this->container->get(CommentTypeApi::class);
 
         return [
             'form' => $form->createView()

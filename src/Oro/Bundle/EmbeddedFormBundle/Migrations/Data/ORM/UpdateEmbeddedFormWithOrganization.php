@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
@@ -37,6 +38,6 @@ class UpdateEmbeddedFormWithOrganization extends UpdateWithOrganization implemen
      */
     public function load(ObjectManager $manager)
     {
-        $this->update($manager, 'OroEmbeddedFormBundle:EmbeddedForm', 'owner');
+        $this->update($manager, EmbeddedForm::class, 'owner');
     }
 }

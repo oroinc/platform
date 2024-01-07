@@ -65,7 +65,7 @@ HELP
         }
 
         /** @var ProcessTrigger $processTrigger */
-        $processTrigger = $this->registry->getRepository('OroWorkflowBundle:ProcessTrigger')->find($triggerId);
+        $processTrigger = $this->registry->getRepository(ProcessTrigger::class)->find($triggerId);
         if (!$processTrigger) {
             $output->writeln('<error>Process trigger not found</error>');
 

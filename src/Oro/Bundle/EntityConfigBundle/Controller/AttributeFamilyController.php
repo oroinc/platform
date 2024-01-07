@@ -35,7 +35,7 @@ class AttributeFamilyController extends AbstractController
     public function createAction(string $alias): array|RedirectResponse
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
-        $attributeManager = $this->get(AttributeManager::class);
+        $attributeManager = $this->container->get(AttributeManager::class);
 
         $this->ensureEntityConfigSupported($entityConfigModel);
 
@@ -82,7 +82,7 @@ class AttributeFamilyController extends AbstractController
         $response = $this->update($attributeFamily, $successMsg);
 
         if (\is_array($response)) {
-            $alias = $this->get(EntityAliasResolver::class)->getAlias($attributeFamily->getEntityClass());
+            $alias = $this->container->get(EntityAliasResolver::class)->getAlias($attributeFamily->getEntityClass());
             $response['entityAlias'] = $alias;
         }
 
@@ -94,7 +94,7 @@ class AttributeFamilyController extends AbstractController
         $options['attributeEntityClass'] = $attributeFamily->getEntityClass();
         $form = $this->createForm(AttributeFamilyType::class, $attributeFamily, $options);
 
-        return $this->get(UpdateHandlerFacade::class)
+        return $this->container->get(UpdateHandlerFacade::class)
             ->update($attributeFamily, $form, $message);
     }
 
@@ -104,7 +104,7 @@ class AttributeFamilyController extends AbstractController
      */
     public function indexAction(string $alias): array|RedirectResponse
     {
-        $entityClass = $this->get(EntityAliasResolver::class)->getClassByAlias($alias);
+        $entityClass = $this->container->get(EntityAliasResolver::class)->getClassByAlias($alias);
 
         return [
             'params' => [
@@ -124,7 +124,7 @@ class AttributeFamilyController extends AbstractController
     {
         $translator = $this->getTranslator();
         if ($this->isGranted('delete', $attributeFamily)) {
-            $doctrineHelper = $this->get(DoctrineHelper::class);
+            $doctrineHelper = $this->container->get(DoctrineHelper::class);
             $entityManager = $doctrineHelper->getEntityManagerForClass(AttributeFamily::class);
             $entityManager->remove($attributeFamily);
             $entityManager->flush();
@@ -144,7 +144,7 @@ class AttributeFamilyController extends AbstractController
      */
     public function viewAction(AttributeFamily $attributeFamily): array
     {
-        $aliasResolver = $this->get(EntityAliasResolver::class);
+        $aliasResolver = $this->container->get(EntityAliasResolver::class);
 
         return [
             'entity' => $attributeFamily,
@@ -154,10 +154,10 @@ class AttributeFamilyController extends AbstractController
 
     private function getEntityByAlias(string $alias): EntityConfigModel
     {
-        $aliasResolver = $this->get(EntityAliasResolver::class);
+        $aliasResolver = $this->container->get(EntityAliasResolver::class);
         $entityClass = $aliasResolver->getClassByAlias($alias);
 
-        $doctrineHelper = $this->get(DoctrineHelper::class);
+        $doctrineHelper = $this->container->get(DoctrineHelper::class);
 
         return $doctrineHelper->getEntityRepository(EntityConfigModel::class)
             ->findOneBy(['className' => $entityClass]);
@@ -169,10 +169,10 @@ class AttributeFamilyController extends AbstractController
     private function ensureEntityConfigSupported(EntityConfigModel $entityConfigModel): void
     {
         /** @var ConfigProvider $extendConfigProvider */
-        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
+        $extendConfigProvider = $this->container->get('oro_entity_config.provider.extend');
         $extendConfig = $extendConfigProvider->getConfig($entityConfigModel->getClassName());
         /** @var ConfigProvider $attributeConfigProvider */
-        $attributeConfigProvider = $this->get('oro_entity_config.provider.attribute');
+        $attributeConfigProvider = $this->container->get('oro_entity_config.provider.attribute');
         $attributeConfig = $attributeConfigProvider->getConfig($entityConfigModel->getClassName());
 
         if (!$extendConfig->is('is_extend') || !$attributeConfig->is('has_attributes')) {
@@ -184,7 +184,7 @@ class AttributeFamilyController extends AbstractController
 
     private function getTranslator(): TranslatorInterface
     {
-        return $this->get(TranslatorInterface::class);
+        return $this->container->get(TranslatorInterface::class);
     }
 
     /**

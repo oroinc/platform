@@ -8,6 +8,7 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Psr\Container\ContainerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -29,7 +30,7 @@ class EmailUserListener implements ServiceSubscriberInterface
 
     public function onFlush(OnFlushEventArgs $args): void
     {
-        $uow = $args->getEntityManager()->getUnitOfWork();
+        $uow = $args->getObjectManager()->getUnitOfWork();
         $this->collectNewEmailUserEntities($uow->getScheduledEntityInsertions());
         $this->collectUpdatedEmailUserEntities($uow->getScheduledEntityUpdates(), $uow);
     }
@@ -49,7 +50,7 @@ class EmailUserListener implements ServiceSubscriberInterface
             $status = $item['status'];
             $entity = $item['entity'];
 
-            $em = $args->getEntityManager();
+            $em = $args->getObjectManager();
             $ownerIds = $this->determineOwners($entity, $em);
             foreach ($ownerIds as $ownerId) {
                 if (\array_key_exists($ownerId, $usersWithNewEmails) === true) {
@@ -87,7 +88,7 @@ class EmailUserListener implements ServiceSubscriberInterface
 
                 $authorizedRoles = $mailbox->getAuthorizedRoles();
                 foreach ($authorizedRoles as $role) {
-                    $users = $em->getRepository('OroUserBundle:Role')
+                    $users = $em->getRepository(Role::class)
                         ->getUserQueryBuilder($role)
                         ->getQuery()->getResult();
 

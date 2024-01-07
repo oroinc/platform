@@ -105,7 +105,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
 
             $queryBuilder = $this
                 ->entityManager
-                ->getRepository('OroEmailBundle:EmailUser')
+                ->getRepository(EmailUser::class)
                 ->getEmailUserBuilderForMassAction(
                     $emailUserIds,
                     $this->tokenAccessor->getUser(),
@@ -133,7 +133,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
 
         $queryBuilder = $this
             ->entityManager
-            ->getRepository('OroEmailBundle:EmailUser')
+            ->getRepository(EmailUser::class)
             ->getEmailUserByThreadId($this->needToProcessThreadIds, $this->tokenAccessor->getUser());
 
         $result = $queryBuilder->getQuery()->iterate();

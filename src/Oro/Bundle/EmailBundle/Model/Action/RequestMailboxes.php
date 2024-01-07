@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Model\Action;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
@@ -46,7 +47,7 @@ class RequestMailboxes extends AbstractAction
         $email = $this->contextAccessor->getValue($context, $this->email);
         $results = [];
         if ($email) {
-            $results = $this->doctrine->getRepository('OroEmailBundle:Mailbox')
+            $results = $this->doctrine->getRepository(Mailbox::class)
                 ->findBySettingsClassAndEmail($settingsClass, $email);
         }
 

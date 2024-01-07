@@ -43,7 +43,7 @@ class UserEmailOriginListener
             && $args->getOldValue('refreshToken') !== $args->getNewValue('refreshToken')
         ) {
             $origin->setIsSyncEnabled(true);
-            $em = $args->getEntityManager();
+            $em = $args->getObjectManager();
             $em->getUnitOfWork()->recomputeSingleEntityChangeSet(
                 $em->getClassMetadata(UserEmailOrigin::class),
                 $origin

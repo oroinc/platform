@@ -9,7 +9,6 @@ use Oro\Bundle\LayoutBundle\Cache\RenderCache;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 use PHPUnit\Framework\TestCase;
-use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\HttpFoundation\Request;
@@ -71,13 +70,11 @@ class RenderCacheTest extends TestCase
             ->with($blockView, $context)
             ->willReturn($layoutCacheMetadata);
 
-        $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cacheItem->expects(self::once())
-            ->method('isHit')
-            ->willReturn(true);
-        $cacheItem->expects(self::any())
-            ->method('getKey')
-            ->willReturn('block_id');
+        $cacheItem = new CacheItem();
+        $r = new \ReflectionProperty($cacheItem, 'isHit');
+        $r->setValue($cacheItem, true);
+        $r = new \ReflectionProperty($cacheItem, 'key');
+        $r->setValue($cacheItem, 'block_id');
 
         $this->cache->expects(self::once())
             ->method('getItem')
@@ -101,7 +98,7 @@ class RenderCacheTest extends TestCase
             ->with($blockView)
             ->willReturn($layoutCacheMetadata);
 
-        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cacheItem = new CacheItem();
 
         $this->cache->expects(self::once())
             ->method('getItem')

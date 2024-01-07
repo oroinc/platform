@@ -27,7 +27,7 @@ class ConfigurationController extends AbstractFOSRestController
      */
     public function cgetAction()
     {
-        $manager = $this->get('oro_config.manager.api');
+        $manager = $this->container->get('oro_config.manager.api');
 
         $data = $manager->getSections();
 
@@ -56,7 +56,7 @@ class ConfigurationController extends AbstractFOSRestController
      */
     public function getAction(Request $request, $path)
     {
-        $manager = $this->get('oro_config.manager.api');
+        $manager = $this->container->get('oro_config.manager.api');
 
         try {
             $data = $manager->getData($path, $request->get('scope', 'user'));

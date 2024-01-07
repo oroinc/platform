@@ -27,7 +27,7 @@ class LoadUserData extends AbstractLoadUserData
                 'apiKey' => 'user_api_key',
                 'reference' => self::USER_NAME,
                 'enabled' => true,
-                'role' => 'IS_AUTHENTICATED_ANONYMOUSLY',
+                'role' => 'PUBLIC_ACCESS',
                 'group' => 'Administrators',
             ],
             [

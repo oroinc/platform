@@ -8,6 +8,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Moves organization name from config to organization entity.
+ */
 class MoveOrganizationFromConfig extends AbstractFixture implements ContainerAwareInterface
 {
     /**
@@ -27,7 +30,7 @@ class MoveOrganizationFromConfig extends AbstractFixture implements ContainerAwa
             return;
         }
 
-        $repo = $manager->getRepository('OroOrganizationBundle:Organization');
+        $repo = $manager->getRepository(Organization::class);
         /** @var Organization $organization */
         $organization = $repo->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION]);
 

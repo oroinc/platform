@@ -4,8 +4,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\UserBundle\Entity;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -24,13 +28,13 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Container
         /** @var Entity\UserManager $userManager */
         $userManager = $this->container->get('oro_user.manager');
 
-        /** @var Entity\User $admin */
-        $admin = $manager->getRepository('OroUserBundle:User')->findOneBy(['username' => 'admin']);
-        /** @var Entity\Group $group */
-        $group = $manager->getRepository('OroUserBundle:Group')->findOneBy(['name' => 'Administrators']);
+        /** @var User $admin */
+        $admin = $manager->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        /** @var Group $group */
+        $group = $manager->getRepository(Group::class)->findOneBy(['name' => 'Administrators']);
         if (!$admin) {
-            /** @var Entity\Role $role */
-            $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
+            /** @var Role $role */
+            $role = $manager->getRepository(Role::class)->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
             $admin = $userManager->createUser();
             $admin
                 ->setUsername('admin')
@@ -46,7 +50,7 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Container
 
         if (0 === count($admin->getApiKeys())) {
             /** @var OrganizationRepository $organizationRepo */
-            $organizationRepo = $manager->getRepository('OroOrganizationBundle:Organization');
+            $organizationRepo = $manager->getRepository(Organization::class);
             $organization = $organizationRepo->getFirst();
             $api = new Entity\UserApi();
             $api->setApiKey('admin_api_key')

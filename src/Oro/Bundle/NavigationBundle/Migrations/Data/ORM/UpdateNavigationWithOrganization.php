@@ -5,6 +5,8 @@ namespace Oro\Bundle\NavigationBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
+use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
 /**
@@ -36,7 +38,7 @@ class UpdateNavigationWithOrganization extends UpdateWithOrganization implements
      */
     public function load(ObjectManager $manager)
     {
-        $this->update($manager, 'OroNavigationBundle:NavigationItem');
-        $this->update($manager, 'OroNavigationBundle:NavigationHistoryItem');
+        $this->update($manager, NavigationItem::class);
+        $this->update($manager, NavigationHistoryItem::class);
     }
 }

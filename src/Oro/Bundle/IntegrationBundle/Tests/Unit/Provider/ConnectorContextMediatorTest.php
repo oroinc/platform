@@ -13,17 +13,19 @@ use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 
-class ConnectorContextMediatorTest extends \PHPUnit\Framework\TestCase
+class ConnectorContextMediatorTest extends TestCase
 {
     /** @var ConnectorContextMediator */
     private $contextMediator;
 
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityRepository|MockObject */
     private $repo;
 
-    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TypesRegistry|MockObject */
     private $registry;
 
     protected function setUp(): void
@@ -40,7 +42,7 @@ class ConnectorContextMediatorTest extends \PHPUnit\Framework\TestCase
 
         $em->expects($this->any())
             ->method('getRepository')
-            ->with('OroIntegrationBundle:Channel')
+            ->with(Integration::class)
             ->willReturn($this->repo);
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())

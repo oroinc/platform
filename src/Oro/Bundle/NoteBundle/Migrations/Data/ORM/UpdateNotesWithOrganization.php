@@ -4,8 +4,12 @@ namespace Oro\Bundle\NoteBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
+/**
+ * Updates notes with organization.
+ */
 class UpdateNotesWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
     /**
@@ -23,6 +27,6 @@ class UpdateNotesWithOrganization extends UpdateWithOrganization implements Depe
      */
     public function load(ObjectManager $manager)
     {
-        $this->update($manager, 'OroNoteBundle:Note', 'organization', true);
+        $this->update($manager, Note::class, 'organization', true);
     }
 }

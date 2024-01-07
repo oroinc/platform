@@ -183,7 +183,6 @@ services:
             - '@oro_user.manager'
             - '@oro_email.manager.template_email'
             - '@oro_config.user'
-            - '@session.flash_bag'
             - '@translator'
             - '@logger'
 

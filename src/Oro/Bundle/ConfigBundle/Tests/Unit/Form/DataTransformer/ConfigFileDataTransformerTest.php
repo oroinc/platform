@@ -9,6 +9,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpFoundation\File\File as HttpFile;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
@@ -111,7 +112,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         $this->validator->expects(self::once())
             ->method('validate')
             ->with($httpFile, $this->constraints)
-            ->willReturn([]);
+            ->willReturn(new ConstraintViolationList());
 
         $em = $this->getEntityManager();
         $em->expects(self::once())
@@ -142,7 +143,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         $this->validator->expects(self::once())
             ->method('validate')
             ->with($httpFile, $this->constraints)
-            ->willReturn(['violation']);
+            ->willReturn(ConstraintViolationList::createFromMessage('violation'));
 
         $em = $this->getEntityManager();
         $em->expects(self::never())
@@ -176,7 +177,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         $this->validator->expects(self::once())
             ->method('validate')
             ->with($httpFile, $this->constraints)
-            ->willReturn(['violation']);
+            ->willReturn(ConstraintViolationList::createFromMessage('violation'));
 
         $em = $this->getEntityManager();
         $em->expects(self::never())

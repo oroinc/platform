@@ -60,7 +60,7 @@ class WorkflowStartListenerTest extends WorkflowTestCase
         $user = self::getContainer()->get('doctrine')
             ->getRepository(User::class)
             ->findOneBy(['username' => 'admin']);
-        $token = new UsernamePasswordToken($user, self::AUTH_PW, 'user');
+        $token = new UsernamePasswordToken($user, 'main');
         self::getContainer()->get('security.token_storage')->setToken($token);
 
         //testing in context of some request as application filters depends on requestStack

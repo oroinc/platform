@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\UserBundle\Entity;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -33,8 +34,8 @@ class AddAvatarToAdminUser extends AbstractFixture implements ContainerAwareInte
     {
         /** @var Entity\UserManager $userManager */
         $userManager = $this->container->get('oro_user.manager');
-        /** @var Entity\User $admin */
-        $admin = $manager->getRepository('OroUserBundle:User')->findOneBy(['username' => 'admin']);
+        /** @var User $admin */
+        $admin = $manager->getRepository(User::class)->findOneBy(['username' => 'admin']);
 
         if ($admin) {
             $this->addAvatarToUser($manager, $admin);
@@ -42,7 +43,7 @@ class AddAvatarToAdminUser extends AbstractFixture implements ContainerAwareInte
         }
     }
 
-    protected function addAvatarToUser(ObjectManager $manager, Entity\User $adminUser)
+    protected function addAvatarToUser(ObjectManager $manager, User $adminUser)
     {
         try {
             $imagePath = $this->container->get('file_locator')

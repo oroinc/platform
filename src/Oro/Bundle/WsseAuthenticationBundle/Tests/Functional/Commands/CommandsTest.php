@@ -26,12 +26,9 @@ class CommandsTest extends WebTestCase
     {
         /** @var Kernel $kernel */
         $kernel = $this->client->getKernel();
-
         $container = $this->client->getContainer();
-
         $application = new Application($kernel);
         $application->setAutoExit(false);
-
         $doctrine = $container->get('doctrine');
 
         /** @var Organization $organization */
@@ -44,7 +41,7 @@ class CommandsTest extends WebTestCase
 
         $command = new GenerateWSSEHeaderCommand(
             $doctrine,
-            $this->getContainer()->get('oro_wsse_authentication.service_locator.encoder')
+            $this->getContainer()->get('oro_wsse_authentication.service_locator.hasher')
         );
         $command->setApplication($application);
         $commandTester = new CommandTester($command);
@@ -66,7 +63,6 @@ class CommandsTest extends WebTestCase
     public function testApiWithWsse(array $header): array
     {
         $response = $this->checkWsse($header);
-
         $this->assertJsonResponseStatusCodeEquals($response, 201);
 
         return $header;
@@ -76,7 +72,6 @@ class CommandsTest extends WebTestCase
     {
         // Restore kernel after console command.
         $this->client->getKernel()->boot();
-
         $request = $this->prepareData();
         $this->client->request(
             'POST',
@@ -114,15 +109,11 @@ class CommandsTest extends WebTestCase
     public function testDeleteNonces(array $header): array
     {
         $nonceCache = $this->getNonceCache(self::FIREWALL_NAME);
-
         $this->assertTrue($nonceCache->hasItem($this->getNonceCacheKey($this->getNonce($header[4][1]))));
-
         /** @var Kernel $kernel */
         $kernel = $this->client->getKernel();
-
         $application = new Application($kernel);
         $application->setAutoExit(false);
-
         $command = new DeleteNoncesCommand(
             $this->getContainer()->get('oro_wsse_authentication.service_locator.nonce_cache')
         );
@@ -133,7 +124,6 @@ class CommandsTest extends WebTestCase
             '--env' => $kernel->getEnvironment(),
             '--firewall' => self::FIREWALL_NAME,
         ]);
-
         $this->assertFalse($nonceCache->hasItem($this->getNonceCacheKey($this->getNonce($header[4][1]))));
         self::assertStringContainsString('Deleted nonce cache', $commandTester->getDisplay());
 

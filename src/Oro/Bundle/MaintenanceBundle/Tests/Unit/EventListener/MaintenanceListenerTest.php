@@ -48,7 +48,7 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
             $this->maintenanceRestrictionsChecker,
             503,
             null,
-            null
+            ''
         );
     }
 

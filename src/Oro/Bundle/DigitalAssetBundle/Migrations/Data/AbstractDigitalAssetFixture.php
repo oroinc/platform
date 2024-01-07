@@ -97,7 +97,6 @@ abstract class AbstractDigitalAssetFixture extends AbstractFixture implements Co
         $tokenStorage->setToken(
             new UsernamePasswordOrganizationToken(
                 $user,
-                $user->getUsername(),
                 'main',
                 $user->getOrganization(),
                 $user->getUserRoles()

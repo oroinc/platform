@@ -68,6 +68,6 @@ class LoadUserWithUserRoleData extends AbstractFixture implements ContainerAware
         $userManager->updateUser($user);
         $manager->flush();
 
-        $this->setReference($user->getUsername(), $user);
+        $this->setReference($user->getUserIdentifier(), $user);
     }
 }

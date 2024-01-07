@@ -24,6 +24,7 @@ use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -54,6 +55,7 @@ class ReportController extends AbstractController
             Router::class,
             FeatureChecker::class,
             DateHelper::class,
+            'form.factory' => FormFactoryInterface::class,
         ]);
     }
 
@@ -63,7 +65,7 @@ class ReportController extends AbstractController
      *      id="oro_report_view",
      *      type="entity",
      *      permission="VIEW",
-     *      class="OroReportBundle:Report"
+     *      class="Oro\Bundle\ReportBundle\Entity\Report"
      * )
      *
      * @param Report $entity
@@ -72,9 +74,9 @@ class ReportController extends AbstractController
     public function viewAction(Report $entity)
     {
         $this->checkReport($entity);
-        $this->get(EntityNameProvider::class)->setCurrentItem($entity);
+        $this->container->get(EntityNameProvider::class)->setCurrentItem($entity);
 
-        $reportGroup = $this->get(ConfigManager::class)
+        $reportGroup = $this->container->get(ConfigManager::class)
             ->getEntityConfig('entity', $entity->getEntity())
             ->get('plural_label');
         $parameters  = [
@@ -86,15 +88,15 @@ class ReportController extends AbstractController
         if ($reportType === ReportType::TYPE_TABLE) {
             $gridName = $entity::GRID_PREFIX . $entity->getId();
 
-            if ($this->get(ReportDatagridConfigurationProvider::class)->isReportValid($gridName)) {
+            if ($this->container->get(ReportDatagridConfigurationProvider::class)->isReportValid($gridName)) {
                 $parameters['gridName'] = $gridName;
 
-                $datagrid = $this->get(Manager::class)->getDatagrid(
+                $datagrid = $this->container->get(Manager::class)->getDatagrid(
                     $gridName,
                     [PagerInterface::PAGER_ROOT_PARAM => [PagerInterface::DISABLED_PARAM => true]]
                 );
 
-                $chartOptions = $this->get(ChartOptionsBuilder::class)->buildOptions(
+                $chartOptions = $this->container->get(ChartOptionsBuilder::class)->buildOptions(
                     $entity->getChartOptions(),
                     $datagrid->getConfig()->toArray()
                 );
@@ -102,7 +104,7 @@ class ReportController extends AbstractController
                 if (!empty($chartOptions)) {
                     $chartOptions = $this->processChartOptions($datagrid, $chartOptions);
 
-                    $parameters['chartView'] = $this->get(ChartViewBuilder::class)
+                    $parameters['chartView'] = $this->container->get(ChartViewBuilder::class)
                         ->setDataGrid($datagrid)
                         ->setOptions($chartOptions)
                         ->getView();
@@ -124,7 +126,7 @@ class ReportController extends AbstractController
      *      id="oro_report_view",
      *      type="entity",
      *      permission="VIEW",
-     *      class="OroReportBundle:Report"
+     *      class="Oro\Bundle\ReportBundle\Entity\Report"
      * )
      *
      * @param string $gridName
@@ -132,11 +134,11 @@ class ReportController extends AbstractController
      */
     public function viewFromGridAction($gridName)
     {
-        $configuration = $this->get(Manager::class)->getConfigurationForGrid($gridName);
+        $configuration = $this->container->get(Manager::class)->getConfigurationForGrid($gridName);
         $pageTitle = isset($configuration['pageTitle']) ? $configuration['pageTitle'] : $gridName;
 
         return [
-            'pageTitle' => $this->get(TranslatorInterface::class)->trans($pageTitle),
+            'pageTitle' => $this->container->get(TranslatorInterface::class)->trans($pageTitle),
             'gridName'  => $gridName,
         ];
     }
@@ -148,7 +150,7 @@ class ReportController extends AbstractController
      *      id="oro_report_create",
      *      type="entity",
      *      permission="CREATE",
-     *      class="OroReportBundle:Report"
+     *      class="Oro\Bundle\ReportBundle\Entity\Report"
      * )
      */
     public function createAction(Request $request)
@@ -164,7 +166,7 @@ class ReportController extends AbstractController
      *      id="oro_report_update",
      *      type="entity",
      *      permission="EDIT",
-     *      class="OroReportBundle:Report"
+     *      class="Oro\Bundle\ReportBundle\Entity\Report"
      * )
      *
      * @param Report $entity
@@ -192,7 +194,7 @@ class ReportController extends AbstractController
 
         $clonedEntity = clone $entity;
         $clonedEntity->setName(
-            $this->get(TranslatorInterface::class)->trans(
+            $this->container->get(TranslatorInterface::class)->trans(
                 'oro.report.action.clone.name_format',
                 [
                     '{name}' => $clonedEntity->getName()
@@ -226,26 +228,26 @@ class ReportController extends AbstractController
      */
     protected function update(Report $entity, Request $request)
     {
-        $reportForm = $this->get('form.factory')->createNamed(
+        $reportForm = $this->container->get('form.factory')->createNamed(
             'oro_report_form',
             ReportFormType::class,
             $entity
         );
-        $this->get(EntityNameProvider::class)->setCurrentItem($entity);
-        if ($this->get(ReportHandler::class)->process($entity, $reportForm)) {
+        $this->container->get(EntityNameProvider::class)->setCurrentItem($entity);
+        if ($this->container->get(ReportHandler::class)->process($entity, $reportForm)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('Report saved')
+                $this->container->get(TranslatorInterface::class)->trans('Report saved')
             );
 
-            return $this->get(Router::class)->redirect($entity);
+            return $this->container->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity'   => $entity,
             'form'     => $reportForm->createView(),
-            'entities' => $this->get('oro_report.entity_provider')->getEntities(),
-            'metadata' => $this->get(QueryDesignerManager::class)->getMetadata('report')
+            'entities' => $this->container->get('oro_report.entity_provider')->getEntities(),
+            'metadata' => $this->container->get(QueryDesignerManager::class)->getMetadata('report')
         ];
     }
 
@@ -269,7 +271,7 @@ class ReportController extends AbstractController
         );
 
         /** @var DateHelper $dateTimeHelper */
-        $dateTimeHelper = $this->get(DateHelper::class);
+        $dateTimeHelper = $this->container->get(DateHelper::class);
         $dateTypes      = [Types::DATETIME_MUTABLE, Types::DATE_MUTABLE, Types::DATETIMETZ_MUTABLE];
 
         if (in_array($labelFieldType, $dateTypes)) {
@@ -298,7 +300,7 @@ class ReportController extends AbstractController
     protected function checkReport(Report $report)
     {
         if ($report->getEntity() &&
-            !$this->get(FeatureChecker::class)->isResourceEnabled($report->getEntity(), 'entities')) {
+            !$this->container->get(FeatureChecker::class)->isResourceEnabled($report->getEntity(), 'entities')) {
             throw $this->createNotFoundException();
         }
     }

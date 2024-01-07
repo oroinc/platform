@@ -4,6 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * Updates given table with default organization
@@ -20,9 +21,9 @@ abstract class UpdateWithOrganization extends AbstractFixture
      */
     public function update(ObjectManager $manager, $tableName, $relationName = 'organization', $onlyEmpty = false)
     {
-        $manager->getRepository('OroOrganizationBundle:Organization')->updateWithOrganization(
+        $manager->getRepository(Organization::class)->updateWithOrganization(
             $tableName,
-            $manager->getRepository('OroOrganizationBundle:Organization')->getFirst()->getId(),
+            $manager->getRepository(Organization::class)->getFirst()->getId(),
             $relationName,
             $onlyEmpty
         );

@@ -54,7 +54,7 @@ class UserPermissionController extends RestGetController
                 'entities' => new ChainParameterFilter(
                     [
                         new StringToArrayParameterFilter(),
-                        new EntityClassParameterFilter($this->get('oro_entity.entity_class_name_helper'))
+                        new EntityClassParameterFilter($this->container->get('oro_entity.entity_class_name_helper'))
                     ]
                 )
             ],
@@ -77,6 +77,6 @@ class UserPermissionController extends RestGetController
      */
     public function getManager()
     {
-        return $this->get('oro_user.permission_manager.api');
+        return $this->container->get('oro_user.permission_manager.api');
     }
 }

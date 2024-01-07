@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\BuildFormBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -70,7 +70,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $formBuilder->expects(self::exactly(2))
             ->method('setDataMapper')
             ->withConsecutive(
-                [self::isInstanceOf(PropertyPathMapper::class)],
+                [self::isInstanceOf(DataMapper::class)],
                 [self::isInstanceOf(AppendRelationshipMapper::class)]
             );
         $formBuilder->expects(self::once())

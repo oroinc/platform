@@ -22,7 +22,7 @@ class RoleRepository extends EntityRepository
     {
         return $this->_em->createQueryBuilder()
             ->select('u')
-            ->from('OroUserBundle:User', 'u')
+            ->from(User::class, 'u')
             ->join('u.userRoles', 'role')
             ->where('role = :role')
             ->setParameter('role', $role);

@@ -26,7 +26,6 @@ class LanguageRepositoryTest extends WebTestCase
 
         $token = new UsernamePasswordOrganizationToken(
             $user,
-            false,
             'k',
             $user->getOrganization(),
             $user->getUserRoles()

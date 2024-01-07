@@ -4,6 +4,8 @@ namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
@@ -40,7 +42,7 @@ class UpdateDashboardsWithOrganization extends UpdateWithOrganization implements
      */
     public function load(ObjectManager $manager)
     {
-        $this->update($manager, 'OroDashboardBundle:Dashboard');
-        $this->update($manager, 'OroDashboardBundle:ActiveDashboard');
+        $this->update($manager, Dashboard::class);
+        $this->update($manager, ActiveDashboard::class);
     }
 }

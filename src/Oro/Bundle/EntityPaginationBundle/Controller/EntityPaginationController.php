@@ -78,12 +78,12 @@ class EntityPaginationController extends AbstractController
      */
     protected function getLink($entityName, $scope, $routeName, $navigation): JsonResponse
     {
-        $doctrineHelper = $this->get(DoctrineHelper::class);
-        $navigationService = $this->get(EntityPaginationNavigation::class);
+        $doctrineHelper = $this->container->get(DoctrineHelper::class);
+        $navigationService = $this->container->get(EntityPaginationNavigation::class);
 
-        $params = $this->get('request_stack')->getCurrentRequest()->query->all();
+        $params = $this->container->get('request_stack')->getCurrentRequest()->query->all();
 
-        $entityName = $this->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
+        $entityName = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
         $identifier = $doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
         $message = null;
 
@@ -113,7 +113,7 @@ class EntityPaginationController extends AbstractController
                     $params[$identifier] = $entityId;
                 }
 
-                $messageManager = $this->get(MessageManager::class);
+                $messageManager = $this->container->get(MessageManager::class);
 
                 if (!$result->isAvailable()) {
                     $message = $messageManager->getNotAvailableMessage($entity, $scope);

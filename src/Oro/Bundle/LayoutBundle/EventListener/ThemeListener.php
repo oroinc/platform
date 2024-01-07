@@ -35,7 +35,7 @@ class ThemeListener implements EventSubscriberInterface
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        if ($event->getRequestType() === HttpKernelInterface::MASTER_REQUEST) {
+        if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
             // remember the theme of the master request
             if ($this->debug && $request->query->has('_theme')) {
                 $theme = $request->query->get('_theme');

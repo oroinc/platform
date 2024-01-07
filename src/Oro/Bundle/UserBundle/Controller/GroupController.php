@@ -28,7 +28,7 @@ class GroupController extends AbstractController
      * @Acl(
      *      id="oro_user_group_create",
      *      type="entity",
-     *      class="OroUserBundle:Group",
+     *      class="Oro\Bundle\UserBundle\Entity\Group",
      *      permission="CREATE"
      * )
      * @param Request $request
@@ -47,7 +47,7 @@ class GroupController extends AbstractController
      * @Acl(
      *      id="oro_user_group_update",
      *      type="entity",
-     *      class="OroUserBundle:Group",
+     *      class="Oro\Bundle\UserBundle\Entity\Group",
      *      permission="EDIT"
      * )
      * @param Request $request
@@ -68,7 +68,7 @@ class GroupController extends AbstractController
      * @Acl(
      *      id="oro_user_group_view",
      *      type="entity",
-     *      class="OroUserBundle:Group",
+     *      class="Oro\Bundle\UserBundle\Entity\Group",
      *      permission="VIEW"
      * )
      * @Template
@@ -87,20 +87,20 @@ class GroupController extends AbstractController
      */
     protected function update(Request $request, Group $entity)
     {
-        if ($this->get(GroupHandler::class)->process($entity)) {
+        if ($this->container->get(GroupHandler::class)->process($entity)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.user.controller.group.message.saved')
+                $this->container->get(TranslatorInterface::class)->trans('oro.user.controller.group.message.saved')
             );
 
             if (!$request->get('_widgetContainer')) {
-                return $this->get(Router::class)->redirect($entity);
+                return $this->container->get(Router::class)->redirect($entity);
             }
         }
 
         return [
             'entity'   => $entity,
-            'form'     => $this->get('oro_user.form.group')->createView(),
+            'form'     => $this->container->get('oro_user.form.group')->createView(),
         ];
     }
 

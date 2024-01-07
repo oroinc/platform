@@ -52,7 +52,6 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Dependent
                 ->setPlainPassword($userData['plainPassword'])
                 ->setFirstName($userData['firstName'])
                 ->setLastName($userData['lastName'])
-                ->addUserRole($role)
                 ->addGroup($group)
                 ->setEmail($userData['email'])
                 ->setOwner($this->getReference('business_unit'))
@@ -60,6 +59,9 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Dependent
                 ->setOrganizations(new ArrayCollection([$organization]))
                 ->addApiKey($api)
                 ->setSalt('');
+            if ($role) {
+                $user->addUserRole($role);
+            }
 
             $userManager->updateUser($user, false);
 

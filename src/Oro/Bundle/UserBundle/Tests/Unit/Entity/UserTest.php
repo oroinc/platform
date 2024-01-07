@@ -426,7 +426,7 @@ class UserTest extends AbstractUserTest
         $user = $this->getUser();
         $user->setUsername('John');
 
-        self::assertEquals('John', $user->getUsername());
+        self::assertEquals('John', $user->getUserIdentifier());
         self::assertEquals('john', $user->getUsernameLowercase());
     }
 
@@ -446,7 +446,7 @@ class UserTest extends AbstractUserTest
 
         self::assertEquals($serialized[0], $user->getPassword());
         self::assertEquals($serialized[1], $user->getSalt());
-        self::assertEquals($serialized[2], $user->getUsername());
+        self::assertEquals($serialized[2], $user->getUserIdentifier());
         self::assertEquals(mb_strtolower($serialized[2]), $user->getUsernameLowercase());
         self::assertEquals($serialized[3], $user->isEnabled());
         self::assertEquals($serialized[4], $user->getConfirmationToken());

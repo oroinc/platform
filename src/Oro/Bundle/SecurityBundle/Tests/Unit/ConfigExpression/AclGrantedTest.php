@@ -11,6 +11,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -52,7 +53,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects(self::once())
             ->method('getToken')
-            ->willReturn(new \stdClass());
+            ->willReturn($this->createMock(TokenInterface::class));
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
@@ -75,7 +76,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects(self::once())
             ->method('getToken')
-            ->willReturn(new \stdClass());
+            ->willReturn($this->createMock(TokenInterface::class));
 
         $this->authorizationChecker->expects(self::exactly(count($isGrantedCalls)))
             ->method('isGranted')
@@ -127,7 +128,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects(self::once())
             ->method('getToken')
-            ->willReturn(new \stdClass());
+            ->willReturn($this->createMock(TokenInterface::class));
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
@@ -165,7 +166,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects(self::once())
             ->method('getToken')
-            ->willReturn(new \stdClass());
+            ->willReturn($this->createMock(TokenInterface::class));
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
@@ -201,7 +202,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects(self::once())
             ->method('getToken')
-            ->willReturn(new \stdClass());
+            ->willReturn($this->createMock(TokenInterface::class));
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
@@ -239,7 +240,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects(self::once())
             ->method('getToken')
-            ->willReturn(new \stdClass());
+            ->willReturn($this->createMock(TokenInterface::class));
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')

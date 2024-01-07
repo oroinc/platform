@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
@@ -12,6 +13,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class EmailQueryFactoryTest extends OrmTestCase
@@ -23,13 +25,13 @@ class EmailQueryFactoryTest extends OrmTestCase
     /** @var EmailOwnerProviderStorage */
     private $providerStorage;
 
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityNameResolver|MockObject */
     private $entityNameResolver;
 
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|MockObject */
     private $tokenAccessor;
 
-    /** @var MailboxManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var MailboxManager|MockObject */
     private $mailboxManager;
 
     /** @var EmailQueryFactory */
@@ -57,14 +59,14 @@ class EmailQueryFactoryTest extends OrmTestCase
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->select('e')
-            ->from('OroEmailBundle:Email', 'e')
+            ->from(Email::class, 'e')
             ->leftJoin('e.fromEmailAddress', self::JOIN_ALIAS);
 
         $this->factory->addFromEmailAddress($qb);
         $this->assertEquals(
             'SELECT e, NULLIF(\'\', \'\') AS fromEmailAddressOwnerClass,'
             . ' NULLIF(0, 0) AS fromEmailAddressOwnerId, a.email AS fromEmailAddress'
-            . ' FROM OroEmailBundle:Email e LEFT JOIN e.fromEmailAddress a',
+            . ' FROM Oro\Bundle\EmailBundle\Entity\Email e LEFT JOIN e.fromEmailAddress a',
             $qb->getDQL()
         );
     }
@@ -84,7 +86,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->select('e')
-            ->from('OroEmailBundle:Email', 'e')
+            ->from(Email::class, 'e')
             ->leftJoin('e.fromEmailAddress', self::JOIN_ALIAS);
 
         $this->factory->addFromEmailAddress($qb);
@@ -99,7 +101,7 @@ class EmailQueryFactoryTest extends OrmTestCase
             . ' CASE WHEN a.hasOwner = true THEN (CASE'
             . ' WHEN a.owner1 IS NOT NULL THEN CONCAT(a.firstName, CONCAT(a.lastName, \'\'))'
             . ' ELSE \'\' END) ELSE a.email END) AS fromEmailAddress'
-            . ' FROM OroEmailBundle:Email e LEFT JOIN e.fromEmailAddress a LEFT JOIN a.owner1 owner1',
+            . ' FROM Oro\Bundle\EmailBundle\Entity\Email e LEFT JOIN e.fromEmailAddress a LEFT JOIN a.owner1 owner1',
             $qb->getDQL()
         );
     }

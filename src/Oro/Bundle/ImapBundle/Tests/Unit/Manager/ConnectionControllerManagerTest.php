@@ -101,10 +101,12 @@ class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
 
         $form->expects(self::once())
             ->method('setData')
-            ->willReturnCallback(function (User $user) use ($expectedData) {
+            ->willReturnCallback(function (User $user) use ($expectedData, $form) {
                 $user->setSalt('');
                 $expectedData->setSalt('');
                 self::assertEquals($expectedData, $user);
+
+                return $form;
             });
 
         $resultForm = $this->controllerManager->getImapConnectionForm(
@@ -164,10 +166,12 @@ class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
 
         $form->expects(self::once())
             ->method('setData')
-            ->willReturnCallback(function (User $user) use ($expectedData) {
+            ->willReturnCallback(function (User $user) use ($expectedData, $form) {
                 $user->setSalt('');
                 $expectedData->setSalt('');
                 self::assertEquals($expectedData, $user);
+
+                return $form;
             });
 
         $resultForm = $this->controllerManager->getImapConnectionForm(

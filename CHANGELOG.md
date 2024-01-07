@@ -25,6 +25,148 @@ The current file describes significant changes in the code that may affect the u
 
 ## UNRELEASED
 
+### Security Changes
+
+Based on symfony security changes, the approach to user authentication was updated. The main differences in the new approach will be described below.
+
+* You should use `SecurityExtension::addAuthenticatorFactory()` instead of `SecurityExtension::addSecurityListenerFactory()`.
+
+Before:
+
+```php
+$extension->addSecurityListenerFactory(new OrganizationFormLoginFactory());
+```
+
+After:
+
+```php
+$extension->addAuthenticatorFactory(new OrganizationFormLoginFactory());
+```
+
+* Authenticators have replaced the previous implementation of authentication using providers and listeners.
+
+Before:
+
+```text
+Oro\Bundle\SecurityBundle\Http\Firewal\OrganizationBasicAuthenticationListener
+Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
+```
+
+After:
+
+```text
+Oro\Bundle\SecurityBundle\Authentication\Authenticator\UsernamePasswordOrganizationAuthenticator
+```
+
+* You should use `security.access_control` rules instead of anonymous authenticator.
+
+Before:
+
+```yaml
+security:
+    firewalls:
+        healthcheck_http_status_checks:
+            pattern:   /healthcheck/http_status_check(s$|/.*)
+            provider:  chain_provider
+            anonymous: true # anonymous authentication is not available
+```
+
+After:
+
+```yaml
+security:
+    firewalls:
+        healthcheck_http_status_checks:
+            pattern:   /healthcheck/http_status_check(s$|/.*)
+            provider:  chain_provider
+
+oro_security:
+    access_control:
+        - { path: /healthcheck/http_status_check(s$|/.*), roles: PUBLIC_ACCESS }
+```
+
+* Changed implementation of `anonymous_customer_user` authnetication. To check whether the user is authorized, it is not enough to check whether the user is absent in the token, it is also worth checking whether this user is not a customer visitor (`CustomerVisitor::class`).
+
+Before:
+
+```php
+if ($this->getUser()) {
+    # implementation
+}
+```
+
+```php
+if (null !== $this->getUser()) {
+    # implementation
+}
+```
+
+After:
+
+```php
+if ($this->getUser() instanceof AbstractUser) {
+    # implementation
+}
+```
+
+```php
+if (!$this->getUser() instanceof CustomerUser) { 
+    # implementation
+}
+```
+
+* In twig templates, to check whether the user is authorized, you need to use the function `is_authenticated` that excludes from the check (anonymous customer user).
+
+Before:
+
+```text
+{% if app.user is not null %}
+    # implementation
+{% endif %}
+```
+
+After:
+
+```text
+{% if is_authenticated() %}
+    # implementation  
+{% endif %}
+```
+
+* Added new `feature_firewall_authenticators` option to `api_firewalls` configuration to disable authenticator when some API feature is disabled.
+
+Before:
+
+```yaml
+oro_api:
+  api_firewalls:
+    api_wsse_secured:
+      feature_firewall_listeners:
+        - Oro\Bundle\OAuth2ServerBundle\Security\Firewall\OAuth2Listener
+    wsse_secured:
+      feature_firewall_listeners:
+        - Oro\Bundle\OAuth2ServerBundle\Security\Firewall\OAuth2Listener
+    frontend_api_wsse_secured:
+      feature_firewall_listeners:
+        - Oro\Bundle\OAuth2ServerBundle\Security\Firewall\OAuth2Listener
+```
+
+After:
+
+```yaml
+oro_api:
+  api_firewalls:
+    api_wsse_secured:
+      feature_firewall_authenticators: # FeatureDependAuthenticatorChecker
+        - Oro\Bundle\OAuth2ServerBundle\Security\Authenticator\OAuth2Authenticator
+    wsse_secured:
+      feature_firewall_authenticators: # FeatureDependAuthenticatorChecker
+        - Oro\Bundle\OAuth2ServerBundle\Security\Authenticator\OAuth2Authenticator
+    frontend_api_wsse_secured:
+      feature_firewall_authenticators: # FeatureDependAuthenticatorChecker
+        - Oro\Bundle\OAuth2ServerBundle\Security\Authenticator\OAuth2Authenticator
+```
+
 ### Added
 
 #### ApiBundle

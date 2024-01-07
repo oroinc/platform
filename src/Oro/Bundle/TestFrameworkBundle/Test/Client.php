@@ -22,7 +22,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class Client extends BaseKernelBrowser
 {
-    const LOCAL_URL = 'http://localhost';
+    public const LOCAL_HOST = 'localhost';
+    public const LOCAL_URL = 'http://' . self::LOCAL_HOST;
 
     /**
      * @var bool
@@ -125,6 +126,8 @@ class Client extends BaseKernelBrowser
      * @param bool $isRealRequest
      * @param string $route
      * @return Response
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function requestGrid(
         $gridParameters,
@@ -150,6 +153,15 @@ class Client extends BaseKernelBrowser
             $session = $container->has('session')
                 ? $container->get('session')
                 : $container->get('session.factory')->createSession();
+
+            // if new session was created, and we have a cookie with session-id, set it back
+            if (!$session->getId()) {
+                $sessCookie = $this->getCookieJar()->get('MOCKSESSID');
+                if ($sessCookie && $sessCookie->getValue()) {
+                    $session->setId($sessCookie->getValue());
+                }
+            }
+
             $request->setSession($session);
 
             /** @var Manager $gridManager */

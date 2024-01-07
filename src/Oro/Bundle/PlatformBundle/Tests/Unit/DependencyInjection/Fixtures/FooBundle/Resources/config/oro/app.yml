@@ -1,0 +1,5 @@
+oro_security:
+    access_control:
+        - { path: ^/contact-us$, roles: FOO_ROLE_0 }
+        - { path: ^/test-us$, roles: FOO_ROLE_110, priority: 110 }
+        - { path: ^/test-us/test$, roles: FOO_ROLE_0 }

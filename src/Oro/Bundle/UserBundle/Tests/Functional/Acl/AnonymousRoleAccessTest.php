@@ -43,7 +43,7 @@ class AnonymousRoleAccessTest extends RestJsonApiTestCase
 
     public function testTryToAccessTheAnonymousRole(): void
     {
-        $role = $this->getReference('role.is_authenticated_anonymously');
+        $role = $this->getReference('role.public_access');
 
         $this->client->request('GET', $this->getUrl('oro_user_role_view', ['id' => $role->getId()]));
         self::assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 403);
@@ -71,7 +71,7 @@ class AnonymousRoleAccessTest extends RestJsonApiTestCase
 
     public function testTryToSearchTheAnonymousRole(): void
     {
-        $role = $this->getReference('role.is_authenticated_anonymously');
+        $role = $this->getReference('role.public_access');
 
         $response = $this->cget(
             ['entity' => 'search'],

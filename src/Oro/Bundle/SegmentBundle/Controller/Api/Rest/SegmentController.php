@@ -43,7 +43,7 @@ class SegmentController extends RestController
      */
     public function getItemsAction(Request $request)
     {
-        $entityName = $this->get('oro_entity.routing_helper')
+        $entityName = $this->container->get('oro_entity.routing_helper')
             ->resolveEntityClass($request->get('entityName'));
         $page = (int)$request->query->get('page', 1);
         $term = $request->query->get('term');
@@ -53,7 +53,7 @@ class SegmentController extends RestController
         }
 
         /** @var SegmentManager $provider */
-        $manager = $this->get('oro_segment.segment_manager');
+        $manager = $this->container->get('oro_segment.segment_manager');
 
         $statusCode = Response::HTTP_OK;
         try {
@@ -79,7 +79,7 @@ class SegmentController extends RestController
      *      id="oro_segment_delete",
      *      type="entity",
      *      permission="DELETE",
-     *      class="OroSegmentBundle:Segment"
+     *      class="Oro\Bundle\SegmentBundle\Entity\Segment"
      * )
      * @return Response
      */
@@ -109,7 +109,7 @@ class SegmentController extends RestController
         }
 
         try {
-            $this->get('oro_segment.static_segment_manager')->run($segment);
+            $this->container->get('oro_segment.static_segment_manager')->run($segment);
             return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
         } catch (\LogicException $e) {
             return $this->handleView($this->view(null, Response::HTTP_BAD_REQUEST));
@@ -123,7 +123,7 @@ class SegmentController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_segment.segment_manager.api');
+        return $this->container->get('oro_segment.segment_manager.api');
     }
 
     /**

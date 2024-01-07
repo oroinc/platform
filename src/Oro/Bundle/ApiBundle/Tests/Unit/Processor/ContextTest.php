@@ -663,11 +663,11 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testMasterRequest()
     {
-        self::assertFalse($this->context->isMasterRequest());
+        self::assertFalse($this->context->isMainRequest());
         self::assertFalse($this->context->get('masterRequest'));
 
         $this->context->setMasterRequest(true);
-        self::assertTrue($this->context->isMasterRequest());
+        self::assertTrue($this->context->isMainRequest());
         self::assertTrue($this->context->get('masterRequest'));
     }
 

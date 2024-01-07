@@ -20,7 +20,7 @@ class RuntimeAssetVersionStrategyTest extends \PHPUnit\Framework\TestCase
         $wrappedStrategy = $this->createMock(VersionStrategyInterface::class);
         $wrappedStrategy
             ->method('getVersion')
-            ->willReturn(123);
+            ->willReturn('123');
         $assetVersionStrategy = new RuntimeAssetVersionStrategy('test_package', $wrappedStrategy, $assetVersionManager);
 
         $assetVersionManager->expects($this->once())

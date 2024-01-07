@@ -62,6 +62,6 @@ class EmailActivitySuggestionController extends RestGetController
      */
     public function getManager()
     {
-        return $this->get('oro_email.manager.email_activity_suggestion.api');
+        return $this->container->get('oro_email.manager.email_activity_suggestion.api');
     }
 }

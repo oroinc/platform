@@ -181,7 +181,7 @@ class BusinessUnitManager
      */
     public function getBusinessUnitRepo()
     {
-        return $this->em->getRepository('OroOrganizationBundle:BusinessUnit');
+        return $this->em->getRepository(BusinessUnit::class);
     }
 
     /**
@@ -189,7 +189,7 @@ class BusinessUnitManager
      */
     public function getUserRepo()
     {
-        return $this->em->getRepository('OroUserBundle:User');
+        return $this->em->getRepository(User::class);
     }
 
     /**

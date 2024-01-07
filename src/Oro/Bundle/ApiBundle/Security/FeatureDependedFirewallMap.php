@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Security;
 
 use Oro\Bundle\ApiBundle\Security\Http\Firewall\FeatureAccessListener;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\SecurityBundle\Authentication\Listener\OnNoTokenAccessListener;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
@@ -18,7 +19,7 @@ class FeatureDependedFirewallMap extends FirewallMap
 {
     private FeatureChecker $featureChecker;
     private FeatureAccessListener $featureAccessListener;
-    /** @var array [firewall name => ['feature_name' => name, 'feature_firewall_listeners' => [class, ...]], ...] */
+    /** @var array [firewall name => ['feature_name' => name, 'feature_firewall_authenticators' => [class, ...]], ...] */
     private array $featureDependedFirewalls;
 
     public function __construct(
@@ -54,7 +55,7 @@ class FeatureDependedFirewallMap extends FirewallMap
         ) {
             $listeners = $this->getApplicableListeners(
                 $listeners,
-                $this->featureDependedFirewalls[$firewallName]['feature_firewall_listeners']
+                $this->featureDependedFirewalls[$firewallName]['feature_firewall_authenticators']
             );
         }
 
@@ -69,43 +70,27 @@ class FeatureDependedFirewallMap extends FirewallMap
         return $method->invoke($this, $request);
     }
 
-    /**
-     * @param iterable $listeners
-     * @param string[] $excludedListenerClasses
-     *
-     * @return iterable
-     */
-    private function getApplicableListeners(iterable $listeners, array $excludedListenerClasses): iterable
+    private function getApplicableListeners(iterable $listeners, array $excludedAuthenticatorClasses): iterable
     {
         if (\count($listeners) > 0) {
             $applicableListeners = [];
+            $isFeatureListenerAdded = false;
             foreach ($listeners as $listener) {
-                if ($this->isApplicableListener($listener, $excludedListenerClasses)) {
-                    if ($listener instanceof AccessListener) {
-                        $applicableListeners[] = $this->featureAccessListener;
-                    }
-                    $applicableListeners[] = $listener;
+                if ((!$isFeatureListenerAdded && $listener instanceof AccessListener)
+                    || $listener instanceof OnNoTokenAccessListener) {
+                    $applicableListeners[] = $this->featureAccessListener;
+                    $isFeatureListenerAdded = true;
                 }
+                $applicableListeners[] = $listener;
             }
 
             return $applicableListeners;
         }
 
-        if (\count($excludedListenerClasses) === 0) {
+        if (\count($excludedAuthenticatorClasses) === 0) {
             return [$this->featureAccessListener];
         }
 
         return $listeners;
-    }
-
-    private function isApplicableListener(object $listener, array $excludedListenerClasses): bool
-    {
-        foreach ($excludedListenerClasses as $listenerClass) {
-            if (is_a($listener, $listenerClass)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

@@ -162,8 +162,8 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
      */
     protected function loadCountriesAndRegions(ObjectManager $manager, array $countries)
     {
-        $this->countryRepository = $manager->getRepository('OroAddressBundle:Country');
-        $this->regionRepository  = $manager->getRepository('OroAddressBundle:Region');
+        $this->countryRepository = $manager->getRepository(Country::class);
+        $this->regionRepository  = $manager->getRepository(Region::class);
 
         $translationLocales = $this->getTranslationLocales();
 

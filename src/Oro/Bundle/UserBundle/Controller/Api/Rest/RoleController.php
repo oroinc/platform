@@ -118,7 +118,7 @@ class RoleController extends RestController
      * @Acl(
      *      id="oro_user_role_delete",
      *      type="entity",
-     *      class="OroUserBundle:Role",
+     *      class="Oro\Bundle\UserBundle\Entity\Role",
      *      permission="DELETE"
      * )
      *
@@ -180,7 +180,7 @@ class RoleController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_user.role_manager.api');
+        return $this->container->get('oro_user.role_manager.api');
     }
 
     /**
@@ -188,7 +188,7 @@ class RoleController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_user.form.role.api');
+        return $this->container->get('oro_user.form.role.api');
     }
 
     /**
@@ -196,6 +196,6 @@ class RoleController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_user.form.handler.role.api');
+        return $this->container->get('oro_user.form.handler.role.api');
     }
 }

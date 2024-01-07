@@ -5,7 +5,11 @@ namespace Oro\Bundle\TagBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
+use Oro\Bundle\TagBundle\Entity\Tag;
 
+/**
+ * Updates tags with organization.
+ */
 class UpdateTagWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
     /**
@@ -21,6 +25,6 @@ class UpdateTagWithOrganization extends UpdateWithOrganization implements Depend
      */
     public function load(ObjectManager $manager)
     {
-        $this->update($manager, 'OroTagBundle:Tag');
+        $this->update($manager, Tag::class);
     }
 }

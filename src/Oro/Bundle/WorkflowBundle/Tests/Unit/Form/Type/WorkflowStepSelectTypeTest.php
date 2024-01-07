@@ -16,6 +16,7 @@ use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
@@ -25,13 +26,13 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 
 class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowRegistry|MockObject */
     private $workflowRegistry;
 
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityRepository|MockObject */
     private $repository;
 
-    /** @var MessageCatalogueInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var MessageCatalogueInterface|MockObject */
     private $translatorCatalogue;
 
     /** @var WorkflowStepSelectType */
@@ -266,7 +267,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ],
             [
                 [
-                    'class' => 'OroWorkflowBundle:WorkflowStep',
+                    'class' => WorkflowStep::class,
                     'choice_label' => 'label'
                 ]
             ]

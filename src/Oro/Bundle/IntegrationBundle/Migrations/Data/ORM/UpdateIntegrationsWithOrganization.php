@@ -4,8 +4,12 @@ namespace Oro\Bundle\IntegrationBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
+/**
+ * Updates integrations with organization.
+ */
 class UpdateIntegrationsWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
     /**
@@ -23,6 +27,6 @@ class UpdateIntegrationsWithOrganization extends UpdateWithOrganization implemen
      */
     public function load(ObjectManager $manager)
     {
-        $this->update($manager, 'OroIntegrationBundle:Channel');
+        $this->update($manager, Channel::class);
     }
 }

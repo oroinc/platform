@@ -12,7 +12,7 @@ class VariableOrArrayNode extends ArrayNode
     /**
      * {@inheritdoc}
      */
-    protected function preNormalize($value)
+    protected function preNormalize($value): mixed
     {
         return $value;
     }
@@ -20,7 +20,7 @@ class VariableOrArrayNode extends ArrayNode
     /**
      * {@inheritdoc}
      */
-    protected function normalizeValue($value)
+    protected function normalizeValue($value): mixed
     {
         return $value;
     }
@@ -28,7 +28,7 @@ class VariableOrArrayNode extends ArrayNode
     /**
      * {@inheritdoc}
      */
-    protected function finalizeValue($value)
+    protected function finalizeValue($value): mixed
     {
         return $value;
     }
@@ -43,7 +43,7 @@ class VariableOrArrayNode extends ArrayNode
     /**
      * {@inheritdoc}
      */
-    protected function mergeValues($leftSide, $rightSide)
+    protected function mergeValues($leftSide, $rightSide): mixed
     {
         if (\is_array($leftSide) && \is_array($rightSide)) {
             return parent::mergeValues($leftSide, $rightSide);

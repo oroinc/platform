@@ -27,7 +27,7 @@ oro_attachment_get_file:
 
 oro_imagine_filter:
     path: "/media/cache/resolve/{filter}/{path}"
-    defaults: { _controller: oro_attachment.controller.imagine:getFilteredImageAction }
+    defaults: { _controller: oro_attachment.controller.imagine::getFilteredImageAction }
     methods: [ GET ]
     requirements:
         filter: '[a-z0-9_-]*'

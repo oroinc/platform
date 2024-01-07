@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -50,7 +51,7 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
      */
     public function load(ObjectManager $manager)
     {
-        $adminRole = $manager->getRepository('OroUserBundle:Role')
+        $adminRole = $manager->getRepository(Role::class)
             ->findOneBy(['role' => LoadRolesData::ROLE_ADMINISTRATOR]);
 
         if (!$adminRole) {
@@ -62,7 +63,7 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
         }
 
         $businessUnit = $manager
-            ->getRepository('OroOrganizationBundle:BusinessUnit')
+            ->getRepository(BusinessUnit::class)
             ->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT]);
 
         $organization = $this->getReference('default_organization');
@@ -90,6 +91,6 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
      */
     protected function isUserWithRoleExist(ObjectManager $manager, Role $role)
     {
-        return null !== $manager->getRepository('OroUserBundle:Role')->getFirstMatchedUser($role);
+        return null !== $manager->getRepository(Role::class)->getFirstMatchedUser($role);
     }
 }

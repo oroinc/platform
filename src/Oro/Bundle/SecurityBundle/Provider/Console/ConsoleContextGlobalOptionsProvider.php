@@ -140,7 +140,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
         if ($user instanceof User && !$user->isBelongToOrganization($organizationEntity)) {
             throw new \InvalidArgumentException(\sprintf(
                 'User %s is not in organization %s',
-                $user->getUsername(),
+                $user->getUserIdentifier(),
                 $organizationEntity->getName()
             ));
         }

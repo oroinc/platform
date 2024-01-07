@@ -32,14 +32,14 @@ class SearchController extends AbstractFOSRestController
      */
     public function getAction(Request $request)
     {
-        $searchResults = $this->get('oro_search.index')->simpleSearch(
+        $searchResults = $this->container->get('oro_search.index')->simpleSearch(
             $request->get('search'),
             (int) $request->get('offset'),
             (int) $request->get('max_results'),
             $request->get('from')
         );
 
-        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher = $this->container->get('event_dispatcher');
         foreach ($searchResults->getElements() as $item) {
             $dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
         }

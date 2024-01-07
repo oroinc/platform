@@ -60,13 +60,13 @@ class UserAuthenticationFieldsValidator extends ConstraintValidator
      */
     private function isSameUserExists(User $entity): bool
     {
-        $username = $entity->getUsername();
+        $username = $entity->getUserIdentifier();
         if (!$username) {
             return false;
         }
 
         /** @var User $existingUser */
-        $existingUser = $this->userManager->findUserByEmail($entity->getUsername());
+        $existingUser = $this->userManager->findUserByEmail($entity->getUserIdentifier());
         if ($existingUser && (!$entity->getId() || $existingUser->getId() !== $entity->getId())) {
             return true;
         }

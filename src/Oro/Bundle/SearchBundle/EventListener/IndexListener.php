@@ -88,7 +88,7 @@ class IndexListener implements OptionalListenerInterface
             return;
         }
 
-        $entityManager = $args->getEntityManager();
+        $entityManager = $args->getObjectManager();
         $this->scheduleSavedEntities($entityManager);
         $this->scheduleDeletedEntities($entityManager);
     }

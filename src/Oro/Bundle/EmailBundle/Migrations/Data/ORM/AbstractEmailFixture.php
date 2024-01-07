@@ -7,11 +7,15 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * Abstract class for loading email templates
+ */
 abstract class AbstractEmailFixture extends AbstractFixture implements
     DependentFixtureInterface,
     ContainerAwareInterface
@@ -151,7 +155,7 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
             return $this->organization;
         }
 
-        $this->organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $this->organization = $manager->getRepository(Organization::class)->getFirst();
 
         return $this->organization;
     }
@@ -171,7 +175,7 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
             return $this->adminUser;
         }
 
-        $repository = $manager->getRepository('OroUserBundle:Role');
+        $repository = $manager->getRepository(Role::class);
         $role       = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
 
         if (!$role) {

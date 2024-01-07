@@ -21,7 +21,7 @@ class MaintenanceListener
     private MaintenanceRestrictionsChecker $restrictionsChecker;
     private ?int $httpCode;
     private ?string $httpStatus;
-    private ?string $httpExceptionMessage;
+    private string $httpExceptionMessage;
     private bool $handleResponse = false;
 
     public function __construct(
@@ -30,7 +30,7 @@ class MaintenanceListener
         MaintenanceRestrictionsChecker $restrictionsChecker,
         ?int $httpCode = null,
         ?string $httpStatus = null,
-        ?string $httpExceptionMessage = null
+        string $httpExceptionMessage = ''
     ) {
         $this->driverFactory = $driverFactory;
         $this->routerListener = $routerListener;

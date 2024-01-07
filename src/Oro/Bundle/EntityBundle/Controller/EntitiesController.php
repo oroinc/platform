@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Form\Type\CustomEntityType;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -42,7 +43,7 @@ class EntitiesController extends AbstractController
      */
     public function indexAction($entityName)
     {
-        $entityClass = $this->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
+        $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -51,7 +52,7 @@ class EntitiesController extends AbstractController
         $this->checkAccess('VIEW', $entityClass);
 
         /** @var ConfigProvider $entityConfigProvider */
-        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+        $entityConfigProvider = $this->container->get('oro_entity_config.provider.entity');
 
         if (!$entityConfigProvider->hasConfig($entityClass)) {
             throw $this->createNotFoundException();
@@ -83,7 +84,7 @@ class EntitiesController extends AbstractController
      */
     public function detailedAction($id, $entityName, $fieldName)
     {
-        $entityClass = $this->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
+        $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -91,8 +92,8 @@ class EntitiesController extends AbstractController
 
         $this->checkAccess('VIEW', $entityClass);
 
-        $entityProvider = $this->get('oro_entity_config.provider.entity');
-        $extendProvider = $this->get('oro_entity_config.provider.extend');
+        $entityProvider = $this->container->get('oro_entity_config.provider.entity');
+        $extendProvider = $this->container->get('oro_entity_config.provider.extend');
         $relationConfig = $extendProvider->getConfig($entityClass, $fieldName);
         $relationTargetEntity = $relationConfig->get('target_entity');
 
@@ -113,7 +114,7 @@ class EntitiesController extends AbstractController
             $relationConfig->get('target_entity')
         );
 
-        $entity = $this->getDoctrine()->getRepository($relationTargetEntity)->find($id);
+        $entity = $this->container->get('doctrine')->getRepository($relationTargetEntity)->find($id);
 
         if (!$entity) {
             return $this->createNotFoundException();
@@ -152,7 +153,7 @@ class EntitiesController extends AbstractController
      */
     public function relationAction($id, $entityName, $fieldName)
     {
-        $entityClass = $this->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
+        $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -161,8 +162,8 @@ class EntitiesController extends AbstractController
         $this->checkAccess('VIEW', $entityClass);
 
         /** @var ConfigProvider $entityConfigProvider */
-        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
-        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
+        $entityConfigProvider = $this->container->get('oro_entity_config.provider.entity');
+        $extendConfigProvider = $this->container->get('oro_entity_config.provider.extend');
 
         if (!$entityConfigProvider->hasConfig($entityClass)) {
             throw $this->createNotFoundException();
@@ -199,7 +200,7 @@ class EntitiesController extends AbstractController
      */
     public function viewAction($entityName, $id)
     {
-        $entityClass = $this->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
+        $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -208,8 +209,8 @@ class EntitiesController extends AbstractController
         $this->checkAccess('VIEW', $entityClass);
 
         /** @var OroEntityManager $em */
-        $em = $this->getDoctrine()->getManager();
-        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+        $em = $this->container->get('doctrine')->getManager();
+        $entityConfigProvider = $this->container->get('oro_entity_config.provider.entity');
         $record = $em->getRepository($entityClass)->find($id);
 
         if (!$record) {
@@ -242,7 +243,7 @@ class EntitiesController extends AbstractController
      */
     public function updateAction(Request $request, $entityName, $id)
     {
-        $entityClass = $this->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
+        $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -251,10 +252,10 @@ class EntitiesController extends AbstractController
         $this->checkAccess(!$id ? 'CREATE' : 'EDIT', $entityClass);
 
         /** @var OroEntityManager $em */
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->container->get('doctrine')->getManager();
 
         /** @var ConfigProvider $entityConfigProvider */
-        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+        $entityConfigProvider = $this->container->get('oro_entity_config.provider.entity');
         $entityConfig         = $entityConfigProvider->getConfig($entityClass);
 
         $entityRepository = $em->getRepository($entityClass);
@@ -283,10 +284,10 @@ class EntitiesController extends AbstractController
 
                 $request->getSession()->getFlashBag()->add(
                     'success',
-                    $this->get(TranslatorInterface::class)->trans('oro.entity.controller.message.saved')
+                    $this->container->get(TranslatorInterface::class)->trans('oro.entity.controller.message.saved')
                 );
 
-                return $this->get(Router::class)->redirect($record);
+                return $this->container->get(Router::class)->redirect($record);
             }
         }
 
@@ -316,7 +317,7 @@ class EntitiesController extends AbstractController
      */
     public function deleteAction($entityName, $id)
     {
-        $entityClass = $this->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
+        $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -325,7 +326,7 @@ class EntitiesController extends AbstractController
         $this->checkAccess('DELETE', $entityClass);
 
         /** @var OroEntityManager $em */
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->container->get('doctrine')->getManager();
 
         $entityRepository = $em->getRepository($entityClass);
 
@@ -368,6 +369,7 @@ class EntitiesController extends AbstractController
                 'oro_entity_config.provider.extend' => ConfigProvider::class,
                 TranslatorInterface::class,
                 Router::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

@@ -34,7 +34,7 @@ class WorkflowDataSerializeListener implements ServiceSubscriberInterface
      */
     public function onFlush(OnFlushEventArgs $args): void
     {
-        $uow = $args->getEntityManager()->getUnitOfWork();
+        $uow = $args->getObjectManager()->getUnitOfWork();
         $this->scheduleEntities($uow->getScheduledEntityInsertions());
         $this->scheduleEntities($uow->getScheduledEntityUpdates());
     }
@@ -45,7 +45,7 @@ class WorkflowDataSerializeListener implements ServiceSubscriberInterface
             while ($workflowItem = array_shift($this->scheduledEntities)) {
                 $this->serialize($workflowItem);
             }
-            $args->getEntityManager()->flush();
+            $args->getObjectManager()->flush();
         }
     }
 

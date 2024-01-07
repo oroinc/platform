@@ -5,6 +5,7 @@ namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
@@ -12,6 +13,7 @@ use Oro\Bundle\DashboardBundle\Model\Factory;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\WidgetModel;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -121,7 +123,7 @@ abstract class AbstractDashboardFixture extends AbstractFixture implements Conta
      */
     protected function getAdminUser(ObjectManager $manager)
     {
-        $repository = $manager->getRepository('OroUserBundle:Role');
+        $repository = $manager->getRepository(Role::class);
         $role       = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
 
         if (!$role) {
@@ -160,6 +162,6 @@ abstract class AbstractDashboardFixture extends AbstractFixture implements Conta
      */
     protected function getDashboardRepository()
     {
-        return $this->container->get('doctrine')->getRepository('OroDashboardBundle:Dashboard');
+        return $this->container->get('doctrine')->getRepository(Dashboard::class);
     }
 }

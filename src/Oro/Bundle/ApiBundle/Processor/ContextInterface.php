@@ -109,7 +109,7 @@ interface ContextInterface extends SharedDataAwareContextInterface
      * Indicates whether the current action processes a master API request
      * or it is executed as part of another action.
      */
-    public function isMasterRequest(): bool;
+    public function isMainRequest(): bool;
 
     /**
      * Sets a flag indicates whether the current action processes a master API request

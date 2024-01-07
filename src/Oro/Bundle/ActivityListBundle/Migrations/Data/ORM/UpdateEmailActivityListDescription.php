@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -49,7 +50,7 @@ class UpdateEmailActivityListDescription extends AbstractFixture implements Cont
 
         $itemsCount = 0;
         $entities   = [];
-        $emailRepository = $manager->getRepository('OroEmailBundle:Email');
+        $emailRepository = $manager->getRepository(Email::class);
         $activityProvider = $this->container->get('oro_email.activity_list.provider');
 
         foreach ($iterator as $activity) {

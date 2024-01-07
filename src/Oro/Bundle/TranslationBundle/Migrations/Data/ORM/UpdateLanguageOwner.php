@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 
@@ -51,12 +52,12 @@ class UpdateLanguageOwner extends AbstractFixture implements DependentFixtureInt
      */
     protected function getUser(ObjectManager $manager)
     {
-        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => LoadRolesData::ROLE_ADMINISTRATOR]);
+        $role = $manager->getRepository(Role::class)->findOneBy(['role' => LoadRolesData::ROLE_ADMINISTRATOR]);
         if (!$role) {
             throw new \RuntimeException(sprintf('%s role should exist.', LoadRolesData::ROLE_ADMINISTRATOR));
         }
 
-        $user = $manager->getRepository('OroUserBundle:Role')->getFirstMatchedUser($role);
+        $user = $manager->getRepository(Role::class)->getFirstMatchedUser($role);
         if (!$user) {
             throw new \RuntimeException(
                 sprintf('At least one user with role %s should exist.', LoadRolesData::ROLE_ADMINISTRATOR)

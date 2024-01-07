@@ -4,11 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
 use Oro\Bundle\NavigationBundle\Entity\PageState;
+use Oro\Bundle\NavigationBundle\Form\Handler\PageStateHandler;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -78,9 +80,9 @@ class PagestateController extends AbstractFOSRestController
         /** @var AbstractPageState $entity */
         $entity = new $pageStateClass();
 
-        $view = $this->get('oro_navigation.form.handler.pagestate')->process($entity)
+        $view = $this->container->get(PageStateHandler::class)->process($entity)
             ? $this->view($this->getState($entity), Response::HTTP_CREATED)
-            : $this->view($this->get('oro_navigation.form.pagestate'), Response::HTTP_BAD_REQUEST);
+            : $this->view($this->container->get('oro_navigation.form.pagestate'), Response::HTTP_BAD_REQUEST);
 
         return $this->handleView($view);
     }
@@ -107,9 +109,9 @@ class PagestateController extends AbstractFOSRestController
             return $this->handleNotFound();
         }
 
-        $view = $this->get('oro_navigation.form.handler.pagestate')->process($entity)
+        $view = $this->container->get(PageStateHandler::class)->process($entity)
             ? $this->view('', Response::HTTP_NO_CONTENT)
-            : $this->view($this->get('oro_navigation.form.pagestate'), Response::HTTP_BAD_REQUEST);
+            : $this->view($this->container->get('oro_navigation.form.pagestate'), Response::HTTP_BAD_REQUEST);
 
         return $this->handleView($view);
     }
@@ -155,7 +157,7 @@ class PagestateController extends AbstractFOSRestController
     public function getCheckidAction()
     {
         $hash = AbstractPageState::generateHash(
-            $this->get('request_stack')->getCurrentRequest()->get('pageId'),
+            $this->container->get('request_stack')->getCurrentRequest()->get('pageId'),
             $this->getUser()->getId(),
         );
 
@@ -166,7 +168,7 @@ class PagestateController extends AbstractFOSRestController
 
     protected function getManager(): EntityManagerInterface
     {
-        return $this->getDoctrine()->getManagerForClass($this->getPageStateClass());
+        return $this->container->get(ManagerRegistry::class)->getManagerForClass($this->getPageStateClass());
     }
 
     protected function getPageStateRepository(): EntityRepository
@@ -213,5 +215,19 @@ class PagestateController extends AbstractFOSRestController
     private function handleNotFound(): Response
     {
         return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                ManagerRegistry::class,
+                PageStateHandler::class,
+            ]
+        );
     }
 }

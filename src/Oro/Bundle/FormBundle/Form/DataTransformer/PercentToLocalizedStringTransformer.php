@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
-use Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer as BaseTransformer;
-
 /**
  * Fix for standard transformer that supports precision = null
  * and if the conversion type is "fractional", convert strings represent an integer value to float instead of integer.
  */
-class PercentToLocalizedStringTransformer extends BaseTransformer
+class PercentToLocalizedStringTransformer extends Symfony54PercentToLocalizedStringTransformer
 {
     /** @var int|null */
     private $scale;

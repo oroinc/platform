@@ -417,7 +417,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
             'User %s is not in organization %s',
-            $user->getUsername(),
+            $user->getUserIdentifier(),
             $organization->getName()
         ));
         $this->provider->resolveGlobalOptions($input);

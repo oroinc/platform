@@ -28,7 +28,7 @@ class ReportController extends RestController
      *      id="oro_report_delete",
      *      type="entity",
      *      permission="DELETE",
-     *      class="OroReportBundle:Report"
+     *      class="Oro\Bundle\ReportBundle\Entity\Report"
      * )
      * @return Response
      */
@@ -44,7 +44,7 @@ class ReportController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_report.report.manager.api');
+        return $this->container->get('oro_report.report.manager.api');
     }
 
     /**

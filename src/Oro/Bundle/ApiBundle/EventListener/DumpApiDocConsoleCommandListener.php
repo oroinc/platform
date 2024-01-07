@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\EventListener;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
-use Oro\Component\PhpUtils\ReflectionUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -47,11 +46,12 @@ class DumpApiDocConsoleCommandListener
     private function getHelpInnerCommand(Command $helpCommand, InputInterface $input): ?Command
     {
         $innerCommand = null;
-        $commandProperty = ReflectionUtil::getProperty(new \ReflectionClass($helpCommand), 'command');
-        if (null !== $commandProperty) {
-            $commandProperty->setAccessible(true);
-            $innerCommand = $commandProperty->getValue($helpCommand);
+
+        $innerCommandName = $input->getArgument('command_name');
+        if ($innerCommandName && $helpCommand->getApplication()->has($innerCommandName)) {
+            $innerCommand = $helpCommand->getApplication()->find($innerCommandName);
         }
+
         if (!$innerCommand) {
             $innerCommandName = $this->getApiDocDumpCommandFromParameterOptions($input);
             if ($innerCommandName && $helpCommand->getApplication()->has($innerCommandName)) {

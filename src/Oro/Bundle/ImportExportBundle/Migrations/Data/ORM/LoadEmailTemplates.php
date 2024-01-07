@@ -42,7 +42,7 @@ class LoadEmailTemplates extends AbstractEmailFixture implements
             return null;
         }
 
-        return $manager->getRepository('OroEmailBundle:EmailTemplate')->findOneBy([
+        return $manager->getRepository(EmailTemplate::class)->findOneBy([
             'name' => $template['params']['name'],
         ]);
     }

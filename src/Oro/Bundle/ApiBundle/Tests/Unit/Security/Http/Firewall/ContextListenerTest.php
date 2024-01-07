@@ -3,17 +3,18 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Security\Http\Firewall;
 
 use Oro\Bundle\ApiBundle\Security\Http\Firewall\ContextListener;
+use Oro\Bundle\SecurityBundle\Authentication\Token\AnonymousToken;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\SecurityBundle\Request\CsrfProtectedRequestHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Firewall\ContextListener as BaseContextListener;
 
 class ContextListenerTest extends \PHPUnit\Framework\TestCase
@@ -110,7 +111,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
 
         $tokenStorage->expects(self::once())
             ->method('getToken')
-            ->willReturn(new UsernamePasswordToken('user', 'password', 'test'));
+            ->willReturn(new UsernamePasswordToken($this->createMock(UserInterface::class), 'test'));
         $this->innerListener->expects(self::never())
             ->method('__invoke');
 

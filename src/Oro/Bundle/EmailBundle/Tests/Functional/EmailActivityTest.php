@@ -100,7 +100,7 @@ class EmailActivityTest extends WebTestCase
             $url,
             [],
             [],
-            $this->generateWsseAuthHeader($user->getUsername(), $user->getUsername())
+            $this->generateWsseAuthHeader($user->getUserIdentifier(), $user->getUserIdentifier())
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);

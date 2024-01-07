@@ -15,6 +15,7 @@ services:
             - '@event_dispatcher'
             - '@oro_distribution.handler.application_status'
             - '@oro_installer.script_manager'
+            - '@validator'
         tags:
             - { name: console.command }
 

@@ -1,5 +1,5 @@
 {% import '@OroUI/macros.html.twig' as UI %}
-{% if app.user %}
+{% if is_authenticated() %}
     <li class="dropdown user-menu-dropdown" id="user-menu"
         {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/user-menu-view'}) }}>
         {{ oro_menu_render('usermenu', {class:'dropdown-menu-right'}) }}

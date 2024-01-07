@@ -23,7 +23,7 @@ class RequestListener
     {
         $route = $event->getRequest()->get('_route');
         if (null !== $route && !$this->featureChecker->isResourceEnabled($route, 'routes')) {
-            if ($event->isMasterRequest()) {
+            if ($event->isMainRequest()) {
                 throw new NotFoundHttpException();
             }
 

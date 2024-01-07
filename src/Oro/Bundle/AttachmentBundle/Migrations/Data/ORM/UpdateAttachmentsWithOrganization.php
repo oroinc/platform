@@ -4,8 +4,12 @@ namespace Oro\Bundle\AttachmentBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
+/**
+ * Updates attachments with organization.
+ */
 class UpdateAttachmentsWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
     /**
@@ -23,6 +27,6 @@ class UpdateAttachmentsWithOrganization extends UpdateWithOrganization implement
      */
     public function load(ObjectManager $manager)
     {
-        $this->update($manager, 'OroAttachmentBundle:Attachment');
+        $this->update($manager, Attachment::class);
     }
 }

@@ -48,7 +48,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user);
-        $this->setReference($user->getUsername(), $user);
+        $this->setReference($user->getUserIdentifier(), $user);
 
         $user = $userManager->createUser();
         $user->setUsername(self::SIMPLE_USER_2)
@@ -63,6 +63,6 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setEnabled(true);
         $userManager->updateUser($user);
 
-        $this->setReference($user->getUsername(), $user);
+        $this->setReference($user->getUserIdentifier(), $user);
     }
 }

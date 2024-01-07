@@ -37,7 +37,7 @@ class SendWorkflowStepChangesToAuditListener implements OptionalListenerInterfac
         }
 
         $this->storage->addEntityUpdate(
-            $eventArgs->getEntityManager(),
+            $eventArgs->getObjectManager(),
             $workflowEntity,
             [
                 self::FIELD_ALIAS => [

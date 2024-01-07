@@ -72,11 +72,11 @@ class DigitalAssetController extends AbstractController
      */
     protected function update(DigitalAsset $digitalAsset)
     {
-        return $this->get(UpdateHandlerFacade::class)
+        return $this->container->get(UpdateHandlerFacade::class)
             ->update(
                 $digitalAsset,
                 $this->createForm(DigitalAssetType::class, $digitalAsset),
-                $this->get(TranslatorInterface::class)->trans('oro.digitalasset.controller.saved.message')
+                $this->container->get(TranslatorInterface::class)->trans('oro.digitalasset.controller.saved.message')
             );
     }
 
@@ -93,16 +93,16 @@ class DigitalAssetController extends AbstractController
     public function chooseAction(string $parentEntityClass, string $parentEntityFieldName)
     {
         try {
-            $resolvedParentEntityClass = $this->get(EntityClassNameHelper::class)
+            $resolvedParentEntityClass = $this->container->get(EntityClassNameHelper::class)
                 ->resolveEntityClass($parentEntityClass);
         } catch (EntityAliasNotFoundException $e) {
-            $this->get(LoggerInterface::class)
+            $this->container->get(LoggerInterface::class)
                 ->warning(sprintf('Entity alias for %s was not found', $parentEntityClass), ['exception' => $e]);
 
             throw new NotFoundHttpException();
         }
 
-        $attachmentEntityFieldConfig = $this->get(AttachmentEntityConfigProviderInterface::class)
+        $attachmentEntityFieldConfig = $this->container->get(AttachmentEntityConfigProviderInterface::class)
             ->getFieldConfig($resolvedParentEntityClass, $parentEntityFieldName);
 
         if (!$attachmentEntityFieldConfig) {
@@ -110,9 +110,9 @@ class DigitalAssetController extends AbstractController
         }
 
         $isImageType = FieldConfigHelper::isImageField($attachmentEntityFieldConfig->getId());
-        $mimeTypes = $this->get(FileConstraintsProvider::class)
+        $mimeTypes = $this->container->get(FileConstraintsProvider::class)
             ->getAllowedMimeTypesForEntityField($resolvedParentEntityClass, $parentEntityFieldName);
-        $maxFileSize = $this->get(FileConstraintsProvider::class)
+        $maxFileSize = $this->container->get(FileConstraintsProvider::class)
             ->getMaxSizeForEntityField($resolvedParentEntityClass, $parentEntityFieldName);
 
         return $this->handleChooseForm($isImageType, $mimeTypes, $maxFileSize);
@@ -137,7 +137,7 @@ class DigitalAssetController extends AbstractController
             ]
         );
 
-        return $this->get(UpdateHandlerFacade::class)
+        return $this->container->get(UpdateHandlerFacade::class)
             ->update(
                 $form->getData(),
                 $form,
@@ -168,8 +168,8 @@ class DigitalAssetController extends AbstractController
      */
     public function chooseImageAction()
     {
-        $mimeTypes = $this->get(FileConstraintsProvider::class)->getImageMimeTypes();
-        $maxFileSize = $this->get(FileConstraintsProvider::class)->getMaxSize();
+        $mimeTypes = $this->container->get(FileConstraintsProvider::class)->getImageMimeTypes();
+        $maxFileSize = $this->container->get(FileConstraintsProvider::class)->getMaxSize();
 
         return $this->handleChooseForm(true, $mimeTypes, $maxFileSize);
     }
@@ -183,8 +183,8 @@ class DigitalAssetController extends AbstractController
      */
     public function chooseFileAction()
     {
-        $mimeTypes = $this->get(FileConstraintsProvider::class)->getFileMimeTypes();
-        $maxFileSize = $this->get(FileConstraintsProvider::class)->getMaxSize();
+        $mimeTypes = $this->container->get(FileConstraintsProvider::class)->getFileMimeTypes();
+        $maxFileSize = $this->container->get(FileConstraintsProvider::class)->getMaxSize();
 
         return $this->handleChooseForm(false, $mimeTypes, $maxFileSize);
     }

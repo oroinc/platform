@@ -8,6 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for percentage values.
+ */
 class OroPercentType extends AbstractType
 {
     const NAME = 'oro_percent';
@@ -42,7 +45,10 @@ class OroPercentType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setAllowedTypes('scale', ['null', 'int']);
-        $resolver->setDefaults(array('scale' => null));
+        $resolver->setDefaults([
+            'scale' => null,
+            'rounding_mode' => \NumberFormatter::ROUND_CEILING
+        ]);
     }
 
     /**

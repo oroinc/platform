@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Controller\Api;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Iterator\RecursiveItemIterator;
+use Knp\Menu\Provider\MenuProviderInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +32,7 @@ class ShortcutsController extends AbstractFOSRestController
     public function getAction($query)
     {
         /** @var BuilderChainProvider $provider */
-        $provider = $this->container->get('oro_menu.builder_chain');
+        $provider = $this->container->get(MenuProviderInterface::class);
         /**
          * merging shortcuts and application menu
          */
@@ -45,7 +46,7 @@ class ShortcutsController extends AbstractFOSRestController
     protected function getResults(ItemInterface $items, string $query): array
     {
         /** @var TranslatorInterface $translator */
-        $translator = $this->get('translator');
+        $translator = $this->container->get(TranslatorInterface::class);
         $itemIterator = new RecursiveItemIterator($items);
         $iterator = new \RecursiveIteratorIterator($itemIterator, \RecursiveIteratorIterator::SELF_FIRST);
         $result = [];
@@ -82,6 +83,20 @@ class ShortcutsController extends AbstractFOSRestController
             && !in_array($item->getUri(), $this->uris)
             && $item->getUri() !== '#'
             && $item->isDisplayed()
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                MenuProviderInterface::class,
+                TranslatorInterface::class,
+            ]
         );
     }
 }

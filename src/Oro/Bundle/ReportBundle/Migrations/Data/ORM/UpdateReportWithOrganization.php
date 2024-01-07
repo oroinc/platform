@@ -5,7 +5,11 @@ namespace Oro\Bundle\ReportBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
+use Oro\Bundle\ReportBundle\Entity\Report;
 
+/**
+ * Updates reports with organization.
+ */
 class UpdateReportWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
     /**
@@ -23,6 +27,6 @@ class UpdateReportWithOrganization extends UpdateWithOrganization implements Dep
      */
     public function load(ObjectManager $manager)
     {
-        $this->update($manager, 'OroReportBundle:Report');
+        $this->update($manager, Report::class);
     }
 }

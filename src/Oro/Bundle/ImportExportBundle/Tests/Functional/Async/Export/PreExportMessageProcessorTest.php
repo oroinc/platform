@@ -108,7 +108,7 @@ class PreExportMessageProcessorTest extends WebTestCase
     private function setSecurityToken(): void
     {
         $user = $this->getCurrentUser();
-        $token = new UsernamePasswordToken($user, false, 'k', $user->getRoles());
+        $token = new UsernamePasswordToken($user, 'k', $user->getRoles());
         self::getContainer()->get('security.token_storage')->setToken($token);
     }
 }

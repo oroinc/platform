@@ -98,7 +98,7 @@ class SegmentSnapshotRepository extends EntityRepository
         $entityManager = $this->getEntityManager();
 
         $segmentQB = $entityManager->createQueryBuilder();
-        $segmentQB->select('s.id, s.entity')->from('OroSegmentBundle:Segment', 's');
+        $segmentQB->select('s.id, s.entity')->from(Segment::class, 's');
 
         foreach ($entities as $key => $entity) {
             QueryBuilderUtil::checkIdentifier($key);
@@ -175,7 +175,7 @@ class SegmentSnapshotRepository extends EntityRepository
      * Get SELECT query builder for retrieving entity identifiers from snapshot
      *
      * @param Segment $segment
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function getIdentifiersSelectQueryBuilder(Segment $segment)
     {

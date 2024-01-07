@@ -13,6 +13,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\ORM\Mocks\ConnectionMock;
 use Oro\Component\Testing\Unit\ORM\Mocks\DriverMock;
@@ -123,7 +124,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ->willReturn($token);
         $token->expects(self::once())
             ->method('getUser')
-            ->willReturn(new \stdClass());
+            ->willReturn($this->createMock(UserInterface::class));
 
         $this->assertFalse($this->treeProvider->supports());
     }

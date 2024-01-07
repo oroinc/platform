@@ -23,7 +23,7 @@ class AutoResponseRuleController extends RestController
      *      id="oro_email_autoresponserule_delete",
      *      type="entity",
      *      permission="DELETE",
-     *      class="OroEmailBundle:AutoResponseRule"
+     *      class="Oro\Bundle\EmailBundle\Entity\AutoResponseRule"
      * )
      * @return Response
      */
@@ -45,6 +45,6 @@ class AutoResponseRuleController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_email.manager.autoresponserule.api');
+        return $this->container->get('oro_email.manager.autoresponserule.api');
     }
 }

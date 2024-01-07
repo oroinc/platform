@@ -6,6 +6,9 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\TranslationBundle\DataFixtures\AbstractTranslatableEntityFixture;
 
+/**
+ * Loads address types
+ */
 class LoadAddressTypeData extends AbstractTranslatableEntityFixture
 {
     const ADDRESS_TYPE_PREFIX = 'address_type';
@@ -31,7 +34,7 @@ class LoadAddressTypeData extends AbstractTranslatableEntityFixture
      */
     protected function loadEntities(ObjectManager $manager)
     {
-        $addressTypeRepository = $manager->getRepository('OroAddressBundle:AddressType');
+        $addressTypeRepository = $manager->getRepository(AddressType::class);
 
         $translationLocales = $this->getTranslationLocales();
         $addressTypes = $this->getAddressTypes();

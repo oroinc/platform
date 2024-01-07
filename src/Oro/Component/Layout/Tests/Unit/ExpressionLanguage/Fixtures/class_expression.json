@@ -3,6 +3,8 @@
   "node": {
     "Symfony\\Component\\ExpressionLanguage\\Node\\GetAttrNode": {
       "attributes": {
+        "is_null_coalesce": false,
+        "is_short_circuited": false,
         "type": 3
       },
       "nodes": {

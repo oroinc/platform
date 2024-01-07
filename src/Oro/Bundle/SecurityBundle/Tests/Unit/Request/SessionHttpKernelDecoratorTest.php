@@ -54,7 +54,7 @@ class SessionHttpKernelDecoratorTest extends \PHPUnit\Framework\TestCase
         $request->expects(self::once())
             ->method('getBasePath')
             ->willReturn('/');
-        $type = HttpKernelInterface::MASTER_REQUEST;
+        $type = HttpKernelInterface::MAIN_REQUEST;
         $catch = true;
         $response = $this->createMock(Response::class);
 
@@ -80,7 +80,7 @@ class SessionHttpKernelDecoratorTest extends \PHPUnit\Framework\TestCase
         $request->expects(self::once())
             ->method('getBasePath')
             ->willReturn('/subDir');
-        $type = HttpKernelInterface::MASTER_REQUEST;
+        $type = HttpKernelInterface::MAIN_REQUEST;
         $catch = true;
 
         $this->kernel->expects(self::once())
@@ -102,7 +102,7 @@ class SessionHttpKernelDecoratorTest extends \PHPUnit\Framework\TestCase
         $request->expects(self::once())
             ->method('getBasePath')
             ->willReturn('/subDir');
-        $type = HttpKernelInterface::MASTER_REQUEST;
+        $type = HttpKernelInterface::MAIN_REQUEST;
         $catch = true;
 
         $this->kernel->expects(self::exactly(2))

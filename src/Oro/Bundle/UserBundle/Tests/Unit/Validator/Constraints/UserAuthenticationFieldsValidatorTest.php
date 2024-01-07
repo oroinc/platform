@@ -137,6 +137,7 @@ class UserAuthenticationFieldsValidatorTest extends ConstraintValidatorTestCase
     public function testUsernameIsNull()
     {
         $user = $this->getUser(1);
+        $user->setUserIdentifier('test@example.com');
         $user->setEmail('test@example.com');
 
         $this->userManager->expects($this->never())

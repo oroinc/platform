@@ -40,7 +40,7 @@ class ModifyCreatedAndUpdatedPropertiesListener
             return;
         }
 
-        $em = $args->getEntityManager();
+        $em = $args->getObjectManager();
         $uow = $em->getUnitOfWork();
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {

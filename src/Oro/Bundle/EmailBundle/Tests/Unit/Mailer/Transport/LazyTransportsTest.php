@@ -5,18 +5,20 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Transport;
 use Oro\Bundle\EmailBundle\Mailer\Transport\LazyTransports;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\Transport as TransportFactory;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
-use Symfony\Component\Mailer\Transport\Transports;
 use Symfony\Component\Mime\Message;
 
 class LazyTransportsTest extends \PHPUnit\Framework\TestCase
 {
-    private TransportFactory|\PHPUnit\Framework\MockObject\MockObject $transportFactory;
+    private TransportFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $transportFactory;
+    private Transport $transport;
 
     protected function setUp(): void
     {
-        $this->transportFactory = $this->createMock(TransportFactory::class);
+        $this->transportFactory = $this->createMock(TransportFactoryInterface::class);
+        $this->transport = new Transport([$this->transportFactory]);
     }
 
     public function testConstructDoesNotCreateTransports(): void
@@ -25,19 +27,21 @@ class LazyTransportsTest extends \PHPUnit\Framework\TestCase
             ->expects(self::never())
             ->method(self::anything());
 
-        new LazyTransports($this->transportFactory, ['main' => 'null://null']);
+        new LazyTransports($this->transport, ['main' => 'null://null']);
     }
 
     public function testSendCreatesTransport(): void
     {
         $transportsDsns = ['main' => 'null://null'];
         $mainTransport = $this->createMock(TransportInterface::class);
-        $transports = new Transports(['main' => $mainTransport]);
         $this->transportFactory
             ->expects(self::once())
-            ->method('fromStrings')
-            ->with($transportsDsns)
-            ->willReturn($transports);
+            ->method('supports')
+            ->willReturn(true);
+        $this->transportFactory
+            ->expects(self::once())
+            ->method('create')
+            ->willReturn($mainTransport);
 
         $message = new Message();
         $envelope = $this->createMock(Envelope::class);
@@ -48,7 +52,7 @@ class LazyTransportsTest extends \PHPUnit\Framework\TestCase
             ->with($message, $envelope)
             ->willReturn($expectedSentMessage);
 
-        $lazyTransports = new LazyTransports($this->transportFactory, $transportsDsns);
+        $lazyTransports = new LazyTransports($this->transport, $transportsDsns);
 
         self::assertSame($expectedSentMessage, $lazyTransports->send($message, $envelope));
 
@@ -63,7 +67,7 @@ class LazyTransportsTest extends \PHPUnit\Framework\TestCase
             ->expects(self::never())
             ->method(self::anything());
 
-        $lazyTransports = new LazyTransports($this->transportFactory, $transportsDsns);
+        $lazyTransports = new LazyTransports($this->transport, $transportsDsns);
 
         self::assertEquals('[main,another]', (string)$lazyTransports);
     }

@@ -6,10 +6,19 @@ use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Oro\Bundle\TestFrameworkBundle\Entity\ItemValue;
+use Oro\Bundle\TestFrameworkBundle\Entity\Product;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityInterface;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTargetInterface;
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class PermissionConfigurationProviderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -31,19 +40,19 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             'group_names' => [PermissionConfiguration::DEFAULT_GROUP_NAME, 'frontend', 'new_group'],
             'apply_to_all' => false,
             'apply_to_entities' => [
-                'OroTestFrameworkBundle:TestActivity',
-                'OroTestFrameworkBundle:Product',
-                'OroTestFrameworkBundle:TestActivityTarget',
+                TestActivity::class,
+                Product::class,
+                TestActivityTarget::class,
             ],
             'exclude_entities' => [
-                'OroTestFrameworkBundle:Item',
-                'OroTestFrameworkBundle:ItemValue',
-                'OroTestFrameworkBundle:WorkflowAwareEntity',
+                Item::class,
+                ItemValue::class,
+                WorkflowAwareEntity::class,
             ],
             'description' => 'Permission 2 description',
             'apply_to_interfaces' => [
-                'OroTestFrameworkBundle:TestActivityInterface',
-                'OroTestFrameworkBundle:TestActivityTargetInterface',
+                TestActivityInterface::class,
+                TestActivityTargetInterface::class,
             ],
         ],
         self::PERMISSION3 => [

@@ -31,7 +31,6 @@ class ActivityListManagerTest extends WebTestCase
             ->findOneBy(['username' => 'admin']);
         $adminToken = new UsernamePasswordOrganizationToken(
             $user,
-            'admin',
             'key',
             $organization,
             $user->getUserRoles()
