@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": "~8.2.0",
+        "php": "~8.3.0",
         "ext-ctype": "*",
         "ext-dom": "*",
         "ext-gd": "*",
@@ -100,7 +100,7 @@
         "ass/xmlsecurity": "1.1.1",
         "stof/doctrine-extensions-bundle": "~1.7.0",
         "liip/imagine-bundle": "~2.10.0",
-        "laminas/laminas-mail": "^2.22.0",
+        "laminas/laminas-mail": "^2.25.0",
         "dragonmantank/cron-expression": "~3.3.2",
         "gos/web-socket-bundle": "~3.15.0",
         "guzzlehttp/guzzle": "~7.5.0",
@@ -110,7 +110,7 @@
         "ocramius/proxy-manager": "~2.11.1",
         "knplabs/knp-gaufrette-bundle": "~0.8.0",
         "oro/doctrine-extensions": "~2.0.2",
-        "ezyang/htmlpurifier": "~4.16.0",
+        "ezyang/htmlpurifier": "~4.17.0",
         "xemlock/htmlpurifier-html5": "0.1.10",
         "hwi/oauth-bundle": "2.1.0",
         "kriswallsmith/buzz": "~1.2.0",

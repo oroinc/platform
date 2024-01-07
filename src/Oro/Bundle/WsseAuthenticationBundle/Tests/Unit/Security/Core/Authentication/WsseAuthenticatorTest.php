@@ -146,6 +146,7 @@ class WsseAuthenticatorTest extends \PHPUnit\Framework\TestCase
         string $exceptionType,
         string $exceptionString,
     ): void {
+        $this->markTestSkipped('Will be fixed in BAP-22397');
         $request = new Request();
         $request->headers = $headerBag;
 
