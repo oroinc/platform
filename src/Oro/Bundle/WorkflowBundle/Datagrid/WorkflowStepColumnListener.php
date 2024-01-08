@@ -230,7 +230,7 @@ class WorkflowStepColumnListener
                 $filters[self::WORKFLOW_FILTER] = [
                     'label' => 'oro.workflow.workflowdefinition.entity_label',
                     'type' => 'entity',
-                    'data_name' => '_workflowItem.workflowName',
+                    'data_name' => self::WORKFLOW_ITEM_ALIAS . '.workflowName',
                     'options' => [
                         'field_type' => WorkflowDefinitionSelectType::class,
                         'field_options' => [
