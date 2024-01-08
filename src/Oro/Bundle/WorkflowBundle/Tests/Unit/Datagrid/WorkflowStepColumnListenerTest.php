@@ -369,7 +369,20 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                             'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]],
                             'join' => [
                                 'inner' => [['join' => self::ALIAS . '.b', 'alias' => 'b']],
-                                'left' => [['join' => self::ALIAS . '.c', 'alias' => 'c']]
+                                'left' => [
+                                    ['join' => self::ALIAS . '.c', 'alias' => 'c'],
+                                    [
+                                        'join' => WorkflowItem::class,
+                                        'alias' => '_workflowItem',
+                                        'conditionType' => 'WITH',
+                                        'condition' => "_workflowItem.entityClass = 'Test\Entity\Full\Name'"
+                                            . " and _workflowItem.entityId = CAST(testEntity.id as string)"
+                                    ],
+                                    [
+                                        'join' => '_workflowItem.currentStep',
+                                        'alias' => 'workflowStepLabel'
+                                    ]
+                                ]
                             ],
                         ],
                         'type' => OrmDatasource::TYPE,
@@ -392,7 +405,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                             'leftJoinField' => ['data_name' => 'c.leftJoinField'],
                             WorkflowStepColumnListener::WORKFLOW_FILTER => [
                                 'type' => 'entity',
-                                'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN,
+                                'data_name' => WorkflowStepColumnListener::WORKFLOW_ITEM_ALIAS . '.workflowName',
                                 'options' => [
                                     'field_type' => WorkflowDefinitionSelectType::class,
                                     'field_options' => [
@@ -476,6 +489,17 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                                 'inner' => [['join' => self::ALIAS . '.b', 'alias' => 'b']],
                                 'left' => [
                                     ['join' => self::ALIAS . '.c', 'alias' => 'c'],
+                                    [
+                                        'join' => WorkflowItem::class,
+                                        'alias' => '_workflowItem',
+                                        'conditionType' => 'WITH',
+                                        'condition' => "_workflowItem.entityClass = 'Test\Entity\Full\Name'"
+                                            . " and _workflowItem.entityId = CAST(testEntity.id as string)"
+                                    ],
+                                    [
+                                        'join' => '_workflowItem.currentStep',
+                                        'alias' => 'workflowStepLabel'
+                                    ]
                                 ]
                             ],
                         ],
