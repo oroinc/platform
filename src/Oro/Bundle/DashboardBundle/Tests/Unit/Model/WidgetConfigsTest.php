@@ -13,32 +13,34 @@ use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Bundle\SidebarBundle\Entity\Repository\WidgetRepository;
 use Oro\Component\Config\Resolver\ResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
+class WidgetConfigsTest extends TestCase
 {
-    /** @var WidgetRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WidgetRepository|MockObject */
     private $widgetRepository;
 
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|MockObject */
     private $em;
 
-    /** @var ConfigValueProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigValueProvider|MockObject */
     private $valueProvider;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|MockObject */
     private $configProvider;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|MockObject */
     private $translator;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcherInterface|MockObject */
     private $eventDispatcher;
 
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var RequestStack|MockObject */
     private $requestStack;
 
     /** @var WidgetConfigs */
@@ -77,7 +79,7 @@ class WidgetConfigsTest extends \PHPUnit\Framework\TestCase
         $this->widgetRepository = $this->createMock(EntityRepository::class);
         $this->em->expects(self::any())
             ->method('getRepository')
-            ->with('OroDashboardBundle:Widget')
+            ->with(Widget::class)
             ->willReturn($this->widgetRepository);
     }
 

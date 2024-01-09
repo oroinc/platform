@@ -24,7 +24,7 @@ class NotificationAlertController extends AbstractController
      *      id="oro_notification_notificationalert_view",
      *      type="entity",
      *      permission="VIEW",
-     *      class="OroNotificationBundle:NotificationAlert"
+     *      class="Oro\Bundle\NotificationBundle\Entity\NotificationAlert"
      * )
      * @Template()
      */

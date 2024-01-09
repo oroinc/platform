@@ -125,7 +125,7 @@ HELP
         }
         $output->writeln(sprintf('<comment>Integration statuses will be deleted:</comment> %d', count($iterator)));
 
-        $this->deleteRecords($iterator, 'OroIntegrationBundle:Status');
+        $this->deleteRecords($iterator, Status::class);
 
         $output->writeln('<info>Integration statuses history cleanup completed</info>');
 

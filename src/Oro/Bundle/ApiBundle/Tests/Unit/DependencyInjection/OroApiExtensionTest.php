@@ -1660,12 +1660,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                         'feature_name' => 'feature1'
                     ],
                     'firewall2' => [
-                        'feature_name'               => 'feature2',
-                        'feature_firewall_listeners' => ['firewall2_listener1']
+                        'feature_name' => 'feature2',
+                        'feature_firewall_authenticators' => ['firewall2_authenticator1'],
                     ],
                     'firewall3' => [
-                        'feature_name'               => 'feature3',
-                        'feature_firewall_listeners' => ['firewall3_listener1']
+                        'feature_name' => 'feature3',
+                        'feature_firewall_authenticators' => ['firewall3_authenticator1'],
                     ],
                     'firewall4' => [
                         'feature_name' => 'feature4'
@@ -1675,10 +1675,10 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'api_firewalls' => [
                     'firewall2' => [
-                        'feature_firewall_listeners' => ['firewall2_listener2']
+                        'feature_firewall_authenticators' => ['firewall2_authenticator2'],
                     ],
                     'firewall4' => [
-                        'feature_firewall_listeners' => ['firewall4_listener1']
+                        'feature_firewall_authenticators' => ['firewall4_authenticator1'],
                     ],
                     'firewall5' => [
                         'feature_name' => 'feature5'
@@ -1695,23 +1695,23 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'firewall1' => [
                     'feature_name'               => 'feature1',
-                    'feature_firewall_listeners' => []
+                    'feature_firewall_authenticators' => [],
                 ],
                 'firewall2' => [
                     'feature_name'               => 'feature2',
-                    'feature_firewall_listeners' => ['firewall2_listener1', 'firewall2_listener2']
+                    'feature_firewall_authenticators' => ['firewall2_authenticator1', 'firewall2_authenticator2'],
                 ],
                 'firewall3' => [
                     'feature_name'               => 'feature3',
-                    'feature_firewall_listeners' => ['firewall3_listener1']
+                    'feature_firewall_authenticators' => ['firewall3_authenticator1'],
                 ],
                 'firewall4' => [
                     'feature_name'               => 'feature4',
-                    'feature_firewall_listeners' => ['firewall4_listener1']
+                    'feature_firewall_authenticators' => ['firewall4_authenticator1'],
                 ],
                 'firewall5' => [
                     'feature_name'               => 'feature5',
-                    'feature_firewall_listeners' => []
+                    'feature_firewall_authenticators' => [],
                 ]
             ],
             $apiConfig['api_firewalls']

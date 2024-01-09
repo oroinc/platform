@@ -37,7 +37,7 @@ class DeletedAttributeRelationListener
 
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
-        $uow = $eventArgs->getEntityManager()->getUnitOfWork();
+        $uow = $eventArgs->getObjectManager()->getUnitOfWork();
 
         foreach ($uow->getScheduledEntityDeletions() as $attributeRelation) {
             if (!$attributeRelation instanceof AttributeGroupRelation) {

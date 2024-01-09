@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Entity\GridViewUser;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewUserRepository;
 use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadGridViewData;
 use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadGridViewUserData;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 
 class GridViewUserRepositoryTest extends AbstractDataGridRepositoryTest
 {
@@ -16,10 +16,16 @@ class GridViewUserRepositoryTest extends AbstractDataGridRepositoryTest
     protected function setUp(): void
     {
         parent::setUp();
+        $this->loadFixtures([LoadGridViewUserData::class, LoadUser::class]);
+        $this->repository = self::getContainer()->get('doctrine')->getRepository(GridViewUser::class);
+    }
 
-        $this->loadFixtures([LoadGridViewUserData::class]);
-
-        $this->repository = $this->getContainer()->get('doctrine')->getRepository(GridViewUser::class);
+    /**
+     * {@inheritDoc}
+     */
+    protected function getUserReference(): string
+    {
+        return LoadUser::USER;
     }
 
     public function testFindDefaultGridView()
@@ -48,13 +54,5 @@ class GridViewUserRepositoryTest extends AbstractDataGridRepositoryTest
 
         $this->assertNotNull($view);
         $this->assertGridViewExists($this->getReference(LoadGridViewUserData::GRID_VIEW_USER_3), [$view]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getUsername(): string
-    {
-        return LoadAdminUserData::DEFAULT_ADMIN_USERNAME;
     }
 }

@@ -29,14 +29,14 @@ class OrganizationController extends AbstractController
      * @Acl(
      *      id="oro_organization_update",
      *      type="entity",
-     *      class="OroOrganizationBundle:Organization",
+     *      class="Oro\Bundle\OrganizationBundle\Entity\Organization",
      *      permission="EDIT"
      * )
      */
     public function updateCurrentAction(Request $request)
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token = $this->get(TokenStorageInterface::class)->getToken();
+        $token = $this->container->get(TokenStorageInterface::class)->getToken();
         $organization = $token->getOrganization();
 
         return $this->update($organization, $request);
@@ -49,19 +49,19 @@ class OrganizationController extends AbstractController
      */
     protected function update(Organization $entity, Request $request)
     {
-        $organizationForm = $this->get(FormFactoryInterface::class)->createNamed(
+        $organizationForm = $this->container->get(FormFactoryInterface::class)->createNamed(
             'oro_organization_form',
             OrganizationType::class,
             $entity
         );
 
-        if ($this->get(OrganizationHandler::class)->process($entity, $organizationForm)) {
+        if ($this->container->get(OrganizationHandler::class)->process($entity, $organizationForm)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.organization.controller.message.saved')
+                $this->container->get(TranslatorInterface::class)->trans('oro.organization.controller.message.saved')
             );
 
-            return $this->get(Router::class)->redirect($entity);
+            return $this->container->get(Router::class)->redirect($entity);
         }
 
         return [

@@ -58,7 +58,7 @@ class HintFormExtensionTest extends \PHPUnit\Framework\TestCase
         $view = new FormView();
         $this->form->expects($this->any())
             ->method('getParent')
-            ->willReturn(false);
+            ->willReturn(null);
 
         $extension = new HintFormExtension();
         $extension->buildView($view, $this->form, ['toolbar' => 'test']);

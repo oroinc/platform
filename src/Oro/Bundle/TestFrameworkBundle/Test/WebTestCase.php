@@ -36,9 +36,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -288,7 +291,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * {@inheritdoc}
      */
-    protected static function createKernel(array $options = [])
+    protected static function createKernel(array $options = []): KernelInterface
     {
         if (!array_key_exists('environment', $options)) {
             if (isset($_ENV['ORO_ENV'])) {
@@ -368,11 +371,20 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param string $tokenId
      * @return CsrfToken
      */
-    protected function getCsrfToken($tokenId): CsrfToken
+    protected function getCsrfToken(string $tokenId): CsrfToken
     {
         $this->ensureSessionIsAvailable();
 
-        return self::getContainer()->get('security.csrf.token_manager')->getToken($tokenId);
+        $container = self::getContainer();
+        $session = $container->get('request_stack')->getSession();
+
+        $tokenGenerator = $container->get('security.csrf.token_generator');
+        $csrfToken = $tokenGenerator->generateToken();
+
+        $session->set(SessionTokenStorage::SESSION_NAMESPACE . "/{$tokenId}", $csrfToken);
+        $session->save();
+
+        return new CsrfToken($tokenId, $csrfToken);
     }
 
     /**
@@ -393,7 +405,6 @@ abstract class WebTestCase extends BaseWebTestCase
         $user = $this->getUser($email);
         $token = new UsernamePasswordOrganizationToken(
             $user,
-            false,
             'main',
             $user->getOrganization(),
             $user->getRoles()
@@ -1276,6 +1287,44 @@ abstract class WebTestCase extends BaseWebTestCase
             && false === strpos($path, ':');
     }
 
+    /**
+     * @return Session
+     */
+    protected function createSession(): Session
+    {
+        if (!$this->client) {
+            throw new \LogicException('Initialize the client before creating the session!');
+        }
+
+        $cookie = $this->client->getCookieJar()->get('MOCKSESSID');
+
+        // create a new session object
+        $container = self::getContainer();
+        $session = $container->get('session.factory')->createSession();
+
+        $domain = str_replace('http://', '', Client::LOCAL_URL);
+        if ($cookie) {
+            // get the session id from the session cookie if it exists
+            $session->setId($cookie->getValue());
+            $session->start();
+        } else {
+            // or create a new session id and a session cookie
+            $session->start();
+            $session->save();
+
+            $sessionCookie = new Cookie(
+                $session->getName(),
+                $session->getId(),
+                null,
+                null,
+                $domain,
+            );
+            $this->client->getCookieJar()->set($sessionCookie);
+        }
+
+        return $session;
+    }
+
     protected function getSession(): ?SessionInterface
     {
         $this->ensureSessionIsAvailable();
@@ -1291,9 +1340,7 @@ abstract class WebTestCase extends BaseWebTestCase
         try {
             $requestStack->getSession();
         } catch (SessionNotFoundException $e) {
-            $session = $container->has('session')
-                ? $container->get('session')
-                : $container->get('session.factory')->createSession();
+            $session = $this->createSession();
 
             $masterRequest = new Request();
             $masterRequest->setSession($session);
@@ -1306,6 +1353,18 @@ abstract class WebTestCase extends BaseWebTestCase
             $cookie = new Cookie($session->getName(), $session->getId());
             self::getClientInstance()->getCookieJar()->set($cookie);
         }
+    }
+
+    /**
+     * Creates request needed for emulate request processing.
+     *
+     * @return void
+     */
+    protected function emulateRequest(): void
+    {
+        $request = new Request();
+        $request->setSession($this->createSession());
+        self::getContainer()->get('request_stack')->push($request);
     }
 
     private function checkRunEnvironment(): void
@@ -1337,7 +1396,7 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         //Check changes username
-        $userName = $user->getUsername();
+        $userName = $user->getUserIdentifier();
         if ($userName !== $defaultOptionsProvider->getUserName()) {
             throw new \Exception(
                 sprintf(

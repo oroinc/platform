@@ -7,10 +7,11 @@ use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber;
 use Oro\Bundle\AddressBundle\Form\Type\AddressType;
 use Oro\Bundle\AddressBundle\Form\Type\TypedAddressType;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilder;
 
-class TypedAddressTypeTest extends \PHPUnit\Framework\TestCase
+class TypedAddressTypeTest extends TestCase
 {
     /** @var TypedAddressType */
     private $type;
@@ -44,7 +45,7 @@ class TypedAddressTypeTest extends \PHPUnit\Framework\TestCase
                     'types',
                     TranslatableEntityType::class,
                     [
-                        'class'        => 'OroAddressBundle:AddressType',
+                        'class'        => \Oro\Bundle\AddressBundle\Entity\AddressType::class,
                         'choice_label' => 'label',
                         'required'     => false,
                         'multiple'     => true,

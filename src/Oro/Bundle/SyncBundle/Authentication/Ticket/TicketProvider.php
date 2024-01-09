@@ -35,7 +35,7 @@ class TicketProvider implements TicketProviderInterface
             $password = $this->secret;
         } else {
             $password = $user->getPassword();
-            $userName = $user->getUsername();
+            $userName = $user->getUserIdentifier();
         }
 
         $passwordDigest = $this->ticketDigestGenerator->generateDigest($nonce, $created, $password);

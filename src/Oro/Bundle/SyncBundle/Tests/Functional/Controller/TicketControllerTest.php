@@ -36,7 +36,7 @@ class TicketControllerTest extends WebTestCase
             ->getUser($connection);
 
         self::assertInstanceOf(UserInterface::class, $user);
-        self::assertSame('admin', $user->getUsername());
+        self::assertSame('admin', $user->getUserIdentifier());
     }
 
     /**

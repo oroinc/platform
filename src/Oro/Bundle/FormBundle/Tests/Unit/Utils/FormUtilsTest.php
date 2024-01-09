@@ -138,8 +138,10 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
         $newTransformers = [];
         $builder->expects(self::any())
             ->method($model ? 'addModelTransformer' : 'addViewTransformer')
-            ->willReturnCallback(function ($transformer) use (&$newTransformers) {
+            ->willReturnCallback(function ($transformer) use (&$newTransformers, $builder) {
                 $newTransformers [] = $transformer;
+
+                return $builder;
             });
 
         FormUtils::replaceTransformer($builder, $toReplace, $type);

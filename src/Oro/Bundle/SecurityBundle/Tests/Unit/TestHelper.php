@@ -149,11 +149,6 @@ class TestHelper
             ->method('getManager')
             ->with($this->testCase->equalTo('default'))
             ->willReturn($em);
-        $doctrine->expects($this->testCase->any())
-            ->method('getAliasNamespace')
-            ->willReturnMap([
-                ['Test', 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'],
-            ]);
 
         $entityMetadataProvider = $this->testCase->getMockBuilder(EntitySecurityMetadataProvider::class)
             ->disableOriginalConstructor()
@@ -245,11 +240,6 @@ class TestHelper
             ->method('getManager')
             ->with($this->testCase->equalTo('default'))
             ->willReturn($em);
-        $doctrine->expects($this->testCase->any())
-            ->method('getAliasNamespace')
-            ->willReturnMap([
-                ['Test', 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity']
-            ]);
 
         $entityMetadataProvider = $this->testCase->getMockBuilder(EntitySecurityMetadataProvider::class)
             ->disableOriginalConstructor()

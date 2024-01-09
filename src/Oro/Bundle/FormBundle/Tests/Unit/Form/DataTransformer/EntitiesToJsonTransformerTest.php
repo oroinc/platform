@@ -7,10 +7,12 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToJsonTransformer;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntitiesToJsonTransformerTest extends \PHPUnit\Framework\TestCase
+class EntitiesToJsonTransformerTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|MockObject */
     private $entityManager;
 
     /** @var EntitiesToJsonTransformer */
@@ -65,7 +67,7 @@ class EntitiesToJsonTransformerTest extends \PHPUnit\Framework\TestCase
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->exactly(2))
             ->method('getName')
-            ->willReturn('OroUserBundle:User');
+            ->willReturn(User::class);
         $this->entityManager->expects($this->exactly(2))
             ->method('getClassMetadata')
             ->willReturn($metadata);

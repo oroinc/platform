@@ -4,7 +4,9 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Controller\Configuration\MailboxController;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -76,11 +78,11 @@ class MailboxAuthorizationListener
 
     protected function getOrganizationRepository(): OrganizationRepository
     {
-        return $this->registry->getRepository('OroOrganizationBundle:Organization');
+        return $this->registry->getRepository(Organization::class);
     }
 
     protected function getMailboxRepository(): MailboxRepository
     {
-        return $this->registry->getRepository('OroEmailBundle:Mailbox');
+        return $this->registry->getRepository(Mailbox::class);
     }
 }

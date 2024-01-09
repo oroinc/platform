@@ -24,7 +24,6 @@ security:
             methods: [OPTIONS]
             security: false
             stateless: true
-            anonymous: false
         api_wsse_secured:
             pattern: '%oro_api.rest.pattern%'
             provider: oro_user
@@ -33,6 +32,7 @@ security:
                 lifetime: 3600
                 realm:    "Secured API"
                 profile:  "UsernameToken"
+            entry_point: wsse
             context: main
             organization-remember-me: # should be the same as for "main" firewall except "csrf_protected_mode" option
                 token_provider:             oro_security.token.provider.rememberme
@@ -41,9 +41,7 @@ security:
                 lifetime:                   1209600   # stay logged for two weeks
                 httponly:                   true
                 csrf_protected_mode:        true
-            guard: # see "main" firewall
-                authenticators:
-                    - oro_user.impersonation_authenticator
+            custom_authenticator: oro_user.impersonation_authenticator
 
 knp_gaufrette:
     adapters:
@@ -68,12 +66,12 @@ oro_api:
     api_firewalls:
         api_wsse_secured:
             feature_name: web_api
-            feature_firewall_listeners:
-                - Oro\Bundle\WsseAuthenticationBundle\Security\Http\Firewall\WsseAuthenticationListener
+            feature_firewall_authenticators: # FeatureDependAuthenticatorChecker
+                - Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\WsseAuthenticator
         wsse_secured:
             feature_name: web_api
-            feature_firewall_listeners:
-                - Oro\Bundle\WsseAuthenticationBundle\Security\Http\Firewall\WsseAuthenticationListener
+            feature_firewall_authenticators: # FeatureDependAuthenticatorChecker
+                - Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\WsseAuthenticator
         api_options:
             feature_name: web_api
 

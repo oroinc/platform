@@ -32,7 +32,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
         string $to,
         int $scale = null,
         ?bool $grouping = false,
-        ?int $roundingMode = NumberToLocalizedStringTransformer::ROUND_HALF_UP,
+        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
         string $locale = null
     ): void {
         if (null !== $scale) {
@@ -64,7 +64,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
             [1234.123456789, '1234.123456789'],
             [1234.123456789, '1234.123456789', 2],
             [1234.123456789, '1,234.123456789', 2, true],
-            [1234.123456789, '1.234,123456789', 2, true, NumberToLocalizedStringTransformer::ROUND_HALF_UP, 'de_DE'],
+            [1234.123456789, '1.234,123456789', 2, true, \NumberFormatter::ROUND_HALFUP, 'de_DE'],
         ];
     }
 
@@ -76,7 +76,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
         string|float|null $to,
         int $scale = null,
         ?bool $grouping = false,
-        ?int $roundingMode = NumberToLocalizedStringTransformer::ROUND_HALF_UP,
+        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
         string $locale = 'en',
         string $decimalSeparator = '.',
         string $groupingSeparator = ','
@@ -116,14 +116,14 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
             ['1234.123456789', 1234.123456789],
             ['1234.123', 1234.123, 3],
             ['1234.123456789', '1234.123456789', 3],
-            ['1,234.123', 1234.123, 3, true, NumberToLocalizedStringTransformer::ROUND_HALF_UP],
+            ['1,234.123', 1234.123, 3, true, \NumberFormatter::ROUND_HALFUP],
             ['1,234.123456789123456789123456789', '1234.123456789123456789123456789', 3, true],
             [
                 '1.234,123',
                 1234.123,
                 3,
                 true,
-                NumberToLocalizedStringTransformer::ROUND_HALF_UP,
+                \NumberFormatter::ROUND_HALFUP,
                 'de_DE',
                 ',',
                 '.'
@@ -133,7 +133,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
                 '1234.123456789',
                 3,
                 true,
-                NumberToLocalizedStringTransformer::ROUND_HALF_UP,
+                \NumberFormatter::ROUND_HALFUP,
                 'de_DE',
                 ',',
                 '.'
@@ -143,7 +143,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
                 1234.9999,
                 4,
                 true,
-                NumberToLocalizedStringTransformer::ROUND_HALF_UP,
+                \NumberFormatter::ROUND_HALFUP,
                 'de_DE',
                 ',',
                 '.'
@@ -154,7 +154,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
                 '1234.99999',
                 4,
                 true,
-                NumberToLocalizedStringTransformer::ROUND_HALF_UP,
+                \NumberFormatter::ROUND_HALFUP,
                 'de_DE',
                 ',',
                 '.'

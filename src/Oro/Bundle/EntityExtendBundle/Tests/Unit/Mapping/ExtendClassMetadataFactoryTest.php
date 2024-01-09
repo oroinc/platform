@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Component\Cache\CacheItem;
 
 class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,13 +24,9 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $classMetadata = new ClassMetadata(User::class);
         $cache = $this->createMock(ArrayAdapter::class);
-        $cacheItem = $this->createMock(ItemInterface::class);
+        $cacheItem = new CacheItem();
         $cache->expects($this->once())
             ->method('getItem')
-            ->willReturn($cacheItem);
-        $cacheItem->expects($this->once())
-            ->method('set')
-            ->with($classMetadata)
             ->willReturn($cacheItem);
         $cache->expects($this->once())
             ->method('save')

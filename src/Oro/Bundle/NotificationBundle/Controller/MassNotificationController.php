@@ -26,7 +26,7 @@ class MassNotificationController extends AbstractController
      * @Acl(
      *      id="oro_notification_massnotification_view",
      *      type="entity",
-     *      class="OroNotificationBundle:MassNotification",
+     *      class="Oro\Bundle\NotificationBundle\Entity\MassNotification",
      *      permission="VIEW"
      * )
      * @Template()
@@ -57,7 +57,7 @@ class MassNotificationController extends AbstractController
      */
     public function infoAction(MassNotification $massNotification)
     {
-        $translator = $this->get(TranslatorInterface::class);
+        $translator = $this->container->get(TranslatorInterface::class);
         $statusLabel = $massNotification->getStatus() == MassNotification::STATUS_FAILED ?
             $translator->trans('oro.notification.massnotification.status.failed') :
             $translator->trans('oro.notification.massnotification.status.success');

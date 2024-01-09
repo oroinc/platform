@@ -58,9 +58,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(Form::class);
         $form->expects($this->once())
             ->method('getParent')
-            ->willReturn(true);
-        $form->expects($this->never())
-            ->method('has');
+            ->willReturn(null);
 
         $event = new FormEvent($form, null);
         $this->subscriber->postSetData($event);
@@ -71,7 +69,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(Form::class);
         $form->expects($this->once())
             ->method('getParent')
-            ->willReturn(false);
+            ->willReturn(null);
         $form->expects($this->once())
             ->method('has')
             ->with($this->fieldName)
@@ -88,7 +86,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(Form::class);
         $form->expects($this->once())
             ->method('getParent')
-            ->willReturn(false);
+            ->willReturn(null);
         $form->expects($this->once())
             ->method('has')
             ->with($this->fieldName)
@@ -107,7 +105,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(Form::class);
         $form->expects($this->once())
             ->method('getParent')
-            ->willReturn(false);
+            ->willReturn(null);
         $form->expects($this->once())
             ->method('has')
             ->with($this->fieldName)
@@ -130,7 +128,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(Form::class);
         $form->expects($this->once())
             ->method('getParent')
-            ->willReturn(false);
+            ->willReturn(null);
         $form->expects($this->once())
             ->method('has')
             ->with($this->fieldName)
@@ -159,7 +157,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(Form::class);
         $form->expects($this->once())
             ->method('getParent')
-            ->willReturn(false);
+            ->willReturn(null);
         $form->expects($this->once())
             ->method('has')
             ->with($this->fieldName)
@@ -234,7 +232,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(Form::class);
         $form->expects($this->once())
             ->method('getParent')
-            ->willReturn(false);
+            ->willReturn(null);
         $form->expects($this->once())
             ->method('has')
             ->with($this->fieldName)
@@ -261,7 +259,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(Form::class);
         $form->expects($this->once())
             ->method('getParent')
-            ->willReturn(false);
+            ->willReturn(null);
         $form->expects($this->once())
             ->method('has')
             ->with($this->fieldName)

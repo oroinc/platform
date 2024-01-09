@@ -11,6 +11,11 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Subscriber for User form type
+ * - disable editing of Enabled status
+ * - disable editing of Password for non current user
+ */
 class UserSubscriber implements EventSubscriberInterface
 {
     /** @var FormFactoryInterface */
@@ -110,7 +115,7 @@ class UserSubscriber implements EventSubscriberInterface
     protected function isCurrentUser(AbstractUser $user)
     {
         $token = $this->tokenAccessor->getToken();
-        $currentUser = $token ? $token->getUser() : null;
+        $currentUser = $token?->getUser();
         if ($user->getId() && is_object($currentUser)) {
             return $currentUser->getId() == $user->getId();
         }

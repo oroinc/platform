@@ -28,10 +28,10 @@ class WidgetController extends AbstractController
      */
     public function buttonsAction()
     {
-        $buttonSearchContext = $this->get(ButtonSearchContextProvider::class)->getButtonSearchContext();
+        $buttonSearchContext = $this->container->get(ButtonSearchContextProvider::class)->getButtonSearchContext();
 
         return [
-            'buttons' => $this->get(ButtonProvider::class)->findAvailable($buttonSearchContext),
+            'buttons' => $this->container->get(ButtonProvider::class)->findAvailable($buttonSearchContext),
         ];
     }
 
@@ -45,7 +45,7 @@ class WidgetController extends AbstractController
      */
     public function formAction(Request $request, $operationName)
     {
-        $handler = $this->get(OperationFormHandler::class);
+        $handler = $this->container->get(OperationFormHandler::class);
 
         $result = $handler->process($operationName, $request, $request->getSession()->getFlashBag());
 

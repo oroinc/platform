@@ -75,23 +75,6 @@ class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(ExpressionConditionVisitor::class, $visitors->current());
     }
 
-    public function testUnknownConditions()
-    {
-        $visitors = new VisitorCollection();
-
-        $this->expressionLanguage->expects($this->once())
-            ->method('parse')
-            ->with('unknown')
-            ->willReturn(null);
-
-        $this->extension->prepare(
-            new GeneratorData([ExpressionGeneratorExtension::NODE_CONDITIONS => 'unknown']),
-            $visitors
-        );
-
-        $this->assertCount(0, $visitors);
-    }
-
     public function testInvalidConditions()
     {
         $this->expectException(SyntaxException::class);

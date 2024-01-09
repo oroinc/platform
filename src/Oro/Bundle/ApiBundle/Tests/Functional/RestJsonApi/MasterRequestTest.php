@@ -46,7 +46,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "options" action for "%s" (MASTER_REQUEST)', TestProduct::class)
+                sprintf('Process "options" action for "%s" (MAIN_REQUEST)', TestProduct::class)
             ],
             $this->getRequestTypeLogMessages()
         );
@@ -60,7 +60,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "get_list" action for "%s" (MASTER_REQUEST)', TestProduct::class)
+                sprintf('Process "get_list" action for "%s" (MAIN_REQUEST)', TestProduct::class)
             ],
             $this->getRequestTypeLogMessages()
         );
@@ -74,7 +74,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "get" action for "%s" (MASTER_REQUEST)', TestProduct::class)
+                sprintf('Process "get" action for "%s" (MAIN_REQUEST)', TestProduct::class)
             ],
             $this->getRequestTypeLogMessages()
         );
@@ -95,7 +95,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "create" action for "%s" (MASTER_REQUEST)', TestProduct::class),
+                sprintf('Process "create" action for "%s" (MAIN_REQUEST)', TestProduct::class),
                 sprintf('Process "get" action for "%s" (SUB_REQUEST)', TestProduct::class)
             ],
             $this->getRequestTypeLogMessages()
@@ -129,7 +129,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "create" action for "%s" (MASTER_REQUEST)', TestProduct::class),
+                sprintf('Process "create" action for "%s" (MAIN_REQUEST)', TestProduct::class),
                 sprintf('Process "create" action for "%s" (SUB_REQUEST)', TestProductType::class),
                 sprintf('Process "get" action for "%s" (SUB_REQUEST)', TestProduct::class),
                 sprintf('Process "get" action for "%s" (SUB_REQUEST)', TestProductType::class)
@@ -155,7 +155,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "update" action for "%s" (MASTER_REQUEST)', TestProduct::class),
+                sprintf('Process "update" action for "%s" (MAIN_REQUEST)', TestProduct::class),
                 sprintf('Process "get" action for "%s" (SUB_REQUEST)', TestProduct::class)
             ],
             $this->getRequestTypeLogMessages()
@@ -191,7 +191,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "update" action for "%s" (MASTER_REQUEST)', TestProduct::class),
+                sprintf('Process "update" action for "%s" (MAIN_REQUEST)', TestProduct::class),
                 sprintf('Process "create" action for "%s" (SUB_REQUEST)', TestProductType::class),
                 sprintf('Process "get" action for "%s" (SUB_REQUEST)', TestProduct::class),
                 sprintf('Process "get" action for "%s" (SUB_REQUEST)', TestProductType::class)
@@ -208,7 +208,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "delete" action for "%s" (MASTER_REQUEST)', TestProduct::class)
+                sprintf('Process "delete" action for "%s" (MAIN_REQUEST)', TestProduct::class)
             ],
             $this->getRequestTypeLogMessages()
         );
@@ -222,7 +222,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "delete_list" action for "%s" (MASTER_REQUEST)', TestProduct::class)
+                sprintf('Process "delete_list" action for "%s" (MAIN_REQUEST)', TestProduct::class)
             ],
             $this->getRequestTypeLogMessages()
         );
@@ -238,7 +238,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "get_subresource" action for "%s" (MASTER_REQUEST)', TestProductType::class)
+                sprintf('Process "get_subresource" action for "%s" (MAIN_REQUEST)', TestProductType::class)
             ],
             $this->getRequestTypeLogMessages()
         );
@@ -254,7 +254,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "get_relationship" action for "%s" (MASTER_REQUEST)', TestProductType::class)
+                sprintf('Process "get_relationship" action for "%s" (MAIN_REQUEST)', TestProductType::class)
             ],
             $this->getRequestTypeLogMessages()
         );
@@ -279,7 +279,7 @@ class MasterRequestTest extends RestJsonApiTestCase
 
         self::assertEquals(
             [
-                sprintf('Process "update_relationship" action for "%s" (MASTER_REQUEST)', TestProductType::class)
+                sprintf('Process "update_relationship" action for "%s" (MAIN_REQUEST)', TestProductType::class)
             ],
             $this->getRequestTypeLogMessages()
         );

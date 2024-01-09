@@ -10,8 +10,8 @@ use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadGridViewData;
 use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadUserData;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 class OrmFilteredEntityIdentityReaderTest extends WebTestCase
 {
@@ -20,17 +20,15 @@ class OrmFilteredEntityIdentityReaderTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
+        $this->loadFixtures([LoadGridViewData::class, LoadUser::class]);
         $this->setSecurityToken();
-
-        $this->loadFixtures([LoadGridViewData::class]);
-        $this->reader = $this->getContainer()
+        $this->reader = self::getContainer()
             ->get('oro_datagrid.importexport.filtered_entity.orm_entity_identity_reader');
     }
 
     protected function tearDown(): void
     {
-        $this->getContainer()->get('security.token_storage')
-            ->setToken(null);
+        self::getContainer()->get('security.token_storage')->setToken(null);
         parent::tearDown();
     }
 
@@ -122,17 +120,12 @@ class OrmFilteredEntityIdentityReaderTest extends WebTestCase
 
     private function setSecurityToken(?User $user = null): void
     {
-        $container = $this->getContainer();
-
         if (null === $user) {
             $user = $this->getAdminUser();
         }
-
         $token = new OrganizationToken($user->getOrganization(), ['ROLE_ADMINISTRATOR']);
         $token->setUser($user);
-
-        $container->get('security.token_storage')
-            ->setToken($token);
+        self::getContainer()->get('security.token_storage')->setToken($token);
     }
 
     private function getDatagrid(array $options): DatagridInterface
@@ -151,8 +144,6 @@ class OrmFilteredEntityIdentityReaderTest extends WebTestCase
 
     private function getAdminUser(): User
     {
-        return self::getContainer()->get('doctrine')
-            ->getRepository(User::class)
-            ->findOneBy(['username' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME]);
+        return $this->getReference(LoadUser::USER);
     }
 }

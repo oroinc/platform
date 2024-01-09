@@ -43,16 +43,6 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->tokenSerializer->serialize($token));
     }
 
-    public function testSerializeForTokenWithUnsupportedUser()
-    {
-        $organization = new Organization();
-        $organization->setId(1);
-        $token = new OrganizationToken($organization);
-        $token->setUser('user');
-
-        self::assertNull($this->tokenSerializer->serialize($token));
-    }
-
     public function testSerializeForSupportedTokenWithoutRoles()
     {
         $organization = new Organization();

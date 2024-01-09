@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -38,7 +39,7 @@ class UserController extends AbstractController
      * @Acl(
      *      id="oro_user_user_view",
      *      type="entity",
-     *      class="OroUserBundle:User",
+     *      class="Oro\Bundle\UserBundle\Entity\User",
      *      permission="VIEW"
      * )
      *
@@ -119,13 +120,13 @@ class UserController extends AbstractController
      * @Acl(
      *      id="oro_user_user_create",
      *      type="entity",
-     *      class="OroUserBundle:User",
+     *      class="Oro\Bundle\UserBundle\Entity\User",
      *      permission="CREATE"
      * )
      */
     public function createAction(Request $request)
     {
-        $user = $this->get(UserManager::class)->createUser();
+        $user = $this->container->get(UserManager::class)->createUser();
 
         return $this->update($user, $request);
     }
@@ -138,7 +139,7 @@ class UserController extends AbstractController
      * @Acl(
      *      id="oro_user_user_update",
      *      type="entity",
-     *      class="OroUserBundle:User",
+     *      class="Oro\Bundle\UserBundle\Entity\User",
      *      permission="EDIT"
      * )
      *
@@ -176,18 +177,18 @@ class UserController extends AbstractController
      */
     private function update(User $entity, Request $request)
     {
-        if ($this->get(UserHandler::class)->process($entity)) {
+        if ($this->container->get(UserHandler::class)->process($entity)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.user.controller.user.message.saved')
+                $this->container->get(TranslatorInterface::class)->trans('oro.user.controller.user.message.saved')
             );
 
-            return $this->get(Router::class)->redirect($entity);
+            return $this->container->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity'       => $entity,
-            'form'         => $this->get(UserType::class)->createView(),
+            'form'         => $this->container->get(UserType::class)->createView(),
             'allow_delete' => $entity->getId() && $this->isDeleteGranted($entity)
         ];
     }
@@ -249,7 +250,7 @@ class UserController extends AbstractController
      */
     private function getUserApi(User $user)
     {
-        $userManager  = $this->get(UserManager::class);
+        $userManager  = $this->container->get(UserManager::class);
         if (!$userApi = $userManager->getApi($user, $this->getOrganization())) {
             $userApi = new UserApi();
             $userApi->setUser($user);
@@ -266,14 +267,14 @@ class UserController extends AbstractController
     private function getOrganization()
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token = $this->get(TokenStorageInterface::class)->getToken();
+        $token = $this->container->get(TokenStorageInterface::class)->getToken();
 
         return $token->getOrganization();
     }
 
     private function isDeleteGranted(User $entity): bool
     {
-        return $this->get(EntityDeleteHandlerRegistry::class)
+        return $this->container->get(EntityDeleteHandlerRegistry::class)
             ->getHandler(User::class)
             ->isDeleteGranted($entity);
     }
@@ -285,13 +286,13 @@ class UserController extends AbstractController
      */
     private function isUserApiGenAllowed(User $entity)
     {
-        return $this->get(TokenAccessorInterface::class)->getUserId() === $entity->getId()
+        return $this->container->get(TokenAccessorInterface::class)->getUserId() === $entity->getId()
                || $this->isGranted('MANAGE_API_KEY', $entity);
     }
 
     private function saveUserApi(User $user, UserApi $userApi)
     {
-        $em = $this->getDoctrine()->getManagerForClass(User::class);
+        $em = $this->container->get('doctrine')->getManagerForClass(User::class);
 
         $userApi
             ->setUser($user)
@@ -316,7 +317,8 @@ class UserController extends AbstractController
                 EntityDeleteHandlerRegistry::class,
                 UserType::class,
                 UserHandler::class,
-                TokenStorageInterface::class
+                TokenStorageInterface::class,
+                'doctrine' => ManagerRegistry::class
             ]
         );
     }

@@ -531,7 +531,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $qb = new QueryBuilder($this->em);
         $qb
             ->select('e')
-            ->from('Test:User', 'e')
+            ->from(Entity\User::class, 'e')
             ->leftJoin('e.groups', 'groups');
 
         $expressionVisitor->setQuery($qb);
@@ -782,7 +782,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $qb = new QueryBuilder($this->em);
         $qb
             ->select('e')
-            ->from('Test:User', 'e')
+            ->from(Entity\User::class, 'e')
             ->leftJoin(Entity\User::class, 'users', QueryExpr\Join::WITH, 'e MEMBER OF users.groups');
 
         $expressionVisitor->setQuery($qb);
@@ -819,7 +819,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $qb
             ->select('e')
             ->from(Entity\Origin::class, 'e')
-            ->leftJoin('Test:User', 'user', QueryExpr\Join::WITH, 'user = e.user')
+            ->leftJoin(Entity\User::class, 'user', QueryExpr\Join::WITH, 'user = e.user')
             ->leftJoin('user.groups', 'user_groups');
 
         $expressionVisitor->setQuery($qb);

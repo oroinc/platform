@@ -88,7 +88,7 @@ class RecipientListRepository extends EntityRepository
     {
         return $this->_em->createQueryBuilder()
             ->select('u.email')
-            ->from('OroUserBundle:User', 'u')
+            ->from(User::class, 'u')
             ->leftJoin('u.groups', 'groups')
             ->where('groups.id IN (:groupIds)')
             ->setParameter('groupIds', $groups);

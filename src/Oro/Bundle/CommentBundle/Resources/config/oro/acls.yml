@@ -1,28 +1,28 @@
 acls:
     oro_comment_view:
         type: entity
-        class: OroCommentBundle:Comment
+        class: Oro\Bundle\CommentBundle\Entity\Comment
         permission: VIEW
         group_name: ""
         bindings: ~
 
     oro_comment_create:
         type: entity
-        class: OroCommentBundle:Comment
+        class: Oro\Bundle\CommentBundle\Entity\Comment
         permission: CREATE
         group_name: ""
         bindings: ~
 
     oro_comment_update:
         type: entity
-        class: OroCommentBundle:Comment
+        class: Oro\Bundle\CommentBundle\Entity\Comment
         permission: EDIT
         group_name: ""
         bindings: ~
 
     oro_comment_delete:
         type: entity
-        class: OroCommentBundle:Comment
+        class: Oro\Bundle\CommentBundle\Entity\Comment
         permission: DELETE
         group_name: ""
         bindings: ~

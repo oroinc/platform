@@ -107,6 +107,6 @@ class Audit extends AbstractAudit
      */
     public function getUsername()
     {
-        return $this->getUser() ? $this->getUser()->getUsername() : '';
+        return $this->getUser() ? $this->getUser()->getUserIdentifier() : '';
     }
 }

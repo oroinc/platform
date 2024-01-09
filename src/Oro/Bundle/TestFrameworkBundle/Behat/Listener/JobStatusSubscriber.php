@@ -31,8 +31,10 @@ class JobStatusSubscriber implements EventSubscriberInterface
     private array $processes = [];
     private int $countConsumers;
 
-    public function __construct(private KernelInterface $kernel)
-    {
+    public function __construct(
+        private KernelInterface $kernel,
+        private Filesystem $filesystem
+    ) {
         $this->startDateTime = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->phpExecutablePath = (new PhpExecutableFinder())->find();
     }
@@ -126,8 +128,7 @@ class JobStatusSubscriber implements EventSubscriberInterface
 
         $this->processes = array_filter($this->processes, fn ($process) => $process->isRunning());
 
-        /** @var Filesystem $filesystem */
-        $filesystem = $this->kernel->getContainer()->get('filesystem');
+        $filesystem = $this->filesystem;
         $logDir = realpath($this->kernel->getLogDir());
 
         $command = [

@@ -8,7 +8,8 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadChannelData;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 
 /**
@@ -21,7 +22,7 @@ class IntegrationProcessTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures([LoadChannelData::class]);
+        $this->loadFixtures([LoadChannelData::class, LoadUser::class]);
         $this->getOptionalListenerManager()->enableListener('oro_workflow.listener.event_trigger_collector');
     }
 
@@ -30,17 +31,14 @@ class IntegrationProcessTest extends WebTestCase
      */
     public function testShouldScheduleIntegrationSyncMessageOnCreate(): void
     {
-        $userManager = self::getContainer()->get('oro_user.manager');
-        $admin = $userManager->findUserByEmail(LoadAdminUserData::DEFAULT_ADMIN_EMAIL);
-
+        /** @var User $user */
+        $user = $this->getReference(LoadUser::USER);
         $integration = new Integration();
-
         $integration->setName('aName');
         $integration->setType('aType');
         $integration->setEnabled(true);
-        $integration->setDefaultUserOwner($admin);
-        $integration->setOrganization($admin->getOrganization());
-
+        $integration->setDefaultUserOwner($user);
+        $integration->setOrganization($user->getOrganization());
         $this->getEntityManager()->persist($integration);
         $this->getEntityManager()->flush();
 

@@ -20,23 +20,23 @@ security:
             algorithm: sodium
             migrate_from:
                 - legacy # uses the "legacy" hasher configured above
+
     firewalls:
         login:
             pattern:                        ^/user/(login|reset-request|send-email|check-email)$
             provider:                       chain_provider
-            anonymous:                      true
             context:                        main
 
         reset_password:
             pattern:                        ^/user/reset/*
             provider:                       chain_provider
-            anonymous:                      true
 
         main:
             pattern:                        ^/
             provider:                       chain_provider
+            entry_point:                    organization_form_login
             organization-form-login:
-                csrf_token_generator:       security.csrf.token_manager
+                enable_csrf: true
                 check_path:                 oro_user_security_check
                 login_path:                 oro_user_security_login
                 default_target_path:        oro_default
@@ -52,10 +52,12 @@ security:
                 name:                       BAPRM
                 lifetime:                   1209600   # stay logged for two weeks
                 httponly:                   true
-            anonymous:                      false
-            guard:
-                authenticators:
-                    - oro_user.impersonation_authenticator
+            custom_authenticator: oro_user.impersonation_authenticator
+
+oro_security:
+    access_control:
+        - { path: ^%web_backend_prefix%/user/(login|reset-request|send-email|check-email)$, roles: PUBLIC_ACCESS }
+        - { path: ^%web_backend_prefix%/user/reset/*, roles: PUBLIC_ACCESS }
 
 oro_user:
     privileges:

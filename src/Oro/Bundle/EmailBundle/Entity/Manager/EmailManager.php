@@ -11,6 +11,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Manager for EmailUser entity
+ */
 class EmailManager
 {
     /** @var EmailThreadManager */
@@ -95,7 +98,7 @@ class EmailManager
         if ($entity->getEmail()->getThread() && $entity->getOwner()) {
             $threadedEmailUserBuilder = $this
                 ->em
-                ->getRepository('OroEmailBundle:EmailUser')
+                ->getRepository(EmailUser::class)
                 ->getEmailUserByThreadId([$entity->getEmail()->getThread()->getId()], $entity->getOwner());
 
             $threadedEmailUserList = $threadedEmailUserBuilder->getQuery()->getResult();
@@ -123,7 +126,7 @@ class EmailManager
 
         $emailUserQueryBuilder = $this
             ->em
-            ->getRepository('OroEmailBundle:EmailUser')
+            ->getRepository(EmailUser::class)
             ->findUnseenUserEmail($user, $organization, $ids, $mailboxIds);
         $unseenUserEmails = $emailUserQueryBuilder->getQuery()->getResult();
 
@@ -169,7 +172,7 @@ class EmailManager
      */
     public function findEmailsByIds($ids)
     {
-        return $this->em->getRepository('OroEmailBundle:Email')->findEmailsByIds($ids);
+        return $this->em->getRepository(Email::class)->findEmailsByIds($ids);
     }
 
     /**
@@ -198,6 +201,6 @@ class EmailManager
      */
     protected function getEmailUserRepository()
     {
-        return $this->em->getRepository('OroEmailBundle:EmailUser');
+        return $this->em->getRepository(EmailUser::class);
     }
 }

@@ -7,17 +7,16 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 class LoadGridViewData extends AbstractFixture implements DependentFixtureInterface
 {
-    const GRID_VIEW_1 = 'grid_view.1';
-    const GRID_VIEW_2 = 'grid_view.2';
-    const GRID_VIEW_3 = 'grid_view.3';
+    public const GRID_VIEW_1 = 'grid_view.1';
+    public const GRID_VIEW_2 = 'grid_view.2';
+    public const GRID_VIEW_3 = 'grid_view.3';
 
-    /** @var array */
-    protected static $data = [
+    protected static array $data = [
         self::GRID_VIEW_1 => [
             'name' => 'gridView',
             'type' => GridView::TYPE_PRIVATE,
@@ -34,56 +33,40 @@ class LoadGridViewData extends AbstractFixture implements DependentFixtureInterf
             'name' => 'gridView',
             'type' => GridView::TYPE_PUBLIC,
             'gridName' => 'testing-grid',
-            'owner' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
+            'owner' => LoadUser::USER,
         ]
     ];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function getDependencies(): array
     {
-        $userRepository = $manager->getRepository($this->getUserClassName());
+        return [LoadUserData::class, LoadUser::class];
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function load(ObjectManager $manager): void
+    {
         foreach (static::$data as $name => $data) {
-            $user = $userRepository->findOneBy(['username' => $data['owner']]);
-
+            /** @var AbstractUser $user */
+            $user = $this->getReference($data['owner']);
             $view = $this->createInstance();
-            $view->setName($data['name'])
-                ->setType($data['type'])
-                ->setGridName($data['gridName'])
-                ->setOwner($user)
-                ->setOrganization($user->getOrganization());
-
+            $view->setName($data['name']);
+            $view->setType($data['type']);
+            $view->setGridName($data['gridName']);
+            $view->setOwner($user);
+            $view->setOrganization($user->getOrganization());
             $manager->persist($view);
-
             $this->setReference($name, $view);
         }
-
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDependencies()
-    {
-        return [LoadUserData::class];
-    }
-
-    /**
-     * @return AbstractGridView
-     */
-    protected function createInstance()
+    protected function createInstance(): AbstractGridView
     {
         return new GridView();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getUserClassName()
-    {
-        return User::class;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
@@ -40,7 +41,7 @@ class EmbeddedFormController extends AbstractController
      *      id="oro_embedded_form_create",
      *      type="entity",
      *      permission="CREATE",
-     *      class="OroEmbeddedFormBundle:EmbeddedForm"
+     *      class="Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm"
      * )
      */
     public function createAction(Request $request)
@@ -54,13 +55,13 @@ class EmbeddedFormController extends AbstractController
      *      id="oro_embedded_form_delete",
      *      type="entity",
      *      permission="DELETE",
-     *      class="OroEmbeddedFormBundle:EmbeddedForm"
+     *      class="Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm"
      * )
      * @CsrfProtection()
      */
     public function deleteAction(EmbeddedForm $entity)
     {
-        $em = $this->get('doctrine')->getManagerForClass(EmbeddedForm::class);
+        $em = $this->container->get('doctrine')->getManagerForClass(EmbeddedForm::class);
         $em->remove($entity);
         $em->flush();
 
@@ -94,7 +95,7 @@ class EmbeddedFormController extends AbstractController
      *      id="oro_embedded_form_update",
      *      type="entity",
      *      permission="EDIT",
-     *      class="OroEmbeddedFormBundle:EmbeddedForm"
+     *      class="Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm"
      * )
      */
     public function updateAction(EmbeddedForm $entity, Request $request)
@@ -109,7 +110,7 @@ class EmbeddedFormController extends AbstractController
      *      id="oro_embedded_form_view",
      *      type="entity",
      *      permission="VIEW",
-     *      class="OroEmbeddedFormBundle:EmbeddedForm"
+     *      class="Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm"
      * )
      */
     public function viewAction(EmbeddedForm $entity)
@@ -140,19 +141,19 @@ class EmbeddedFormController extends AbstractController
     protected function update(EmbeddedForm $entity, Request $request)
     {
         $form = $this->createForm(EmbeddedFormType::class, $entity);
-        $form->handleRequest($this->get('request_stack')->getCurrentRequest());
+        $form->handleRequest($this->container->get('request_stack')->getCurrentRequest());
         if ($form->isSubmitted() && $form->isValid()) {
             $entity = $form->getData();
-            $em = $this->get('doctrine')->getManagerForClass(EmbeddedForm::class);
+            $em = $this->container->get('doctrine')->getManagerForClass(EmbeddedForm::class);
             $em->persist($entity);
             $em->flush();
 
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.embeddedform.controller.saved_message')
+                $this->container->get(TranslatorInterface::class)->trans('oro.embeddedform.controller.saved_message')
             );
 
-            return $this->get(Router::class)->redirect($entity);
+            return $this->container->get(Router::class)->redirect($entity);
         }
 
         $formManager = $this->getFormManager();
@@ -166,7 +167,7 @@ class EmbeddedFormController extends AbstractController
 
     protected function getFormManager(): EmbeddedFormManager
     {
-        return $this->get(EmbeddedFormManager::class);
+        return $this->container->get(EmbeddedFormManager::class);
     }
 
     /**
@@ -180,6 +181,7 @@ class EmbeddedFormController extends AbstractController
                 TranslatorInterface::class,
                 Router::class,
                 EmbeddedFormManager::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

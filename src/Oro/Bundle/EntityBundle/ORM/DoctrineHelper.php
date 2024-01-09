@@ -83,16 +83,6 @@ class DoctrineHelper implements ResetInterface
         if (\is_object($entityOrClass)) {
             return $this->getClass($entityOrClass);
         }
-        if (str_contains($entityOrClass, ':')) {
-            if (isset($this->entityClasses[$entityOrClass])) {
-                return $this->entityClasses[$entityOrClass];
-            }
-            [$namespaceAlias, $simpleClassName] = explode(':', $entityOrClass, 2);
-            $realEntityClass = $this->registry->getAliasNamespace($namespaceAlias) . '\\' . $simpleClassName;
-            $this->entityClasses[$entityOrClass] = $realEntityClass;
-
-            return $realEntityClass;
-        }
 
         return $this->getRealClass($entityOrClass);
     }

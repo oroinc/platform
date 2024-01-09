@@ -1,7 +1,7 @@
 acls:
     oro_integration_assign:
         type: entity
-        class: OroIntegrationBundle:Channel
+        class: Oro\Bundle\IntegrationBundle\Entity\Channel
         permission: ASSIGN
         group_name: ""
         bindings: ~

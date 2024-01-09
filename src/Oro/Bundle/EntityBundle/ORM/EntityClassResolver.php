@@ -31,16 +31,13 @@ class EntityClassResolver
         if (count($split) <= 1) {
             // The given entity name is not in bundle:entity format. Suppose that it is the full class name
             return $entityName;
-        } elseif (count($split) > 2) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Incorrect entity name: %s. Expected the full class name or bundle:entity.',
-                    $entityName
-                )
-            );
         }
-
-        return $this->doctrine->getAliasNamespace($split[0]) . '\\' . $split[1];
+        throw new \InvalidArgumentException(
+            sprintf(
+                'Incorrect entity name: %s. Expected the full class name.',
+                $entityName
+            )
+        );
     }
 
     /**

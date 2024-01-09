@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
-use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadAdminOwnerEmailData extends LoadEmailData
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getEmailOwner(ObjectManager $om)
+    protected function getEmailOwner(): User
     {
-        return $om->getRepository(User::class)->findOneByUsername('admin');
+        return $this->getReference(LoadUser::USER);
     }
 }

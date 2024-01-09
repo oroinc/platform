@@ -6,16 +6,16 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 
 class LoadUserData extends AbstractLoadUserData
 {
-    const USER_NAME = 'user_wo_permissions';
-    const USER_PASSWORD = 'user_api_key';
+    public const USER_NAME = 'user_wo_permissions';
+    public const USER_PASSWORD = 'user_api_key';
 
-    const USER_NAME_2 = 'system_user_2';
-    const USER_PASSWORD_2 = 'system_user_2_api_key';
+    public const USER_NAME_2 = 'system_user_2';
+    public const USER_PASSWORD_2 = 'system_user_2_api_key';
 
     /**
-     * return array
+     * {@inheritDoc}
      */
-    protected function getUsersData()
+    protected function getUsersData(): array
     {
         return [
             [
@@ -27,7 +27,7 @@ class LoadUserData extends AbstractLoadUserData
                 'apiKey' => 'user_api_key',
                 'reference' => self::USER_NAME,
                 'enabled' => true,
-                'role' => 'IS_AUTHENTICATED_ANONYMOUSLY',
+                'role' => 'PUBLIC_ACCESS',
                 'group' => 'Administrators',
             ],
             [

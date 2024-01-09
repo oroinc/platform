@@ -52,7 +52,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         object $exceptionListener,
         object $logoutListener
     ): void {
-        $context->expects(self::once())
+        $context->expects(self::exactly(2))
             ->method('getConfig')
             ->willReturn(new FirewallConfig($firewallName, 'user_checker'));
         $context->expects(self::once())
@@ -123,8 +123,8 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         $map = ['security.context' => null];
         $featureDependedFirewalls = [
             'firewall2' => [
-                'feature_name'               => 'web_api',
-                'feature_firewall_listeners' => []
+                'feature_name' => 'web_api',
+                'feature_firewall_authenticators' => []
             ]
         ];
 
@@ -164,7 +164,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         $featureDependedFirewalls = [
             $firewallName => [
                 'feature_name'               => $apiFeatureName,
-                'feature_firewall_listeners' => []
+                'feature_firewall_authenticators' => []
             ]
         ];
 
@@ -206,7 +206,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         $featureDependedFirewalls = [
             $firewallName => [
                 'feature_name'               => $apiFeatureName,
-                'feature_firewall_listeners' => []
+                'feature_firewall_authenticators' => []
             ]
         ];
 
@@ -251,7 +251,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         $featureDependedFirewalls = [
             $firewallName => [
                 'feature_name'               => $apiFeatureName,
-                'feature_firewall_listeners' => []
+                'feature_firewall_authenticators' => []
             ]
         ];
 
@@ -292,14 +292,14 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         $map = ['security.context' => null];
         $featureDependedFirewalls = [
             $firewallName => [
-                'feature_name'               => $apiFeatureName,
-                'feature_firewall_listeners' => [ContextListener::class]
+                'feature_name' => $apiFeatureName,
+                'feature_firewall_authenticators' => []
             ]
         ];
 
         $listeners = [
-            $this->createMock(ContextListener::class),
-            $this->createMock(AccessListener::class)
+            $this->createMock(AccessListener::class),
+            $this->createMock(ContextListener::class)
         ];
         $exceptionListener = $this->createMock(ExceptionListener::class);
         $logoutListener = $this->createMock(LogoutListener::class);
@@ -323,7 +323,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         $firewallMap = $this->getFirewallMap($map, $featureDependedFirewalls);
         [$actualListeners, $actualExceptionListener, $actualLogoutListener] = $firewallMap->getListeners($request);
 
-        self::assertSame([$this->featureAccessListener, $listeners[1]], $actualListeners);
+        self::assertSame([$this->featureAccessListener, ...$listeners], $actualListeners);
         self::assertSame($exceptionListener, $actualExceptionListener);
         self::assertSame($logoutListener, $actualLogoutListener);
     }
@@ -338,7 +338,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         $featureDependedFirewalls = [
             $firewallName => [
                 'feature_name'               => $apiFeatureName,
-                'feature_firewall_listeners' => [ContextListener::class]
+                'feature_firewall_authenticators' => [ContextListener::class]
             ]
         ];
 
@@ -380,7 +380,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         $featureDependedFirewalls = [
             $firewallName => [
                 'feature_name'               => $apiFeatureName,
-                'feature_firewall_listeners' => [ContextListener::class]
+                'feature_firewall_authenticators' => [ContextListener::class]
             ]
         ];
 
@@ -425,13 +425,13 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         $map = ['security.context' => null];
         $featureDependedFirewalls = [
             $firewallName => [
-                'feature_name'               => $apiFeatureName,
-                'feature_firewall_listeners' => [ContextListener::class]
+                'feature_name' => $apiFeatureName,
+                'feature_firewall_authenticators' => []
             ]
         ];
 
-        $listener1 = $this->createMock(ContextListener::class);
-        $listener2 = $this->createMock(AccessListener::class);
+        $listener1 = $this->createMock(AccessListener::class);
+        $listener2 = $this->createMock(ContextListener::class);
         $listeners = new RewindableGenerator(
             function () use ($listener1, $listener2) {
                 yield $listener1;
@@ -461,7 +461,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         $firewallMap = $this->getFirewallMap($map, $featureDependedFirewalls);
         [$actualListeners, $actualExceptionListener, $actualLogoutListener] = $firewallMap->getListeners($request);
 
-        self::assertSame([$this->featureAccessListener, $listener2], $actualListeners);
+        self::assertSame([$this->featureAccessListener, ...$listeners], $actualListeners);
         self::assertSame($exceptionListener, $actualExceptionListener);
         self::assertSame($logoutListener, $actualLogoutListener);
     }

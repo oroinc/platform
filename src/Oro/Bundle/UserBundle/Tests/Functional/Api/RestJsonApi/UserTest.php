@@ -107,7 +107,8 @@ class UserTest extends RestJsonApiTestCase
         self::assertNotEmpty($user->getPassword());
         self::assertNotEmpty($user->getSalt());
         /** @var PasswordHasherInterface $passwordHasher */
-        $passwordHasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $passwordHasher = self::getContainer()->get('security.password_hasher_factory')
+            ->getPasswordHasher($user::class);
         self::assertTrue(
             $passwordHasher->verify(
                 $user->getPassword(),
@@ -134,7 +135,7 @@ class UserTest extends RestJsonApiTestCase
         /** @var User $user */
         $user = $this->getEntityManager()
             ->find(User::class, $userId);
-        self::assertEquals($data['data']['attributes']['username'], $user->getUsername());
+        self::assertEquals($data['data']['attributes']['username'], $user->getUserIdentifier());
         self::assertEquals($data['data']['attributes']['firstName'], $user->getFirstName());
         self::assertEquals($data['data']['attributes']['lastName'], $user->getLastName());
         self::assertEquals($data['data']['attributes']['email'], $user->getEmail());
@@ -301,7 +302,7 @@ class UserTest extends RestJsonApiTestCase
             ->getRepository(User::class)
             ->findOneBy(['email' => self::AUTH_USER]);
         $userId = $user->getId();
-        $userName = $user->getUsername();
+        $userName = $user->getUserIdentifier();
 
         // do not use patch() method to prevent clearing of the entity manager
         // and as result refreshing the security context
@@ -328,7 +329,7 @@ class UserTest extends RestJsonApiTestCase
         /** @var User $loggedInUser */
         $loggedInUser = self::getContainer()->get('security.token_storage')->getToken()->getUser();
         self::assertSame($userId, $loggedInUser->getId());
-        self::assertSame($userName, $loggedInUser->getUsername());
+        self::assertSame($userName, $loggedInUser->getUserIdentifier());
     }
 
     public function testTryToUpdateCurrentLoggedInUserViaUpdateBusinessUnitRequestWhenUserDataAreInvalid()
@@ -338,7 +339,7 @@ class UserTest extends RestJsonApiTestCase
             ->getRepository(User::class)
             ->findOneBy(['email' => self::AUTH_USER]);
         $userId = $user->getId();
-        $userName = $user->getUsername();
+        $userName = $user->getUserIdentifier();
         $buId = $user->getOwner()->getId();
 
         // do not use patch() method to prevent clearing of the entity manager
@@ -353,17 +354,23 @@ class UserTest extends RestJsonApiTestCase
                         'type'          => 'users',
                         'id'            => (string)$userId,
                         'meta'          => ['update' => true],
-                        'attributes'    => ['username' => null],
+                        'attributes'    => ['username' => ''],
                         'relationships' => ['owner' => ['data' => ['type' => 'businessunits', 'id' => (string)$buId]]]
                     ]
                 ]
             ]
         );
 
-        $this->assertResponseValidationError(
+        $this->assertResponseContainsValidationErrors(
             [
-                'title'  => 'not blank constraint',
-                'source' => ['pointer' => '/included/0/attributes/username']
+                [
+                    'title'  => 'not blank constraint',
+                    'source' => ['pointer' => '/included/0/attributes/username'],
+                ],
+                [
+                    'title' => 'length constraint',
+                    'source' => ['pointer' => '/included/0/attributes/username'],
+                ],
             ],
             $response
         );
@@ -371,7 +378,7 @@ class UserTest extends RestJsonApiTestCase
         /** @var User $loggedInUser */
         $loggedInUser = self::getContainer()->get('security.token_storage')->getToken()->getUser();
         self::assertSame($userId, $loggedInUser->getId());
-        self::assertSame($userName, $loggedInUser->getUsername());
+        self::assertSame($userName, $loggedInUser->getUserIdentifier());
     }
 
     public function testUpdateRelationshipForOwner()

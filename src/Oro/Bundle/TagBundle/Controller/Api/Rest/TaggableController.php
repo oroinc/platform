@@ -34,7 +34,7 @@ class TaggableController extends RestController
         if ($entity) {
             $entity = $this->processForm($entity);
             if ($entity) {
-                $result = $this->get('oro_tag.tag.manager')->getPreparedArray($entity);
+                $result = $this->container->get('oro_tag.tag.manager')->getPreparedArray($entity);
 
                 // Returns tags for the updated entity.
                 return $this->buildResponse(
@@ -58,7 +58,7 @@ class TaggableController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_tag.tag.manager.api');
+        return $this->container->get('oro_tag.tag.manager.api');
     }
 
     /**
@@ -66,6 +66,6 @@ class TaggableController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_tag.form.handler.taggable.api');
+        return $this->container->get('oro_tag.form.handler.taggable.api');
     }
 }

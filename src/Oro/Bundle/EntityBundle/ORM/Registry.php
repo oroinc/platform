@@ -36,7 +36,7 @@ class Registry extends BaseRegistry
     /**
      * {@inheritdoc}
      */
-    protected function getService($name)
+    protected function getService($name): object
     {
         if (isset($this->cachedManagerServices[$name])) {
             return $this->cachedManagerServices[$name];
@@ -58,7 +58,7 @@ class Registry extends BaseRegistry
     /**
      * {@inheritdoc}
      */
-    protected function resetService($name)
+    protected function resetService($name): void
     {
         unset($this->cachedManagerServices[$name]);
         parent::resetService($name);

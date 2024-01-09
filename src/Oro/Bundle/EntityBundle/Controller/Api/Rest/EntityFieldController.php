@@ -45,7 +45,7 @@ class EntityFieldController extends AbstractFOSRestController
      */
     public function getFieldsAction(Request $request, $entityName)
     {
-        $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
+        $entityName = $this->container->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
         $withRelations = filter_var($request->get('with-relations'), FILTER_VALIDATE_BOOLEAN);
         $withEntityDetails = filter_var($request->get('with-entity-details'), FILTER_VALIDATE_BOOLEAN);
         $withUnidirectional = filter_var($request->get('with-unidirectional'), FILTER_VALIDATE_BOOLEAN);
@@ -53,7 +53,7 @@ class EntityFieldController extends AbstractFOSRestController
         $applyExclusions = filter_var($request->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
 
         /** @var EntityFieldProvider $provider */
-        $provider = $this->get('oro_entity.entity_field_provider');
+        $provider = $this->container->get('oro_entity.entity_field_provider');
 
         $statusCode = Response::HTTP_OK;
         $options = EntityFieldProvider::OPTION_TRANSLATE;

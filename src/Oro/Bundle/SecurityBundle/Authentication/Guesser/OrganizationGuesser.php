@@ -4,9 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Authentication\Guesser;
 
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
+use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * The default implementation of the organization guesser.
@@ -16,30 +15,25 @@ class OrganizationGuesser implements OrganizationGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guess(AbstractUser $user, TokenInterface $token = null): ?Organization
+    public function guess(AbstractUser $user): ?Organization
     {
-        if ($token instanceof OrganizationAwareTokenInterface) {
-            $organization = $token->getOrganization();
-            if (null !== $organization) {
-                return $organization;
-            }
-        }
-
         $organization = $user->getOrganization();
-        if (null === $organization || !$user->isBelongToOrganization($organization, true)) {
-            $organization = $this->getFirstOrganization($user->getOrganizations(true));
+        if (null === $organization) {
+            throw new BadUserOrganizationException('The user does not have an active organization assigned to it.');
+        }
+        if ($user->isBelongToOrganization($organization, true)) {
+            return $organization;
+        }
+        $firstOrganization = $this->getFirstOrganization($user->getOrganizations(true));
+        if (null === $firstOrganization) {
+            throw new BadUserOrganizationException('The user does not have active organization assigned to it.');
         }
 
-        return $organization;
+        return $firstOrganization;
     }
 
     private function getFirstOrganization(Collection $organizations): ?Organization
     {
-        $organization = $organizations->first();
-        if (false === $organization) {
-            $organization = null;
-        }
-
-        return $organization;
+        return $organizations->first() ?: null;
     }
 }

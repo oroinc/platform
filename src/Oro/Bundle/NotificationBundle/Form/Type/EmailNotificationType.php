@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
@@ -102,7 +103,7 @@ class EmailNotificationType extends AbstractType
             Select2TranslatableEntityType::class,
             [
                 'label' => 'oro.notification.emailnotification.template.label',
-                'class' => 'OroEmailBundle:EmailTemplate',
+                'class' => EmailTemplate::class,
                 'choice_label' => 'name',
                 'configs' => [
                     'allowClear' => true,

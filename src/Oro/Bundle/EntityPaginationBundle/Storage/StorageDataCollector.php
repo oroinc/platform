@@ -13,6 +13,9 @@ use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Collects data for entity pagination
+ */
 class StorageDataCollector
 {
     const PAGINGATION_PARAM = 'entity_pagination';
@@ -226,10 +229,12 @@ class StorageDataCollector
      */
     protected function getGridNames(Request $request)
     {
-        $gridNames = array();
+        $gridNames = [];
 
-        if ($request->query->get('grid')) {
-            $gridNames = (array)$request->query->get('grid', []);
+        $queryParams = $request->query->all();
+        $gridValue = array_key_exists('grid', $queryParams) ? $queryParams['grid'] : [];
+        if ($gridValue) {
+            $gridNames = (array)$gridValue;
             $gridNames = array_keys($gridNames);
         }
         return $gridNames;

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -99,7 +100,7 @@ class ConfigController extends AbstractController
                     $this->getTranslator()->trans('oro.entity_config.controller.config_entity.message.saved')
                 );
 
-                return $this->get(Router::class)->redirect($entity);
+                return $this->container->get(Router::class)->redirect($entity);
             }
         }
 
@@ -227,7 +228,7 @@ class ConfigController extends AbstractController
         [$moduleName, $entityName] = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
 
         $extendConfig = $this->getConfigProvider('extend')->getConfig($entity->getClassName());
-        $ownerTypes = $this->get(OwnershipType::class)->getOwnershipsArray();
+        $ownerTypes = $this->container->get(OwnershipType::class)->getOwnershipsArray();
         $ownerType = $this->getConfigProvider('ownership')->getConfig($entity->getClassName())->get('owner_type');
         $ownerType = $ownerTypes[empty($ownerType) ? 'NONE' : $ownerType];
 
@@ -298,7 +299,7 @@ class ConfigController extends AbstractController
     {
         if (class_exists($entity->getClassName())) {
             /** @var QueryBuilder $qb */
-            $qb = $this->getDoctrine()
+            $qb = $this->container->get('doctrine')
                 ->getManagerForClass($entity->getClassName())
                 ->createQueryBuilder();
             $qb->select('entity');
@@ -341,7 +342,7 @@ class ConfigController extends AbstractController
      */
     private function getRoutingHelper()
     {
-        return $this->get(EntityRoutingHelper::class);
+        return $this->container->get(EntityRoutingHelper::class);
     }
 
     /**
@@ -349,7 +350,7 @@ class ConfigController extends AbstractController
      */
     private function getConfigManager()
     {
-        return $this->get(ConfigManager::class);
+        return $this->container->get(ConfigManager::class);
     }
 
     /**
@@ -367,7 +368,7 @@ class ConfigController extends AbstractController
      */
     private function getConfigFieldHandler()
     {
-        return $this->get(ConfigFieldHandler::class);
+        return $this->container->get(ConfigFieldHandler::class);
     }
 
     /**
@@ -375,7 +376,7 @@ class ConfigController extends AbstractController
      */
     private function getConfigProviderHelper()
     {
-        return $this->get(EntityConfigProviderHelper::class);
+        return $this->container->get(EntityConfigProviderHelper::class);
     }
 
     /**
@@ -383,7 +384,7 @@ class ConfigController extends AbstractController
      */
     private function getEntityFieldProvider()
     {
-        return $this->get('oro_entity.entity_field_provider');
+        return $this->container->get('oro_entity.entity_field_provider');
     }
 
     /**
@@ -391,7 +392,7 @@ class ConfigController extends AbstractController
      */
     private function getTranslator()
     {
-        return $this->get(TranslatorInterface::class);
+        return $this->container->get(TranslatorInterface::class);
     }
 
     /**
@@ -410,6 +411,7 @@ class ConfigController extends AbstractController
                 Router::class,
                 ConfigFieldHandler::class,
                 OwnershipType::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

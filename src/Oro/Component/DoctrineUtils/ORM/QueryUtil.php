@@ -202,7 +202,7 @@ class QueryUtil
         if ($parserResult !== null) {
             $clearMappings = \Closure::bind(
                 static function (Query\ParserResult $parserResult) {
-                    $parserResult->_parameterMappings = [];
+                    $parserResult->parameterMappings = [];
                 },
                 null,
                 $parserResult

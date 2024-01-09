@@ -31,7 +31,7 @@ class DoctrineEventListener
     public function preFlush(PreFlushEventArgs $event): void
     {
         if (!$this->scheduledForInsertScopes->isEmpty()) {
-            $em = $event->getEntityManager();
+            $em = $event->getObjectManager();
             $scopes = $this->scheduledForInsertScopes->getAll();
             foreach ($scopes as $scope) {
                 $em->persist($scope);
@@ -47,7 +47,7 @@ class DoctrineEventListener
             return;
         }
 
-        if ($this->isScopeCacheAffected($event->getEntityManager())) {
+        if ($this->isScopeCacheAffected($event->getObjectManager())) {
             $this->needToResetScopeCache = true;
         }
     }

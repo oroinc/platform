@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
 use Psr\Container\ContainerInterface;
@@ -42,7 +43,7 @@ class ConfigurationController implements ServiceSubscriberInterface
      * @Acl(
      *      id="oro_user_user_config",
      *      type="entity",
-     *      class="OroUserBundle:User",
+     *      class="Oro\Bundle\UserBundle\Entity\User",
      *      permission="CONFIGURE"
      * )
      */
@@ -172,7 +173,7 @@ class ConfigurationController implements ServiceSubscriberInterface
             throw new \LogicException('No security token.');
         }
         $user = $token->getUser();
-        if (null === $user) {
+        if (!$user instanceof AbstractUser) {
             throw new \LogicException('No current user.');
         }
         if (!$user instanceof User) {

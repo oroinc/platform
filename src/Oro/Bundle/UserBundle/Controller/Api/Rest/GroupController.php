@@ -116,7 +116,7 @@ class GroupController extends RestController
      * @Acl(
      *      id="oro_user_group_delete",
      *      type="entity",
-     *      class="OroUserBundle:Group",
+     *      class="Oro\Bundle\UserBundle\Entity\Group",
      *      permission="DELETE"
      * )
      * @return \Symfony\Component\HttpFoundation\Response

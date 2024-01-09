@@ -36,7 +36,7 @@ class DraftKernelListenerTest extends \PHPUnit\Framework\TestCase
             $controller,
             [$source, 'any argument'],
             $request,
-            HttpKernelInterface::MASTER_REQUEST
+            HttpKernelInterface::MAIN_REQUEST
         );
 
         $listener = new DraftKernelListener($draftManger, $draftHelper);

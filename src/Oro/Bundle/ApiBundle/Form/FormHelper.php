@@ -10,7 +10,8 @@ use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataAccessor\PropertyPathAccessor;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -61,7 +62,7 @@ class FormHelper
             $data,
             array_merge($this->getFormDefaultOptions(), $options)
         );
-        $formBuilder->setDataMapper(new PropertyPathMapper($this->propertyAccessor));
+        $formBuilder->setDataMapper(new DataMapper(new PropertyPathAccessor($this->propertyAccessor)));
         if (!empty($eventSubscribers)) {
             $this->addFormEventSubscribers($formBuilder, $eventSubscribers);
         }

@@ -67,7 +67,6 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
             $this->manager,
             $this->emailTemplateManager,
             $this->userConfigManager,
-            $this->flashBag,
             $this->translator,
             $this->logger
         );

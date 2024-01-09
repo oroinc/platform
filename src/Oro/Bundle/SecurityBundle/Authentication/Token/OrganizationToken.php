@@ -22,7 +22,6 @@ class OrganizationToken extends AbstractToken implements OrganizationAwareTokenI
         parent::__construct($this->initRoles($roles));
 
         $this->setOrganization($organization);
-        $this->setAuthenticated(true);
     }
 
     /**

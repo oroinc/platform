@@ -3,37 +3,30 @@
 namespace Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
-class LoadBusinessUnitData extends AbstractFixture implements ContainerAwareInterface
+class LoadBusinessUnitData extends AbstractFixture implements DependentFixtureInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
-
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function getDependencies(): array
     {
-        $this->container = $container;
+        return [LoadOrganization::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $organization = $manager->getRepository(Organization::class)->getFirst();
-
         $businessUnit = new BusinessUnit();
-        $businessUnit->setOrganization($organization);
+        $businessUnit->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
         $businessUnit->setName('TestBusinessUnit');
         $businessUnit->setEmail('test@mail.com');
-
         $manager->persist($businessUnit);
         $this->setReference('TestBusinessUnit', $businessUnit);
         $manager->flush();

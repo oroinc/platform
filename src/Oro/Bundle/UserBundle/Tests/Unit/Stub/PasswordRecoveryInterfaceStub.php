@@ -83,7 +83,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     /**
      * {@inheritDoc}
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -188,5 +188,10 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
         $this->passwordChangedAt = $time;
 
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->getUsername();
     }
 }

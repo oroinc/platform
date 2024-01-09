@@ -123,7 +123,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->willReturnCallback(
-                function (array $defaults) {
+                function (array $defaults) use ($resolver) {
                     $this->assertArrayHasKey('dam_widget_enabled', $defaults);
                     $this->assertIsCallable($defaults['dam_widget_enabled']);
                     $this->assertArrayHasKey('dam_widget_route', $defaults);
@@ -131,6 +131,8 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
                     $this->assertArrayHasKey('dam_widget_parameters', $defaults);
                     $this->assertNull($defaults['dam_widget_parameters']);
                     $this->assertArrayHasKey('validation_groups', $defaults);
+
+                    return $resolver;
                 }
             );
         $resolver->expects($this->once())

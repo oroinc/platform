@@ -7,6 +7,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 /**
  * The form registry is used to switch between default forms that are used on UI and API forms.
@@ -89,7 +90,7 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
     /**
      * {@inheritDoc}
      */
-    public function getType(string $name)
+    public function getType(string $name): ResolvedFormTypeInterface
     {
         // prevent using of not registered in API form types
         if ($this->extensionState->isApiFormExtensionActivated()) {

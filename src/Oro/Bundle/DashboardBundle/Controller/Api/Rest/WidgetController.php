@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -44,7 +45,7 @@ class WidgetController extends AbstractFOSRestController
      *      id="oro_dashboard_update",
      *      type="entity",
      *      permission="EDIT",
-     *      class="OroDashboardBundle:Dashboard"
+     *      class="Oro\Bundle\DashboardBundle\Entity\Dashboard"
      * )
      * @return Response
      */
@@ -195,12 +196,12 @@ class WidgetController extends AbstractFOSRestController
 
     private function getEntityManager(): EntityManagerInterface
     {
-        return $this->getDoctrine()->getManager();
+        return $this->container->get('doctrine')->getManager();
     }
 
     private function getDashboardManager(): Manager
     {
-        return $this->get('oro_dashboard.manager');
+        return $this->container->get('oro_dashboard.manager');
     }
 
     private function handleNotFound(): Response
@@ -216,5 +217,13 @@ class WidgetController extends AbstractFOSRestController
     private function handleNoContent(): Response
     {
         return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            ['doctrine' => ManagerRegistry::class]
+        );
     }
 }

@@ -32,12 +32,12 @@ class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $container = TestContainerBuilder::create()
-            ->add(\stdClass::class, $this->manager1)
+            ->add(User::class, $this->manager1)
             ->add(AbstractUser::class, $this->manager2)
             ->getContainer($this);
 
         $this->registry = new WindowsStateManagerRegistry(
-            [\stdClass::class, AbstractUser::class],
+            [User::class, AbstractUser::class],
             $container,
             $this->tokenStorage
         );
@@ -48,7 +48,7 @@ class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
-            ->willReturn(new \stdClass());
+            ->willReturn($this->createMock(User::class));
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
@@ -61,7 +61,7 @@ class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
-            ->willReturn(new User());
+            ->willReturn($this->createMock(AbstractUser::class));
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
@@ -87,7 +87,7 @@ class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
-            ->willReturn('test');
+            ->willReturn($this->createMock(UserInterface::class));
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token);

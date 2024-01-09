@@ -9,16 +9,16 @@ use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 
 /**
- * Loads email templates to the database.
+ * Loads email templates.
  */
 class LoadEmailTemplates extends AbstractEmailFixture implements
     VersionedFixtureInterface,
     RenamedFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return '1.3';
     }
@@ -34,23 +34,23 @@ class LoadEmailTemplates extends AbstractEmailFixture implements
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function findExistingTemplate(ObjectManager $manager, array $template)
+    protected function findExistingTemplate(ObjectManager $manager, array $template): ?EmailTemplate
     {
         if (empty($template['params']['name'])) {
             return null;
         }
 
-        return $manager->getRepository('OroEmailBundle:EmailTemplate')->findOneBy([
-            'name' => $template['params']['name'],
+        return $manager->getRepository(EmailTemplate::class)->findOneBy([
+            'name' => $template['params']['name']
         ]);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getEmailsDir()
+    public function getEmailsDir(): string
     {
         return $this->container
             ->get('kernel')
@@ -58,9 +58,9 @@ class LoadEmailTemplates extends AbstractEmailFixture implements
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template)
+    protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template): void
     {
         $oldTemplates = $this->getEmailTemplatesList($this->getPreviousEmailsDir());
         if (!isset($oldTemplates[$emailTemplate->getName()])) {
@@ -75,10 +75,7 @@ class LoadEmailTemplates extends AbstractEmailFixture implements
         }
     }
 
-    /**
-     * @return array|string
-     */
-    private function getPreviousEmailsDir()
+    private function getPreviousEmailsDir(): string
     {
         return $this->container
             ->get('kernel')

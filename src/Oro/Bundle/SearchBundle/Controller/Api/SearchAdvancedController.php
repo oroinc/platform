@@ -112,7 +112,7 @@ class SearchAdvancedController extends AbstractFOSRestController
     {
         $view = new View();
 
-        $result = $this->get('oro_search.index')->advancedSearch(
+        $result = $this->container->get('oro_search.index')->advancedSearch(
             $request->get('query')
         );
 

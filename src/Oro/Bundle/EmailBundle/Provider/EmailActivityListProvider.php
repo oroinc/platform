@@ -335,7 +335,7 @@ class EmailActivityListProvider implements
             ->createQueryBuilder('a');
         $queryBuilder
             ->innerJoin(
-                'OroEmailBundle:Email',
+                Email::class,
                 'e',
                 'WITH',
                 'a.relatedActivityId = e.id and a.relatedActivityClass = :class'

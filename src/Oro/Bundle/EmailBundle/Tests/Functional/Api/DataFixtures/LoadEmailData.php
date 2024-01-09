@@ -164,7 +164,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
         );
 
         $origin = $this->getReference(
-            ($owner !== $this->getReference(LoadUser::USER) ? $owner->getUsername() . '_' : '') . 'email_origin'
+            ($owner !== $this->getReference(LoadUser::USER) ? $owner->getUserIdentifier() . '_' : '') . 'email_origin'
         );
         $emailUser->setOrigin($origin);
         $emailUser->addFolder($origin->getFolder(FolderType::SENT));

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Model\Condition;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
@@ -57,7 +58,7 @@ class HasActiveIntegration extends AbstractCondition implements ContextAccessorA
      */
     protected function getActiveIntegration($type)
     {
-        return $this->registry->getRepository('OroIntegrationBundle:Channel')
+        return $this->registry->getRepository(Channel::class)
             ->getConfiguredChannelsForSync($type, true);
     }
 

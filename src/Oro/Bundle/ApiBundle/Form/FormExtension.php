@@ -41,7 +41,7 @@ class FormExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function getType(string $name)
+    public function getType(string $name): FormTypeInterface
     {
         if (!\array_key_exists($name, $this->types)) {
             throw new InvalidArgumentException(sprintf(
@@ -75,7 +75,7 @@ class FormExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function hasType(string $name)
+    public function hasType(string $name): bool
     {
         return \array_key_exists($name, $this->types);
     }
@@ -83,7 +83,7 @@ class FormExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function getTypeExtensions(string $name)
+    public function getTypeExtensions(string $name): array
     {
         $extensions = [];
 
@@ -111,7 +111,7 @@ class FormExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function hasTypeExtensions(string $name)
+    public function hasTypeExtensions(string $name): bool
     {
         return isset($this->typeExtensions[$name]);
     }
@@ -119,7 +119,7 @@ class FormExtension implements FormExtensionInterface
     /**
      * {@inheritDoc}
      */
-    public function getTypeGuesser()
+    public function getTypeGuesser(): ?FormTypeGuesserInterface
     {
         if (!$this->guesserLoaded) {
             $this->guesserLoaded = true;

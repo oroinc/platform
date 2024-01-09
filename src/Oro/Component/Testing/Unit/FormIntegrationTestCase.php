@@ -51,7 +51,7 @@ class FormIntegrationTestCase extends BaseTestCase
         $loader->expects($this->any())
             ->method('loadClassMetadata')
             ->willReturnCallback(function (ClassMetadata $meta) {
-                $this->loadMetadata($meta);
+                return $this->loadMetadata($meta);
             });
 
         return new RecursiveValidator(
@@ -117,13 +117,14 @@ class FormIntegrationTestCase extends BaseTestCase
         );
     }
 
-    protected function loadMetadata(ClassMetadata $meta): void
+    protected function loadMetadata(ClassMetadata $meta): bool
     {
         $configFile = $this->getConfigFile($meta->name);
         if ($configFile) {
             $loader = new YamlFileLoader($configFile);
-            $loader->loadClassMetadata($meta);
+            return $loader->loadClassMetadata($meta);
         }
+        return false;
     }
 
     protected function getConstraintValidatorFactory(): ConstraintValidatorFactoryInterface

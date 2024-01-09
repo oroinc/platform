@@ -16,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
@@ -295,7 +296,7 @@ class WorkflowStepColumnListener
      */
     protected function getWorkflowItemRepository()
     {
-        return $this->doctrineHelper->getEntityRepository('OroWorkflowBundle:WorkflowItem');
+        return $this->doctrineHelper->getEntityRepository(WorkflowItem::class);
     }
 
     /**

@@ -36,7 +36,7 @@ class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
 
         $args->expects($this->once())
-            ->method('getEntityManager')
+            ->method('getObjectManager')
             ->willReturn($entityManager);
 
         $this->entityPool->expects($this->once())
@@ -53,7 +53,7 @@ class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
     {
         $args = $this->createMock(LifecycleEventArgs::class);
         $args->expects($this->once())
-            ->method('getEntity')
+            ->method('getObject')
             ->willReturn('something');
 
         $this->eventDispatcher->expects($this->once())

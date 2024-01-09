@@ -84,7 +84,7 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
             return;
         }
 
-        $em = $event->getEntityManager();
+        $em = $event->getObjectManager();
         $uow = $em->getUnitOfWork();
 
         /** @var EmailOwnerManager $emailOwnerManager */
@@ -115,7 +115,7 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
             return;
         }
 
-        $em = $event->getEntityManager();
+        $em = $event->getObjectManager();
         if ($this->newEmails) {
             /** @var EmailThreadManager $emailThreadManager */
             $emailThreadManager = $this->container->get(EmailThreadManager::class);
@@ -162,7 +162,7 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
             return;
         }
 
-        $emailUser = $args->getEntity();
+        $emailUser = $args->getObject();
         if ($emailUser instanceof EmailUser) {
             $email = $emailUser->getEmail();
             if ($email->getEmailUsers()->isEmpty()) {

@@ -34,7 +34,7 @@ class AjaxApplicationUrlController extends AbstractController
      */
     protected function getConfigManager()
     {
-        return $this->get(ConfigManager::class);
+        return $this->container->get(ConfigManager::class);
     }
 
     /**

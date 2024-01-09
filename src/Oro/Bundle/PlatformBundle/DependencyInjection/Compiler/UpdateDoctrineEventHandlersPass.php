@@ -62,7 +62,8 @@ class UpdateDoctrineEventHandlersPass implements CompilerPassInterface
                     $tag['connection'] = 'default';
                 } elseif ('default' === $tag['connection']) {
                     $definition->setDeprecated(
-                        true,
+                        'oro/platform',
+                        '6.0',
                         sprintf(
                             'Passing "connection: default" to "%%service_id%%" tags is default behaviour now.'
                             . ' Specify one of "%s" or remove default one.',
