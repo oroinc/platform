@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
-use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
@@ -31,7 +29,6 @@ class WorkflowStepColumnListener
 {
     use WorkflowQueryTrait;
 
-    public const WORKFLOW_ITEM_ALIAS = '_workflowItem';
     public const WORKFLOW_STEP_COLUMN = 'workflowStepLabel';
     public const WORKFLOW_FILTER = 'workflowStepLabelByWorkflow';
     public const WORKFLOW_STEP_FILTER = 'workflowStepLabelByWorkflowStep';
@@ -224,13 +221,11 @@ class WorkflowStepColumnListener
         // add filter (only if there is at least one filter)
         $filters = $config->offsetGetByPath('[filters][columns]', []);
         if ($filters) {
-            $this->addWorkflowStepJoin($config, $rootEntity, $rootEntityAlias);
-
             if ($isManyWorkflows) {
                 $filters[self::WORKFLOW_FILTER] = [
                     'label' => 'oro.workflow.workflowdefinition.entity_label',
-                    'type' => 'entity',
-                    'data_name' => self::WORKFLOW_ITEM_ALIAS . '.workflowName',
+                    'type' => 'workflow_name',
+                    'data_name' => $rootEntityAlias . '.id',
                     'options' => [
                         'field_type' => WorkflowDefinitionSelectType::class,
                         'field_options' => [
@@ -244,7 +239,7 @@ class WorkflowStepColumnListener
             $filters[self::WORKFLOW_STEP_FILTER] = [
                 'label' => 'oro.workflow.workflowstep.grid.label',
                 'type' => 'workflow_step',
-                'data_name' => self::WORKFLOW_STEP_COLUMN . '.id',
+                'data_name' => $rootEntityAlias . '.id',
                 'options' => [
                     'field_type' => WorkflowStepSelectType::class,
                     'field_options' => [
@@ -375,38 +370,6 @@ class WorkflowStepColumnListener
                 Segment::GRID_PREFIX
             ),
             $grid->getName()
-        );
-    }
-
-    private function addWorkflowStepJoin(
-        DatagridConfiguration $config,
-        string $rootEntity,
-        string $rootEntityAlias
-    ): void {
-        $config->offsetAddToArrayByPath(
-            OrmQueryConfiguration::LEFT_JOIN_PATH,
-            [
-                [
-                    'join' => WorkflowItem::class,
-                    'alias' => self::WORKFLOW_ITEM_ALIAS,
-                    'conditionType' => Join::WITH,
-                    'condition' => sprintf(
-                        "%1\$s.entityClass = '%2\$s' and %1\$s.entityId = CAST(%3\$s.id as string)",
-                        self::WORKFLOW_ITEM_ALIAS,
-                        $rootEntity,
-                        $rootEntityAlias
-                    )
-                ]
-            ]
-        );
-        $config->offsetAddToArrayByPath(
-            OrmQueryConfiguration::LEFT_JOIN_PATH,
-            [
-                [
-                    'join' => sprintf('%s.currentStep', self::WORKFLOW_ITEM_ALIAS),
-                    'alias' => self::WORKFLOW_STEP_COLUMN
-                ]
-            ]
         );
     }
 }
