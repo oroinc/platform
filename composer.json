@@ -80,6 +80,7 @@
         "symfony/polyfill-ctype": "1.24.0",
         "symfony/security-acl": "~3.3.2",
         "symfony/acl-bundle": "~2.3.0",
+        "symfony/flex": "2.4.*",
         "twig/twig": "~3.5.0",
         "doctrine/orm": "~2.15.0",
         "doctrine/doctrine-bundle": "~2.7.2",
