@@ -202,7 +202,7 @@ class WorkflowStepColumnListener
         return false;
     }
 
-    protected function addWorkflowStep(DatagridConfiguration $config, string $rootEntity, string $rootEntityAlias): void
+    protected function addWorkflowStep(DatagridConfiguration $config, $rootEntity, $rootEntityAlias)
     {
         // add column
         $columns = $config->offsetGetByPath('[columns]', []);
