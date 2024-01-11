@@ -35,7 +35,7 @@ class NeqOrNullComparisonExpression implements ComparisonExpressionInterface
             $mainExpr = $this->walkRangeExpression($visitor, $field, $parameterName, $value);
         } else {
             $visitor->addParameter($parameterName, $value);
-            $mainExpr = $builder->notIn($expression, $visitor->buildPlaceholder($parameterName));
+            $mainExpr = $builder->notIn($expression, $visitor->buildParameterExpression($parameterName, $value));
         }
 
         return $builder->orX($mainExpr, $builder->isNull($expression));

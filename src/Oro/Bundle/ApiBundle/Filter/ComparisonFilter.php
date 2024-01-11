@@ -304,7 +304,6 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     {
         if ($this->caseInsensitive) {
             $operator .= '/i';
-            $value = $this->transformValue($value, 'strtolower');
         } elseif (null !== $this->valueTransformer) {
             $value = $this->transformValue($value, $this->valueTransformer);
         }
