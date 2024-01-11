@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EmptyValueComparisonExpression;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ExpressionValue;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\InComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
@@ -22,6 +23,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class QueryExpressionVisitorTest extends OrmRelatedTestCase
 {
@@ -33,7 +35,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             ->getSQL();
     }
 
-    public function testGetEmptyParameters()
+    public function testGetEmptyParameters(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -44,7 +46,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertSame([], $expressionVisitor->getParameters());
     }
 
-    public function testGetParameters()
+    public function testGetParameters(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -58,7 +60,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals([$parameter], $expressionVisitor->getParameters());
     }
 
-    public function testAddParameterObject()
+    public function testAddParameterObject(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -72,7 +74,21 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals([$parameter], $expressionVisitor->getParameters());
     }
 
-    public function testAddParameterWithoutType()
+    public function testAddParameterObjectAndWithValue(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The parameter "prm1" must be a string.');
+
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        $expressionVisitor->addParameter(new Parameter('prm1', 'val1'), 'val1');
+    }
+
+    public function testAddParameterWithoutType(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -85,7 +101,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals([new Parameter('prm1', 'val1')], $expressionVisitor->getParameters());
     }
 
-    public function testAddParameterWithType()
+    public function testAddParameterWithType(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -98,7 +114,36 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals([new Parameter('prm1', 'val1', 'string')], $expressionVisitor->getParameters());
     }
 
-    public function testCreateParameter()
+    public function testAddParameterWithExpressionValue(): void
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        $expressionVisitor->addParameter('prm1', new ExpressionValue('val1', 'EXPR(%s)'));
+
+        self::assertEquals([new Parameter('prm1', 'val1')], $expressionVisitor->getParameters());
+    }
+
+    public function testAddParameterWithArrayExpressionValue(): void
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        $expressionVisitor->addParameter('prm1', new ExpressionValue(['val1', 'val2'], 'EXPR(%s)'));
+
+        self::assertEquals(
+            [new Parameter('prm1__1', 'val1'), new Parameter('prm1__2', 'val2')],
+            $expressionVisitor->getParameters()
+        );
+    }
+
+    public function testCreateParameter(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -112,7 +157,46 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testBuildPlaceholder()
+    public function testBuildParameterExpression(): void
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        self::assertEquals(':prm1', $expressionVisitor->buildParameterExpression('prm1', 'val1'));
+    }
+
+    public function testBuildParameterExpressionWithExpressionValue(): void
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        self::assertEquals(
+            'EXPR(:prm1)',
+            $expressionVisitor->buildParameterExpression('prm1', new ExpressionValue('val1', 'EXPR(%s)'))
+        );
+    }
+
+    public function testBuildParameterExpressionWithArrayExpressionValue(): void
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        self::assertEquals(
+            'EXPR(:prm1__1), EXPR(:prm1__2)',
+            $expressionVisitor->buildParameterExpression('prm1', new ExpressionValue(['val1', 'val2'], 'EXPR(%s)'))
+        );
+    }
+
+    public function testBuildPlaceholder(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -123,7 +207,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals(':test', $expressionVisitor->buildPlaceholder('test'));
     }
 
-    public function testGetExpressionBuilder()
+    public function testGetExpressionBuilder(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -137,7 +221,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkValue()
+    public function testWalkValue(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -149,7 +233,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertSame($value, $expressionVisitor->walkValue(new Value($value)));
     }
 
-    public function testWalkCompositeExpressionOnNonSupportedExpressionType()
+    public function testWalkCompositeExpressionOnNonSupportedExpressionType(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('Unknown composite NOT SUPPORTED');
@@ -165,7 +249,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->walkCompositeExpression($expr);
     }
 
-    public function testWalkCompositeExpression()
+    public function testWalkCompositeExpression(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             ['AND' => new AndCompositeExpression()],
@@ -200,7 +284,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonWithoutAliases()
+    public function testWalkComparisonWithoutAliases(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('No aliases are set before invoking walkComparison().');
@@ -215,7 +299,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->walkComparison($comparison);
     }
 
-    public function testWalkComparison()
+    public function testWalkComparison(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -239,7 +323,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonWithEmptyFieldName()
+    public function testWalkComparisonWithEmptyFieldName(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -277,7 +361,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonWithUnknownOperator()
+    public function testWalkComparisonWithUnknownOperator(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('Unknown comparison operator "NOT SUPPORTED".');
@@ -293,7 +377,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->walkComparison($comparison);
     }
 
-    public function testWalkComparisonWithUnknownModifierOfOperator()
+    public function testWalkComparisonWithUnknownModifierOfOperator(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('Unknown modifier "a" for comparison operator "=".');
@@ -309,7 +393,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->walkComparison($comparison);
     }
 
-    public function testWalkComparisonWithCaseInsensitiveModifierOfOperator()
+    public function testWalkComparisonWithCaseInsensitiveModifierOfOperator(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -318,20 +402,20 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
 
         $expressionVisitor->setQueryAliases(['e']);
-        $comparison = new Comparison('e.test', '=/i', 'test value');
+        $comparison = new Comparison('e.test', '=/i', 'Test Value');
         $result = $expressionVisitor->walkComparison($comparison);
 
         self::assertEquals(
-            new QueryExpr\Comparison('LOWER(e.test)', '=', ':e_test'),
+            new QueryExpr\Comparison('LOWER(e.test)', '=', 'LOWER(:e_test)'),
             $result
         );
         self::assertEquals(
-            [new Parameter('e_test', 'test value')],
+            [new Parameter('e_test', 'Test Value')],
             $expressionVisitor->getParameters()
         );
     }
 
-    public function testWalkComparisonForEmptyValueOperator()
+    public function testWalkComparisonForEmptyValueOperator(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -357,7 +441,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertNull($expressionVisitor->getFieldDataType());
     }
 
-    public function testWalkComparisonWithUnsafeFieldName()
+    public function testWalkComparisonWithUnsafeFieldName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsafe value passed 1=1 OR e');
@@ -373,7 +457,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->walkComparison($comparison);
     }
 
-    public function testWalkComparisonWithComputedField()
+    public function testWalkComparisonWithComputedField(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -397,7 +481,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testCreateSubqueryWithoutQuery()
+    public function testCreateSubqueryWithoutQuery(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('No query is set before invoking createSubquery().');
@@ -411,7 +495,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('e.test');
     }
 
-    public function testCreateSubqueryWithoutJoinMap()
+    public function testCreateSubqueryWithoutJoinMap(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('No join map is set before invoking createSubquery().');
@@ -428,7 +512,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('e.test');
     }
 
-    public function testCreateSubqueryWithoutAliases()
+    public function testCreateSubqueryWithoutAliases(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('No aliases are set before invoking createSubquery().');
@@ -446,7 +530,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('e.test');
     }
 
-    public function testCreateSubqueryWithoutField()
+    public function testCreateSubqueryWithoutField(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -483,7 +567,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForJoinedRootEntityAssociation()
+    public function testCreateSubqueryForJoinedRootEntityAssociation(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -520,7 +604,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForJoinedRootEntityAssociationAndEntityNameInFrom()
+    public function testCreateSubqueryForJoinedRootEntityAssociationAndEntityNameInFrom(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -557,7 +641,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForJoinedAssociation()
+    public function testCreateSubqueryForJoinedAssociation(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -595,7 +679,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryWhenJoinExistsInJoinMapButDoesNotExistInQuery()
+    public function testCreateSubqueryWhenJoinExistsInJoinMapButDoesNotExistInQuery(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
@@ -621,7 +705,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('user.groups');
     }
 
-    public function testCreateSubqueryWhenParentJoinExistsInJoinMapButDoesNotExistInQuery()
+    public function testCreateSubqueryWhenParentJoinExistsInJoinMapButDoesNotExistInQuery(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
@@ -646,7 +730,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('user.groups');
     }
 
-    public function testCreateSubqueryWhenParentJoinDoesNotExistsInBothJoinMapAndQuery()
+    public function testCreateSubqueryWhenParentJoinDoesNotExistsInBothJoinMapAndQuery(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
@@ -671,7 +755,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('user.groups');
     }
 
-    public function testCreateSubqueryForUnknownAssociation()
+    public function testCreateSubqueryForUnknownAssociation(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
@@ -698,7 +782,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('user.unknownAssociation');
     }
 
-    public function testCreateSubqueryForJoinedUnidirectionalAssociation()
+    public function testCreateSubqueryForJoinedUnidirectionalAssociation(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -733,7 +817,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForJoinedAssociationWithUnidirectionalParentJoin()
+    public function testCreateSubqueryForJoinedAssociationWithUnidirectionalParentJoin(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -771,7 +855,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForJoinedUnidirectionalAssociationWithEntityNameInJoin()
+    public function testCreateSubqueryForJoinedUnidirectionalAssociationWithEntityNameInJoin(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -807,7 +891,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForJoinedAssociationWithUnidirectionalParentJoinWithEntityNameInJoin()
+    public function testCreateSubqueryForJoinedAssociationWithUnidirectionalParentJoinWithEntityNameInJoin(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -845,7 +929,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForNotJoinedRootEntityAssociation()
+    public function testCreateSubqueryForNotJoinedRootEntityAssociation(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -881,7 +965,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForNotJoinedLastAssociation()
+    public function testCreateSubqueryForNotJoinedLastAssociation(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -925,7 +1009,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForNotJoinedAllAssociations()
+    public function testCreateSubqueryForNotJoinedAllAssociations(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -969,7 +1053,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForNotJoinedAllAssociationsAndPathHasMoreThanTwoElements()
+    public function testCreateSubqueryForNotJoinedAllAssociationsAndPathHasMoreThanTwoElements(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -1017,7 +1101,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForNotJoinedSeveralAssociationsAndPathHasMoreThanTwoElements()
+    public function testCreateSubqueryForNotJoinedSeveralAssociationsAndPathHasMoreThanTwoElements(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -1065,7 +1149,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForNotJoinedLastAssociationsAndPathHasMoreThanTwoElements()
+    public function testCreateSubqueryForNotJoinedLastAssociationsAndPathHasMoreThanTwoElements(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],
@@ -1113,7 +1197,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    public function testCreateSubqueryForNotJoinedSeveralAssociationsAndLastElementInPathIsField()
+    public function testCreateSubqueryForNotJoinedSeveralAssociationsAndLastElementInPathIsField(): void
     {
         $expressionVisitor = new QueryExpressionVisitor(
             [],

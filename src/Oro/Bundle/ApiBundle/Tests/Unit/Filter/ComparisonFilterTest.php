@@ -20,7 +20,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSetAndGetField()
+    public function testSetAndGetField(): void
     {
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
         self::assertNull($comparisonFilter->getField());
@@ -30,7 +30,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($fieldName, $comparisonFilter->getField());
     }
 
-    public function testSetAndGetSupportedOperators()
+    public function testSetAndGetSupportedOperators(): void
     {
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
         self::assertEquals([FilterOperator::EQ], $comparisonFilter->getSupportedOperators());
@@ -40,7 +40,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($supportedOperators, $comparisonFilter->getSupportedOperators());
     }
 
-    public function testEmptyFieldName()
+    public function testEmptyFieldName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The field must not be empty.');
@@ -49,7 +49,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
         $comparisonFilter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::EQ));
     }
 
-    public function testNullValue()
+    public function testNullValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The value must not be NULL. Field: "fieldName".');
@@ -59,7 +59,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
         $comparisonFilter->apply(new Criteria(), new FilterValue('path', null, FilterOperator::EQ));
     }
 
-    public function testUnsupportedOperator()
+    public function testUnsupportedOperator(): void
     {
         $this->expectException(InvalidFilterOperatorException::class);
         $this->expectExceptionMessage('The operator "neq" is not supported.');
@@ -69,7 +69,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
         $comparisonFilter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::NEQ));
     }
 
-    public function testFilterWhenOperatorsAreNotSpecified()
+    public function testFilterWhenOperatorsAreNotSpecified(): void
     {
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
         $comparisonFilter->setField('fieldName');
@@ -85,7 +85,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFilterWhenOnlyEqualOperatorIsSpecified()
+    public function testFilterWhenOnlyEqualOperatorIsSpecified(): void
     {
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
         $comparisonFilter->setSupportedOperators([FilterOperator::EQ]);
@@ -111,7 +111,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
         bool $isRangeAllowed,
         ?FilterValue $filterValue,
         ?Expression $expectation
-    ) {
+    ): void {
         $supportedOperators = [
             FilterOperator::EQ,
             FilterOperator::NEQ,
@@ -330,6 +330,98 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider caseInsensitiveFilterDataProvider
+     */
+    public function testCaseInsensitiveFilter(
+        string $fieldName,
+        ?FilterValue $filterValue,
+        ?Expression $expectation
+    ): void {
+        $supportedOperators = [
+            FilterOperator::EQ,
+            FilterOperator::NEQ,
+            FilterOperator::NEQ_OR_NULL,
+            FilterOperator::CONTAINS,
+            FilterOperator::NOT_CONTAINS,
+            FilterOperator::STARTS_WITH,
+            FilterOperator::NOT_STARTS_WITH,
+            FilterOperator::ENDS_WITH,
+            FilterOperator::NOT_ENDS_WITH
+        ];
+
+        $comparisonFilter = new ComparisonFilter(DataType::STRING);
+        $comparisonFilter->setSupportedOperators($supportedOperators);
+        $comparisonFilter->setField($fieldName);
+        $comparisonFilter->setCaseInsensitive(true);
+
+        $criteria = new Criteria();
+        $comparisonFilter->apply($criteria, $filterValue);
+
+        self::assertEquals($expectation, $criteria->getWhereExpression());
+    }
+
+    public function caseInsensitiveFilterDataProvider(): array
+    {
+        return [
+            'EQ filter'              => [
+                'fieldName',
+                new FilterValue('path', 'Value', FilterOperator::EQ),
+                new Comparison('fieldName', Comparison::EQ . '/i', new Value('Value'))
+            ],
+            'NEQ filter'             => [
+                'fieldName',
+                new FilterValue('path', 'Value', FilterOperator::NEQ),
+                new Comparison('fieldName', Comparison::NEQ . '/i', new Value('Value'))
+            ],
+            'EQ filter for array'    => [
+                'fieldName',
+                new FilterValue('path', ['Value1', 'Value2'], FilterOperator::EQ),
+                new Comparison('fieldName', Comparison::IN . '/i', new Value(['Value1', 'Value2']))
+            ],
+            'NEQ filter for array'   => [
+                'fieldName',
+                new FilterValue('path', ['Value1', 'Value2'], FilterOperator::NEQ),
+                new Comparison('fieldName', Comparison::NIN . '/i', new Value(['Value1', 'Value2']))
+            ],
+            'NEQ_OR_NULL filter'     => [
+                'fieldName',
+                new FilterValue('path', 'Value', FilterOperator::NEQ_OR_NULL),
+                new Comparison('fieldName', 'NEQ_OR_NULL/i', new Value('Value'))
+            ],
+            'CONTAINS filter'        => [
+                'fieldName',
+                new FilterValue('path', 'Value', FilterOperator::CONTAINS),
+                new Comparison('fieldName', 'CONTAINS/i', new Value('Value'))
+            ],
+            'NOT_CONTAINS filter'    => [
+                'fieldName',
+                new FilterValue('path', 'Value', FilterOperator::NOT_CONTAINS),
+                new Comparison('fieldName', 'NOT_CONTAINS/i', new Value('Value'))
+            ],
+            'STARTS_WITH filter'     => [
+                'fieldName',
+                new FilterValue('path', 'Value', FilterOperator::STARTS_WITH),
+                new Comparison('fieldName', 'STARTS_WITH/i', new Value('Value'))
+            ],
+            'NOT_STARTS_WITH filter' => [
+                'fieldName',
+                new FilterValue('path', 'Value', FilterOperator::NOT_STARTS_WITH),
+                new Comparison('fieldName', 'NOT_STARTS_WITH/i', new Value('Value'))
+            ],
+            'ENDS_WITH filter'       => [
+                'fieldName',
+                new FilterValue('path', 'Value', FilterOperator::ENDS_WITH),
+                new Comparison('fieldName', 'ENDS_WITH/i', new Value('Value'))
+            ],
+            'NOT_ENDS_WITH filter'   => [
+                'fieldName',
+                new FilterValue('path', 'Value', FilterOperator::NOT_ENDS_WITH),
+                new Comparison('fieldName', 'NOT_ENDS_WITH/i', new Value('Value'))
+            ]
+        ];
+    }
+
+    /**
      * @dataProvider collectionFilterDataProvider
      */
     public function testCollectionFilter(
@@ -338,7 +430,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
         bool $isRangeAllowed,
         ?FilterValue $filterValue,
         ?Expression $expectation
-    ) {
+    ): void {
         $supportedOperators = [
             FilterOperator::EQ,
             FilterOperator::NEQ,
@@ -481,7 +573,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFilterForComputedField()
+    public function testFilterForComputedField(): void
     {
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
         $comparisonFilter->setField(ConfigUtil::IGNORE_PROPERTY_PATH);
