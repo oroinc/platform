@@ -22,7 +22,6 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
         parent::setUp();
 
         $this->extension = new OrmFilterExtension(
-            $this->configurationProvider,
             $this->filterBag,
             $this->filtersProvider,
             $this->filtersMetadataProvider,

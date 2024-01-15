@@ -1,0 +1,36 @@
+datagrids:
+    role-permission-grid:
+        acl_resource: oro_user_role_update
+        source:
+            type: role-permission-provider
+        columns:
+            label:
+                label: oro.user.datagrid.role_permission.columns.label
+                data_name: label
+                frontend_type: string
+                translatable: true
+            permissions:
+                label: oro.user.datagrid.role_permission.columns.permissions.label
+                data_name: permissions
+                frontend_type: action-permissions
+            identity:
+                data_name: identity
+                frontend_type: string
+                renderable: false
+            group:
+                data_name: group
+                frontend_type: string
+                renderable: false
+            fields:
+                data_name: fields
+                frontend_type: array
+                renderable: false
+        filters: ~
+        sorters: ~
+        options:
+            jsmodules:
+                - orouser/js/datagrid/roles-datagrid-builder
+            toolbarOptions:
+                placement:
+                    top: false
+                    bottom: false
