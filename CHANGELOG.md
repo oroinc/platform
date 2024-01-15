@@ -193,7 +193,13 @@ api:
 * Added `\Oro\Bundle\FormBundle\Validator\Constraints\AdaptivelyValidCollection` validation constraint for validating a collection of entities with different validation groups for the new, updated and unchanged elements.
 
 #### PlatformBundle
-* Added `\Oro\Bundle\PlatformBundle\Validator\Constraints\ValidEmbeddable` that allows to apply `Valid` constraint with explicit validation groups specified in `embeddedGroups` option. 
+* Added `\Oro\Bundle\PlatformBundle\Validator\Constraints\ValidEmbeddable` that allows to apply `Valid` constraint with explicit validation groups specified in `embeddedGroups` option.
+
+### Changed
+
+### Datagrids
+* All datagrids used in storefront application were moved from `<BundleName>/Resources/config/oro/datagrids.yml` to layouts folder of the `default` theme `<BundleName>/Resources/views/layouts/default/config/datagrids.yml`.
+This means that storefront datagrids can now differ between themes. Any storefront grid customization should also be moved to the theme folder.
 
 #### SearchBundle
 * Added `\Oro\Bundle\SearchBundle\Event\BeforeIndexEntitiesEvent` that is dispatched in `\Oro\Bundle\SearchBundle\EventListener\IndexListener` in postFlush method after changing or updating indexing entities.

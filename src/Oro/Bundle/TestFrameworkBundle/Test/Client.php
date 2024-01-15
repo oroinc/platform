@@ -128,6 +128,7 @@ class Client extends BaseKernelBrowser
      * @return Response
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function requestGrid(
         $gridParameters,
@@ -148,6 +149,13 @@ class Client extends BaseKernelBrowser
             $container = $this->getContainer();
 
             $request = Request::create($this->getUrl($route, $gridParameters));
+            $requestStack = $container->get('request_stack');
+            // store previously added requests to restore after grid request
+            $originalStack = [];
+            while ($requestStack->getMainRequest()) {
+                $originalStack[] = $requestStack->pop();
+            }
+            $originalStack = array_reverse($originalStack);
             $container->get('request_stack')->push($request);
 
             $session = $container->has('session')
@@ -163,6 +171,10 @@ class Client extends BaseKernelBrowser
             }
 
             $request->setSession($session);
+            // set 'default' theme, as storefront grids require it
+            if ($route === 'oro_frontend_datagrid_index') {
+                $request->attributes->set('_theme', 'default');
+            }
 
             /** @var Manager $gridManager */
             $gridManager = $container->get('oro_datagrid.datagrid.manager');
@@ -174,6 +186,11 @@ class Client extends BaseKernelBrowser
             }
 
             $grid = $gridManager->getDatagridByRequestParams($gridName);
+
+            // put back origin request objects to not affect original test logic
+            foreach ($originalStack as $requests) {
+                $requestStack->push($requests);
+            }
 
             try {
                 $result = $grid->getData();
@@ -193,6 +210,14 @@ class Client extends BaseKernelBrowser
                 }
             }
         }
+    }
+
+    public function requestFrontendGrid(
+        $gridParameters,
+        $filter = array(),
+        $isRealRequest = false,
+    ): JsonResponse|Response {
+        return $this->requestGrid($gridParameters, $filter, $isRealRequest, 'oro_frontend_datagrid_index');
     }
 
     /**
