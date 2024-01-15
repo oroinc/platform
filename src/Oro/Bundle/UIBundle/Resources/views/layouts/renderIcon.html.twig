@@ -1,0 +1,71 @@
+{#
+    Getting url for svg sprite for a particular theme
+#}
+{%- macro getThemeSpriteUrl() -%}
+    {% set layoutContext = get_layout_context() %}
+    {% set theme = layoutContext.theme %}
+    {{- asset('/build/' ~ theme ~ '/svg-icons/theme-icons.svg') -}}
+{%- endmacro -%}
+
+{#
+    Rendering a svg icon
+    Parameters - array:
+        [
+            'name' - icon id to show
+            'id' - element id (attribute)
+            'fill' - fill attribute
+            'width' - width attribute
+            'height' - height attribute
+            'class' - class attribute
+            'extraClass' - extra class
+            'role' - role attribute
+            'title' - short description for accessibulity
+        ]
+#}
+{% macro icon(parameters) -%}
+    {% if (parameters.name is defined) %}
+        {% import _self as themeIcons %}
+        {% set href = themeIcons.getThemeSpriteUrl()|trim ~ '#' ~ parameters.name  %}
+        {% set class = parameters.class|default('theme-icon') %}
+        {% set role = parameters.role|default('img') %}
+        {% set ariaHidden = parameters.ariaHidden|default('true') %}
+        {% set titleId = parameters.name|uniqid %}
+
+        {% if parameters.extraClass is defined %}
+            {% set class = class|trim ~ ' '  ~ parameters.extraClass|trim  %}
+        {% endif %}
+        {% if parameters.title is defined %}
+            {% set ariaHidden = null %}
+        {% endif %}
+        {% if ariaHidden %}
+            {% set role = parameters.role|default('none') %}
+        {% endif %}
+        <svg
+            class="{{- class -}}"
+            role="{{- role -}}"
+        {% if parameters.id is defined %}
+            id="{{- parameters.id -}}"
+        {% endif %}
+        {% if parameters.width is defined %}
+            width="{{- width -}}"
+        {% endif %}
+        {% if parameters.height is defined %}
+            height="{{- height -}}"
+        {% endif %}
+        {% if parameters.fill is defined %}
+            fill="{{- fill -}}"
+        {% endif %}
+        {% if parameters.title is defined %}
+            aria-labelledby="{{- titleId -}}"
+        {% endif %}
+        {% if ariaHidden %}
+            aria-hidden="{{- ariaHidden -}}"
+        {% endif %}
+        >
+        {% if parameters.title is defined %}
+            <title id{{- titleId -}}>{{- title -}}</title>
+        {% endif %}
+            <use href="{{- href -}}"/>
+        </svg>
+    {% endif %}
+{% endmacro %}
