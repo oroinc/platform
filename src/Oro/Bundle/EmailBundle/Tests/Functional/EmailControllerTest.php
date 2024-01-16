@@ -358,7 +358,7 @@ class EmailControllerTest extends WebTestCase
                 [
                     'entityClass' => User::class,
                     'entityId' => $user->getId(),
-                    'query' => $searchById ? base64_encode($userString) : $user->getUsername(),
+                    'query' => $searchById ? base64_encode($userString) : $user->getUserIdentifier(),
                     'search_by_id' => $searchById,
                     'per_page' => 100
                 ]

@@ -5,20 +5,19 @@ namespace Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\DataGridBundle\Entity\AbstractGridViewUser;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\GridViewUser;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 
 class LoadGridViewUserData extends AbstractFixture implements DependentFixtureInterface
 {
-    const GRID_VIEW_USER_1 = 'grid_view_user.1';
-    const GRID_VIEW_USER_2 = 'grid_view_user.2';
-    const GRID_VIEW_USER_3 = 'grid_view_user.3';
-    const GRID_VIEW_USER_4 = 'grid_view_user.4';
+    public const GRID_VIEW_USER_1 = 'grid_view_user.1';
+    public const GRID_VIEW_USER_2 = 'grid_view_user.2';
+    public const GRID_VIEW_USER_3 = 'grid_view_user.3';
+    public const GRID_VIEW_USER_4 = 'grid_view_user.4';
 
-    /** @var array */
-    protected static $data = [
+    protected static array $data = [
         self::GRID_VIEW_USER_1 => [
             'user' => LoadUserData::SIMPLE_USER,
             'gridView' => LoadGridViewData::GRID_VIEW_1
@@ -28,7 +27,7 @@ class LoadGridViewUserData extends AbstractFixture implements DependentFixtureIn
             'gridView' => LoadGridViewData::GRID_VIEW_2
         ],
         self::GRID_VIEW_USER_3 => [
-            'user' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
+            'user' => LoadUser::USER,
             'gridView' => LoadGridViewData::GRID_VIEW_3
         ],
         self::GRID_VIEW_USER_4 => [
@@ -38,54 +37,34 @@ class LoadGridViewUserData extends AbstractFixture implements DependentFixtureIn
     ];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function getDependencies(): array
     {
-        $userRepository = $manager->getRepository($this->getUserClassName());
+        return [LoadGridViewData::class, LoadUserData::class, LoadUser::class];
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function load(ObjectManager $manager): void
+    {
         foreach (static::$data as $name => $data) {
-            /** @var User $user */
-            $user = $userRepository->findOneBy(['username' => $data['user']]);
-
             /** @var GridView $gridView */
             $gridView = $this->getReference($data['gridView']);
-
             $viewUser = $this->createInstance();
-            $viewUser->setUser($user)
-                ->setGridView($gridView)
-                ->setAlias($gridView->getName())
-                ->setGridName($gridView->getGridName());
-
+            $viewUser->setUser($this->getReference($data['user']));
+            $viewUser->setGridView($gridView);
+            $viewUser->setAlias($gridView->getName());
+            $viewUser->setGridName($gridView->getGridName());
             $manager->persist($viewUser);
-
             $this->setReference($name, $viewUser);
         }
-
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDependencies()
-    {
-        return [LoadGridViewData::class];
-    }
-
-    /**
-     * @return GridViewUser
-     */
-    protected function createInstance()
+    protected function createInstance(): AbstractGridViewUser
     {
         return new GridViewUser();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getUserClassName()
-    {
-        return User::class;
     }
 }

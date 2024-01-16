@@ -3,44 +3,44 @@
 namespace Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class LoadUserData extends AbstractFixture implements ContainerAwareInterface
+class LoadUserData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    const SIMPLE_USER_ENABLED = 'simple_user_enabled';
-    const SIMPLE_USER_ENABLED_PASSWORD = 'simple_user_enabled';
-    const SIMPLE_USER_DISABLED = 'simple_user_disabled';
-    const SIMPLE_USER_DISABLED_PASSWORD = 'simple_user_disabled';
+    use ContainerAwareTrait;
+
+    public const SIMPLE_USER_ENABLED = 'simple_user_enabled';
+    public const SIMPLE_USER_ENABLED_PASSWORD = 'simple_user_enabled';
+    public const SIMPLE_USER_DISABLED = 'simple_user_disabled';
+    public const SIMPLE_USER_DISABLED_PASSWORD = 'simple_user_disabled';
 
     /**
-     * @var ContainerInterface
+     * {@inheritDoc}
      */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function getDependencies(): array
     {
-        $this->container = $container;
+        return [LoadOrganization::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $userManager = $this->container->get('oro_user.manager');
-        $organization = $manager->getRepository(Organization::class)->getFirst();
+        /** @var Organization $organization */
+        $organization = $this->getReference(LoadOrganization::ORGANIZATION);
         $role = $manager->getRepository(Role::class)->findOneBy(['role' => User::ROLE_DEFAULT]);
 
-        $user = $userManager->createUser();
-        $user->setUsername(self::SIMPLE_USER_ENABLED)
+        $user1 = $userManager->createUser();
+        $user1->setUsername(self::SIMPLE_USER_ENABLED)
             ->setPlainPassword(self::SIMPLE_USER_ENABLED_PASSWORD)
             ->setEmail('simple_user@example.com')
             ->setFirstName('Elley')
@@ -49,8 +49,8 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->addOrganization($organization)
             ->addUserRole($role)
             ->setEnabled(true);
-
-        $userManager->updateUser($user);
+        $userManager->updateUser($user1);
+        $this->setReference(self::SIMPLE_USER_ENABLED, $user1);
 
         $user2 = $userManager->createUser();
         $user2->setUsername(self::SIMPLE_USER_DISABLED)
@@ -62,10 +62,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->addOrganization($organization)
             ->addUserRole($role)
             ->setEnabled(false);
-
         $userManager->updateUser($user2);
-
-        $this->setReference(self::SIMPLE_USER_ENABLED, $user);
         $this->setReference(self::SIMPLE_USER_DISABLED, $user2);
     }
 }

@@ -9,6 +9,7 @@ use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
 use Oro\Bundle\NotificationBundle\Exception\NotificationAlertFetchFailedException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -109,7 +110,7 @@ HELP
             $builder
                 ->select('a.id, a.createdAt, a.updatedAt, u.username as user, a.sourceType, a.resourceType')
                 ->addSelect('a.alertType, a.operation, a.step, a.itemId, a.externalId, a.message, a.resolved')
-                ->innerJoin('OroUserBundle:User', 'u', 'WITH', 'u.id = a.user');
+                ->innerJoin(User::class, 'u', 'WITH', 'u.id = a.user');
         }
 
         try {

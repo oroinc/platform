@@ -5,77 +5,43 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Model\FolderType;
-use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadEmailWithoutActivityData extends AbstractFixture implements
     ContainerAwareInterface,
     DependentFixtureInterface
 {
-    /**
-     * @var array
-     */
-    protected $templates;
+    use ContainerAwareTrait;
 
     /**
-     * @var EmailEntityBuilder
+     * {@inheritDoc}
      */
-    protected $emailEntityBuilder;
-
-    /**
-     * @var EmailOriginHelper
-     */
-    protected $emailOriginHelper;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return ['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadUserData',];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        if (!$container) {
-            return;
-        }
-
-        $this->container = $container;
-        $this->emailEntityBuilder = $container->get('oro_email.email.entity.builder');
-        $this->emailOriginHelper = $container->get('oro_email.tools.email_origin_helper');
+        return [LoadUserData::class, LoadUser::class];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function load(ObjectManager $om)
+    public function load(ObjectManager $manager): void
     {
-        $this->loadEmailTemplates();
-        $this->loadEmailsDemo($om);
-        $om->flush();
+        $this->loadEmails($manager, $this->loadEmailTemplates());
+        $manager->flush();
     }
 
-    protected function loadEmailTemplates()
+    private function loadEmailTemplates(): array
     {
         $dictionaryDir = $this->container
             ->get('kernel')
             ->locateResource('@OroEmailBundle/Tests/Functional/DataFixtures/Data');
 
-        $handle = fopen($dictionaryDir . DIRECTORY_SEPARATOR. "emails.csv", "r");
+        $templates = [];
+        $handle = fopen($dictionaryDir . DIRECTORY_SEPARATOR. 'emails.csv', 'r');
         if ($handle) {
             $headers = [];
             if (($data = fgetcsv($handle, 1000, ",")) !== false) {
@@ -83,20 +49,23 @@ class LoadEmailWithoutActivityData extends AbstractFixture implements
                 $headers = $data;
             }
             while (($data = fgetcsv($handle, 1000, ",")) !== false) {
-                $this->templates[] = array_combine($headers, array_values($data));
+                $templates[] = array_combine($headers, array_values($data));
             }
         }
+
+        return $templates;
     }
 
-    protected function loadEmailsDemo(ObjectManager $om)
+    private function loadEmails(ObjectManager $manager, array $templates): void
     {
-        $adminUser = $om->getRepository(User::class)->findOneByUsername('admin');
+        $emailEntityBuilder = $this->container->get('oro_email.email.entity.builder');
+        $emailOriginHelper = $this->container->get('oro_email.tools.email_origin_helper');
 
-        foreach ($this->templates as $index => $template) {
+        foreach ($templates as $index => $template) {
             $owner = $this->getReference('simple_user');
-            $origin = $this->emailOriginHelper->getEmailOrigin($owner->getEmail());
+            $origin = $emailOriginHelper->getEmailOrigin($owner->getEmail());
 
-            $emailUser = $this->emailEntityBuilder->emailUser(
+            $emailUser = $emailEntityBuilder->emailUser(
                 $template['Subject'],
                 $owner->getEmail(),
                 $owner->getEmail(),
@@ -115,7 +84,7 @@ class LoadEmailWithoutActivityData extends AbstractFixture implements
             $emailUser->setOwner($owner);
             $emailUser->setOrigin($origin);
 
-            $emailBody = $this->emailEntityBuilder->body(
+            $emailBody = $emailEntityBuilder->body(
                 "Hi,\n" . $template['Text'],
                 false,
                 true
@@ -128,9 +97,9 @@ class LoadEmailWithoutActivityData extends AbstractFixture implements
             $this->setReference('emailBody_' . ($index + 1), $emailBody);
         }
 
-        $emailUser->setOwner($adminUser);
+        $emailUser->setOwner($this->getReference(LoadUser::USER));
         $this->setReference('emailUser_for_mass_mark_test', $emailUser);
 
-        $this->emailEntityBuilder->getBatch()->persist($om);
+        $emailEntityBuilder->getBatch()->persist($manager);
     }
 }

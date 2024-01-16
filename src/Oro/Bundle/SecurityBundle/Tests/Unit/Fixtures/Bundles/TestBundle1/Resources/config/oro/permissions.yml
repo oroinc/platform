@@ -6,8 +6,8 @@ oro_permissions:
     PERMISSION2:
         label: Label for Permission 2
         description: Permission 2 description
-        apply_to_entities: ['OroTestFrameworkBundle:TestActivity', 'OroTestFrameworkBundle:Product']
-        exclude_entities: ['OroTestFrameworkBundle:Item', 'OroTestFrameworkBundle:ItemValue']
-        apply_to_interfaces: ['OroTestFrameworkBundle:TestActivityInterface']
+        apply_to_entities: ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity', 'Oro\Bundle\TestFrameworkBundle\Entity\Product']
+        exclude_entities: ['Oro\Bundle\TestFrameworkBundle\Entity\Item', 'Oro\Bundle\TestFrameworkBundle\Entity\ItemValue']
+        apply_to_interfaces: ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivityInterface']
         group_names: ['', 'frontend']
         apply_to_all: false

@@ -23,7 +23,7 @@ class Percent100ToLocalizedStringTransformer extends NumberToLocalizedStringTran
     /**
      * {@inheritDoc}
      */
-    public function transform($value)
+    public function transform($value): string
     {
         $result = parent::transform(
             is_numeric($value)
@@ -40,7 +40,7 @@ class Percent100ToLocalizedStringTransformer extends NumberToLocalizedStringTran
     /**
      * {@inheritDoc}
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value): float|int|null
     {
         $result = parent::reverseTransform($value);
         if (null !== $result) {

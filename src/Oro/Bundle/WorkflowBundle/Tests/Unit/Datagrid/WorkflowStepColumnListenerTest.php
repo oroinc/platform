@@ -26,42 +26,45 @@ use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
+class WorkflowStepColumnListenerTest extends TestCase
 {
     private const ENTITY = 'Test:Entity';
     private const ENTITY_FULL_NAME = 'Test\Entity\Full\Name';
     private const ALIAS = 'testEntity';
     private const COLUMN = 'workflowStepLabel';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DoctrineHelper|MockObject */
     private $doctrineHelper;
 
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityClassResolver|MockObject */
     private $entityClassResolver;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|MockObject */
     private $configProvider;
 
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowManager|MockObject */
     private $workflowManager;
 
-    /** @var WorkflowManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowManagerRegistry|MockObject */
     private $workflowManagerRegistry;
 
-    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DatagridInterface|MockObject */
     private $datagrid;
 
-    /** @var DatagridStateProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DatagridStateProviderInterface|MockObject */
     private $filtersStateProvider;
 
     /** @var WorkflowStepColumnListener */
@@ -391,8 +394,8 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                             'innerJoinField' => ['data_name' => 'b.innerJoinField'],
                             'leftJoinField' => ['data_name' => 'c.leftJoinField'],
                             WorkflowStepColumnListener::WORKFLOW_FILTER => [
-                                'type' => 'entity',
-                                'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN,
+                                'type' => 'workflow_name',
+                                'data_name' => 'testEntity.id',
                                 'options' => [
                                     'field_type' => WorkflowDefinitionSelectType::class,
                                     'field_options' => [
@@ -404,7 +407,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                             ],
                             WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => [
                                 'type' => 'workflow_step',
-                                'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN . '.id',
+                                'data_name' => 'testEntity.id',
                                 'options' => [
                                     'field_type' => WorkflowStepSelectType::class,
                                     'field_options' => [
@@ -474,9 +477,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                             'from' => [['table' => self::ENTITY, 'alias' => self::ALIAS]],
                             'join' => [
                                 'inner' => [['join' => self::ALIAS . '.b', 'alias' => 'b']],
-                                'left' => [
-                                    ['join' => self::ALIAS . '.c', 'alias' => 'c'],
-                                ]
+                                'left' => [['join' => self::ALIAS . '.c', 'alias' => 'c']]
                             ],
                         ],
                         'type' => OrmDatasource::TYPE,
@@ -499,7 +500,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                             'leftJoinField' => ['data_name' => 'c.leftJoinField'],
                             WorkflowStepColumnListener::WORKFLOW_STEP_FILTER => [
                                 'type' => 'workflow_step',
-                                'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN . '.id',
+                                'data_name' => 'testEntity.id',
                                 'options' => [
                                     'field_type' => WorkflowStepSelectType::class,
                                     'field_options' => [
@@ -636,13 +637,13 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnBuildAfterNoUpdate(DatasourceInterface $datasource, DatagridConfiguration $inputConfig)
     {
-        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockObject $datasource */
+        /** @var DatasourceInterface|MockObject $datasource */
         $datasource->expects($this->never())
             ->method($this->anything());
 
         $event = $this->createBuildAfterEvent($datasource, $inputConfig);
 
-        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $datagrid */
+        /** @var DatagridInterface|MockObject $datagrid */
         $datagrid = $event->getDatagrid();
         $datagrid->expects($this->any())
             ->method('getParameters')
@@ -749,7 +750,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
             )
         );
 
-        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $datagrid */
+        /** @var DatagridInterface|MockObject $datagrid */
         $datagrid = $event->getDatagrid();
         $datagrid->expects($this->exactly(2))
             ->method('getParameters')
@@ -862,7 +863,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return WorkflowItemRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @return WorkflowItemRepository|MockObject
      */
     private function setUpWorkflowItemRepository()
     {
@@ -870,7 +871,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
-            ->with('OroWorkflowBundle:WorkflowItem')
+            ->with(WorkflowItem::class)
             ->willReturn($repository);
 
         return $repository;
@@ -964,7 +965,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return OrmResultAfter|\PHPUnit\Framework\MockObject\MockObject
+     * @return OrmResultAfter|MockObject
      */
     private function createResultAfterEvent(DatagridConfiguration $configuration)
     {

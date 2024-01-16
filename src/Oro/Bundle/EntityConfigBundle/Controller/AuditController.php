@@ -34,7 +34,7 @@ class AuditController extends AbstractController
     {
         return [
             'gridName'    => 'audit-log-grid',
-            'entityClass' => $this->get(EntityRoutingHelper::class)->resolveEntityClass($entity),
+            'entityClass' => $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entity),
             'entityId'    => $id,
         ];
     }
@@ -58,12 +58,12 @@ class AuditController extends AbstractController
         /** @var FieldConfigModel $fieldName */
         $fieldName = $this->getConfigManager()
             ->getEntityManager()
-            ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
+            ->getRepository(FieldConfigModel::class)
             ->findOneBy(['id' => $id]);
 
         return [
             'gridName'    => 'auditfield-log-grid',
-            'entityClass' => $this->get(EntityRoutingHelper::class)->resolveEntityClass($entity),
+            'entityClass' => $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entity),
             'fieldName'   => $fieldName->getFieldName(),
             'entityId'    => $id,
         ];
@@ -74,7 +74,7 @@ class AuditController extends AbstractController
      */
     protected function getConfigManager()
     {
-        return $this->get(ConfigManager::class);
+        return $this->container->get(ConfigManager::class);
     }
 
     /**

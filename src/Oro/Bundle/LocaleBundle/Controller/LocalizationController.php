@@ -24,7 +24,7 @@ class LocalizationController extends AbstractController
      * @Acl(
      *      id="oro_locale_localization_view",
      *      type="entity",
-     *      class="OroLocaleBundle:Localization",
+     *      class="Oro\Bundle\LocaleBundle\Entity\Localization",
      *      permission="VIEW"
      * )
      */
@@ -54,7 +54,7 @@ class LocalizationController extends AbstractController
      *     id="oro_locale_localization_create",
      *     type="entity",
      *     permission="CREATE",
-     *     class="OroLocaleBundle:Localization"
+     *     class="Oro\Bundle\LocaleBundle\Entity\Localization"
      * )
      */
     public function createAction(): array|RedirectResponse
@@ -69,7 +69,7 @@ class LocalizationController extends AbstractController
      *     id="oro_locale_localization_update",
      *     type="entity",
      *     permission="EDIT",
-     *     class="OroLocaleBundle:Localization"
+     *     class="Oro\Bundle\LocaleBundle\Entity\Localization"
      * )
      */
     public function updateAction(Localization $localization): array|RedirectResponse
@@ -79,10 +79,10 @@ class LocalizationController extends AbstractController
 
     protected function update(Localization $localization): array|RedirectResponse
     {
-        return $this->get(UpdateHandlerFacade::class)->update(
+        return $this->container->get(UpdateHandlerFacade::class)->update(
             $localization,
             $this->createForm(LocalizationType::class, $localization),
-            $this->get(TranslatorInterface::class)->trans('oro.locale.controller.localization.saved.message')
+            $this->container->get(TranslatorInterface::class)->trans('oro.locale.controller.localization.saved.message')
         );
     }
 

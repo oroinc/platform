@@ -11,17 +11,16 @@ use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 
 class LoadSegmentData extends AbstractLoadSegmentData
 {
-    const SEGMENT_DYNAMIC = 'segment_dynamic';
-    const SEGMENT_DYNAMIC_WITH_FILTER = 'segment_dynamic_with_filter';
-    const SEGMENT_STATIC = 'segment_static';
-    const SEGMENT_STATIC_WITH_FILTER_AND_SORTING = 'segment_static_with_filter_and_sorting';
-    const SEGMENT_STATIC_WITH_SEGMENT_FILTER = 'segment_static_with_segment_filter';
-    const SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS = 'segment_dynamic_with_duplicated_segment_filters';
-    const SEGMENT_DYNAMIC_WITH_FILTER1 = 'segment_dynamic_with_filter1';
-    const SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER = 'segment_dynamic_with_filter2_and_segment_filter';
+    public const SEGMENT_DYNAMIC = 'segment_dynamic';
+    public const SEGMENT_DYNAMIC_WITH_FILTER = 'segment_dynamic_with_filter';
+    public const SEGMENT_STATIC = 'segment_static';
+    public const SEGMENT_STATIC_WITH_FILTER_AND_SORTING = 'segment_static_with_filter_and_sorting';
+    public const SEGMENT_STATIC_WITH_SEGMENT_FILTER = 'segment_static_with_segment_filter';
+    public const SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS = 'segment_dynamic_with_duplicated_segment_filters';
+    public const SEGMENT_DYNAMIC_WITH_FILTER1 = 'segment_dynamic_with_filter1';
+    public const SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER = 'segment_dynamic_with_filter2_and_segment_filter';
 
-    /** @var array */
-    protected static $segments = [
+    private static array $segments = [
         self::SEGMENT_DYNAMIC => [
             'name' => 'Dynamic Segment',
             'description' => 'Dynamic Segment Description',
@@ -300,29 +299,27 @@ class LoadSegmentData extends AbstractLoadSegmentData
     ];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         parent::load($manager);
-
         $this->applySegmentFilterToDefinition($manager);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getSegmentsData(): array
     {
         return self::$segments;
     }
 
-    private function applySegmentFilterToDefinition(ObjectManager $manager)
+    private function applySegmentFilterToDefinition(ObjectManager $manager): void
     {
         foreach (self::$segments as $reference => $data) {
             $segment = $this->getReference($reference);
             $definition = $data['definition'];
-
             foreach ($definition['filters'] as &$filter) {
                 if (!is_array($filter)) {
                     continue;

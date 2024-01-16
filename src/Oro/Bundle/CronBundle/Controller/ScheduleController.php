@@ -19,7 +19,7 @@ class ScheduleController extends AbstractController
      * @Acl(
      *      id="oro_cron_schedule_view",
      *      type="entity",
-     *      class="OroCronBundle:Schedule",
+     *      class="Oro\Bundle\CronBundle\Entity\Schedule",
      *      permission="VIEW"
      * )
      */

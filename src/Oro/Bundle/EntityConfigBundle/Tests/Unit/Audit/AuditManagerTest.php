@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -103,7 +104,7 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
-            ->willReturn('test');
+            ->willReturn(null);
         $this->tokenStorage->expects($this->any())
             ->method('getToken')
             ->willReturn($token);
@@ -115,7 +116,7 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
 
     private function initSecurityContext(): UserInterface
     {
-        $user = $this->createMock(UserInterface::class);
+        $user = $this->createMock(AbstractUser::class);
 
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())

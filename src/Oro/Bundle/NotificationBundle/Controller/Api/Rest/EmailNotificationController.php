@@ -25,7 +25,7 @@ class EmailNotificationController extends RestController
      * @Acl(
      *      id="oro_notification_emailnotification_delete",
      *      type="entity",
-     *      class="OroNotificationBundle:EmailNotification",
+     *      class="Oro\Bundle\NotificationBundle\Entity\EmailNotification",
      *      permission="DELETE"
      * )
      * @return Response
@@ -42,7 +42,7 @@ class EmailNotificationController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_notification.email_notification.manager.api');
+        return $this->container->get('oro_notification.email_notification.manager.api');
     }
 
     /**

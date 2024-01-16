@@ -18,7 +18,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -149,7 +149,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->willReturn($formBuilder);
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::never())
             ->method('add');
 
@@ -216,7 +216,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::exactly(8))
             ->method('add')
             ->withConsecutive(
@@ -255,7 +255,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::never())
             ->method('add');
 
@@ -284,7 +284,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::never())
             ->method('add');
 
@@ -334,7 +334,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
             ->with('field1', null, [])
@@ -381,7 +381,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
             ->with('field1', null, [])
@@ -428,7 +428,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
             ->with('field1', null, ['mapped' => false])
@@ -474,7 +474,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
             ->with('field1', null, [])
@@ -521,7 +521,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
             ->with('association1', null, ['mapped' => false])
@@ -567,7 +567,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
             ->with('association1', null, [])
@@ -702,7 +702,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::never())
             ->method('add');
 
@@ -747,7 +747,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::never())
             ->method('add');
 
@@ -867,7 +867,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
             ->with('association', null, [])
@@ -915,7 +915,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
             ->with('renamedAssociation', null, ['property_path' => 'association'])
@@ -963,7 +963,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
             ->with('association', 'text', ['trim' => false])
@@ -1010,7 +1010,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
             ->with('association', null, ['mapped' => false])
@@ -1057,7 +1057,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(PropertyPathMapper::class));
+            ->with(self::isInstanceOf(DataMapper::class));
         $formBuilder->expects(self::once())
             ->method('add')
             ->with('association', null, ['data_class' => 'Test\Class'])

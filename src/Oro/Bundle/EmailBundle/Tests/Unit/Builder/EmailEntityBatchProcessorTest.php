@@ -17,17 +17,19 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressProxy;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
+class EmailEntityBatchProcessorTest extends TestCase
 {
-    /** @var EmailAddressManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EmailAddressManager|MockObject */
     private $addressManager;
 
-    /** @var EmailOwnerProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EmailOwnerProvider|MockObject */
     private $ownerProvider;
 
-    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcher|MockObject */
     private $eventDispatcher;
 
     /** @var EmailEntityBatchProcessor */
@@ -217,9 +219,9 @@ class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
         $em->expects($this->exactly(3))
             ->method('getRepository')
             ->willReturnMap([
-                ['OroEmailBundle:EmailFolder', $folderRepo],
+                [EmailFolder::class, $folderRepo],
                 [TestEmailAddressProxy::class, $addressRepo],
-                ['OroEmailBundle:Email', $emailRepo],
+                [Email::class, $emailRepo],
             ]);
 
         $folderRepo->expects($this->exactly(2))

@@ -1,7 +1,7 @@
 acls:
     oro_datagrid_gridview_view:
         type: entity
-        class: OroDataGridBundle:GridView
+        class: Oro\Bundle\DataGridBundle\Entity\GridView
         permission: VIEW
         group_name: ""
 

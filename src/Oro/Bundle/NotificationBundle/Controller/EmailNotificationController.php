@@ -27,7 +27,7 @@ class EmailNotificationController extends AbstractController
      * @Acl(
      *      id="oro_notification_emailnotification_view",
      *      type="entity",
-     *      class="OroNotificationBundle:EmailNotification",
+     *      class="Oro\Bundle\NotificationBundle\Entity\EmailNotification",
      *      permission="VIEW"
      * )
      * @Template()
@@ -46,7 +46,7 @@ class EmailNotificationController extends AbstractController
      * @Acl(
      *      id="oro_notification_emailnotification_update",
      *      type="entity",
-     *      class="OroNotificationBundle:EmailNotification",
+     *      class="Oro\Bundle\NotificationBundle\Entity\EmailNotification",
      *      permission="EDIT"
      * )
      * @Template()
@@ -66,7 +66,7 @@ class EmailNotificationController extends AbstractController
      * @Acl(
      *      id="oro_notification_emailnotification_create",
      *      type="entity",
-     *      class="OroNotificationBundle:EmailNotification",
+     *      class="Oro\Bundle\NotificationBundle\Entity\EmailNotification",
      *      permission="CREATE"
      * )
      * @Template("@OroNotification/EmailNotification/update.html.twig")
@@ -94,10 +94,10 @@ class EmailNotificationController extends AbstractController
             $form = $this->createForm(EmailNotificationType::class, $form->getData());
         }
 
-        $saveMessage = $this->get(TranslatorInterface::class)
+        $saveMessage = $this->container->get(TranslatorInterface::class)
             ->trans('oro.notification.controller.emailnotification.saved.message');
 
-        return $this->get(UpdateHandlerFacade::class)
+        return $this->container->get(UpdateHandlerFacade::class)
             ->update(
                 $entity,
                 $form,

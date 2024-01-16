@@ -89,7 +89,7 @@ class ConfigEntityGridController extends AbstractController
         $configManager = $this->getConfigManager();
 
         if ($request->isMethod('POST')) {
-            $formData = $request->request->get('oro_entity_config_type');
+            $formData = $request->request->all('oro_entity_config_type');
             if (!$formData || !isset($formData['model']['className'])) {
                 throw new BadRequestHttpException(
                     'Request should contains "oro_entity_config_type[model][className]" parameter'
@@ -228,16 +228,16 @@ class ConfigEntityGridController extends AbstractController
 
     private function getRouter(): Router
     {
-        return $this->get(Router::class);
+        return $this->container->get(Router::class);
     }
 
     private function getConfigManager(): ConfigManager
     {
-        return $this->get(ConfigManager::class);
+        return $this->container->get(ConfigManager::class);
     }
 
     private function getTranslator(): TranslatorInterface
     {
-        return $this->get(TranslatorInterface::class);
+        return $this->container->get(TranslatorInterface::class);
     }
 }

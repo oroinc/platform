@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType as SymfonyFormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
@@ -144,7 +145,7 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
             ->willReturn('Test error');
         self::$validator->expects($this->once())
             ->method('validate')
-            ->willReturn([$error]);
+            ->willReturn(new ConstraintViolationList([$error]));
 
         $form = $builder->getForm();
         $form->submit([]);

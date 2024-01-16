@@ -159,7 +159,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
 
     private function getToken(): UsernamePasswordOrganizationToken
     {
-        return new UsernamePasswordOrganizationToken(new User(), 'test', 'key', new Organization());
+        return new UsernamePasswordOrganizationToken(new User(), 'test', new Organization());
     }
 
     /**

@@ -4,8 +4,10 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -74,17 +76,17 @@ class MailboxRepository extends EntityRepository
      * @param User|integer $user User or user id
      * @param Organization|integer|null $organization
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function createAvailableMailboxesQuery($user, $organization = null)
     {
         if (!$user instanceof User) {
-            $user = $this->getEntityManager()->getRepository('OroUserBundle:User')->find($user);
+            $user = $this->getEntityManager()->getRepository(User::class)->find($user);
         }
 
         if ($organization !== null && !$organization instanceof Organization) {
             $organization = $this->getEntityManager()
-                ->getRepository('OroOrganizationBundle:Organization')
+                ->getRepository(Organization::class)
                 ->find($organization);
         }
 
@@ -92,7 +94,7 @@ class MailboxRepository extends EntityRepository
 
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('mb')
-            ->from('OroEmailBundle:Mailbox', 'mb')
+            ->from(Mailbox::class, 'mb')
             ->leftJoin('mb.authorizedUsers', 'au')
             ->leftJoin('mb.authorizedRoles', 'ar')
             ->andWhere(
@@ -125,7 +127,7 @@ class MailboxRepository extends EntityRepository
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('mb')
-            ->from('OroEmailBundle:Mailbox', 'mb')
+            ->from(Mailbox::class, 'mb')
             ->leftJoin('mb.emailUsers', 'eu')
             ->leftJoin('eu.folders', 'f')
             ->leftJoin('mb.processSettings', 'ps')
@@ -171,7 +173,7 @@ class MailboxRepository extends EntityRepository
      */
     public function findForEmail(Email $email)
     {
-        $emailUsersDql = $this->_em->getRepository('OroEmailBundle:EmailUser')->createQueryBuilder('ue')
+        $emailUsersDql = $this->_em->getRepository(EmailUser::class)->createQueryBuilder('ue')
             ->select('ue.id')
             ->where('ue.email = :email')
             ->andWhere('ue.mailboxOwner = m.id')

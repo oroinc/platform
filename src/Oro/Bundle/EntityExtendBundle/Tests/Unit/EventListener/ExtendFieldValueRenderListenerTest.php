@@ -322,9 +322,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
                     ->willReturn($entity['shownFieldValues'][$field]);
             }
 
-            if ($entity['permitted']) {
-                $grantedEntitiesMap[] = ['VIEW', $item, true];
-            }
+            $grantedEntitiesMap[] = ['VIEW', $item, $entity['permitted']];
             $item->expects($this->any())
                 ->method('getId')
                 ->willReturn($entity['id']);

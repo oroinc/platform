@@ -26,6 +26,6 @@ class EqComparisonExpression implements ComparisonExpressionInterface
         $visitor->addParameter($parameterName, $value);
 
         return $visitor->getExpressionBuilder()
-            ->eq($expression, $visitor->buildPlaceholder($parameterName));
+            ->eq($expression, $visitor->buildParameterExpression($parameterName, $value));
     }
 }

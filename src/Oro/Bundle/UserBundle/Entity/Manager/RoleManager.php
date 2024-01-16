@@ -7,10 +7,13 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 
+/**
+ * Role entity manager
+ */
 class RoleManager
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     private $em;
 
@@ -35,6 +38,6 @@ class RoleManager
      */
     protected function getRoleRepo()
     {
-        return $this->em->getRepository('OroUserBundle:Role');
+        return $this->em->getRepository(Role::class);
     }
 }

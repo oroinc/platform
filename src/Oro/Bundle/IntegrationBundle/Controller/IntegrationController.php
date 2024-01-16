@@ -35,7 +35,7 @@ class IntegrationController extends AbstractController
      *      id="oro_integration_view",
      *      type="entity",
      *      permission="VIEW",
-     *      class="OroIntegrationBundle:Channel"
+     *      class="Oro\Bundle\IntegrationBundle\Entity\Channel"
      * )
      * @Template()
      */
@@ -52,7 +52,7 @@ class IntegrationController extends AbstractController
      *      id="oro_integration_create",
      *      type="entity",
      *      permission="CREATE",
-     *      class="OroIntegrationBundle:Channel"
+     *      class="Oro\Bundle\IntegrationBundle\Entity\Channel"
      * )
      * @Template("@OroIntegration/Integration/update.html.twig")
      */
@@ -67,7 +67,7 @@ class IntegrationController extends AbstractController
      *      id="oro_integration_update",
      *      type="entity",
      *      permission="EDIT",
-     *      class="OroIntegrationBundle:Channel"
+     *      class="Oro\Bundle\IntegrationBundle\Entity\Channel"
      * )
      * @Template()
      */
@@ -85,7 +85,7 @@ class IntegrationController extends AbstractController
     {
         if ($integration->isEnabled()) {
             try {
-                $this->get(GenuineSyncScheduler::class)->schedule(
+                $this->container->get(GenuineSyncScheduler::class)->schedule(
                     $integration->getId(),
                     null,
                     ['force' => (bool)$request->get('force', false)]
@@ -99,13 +99,13 @@ class IntegrationController extends AbstractController
                 $status = Response::HTTP_OK;
                 $response = [
                     'successful' => true,
-                    'message'    => $this->get(TranslatorInterface::class)->trans(
+                    'message'    => $this->container->get(TranslatorInterface::class)->trans(
                         'oro.integration.scheduled',
                         ['%url%' => $checkJobProgressUrl]
                     )
                 ];
             } catch (\Exception $e) {
-                $this->get(LoggerInterface::class)->error(
+                $this->container->get(LoggerInterface::class)->error(
                     sprintf(
                         'Failed to schedule integration synchronization. Integration Id: %s.',
                         $integration->getId()
@@ -137,7 +137,7 @@ class IntegrationController extends AbstractController
      */
     protected function update(Integration $integration, Request $request)
     {
-        $formHandler = $this->get(ChannelHandler::class);
+        $formHandler = $this->container->get(ChannelHandler::class);
 
         if ($formHandler->process($integration)) {
             $request->getSession()->getFlashBag()->add(
@@ -145,7 +145,7 @@ class IntegrationController extends AbstractController
                 $this->getTranslator()->trans('oro.integration.controller.integration.message.saved')
             );
 
-            return $this->get(Router::class)->redirect($integration);
+            return $this->container->get(Router::class)->redirect($integration);
         }
 
         $form = $formHandler->getForm();
@@ -158,7 +158,7 @@ class IntegrationController extends AbstractController
 
     private function getTranslator(): TranslatorInterface
     {
-        return $this->get(TranslatorInterface::class);
+        return $this->container->get(TranslatorInterface::class);
     }
 
     /**

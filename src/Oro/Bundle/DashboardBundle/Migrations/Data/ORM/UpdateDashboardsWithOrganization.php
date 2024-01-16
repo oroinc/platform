@@ -4,24 +4,27 @@ namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
+use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
 /**
- * Adds organizations to dashboards.
+ * Sets a default organization to Dashboard and ActiveDashboard entities.
  */
 class UpdateDashboardsWithOrganization extends UpdateWithOrganization implements
     DependentFixtureInterface,
     RenamedFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [
-            'Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData',
-            'Oro\Bundle\DashboardBundle\Migrations\Data\ORM\LoadDashboardData'
+            LoadOrganizationAndBusinessUnitData::class,
+            LoadDashboardData::class
         ];
     }
 
@@ -36,11 +39,11 @@ class UpdateDashboardsWithOrganization extends UpdateWithOrganization implements
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $this->update($manager, 'OroDashboardBundle:Dashboard');
-        $this->update($manager, 'OroDashboardBundle:ActiveDashboard');
+        $this->update($manager, Dashboard::class);
+        $this->update($manager, ActiveDashboard::class);
     }
 }

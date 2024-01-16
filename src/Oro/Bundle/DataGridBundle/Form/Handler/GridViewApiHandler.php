@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Form\Handler;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -80,7 +81,7 @@ class GridViewApiHandler
         $this->setDefaultGridView($entity, $default);
 
         $this->fixFilters($entity);
-        $om = $this->registry->getManagerForClass('OroDataGridBundle:GridView');
+        $om = $this->registry->getManagerForClass(GridView::class);
         $om->persist($entity);
         $om->flush();
     }

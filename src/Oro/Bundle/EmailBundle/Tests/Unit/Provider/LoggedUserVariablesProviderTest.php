@@ -145,7 +145,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
     {
         $user = $this->createMock(UserInterface::class);
         $user->expects($this->once())
-            ->method('getUsername')
+            ->method('getUserIdentifier')
             ->willReturn('test');
 
         $this->tokenAccessor->expects($this->once())

@@ -7,6 +7,7 @@ use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
+use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ExpressionValue;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NeqOrNullComparisonExpression;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
@@ -15,7 +16,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class NeqOrNullComparisonExpressionTest extends OrmRelatedTestCase
 {
-    public function testWalkComparisonExpressionForNullValue()
+    public function testWalkComparisonExpressionForNullValue(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('The value for "e.test" must not be NULL.');
@@ -40,7 +41,7 @@ class NeqOrNullComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpression()
+    public function testWalkComparisonExpression(): void
     {
         $expression = new NeqOrNullComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -76,7 +77,43 @@ class NeqOrNullComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionForRangeValue()
+    public function testWalkComparisonExpressionWithExpressionValue(): void
+    {
+        $expression = new NeqOrNullComparisonExpression();
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+        $field = 'e.test';
+        $expr = 'LOWER(e.test)';
+        $parameterName = 'test_1';
+        $value = new ExpressionValue('text', 'LOWER(%s)');
+
+        $result = $expression->walkComparisonExpression(
+            $expressionVisitor,
+            $field,
+            $expr,
+            $parameterName,
+            $value
+        );
+
+        self::assertEquals(
+            new Expr\Orx(
+                [
+                    new Expr\Func($expr . ' NOT IN', 'LOWER(:' . $parameterName . ')'),
+                    $expr . ' IS NULL'
+                ]
+            ),
+            $result
+        );
+        self::assertEquals(
+            [new Parameter($parameterName, $value->getValue())],
+            $expressionVisitor->getParameters()
+        );
+    }
+
+    public function testWalkComparisonExpressionForRangeValue(): void
     {
         $expression = new NeqOrNullComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -132,7 +169,7 @@ class NeqOrNullComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionForRangeValueWhenLastElementInPathIsField()
+    public function testWalkComparisonExpressionForRangeValueWhenLastElementInPathIsField(): void
     {
         $expression = new NeqOrNullComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(

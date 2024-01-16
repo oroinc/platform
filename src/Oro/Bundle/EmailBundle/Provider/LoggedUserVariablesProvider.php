@@ -123,7 +123,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     {
         if ($user instanceof UserInterface) {
             if ($addValue) {
-                $val = $user->getUsername();
+                $val = $user->getUserIdentifier();
             } else {
                 $val = [
                     'type'  => 'string',

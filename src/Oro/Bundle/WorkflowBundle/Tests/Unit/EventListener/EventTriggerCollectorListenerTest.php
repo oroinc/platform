@@ -40,7 +40,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
 
         $prePersistArgs = $this->createMock(LifecycleEventArgs::class);
         $prePersistArgs->expects(self::never())
-            ->method('getEntity');
+            ->method('getObject');
 
         $this->listener->prePersist($prePersistArgs);
 
@@ -52,7 +52,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
 
         $preRemoveArgs = $this->createMock(LifecycleEventArgs::class);
         $preRemoveArgs->expects(self::never())
-            ->method('getEntity');
+            ->method('getObject');
 
         $this->listener->preRemove($preRemoveArgs);
 

@@ -1,9 +1,12 @@
 security:
     firewalls:
         embedded_form:
-            pattern:   ^/embedded-form/(submit|success)
-            provider:  chain_provider
-            anonymous: true
+            pattern: ^/embedded-form/(submit|success)
+            provider: chain_provider
+
+oro_security:
+    access_control:
+        - { path: ^%web_backend_prefix%/embedded-form/(submit|success), roles: PUBLIC_ACCESS }
 
 # X-Frame-Options header should be removed from embedded forms
 # OroEmbeddedForm bundle has lower priority than OroSecurityBundle

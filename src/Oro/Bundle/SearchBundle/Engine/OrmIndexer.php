@@ -192,7 +192,7 @@ EOF;
             return $this->indexRepository;
         }
 
-        $this->indexRepository = $this->getIndexManager()->getRepository('OroSearchBundle:Item');
+        $this->indexRepository = $this->getIndexManager()->getRepository(Item::class);
 
         return $this->indexRepository;
     }
@@ -208,7 +208,7 @@ EOF;
             return $this->indexManager;
         }
 
-        $this->indexManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
+        $this->indexManager = $this->registry->getManagerForClass(Item::class);
 
         return $this->indexManager;
     }

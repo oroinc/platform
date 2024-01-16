@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
@@ -42,7 +43,7 @@ class DashboardController extends AbstractController
      * @Acl(
      *      id="oro_dashboard_view",
      *      type="entity",
-     *      class="OroDashboardBundle:Dashboard",
+     *      class="Oro\Bundle\DashboardBundle\Entity\Dashboard",
      *      permission="VIEW"
      * )
      * @Template
@@ -92,7 +93,7 @@ class DashboardController extends AbstractController
             [
                 'dashboards' => $this->getDashboardManager()->findAllowedDashboards(),
                 'dashboard'  => $currentDashboard,
-                'widgets'    => $this->get(WidgetConfigs::class)->getWidgetConfigs()
+                'widgets'    => $this->container->get(WidgetConfigs::class)->getWidgetConfigs()
             ]
         );
     }
@@ -111,15 +112,15 @@ class DashboardController extends AbstractController
             throw new AccessDeniedException();
         }
 
-        $form  = $this->get(WidgetConfigurationFormProvider::class)->getForm($widget->getName());
+        $form  = $this->container->get(WidgetConfigurationFormProvider::class)->getForm($widget->getName());
         $saved = false;
 
-        $form->setData($this->get(WidgetConfigs::class)->getFormValues($widget));
+        $form->setData($this->container->get(WidgetConfigs::class)->getFormValues($widget));
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $widget->setOptions($form->getData());
-            $this->getDoctrine()->getManagerForClass(Widget::class)->flush();
+            $this->container->get('doctrine')->getManagerForClass(Widget::class)->flush();
             $saved = true;
         }
 
@@ -135,7 +136,7 @@ class DashboardController extends AbstractController
      * @Acl(
      *      id="oro_dashboard_update",
      *      type="entity",
-     *      class="OroDashboardBundle:Dashboard",
+     *      class="Oro\Bundle\DashboardBundle\Entity\Dashboard",
      *      permission="EDIT"
      * )
      *
@@ -156,7 +157,7 @@ class DashboardController extends AbstractController
      * @Acl(
      *      id="oro_dashboard_create",
      *      type="entity",
-     *      class="OroDashboardBundle:Dashboard",
+     *      class="Oro\Bundle\DashboardBundle\Entity\Dashboard",
      *      permission="CREATE"
      * )
      * @Template("@OroDashboard/Dashboard/update.html.twig")
@@ -191,10 +192,10 @@ class DashboardController extends AbstractController
                 $this->getDashboardManager()->save($dashboardModel, true);
                 $request->getSession()->getFlashBag()->add(
                     'success',
-                    $this->get(TranslatorInterface::class)->trans('oro.dashboard.saved_message')
+                    $this->container->get(TranslatorInterface::class)->trans('oro.dashboard.saved_message')
                 );
 
-                return $this->get(Router::class)->redirect($dashboardModel->getEntity());
+                return $this->container->get(Router::class)->redirect($dashboardModel->getEntity());
             }
         }
 
@@ -222,7 +223,7 @@ class DashboardController extends AbstractController
 
         return $this->render(
             $view,
-            $this->get(WidgetConfigs::class)->getWidgetAttributesForTwig($widget)
+            $this->container->get(WidgetConfigs::class)->getWidgetAttributesForTwig($widget)
         );
     }
 
@@ -241,7 +242,7 @@ class DashboardController extends AbstractController
     public function itemizedWidgetAction($widget, $bundle, $name)
     {
         /** @var WidgetConfigs $manager */
-        $manager = $this->get(WidgetConfigs::class);
+        $manager = $this->container->get(WidgetConfigs::class);
 
         $params = array_merge(
             [
@@ -271,7 +272,7 @@ class DashboardController extends AbstractController
     public function itemizedDataWidgetAction(Request $request, $widget, $bundle, $name)
     {
         /** @var WidgetConfigs $manager */
-        $manager = $this->get(WidgetConfigs::class);
+        $manager = $this->container->get(WidgetConfigs::class);
 
         $params = array_merge(
             [
@@ -342,7 +343,7 @@ class DashboardController extends AbstractController
         $params       = $request->get('params', []);
         $renderParams = $request->get('renderParams', []);
 
-        $viewId = $this->get(WidgetConfigs::class)->getWidgetOptions()->get('gridView');
+        $viewId = $this->container->get(WidgetConfigs::class)->getWidgetOptions()->get('gridView');
         if ($viewId && null !== $view = $this->findView($viewId)) {
             $params = array_merge(
                 $params,
@@ -356,8 +357,8 @@ class DashboardController extends AbstractController
             );
         }
 
-        $options = $this->get(WidgetConfigs::class)->getWidgetOptions();
-        $gridConfig = $this->get(ConfigurationProviderInterface::class)->getConfiguration($gridName);
+        $options = $this->container->get(WidgetConfigs::class)->getWidgetOptions();
+        $gridConfig = $this->container->get(ConfigurationProviderInterface::class)->getConfiguration($gridName);
         if (isset($gridConfig['filters'], $gridConfig['filters']['columns'])) {
             if (!isset($params['_filter'])) {
                 $params['_filter'] = [];
@@ -373,7 +374,7 @@ class DashboardController extends AbstractController
                 'params'       => $params,
                 'renderParams' => $renderParams,
             ],
-            $this->get(WidgetConfigs::class)->getWidgetAttributesForTwig($widget)
+            $this->container->get(WidgetConfigs::class)->getWidgetAttributesForTwig($widget)
         );
     }
 
@@ -384,7 +385,7 @@ class DashboardController extends AbstractController
      */
     protected function findView($id)
     {
-        return $this->getDoctrine()->getRepository(GridView::class)->find($id);
+        return $this->container->get('doctrine')->getRepository(GridView::class)->find($id);
     }
 
     /**
@@ -392,7 +393,7 @@ class DashboardController extends AbstractController
      */
     protected function getDashboardManager()
     {
-        return $this->get(Manager::class);
+        return $this->container->get(Manager::class);
     }
 
     /**
@@ -400,7 +401,7 @@ class DashboardController extends AbstractController
      */
     protected function getDashboardRepository()
     {
-        return $this->getDoctrine()->getRepository(Dashboard::class);
+        return $this->container->get('doctrine')->getRepository(Dashboard::class);
     }
 
     /**
@@ -414,7 +415,8 @@ class DashboardController extends AbstractController
             Router::class,
             WidgetConfigurationFormProvider::class,
             Manager::class,
-            ConfigurationProviderInterface::class
+            ConfigurationProviderInterface::class,
+            'doctrine' => ManagerRegistry::class
         ]);
     }
 }

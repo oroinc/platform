@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
@@ -236,7 +237,7 @@ class EmailController extends AbstractController
             $emails[] = $entity;
         } else {
             $emails = $this->getEmailThreadProvider()->getThreadEmails(
-                $this->getDoctrine()->getManager(),
+                $this->container->get('doctrine')->getManager(),
                 $entity
             );
             $targetActivityClass = $request->get('targetActivityClass');
@@ -302,12 +303,12 @@ class EmailController extends AbstractController
             $emails[] = $entity;
         } else {
             $emails = $this->getEmailThreadProvider()->getUserThreadEmails(
-                $this->getDoctrine()->getManager(),
+                $this->container->get('doctrine')->getManager(),
                 $entity,
                 $this->getUser(),
-                $this->get(MailboxManager::class)->findAvailableMailboxes(
+                $this->container->get(MailboxManager::class)->findAvailableMailboxes(
                     $this->getUser(),
-                    $this->get('security.token_storage')->getToken()->getOrganization()
+                    $this->container->get('security.token_storage')->getToken()->getOrganization()
                 )
             );
         }
@@ -339,7 +340,7 @@ class EmailController extends AbstractController
         $emails = [];
         $ids = $this->prepareArrayParam($request, 'ids');
         if (count($ids) !== 0) {
-            $emails = $this->getDoctrine()->getRepository(Email::class)->findEmailsByIds($ids);
+            $emails = $this->container->get('doctrine')->getRepository(Email::class)->findEmailsByIds($ids);
         }
         $this->loadEmailBody($emails);
 
@@ -546,7 +547,7 @@ class EmailController extends AbstractController
         $fileManager = $this->getFileManager();
         $content = $fileManager->getContent($path, false);
         if (null === $content) {
-            $imageBinary = $this->get(ResizedImageProvider::class)->getResizedImageByContent(
+            $imageBinary = $this->container->get(ResizedImageProvider::class)->getResizedImageByContent(
                 ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
                     $attachment->getContent()->getContentTransferEncoding()
@@ -688,8 +689,8 @@ class EmailController extends AbstractController
     public function userEmailsSyncAction()
     {
         try {
-            $this->get(EmailSynchronizationManager::class)->syncOrigins(
-                $this->get(EmailGridHelper::class)->getEmailOrigins($this->getTokenAccessor()->getUserId()),
+            $this->container->get(EmailSynchronizationManager::class)->syncOrigins(
+                $this->container->get(EmailGridHelper::class)->getEmailOrigins($this->getTokenAccessor()->getUserId()),
                 true
             );
         } catch (\Exception $e) {
@@ -761,7 +762,7 @@ class EmailController extends AbstractController
             $result = $this->getEmailManager()->markAllEmailsAsSeen(
                 $loggedUser,
                 $tokenAccessor->getOrganization(),
-                $this->getRequestStack()->getCurrentRequest()->query->get('ids', [])
+                $this->getRequestStack()->getCurrentRequest()->query->all('ids')
             );
         }
 
@@ -780,7 +781,7 @@ class EmailController extends AbstractController
     public function markMassAction(Request $request, $gridName, $actionName)
     {
         /** @var MassActionDispatcher $massActionDispatcher */
-        $massActionDispatcher = $this->get(MassActionDispatcher::class);
+        $massActionDispatcher = $this->container->get(MassActionDispatcher::class);
 
         $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
 
@@ -825,7 +826,7 @@ class EmailController extends AbstractController
             $entityClass = $request->get('entityClass');
             $entityId = $request->get('entityId');
             if ($entityClass && $entityId) {
-                $em = $this->getDoctrine()->getManagerForClass($entityClass);
+                $em = $this->container->get('doctrine')->getManagerForClass($entityClass);
                 $relatedEntity = $em->getReference($entityClass, $entityId);
                 if ($relatedEntity === $this->getUser()) {
                     $relatedEntity = null;
@@ -846,102 +847,102 @@ class EmailController extends AbstractController
 
     protected function getEmailRecipientsHelper(): EmailRecipientsHelper
     {
-        return $this->get(EmailRecipientsHelper::class);
+        return $this->container->get(EmailRecipientsHelper::class);
     }
 
     protected function getEmailRecipientsProvider(): EmailRecipientsProvider
     {
-        return $this->get(EmailRecipientsProvider::class);
+        return $this->container->get(EmailRecipientsProvider::class);
     }
 
     private function getEmailNotificationManager(): EmailNotificationManager
     {
-        return $this->get(EmailNotificationManager::class);
+        return $this->container->get(EmailNotificationManager::class);
     }
 
     private function getEmailAttachmentManager(): EmailAttachmentManager
     {
-        return $this->get(EmailAttachmentManager::class);
+        return $this->container->get(EmailAttachmentManager::class);
     }
 
     protected function getEmailCacheManager(): EmailCacheManager
     {
-        return $this->get(EmailCacheManager::class);
+        return $this->container->get(EmailCacheManager::class);
     }
 
     protected function getEmailManager(): EmailManager
     {
-        return $this->get(EmailManager::class);
+        return $this->container->get(EmailManager::class);
     }
 
     protected function getEmailThreadProvider(): EmailThreadProvider
     {
-        return $this->get(EmailThreadProvider::class);
+        return $this->container->get(EmailThreadProvider::class);
     }
 
     private function getEmailModelBuilder(): EmailModelBuilder
     {
-        return $this->get(EmailModelBuilder::class);
+        return $this->container->get(EmailModelBuilder::class);
     }
 
     protected function getOrganizationRepository(): EntityRepository
     {
-        return $this->getDoctrine()->getRepository(Organization::class);
+        return $this->container->get('doctrine')->getRepository(Organization::class);
     }
 
     private function getMessageProducer(): MessageProducerInterface
     {
-        return $this->get(MessageProducerInterface::class);
+        return $this->container->get(MessageProducerInterface::class);
     }
 
     private function getTranslator(): TranslatorInterface
     {
-        return $this->get(TranslatorInterface::class);
+        return $this->container->get(TranslatorInterface::class);
     }
 
     private function getTokenAccessor(): TokenAccessorInterface
     {
-        return $this->get(TokenAccessorInterface::class);
+        return $this->container->get(TokenAccessorInterface::class);
     }
 
     private function getRequestStack(): RequestStack
     {
-        return $this->get('request_stack');
+        return $this->container->get('request_stack');
     }
 
     private function getFilterBag(): FilterBag
     {
-        return $this->get(FilterBag::class);
+        return $this->container->get(FilterBag::class);
     }
 
     private function getFileManager(): FileManager
     {
-        return $this->get(FileManager::class);
+        return $this->container->get(FileManager::class);
     }
 
     private function getUserConfigManager(): ConfigManager
     {
-        return $this->get('oro_config.user');
+        return $this->container->get('oro_config.user');
     }
 
     private function getActivityListManager(): ActivityListManager
     {
-        return $this->get(ActivityListManager::class);
+        return $this->container->get(ActivityListManager::class);
     }
 
     private function getEntityRoutingHelper(): EntityRoutingHelper
     {
-        return $this->get(EntityRoutingHelper::class);
+        return $this->container->get(EntityRoutingHelper::class);
     }
 
     private function getSmtpSettingsChecker(): SmtpSettingsChecker
     {
-        return $this->get(SmtpSettingsChecker::class);
+        return $this->container->get(SmtpSettingsChecker::class);
     }
 
     private function getSmtpSettingsProvider(): SmtpSettingsProviderInterface
     {
-        return $this->get(SmtpSettingsProviderInterface::class);
+        return $this->container->get(SmtpSettingsProviderInterface::class);
     }
 
     protected function process(EmailModel $emailModel): array
@@ -951,10 +952,10 @@ class EmailController extends AbstractController
             'saved' => false,
             'appendSignature' => (bool)$this->getUserConfigManager()->get('oro_email.append_signature')
         ];
-        if ($this->get(EmailHandler::class)->process($emailModel)) {
+        if ($this->container->get(EmailHandler::class)->process($emailModel)) {
             $responseData['saved'] = true;
         }
-        $responseData['form'] = $this->get(EmailType::class)->createView();
+        $responseData['form'] = $this->container->get(EmailType::class)->createView();
 
         return $responseData;
     }
@@ -1042,7 +1043,7 @@ class EmailController extends AbstractController
         $entityClassName = $this->getEntityRoutingHelper()->getEntityClassName($request, 'targetActivityClass');
         if (null !== $entityClassName) {
             /** @var ConfigProvider $targetConfigProvider */
-            $targetConfigProvider = $this->get('oro_entity_config.provider.attachment');
+            $targetConfigProvider = $this->container->get('oro_entity_config.provider.attachment');
             if ($targetConfigProvider->hasConfig($entityClassName)) {
                 $enabledAttachment = (bool)$targetConfigProvider->getConfig($entityClassName)->get('enabled');
             }
@@ -1064,7 +1065,7 @@ class EmailController extends AbstractController
             return null;
         }
 
-        return $this->get(DoctrineHelper::class)->getEntity($scopeClass, $scopeId);
+        return $this->container->get(DoctrineHelper::class)->getEntity($scopeClass, $scopeId);
     }
 
     /**
@@ -1102,6 +1103,7 @@ class EmailController extends AbstractController
                 EmailManager::class,
                 'oro_config.user' => ConfigManager::class,
                 'oro_entity_config.provider.attachment' => ConfigProvider::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

@@ -109,29 +109,26 @@ class OrganizationRepository extends EntityRepository
     }
 
     /**
-     * Update all records in given table with organization id
-     *
-     * @param string  $tableName    table name to update, example: OroAccountBundle:Account or OroUserBundle:Group
-     * @param integer $id           Organization id
-     * @param string  $relationName relation name to update. By default 'organization'
-     * @param bool    $onlyEmpty    Update data only for the records with empty relation
-     *
-     * @return integer Number of rows affected
+     * Update all records for the given entity with the given organization ID.
      */
-    public function updateWithOrganization($tableName, $id, $relationName = 'organization', $onlyEmpty = false)
-    {
+    public function updateWithOrganization(
+        string $entityClass,
+        int $id,
+        string $relationName = 'organization',
+        bool $onlyEmpty = false
+    ): int {
         QueryBuilderUtil::checkIdentifier($relationName);
 
         $qb = $this->getEntityManager()
             ->createQueryBuilder()
-            ->update($tableName, 't')
+            ->update($entityClass, 't')
             ->set('t.' . $relationName, ':id')
             ->setParameter('id', $id);
         if ($onlyEmpty) {
-            $qb->where('t.' . $relationName . ' IS NULL ');
+            $qb->where('t.' . $relationName . ' IS NULL');
         }
-        return $qb->getQuery()
-            ->execute();
+
+        return $qb->getQuery()->execute();
     }
 
     /**

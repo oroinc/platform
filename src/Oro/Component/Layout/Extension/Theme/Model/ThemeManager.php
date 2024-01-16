@@ -29,7 +29,7 @@ class ThemeManager
     public function __construct(
         ThemeFactoryInterface $themeFactory,
         ThemeDefinitionBagInterface $themeDefinitionBag,
-        array $enabledThemes
+        array $enabledThemes,
     ) {
         $this->themeFactory = $themeFactory;
         $this->themeDefinitionBag = $themeDefinitionBag;

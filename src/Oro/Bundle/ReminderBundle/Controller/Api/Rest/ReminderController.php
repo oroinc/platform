@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ReminderBundle\Controller\Api\Rest;
 
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,7 +17,7 @@ class ReminderController extends AbstractFOSRestController
     /**
      * Update reminder, set shown status
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function postShownAction(Request $request)
     {
@@ -40,16 +42,24 @@ class ReminderController extends AbstractFOSRestController
             }
         }
 
-        $this->getDoctrine()->getManager()->flush();
+        $this->container->get('doctrine')->getManager()->flush();
 
         return $this->handleView($this->view('', Response::HTTP_OK));
     }
 
     /**
-     * @return \Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository
+     * @return ReminderRepository
      */
     protected function getReminderRepository()
     {
-        return $this->getDoctrine()->getRepository('OroReminderBundle:Reminder');
+        return $this->container->get('doctrine')->getRepository(Reminder::class);
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            ['doctrine' => ManagerRegistry::class]
+        );
     }
 }

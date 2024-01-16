@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Security\Http\Firewall;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\AnonymousToken;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\SecurityBundle\Request\CsrfProtectedRequestHelper;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**

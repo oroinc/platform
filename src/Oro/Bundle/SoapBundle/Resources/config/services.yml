@@ -22,6 +22,10 @@ services:
         alias: oro_soap.handler.include_delegate
         public: true
 
+    Oro\Bundle\SoapBundle\Handler\DelegateIncludeHandler:
+        alias: oro_soap.handler.include_delegate
+        public: true
+
     oro_soap.handler.include_total_header:
         class: Oro\Bundle\SoapBundle\Handler\TotalHeaderHandler
         public: true

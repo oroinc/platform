@@ -26,7 +26,7 @@ class DoctrinePreRemoveListener
 
     public function preRemove(LifecycleEventArgs $args): void
     {
-        $entity = $args->getEntity();
+        $entity = $args->getObject();
         $className = ClassUtils::getClass($entity);
 
         if ($this->configManager->hasConfig($className)) {
@@ -42,7 +42,7 @@ class DoctrinePreRemoveListener
     public function postFlush(PostFlushEventArgs $args): void
     {
         if ($this->deleteEntities) {
-            $em = $args->getEntityManager();
+            $em = $args->getObjectManager();
             $knownNamespaces = $em->getConfiguration()->getEntityNamespaces();
             if (!empty($knownNamespaces['OroSegmentBundle'])) {
                 $em->getRepository(SegmentSnapshot::class)->massRemoveByEntities($this->deleteEntities);

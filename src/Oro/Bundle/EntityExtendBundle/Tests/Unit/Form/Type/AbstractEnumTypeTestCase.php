@@ -20,6 +20,7 @@ use Symfony\Component\Form\Test\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AbstractEnumTypeTestCase extends TypeTestCase
 {
@@ -160,7 +161,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
 
         $form->expects($this->once())
             ->method('getPropertyPath')
-            ->willReturn('value'); // name of property TestEntity::$value
+            ->willReturn(new PropertyPath('value')); // name of property TestEntity::$value
 
         $this->doctrine->expects($this->never())
             ->method('anything');
@@ -196,7 +197,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         // name of property TestEntity::$value
         $form->expects($this->once())
             ->method('getPropertyPath')
-            ->willReturn('value');
+            ->willReturn(new PropertyPath('value'));
 
         $this->expectFormConfigWillReturnOptions(
             $formConfig,
@@ -251,7 +252,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         // name of property TestEntity::$value
         $form->expects($this->once())
             ->method('getPropertyPath')
-            ->willReturn('value');
+            ->willReturn(new PropertyPath('value'));
 
         $this->setExpectationsForLoadDefaultEnumValues(
             $enumValueClassName,

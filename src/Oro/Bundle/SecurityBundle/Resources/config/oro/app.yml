@@ -1,5 +1,5 @@
 security:
-    enable_authenticator_manager: false
+    enable_authenticator_manager: true
 
     access_decision_manager:
         strategy: unanimous
@@ -92,6 +92,9 @@ oro_security:
 #            unload: deny
 #            web-share: deny
 #            xr-spatial-tracking: deny
+    access_control:
+        - { path: ^/media/[\w-]+/.+$, roles: PUBLIC_ACCESS }
+        - { path: ^%web_backend_prefix%, roles: IS_AUTHENTICATED, priority: -100 }
 
 nelmio_security:
     # prevents framing of the entire site

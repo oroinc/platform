@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataAuditBundle\Controller\Api\Rest;
 
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
@@ -13,6 +14,7 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\IdentifierToReferenceFilter;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -76,8 +78,10 @@ class AuditController extends RestGetController
         $limit = (int)$request->get('limit', self::ITEMS_PER_PAGE);
         $filterParameters = [
             'loggedAt'    => new HttpDateTimeParameterFilter(),
-            'user'        => new IdentifierToReferenceFilter($this->getDoctrine(), 'OroUserBundle:User'),
-            'objectClass' => new EntityClassParameterFilter($this->get('oro_entity.entity_class_name_helper'))
+            'user' => new IdentifierToReferenceFilter($this->container->get('doctrine'), User::class),
+            'objectClass' => new EntityClassParameterFilter(
+                $this->container->get('oro_entity.entity_class_name_helper')
+            )
         ];
 
         $criteria = $this->getFilterCriteria($this->getSupportedQueryParameters('cgetAction'), $filterParameters);
@@ -130,12 +134,17 @@ class AuditController extends RestGetController
     public function getFieldsAction(Request $request)
     {
         /* @var $provider EntityWithFieldsProvider */
-        $provider = $this->get('oro_query_designer.entity_field_list_provider');
+        $provider = $this->container->get('oro_query_designer.entity_field_list_provider');
         $withRelations = filter_var($request->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
         $statusCode = Response::HTTP_OK;
 
         try {
-            $entities = $provider->getFields(true, true, $withRelations, false);
+            $entities = $provider->getFields(
+                true,
+                true,
+                $withRelations,
+                false
+            );
             $result = $this->filterAuditableEntities($entities);
         } catch (InvalidEntityException $ex) {
             $statusCode = Response::HTTP_NOT_FOUND;
@@ -152,7 +161,7 @@ class AuditController extends RestGetController
      */
     public function getManager()
     {
-        return $this->get('oro_dataaudit.audit.manager.api');
+        return $this->container->get('oro_dataaudit.audit.manager.api');
     }
 
     /**
@@ -167,7 +176,8 @@ class AuditController extends RestGetController
         $result['user'] = $entity->getUser() ? $entity->getUser()->getId() : null;
 
         unset($result['fields']);
-        $result['data'] = $this->get('oro_dataaudit.model.fields_transformer')->getCollectionData($entity->getFields());
+        $result['data'] = $this->container->get('oro_dataaudit.model.fields_transformer')
+            ->getCollectionData($entity->getFields());
 
         return $result;
     }
@@ -179,7 +189,7 @@ class AuditController extends RestGetController
      */
     private function filterAuditableEntities(array $entities = [])
     {
-        $auditConfigProvider = $this->get('oro_entity_config.provider.dataaudit');
+        $auditConfigProvider = $this->container->get('oro_entity_config.provider.dataaudit');
 
         $auditableEntities = [];
         foreach ($entities as $entityClass => $entityData) {
@@ -213,5 +223,13 @@ class AuditController extends RestGetController
         }
 
         return $auditableEntities;
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            ['doctrine' => ManagerRegistry::class]
+        );
     }
 }

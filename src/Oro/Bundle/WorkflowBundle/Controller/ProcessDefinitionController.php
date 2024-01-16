@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,7 +23,7 @@ class ProcessDefinitionController extends AbstractController
      * @Acl(
      *      id="oro_process_definition_view",
      *      type="entity",
-     *      class="OroWorkflowBundle:ProcessDefinition",
+     *      class="Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition",
      *      permission="VIEW"
      * )
      *
@@ -45,7 +47,7 @@ class ProcessDefinitionController extends AbstractController
      */
     public function viewAction(ProcessDefinition $processDefinition)
     {
-        $triggers = $this->getRepository('OroWorkflowBundle:ProcessTrigger')
+        $triggers = $this->getRepository(ProcessTrigger::class)
             ->findBy(['definition' => $processDefinition]);
         return [
             'entity'   => $processDefinition,
@@ -59,6 +61,14 @@ class ProcessDefinitionController extends AbstractController
      */
     protected function getRepository($entityName)
     {
-        return $this->getDoctrine()->getRepository($entityName);
+        return $this->container->get('doctrine')->getRepository($entityName);
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            ['doctrine' => ManagerRegistry::class]
+        );
     }
 }

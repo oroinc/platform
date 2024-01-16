@@ -314,7 +314,7 @@ class EmailModelBuilder
         }
         if (!$emailModel->getEntityClass() || !$emailModel->getEntityId()) {
             if ($emailModel->getParentEmailId()) {
-                $parentEmail = $this->entityManager->getRepository('OroEmailBundle:Email')
+                $parentEmail = $this->entityManager->getRepository(EmailEntity::class)
                     ->find($emailModel->getParentEmailId());
                 $this->applyEntityDataFromEmail($emailModel, $parentEmail);
             }

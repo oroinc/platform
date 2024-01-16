@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\AnonymousToken;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**

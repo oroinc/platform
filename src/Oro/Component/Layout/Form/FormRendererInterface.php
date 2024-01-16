@@ -32,5 +32,5 @@ interface FormRendererInterface extends BaseFormRendererInterface
         $blockNameSuffix,
         array $variables = [],
         $renderParentBlock = false
-    );
+    ): string;
 }

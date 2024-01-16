@@ -3,7 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Provider;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Provider\RawConfigurationProvider;
+use Oro\Bundle\DataGridBundle\Provider\RawConfigurationProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -14,11 +14,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FiltersMetadataProvider
 {
-    private RawConfigurationProvider $configurationProvider;
+    private RawConfigurationProviderInterface $configurationProvider;
     private TranslatorInterface $translator;
 
-    public function __construct(RawConfigurationProvider $configurationProvider, TranslatorInterface $translator)
-    {
+    public function __construct(
+        RawConfigurationProviderInterface $configurationProvider,
+        TranslatorInterface $translator
+    ) {
         $this->configurationProvider = $configurationProvider;
         $this->translator = $translator;
     }

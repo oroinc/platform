@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Adds or removes the region field based on the country set.
+ */
 class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
 {
     private $om;
@@ -98,7 +101,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
         $data = $event->getData();
 
         /** @var $country Country */
-        $country = $this->om->getRepository('OroAddressBundle:Country')
+        $country = $this->om->getRepository(Country::class)
             ->find(isset($data['country']) ? $data['country'] : false);
 
         if ($country && $country->hasRegions()) {

@@ -1,5 +1,5 @@
 {% set userName = null %}
-{% if app.user %}
+{% if is_authenticated() %}
     {% set userName = app.user.username %}
 {% endif %}
 {% import '@OroAsset/Asset.html.twig' as Asset %}

@@ -41,7 +41,7 @@ class RedisConnectionFactory
         try {
             return RedisAdapter::createConnection($dsn, $options);
         } catch (InvalidArgumentException $e) {
-            if (str_contains($e->getMessage(), 'does not start with "redis:" or "rediss"')) {
+            if (str_contains($e->getMessage(), 'does not start with "redis[s]:"')) {
                 return null;
             }
 

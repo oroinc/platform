@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Form\Type;
 
+use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\FormBundle\Form\Type\OroUnstructuredHiddenType;
 use Oro\Bundle\FormBundle\Form\Type\OroUnstructuredTextType;
@@ -47,7 +48,7 @@ class GridViewType extends AbstractType
                 'appearanceType',
                 EntityType::class,
                 [
-                    'class' => 'OroDataGridBundle:AppearanceType',
+                    'class' => AppearanceType::class,
                     'property_path' => 'appearanceType',
                     'required' => false,
                 ]

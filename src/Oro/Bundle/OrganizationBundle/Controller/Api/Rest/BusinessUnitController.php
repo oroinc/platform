@@ -147,7 +147,7 @@ class BusinessUnitController extends RestController
      * @Acl(
      *      id="oro_business_unit_delete",
      *      type="entity",
-     *      class="OroOrganizationBundle:BusinessUnit",
+     *      class="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit",
      *      permission="DELETE"
      * )
      * @return Response
@@ -162,7 +162,7 @@ class BusinessUnitController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_organization.business_unit.manager.api');
+        return $this->container->get('oro_organization.business_unit.manager.api');
     }
 
     /**
@@ -170,7 +170,7 @@ class BusinessUnitController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_organization.form.business_unit.api');
+        return $this->container->get('oro_organization.form.business_unit.api');
     }
 
     /**
@@ -178,6 +178,6 @@ class BusinessUnitController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_organization.form.handler.business_unit.api');
+        return $this->container->get('oro_organization.form.handler.business_unit.api');
     }
 }

@@ -35,7 +35,7 @@ class TranslationDownloaderTest extends \PHPUnit\Framework\TestCase
     private const WEIRD_YAML_TRANSLATIONS = <<<'YAML'
 ---
 test: test
-test1:
+test1: ~
 test %num%: tessto presto %num% #%num%
 multi: |-
   Test l'aide <a href="http://community.oroinc.com"> forums</a>.
@@ -49,7 +49,6 @@ YAML
 
     private const PARSED_YAML_TRANSLATIONS = [
         'test' => 'test',
-        'test1' => null,
         'test %num%' => 'tessto presto %num%',
         'multi' => "Test l'aide <a href=\"http://community.oroinc.com\"> forums</a>.\nSecond line.",
         'another one' => 'another one string',

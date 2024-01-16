@@ -138,7 +138,7 @@ class WindowsStateController extends AbstractFOSRestController
 
     private function getWindowsStateManager(): ?WindowsStateManager
     {
-        return $this->get('oro_windows.manager.windows_state_registry')->getManager();
+        return $this->container->get('oro_windows.manager.windows_state_registry')->getManager();
     }
 
     private function handleNotFound(): Response

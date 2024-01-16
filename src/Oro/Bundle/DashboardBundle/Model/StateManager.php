@@ -9,6 +9,9 @@ use Oro\Bundle\DashboardBundle\Entity\WidgetStateNullObject;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Manages WidgetState entity in scope of current user.
+ */
 class StateManager
 {
     /** @var EntityManager */
@@ -40,7 +43,7 @@ class StateManager
         }
 
         $state = $this->entityManager
-            ->getRepository('OroDashboardBundle:WidgetState')
+            ->getRepository(WidgetState::class)
             ->findOneBy(
                 [
                     'owner'  => $user,

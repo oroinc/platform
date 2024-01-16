@@ -144,7 +144,7 @@ abstract class RestController extends RestGetController implements
         $formName = $this->getForm()->getName();
         $data     = empty($formName)
             ? $request->request->all()
-            : $request->request->get($formName);
+            : $request->get($formName);
 
         if (is_array($data) && $this->fixFormData($data, $entity)) {
             if (empty($formName)) {
@@ -203,6 +203,6 @@ abstract class RestController extends RestGetController implements
      */
     protected function getDeleteHandler()
     {
-        return $this->get('oro_soap.handler.delete');
+        return $this->container->get('oro_soap.handler.delete');
     }
 }

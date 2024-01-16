@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,7 +21,7 @@ class CountryType extends AbstractType
         $resolver->setDefaults(
             array(
                 'label' => 'oro.address.country.entity_label',
-                'class' => 'OroAddressBundle:Country',
+                'class' => Country::class,
                 'random_id' => true,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')

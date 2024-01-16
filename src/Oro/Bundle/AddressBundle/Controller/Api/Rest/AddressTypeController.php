@@ -46,6 +46,6 @@ class AddressTypeController extends RestGetController
      */
     public function getManager()
     {
-        return $this->get('oro_address.api.manager.address_type');
+        return $this->container->get('oro_address.api.manager.address_type');
     }
 }

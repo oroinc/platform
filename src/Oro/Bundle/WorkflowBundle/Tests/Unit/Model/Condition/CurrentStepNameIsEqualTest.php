@@ -126,6 +126,7 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
     public function testCompile()
     {
         $toStringStub = new User();
+        $toStringStub->setUserIdentifier('testUser');
         $options = [
             'main_entity' => $toStringStub,
             'step_name' => self::STEP_NAME,

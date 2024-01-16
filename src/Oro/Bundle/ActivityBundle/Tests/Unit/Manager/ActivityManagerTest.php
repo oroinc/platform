@@ -66,11 +66,6 @@ class ActivityManagerTest extends OrmTestCase
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($this->em);
-        $doctrine->expects($this->any())
-            ->method('getAliasNamespace')
-            ->willReturnMap([
-                ['Test', 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity']
-            ]);
 
         $this->activityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->groupingConfigProvider = $this->createMock(ConfigProvider::class);

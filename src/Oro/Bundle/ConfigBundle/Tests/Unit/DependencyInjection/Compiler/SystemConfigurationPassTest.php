@@ -88,7 +88,7 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $configBagServiceDef->expects($this->once())
             ->method('replaceArgument')
             ->with($this->equalTo(0), $this->isType('array'))
-            ->willReturnCallback(function ($index, $argument) {
+            ->willReturnCallback(function ($index, $argument) use ($configBagServiceDef) {
                 self::assertEquals(
                     ['Test\Class::method'],
                     $argument['groups']['group_with_scalar_configurator_and_handler']['configurator']
@@ -105,6 +105,7 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
                     ['Test\Class::method'],
                     $argument['groups']['group_with_array_configurator_and_handler']['handler']
                 );
+                return $configBagServiceDef;
             });
 
         $mainServiceAlias = $this->createMock(Alias::class);

@@ -126,7 +126,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             return;
         }
 
-        $em = $eventArgs->getEntityManager();
+        $em = $eventArgs->getObjectManager();
 
         $this->findAuditableInsertions($em);
         $this->findAuditableUpdates($em);
@@ -145,7 +145,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             return;
         }
 
-        $em = $eventArgs->getEntityManager();
+        $em = $eventArgs->getObjectManager();
         try {
             $insertions = $this->processInsertions($em);
             $updates = $this->processUpdates($em);

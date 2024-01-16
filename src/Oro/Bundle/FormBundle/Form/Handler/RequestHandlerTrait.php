@@ -19,7 +19,7 @@ trait RequestHandlerTrait
     protected function submitPostPutRequest(FormInterface $form, Request $request, bool $clearMissing = true)
     {
         $requestData = $form->getName()
-            ? $request->request->get($form->getName(), [])
+            ? $request->request->all($form->getName())
             : $request->request->all();
 
         $filesData = $form->getName()

@@ -190,7 +190,7 @@ class OwnerHelper
             return [];
         }
 
-        $qb = $this->registry->getRepository('OroUserBundle:User')
+        $qb = $this->registry->getRepository(User::class)
             ->createQueryBuilder('u')
             ->select('DISTINCT(u.id)')
             ->join('u.userRoles', 'r');

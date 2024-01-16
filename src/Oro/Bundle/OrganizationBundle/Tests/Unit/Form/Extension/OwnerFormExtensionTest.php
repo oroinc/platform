@@ -33,6 +33,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -189,7 +190,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->any())
             ->method('getUser')
-            ->willReturn('anon.');
+            ->willReturn($this->createMock(UserInterface::class));
 
         $this->ownershipMetadataProvider->expects($this->never())
             ->method('getMetadata');
@@ -487,7 +488,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $form->expects($this->any())
             ->method('getParent')
-            ->willReturn(false);
+            ->willReturn(null);
         $form->expects($this->once())
             ->method('getNormData')
             ->willReturn($this->entityClassName);
@@ -517,7 +518,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->builder);
         $form->expects($this->any())
             ->method('getParent')
-            ->willReturn(false);
+            ->willReturn(null);
         $form->expects($this->any())
             ->method('has')
             ->willReturn(true);

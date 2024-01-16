@@ -49,13 +49,13 @@ class WorkflowController extends AbstractFOSRestController
 
         try {
             /** @var WorkflowManager $workflowManager */
-            $workflowManager = $this->get('oro_workflow.manager');
+            $workflowManager = $this->container->get('oro_workflow.manager');
 
             $entityId = $request->get('entityId', 0);
             $data = $request->get('data');
             $dataArray = [];
             if ($data) {
-                $serializer = $this->get('oro_workflow.serializer.data.serializer');
+                $serializer = $this->container->get('oro_workflow.serializer.data.serializer');
                 $serializer->setWorkflowName($workflowName);
                 /** @var WorkflowData $data */
                 $data = $serializer->deserialize(
@@ -72,7 +72,7 @@ class WorkflowController extends AbstractFOSRestController
             $transition = $workflow->getTransitionManager()->getTransition($transitionName);
             if (!$transition->isEmptyInitOptions()) {
                 $contextAttribute = $transition->getInitContextAttribute();
-                $dataArray[$contextAttribute] = $this->get('oro_action.provider.button_search_context')
+                $dataArray[$contextAttribute] = $this->container->get('oro_action.provider.button_search_context')
                     ->getButtonSearchContext();
                 $entityId = null;
             }
@@ -107,7 +107,7 @@ class WorkflowController extends AbstractFOSRestController
 
     private function buildMessageString(Collection $errors, \Exception $e): string
     {
-        $translator = $this->get('translator');
+        $translator = $this->container->get('translator');
 
         $messages = $errors->map(
             static function ($error) use ($translator) {
@@ -133,7 +133,7 @@ class WorkflowController extends AbstractFOSRestController
     protected function getOrCreateEntityReference($entityClass, $entityId)
     {
         /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
+        $doctrineHelper = $this->container->get('oro_entity.doctrine_helper');
         try {
             if ($entityId) {
                 $entity = $doctrineHelper->getEntityReference($entityClass, $entityId);
@@ -167,7 +167,7 @@ class WorkflowController extends AbstractFOSRestController
         $errors = new ArrayCollection();
 
         try {
-            $this->get('oro_workflow.manager')->transit($workflowItem, $transitionName, $errors);
+            $this->container->get('oro_workflow.manager')->transit($workflowItem, $transitionName, $errors);
         } catch (WorkflowNotFoundException $e) {
             return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_NOT_FOUND);
         } catch (InvalidTransitionException $e) {
@@ -218,7 +218,7 @@ class WorkflowController extends AbstractFOSRestController
      */
     public function deleteAction(WorkflowItem $workflowItem)
     {
-        $this->get('oro_workflow.manager')->resetWorkflowItem($workflowItem);
+        $this->container->get('oro_workflow.manager')->resetWorkflowItem($workflowItem);
 
         return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
     }
@@ -236,7 +236,7 @@ class WorkflowController extends AbstractFOSRestController
      */
     public function activateAction(WorkflowDefinition $workflowDefinition)
     {
-        $workflowManager = $this->get('oro_workflow.registry.workflow_manager')->getManager();
+        $workflowManager = $this->container->get('oro_workflow.registry.workflow_manager')->getManager();
 
         $workflowManager->resetWorkflowData($workflowDefinition->getName());
         $workflowManager->activateWorkflow($workflowDefinition->getName());
@@ -245,7 +245,7 @@ class WorkflowController extends AbstractFOSRestController
             $this->view(
                 [
                     'successful' => true,
-                    'message' => $this->get('translator')->trans('Workflow activated')
+                    'message' => $this->container->get('translator')->trans('Workflow activated')
                 ],
                 Response::HTTP_OK
             )
@@ -265,7 +265,7 @@ class WorkflowController extends AbstractFOSRestController
      */
     public function deactivateAction(WorkflowDefinition $workflowDefinition)
     {
-        $workflowManager = $this->get('oro_workflow.registry.workflow_manager')->getManager();
+        $workflowManager = $this->container->get('oro_workflow.registry.workflow_manager')->getManager();
 
         $workflowManager->resetWorkflowData($workflowDefinition->getName());
         $workflowManager->deactivateWorkflow($workflowDefinition->getName());
@@ -274,7 +274,7 @@ class WorkflowController extends AbstractFOSRestController
             $this->view(
                 [
                     'successful' => true,
-                    'message' => $this->get('translator')->trans('Workflow deactivated')
+                    'message' => $this->container->get('translator')->trans('Workflow deactivated')
                 ],
                 Response::HTTP_OK
             )
@@ -307,6 +307,6 @@ class WorkflowController extends AbstractFOSRestController
             return null;
         }
 
-        return $this->get('oro_workflow.workflow_item_serializer')->serialize($workflowItem);
+        return $this->container->get('oro_workflow.workflow_item_serializer')->serialize($workflowItem);
     }
 }

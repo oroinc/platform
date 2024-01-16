@@ -23,7 +23,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             'permissions_policy' => [
                 'enable' => false,
                 'directives' => []
-            ]
+            ],
+            'access_control' => []
         ];
 
         $processedConfig = $this->processConfiguration([]);
@@ -47,7 +48,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'test3' => ['allow_all'],
                     'test4' => ['http://test.com']
                 ]
-            ]
+            ],
+            'access_control' => []
         ];
 
         $processedConfig = $this->processConfiguration([

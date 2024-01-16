@@ -12,7 +12,7 @@ use Oro\Bundle\EntityExtendBundle\PropertyAccess;
  */
 class ConfigurationProvider implements ConfigurationProviderInterface
 {
-    /** @var RawConfigurationProvider */
+    /** @var RawConfigurationProviderInterface */
     private $rawConfigurationProvider;
 
     /** @var SystemAwareResolver */
@@ -21,8 +21,10 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     /** @var array */
     private $processedConfiguration = [];
 
-    public function __construct(RawConfigurationProvider $rawConfigurationProvider, SystemAwareResolver $resolver)
-    {
+    public function __construct(
+        RawConfigurationProviderInterface $rawConfigurationProvider,
+        SystemAwareResolver $resolver
+    ) {
         $this->rawConfigurationProvider = $rawConfigurationProvider;
         $this->resolver = $resolver;
     }

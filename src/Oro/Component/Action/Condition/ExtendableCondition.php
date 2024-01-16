@@ -6,11 +6,21 @@ use Oro\Component\Action\Event\ExtendableConditionEvent;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Checks if the event has errors.
+ *
+ * Usage:
+ *
+ * @extendable:
+ *     events: [extendable_condition.shopping_list_start]
+ *     showErrors: true
+ *     messageType: 'error'
+ */
 class ExtendableCondition extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
@@ -25,9 +35,9 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
     protected $eventDispatcher;
 
     /**
-     * @var FlashBag
+     * @var RequestStack
      */
-    protected $flashBag;
+    protected $requestStack;
 
     /**
      * @var TranslatorInterface
@@ -46,11 +56,11 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
-        FlashBag $flashBag,
+        RequestStack $requestStack,
         TranslatorInterface $translator
     ) {
         $this->eventDispatcher = $eventDispatcher;
-        $this->flashBag = $flashBag;
+        $this->requestStack = $requestStack;
         $this->translator = $translator;
     }
 
@@ -138,7 +148,7 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
 
         if ($showErrors) {
             foreach ($errors as $error) {
-                $this->flashBag->add($this->options['messageType'], $error);
+                $this->requestStack?->getSession()?->getFlashBag()->add($this->options['messageType'], $error);
             }
         }
 

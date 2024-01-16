@@ -112,12 +112,15 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
         if (null === $userStub && true !== $nullUserStub) {
             $userStub = $this->getMockBuilder($userClass ?? User::class)
                 ->disableOriginalConstructor()
-                ->onlyMethods(['isEnabled'])
+                ->onlyMethods(['isEnabled', 'getUserIdentifier'])
                 ->addMethods(['getAuthStatus'])
                 ->getMock();
             $userStub->expects(self::any())
                 ->method('isEnabled')
                 ->willReturn($userEnabled ?? true);
+            $userStub->expects(self::any())
+                ->method('getUserIdentifier')
+                ->willReturn(self::USERNAME);
             $userStub->expects(self::any())
                 ->method('getAuthStatus')
                 ->willReturn(new TestEnumValue(

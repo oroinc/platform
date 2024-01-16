@@ -15,7 +15,6 @@ use Oro\Bundle\ReportBundle\Entity\ReportType;
 use Oro\Bundle\ReportBundle\Tests\Functional\ReportDateTimeFilterExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 /**
  * Do not use fixtures, as the time specified in the filters may be different from the actual time at the
@@ -399,11 +398,10 @@ class ReportControllerWithFiltersTest extends WebTestCase
         $this->entityManager->flush();
     }
 
-    private function getOwner(string $email = LoadAdminUserData::DEFAULT_ADMIN_EMAIL): User
+    private function getOwner(string $email = self::AUTH_USER): User
     {
         if (!$this->owner) {
-            $userRepository = $this->entityManager->getRepository(User::class);
-            return $userRepository->findOneBy(['email' => $email]);
+            return $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
         }
 
         return $this->owner;
@@ -413,9 +411,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
         string $businessUnit = LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT
     ): BusinessUnit {
         if (!$this->businessUnit) {
-            /** @var BusinessUnit $owner */
-            $buRepository = $this->entityManager->getRepository(BusinessUnit::class);
-            return $buRepository->findOneBy(['name' => $businessUnit]);
+            return $this->entityManager->getRepository(BusinessUnit::class)->findOneBy(['name' => $businessUnit]);
         }
 
         return $this->businessUnit;
@@ -424,9 +420,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
     private function getReportType(string $reportType = ReportType::TYPE_TABLE): ReportType
     {
         if (!$this->reportType) {
-            /** @var ReportType $type */
-            $reportTypeRepository = $this->entityManager->getRepository(ReportType::class);
-            return $reportTypeRepository->findOneBy(['name' => $reportType]);
+            return $this->entityManager->getRepository(ReportType::class)->findOneBy(['name' => $reportType]);
         }
 
         return $this->reportType;

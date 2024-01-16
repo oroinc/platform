@@ -7,9 +7,12 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\UserBundle\Entity\Role;
 
+/**
+ * Loads default roles
+ */
 class LoadRolesData extends AbstractFixture implements DependentFixtureInterface
 {
-    const ROLE_ANONYMOUS     = 'IS_AUTHENTICATED_ANONYMOUSLY';
+    const ROLE_ANONYMOUS     = 'PUBLIC_ACCESS';
     const ROLE_USER          = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
     const ROLE_MANAGER       = 'ROLE_MANAGER';

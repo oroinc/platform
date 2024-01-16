@@ -19,9 +19,12 @@ class ContainsComparisonExpression implements ComparisonExpressionInterface
         string $parameterName,
         mixed $value
     ): mixed {
-        $visitor->addParameter($parameterName, '%' . $value . '%');
+        $visitor->addParameter(
+            $parameterName,
+            '%' . ($value instanceof ExpressionValue ? $value->getValue() : $value) . '%'
+        );
 
         return $visitor->getExpressionBuilder()
-            ->like($expression, $visitor->buildPlaceholder($parameterName));
+            ->like($expression, $visitor->buildParameterExpression($parameterName, $value));
     }
 }

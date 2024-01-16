@@ -9,15 +9,16 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Loads the first user from the database.
+ * This user is the system administrator.
  */
 class LoadUser extends AbstractFixture implements InitialFixtureInterface
 {
     public const USER = 'user';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $user = $manager->getRepository(User::class)
             ->createQueryBuilder('t')

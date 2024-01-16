@@ -8,7 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -16,11 +16,10 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
 {
     use ContainerAwareTrait;
 
-    const ATTRIBUTE_FAMILY_1 = 'attribute_family_1';
-    const ATTRIBUTE_FAMILY_2 = 'attribute_family_2';
+    public const ATTRIBUTE_FAMILY_1 = 'attribute_family_1';
+    public const ATTRIBUTE_FAMILY_2 = 'attribute_family_2';
 
-    /** @var array */
-    protected $families = [
+    private array $families = [
         self::ATTRIBUTE_FAMILY_1 => [
             LoadAttributeGroupData::DEFAULT_ATTRIBUTE_GROUP_1,
             LoadAttributeGroupData::REGULAR_ATTRIBUTE_GROUP_1,
@@ -32,42 +31,37 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
     ];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return [
-            LoadAttributeGroupData::class,
-        ];
+        return [LoadAttributeGroupData::class, LoadOrganization::class];
     }
 
-    public function load(ObjectManager $manager)
+    /**
+     * {@inheritDoc}
+     */
+    public function load(ObjectManager $manager): void
     {
         $configManager = $this->container->get('oro_entity_config.config_manager');
         /** @var EntityConfigModel $entityConfigModel */
         $entityConfigModel = $configManager->getConfigEntityModel(LoadAttributeData::ENTITY_CONFIG_MODEL);
-        foreach ($this->families as $familyName => $groups) {
+        foreach ($this->families as $familyName => $groupNames) {
             $family = new AttributeFamily();
             $family->setDefaultLabel($familyName);
-            $family->setOwner($this->getOrganization($manager));
+            $family->setOwner($this->getReference(LoadOrganization::ORGANIZATION));
             $family->setCode($familyName);
             $family->setEntityClass($entityConfigModel->getClassName());
-            foreach ($groups as $group) {
+            foreach ($groupNames as $groupName) {
                 /** @var AttributeGroup $group */
-                $group = $this->getReference($group);
+                $group = $this->getReference($groupName);
                 $group->setAttributeFamily($family);
                 $manager->persist($group);
                 $family->addAttributeGroup($group);
             }
-
             $this->setReference($familyName, $family);
             $manager->persist($family);
         }
         $manager->flush();
-    }
-
-    private function getOrganization(ObjectManager $manager): Organization
-    {
-        return $manager->getRepository(Organization::class)->getFirst();
     }
 }

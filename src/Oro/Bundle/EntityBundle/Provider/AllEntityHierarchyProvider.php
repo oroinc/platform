@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\Persistence\Mapping\AbstractClassMetadataFactory;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\ManagerBagInterface;
+use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -41,16 +41,17 @@ class AllEntityHierarchyProvider extends AbstractEntityHierarchyProvider
         $managers = $this->managerBag->getManagers();
         foreach ($managers as $om) {
             $metadataFactory = $om->getMetadataFactory();
-            $cacheDriver = $metadataFactory instanceof AbstractClassMetadataFactory
-                ? $metadataFactory->getCacheDriver()
+            $cache = $metadataFactory instanceof OroClassMetadataFactory
+                ? $metadataFactory->getCacheItemPool()
                 : null;
-            if ($cacheDriver) {
-                $hierarchy = $cacheDriver->fetch(static::HIERARCHY_METADATA_CACHE_KEY);
-                if (false === $hierarchy) {
+            if ($cache) {
+                $hierarchyItem = $cache->getItem(static::HIERARCHY_METADATA_CACHE_KEY);
+                if (!$hierarchyItem->isHit()) {
                     $hierarchy = $this->loadHierarchy($om);
-                    $cacheDriver->save(static::HIERARCHY_METADATA_CACHE_KEY, $hierarchy);
-                } elseif (!empty($hierarchy)) {
-                    $this->hierarchy = array_merge($this->hierarchy, $hierarchy);
+                    $hierarchyItem->set($hierarchy);
+                    $cache->save($hierarchyItem);
+                } elseif (!empty($hierarchyItem->get())) {
+                    $this->hierarchy = array_merge($this->hierarchy, $hierarchyItem->get());
                 }
             } else {
                 $this->loadHierarchy($om);

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\UserBundle\EventListener;
 
 use Oro\Bundle\UserBundle\Security\LoginAttemptsHandlerInterface;
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 
 /**
  * Delegates handling of success and failed login to a specified handler.
@@ -23,7 +23,7 @@ class LoginAttemptsLogListener
         $this->loginAttemptsHandler->onInteractiveLogin($event);
     }
 
-    public function onAuthenticationFailure(AuthenticationFailureEvent $event): void
+    public function onAuthenticationFailure(LoginFailureEvent $event): void
     {
         $this->loginAttemptsHandler->onAuthenticationFailure($event);
     }

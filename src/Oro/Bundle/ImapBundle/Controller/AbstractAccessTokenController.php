@@ -43,7 +43,7 @@ abstract class AbstractAccessTokenController extends AbstractController
 
     protected function trans(string $id): string
     {
-        return $this->get(TranslatorInterface::class)->trans($id);
+        return $this->container->get(TranslatorInterface::class)->trans($id);
     }
 
     protected function getAccessTokenScopes(string $state): ?array

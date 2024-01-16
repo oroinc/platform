@@ -5,6 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -99,7 +100,7 @@ class BusinessUnitType extends AbstractType
                 'appendUsers',
                 EntityIdentifierType::class,
                 [
-                    'class'    => 'OroUserBundle:User',
+                    'class'    => User::class,
                     'required' => false,
                     'mapped'   => false,
                     'multiple' => true,
@@ -109,7 +110,7 @@ class BusinessUnitType extends AbstractType
                 'removeUsers',
                 EntityIdentifierType::class,
                 [
-                    'class'    => 'OroUserBundle:User',
+                    'class'    => User::class,
                     'required' => false,
                     'mapped'   => false,
                     'multiple' => true,

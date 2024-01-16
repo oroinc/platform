@@ -3,7 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 
+/**
+ * Repository for ProcessJob entity
+ */
 class ProcessJobRepository extends EntityRepository
 {
     const DELETE_HASH_BATCH = 100;
@@ -11,7 +15,7 @@ class ProcessJobRepository extends EntityRepository
     public function deleteByHashes(array $hashes)
     {
         $queryBuilder = $this->createQueryBuilder('job');
-        $queryBuilder->delete('OroWorkflowBundle:ProcessJob', 'job')
+        $queryBuilder->delete(ProcessJob::class, 'job')
             ->where($queryBuilder->expr()->in('job.entityHash', ':hashChunk'));
 
         $hashChunks = array_chunk($hashes, self::DELETE_HASH_BATCH);

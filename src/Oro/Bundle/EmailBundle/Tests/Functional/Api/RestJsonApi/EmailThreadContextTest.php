@@ -118,7 +118,7 @@ class EmailThreadContextTest extends RestJsonApiTestCase
             'type'       => 'users',
             'id'         => (string)$user->getId(),
             'attributes' => [
-                'username' => $user->getUsername()
+                'username' => $user->getUserIdentifier()
             ]
         ];
     }

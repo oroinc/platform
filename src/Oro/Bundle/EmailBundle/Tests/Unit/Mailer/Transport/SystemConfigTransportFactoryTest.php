@@ -7,18 +7,19 @@ use Oro\Bundle\EmailBundle\Mailer\Transport\SystemConfigTransportRealDsnProvider
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class SystemConfigTransportFactoryTest extends \PHPUnit\Framework\TestCase
 {
     private Transport|\PHPUnit\Framework\MockObject\MockObject $transportFactory;
-
     private SystemConfigTransportRealDsnProvider $systemConfigTransportRealDsnProvider;
-
     private SystemConfigTransportFactory $factory;
+    private TransportFactoryInterface $transportFactoryBase;
 
     protected function setUp(): void
     {
-        $this->transportFactory = $this->createMock(Transport::class);
+        $this->transportFactoryBase = $this->createMock(TransportFactoryInterface::class);
+        $this->transportFactory = new Transport([$this->transportFactoryBase]);
         $this->systemConfigTransportRealDsnProvider = $this->createMock(SystemConfigTransportRealDsnProvider::class);
         $requestStack = new RequestStack();
 
@@ -58,10 +59,13 @@ class SystemConfigTransportFactoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn($realDsn);
 
         $expectedTransport = $this->createMock(Transport\TransportInterface::class);
-        $this->transportFactory
+        $this->transportFactoryBase
             ->expects(self::once())
-            ->method('fromDsnObject')
-            ->with($realDsn)
+            ->method('supports')
+            ->willReturn(true);
+        $this->transportFactoryBase
+            ->expects(self::once())
+            ->method('create')
             ->willReturn($expectedTransport);
 
         self::assertEquals($expectedTransport, $this->factory->create($dsn));

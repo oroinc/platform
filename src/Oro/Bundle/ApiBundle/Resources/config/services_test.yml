@@ -386,7 +386,7 @@ services:
     oro_api.tests.test_flash_bag_depended_service:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestFlashBagDependedService
         arguments:
-            - '@session.flash_bag'
+            - '@request_stack'
 
     oro_api.tests.test_flash_bag_injection:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\TestFlashBagInjection

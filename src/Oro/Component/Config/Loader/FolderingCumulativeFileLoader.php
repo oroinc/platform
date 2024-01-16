@@ -94,7 +94,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
                                 $loader->setRelativeFilePath($currentRelativeFilePath);
                                 $this->addLoadedResource(
                                     $result,
-                                    $loader->load($bundleClass, $bundleDir, $bundleAppDir)
+                                    $loader->load($bundleClass, $bundleDir, $bundleAppDir, $file->getFilename())
                                 );
                             } catch (\Exception $e) {
                                 $loader->setRelativeFilePath($originalRelativeFilePath);
@@ -193,7 +193,8 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
             $this->folderPattern,
             $this->fileResourceLoaders,
             $this->registeredRelativeFilePaths
-        ] = $serialized[0];
+        ] = $serialized;
+        $this->initialize();
     }
 
     /**

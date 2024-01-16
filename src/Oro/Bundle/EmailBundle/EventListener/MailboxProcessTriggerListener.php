@@ -74,7 +74,7 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
         $emailBodies = $this->emailBodies;
         $this->emailBodies = [];
 
-        $em = $args->getEntityManager();
+        $em = $args->getObjectManager();
         $processRepository = $em->getRepository(ProcessDefinition::class);
         $processStorage = $this->container->get('oro_email.mailbox.process_storage');
         $handler = $this->container->get('oro_workflow.process.process_handler');

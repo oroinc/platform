@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Authentication\Token;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
  * An interface for factories to create OrganizationRememberMeToken.
@@ -11,12 +11,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 interface OrganizationRememberMeTokenFactoryInterface
 {
     /**
-     * @param UserInterface $user
-     * @param string        $providerKey
-     * @param string        $key
+     * @param AbstractUser  $user
+     * @param string        $firewall
+     * @param string        $secret
      * @param Organization  $organization
      *
      * @return OrganizationRememberMeToken
      */
-    public function create(UserInterface $user, $providerKey, $key, Organization $organization);
+    public function create(AbstractUser $user, string $firewall, string $secret, Organization $organization);
 }

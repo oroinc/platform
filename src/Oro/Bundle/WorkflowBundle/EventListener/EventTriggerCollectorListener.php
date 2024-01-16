@@ -56,7 +56,7 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
             return;
         }
 
-        $this->schedule($args->getEntity(), EventTriggerInterface::EVENT_CREATE);
+        $this->schedule($args->getObject(), EventTriggerInterface::EVENT_CREATE);
     }
 
     public function preUpdate(PreUpdateEventArgs $args)
@@ -71,7 +71,7 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
             $changeSet[$field] = ['old' => $args->getOldValue($field), 'new' => $args->getNewValue($field)];
         }
 
-        $this->schedule($args->getEntity(), EventTriggerInterface::EVENT_UPDATE, $changeSet);
+        $this->schedule($args->getObject(), EventTriggerInterface::EVENT_UPDATE, $changeSet);
     }
 
     public function preRemove(LifecycleEventArgs $args)
@@ -80,7 +80,7 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
             return;
         }
 
-        $this->schedule($args->getEntity(), EventTriggerInterface::EVENT_DELETE);
+        $this->schedule($args->getObject(), EventTriggerInterface::EVENT_DELETE);
     }
 
     public function onClear(OnClearEventArgs $args)
@@ -100,7 +100,7 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
 
         $extensions = $this->getExtensions();
         foreach ($extensions as $extension) {
-            $extension->process($args->getEntityManager());
+            $extension->process($args->getObjectManager());
         }
     }
 

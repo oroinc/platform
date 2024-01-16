@@ -1244,3 +1244,9 @@ services:
         arguments:
             - '@security.http_utils'
             - '@oro_api.rest.doc_url_generator'
+
+    oro_api.security.authenticator.feature_checker:
+        class: Oro\Bundle\ApiBundle\Security\FeatureDependAuthenticatorChecker
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+            - ~ # SecurityFirewallCompilerPass

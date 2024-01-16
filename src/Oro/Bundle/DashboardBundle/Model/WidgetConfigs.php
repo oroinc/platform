@@ -305,7 +305,7 @@ class WidgetConfigs
      */
     protected function findWidget($id)
     {
-        return $this->entityManager->getRepository('OroDashboardBundle:Widget')->find($id);
+        return $this->entityManager->getRepository(Widget::class)->find($id);
     }
 
     /**

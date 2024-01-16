@@ -41,7 +41,7 @@ class DefaultOperationRequestHelper
         $route = $request->get('_route');
 
         if (in_array($route, [self::DATAGRID_ROUTE, self::MASS_ACTION_ROUTE, self::DATAGRID_WIDGET_ROUTE], true)) {
-            $params = $request->query->get($request->get('gridName'));
+            $params = $request->query->all($request->get('gridName'));
 
             if (isset($params[self::ORIGINAL_ROUTE_URL_PARAMETER_KEY])) {
                 $route = $params[self::ORIGINAL_ROUTE_URL_PARAMETER_KEY];
