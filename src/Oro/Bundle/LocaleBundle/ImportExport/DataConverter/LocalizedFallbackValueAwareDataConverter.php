@@ -280,9 +280,11 @@ class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConv
     protected function getFieldHeader($entityName, $field): string
     {
         if (!is_array($field) || !array_key_exists('name', $field)) {
-            throw new \InvalidArgumentException('Property is not array or key "name" is not exist.');
+            throw new \InvalidArgumentException('Property is not array or key "name" does not exist.');
         }
 
-        return $this->fieldHelper->getConfigValue($entityName, $field['name'], 'header', $field['label']);
+        $fieldHeader = $this->fieldHelper->getConfigValue($entityName, $field['name'], 'header', $field['label']);
+
+        return $fieldHeader ?? $field['label'];
     }
 }

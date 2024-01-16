@@ -22,6 +22,6 @@ class InComparisonExpression implements ComparisonExpressionInterface
         $visitor->addParameter($parameterName, $value);
 
         return $visitor->getExpressionBuilder()
-            ->in($expression, $visitor->buildPlaceholder($parameterName));
+            ->in($expression, $visitor->buildParameterExpression($parameterName, $value));
     }
 }

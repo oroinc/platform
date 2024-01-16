@@ -28,9 +28,10 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 class WorkflowStepColumnListener
 {
     use WorkflowQueryTrait;
-    const WORKFLOW_STEP_COLUMN = 'workflowStepLabel';
-    const WORKFLOW_FILTER = 'workflowStepLabelByWorkflow';
-    const WORKFLOW_STEP_FILTER = 'workflowStepLabelByWorkflowStep';
+
+    public const WORKFLOW_STEP_COLUMN = 'workflowStepLabel';
+    public const WORKFLOW_FILTER = 'workflowStepLabelByWorkflow';
+    public const WORKFLOW_STEP_FILTER = 'workflowStepLabelByWorkflowStep';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -201,11 +202,6 @@ class WorkflowStepColumnListener
         return false;
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param string $rootEntity
-     * @param string $rootEntityAlias
-     */
     protected function addWorkflowStep(DatagridConfiguration $config, $rootEntity, $rootEntityAlias)
     {
         // add column
@@ -228,8 +224,8 @@ class WorkflowStepColumnListener
             if ($isManyWorkflows) {
                 $filters[self::WORKFLOW_FILTER] = [
                     'label' => 'oro.workflow.workflowdefinition.entity_label',
-                    'type' => 'entity',
-                    'data_name' => self::WORKFLOW_STEP_COLUMN,
+                    'type' => 'workflow_name',
+                    'data_name' => $rootEntityAlias . '.id',
                     'options' => [
                         'field_type' => WorkflowDefinitionSelectType::class,
                         'field_options' => [
@@ -243,7 +239,7 @@ class WorkflowStepColumnListener
             $filters[self::WORKFLOW_STEP_FILTER] = [
                 'label' => 'oro.workflow.workflowstep.grid.label',
                 'type' => 'workflow_step',
-                'data_name' => self::WORKFLOW_STEP_COLUMN . '.id',
+                'data_name' => $rootEntityAlias . '.id',
                 'options' => [
                     'field_type' => WorkflowStepSelectType::class,
                     'field_options' => [
@@ -313,7 +309,10 @@ class WorkflowStepColumnListener
             $rootEntityAlias = $datagrid->getConfig()->getOrmQuery()->getRootAlias();
 
             $items = $this->getWorkflowItemRepository()
-                ->$repositoryMethod($rootEntity, (array)$filters[$filter]['value']);
+                ->$repositoryMethod(
+                    $rootEntity,
+                    (array)$filters[$filter]['value']
+                );
 
             /** @var OrmDatasource $datasource */
             $datasource = $datagrid->getDatasource();
@@ -364,7 +363,7 @@ class WorkflowStepColumnListener
 
     private function isReportDatagrid(DatagridInterface $grid): bool
     {
-        return (bool) preg_match(
+        return (bool)preg_match(
             sprintf(
                 '/(%s|%s)\d+/',
                 Report::GRID_PREFIX,
