@@ -151,7 +151,7 @@ define(function(require, exports, module) {
                 .append(this.options.moreLabel);
 
             if (this.options.moreButtonIcon) {
-                $button.append(_.macros('orofrontend::renderIcon')({
+                $button.append(_.macros('oroui::renderIcon')({
                     'name': this.options.moreButtonIcon,
                     'class': 'theme-icon'
                 }));

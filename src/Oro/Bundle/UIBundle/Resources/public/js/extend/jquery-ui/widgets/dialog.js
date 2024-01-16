@@ -42,7 +42,7 @@ $.widget('ui.dialog', $.ui.dialog, {
 
         if (dialogTitleIcon) {
             return $(`<span class="dialog-icon" aria-hidden="true">
-                ${macros('orofrontend::renderIcon')({name: dialogTitleIcon})}
+                ${macros('oroui::renderIcon')({name: dialogTitleIcon})}
             </span>`);
         }
 
