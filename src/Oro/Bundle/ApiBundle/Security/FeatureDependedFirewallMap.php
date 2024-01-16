@@ -5,7 +5,9 @@ namespace Oro\Bundle\ApiBundle\Security;
 use Oro\Bundle\ApiBundle\Security\Http\Firewall\FeatureAccessListener;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\Authentication\Listener\OnNoTokenAccessListener;
+use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Psr\Container\ContainerInterface;
+use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,12 +64,31 @@ class FeatureDependedFirewallMap extends FirewallMap
         return [$listeners, $exceptionListener, $logoutListener];
     }
 
+    public function getFirewallConfig(Request $request): ?FirewallConfig
+    {
+        $context = $this->getContext($request);
+        if (null === $context) {
+            return null;
+        }
+
+        return $context->getConfig();
+    }
+
     private function getContext(Request $request): ?FirewallContext
     {
         $method = new \ReflectionMethod($this, 'getFirewallContext');
         $method->setAccessible(true);
 
-        return $method->invoke($this, $request);
+        $context = $method->invoke($this, $request);
+        // removing the stateless attribute for a csrf-protected api requests that should be stateful
+        if (null !== $context
+            && $context->getConfig()?->isStateless()
+            && $request->attributes->has('_stateless')
+            && $request->headers->has(CsrfRequestManager::CSRF_HEADER)) {
+            $request->attributes->remove('_stateless');
+        }
+
+        return $context;
     }
 
     private function getApplicableListeners(iterable $listeners, array $excludedAuthenticatorClasses): iterable
