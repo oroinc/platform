@@ -9,7 +9,8 @@ $select-font-size: $base-ui-element-font-size !default;
 $select-font-family: $base-font !default;
 $select-line-height: $base-ui-element-line-height !default;
 
-$select-padding: 11px $base-ui-element-icon-size 11px spacing('md') !default;
+$select-padding-start: spacing('md') !default;
+$select-padding: 11px $base-ui-element-icon-size 11px $select-padding-start !default;
 
 $select-placeholder-color: $base-ui-element-placeholder-color !default;
 

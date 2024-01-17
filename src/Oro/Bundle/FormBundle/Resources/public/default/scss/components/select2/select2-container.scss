@@ -34,7 +34,7 @@
     .select2-choice {
         position: relative;
 
-        display: block;
+        display: flex;
         padding: $select2-container-size-l;
 
         text-decoration: none;
@@ -67,6 +67,12 @@
             white-space: nowrap;
 
             text-overflow: ellipsis;
+        }
+
+        .select2-chosen-extra {
+            padding-inline-end: $select-inline-label-gap;
+            color: $select-inline-label-color;
+            overflow: initial;
         }
     }
 
