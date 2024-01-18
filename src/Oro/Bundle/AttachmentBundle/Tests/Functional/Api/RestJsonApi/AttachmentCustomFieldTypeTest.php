@@ -1,6 +1,6 @@
 <?php
 
-namespace Functional\Api\RestJsonApi;
+namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\Environment\Entity\TestAttachmentOwner;
