@@ -83,7 +83,7 @@ class AbstractUserRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('u');
         $qb->select('u.emailLowercase')
-            ->groupBy('u.emailLowercase')
+            ->groupBy('u.emailLowercase', 'u.organization')
             ->having($qb->expr()->gt('COUNT(u.id)', 1))
             ->setMaxResults($limit);
 

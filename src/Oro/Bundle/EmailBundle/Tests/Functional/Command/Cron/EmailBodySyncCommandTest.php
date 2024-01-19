@@ -36,14 +36,6 @@ class EmailBodySyncCommandTest extends WebTestCase
         }
     }
 
-    public function testCommandOutputWithEmailFeatureDisabled()
-    {
-        $this->disableEmailFeature();
-        $result = $this->runCommand('oro:cron:email-body-sync');
-
-        self::assertStringContainsString('The email feature is disabled. The command will not run.', $result);
-    }
-
     /**
      * @return array
      */

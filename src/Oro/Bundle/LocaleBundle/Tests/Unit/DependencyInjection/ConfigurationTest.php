@@ -77,6 +77,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                             'value' => null,
                             'scope' => 'app'
                         ],
+                        'use_localization_names_in_email_template_editor' => [
+                            'value' => false,
+                            'scope' => 'app'
+                        ],
                     ],
                     'formatting_code' => Translator::DEFAULT_LOCALE,
                     'language' => Translator::DEFAULT_LOCALE,
