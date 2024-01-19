@@ -105,6 +105,11 @@
             cursor: default;
         }
     }
+
+    // Hide select2 if its select is invisible
+    &:has(~ .select.invisible) {
+        display: none;
+    }
 }
 
 .select2-drop {
