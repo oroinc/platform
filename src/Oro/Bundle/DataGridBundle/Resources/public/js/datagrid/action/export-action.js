@@ -119,7 +119,10 @@ define([
                     }));
 
                     self.confirmModal.on('ok', function() {
-                        window.location.href = link.attr('href');
+                        const prevKey = self.actionKey;
+                        self.actionKey = link.data('key');
+                        self.execute();
+                        self.actionKey = prevKey;
                         self.confirmModal.off();
                     });
 
