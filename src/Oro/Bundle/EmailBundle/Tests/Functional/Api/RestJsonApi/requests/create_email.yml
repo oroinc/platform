@@ -34,7 +34,7 @@ data:
         xMessageId: 'test_x_message_id'
         xThreadId: 'test_x_thread_id'
         references:
-            - '<id1@email-api.func-test>'
+            - '<id2@email-api.func-test>'
         body:
             content: 'Test <b>email</b> body'
             type: html

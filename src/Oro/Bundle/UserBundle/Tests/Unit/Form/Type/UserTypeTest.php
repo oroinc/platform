@@ -117,7 +117,6 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
                 'expanded'             => true,
                 'required'             => false,
                 'attr'                 => $attr,
-                'disabled'             => $isMyProfile,
                 'translatable_options' => false
             ]];
         }

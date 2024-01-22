@@ -11,6 +11,9 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
 {
     private EmailThreadProvider $provider;
@@ -20,7 +23,7 @@ class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new EmailThreadProvider();
     }
 
-    public function testGetEmailReferencesWithoutThread(): void
+    public function testGetEmailReferencesWithoutRefs(): void
     {
         $email = $this->createMock(Email::class);
         $email->expects(self::once())
@@ -34,7 +37,7 @@ class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->provider->getEmailReferences($entityManager, $email));
     }
 
-    public function testGetEmailReferencesWithThread(): void
+    public function testGetEmailReferencesWithRefs(): void
     {
         $email = $this->createMock(Email::class);
         $email->expects(self::once())
@@ -72,6 +75,82 @@ class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($result);
 
         self::assertSame($result, $this->provider->getEmailReferences($entityManager, $email));
+    }
+
+    public function testGetReferredEmailsWithRefs(): void
+    {
+        $email = $this->createMock(Email::class);
+        $email->expects(self::once())
+            ->method('getRefs')
+            ->willReturn(['ref1']);
+        $email->expects(self::never())
+            ->method('getMessageId');
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())
+            ->method(self::anything());
+
+        self::assertSame([], $this->provider->getReferredEmails($entityManager, $email));
+    }
+
+    public function testGetReferredEmailsWithoutRefsAndMessageId(): void
+    {
+        $email = $this->createMock(Email::class);
+        $email->expects(self::once())
+            ->method('getRefs')
+            ->willReturn([]);
+        $email->expects(self::once())
+            ->method('getMessageId')
+            ->willReturn(null);
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())
+            ->method(self::anything());
+
+        self::assertSame([], $this->provider->getReferredEmails($entityManager, $email));
+    }
+
+    public function testGetReferredEmailsWithoutRefs(): void
+    {
+        $email = $this->createMock(Email::class);
+        $email->expects(self::once())
+            ->method('getRefs')
+            ->willReturn([]);
+        $email->expects(self::once())
+            ->method('getMessageId')
+            ->willReturn('msg1');
+        $result = [new Email(), new Email()];
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $query = $this->createMock(AbstractQuery::class);
+        $entityManager->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects(self::once())
+            ->method('select')
+            ->with('e')
+            ->willReturnSelf();
+        $queryBuilder->expects(self::once())
+            ->method('from')
+            ->with(Email::class, 'e')
+            ->willReturnSelf();
+        $queryBuilder->expects(self::once())
+            ->method('where')
+            ->with('e.refs LIKE :messagesId')
+            ->willReturnSelf();
+        $queryBuilder->expects(self::once())
+            ->method('setParameter')
+            ->with('messagesId', '%msg1%')
+            ->willReturnSelf();
+        $queryBuilder->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $query->expects(self::once())
+            ->method('getResult')
+            ->willReturn($result);
+
+        self::assertSame($result, $this->provider->getReferredEmails($entityManager, $email));
     }
 
     public function testGetHeadEmailWithoutThread(): void
