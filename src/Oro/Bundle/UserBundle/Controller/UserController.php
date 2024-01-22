@@ -47,7 +47,7 @@ class UserController extends AbstractController
      */
     public function viewAction(User $user)
     {
-        return $this->view($user);
+        return $this->view($user, $user === $this->getUser());
     }
 
     /**
