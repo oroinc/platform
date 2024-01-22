@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
+use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 
 /**
@@ -12,20 +13,11 @@ use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
  */
 class RootBasedAclWrapper implements AclInterface
 {
-    /** @var Acl */
-    private $acl;
-
-    /** @var RootAclWrapper */
-    private $rootAcl;
-
-    /** @var PermissionGrantingStrategyInterface */
-    private $permissionGrantingStrategy;
-
-    /** @var array|null */
-    private $classAces;
-
-    /** @var array */
-    private $classFieldAces = [];
+    private Acl $acl;
+    private RootAclWrapper $rootAcl;
+    private ?PermissionGrantingStrategyInterface $permissionGrantingStrategy = null;
+    private ?array $classAces = null;
+    private array $classFieldAces = [];
 
     public function __construct(Acl $acl, RootAclWrapper $rootAcl)
     {
@@ -34,9 +26,9 @@ class RootBasedAclWrapper implements AclInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getClassAces()
+    public function getClassAces(): array
     {
         if (null !== $this->classAces) {
             return $this->classAces;
@@ -49,9 +41,9 @@ class RootBasedAclWrapper implements AclInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getClassFieldAces($field)
+    public function getClassFieldAces($field): array
     {
         if (isset($this->classFieldAces[$field])) {
             return $this->classFieldAces[$field];
@@ -64,25 +56,25 @@ class RootBasedAclWrapper implements AclInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getObjectAces()
+    public function getObjectAces(): array
     {
         return $this->acl->getObjectAces();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getObjectFieldAces($field)
+    public function getObjectFieldAces($field): array
     {
         return $this->acl->getObjectFieldAces($field);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getObjectIdentity()
+    public function getObjectIdentity(): ObjectIdentityInterface
     {
         if (!$this->acl->getClassAces() && !$this->acl->getObjectAces()) {
             return $this->rootAcl->getObjectIdentity();
@@ -91,50 +83,59 @@ class RootBasedAclWrapper implements AclInterface
         return $this->acl->getObjectIdentity();
     }
 
+    public function getFieldObjectIdentity(string $fieldName): ObjectIdentityInterface
+    {
+        if ($this->acl->getClassFieldAces($fieldName) || $this->acl->getObjectFieldAces($fieldName)) {
+            return $this->acl->getObjectIdentity();
+        }
+
+        return $this->getObjectIdentity();
+    }
+
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getParentAcl()
+    public function getParentAcl(): ?AclInterface
     {
         return $this->acl->getParentAcl();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isEntriesInheriting()
+    public function isEntriesInheriting(): bool
     {
         return $this->acl->isEntriesInheriting();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isFieldGranted($field, array $masks, array $securityIdentities, $administrativeMode = false)
+    public function isFieldGranted($field, array $masks, array $securityIdentities, $administrativeMode = false): bool
     {
         return $this->getPermissionGrantingStrategy()
             ->isFieldGranted($this, $field, $masks, $securityIdentities, $administrativeMode);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isGranted(array $masks, array $securityIdentities, $administrativeMode = false)
+    public function isGranted(array $masks, array $securityIdentities, $administrativeMode = false): bool
     {
         return $this->getPermissionGrantingStrategy()
             ->isGranted($this, $masks, $securityIdentities, $administrativeMode);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function isSidLoaded($securityIdentities)
+    public function isSidLoaded($securityIdentities): bool
     {
         return $this->acl->isSidLoaded($securityIdentities);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function serialize()
     {
@@ -142,7 +143,7 @@ class RootBasedAclWrapper implements AclInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function unserialize($serialized)
     {
@@ -182,7 +183,7 @@ class RootBasedAclWrapper implements AclInterface
      *
      * @return EntryInterface[]
      */
-    private function addRootAces(array $aces, $field = null)
+    private function addRootAces(array $aces, ?string $field = null): array
     {
         return $this->rootAcl->addRootAces(
             $this->getPermissionGrantingStrategy()->getContext()->getAclExtension(),
