@@ -5,12 +5,14 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Provider;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailThreadProvider */
@@ -28,7 +30,6 @@ class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getRefs')
             ->willReturn(['testMessageId']);
         $entityManager = $this->createMock(EntityManager::class);
-        $repository = $this->createMock(EntityRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $query = $this->createMock(AbstractQuery::class);
 
@@ -38,32 +39,31 @@ class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getThread')
             ->willReturn($thread);
 
+        $entityManager->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
         $query->expects($this->once())
             ->method('getResult')
             ->willReturn([$emailFromTread]);
         $queryBuilder->expects($this->once())
             ->method('getQuery')
             ->willReturn($query);
-        $expressionBuilder = $this->createMock(Expr::class);
-        $expressionBuilder->expects($this->atLeastOnce())
-            ->method('in');
-        $queryBuilder->expects($this->atLeastOnce())
-            ->method('expr')
-            ->willReturn($expressionBuilder);
-        $queryBuilder->expects($this->atLeastOnce())
-            ->method('where')
-            ->willReturnSelf();
-        $queryBuilder->expects($this->atLeastOnce())
-            ->method('setParameter')
-            ->willReturnSelf();
-        $repository->expects($this->once())
-            ->method('createQueryBuilder')
+        $queryBuilder->expects($this->once())
+            ->method('select')
             ->with('e')
-            ->willReturn($queryBuilder);
-        $entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with('OroEmailBundle:Email')
-            ->willReturn($repository);
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('from')
+            ->with(Email::class, 'e')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('e.messageId IN (:messagesIds)')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('messagesIds', ['testMessageId'])
+            ->willReturnSelf();
 
         $this->assertEquals($thread, $this->provider->getEmailThread($entityManager, $email));
     }
@@ -75,20 +75,7 @@ class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getRefs')
             ->willReturn(['testMessageId']);
         $entityManager = $this->createMock(EntityManager::class);
-        $repository = $this->createMock(EntityRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $expressionBuilder = $this->createMock(Expr::class);
-        $expressionBuilder->expects($this->atLeastOnce())
-            ->method('in');
-        $queryBuilder->expects($this->atLeastOnce())
-            ->method('expr')
-            ->willReturn($expressionBuilder);
-        $queryBuilder->expects($this->atLeastOnce())
-            ->method('where')
-            ->willReturnSelf();
-        $queryBuilder->expects($this->atLeastOnce())
-            ->method('setParameter')
-            ->willReturnSelf();
         $query = $this->createMock(AbstractQuery::class);
 
         $thread = $this->createMock(EmailThread::class);
@@ -97,20 +84,31 @@ class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getThread')
             ->willReturn($thread);
 
+        $entityManager->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
         $query->expects($this->once())
             ->method('getResult')
             ->willReturn([$emailFromTread]);
         $queryBuilder->expects($this->once())
             ->method('getQuery')
             ->willReturn($query);
-        $repository->expects($this->once())
-            ->method('createQueryBuilder')
+        $queryBuilder->expects($this->once())
+            ->method('select')
             ->with('e')
-            ->willReturn($queryBuilder);
-        $entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with('OroEmailBundle:Email')
-            ->willReturn($repository);
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('from')
+            ->with(Email::class, 'e')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('e.messageId IN (:messagesIds)')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('messagesIds', ['testMessageId'])
+            ->willReturnSelf();
 
         $this->assertEquals($thread, $this->provider->getEmailThread($entityManager, $email));
     }
@@ -122,38 +120,36 @@ class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getRefs')
             ->willReturn(['testMessageId']);
         $entityManager = $this->createMock(EntityManager::class);
-        $repository = $this->createMock(EntityRepository::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $expressionBuilder = $this->createMock(Expr::class);
-        $expressionBuilder->expects($this->atLeastOnce())
-            ->method('in');
-        $queryBuilder->expects($this->atLeastOnce())
-            ->method('expr')
-            ->willReturn($expressionBuilder);
-        $queryBuilder->expects($this->atLeastOnce())
-            ->method('where')
-            ->willReturnSelf();
-        $queryBuilder->expects($this->atLeastOnce())
-            ->method('setParameter')
-            ->willReturnSelf();
         $query = $this->createMock(AbstractQuery::class);
 
         $emailFromTread = $this->createMock(Email::class);
 
+        $entityManager->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
         $query->expects($this->once())
             ->method('getResult')
             ->willReturn([$emailFromTread]);
         $queryBuilder->expects($this->once())
             ->method('getQuery')
             ->willReturn($query);
-        $repository->expects($this->once())
-            ->method('createQueryBuilder')
+        $queryBuilder->expects($this->once())
+            ->method('select')
             ->with('e')
-            ->willReturn($queryBuilder);
-        $entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with('OroEmailBundle:Email')
-            ->willReturn($repository);
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('from')
+            ->with(Email::class, 'e')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('e.messageId IN (:messagesIds)')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('messagesIds', ['testMessageId'])
+            ->willReturnSelf();
 
         $this->assertNotEmpty($this->provider->getEmailThread($entityManager, $email));
     }
