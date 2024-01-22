@@ -11,7 +11,7 @@ interface AccessRuleInterface
      * Checks whether this rule can be applied to the given criteria.
      * Note: this method is intended for complex logic that cannot be achieved
      * via the "oro_security.access_rule" tag options.
-     * @link ../Resources/doc/access-rules.md#add-a-new-access-rule
+     * @link https://doc.oroinc.com/backend/security/access-rules/#add-a-new-access-rule
      */
     public function isApplicable(Criteria $criteria): bool;
 
