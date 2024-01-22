@@ -27,10 +27,9 @@ class EmailThreadManager
      */
     public function updateThreads(array $newEmails): void
     {
-        /** @var EntityManagerInterface $em */
-        $em = $this->doctrine->getManagerForClass(Email::class);
+        $em = $this->getEntityManager();
         foreach ($newEmails as $email) {
-            $threadEmails = $this->emailThreadProvider->getEmailReferences($em, $email);
+            $threadEmails = $this->findThreadEmails($em, $email);
             $thread = $this->findThread($threadEmails);
             if (null === $thread && $threadEmails) {
                 $thread = new EmailThread();
@@ -52,8 +51,7 @@ class EmailThreadManager
      */
     public function updateHeads(array $updatedEmails): void
     {
-        /** @var EntityManagerInterface $em */
-        $em = $this->doctrine->getManagerForClass(Email::class);
+        $em = $this->getEntityManager();
         foreach ($updatedEmails as $email) {
             if (!$email->getThread() || !$email->getId()) {
                 continue;
@@ -71,10 +69,30 @@ class EmailThreadManager
         }
     }
 
+    /**
+     * @param EntityManagerInterface $em
+     * @param Email                  $email
+     *
+     * @return Email[]
+     */
+    private function findThreadEmails(EntityManagerInterface $em, Email $email): array
+    {
+        $threadEmails = $this->emailThreadProvider->getEmailReferences($em, $email);
+        if (!$threadEmails) {
+            $threadEmails = $this->emailThreadProvider->getReferredEmails($em, $email);
+        }
+
+        return $threadEmails;
+    }
+
+    /**
+     * @param Email[] $threadEmails
+     *
+     * @return EmailThread|null
+     */
     private function findThread(array $threadEmails): ?EmailThread
     {
         $thread = null;
-        /** @var Email $threadEmail */
         foreach ($threadEmails as $threadEmail) {
             $thread = $threadEmail->getThread();
             if (null !== $thread) {
@@ -83,5 +101,10 @@ class EmailThreadManager
         }
 
         return $thread;
+    }
+
+    private function getEntityManager(): EntityManagerInterface
+    {
+        return $this->doctrine->getManagerForClass(Email::class);
     }
 }

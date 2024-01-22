@@ -67,6 +67,10 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getEmailReferences')
             ->with(self::identicalTo($this->em), self::identicalTo($newEmail))
             ->willReturn([]);
+        $this->emailThreadProvider->expects(self::once())
+            ->method('getReferredEmails')
+            ->with(self::identicalTo($this->em), self::identicalTo($newEmail))
+            ->willReturn([]);
 
         $this->emailThreadManager->updateThreads([$newEmail]);
 
@@ -82,6 +86,8 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getEmailReferences')
             ->with(self::identicalTo($this->em), self::identicalTo($newEmail))
             ->willReturn([$threadEmail]);
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getReferredEmails');
 
         $this->emailThreadManager->updateThreads([$newEmail]);
 
@@ -100,6 +106,34 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->emailThreadProvider->expects(self::once())
             ->method('getEmailReferences')
+            ->with(self::identicalTo($this->em), self::identicalTo($newEmail))
+            ->willReturn([$threadEmail1, $threadEmail2, $threadEmail3]);
+        $this->emailThreadProvider->expects(self::never())
+            ->method('getReferredEmails');
+
+        $this->emailThreadManager->updateThreads([$newEmail]);
+
+        self::assertEquals($thread1, $newEmail->getThread());
+        self::assertEquals($thread1, $threadEmail1->getThread());
+        self::assertEquals($thread1, $threadEmail2->getThread());
+        self::assertEquals($thread2, $threadEmail3->getThread());
+    }
+
+    public function testUpdateThreadsForNewEmailThatIsRootForAlreadyExistingEmails(): void
+    {
+        $newEmail = $this->getEmail(null, true);
+        $thread1 = $this->getThread(1);
+        $thread2 = $this->getThread(2);
+        $threadEmail1 = $this->getEmail(1, true);
+        $threadEmail2 = $this->getEmail(2, true, $thread1);
+        $threadEmail3 = $this->getEmail(3, true, $thread2);
+
+        $this->emailThreadProvider->expects(self::once())
+            ->method('getEmailReferences')
+            ->with(self::identicalTo($this->em), self::identicalTo($newEmail))
+            ->willReturn([]);
+        $this->emailThreadProvider->expects(self::once())
+            ->method('getReferredEmails')
             ->with(self::identicalTo($this->em), self::identicalTo($newEmail))
             ->willReturn([$threadEmail1, $threadEmail2, $threadEmail3]);
 

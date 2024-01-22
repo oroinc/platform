@@ -136,6 +136,29 @@ class EmailUserTest extends RestJsonApiTestCase
                     ],
                     [
                         'type'          => 'emailusers',
+                        'id'            => '<toString(@emailUser_6->id)>',
+                        'attributes'    => [
+                            'receivedAt' => '2022-05-01T15:00:00Z',
+                            'seen'       => false,
+                            'private'    => true,
+                            'folders'    => [
+                                ['type' => 'sent', 'name' => 'Sent', 'path' => 'Sent']
+                            ]
+                        ],
+                        'relationships' => [
+                            'organization' => [
+                                'data' => ['type' => 'organizations', 'id' => '<toString(@organization->id)>']
+                            ],
+                            'owner'        => [
+                                'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                            ],
+                            'email'        => [
+                                'data' => ['type' => 'emails', 'id' => '<toString(@email_6->id)>']
+                            ]
+                        ]
+                    ],
+                    [
+                        'type'          => 'emailusers',
                         'id'            => '<toString(@emailUser_3_2->id)>',
                         'attributes'    => [
                             'receivedAt' => '2022-05-01T15:00:00Z',
