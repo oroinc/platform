@@ -34,6 +34,13 @@ oro_api:
     error_title_overrides:
         'file constraint from system config constraint': 'file constraint'
 
+    form_types:
+        - Oro\Bundle\AttachmentBundle\Form\Type\FileType
+
+    form_type_guesses:
+        file:
+            form_type: Oro\Bundle\AttachmentBundle\Form\Type\FileType
+
 oro_security:
     login_target_path_excludes:
         - oro_attachment_get_file
