@@ -1,6 +1,8 @@
 /* @theme: default; */
 
 .catalog-switcher {
+    display: none;
+
     &__tooltip-trigger {
         position: absolute;
         inset: 0;
@@ -10,9 +12,19 @@
         position: relative;
     }
 
+    .dropdown-menu {
+        margin: spacing('sm') 0;
+    }
+
     .dropdown-menu[x-placement] {
         .dropdown-item {
             white-space: $catalog-switcher-dropdown-item-white-space;
         }
+    }
+}
+
+@include breakpoint('mobile-big') {
+    .catalog-switcher {
+        display: block;
     }
 }
