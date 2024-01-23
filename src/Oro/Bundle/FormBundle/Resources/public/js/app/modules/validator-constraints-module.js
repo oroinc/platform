@@ -15,6 +15,7 @@ $.validator.loadMethod([
     'oroform/js/validator/open-range',
     'oroform/js/validator/regex',
     'oroform/js/validator/repeated',
+    'oroform/js/validator/not-blank-group',
     'oroform/js/validator/time',
     'oroform/js/validator/url',
     'oroform/js/validator/type',

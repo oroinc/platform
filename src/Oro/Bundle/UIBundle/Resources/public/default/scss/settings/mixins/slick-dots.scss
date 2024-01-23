@@ -4,55 +4,72 @@
 @mixin slick-dots(
     $slick-dots-class:                    '.slick-dots',
     $slick-dots-bottom-pos:               spacing('base'),
-    $slick-dots-item-offset:              0 spacing('xs'),
-    $slick-dots-button-size:              10px,
-    $slick-dots-button-bg:                get-color('additional-old', 'light'),
-    $slick-dots-button-border:            1px solid get-color('additional-old', 'middle'),
-    $slick-dots-button-box-shadow:        null,
-    $slick-dots-button-border-radius:     50%,
-    $slick-dots-button-active-border:     1px solid get-color('ui', 'focus'),
-    $slick-dots-button-active-bg:         get-color('ui', 'focus'),
-    $slick-dots-button-active-box-shadow: 0 0 7px get-color('ui', 'focus')
+    $slick-dots-item-offset:              null,
+    $slick-dots-line-height:              0,
+    $slick-dots-button-height:            6px,
+    $slick-dots-button-width:             28px,
+    $slick-dots-button-padding:           19px 8px,
+    $slick-dots-align-items:              center,
+    $slick-dots-justify-content:          center,
+    $slick-dots-button-bg:                get-color('neutral', 'grey2'),
+    $slick-dots-button-bg-hover:          get-color('neutral', 'grey3'),
+    $slick-dots-button-border:            none,
+    $slick-dots-button-box-shadow:        none,
+    $slick-dots-button-border-radius:     $base-ui-element-border-radius,
+    $slick-dots-button-active-border:     none,
+    $slick-dots-button-active-bg:         get-color('primary', 'active'),
+    $slick-dots-button-active-box-shadow: none,
+    $slick-dots-padding:                  0,
+    $slick-dots-margin:                   0,
+    $slick-dots-width:                    100%
 ) {
     #{$slick-dots-class} {
-        position: absolute;
-        bottom: $slick-dots-bottom-pos;
-
-        width: 100%;
-        margin: 0 auto;
-        padding: 0;
-
-        text-align: center;
-        vertical-align: bottom;
+        width: $slick-dots-width;
+        margin: $slick-dots-margin;
+        padding: $slick-dots-padding;
+        list-style: none;
+        display: flex;
+        align-items: $slick-dots-align-items;
+        justify-content: $slick-dots-justify-content;
+        line-height: $slick-dots-line-height;
 
         li {
-            display: inline-block;
-
             margin: $slick-dots-item-offset;
+            transition: width .15s linear, height .15s linear;
 
             &.slick-active {
                 button {
-                    background: $slick-dots-button-active-bg;
-                    border: $slick-dots-button-active-border;
-                    box-shadow: $slick-dots-button-active-box-shadow;
+                    &:before {
+                        background-color: $slick-dots-button-active-bg;
+                    }
                 }
             }
         }
 
         button {
-            width: $slick-dots-button-size;
-            height: $slick-dots-button-size;
-            padding: 0;
-
+            padding: $slick-dots-button-padding;
             font-size: 0;
-
-            background: $slick-dots-button-bg;
-            border: $slick-dots-button-border;
-            box-shadow: $slick-dots-button-box-shadow;
-
-            border-radius: $slick-dots-button-border-radius;
-
             cursor: pointer;
+            border: none;
+            box-shadow: none;
+            background-color: transparent;
+
+            &:before {
+                content: '';
+                display: block;
+                width: $slick-dots-button-width;
+                height: $slick-dots-button-height;
+                background-color: $slick-dots-button-bg;
+                border: $slick-dots-button-border;
+                box-shadow: $slick-dots-button-box-shadow;
+                border-radius: $slick-dots-button-border-radius;
+            }
+
+            &:hover {
+                &:before {
+                    background-color: $slick-dots-button-bg-hover;
+                }
+            }
         }
     }
 }
