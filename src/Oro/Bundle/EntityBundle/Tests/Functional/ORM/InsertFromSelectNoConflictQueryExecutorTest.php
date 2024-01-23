@@ -1,6 +1,6 @@
 <?php
 
-namespace Functional\ORM;
+namespace Oro\Bundle\EntityBundle\Tests\Functional\ORM;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
