@@ -10,6 +10,9 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Provides data related to email threads.
+ */
 class EmailThreadProvider
 {
     /**
@@ -51,24 +54,53 @@ class EmailThreadProvider
      */
     public function getEmailReferences(EntityManager $entityManager, Email $entity)
     {
-        $result = [];
         $refs = $entity->getRefs();
-        if ($refs) {
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
-            $queryBuilder->where($queryBuilder->expr()->in('e.messageId', ':messagesIds'))
-                ->setParameter('messagesIds', $refs);
-            $result = $queryBuilder->getQuery()->getResult();
+        if (!$refs) {
+            return [];
         }
 
-        return $result;
+        return $entityManager->createQueryBuilder()
+            ->select('e')
+            ->from(Email::class, 'e')
+            ->where('e.messageId IN (:messagesIds)')
+            ->setParameter('messagesIds', $refs)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Gets all emails that are referred to the given email.
+     *
+     * @param EntityManager $entityManager
+     * @param Email $entity
+     *
+     * @return Email[]
+     */
+    public function getReferredEmails(EntityManager $entityManager, Email $entity): array
+    {
+        if ($entity->getRefs()) {
+            return [];
+        }
+
+        $messageId = $entity->getMessageId();
+        if (!$messageId) {
+            return [];
+        }
+
+        return $entityManager->createQueryBuilder()
+            ->select('e')
+            ->from(Email::class, 'e')
+            ->where('e.refs LIKE :messagesId')
+            ->setParameter('messagesId', '%' . $messageId . '%')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
      * Get head email in thread
      *
      * @param EntityManager $entityManager
-     * @param Email $entity
+     * @param Email         $entity
      *
      * @return Email
      */

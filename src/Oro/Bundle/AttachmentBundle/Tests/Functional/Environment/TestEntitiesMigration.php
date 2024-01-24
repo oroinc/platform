@@ -43,6 +43,7 @@ class TestEntitiesMigration implements
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->addAttachmentAssociationToTestDepartment($schema);
+        $this->createTestAttachmentOwnerTable($schema);
     }
 
     private function addAttachmentAssociationToTestDepartment(Schema $schema): void
@@ -54,5 +55,19 @@ class TestEntitiesMigration implements
         if (!$schema->getTable('oro_attachment')->hasColumn($associationColumnName)) {
             $this->attachmentExtension->addAttachmentAssociation($schema, 'test_api_department', ['image/*']);
         }
+    }
+
+    private function createTestAttachmentOwnerTable(Schema $schema): void
+    {
+        if ($schema->hasTable('test_api_attachment_owner')) {
+            return;
+        }
+
+        $table = $schema->createTable('test_api_attachment_owner');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->setPrimaryKey(['id']);
+
+        $this->attachmentExtension->addFileRelation($schema, 'test_api_attachment_owner', 'test_file');
     }
 }

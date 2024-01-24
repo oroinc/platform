@@ -4,8 +4,12 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 
+/**
+ * Provides a set of methods to manage data related to email threads.
+ */
 class EmailThreadManager
 {
     /** @var EmailThreadProvider */
@@ -25,13 +29,21 @@ class EmailThreadManager
      */
     public function updateThreads(array $newEmails)
     {
-        foreach ($newEmails as $entity) {
-            $thread = $this->emailThreadProvider->getEmailThread($this->em, $entity);
-            if ($thread) {
+        foreach ($newEmails as $email) {
+            $threadEmails = $this->findThreadEmails($this->em, $email);
+            $thread = $this->findThread($threadEmails);
+            if (null === $thread && $threadEmails) {
+                $thread = new EmailThread();
                 $this->em->persist($thread);
-                $entity->setThread($thread);
             }
-            $this->updateRefs($this->em, $entity);
+            if (null !== $thread) {
+                $email->setThread($thread);
+                foreach ($threadEmails as $threadEmail) {
+                    if (null === $threadEmail->getThread()) {
+                        $threadEmail->setThread($thread);
+                    }
+                }
+            }
         }
     }
 
@@ -75,5 +87,40 @@ class EmailThreadManager
                 }
             }
         }
+    }
+
+
+    /**
+     * @param EntityManager $em
+     * @param Email $email
+     *
+     * @return Email[]
+     */
+    private function findThreadEmails(EntityManager $em, Email $email): array
+    {
+        $threadEmails = $this->emailThreadProvider->getEmailReferences($em, $email);
+        if (!$threadEmails) {
+            $threadEmails = $this->emailThreadProvider->getReferredEmails($em, $email);
+        }
+
+        return $threadEmails;
+    }
+
+    /**
+     * @param Email[] $threadEmails
+     *
+     * @return EmailThread|null
+     */
+    private function findThread(array $threadEmails): ?EmailThread
+    {
+        $thread = null;
+        foreach ($threadEmails as $threadEmail) {
+            $thread = $threadEmail->getThread();
+            if (null !== $thread) {
+                break;
+            }
+        }
+
+        return $thread;
     }
 }
