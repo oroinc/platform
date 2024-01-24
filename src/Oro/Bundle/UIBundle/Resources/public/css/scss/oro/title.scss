@@ -1,0 +1,25 @@
+/* @theme: admin.oro; */
+
+.terms-title {
+    font-weight: 700;
+    font-size: $base-font-size;
+    margin-bottom: $content-padding-medium;
+
+    &-divider {
+        padding: $content-padding-small 0;
+        font-size: $base-font-size;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+
+        &::after {
+            content: '';
+            display: block;
+            flex-grow: 1;
+            background: $primary-860;
+            height: 8px;
+        }
+    }
+}
