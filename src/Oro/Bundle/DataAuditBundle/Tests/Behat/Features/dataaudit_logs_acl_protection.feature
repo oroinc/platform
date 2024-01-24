@@ -33,7 +33,7 @@ Feature: DataAudit logs acl protection
     And select following permissions:
       | Audit   | View:Global |
     And select following permissions:
-      | Contact | View:Global | Create:Global | Edit:Global | Delete:Global | Assign:Global|Share:Global|
+      | Contact | View:Global | Create:Global | Edit:Global | Delete:Global | Assign:Global |
     And save and close form
     And I proceed as the User
     And login to dashboard as "testUser1@test.com" user
