@@ -694,6 +694,10 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 #### MessageQueueBundle
 * Every custom MQ topic needs a `topic` class now; see more in the [Message Queue Topics](https://doc.oroinc.com/backend/mq/message-queue-topics/) topic.
 
+#### WorkflowBundle
+* To unify the WorkflowBundle and ActionBundle syntax, the `pre_conditions` and `post_actions` options of the workflow process definition configuration were renamed to `preconditions` and `actions` respectively.
+
+
 ### Removed
 
 #### CronBundle
@@ -741,9 +745,6 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 * The deprecated method `tools.loadModuleAndReplace()` from `'oroui/js/tools'` module, use `loadModules.fromObjectProp` from `'oroui/js/app/services/load-modules'` instead.
 * `vertical_container` layout block type has been removed, as redundant. Use conventional `container` layout block type instead, with additions custom CSS class that implements required alignment.
 
-#### WorkflowBundle
-* The deprecated `pre_conditions` option was removed for the configuration of workflow process definitions.
-* The deprecated `pre_conditions` and `post_actions` options were removed for the configuration of workflows.
 
 #### LayoutBundle
 * Removed `Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder`, use `Oro\Component\Layout\LayoutContextStack` instead.
