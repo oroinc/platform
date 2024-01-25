@@ -22,6 +22,8 @@ layout:
                     blockType: block
                 __datagrid_toolbar_pagination:
                     blockType: block
+                __datagrid_toolbar_pagination_info:
+                    blockType: block
                 __datagrid_toolbar_sorting:
                     blockType: block
                 __datagrid_items_counter:
@@ -39,3 +41,4 @@ layout:
                                 __datagrid_toolbar_actions_panel: ~
                             __datagrid_toolbar_page_size: ~
                         __datagrid_toolbar_pagination: ~
+                        __datagrid_toolbar_pagination_info: ~
