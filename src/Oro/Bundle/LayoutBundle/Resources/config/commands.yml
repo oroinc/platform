@@ -17,3 +17,35 @@ services:
             - '@oro_layout.theme_extension.configuration'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\LayoutBundle\Command\DumpThemeResourcesConfigCommand:
+        class: Oro\Bundle\LayoutBundle\Command\DumpThemeResourcesConfigCommand
+        public: false
+        arguments:
+            - '@oro_layout.theme_extension.resource_provider.theme'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\LayoutBundle\Command\DebugDataProviderSignatureCommand:
+        class: Oro\Bundle\LayoutBundle\Command\DebugDataProviderSignatureCommand
+        arguments:
+            - '@oro_layout.layout_manager'
+            - '@oro_layout.method_phpdoc_extractor'
+            - !abstract '$dataProviders defined in Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass'
+        tags:
+            - { name: console.command, command: 'oro:debug:layout:data-providers' }
+
+    Oro\Bundle\LayoutBundle\Command\DebugLayoutBlockTypeSignatureCommand:
+        class: Oro\Bundle\LayoutBundle\Command\DebugLayoutBlockTypeSignatureCommand
+        arguments:
+            - '@oro_layout.layout_manager'
+            - !abstract '$blockTypes defined in Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass'
+        tags:
+            - { name: console.command, command: 'oro:debug:layout:block-types' }
+
+    Oro\Bundle\LayoutBundle\Command\DebugLayoutContextConfiguratorsSignatureCommand:
+        class: Oro\Bundle\LayoutBundle\Command\DebugLayoutContextConfiguratorsSignatureCommand
+        arguments:
+            - !abstract '$contextConfigurators defined in Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass'
+        tags:
+            - { name: console.command, command: 'oro:debug:layout:context-configurators' }

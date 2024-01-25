@@ -57,7 +57,8 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'label'              => 'Base theme',
                 'groups'             => [],
                 'image_placeholders' => [],
-                'extra_js_builds'  => []
+                'extra_js_builds'  => [],
+                'resolve_extra_paths' => []
             ],
             $this->configurationProvider->getThemeDefinition('base')
         );
@@ -141,7 +142,8 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                     'label' => 'Sample label'
                 ]
             ],
-            'extra_js_builds'  => []
+            'extra_js_builds'  => [],
+            'resolve_extra_paths' => [],
         ];
 
         $actual = $this->configurationProvider->getThemeDefinition('oro-black');

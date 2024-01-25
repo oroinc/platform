@@ -12,17 +12,17 @@ class DebugOptionsResolverDecorator
 {
     public const NO_VALUE = 'NO_VALUE';
 
+    protected $optionsResolver;
+
     /**
      * @var OptionsResolver
      */
-    protected $optionsResolver;
-
-    public function __construct(OptionsResolver $optionsResolver)
+    public function __construct(OptionsResolver$optionsResolver)
     {
         $this->optionsResolver = $optionsResolver;
     }
 
-    public function getOptionResolver(): OptionsResolver
+    public function getOptionResolver()
     {
         return $this->optionsResolver;
     }
@@ -94,7 +94,7 @@ class DebugOptionsResolverDecorator
      * @return mixed
      * @throws \ReflectionException
      */
-    private function getPrivatePropertyValue($object, $propertyName)
+    protected function getPrivatePropertyValue($object, $propertyName)
     {
         $property = ReflectionUtil::getProperty(new \ReflectionClass($object), $propertyName);
         if (!$property) {
