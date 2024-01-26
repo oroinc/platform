@@ -39,8 +39,12 @@ class UrlConverter
             return $url;
         }
 
-        $originalRoute = $urlParameters[$datagridName][DefaultOperationRequestHelper::ORIGINAL_ROUTE_URL_PARAMETER_KEY];
-        $originalRouteUrl = $this->router->generate($originalRoute);
+        $datagridParams = $urlParameters[$datagridName];
+        $originalRoute = $datagridParams[DefaultOperationRequestHelper::ORIGINAL_ROUTE_URL_PARAMETER_KEY];
+        $originalRouteParameters = $datagridParams[DefaultOperationRequestHelper::ORIGINAL_ROUTE_PARAMETERS_KEY] ?? '';
+        $originalRouteParameters = json_decode(urldecode($originalRouteParameters), true) ?: [];
+
+        $originalRouteUrl = $this->router->generate($originalRoute, $originalRouteParameters);
         if ($originalRouteUrl === $baseUrl) {
             return $url;
         }

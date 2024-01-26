@@ -6,6 +6,7 @@ use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -59,8 +60,9 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
                     'datagrid' => null,
                     'group' => null,
                     'fromUrl' => null,
+                    'route_params' => '%5B%5D',
                 ],
-                'calls' => 7,
+                'calls' => 8,
             ],
             [
                 'request' => new Request(),
@@ -71,8 +73,9 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
                     'datagrid' => null,
                     'group' => null,
                     'fromUrl' => null,
+                    'route_params' => '%5B%5D',
                 ],
-                'calls' => 7,
+                'calls' => 8,
             ],
             [
                 'request' => new Request(
@@ -83,7 +86,8 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
                         'datagrid' => 'test_datagrid',
                         'group' => 'test_group',
                         'fromUrl' => 'test-url',
-                    ]
+                    ],
+                    attributes: ['_route_params' => ['id' => 42]]
                 ),
                 'expected' => [
                     'route' => 'test_route',
@@ -91,9 +95,10 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
                     'entityClass' => 'stdClass',
                     'datagrid' => 'test_datagrid',
                     'group' => 'test_group',
-                    'fromUrl' => 'test-url'
+                    'fromUrl' => 'test-url',
+                    'route_params' => '%7B%22id%22%3A42%7D',
                 ],
-                'calls' => 6,
+                'calls' => 7,
             ]
         ];
     }
@@ -104,10 +109,12 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetActionParameters(array $context, array $expected)
     {
         $request = $this->createMock(Request::class);
-        $request->expects($this->once())
+        $requestAttributes = $this->createMock(ParameterBag::class);
+        $requestAttributes->expects($this->exactly(2))
             ->method('get')
-            ->with('_route')
-            ->willReturn(self::ROUTE);
+            ->withConsecutive(['_route', null], ['_route_params', []])
+            ->willReturnOnConsecutiveCalls(self::ROUTE, $context['route_params'] ?? []);
+        $request->attributes = $requestAttributes;
         $request->expects($this->once())
             ->method('getRequestUri')
             ->willReturn(self::REQUEST_URI);
@@ -150,41 +157,53 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         return [
             'empty context' => [
                 'context' => [],
-                'expected' => ['route' => self::ROUTE, 'fromUrl' => self::REQUEST_URI],
+                'expected' => ['route' => self::ROUTE, 'fromUrl' => self::REQUEST_URI, 'route_params' => []],
             ],
             'entity_class' => [
                 'context' => ['entity_class' => \stdClass::class],
                 'expected' => [
                     'route' => self::ROUTE,
                     'entityClass' => \stdClass::class,
-                    'fromUrl' => self::REQUEST_URI
+                    'fromUrl' => self::REQUEST_URI,
+                    'route_params' => []
                 ],
             ],
             'new entity' => [
                 'context' => ['entity' => $this->getEntity()],
-                'expected' => ['route' => self::ROUTE, 'fromUrl' => self::REQUEST_URI],
+                'expected' => ['route' => self::ROUTE, 'fromUrl' => self::REQUEST_URI, 'route_params' => []],
             ],
             'existing entity' => [
-                'context' => ['entity' => $this->getEntity(42)],
+                'context' => ['entity' => $this->getEntity(42), 'route_params' => ['id' => 42]],
                 'expected' => [
                     'route' => self::ROUTE,
                     'entityClass' => 'stdClass',
                     'entityId' => ['id' => 42],
-                    'fromUrl' => self::REQUEST_URI
+                    'fromUrl' => self::REQUEST_URI,
+                    'route_params' => ['id' => 42],
                 ],
             ],
             'existing entity & entity_class' => [
-                'context' => ['entity' => $this->getEntity(43), 'entity_class' => 'testClass'],
+                'context' => [
+                    'entity' => $this->getEntity(43),
+                    'entity_class' => 'testClass',
+                    'route_params' => ['id' => 43],
+                ],
                 'expected' => [
                     'route' => self::ROUTE,
                     'entityClass' => 'stdClass',
                     'entityId' => ['id' => 43],
-                    'fromUrl' => self::REQUEST_URI
+                    'fromUrl' => self::REQUEST_URI,
+                    'route_params' => ['id' => 43],
                 ],
             ],
             'new entity & entity_class' => [
                 'context' => ['entity' => $this->getEntity(), 'entity_class' => 'testClass'],
-                'expected' => ['route' => self::ROUTE, 'entityClass' => 'testClass', 'fromUrl' => self::REQUEST_URI],
+                'expected' => [
+                    'route' => self::ROUTE,
+                    'entityClass' => 'testClass',
+                    'fromUrl' => self::REQUEST_URI,
+                    'route_params' => [],
+                ],
             ],
         ];
     }
@@ -239,7 +258,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         return [
             'without request' => [
                 'request' => null,
-                'requestStackCalls' => 7,
+                'requestStackCalls' => 8,
                 'expected' => new ActionData(
                     [
                         'data' => null,
@@ -249,7 +268,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
             ],
             'empty request' => [
                 'request' => new Request(),
-                'requestStackCalls' => 7,
+                'requestStackCalls' => 8,
                 'expected' => new ActionData(
                     [
                         'data' => null,
@@ -264,7 +283,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
                         'entityClass' => $entityClass
                     ]
                 ),
-                'requestStackCalls' => 6,
+                'requestStackCalls' => 7,
                 'expected' => new ActionData(
                     [
                         'data' => new \stdClass(),
