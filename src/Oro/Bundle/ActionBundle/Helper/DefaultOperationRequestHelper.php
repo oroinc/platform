@@ -16,6 +16,7 @@ class DefaultOperationRequestHelper
     const DATAGRID_WIDGET_ROUTE = 'oro_datagrid_widget';
 
     const ORIGINAL_ROUTE_URL_PARAMETER_KEY = 'originalRoute';
+    const ORIGINAL_ROUTE_PARAMETERS_KEY = 'originalRouteParameters';
 
     /** @var RequestStack */
     protected $requestStack;

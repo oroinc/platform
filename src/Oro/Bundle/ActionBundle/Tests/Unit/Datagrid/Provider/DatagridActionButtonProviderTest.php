@@ -29,6 +29,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const PROVIDER_ALIAS = 'test_mass_action_provider';
     private const TEST_ROUTE = 'test_route';
+    private const TEST_ROUTE_PARAMS = '%7B%22gridName%22%3A%22customer-view-quote-grid%22%7D';
 
     /** @var ButtonProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $buttonProvider;
@@ -46,6 +47,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(
                 [
                     ContextHelper::ROUTE_PARAM => self::TEST_ROUTE,
+                    ContextHelper::ROUTE_PARAMETERS => self::TEST_ROUTE_PARAMS,
                     ContextHelper::ENTITY_ID_PARAM => null,
                     ContextHelper::ENTITY_CLASS_PARAM => null,
                     ContextHelper::DATAGRID_PARAM => null,
@@ -117,6 +119,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
             $this->assertArrayHasKey('urlParams', $options);
             $this->assertArrayHasKey('originalRoute', $options['urlParams']);
             $this->assertEquals(self::TEST_ROUTE, $options['urlParams']['originalRoute']);
+            $this->assertEquals(self::TEST_ROUTE_PARAMS, $options['urlParams']['originalRouteParameters']);
 
             $this->assertNotEmpty($config->offsetGetOr('actions'));
             $this->assertNotEmpty($config->offsetGetOr('action_configuration'));
