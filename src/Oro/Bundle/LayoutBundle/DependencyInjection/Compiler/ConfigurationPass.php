@@ -3,6 +3,9 @@
 namespace Oro\Bundle\LayoutBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\LayoutBundle\Command\DebugCommand;
+use Oro\Bundle\LayoutBundle\Command\DebugDataProviderSignatureCommand;
+use Oro\Bundle\LayoutBundle\Command\DebugLayoutBlockTypeSignatureCommand;
+use Oro\Bundle\LayoutBundle\Command\DebugLayoutContextConfiguratorsSignatureCommand;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -72,12 +75,27 @@ class ConfigurationPass implements CompilerPassInterface
         $extensionDef->replaceArgument(1, $blockTypes);
         $extensionDef->replaceArgument(2, $this->getBlockTypeExtensions($container, $servicesForServiceLocator));
         $extensionDef->replaceArgument(3, $this->getLayoutUpdates($container, $servicesForServiceLocator));
-        $extensionDef->replaceArgument(4, $this->getContextConfigurators($container, $servicesForServiceLocator));
+        $contextConfiguratorIds = $this->getContextConfigurators($container, $servicesForServiceLocator);
+        $extensionDef->replaceArgument(4, $contextConfiguratorIds);
         $extensionDef->replaceArgument(5, $dataProviders);
+        $contextConfiguratorIds = $this->getContextConfigurators($container, $servicesForServiceLocator);
 
         $commandDef = $container->getDefinition(DebugCommand::class);
         $commandDef->replaceArgument(2, array_keys($blockTypes));
         $commandDef->replaceArgument(3, array_keys($dataProviders));
+
+        $dataProviderCommandDef = $container->getDefinition(DebugDataProviderSignatureCommand::class);
+        $dataProviderCommandDef->setArgument('$dataProviders', array_keys($dataProviders));
+
+        $blockTypeCommandDef = $container->getDefinition(DebugLayoutBlockTypeSignatureCommand::class);
+        $blockTypeCommandDef->setArgument('$blockTypes', array_keys($blockTypes));
+
+        $contextConfigCommandDef = $container->getDefinition(DebugLayoutContextConfiguratorsSignatureCommand::class);
+
+        $contextConfigCommandDef->setArgument(
+            '$contextConfigurators',
+            $this->getContextConfiguratorsAsServices($contextConfiguratorIds)
+        );
     }
 
     private function getBlockTypes(ContainerBuilder $container, array &$servicesForServiceLocator): array
@@ -165,6 +183,19 @@ class ConfigurationPass implements CompilerPassInterface
         }
 
         return $configurators;
+    }
+
+    private function getContextConfiguratorsAsServices(array $contextConfigIds): array
+    {
+        $configServices = [];
+        foreach ($contextConfigIds as $configurator) {
+            $configServices[$configurator] = [
+                'id' => $configurator,
+                'service' => new Reference($configurator)
+            ];
+        }
+
+        return $configServices;
     }
 
     private function getDataProviders(ContainerBuilder $container, array &$servicesForServiceLocator): array
