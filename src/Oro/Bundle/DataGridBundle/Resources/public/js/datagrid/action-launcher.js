@@ -153,7 +153,8 @@ define(function(require, exports, module) {
 
         setOptions: function(options) {
             const truthy = _.pick(options, 'template', 'label', 'title', 'ariaLabel', 'allowDefaultAriaLabel',
-                'icon', 'link', 'launcherMode', 'iconClassName', 'className', 'action', 'attributes', 'withinDropdown');
+                'icon', 'link', 'launcherMode', 'iconClassName', 'className', 'action', 'attributes', 'withinDropdown',
+                'actionClassNames');
 
             _.extend(
                 this,
@@ -166,7 +167,8 @@ define(function(require, exports, module) {
 
         getTemplateData: function() {
             const data = _.pick(this, 'icon', 'title', 'label', 'ariaLabel', 'className', 'iconClassName',
-                'launcherMode', 'link', 'links', 'action', 'attributes', 'enabled', 'tagName', 'withinDropdown');
+                'launcherMode', 'link', 'links', 'action', 'attributes', 'enabled', 'tagName', 'withinDropdown',
+                'actionClassNames');
 
             if (!data.label) {
                 data.label = this.action.label;

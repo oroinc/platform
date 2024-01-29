@@ -43,7 +43,7 @@ define(function(require, exports, module) {
         launcherMode: '',
 
         /**
-         * Allow launcher to use / set default aria-label attribute if it not defined
+         * Allow launcher to use / set default aria-label attribute if it is not defined
          *
          * @property boolean
          * */
@@ -53,18 +53,7 @@ define(function(require, exports, module) {
         actionsState: '',
 
         /** @property */
-        baseMarkup: _.template(
-            `<div class="more-bar-holder">
-                <div class="dropleft">
-                    <a class="dropdown-toggle" href="#" role="button" id="<%- togglerId %>" data-toggle="dropdown" 
-                        aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>">
-                        <span class="icon fa-ellipsis-h fa--no-offset" aria-hidden="true"></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" 
-                        aria-labelledby="<%- togglerId %>"></ul>
-                </div>
-            </div>`
-        ),
+        baseMarkup: require('tpl-loader!orodatagrid/templates/datagrid/action-cell-base-markup.html'),
 
         /** @property */
         simpleBaseMarkup: _.template(`<div class="more-bar-holder action-row"></div>`),
@@ -97,7 +86,7 @@ define(function(require, exports, module) {
 
         /** @property */
         launcherItemTemplate: _.template(
-            `<li class="launcher-item<% if (className) { %> <%= 'mode-' + className %><% } %>"></li>`
+            `<li class="launcher-item<% if (className) { %> <%- 'mode-' + className %><% } %>"></li>`
         ),
 
         /** @property */
@@ -391,10 +380,26 @@ define(function(require, exports, module) {
             $launcherItem.append(launcher.render().$el);
             const className = 'mode-' + launcher.launcherMode;
             $launcherItem.addClass(className);
+            this.decorateLauncherItem(launcher);
+            return result;
+        },
+
+        /**
+         * Add extra classes to launcher
+         *
+         * @param {orodatagrid.datagrid.ActionLauncher} launcher
+         * @return {Object}
+         */
+        decorateLauncherItem(launcher) {
+            if (!launcher.$el) {
+                return this;
+            }
+
             if (this.isDropdownActions) {
                 launcher.$el.addClass('dropdown-item');
             }
-            return result;
+
+            return this;
         },
 
         /**

@@ -1,17 +1,25 @@
 /* @theme: default; */
 
 .launchers-dropdown-menu {
-    /* stylelint-disable declaration-no-important */
-    // Override bootstrap styles
-    min-width: 0 !important;
-    // Override bootstrap styles;
-    margin: 0 !important;
-    // Override bootstrap styles;
-    padding: 0 !important;
-
-    &.show {
-        // Override bootstrap styles;
-        margin: 0 !important;
+    .launchers-list {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
     }
-    /* stylelint-enable declaration-no-important */
+
+    .launcher-item {
+        width: 100%;
+    }
+
+    .action {
+        justify-content: flex-start;
+        padding: $dropdown-item-padding-y $dropdown-item-padding-x;
+
+        color: inherit;
+
+        &:hover,
+        &:focus {
+            color: inherit;
+        }
+    }
 }

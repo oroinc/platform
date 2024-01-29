@@ -1,0 +1,55 @@
+<% let oroui = _.macros('oroui') %>
+<% obj.attributesTemplate = function(attributes) {
+    _.each(attributes, function(attribute, name) { %>
+        <%- name %><% if (!_.isNull(attribute)) { %>="<%- attribute %>"<% } %>
+    <% });
+} %>
+
+<%
+    if (obj.iconClassName) {
+        obj.iconClassName = obj.iconClassName.replace(/^fa-/, '');
+    }
+    if (obj.icon) {
+        obj.icon = obj.icon.replace(/^fa-/, '');
+    }
+    const actionClassNames = typeof obj.actionClassNames === 'string' ? obj.actionClassNames.split(' ') : [];
+    actionClassNames.push('action btn');
+    if (className) {
+        actionClassNames.push(className);
+    }
+    if (!enabled) {
+        actionClassNames.push('disabled');
+    }
+    if (launcherMode != '') {
+        actionClassNames.push('mode-' +  launcherMode);
+    }
+    actionClassNames.push('dropdown-toggle');
+    const togglerId = _.uniqueId('dropdown-');
+    const renderLauncherIcon = data => {
+        return oroui.renderIcon({
+            name: data.iconClassName ? iconClassName : icon,
+            extraClass: 'theme-icon--medium' + (data.icon ? ' theme-icon-' + icon : '')
+        })
+    };
+%>
+<div class="<%- wrapperClassName %> dropdown">
+    <a href="#" class="<%- actionClassNames.join(' ') %>"
+       title="<%- title %>"
+       role="button" id="<%- togglerId %>" data-toggle="dropdown"
+       aria-haspopup="true" aria-expanded="false"
+       <% if (launcherMode == 'icon-only' && obj.ariaLabel) { %> aria-label="<%- ariaLabel %>" <% } %>
+       <% attributesTemplate(attributes) %>>
+        <% if (launcherMode == 'icon-text') { %>
+            <%= renderLauncherIcon(obj) %>
+            <%- label %>
+        <% } else if (launcherMode == 'icon-only') { %>
+            <%= renderLauncherIcon(obj) %>
+        <% } else if (launcherMode == 'text-only') { %>
+            <% if (iconClassName) { %>
+                <%= renderLauncherIcon(obj) %>
+            <% } %>
+            <%- label %>
+        <% } %>
+    </a>
+    <div class="dropdown-menu" aria-labelledby="<%- togglerId %>"></div>
+</div>
