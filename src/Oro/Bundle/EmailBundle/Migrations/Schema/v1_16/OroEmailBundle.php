@@ -10,30 +10,26 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroEmailBundle implements Migration, OrderedMigrationInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 1;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::createOroEmailMailboxTable($schema);
-        self::createOroEmailMailboxProcessSettingsTable($schema);
-
-        self::addOwnerMailboxColumn($schema);
-        self::addOroEmailMailboxForeignKeys($schema);
-        self::addEmailUserMailboxOwnerColumn($schema);
+        $this->createOroEmailMailboxTable($schema);
+        $this->createOroEmailMailboxProcessSettingsTable($schema);
+        $this->addOwnerMailboxColumn($schema);
+        $this->addOroEmailMailboxForeignKeys($schema);
+        $this->addEmailUserMailboxOwnerColumn($schema);
     }
 
-    /**
-     * Creates 'oro_email_mailbox' table which represents Mailbox entity.
-     */
-    public static function createOroEmailMailboxTable(Schema $schema)
+    private function createOroEmailMailboxTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_mailbox');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -42,21 +38,17 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
         $table->addColumn('origin_id', 'integer', ['notnull' => false]);
         $table->addColumn('email', 'string', ['length' => 255]);
         $table->addColumn('label', 'string', ['length' => 255]);
-        $table->addColumn('created_at', 'datetime', []);
+        $table->addColumn('created_at', 'datetime');
         $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['email'], 'UNIQ_574C364FE7927C74');
         $table->addUniqueIndex(['label'], 'UNIQ_574C364FEA750E8');
         $table->addUniqueIndex(['process_settings_id'], 'UNIQ_574C364F37BAC19A');
         $table->addUniqueIndex(['origin_id'], 'UNIQ_574C364F56A273CC');
-        $table->addIndex(['organization_id'], 'IDX_574C364F32C8A3DE', []);
+        $table->addIndex(['organization_id'], 'IDX_574C364F32C8A3DE');
     }
 
-    /**
-     * Creates 'oro_email_mailbox_process' table which represents MailboxProcessSettings entity.
-     * A common shared mapped superclass for all mailbox process settings types.
-     */
-    public static function createOroEmailMailboxProcessSettingsTable(Schema $schema)
+    private function createOroEmailMailboxProcessSettingsTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_mailbox_process');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -64,13 +56,9 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
         $table->setPrimaryKey(['id']);
     }
 
-    /**
-     * Adds mailbox owner to EmailUser entity.
-     */
-    public static function addOwnerMailboxColumn(Schema $schema)
+    private function addOwnerMailboxColumn(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_address');
-
         $table->addColumn('owner_mailbox_id', 'integer', ['notnull' => false]);
         $table->addIndex(['owner_mailbox_id'], 'IDX_FC9DBBC53486AC89');
         $table->addForeignKeyConstraint(
@@ -82,10 +70,7 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
         );
     }
 
-    /**
-     * Add 'oro_email_mailbox' table foreign keys.
-     */
-    public static function addOroEmailMailboxForeignKeys(Schema $schema)
+    private function addOroEmailMailboxForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_mailbox');
         $table->addForeignKeyConstraint(
@@ -108,14 +93,10 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
         );
     }
 
-    /**
-     * Adds foreign keys to new columns in 'oro_email_user' table.
-     */
-    public static function addEmailUserMailboxOwnerColumn(Schema $schema)
+    private function addEmailUserMailboxOwnerColumn(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_user');
         $table->addColumn('mailbox_owner_id', 'integer', ['notnull' => false]);
-
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email_mailbox'),
             ['mailbox_owner_id'],

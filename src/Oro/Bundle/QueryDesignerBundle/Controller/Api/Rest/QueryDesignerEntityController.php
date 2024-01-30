@@ -37,7 +37,7 @@ class QueryDesignerEntityController extends AbstractFOSRestController
     public function fieldsAction(Request $request)
     {
         /** @var EntityWithFieldsProvider $provider */
-        $provider = $this->get('oro_query_designer.entity_field_list_provider');
+        $provider = $this->container->get('oro_query_designer.entity_field_list_provider');
         $withRelations = filter_var($request->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
         $statusCode = Response::HTTP_OK;
 

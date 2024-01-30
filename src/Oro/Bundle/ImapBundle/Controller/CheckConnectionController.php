@@ -36,7 +36,7 @@ class CheckConnectionController extends AbstractController
 
     private function getConnectionManager(): ConnectionControllerManager
     {
-        return $this->get(ConnectionControllerManager::class);
+        return $this->container->get(ConnectionControllerManager::class);
     }
 
     public static function getSubscribedServices(): array

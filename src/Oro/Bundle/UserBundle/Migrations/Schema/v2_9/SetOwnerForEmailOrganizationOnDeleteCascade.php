@@ -11,19 +11,15 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class SetOwnerForEmailOrganizationOnDeleteCascade implements Migration
 {
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::updateOrganizationConstraint($schema);
-    }
-
-    public static function updateOrganizationConstraint(Schema $schema): void
+    /**
+     * {@inheritDoc}
+     */
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_email_user');
-
         if ($table->hasForeignKey('FK_91F5CFF632C8A3DE')) {
             $table->removeForeignKey('FK_91F5CFF632C8A3DE');
         }
-
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],

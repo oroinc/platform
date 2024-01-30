@@ -7,6 +7,7 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnerMetadataProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMakerPass;
+use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\PublicSecurityServicesPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\RemoveAclSchemaListenerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SessionPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SetFirewallExceptionListenerPass;
@@ -54,6 +55,7 @@ class OroSecurityBundle extends Bundle
         ));
         $container->addCompilerPass(new SessionPass());
         $container->addCompilerPass(new SetFirewallExceptionListenerPass());
+        $container->addCompilerPass(new PublicSecurityServicesPass());
 
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new RemoveAclSchemaListenerPass());
@@ -64,9 +66,9 @@ class OroSecurityBundle extends Bundle
         }
 
         $extension = $container->getExtension('security');
-        $extension->addSecurityListenerFactory(new OrganizationFormLoginFactory());
-        $extension->addSecurityListenerFactory(new OrganizationHttpBasicFactory());
-        $extension->addSecurityListenerFactory(new OrganizationRememberMeFactory());
+        $extension->addAuthenticatorFactory(new OrganizationFormLoginFactory());
+        $extension->addAuthenticatorFactory(new OrganizationHttpBasicFactory());
+        $extension->addAuthenticatorFactory(new OrganizationRememberMeFactory());
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(

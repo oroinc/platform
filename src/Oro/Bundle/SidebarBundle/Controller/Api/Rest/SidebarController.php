@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SidebarBundle\Controller\Api\Rest;
 
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SidebarBundle\Entity\AbstractSidebarState;
@@ -101,7 +102,7 @@ class SidebarController extends AbstractFOSRestController
      */
     protected function validatePermissions(UserInterface $user)
     {
-        return $user->getUsername() === $this->getUser()->getUsername();
+        return $user->getUserIdentifier() === $this->getUser()->getUserIdentifier();
     }
 
     /**
@@ -111,7 +112,7 @@ class SidebarController extends AbstractFOSRestController
      */
     protected function getManager()
     {
-        return $this->getDoctrine()->getManagerForClass($this->getSidebarStateClass());
+        return $this->container->get('doctrine')->getManagerForClass($this->getSidebarStateClass());
     }
 
     /**
@@ -128,5 +129,13 @@ class SidebarController extends AbstractFOSRestController
     protected function getSidebarStateClass()
     {
         return SidebarState::class;
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            ['doctrine' => ManagerRegistry::class]
+        );
     }
 }

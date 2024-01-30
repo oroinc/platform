@@ -12,6 +12,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -71,7 +72,7 @@ class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
-            ->willReturn(new \stdClass());
+            ->willReturn($this->createMock(UserInterface::class));
         $this->tokenStorage->expects($this->atLeastOnce())
             ->method('getToken')
             ->willReturn($token);

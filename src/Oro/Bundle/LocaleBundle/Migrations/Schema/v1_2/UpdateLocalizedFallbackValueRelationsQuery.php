@@ -3,8 +3,8 @@
 namespace Oro\Bundle\LocaleBundle\Migrations\Schema\v1_2;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
 use Oro\Bundle\EntityConfigBundle\Migration\ConfigurationHandlerAwareInterface;
+use Oro\Bundle\EntityConfigBundle\Migration\ConfigurationHandlerAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Query\AbstractEntityConfigQuery;
@@ -18,9 +18,9 @@ use Psr\Log\LoggerInterface;
 class UpdateLocalizedFallbackValueRelationsQuery extends AbstractEntityConfigQuery implements
     ConfigurationHandlerAwareInterface
 {
-    const LIMIT = 100;
+    use ConfigurationHandlerAwareTrait;
 
-    protected ConfigurationHandler $configurationHandler;
+    const LIMIT = 100;
 
     /**
      * {@inheritdoc}
@@ -28,14 +28,6 @@ class UpdateLocalizedFallbackValueRelationsQuery extends AbstractEntityConfigQue
     public function getDescription()
     {
         return 'Update all LocalizedFallbackValue relations to be unidirectional';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConfigurationHandler(ConfigurationHandler $configurationHandler): void
-    {
-        $this->configurationHandler = $configurationHandler;
     }
 
     /**

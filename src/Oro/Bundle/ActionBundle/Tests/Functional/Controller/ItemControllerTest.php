@@ -142,7 +142,7 @@ class ItemControllerTest extends WebTestCase
         $this->assertCount(count($operations), $node);
 
         $router = $this->getContainer()->get('router');
-        $container = $node->parents()->parents()->html();
+        $container = $node->ancestors()->ancestors()->html();
 
         foreach ($operations as $operation) {
             self::assertStringContainsString(

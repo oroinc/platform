@@ -16,18 +16,18 @@ Feature: Create email template with fallbacks
       | Entity Name   | User            |
       | Subject       | Default subject |
       | Content       | Default content |
-    When I click "Localization 1"
+    When I click "Localization1"
     Then I should see "Use Default Localization"
     And I fill "Email Template Form" with:
       | Subject Fallback | false                  |
       | Subject          | Localization 1 subject |
-    When I click "Localization 2"
+    When I click "Localization2"
     Then I should see "Use Localization 1 (Parent localization)"
     And I fill "Email Template Form" with:
       | Content Fallback | false                  |
       | Content          | Localization 2 content |
     And click "Ellipsis button"
-    When I click "Localization 3"
+    When I click "Localization3"
     Then I should see "Use Localization 1 (Parent localization)"
     And I fill "Email Template Form" with:
       | Subject Fallback | false                  |
@@ -78,7 +78,7 @@ Feature: Create email template with fallbacks
     Given I go to System/ Emails/ Templates
     And I filter Template name as is equal to "Test Template"
     And I click "Edit" on row "Test Template" in grid
-    And I click "Localization 1"
+    And I click "Localization1"
     And I fill "Email Template Form" with:
       | Subject Fallback | false                      |
       | Subject          | New localization 1 subject |

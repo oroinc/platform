@@ -9,7 +9,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroBatchBundleInstaller implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMigrationVersion(): string
     {
@@ -17,7 +17,7 @@ class OroBatchBundleInstaller implements Installation
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries): void
     {
@@ -36,12 +36,12 @@ class OroBatchBundleInstaller implements Installation
     /**
      * Create akeneo_batch_job_execution table
      */
-    protected function createAkeneoBatchJobExecutionTable(Schema $schema)
+    private function createAkeneoBatchJobExecutionTable(Schema $schema): void
     {
         $table = $schema->createTable('akeneo_batch_job_execution');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('job_instance_id', 'integer', []);
-        $table->addColumn('status', 'integer', []);
+        $table->addColumn('job_instance_id', 'integer');
+        $table->addColumn('status', 'integer');
         $table->addColumn('start_time', 'datetime', ['notnull' => false]);
         $table->addColumn('end_time', 'datetime', ['notnull' => false]);
         $table->addColumn('create_time', 'datetime', ['notnull' => false]);
@@ -53,20 +53,20 @@ class OroBatchBundleInstaller implements Installation
         $table->addColumn('pid', 'integer', ['notnull' => false]);
         $table->addColumn('user', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['job_instance_id'], 'IDX_66BCFEA7593D6954', []);
+        $table->addIndex(['job_instance_id'], 'IDX_66BCFEA7593D6954');
     }
 
     /**
      * Create akeneo_batch_job_instance table
      */
-    protected function createAkeneoBatchJobInstanceTable(Schema $schema)
+    private function createAkeneoBatchJobInstanceTable(Schema $schema): void
     {
         $table = $schema->createTable('akeneo_batch_job_instance');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('code', 'string', ['length' => 100]);
         $table->addColumn('label', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('alias', 'string', ['length' => 50]);
-        $table->addColumn('status', 'integer', []);
+        $table->addColumn('status', 'integer');
         $table->addColumn('connector', 'string', ['length' => 255]);
         $table->addColumn('type', 'string', ['length' => 255]);
         $table->addColumn('rawConfiguration', 'array', ['comment' => '(DC2Type:array)']);
@@ -77,15 +77,15 @@ class OroBatchBundleInstaller implements Installation
     /**
      * Create akeneo_batch_step_execution table
      */
-    protected function createAkeneoBatchStepExecutionTable(Schema $schema)
+    private function createAkeneoBatchStepExecutionTable(Schema $schema): void
     {
         $table = $schema->createTable('akeneo_batch_step_execution');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('job_execution_id', 'integer', ['notnull' => false]);
         $table->addColumn('step_name', 'string', ['notnull' => false, 'length' => 100]);
-        $table->addColumn('status', 'integer', []);
-        $table->addColumn('read_count', 'integer', []);
-        $table->addColumn('write_count', 'integer', []);
+        $table->addColumn('status', 'integer');
+        $table->addColumn('read_count', 'integer');
+        $table->addColumn('write_count', 'integer');
         $table->addColumn('start_time', 'datetime', ['notnull' => false]);
         $table->addColumn('end_time', 'datetime', ['notnull' => false]);
         $table->addColumn('exit_code', 'string', ['notnull' => false, 'length' => 255]);
@@ -95,13 +95,13 @@ class OroBatchBundleInstaller implements Installation
         $table->addColumn('errors', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('summary', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['job_execution_id'], 'IDX_3B30CD3C5871C06B', []);
+        $table->addIndex(['job_execution_id'], 'IDX_3B30CD3C5871C06B');
     }
 
     /**
      * Create akeneo_batch_warning table
      */
-    protected function createAkeneoBatchWarningTable(Schema $schema)
+    private function createAkeneoBatchWarningTable(Schema $schema): void
     {
         $table = $schema->createTable('akeneo_batch_warning');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -111,13 +111,13 @@ class OroBatchBundleInstaller implements Installation
         $table->addColumn('reason_parameters', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('item', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['step_execution_id'], 'IDX_8EE0AE736C7DA296', []);
+        $table->addIndex(['step_execution_id'], 'IDX_8EE0AE736C7DA296');
     }
 
     /**
      * Add akeneo_batch_job_execution foreign keys.
      */
-    protected function addAkeneoBatchJobExecutionForeignKeys(Schema $schema)
+    private function addAkeneoBatchJobExecutionForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('akeneo_batch_job_execution');
         $table->addForeignKeyConstraint(
@@ -131,7 +131,7 @@ class OroBatchBundleInstaller implements Installation
     /**
      * Add akeneo_batch_mapping_field foreign keys.
      */
-    protected function addAkeneoBatchStepExecutionForeignKeys(Schema $schema)
+    private function addAkeneoBatchStepExecutionForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('akeneo_batch_step_execution');
         $table->addForeignKeyConstraint(
@@ -145,7 +145,7 @@ class OroBatchBundleInstaller implements Installation
     /**
      * Add akeneo_batch_warning foreign keys.
      */
-    protected function addAkeneoBatchWarningForeignKeys(Schema $schema)
+    private function addAkeneoBatchWarningForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('akeneo_batch_warning');
         $table->addForeignKeyConstraint(

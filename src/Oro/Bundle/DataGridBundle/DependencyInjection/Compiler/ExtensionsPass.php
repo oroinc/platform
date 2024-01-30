@@ -17,7 +17,7 @@ class ExtensionsPass implements CompilerPassInterface
     /**
      * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->getDefinition('oro_datagrid.datagrid.builder')
             ->setArgument(

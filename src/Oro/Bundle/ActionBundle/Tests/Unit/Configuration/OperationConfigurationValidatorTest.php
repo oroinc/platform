@@ -235,28 +235,6 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
-            'unknown entity short syntax' => [
-                'input' => [
-                    'debug' => true,
-                    'routes' => $routes,
-                    'templates' => $templates,
-                    'config' => [
-                        'unknown_entity_short_syntax_action' => array_merge($config, [
-                            'entities' => ['UnknownBundle:UnknownEntity'],
-                        ]),
-                    ],
-                ],
-                'expected' => [
-                    'expectsLog' => $this->once(),
-                    'logMessage' => 'InvalidConfiguration: ' .
-                        'unknown_entity_short_syntax_action.entities.0: ' .
-                            'Entity "UnknownBundle:UnknownEntity" not found.',
-                    'errors' => [
-                        'unknown_entity_short_syntax_action.entities.0: ' .
-                            'Entity "UnknownBundle:UnknownEntity" not found.',
-                    ],
-                ],
-            ],
             'unknown entity' => [
                 'input' => [
                     'debug' => true,

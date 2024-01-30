@@ -22,6 +22,6 @@ class NinComparisonExpression implements ComparisonExpressionInterface
         $visitor->addParameter($parameterName, $value);
 
         return $visitor->getExpressionBuilder()
-            ->notIn($expression, $visitor->buildPlaceholder($parameterName));
+            ->notIn($expression, $visitor->buildParameterExpression($parameterName, $value));
     }
 }

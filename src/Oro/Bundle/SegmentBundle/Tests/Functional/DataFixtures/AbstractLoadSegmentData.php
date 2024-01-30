@@ -3,39 +3,44 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
-abstract class AbstractLoadSegmentData extends AbstractFixture
+abstract class AbstractLoadSegmentData extends AbstractFixture implements DependentFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function getDependencies(): array
     {
-        $organization = $manager->getRepository(Organization::class)->getFirst();
+        return [LoadOrganization::class];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function load(ObjectManager $manager): void
+    {
+        /** @var Organization $organization */
+        $organization = $this->getReference(LoadOrganization::ORGANIZATION);
         $owner = $organization->getBusinessUnits()->first();
-
         foreach ($this->getSegmentsData() as $segmentReference => $data) {
-            $segmentType = $manager->getRepository(SegmentType::class)->find($data['type']);
-
             $entity = new Segment();
             $entity->setName($data['name']);
             $entity->setDescription($data['description']);
             $entity->setEntity($data['entity']);
             $entity->setOwner($owner);
-            $entity->setType($segmentType);
+            $entity->setType($manager->getRepository(SegmentType::class)->find($data['type']));
             $entity->setOrganization($organization);
             $entity->setDefinition(QueryDefinitionUtil::encodeDefinition($data['definition']));
-
             $this->setReference($segmentReference, $entity);
-
             $manager->persist($entity);
         }
-
         $manager->flush();
     }
 

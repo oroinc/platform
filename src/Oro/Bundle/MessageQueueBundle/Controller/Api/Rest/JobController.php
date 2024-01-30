@@ -33,7 +33,7 @@ class JobController extends AbstractFOSRestController
         return $this->handleView($this->view(
             [
                 'successful' => true,
-                'message' => $this->get('translator')->trans('oro.message_queue_job.rest.job_interrupted'),
+                'message' => $this->container->get('translator')->trans('oro.message_queue_job.rest.job_interrupted'),
             ],
             Response::HTTP_OK
         ));
@@ -44,6 +44,6 @@ class JobController extends AbstractFOSRestController
      */
     private function getJobProcessor()
     {
-        return $this->get('oro_message_queue.job.processor');
+        return $this->container->get('oro_message_queue.job.processor');
     }
 }

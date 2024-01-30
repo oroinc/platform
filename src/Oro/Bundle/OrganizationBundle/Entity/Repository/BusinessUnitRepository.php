@@ -101,7 +101,7 @@ class BusinessUnitRepository extends EntityRepository
         $tree          = [];
         $businessUnits = $this->getBusinessUnitsTree();
 
-        $organizations = $this->_em->getRepository('OroOrganizationBundle:Organization')
+        $organizations = $this->_em->getRepository(Organization::class)
             ->getOrganizationsPartialData(
                 ['id', 'name', 'enabled'],
                 $sortOrder,

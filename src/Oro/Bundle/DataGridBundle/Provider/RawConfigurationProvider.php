@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Provider;
 
+use Oro\Bundle\DataGridBundle\Provider\Cache\GridCacheUtils;
 use Oro\Component\Config\Cache\ConfigCache;
 use Oro\Component\Config\Cache\PhpConfigCacheAccessor;
 use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
@@ -9,8 +10,6 @@ use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\ResourcesContainer;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\Config\ConfigCacheInterface;
-use Symfony\Component\Config\ResourceCheckerConfigCache;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -18,10 +17,9 @@ use Symfony\Component\Filesystem\Filesystem;
  * that is loaded from "Resources/config/oro/datagrids.yml" files
  * and not processed by SystemAwareResolver.
  */
-class RawConfigurationProvider implements WarmableConfigCacheInterface
+class RawConfigurationProvider implements RawConfigurationProviderInterface, WarmableConfigCacheInterface
 {
     private const CONFIG_FILE = 'Resources/config/oro/datagrids.yml';
-    private const ROOT_SECTION = 'datagrids';
     private const MIXINS_SECTION = 'mixins';
 
     /** @var string */
@@ -42,14 +40,13 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
     /** @var array */
     private $rawConfiguration = [];
 
-    /** @var int */
-    private $cacheDirLength;
+    private GridCacheUtils $gridCacheUtils;
 
-    public function __construct(string $cacheDir, bool $debug)
+    public function __construct(string $cacheDir, bool $debug, GridCacheUtils $gridCacheUtils)
     {
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
-        $this->cacheDirLength = \strlen($this->cacheDir);
+        $this->gridCacheUtils = $gridCacheUtils;
     }
 
     public function getRawConfiguration(string $gridName): ?array
@@ -72,6 +69,35 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
         $this->ensureCacheWarmedUp();
     }
 
+
+    /**
+     * Group grid config with their mixins and save to cache
+     *
+     * @param array $configs [grid name => config, ...]
+     *
+     * @return array [grid name => [grid name => config, mixin grid name => config, ...], ...]
+     */
+    public function aggregateConfiguration(array $configs): array
+    {
+        $result = [];
+        foreach ($configs as $gridName => $gridConfig) {
+            $aggregatedConfig = [$gridName => $gridConfig];
+            if (isset($gridConfig[self::MIXINS_SECTION])) {
+                $mixins = $gridConfig[self::MIXINS_SECTION];
+                if (\is_array($mixins)) {
+                    foreach ($mixins as $mixin) {
+                        $aggregatedConfig[$mixin] = $configs[$mixin];
+                    }
+                } elseif (\is_string($mixins)) {
+                    $aggregatedConfig[$mixins] = $configs[$mixins];
+                }
+            }
+            $result[$gridName] = $aggregatedConfig;
+        }
+
+        return $result;
+    }
+
     /**
      * Makes sure that configuration cache was warmed up.
      */
@@ -84,7 +110,7 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
                 $gridCacheAccessor = $this->getGridCacheAccessor();
                 $aggregatedConfigs = $this->loadConfiguration($resourcesContainer);
                 foreach ($aggregatedConfigs as $gridName => $gridConfigs) {
-                    $gridCacheAccessor->save($this->getGridConfigCache($gridName), $gridConfigs);
+                    $gridCacheAccessor->save($this->gridCacheUtils->getGridConfigCache($gridName), $gridConfigs);
                 }
                 $this->getRootCacheAccessor()->save($rootCache, true, $resourcesContainer->getResources());
             }
@@ -97,7 +123,7 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
     {
         $this->ensureCacheWarmedUp();
         if (!isset($this->rawConfiguration[$gridName])) {
-            $gridCache = $this->getGridConfigCache($gridName);
+            $gridCache = $this->gridCacheUtils->getGridConfigCache($gridName);
             if (\is_file($gridCache->getPath())) {
                 $this->rawConfiguration = \array_merge(
                     $this->rawConfiguration,
@@ -118,8 +144,8 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
         $cumulativeConfigLoader = CumulativeConfigLoaderFactory::create('oro_datagrid', self::CONFIG_FILE);
         $resources = $cumulativeConfigLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
-            if (isset($resource->data[self::ROOT_SECTION])) {
-                $grids = $resource->data[self::ROOT_SECTION];
+            if (isset($resource->data[RawConfigurationProviderInterface::ROOT_SECTION])) {
+                $grids = $resource->data[RawConfigurationProviderInterface::ROOT_SECTION];
                 if (\is_array($grids)) {
                     $configs = ArrayUtil::arrayMergeRecursiveDistinct($configs, $grids);
                 }
@@ -127,34 +153,6 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
         }
 
         return $this->aggregateConfiguration($configs);
-    }
-
-    /**
-     * Group grid config with their mixins and save to cache
-     *
-     * @param array $configs [grid name => config, ...]
-     *
-     * @return array [grid name => [grid name => config, mixin grid name => config, ...], ...]
-     */
-    private function aggregateConfiguration(array $configs): array
-    {
-        $result = [];
-        foreach ($configs as $gridName => $gridConfig) {
-            $aggregatedConfig = [$gridName => $gridConfig];
-            if (isset($gridConfig[self::MIXINS_SECTION])) {
-                $mixins = $gridConfig[self::MIXINS_SECTION];
-                if (\is_array($mixins)) {
-                    foreach ($mixins as $mixin) {
-                        $aggregatedConfig[$mixin] = $configs[$mixin];
-                    }
-                } elseif (\is_string($mixins)) {
-                    $aggregatedConfig[$mixins] = $configs[$mixins];
-                }
-            }
-            $result[$gridName] = $aggregatedConfig;
-        }
-
-        return $result;
     }
 
     private function getRootCacheAccessor(): PhpConfigCacheAccessor
@@ -181,26 +179,5 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
         }
 
         return $this->gridCacheAccessor;
-    }
-
-    private function getGridConfigCache(string $gridName): ConfigCacheInterface
-    {
-        return new ResourceCheckerConfigCache($this->getGridFile($gridName));
-    }
-
-    private function getGridFile(string $gridName): string
-    {
-        // This ensures that the filename does not contain invalid chars.
-        $fileName = \preg_replace('#[^a-z0-9-_]#i', '-', $gridName);
-
-        // This ensures that the filename is not too long.
-        // Most filesystems have a limit of 255 chars for each path component.
-        // On Windows the the whole path is limited to 260 chars (including terminating null char).
-        $fileNameLength = \strlen($fileName) + 4; // 4 === strlen('.php')
-        if ($fileNameLength > 255 || $this->cacheDirLength + $fileNameLength > 259) {
-            $fileName = \hash('sha256', $gridName);
-        }
-
-        return \sprintf('%s/%s.php', $this->cacheDir, $fileName);
     }
 }

@@ -5,6 +5,8 @@ namespace Oro\Bundle\MessageQueueBundle\Migrations\Schema;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
@@ -12,34 +14,24 @@ use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Component\MessageQueue\Job\Schema as UniqueJobSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInterface, DatabasePlatformAwareInterface
+class OroMessageQueueBundleInstaller implements Installation, DatabasePlatformAwareInterface, ConnectionAwareInterface
 {
-    use ContainerAwareTrait;
     use DatabasePlatformAwareTrait;
+    use ConnectionAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_10';
     }
 
     /**
-     * @return \Doctrine\DBAL\Connection
+     * {@inheritDoc}
      */
-    private function getDbalConnection()
-    {
-        return $this->container->get('doctrine')->getConnection('message_queue');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $this->createDbalQueueTable($schema);
         $this->createJobTable($schema, $queries);
@@ -48,27 +40,19 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
         $this->initializeCacheState($queries);
     }
 
-    private function createDbalQueueTable(Schema $schema)
+    private function createDbalQueueTable(Schema $schema): void
     {
-        $queueSchema = new DbalSchema(
-            $this->getDbalConnection(),
-            'oro_message_queue'
-        );
-
+        $queueSchema = new DbalSchema($this->connection, 'oro_message_queue');
         $queueSchema->addToSchema($schema);
     }
 
-    private function createUniqueJobTable(Schema $schema)
+    private function createUniqueJobTable(Schema $schema): void
     {
-        $uniqueJobSchema = new UniqueJobSchema(
-            $this->getDbalConnection(),
-            'oro_message_queue_job_unique'
-        );
-
+        $uniqueJobSchema = new UniqueJobSchema($this->connection, 'oro_message_queue_job_unique');
         $uniqueJobSchema->addToSchema($schema);
     }
 
-    private function createJobTable(Schema $schema, QueryBag $queries)
+    private function createJobTable(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->createTable('oro_message_queue_job');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -87,15 +71,15 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
             'comment' => '(DC2Type:json_array)',
         ]);
         $table->addColumn('job_progress', 'percent', ['notnull' => false, 'precision' => 0]);
-
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['status'], 'idx_status');
+
         $table->addForeignKeyConstraint(
             $table,
             ['root_job_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
-        $table->addIndex(['status'], 'idx_status');
 
         if ($this->platform instanceof PostgreSQL94Platform) {
             $queries->addQuery('ALTER TABLE oro_message_queue_job ALTER COLUMN data TYPE jsonb USING data::jsonb');
@@ -105,7 +89,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
     /**
      * Adds the oro_message_queue_state table structure.
      */
-    private function createStateTable(Schema $schema)
+    private function createStateTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_message_queue_state');
         $table->addColumn('id', 'string', ['length' => 15, 'notnull' => true]);
@@ -116,7 +100,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
     /**
      * Adds the initial cache state data to oro_message_queue_state table.
      */
-    private function initializeCacheState(QueryBag $queries)
+    private function initializeCacheState(QueryBag $queries): void
     {
         $queries->addPostQuery(
             new ParametrizedSqlMigrationQuery(

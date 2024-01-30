@@ -242,7 +242,7 @@ define(function(require) {
             this.updateLocalValues(response.results);
             this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
             this._updateCriteriaHint();
-            this.trigger('update');
+            this.trigger('update_criteria_label');
         },
 
         /**

@@ -95,6 +95,7 @@ class SearchSourceFilteredEntityIdentityReaderTest extends SearchBundleWebTestCa
     {
         // Create token with fake organization which Id is another than organization which used in fixtures.
         $user = new User();
+        $user->setUserIdentifier('UserName');
         $organizationId = $this->getReference('organization')->getId();
         $organization = new Organization();
         $organization->setId(++$organizationId);

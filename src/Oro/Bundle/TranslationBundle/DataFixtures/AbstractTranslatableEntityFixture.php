@@ -5,19 +5,19 @@ namespace Oro\Bundle\TranslationBundle\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Finder\Finder;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The base class for fixtures that load translatable entities.
+ */
 abstract class AbstractTranslatableEntityFixture extends AbstractFixture implements ContainerAwareInterface
 {
-    const ENTITY_DOMAIN      = 'entities';
-    const DOMAIN_FILE_REGEXP = '/^%domain%\.(.*?)\./';
+    use ContainerAwareTrait;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    private const ENTITY_DOMAIN = 'entities';
+    private const DOMAIN_FILE_REGEXP = '/^%domain%\.(.*?)\./';
 
     /**
      * @var TranslatorInterface
@@ -34,41 +34,35 @@ abstract class AbstractTranslatableEntityFixture extends AbstractFixture impleme
      */
     protected $translationLocales;
 
-    public function load(ObjectManager $manager)
+    /**
+     * {@inheritDoc}
+     */
+    public function load(ObjectManager $manager): void
     {
         $this->translator = $this->container->get('translator');
         $this->loadEntities($manager);
     }
 
-    public function setContainer(ContainerInterface $container = null)
+    /**
+     * Gets regexp for current entity domain.
+     */
+    protected function getDomainFileRegExp(): string
     {
-        $this->container = $container;
+        return str_replace('%domain%', self::ENTITY_DOMAIN, self::DOMAIN_FILE_REGEXP);
     }
 
     /**
-     * Get regexp for current entity domain
-     *
-     * @return string
+     * Gets list of existing translation locales for current translation domain.
      */
-    protected function getDomainFileRegExp()
-    {
-        return str_replace('%domain%', preg_quote(static::ENTITY_DOMAIN), static::DOMAIN_FILE_REGEXP);
-    }
-
-    /**
-     * Get list of existing translation locales for current translation domain
-     *
-     * @return array
-     */
-    protected function getTranslationLocales()
+    protected function getTranslationLocales(): array
     {
         if (null === $this->translationLocales) {
             $translationDirectory = str_replace('/', DIRECTORY_SEPARATOR, $this->translationDirectory);
-            $translationDirectories = array();
+            $translationDirectories = [];
 
             foreach ($this->container->getParameter('kernel.bundles') as $bundle) {
                 $reflection = new \ReflectionClass($bundle);
-                $bundleTranslationDirectory = dirname($reflection->getFilename()) . $translationDirectory;
+                $bundleTranslationDirectory = \dirname($reflection->getFileName()) . $translationDirectory;
                 if (is_dir($bundleTranslationDirectory) && is_readable($bundleTranslationDirectory)) {
                     $translationDirectories[] = realpath($bundleTranslationDirectory);
                 }
@@ -79,8 +73,7 @@ abstract class AbstractTranslatableEntityFixture extends AbstractFixture impleme
             $finder = new Finder();
             $finder->in($translationDirectories)->name($domainFileRegExp);
 
-            $this->translationLocales = array();
-            /** @var $file \SplFileInfo */
+            $this->translationLocales = [];
             foreach ($finder as $file) {
                 preg_match($domainFileRegExp, $file->getFilename(), $matches);
                 if ($matches) {
@@ -94,42 +87,29 @@ abstract class AbstractTranslatableEntityFixture extends AbstractFixture impleme
     }
 
     /**
-     * Translate string based on input parameters
-     *
-     * @param string $id
-     * @param string $prefix
-     * @param string $locale
-     * @param array $parameters
-     * @param string $domain
-     * @return string
+     * Translates the given string.
      */
-    protected function translate($id, $prefix = null, $locale = null, $parameters = array(), $domain = null)
-    {
+    protected function translate(
+        string $id,
+        ?string $prefix = null,
+        ?string $locale = null,
+        array $parameters = [],
+        ?string $domain = null
+    ): string {
         if (!$domain) {
-            $domain = static::ENTITY_DOMAIN;
+            $domain = self::ENTITY_DOMAIN;
         }
 
-        $translationId = $this->getTranslationId($id, $prefix);
-
-        return $this->translator->trans($translationId, $parameters, $domain, $locale);
+        return $this->translator->trans($this->getTranslationId($id, $prefix), $parameters, $domain, $locale);
     }
 
     /**
-     * Get translation ID based on source ID and prefix
-     *
-     * @param string $id
-     * @param string $prefix
-     * @return string
+     * Gets translation ID based on source ID and prefix.
      */
-    protected function getTranslationId($id, $prefix = null)
+    protected function getTranslationId(string $id, ?string $prefix = null): string
     {
-        $prefixString = $prefix ? $prefix . '.' : '';
-
-        return $prefixString . $id;
+        return ($prefix ? $prefix . '.' : '') . $id;
     }
 
-    /**
-     * Load entities to DB
-     */
     abstract protected function loadEntities(ObjectManager $manager);
 }

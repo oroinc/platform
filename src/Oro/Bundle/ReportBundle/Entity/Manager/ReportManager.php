@@ -3,7 +3,11 @@
 namespace Oro\Bundle\ReportBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\ReportBundle\Entity\ReportType;
 
+/**
+ * Provides report types choices
+ */
 class ReportManager
 {
     /**
@@ -26,7 +30,7 @@ class ReportManager
     public function getReportTypeChoices()
     {
         $result = [];
-        $types = $this->em->getRepository('OroReportBundle:ReportType')->findAll();
+        $types = $this->em->getRepository(ReportType::class)->findAll();
         foreach ($types as $type) {
             $result[$type->getLabel()] = $type->getName();
         }

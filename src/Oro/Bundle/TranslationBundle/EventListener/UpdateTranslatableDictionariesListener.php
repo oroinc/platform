@@ -89,7 +89,7 @@ class UpdateTranslatableDictionariesListener
             return;
         }
 
-        $em = $event->getEntityManager();
+        $em = $event->getObjectManager();
         $connection = $em->getConnection();
         $connection->beginTransaction();
         try {

@@ -15,41 +15,38 @@ class LoadTest3BundleData2 extends AbstractFixture implements
     OrderedFixtureInterface,
     RenamedFixtureInterface
 {
-    public $dbVersion;
-
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return '1.0';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setLoadedVersion($version = null)
-    {
-        $this->dbVersion = $version;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function load(ObjectManager $manager)
+    public function setLoadedVersion($version = null): void
     {
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOrder()
+    public function load(ObjectManager $manager): void
+    {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOrder(): int
     {
         return 2;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getPreviousClassNames(): array
     {

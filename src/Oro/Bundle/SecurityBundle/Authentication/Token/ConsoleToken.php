@@ -17,8 +17,6 @@ class ConsoleToken extends AbstractToken implements OrganizationAwareTokenInterf
     public function __construct(array $roles = [])
     {
         parent::__construct($this->initRoles($roles));
-
-        $this->setAuthenticated(true);
     }
 
     /**

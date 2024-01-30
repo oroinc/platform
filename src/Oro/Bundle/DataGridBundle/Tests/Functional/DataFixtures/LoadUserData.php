@@ -4,36 +4,38 @@ namespace Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class LoadUserData extends AbstractFixture implements ContainerAwareInterface
+class LoadUserData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    const SIMPLE_USER = 'simple_user';
-    const SIMPLE_USER_2 = 'simple_user2';
+    use ContainerAwareTrait;
 
-    /** @var ContainerInterface */
-    protected $container;
+    public const SIMPLE_USER = 'simple_user';
+    public const SIMPLE_USER_2 = 'simple_user2';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function getDependencies(): array
     {
-        $this->container = $container;
+        return [LoadOrganization::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $userManager = $this->container->get('oro_user.manager');
-        $organization = $manager->getRepository(Organization::class)->getFirst();
+        /** @var Organization $organization */
+        $organization = $this->getReference(LoadOrganization::ORGANIZATION);
         $role = $manager->getRepository(Role::class)->findOneBy(['role' => User::ROLE_DEFAULT]);
 
         $user = $userManager->createUser();
@@ -48,7 +50,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user);
-        $this->setReference($user->getUsername(), $user);
+        $this->setReference($user->getUserIdentifier(), $user);
 
         $user = $userManager->createUser();
         $user->setUsername(self::SIMPLE_USER_2)
@@ -62,7 +64,6 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user);
-
-        $this->setReference($user->getUsername(), $user);
+        $this->setReference($user->getUserIdentifier(), $user);
     }
 }

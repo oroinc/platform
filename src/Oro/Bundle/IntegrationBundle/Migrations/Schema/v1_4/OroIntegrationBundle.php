@@ -9,19 +9,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroIntegrationBundle implements Migration
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::modifyChannelTable($schema);
-    }
-
-    /**
-     * Change oro_integration_channel table
-     */
-    public static function modifyChannelTable(Schema $schema)
-    {
-        $table = $schema->getTable('oro_integration_channel');
-        $table->addIndex(['name'], 'oro_integration_channel_name_idx', []);
+        $schema->getTable('oro_integration_channel')
+            ->addIndex(['name'], 'oro_integration_channel_name_idx');
     }
 }

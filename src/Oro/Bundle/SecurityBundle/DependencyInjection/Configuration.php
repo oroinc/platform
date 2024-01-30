@@ -11,6 +11,7 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -43,10 +44,76 @@ class Configuration implements ConfigurationInterface
                 ->normalizeKeys(false)
                 ->defaultValue([])
                 ->prototype('variable')
+                ->end()
                 ->info(
                     "List of routes that must not be used as a redirect path after log in. ".
                     "See \Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener."
                 )
+            ->end()
+            ->arrayNode('access_control')
+                ->prototype('array')
+                    ->fixXmlConfig('ip')
+                    ->fixXmlConfig('method')
+                    ->children()
+                        ->scalarNode('requires_channel')->defaultNull()->end()
+                        ->scalarNode('path')
+                            ->defaultNull()
+                            ->info('use the urldecoded format')
+                            ->example('^/path to resource/')
+                        ->end()
+                        ->scalarNode('host')->defaultNull()->end()
+                        ->integerNode('priority')->defaultValue(0)->end()
+                        ->integerNode('port')->defaultNull()->end()
+                        ->arrayNode('ips')
+                            ->beforeNormalization()->ifString()
+                            ->then(
+                                function ($v) {
+                                    return [$v];
+                                }
+                            )
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->arrayNode('methods')
+                            ->beforeNormalization()
+                            ->ifString()
+                            ->then(
+                                function ($v) {
+                                    return preg_split('/\s*,\s*/', $v);
+                                }
+                            )
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->scalarNode('allow_if')->defaultNull()->end()
+                    ->end()
+                    ->fixXmlConfig('role')
+                    ->children()
+                        ->arrayNode('roles')
+                            ->beforeNormalization()
+                            ->ifString()
+                            ->then(
+                                function ($v) {
+                                    return preg_split('/\s*,\s*/', $v);
+                                }
+                            )
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->arrayNode('permissions_policy')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->booleanNode('enable')->defaultFalse()->end()
+                    ->arrayNode('directives')
+                        ->useAttributeAsKey('name')
+                        ->prototype('variable')
+                            ->beforeNormalization()->castToArray()->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ->end();
 

@@ -74,7 +74,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
          * The correct expression cannot be used due a bug in doctrine 2.5, in the case when we try equals expression
          * with IS NULL.
          * An example of DQL which fails:
-         * SELECT u.id FROM OroUserBundle:User u
+         * SELECT u.id FROM Oro\Bundle\UserBundle\Entity\User u
          * WHERE (
          *      CASE WHEN (:business_unit_id IS NOT NULL)
          *           THEN CASE

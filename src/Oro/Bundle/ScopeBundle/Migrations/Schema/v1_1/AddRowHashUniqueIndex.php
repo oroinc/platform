@@ -13,7 +13,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class AddRowHashUniqueIndex implements Migration, OrderedMigrationInterface
 {
     /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries): void
     {

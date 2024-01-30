@@ -110,9 +110,7 @@ class EmailTemplateTranslationType extends AbstractType
             /** @var Localization $localization */
             $localization = $options['localization'];
             $view->vars['localization_id'] = $localization->getId();
-            $view->vars['localization_title'] = $localization->getTitle(
-                $this->localizationManager->getDefaultLocalization()
-            );
+            $view->vars['localization_title'] = $localization->getName();
 
             if ($localization->getParentLocalization()) {
                 $view->vars['localization_parent_id'] = $localization->getParentLocalization()->getId();

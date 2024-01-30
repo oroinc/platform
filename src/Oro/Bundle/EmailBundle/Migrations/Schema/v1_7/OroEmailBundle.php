@@ -9,19 +9,15 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroEmailBundle implements Migration
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addTable($schema);
-        self::addColumns($schema);
-        self::addForeignKeys($schema);
+        $this->createEmailThreadTable($schema);
+        $this->updateEmailTable($schema);
     }
 
-    /**
-     * Add additional fields
-     */
-    public static function addTable(Schema $schema)
+    private function createEmailThreadTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_thread');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -30,26 +26,14 @@ class OroEmailBundle implements Migration
         $table->setPrimaryKey(['id']);
     }
 
-    /**
-     * Add additional fields
-     */
-    public static function addColumns(Schema $schema)
+    private function updateEmailTable(Schema $schema): void
     {
         $table = $schema->getTable('oro_email');
         $table->addColumn('is_head', 'boolean', ['default' => true]);
         $table->addColumn('is_seen', 'boolean', ['default' => true]);
         $table->addColumn('thread_id', 'integer', ['notnull' => false]);
         $table->addColumn('refs', 'text', ['notnull' => false]);
-
         $table->addIndex(['is_head'], 'oro_email_is_head');
-    }
-
-    /**
-     * Generate foreign keys for table oro_email
-     */
-    public static function addForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('oro_email');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email_thread'),
             ['thread_id'],

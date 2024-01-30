@@ -3,16 +3,16 @@
 namespace Oro\Bundle\TestFrameworkBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareTrait;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
-use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtension;
 use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtensionAwareInterface;
+use Oro\Bundle\EntitySerializedFieldsBundle\Migration\Extension\SerializedFieldsExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareInterface;
@@ -34,59 +34,24 @@ class OroTestFrameworkBundleInstaller implements
     SerializedFieldsExtensionAwareInterface,
     AttachmentExtensionAwareInterface
 {
+    use ActivityExtensionAwareTrait;
+    use ExtendExtensionAwareTrait;
     use ScopeExtensionAwareTrait;
+    use SerializedFieldsExtensionAwareTrait;
     use AttachmentExtensionAwareTrait;
 
-    public const ENUM_FIELD_NAME = 'testEnumField';
-    public const ENUM_FIELD_CODE = 'test_enum_code';
-    public const MULTIENUM_FIELD_NAME = 'testMultienumField';
-    public const MULTIENUM_FIELD_CODE = 'test_multienum_code';
-
-    /** @var ActivityExtension */
-    protected $activityExtension;
-
-    /** @var ExtendExtension */
-    protected $extendExtension;
-
-    /** @var SerializedFieldsExtension */
-    private $serializedFieldsExtension;
-
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setSerializedFieldsExtension(SerializedFieldsExtension $serializedFieldsExtension)
-    {
-        $this->serializedFieldsExtension = $serializedFieldsExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setActivityExtension(ActivityExtension $activityExtension)
-    {
-        $this->activityExtension = $activityExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension)
-    {
-        $this->extendExtension = $extendExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_0';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createTestActivityTargetTable($schema);
@@ -105,9 +70,6 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestUserOwnershipTable($schema);
         $this->createTestExtendedEntityTable($schema);
 
-        /** Entity extensions generation */
-        $this->extendScopeForTestActivity($schema);
-
         /** Foreign keys generation **/
         $this->addTestSearchItemForeignKeys($schema);
         $this->addTestSearchItemValueForeignKeys($schema);
@@ -116,14 +78,9 @@ class OroTestFrameworkBundleInstaller implements
         $this->addTestProductForeignKeys($schema);
         $this->addTestUserOwnershipForeignKeys($schema);
 
+        $this->scopeExtension->addScopeAssociation($schema, 'test_activity', 'test_activity', 'id');
         $this->activityExtension->addActivityAssociation($schema, 'test_activity', 'test_activity_target', true);
-
-        $this->activityExtension->addActivityAssociation(
-            $schema,
-            'oro_note',
-            'test_activity_target',
-            true
-        );
+        $this->activityExtension->addActivityAssociation($schema, 'oro_note', 'test_activity_target', true);
 
         // add activity association if calendar package is installed
         if ($schema->hasTable('oro_calendar_event')) {
@@ -147,7 +104,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create test_activity_target table
      */
-    protected function createTestActivityTargetTable(Schema $schema)
+    private function createTestActivityTargetTable(Schema $schema): void
     {
         $table = $schema->createTable('test_activity_target');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -158,7 +115,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create test_workflow_aware_entity table
      */
-    protected function createTestWorkflowAwareEntityTable(Schema $schema)
+    private function createTestWorkflowAwareEntityTable(Schema $schema): void
     {
         $table = $schema->createTable('test_workflow_aware_entity');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -169,7 +126,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create test_department table
      */
-    protected function createTestDepartmentTable(Schema $schema)
+    private function createTestDepartmentTable(Schema $schema): void
     {
         $table = $schema->createTable('test_department');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -180,7 +137,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create test_employee table
      */
-    protected function createTestEmployeeTable(Schema $schema)
+    private function createTestEmployeeTable(Schema $schema): void
     {
         $table = $schema->createTable('test_employee');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -188,26 +145,26 @@ class OroTestFrameworkBundleInstaller implements
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('position', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['department_id'], 'IDX_A305D658AE80F5DF', []);
+        $table->addIndex(['department_id'], 'IDX_A305D658AE80F5DF');
     }
 
     /**
      * Create test_product table
      */
-    protected function createTestProductTable(Schema $schema)
+    private function createTestProductTable(Schema $schema): void
     {
         $table = $schema->createTable('test_product');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('product_type', 'string', ['notnull' => false, 'length' => 50]);
         $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['product_type'], 'IDX_F0BD0651367588', []);
+        $table->addIndex(['product_type'], 'IDX_F0BD0651367588');
     }
 
     /**
      * Create test_product_type table
      */
-    protected function createTestProductTypeTable(Schema $schema)
+    private function createTestProductTypeTable(Schema $schema): void
     {
         $table = $schema->createTable('test_product_type');
         $table->addColumn('name', 'string', ['length' => 50]);
@@ -218,7 +175,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create test_search_item table
      */
-    protected function createTestSearchItemTable(Schema $schema)
+    private function createTestSearchItemTable(Schema $schema): void
     {
         $table = $schema->createTable('test_search_item');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -241,7 +198,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create test_search_item2 table
      */
-    protected function createTestSearchItem2Table(Schema $schema)
+    private function createTestSearchItem2Table(Schema $schema): void
     {
         $table = $schema->createTable('test_search_item2');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -251,7 +208,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create test_search_item_value table
      */
-    protected function createTestSearchItemValueTable(Schema $schema)
+    private function createTestSearchItemValueTable(Schema $schema): void
     {
         $table = $schema->createTable('test_search_item_value');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -262,7 +219,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create test_search_product table
      */
-    protected function createTestSearchProductTable(Schema $schema)
+    private function createTestSearchProductTable(Schema $schema): void
     {
         $table = $schema->createTable('test_search_product');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -273,16 +230,16 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create test_activity table
      */
-    protected function createTestActivityTable(Schema $schema)
+    private function createTestActivityTable(Schema $schema): void
     {
         $table = $schema->createTable('test_activity');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addColumn('message', 'text', []);
+        $table->addColumn('message', 'text');
         $table->addColumn('description', 'text', ['notnull' => false]);
-        $table->addIndex(['owner_id'], 'idx_test_activity_owner_id', []);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['owner_id'], 'idx_test_activity_owner_id');
     }
 
     /**
@@ -290,7 +247,7 @@ class OroTestFrameworkBundleInstaller implements
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function createTestCustomEntityTables(Schema $schema)
+    private function createTestCustomEntityTables(Schema $schema): void
     {
         $extendFields = [
             'owner' => ExtendScope::OWNER_CUSTOM,
@@ -481,8 +438,8 @@ class OroTestFrameworkBundleInstaller implements
         $this->extendExtension->addEnumField(
             $schema,
             $table1,
-            self::ENUM_FIELD_NAME,
-            self::ENUM_FIELD_CODE,
+            'testEnumField',
+            'test_enum_code',
             false,
             false,
             [
@@ -496,8 +453,8 @@ class OroTestFrameworkBundleInstaller implements
         $this->extendExtension->addEnumField(
             $schema,
             $table1,
-            self::MULTIENUM_FIELD_NAME,
-            self::MULTIENUM_FIELD_CODE,
+            'testMultienumField',
+            'test_multienum_code',
             true,
             false,
             [
@@ -514,7 +471,7 @@ class OroTestFrameworkBundleInstaller implements
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function createTestCustomEntityTablesWithCascadeOption(Schema $schema)
+    private function createTestCustomEntityTablesWithCascadeOption(Schema $schema): void
     {
         $extendFields = [
             'owner' => ExtendScope::OWNER_CUSTOM,
@@ -642,7 +599,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Create test_user_ownership table
      */
-    protected function createTestUserOwnershipTable(Schema $schema)
+    private function createTestUserOwnershipTable(Schema $schema): void
     {
         $table = $schema->createTable('test_user_ownership');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -650,22 +607,14 @@ class OroTestFrameworkBundleInstaller implements
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['organization_id'], 'IDX_673C997D32C8A3DE', []);
-        $table->addIndex(['owner_id'], 'IDX_673C997D7E3C61F9', []);
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    private function extendScopeForTestActivity($schema)
-    {
-        $this->scopeExtension->addScopeAssociation($schema, 'test_activity', 'test_activity', 'id');
+        $table->addIndex(['organization_id'], 'IDX_673C997D32C8A3DE');
+        $table->addIndex(['owner_id'], 'IDX_673C997D7E3C61F9');
     }
 
     /**
      * Add test_search_item foreign keys.
      */
-    protected function addTestSearchItemForeignKeys(Schema $schema)
+    private function addTestSearchItemForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('test_search_item');
         $table->addForeignKeyConstraint(
@@ -685,7 +634,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Add test_search_item_value foreign keys.
      */
-    protected function addTestSearchItemValueForeignKeys(Schema $schema)
+    private function addTestSearchItemValueForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('test_search_item_value');
         $table->addForeignKeyConstraint(
@@ -699,7 +648,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Add test_activity foreign keys.
      */
-    protected function addTestActivityForeignKeys(Schema $schema)
+    private function addTestActivityForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('test_activity');
         $table->addForeignKeyConstraint(
@@ -719,7 +668,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Add test_employee foreign keys.
      */
-    protected function addTestEmployeeForeignKeys(Schema $schema)
+    private function addTestEmployeeForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('test_employee');
         $table->addForeignKeyConstraint(
@@ -733,7 +682,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Add test_product foreign keys.
      */
-    protected function addTestProductForeignKeys(Schema $schema)
+    private function addTestProductForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('test_product');
         $table->addForeignKeyConstraint(
@@ -747,7 +696,7 @@ class OroTestFrameworkBundleInstaller implements
     /**
      * Add test_user_ownership foreign keys.
      */
-    protected function addTestUserOwnershipForeignKeys(Schema $schema)
+    private function addTestUserOwnershipForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('test_user_ownership');
         $table->addForeignKeyConstraint(
@@ -764,7 +713,7 @@ class OroTestFrameworkBundleInstaller implements
         );
     }
 
-    public function addAttributeFamilyRelationForTestActivityTarget(Schema $schema)
+    private function addAttributeFamilyRelationForTestActivityTarget(Schema $schema): void
     {
         $table = $schema->getTable('test_activity_target');
 
@@ -780,7 +729,7 @@ class OroTestFrameworkBundleInstaller implements
     }
 
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
-    protected function createTestExtendedEntityTable(Schema $schema)
+    private function createTestExtendedEntityTable(Schema $schema): void
     {
         $extendFields = [
             'owner' => ExtendScope::OWNER_CUSTOM,

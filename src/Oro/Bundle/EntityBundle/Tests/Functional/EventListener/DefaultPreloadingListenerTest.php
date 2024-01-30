@@ -17,13 +17,7 @@ class DefaultPreloadingListenerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $this->loadFixtures(
-            [
-                LoadUserData::class,
-                LoadUserEmailData::class,
-            ]
-        );
+        $this->loadFixtures([LoadUserData::class, LoadUserEmailData::class]);
     }
 
     public function testOnPreloadWhenNotExitingEntity(): void

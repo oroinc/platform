@@ -33,28 +33,28 @@ class DoctrineListener implements OptionalListenerInterface
     public function postFlush(PostFlushEventArgs $args)
     {
         if ($this->enabled) {
-            $this->entityPool->persistAndFlush($args->getEntityManager());
+            $this->entityPool->persistAndFlush($args->getObjectManager());
         }
     }
 
     public function postUpdate(LifecycleEventArgs $args)
     {
         if ($this->enabled) {
-            $this->dispatch('oro.notification.event.entity_post_update', $args->getEntity());
+            $this->dispatch('oro.notification.event.entity_post_update', $args->getObject());
         }
     }
 
     public function postPersist(LifecycleEventArgs $args)
     {
         if ($this->enabled) {
-            $this->dispatch('oro.notification.event.entity_post_persist', $args->getEntity());
+            $this->dispatch('oro.notification.event.entity_post_persist', $args->getObject());
         }
     }
 
     public function postRemove(LifecycleEventArgs $args)
     {
         if ($this->enabled) {
-            $this->dispatch('oro.notification.event.entity_post_remove', $args->getEntity());
+            $this->dispatch('oro.notification.event.entity_post_remove', $args->getObject());
         }
     }
 

@@ -11,6 +11,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Report form type
+ */
 class ReportType extends AbstractQueryDesignerType
 {
     /**
@@ -25,7 +28,7 @@ class ReportType extends AbstractQueryDesignerType
                 'type',
                 EntityType::class,
                 array(
-                    'class'       => 'OroReportBundle:ReportType',
+                    'class'       => \Oro\Bundle\ReportBundle\Entity\ReportType::class,
                     'choice_label'    => 'label',
                     'required'    => true,
                     'placeholder' => 'oro.report.form.choose_report_type'

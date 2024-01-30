@@ -76,13 +76,18 @@ HELP
             $now = new \DateTime('now', new \DateTimeZone('UTC'));
             $cleanBefore = clone $now;
 
-            /** @noinspection PhpUsageOfSilenceOperatorInspection */
-            $dateInterval = @\DateInterval::createFromDateString($interval);
-            if ($dateInterval instanceof \DateInterval) {
-                $cleanBefore->sub($dateInterval);
-            }
+            try {
+                $dateInterval = \DateInterval::createFromDateString($interval);
+                if ($dateInterval instanceof \DateInterval) {
+                    $cleanBefore->sub($dateInterval);
+                }
 
-            if ($cleanBefore >= $now) {
+                if ($cleanBefore >= $now) {
+                    throw new \DateMalformedStringException(
+                        \sprintf("Interval string '%s' should not be positive", $interval)
+                    );
+                }
+            } catch (\DateException $e) {
                 throw new \InvalidArgumentException(\sprintf("Value '%s' should be valid date interval", $interval));
             }
 

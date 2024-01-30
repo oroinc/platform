@@ -31,7 +31,7 @@ class AutocompleteController extends AbstractFOSRestController
     public function searchAction(Request $request)
     {
         $autocompleteRequest = new AutocompleteRequest($request);
-        $validator           = $this->get('validator');
+        $validator           = $this->container->get('validator');
         $result              = [
             'results' => [],
             'hasMore' => false,
@@ -45,7 +45,9 @@ class AutocompleteController extends AbstractFOSRestController
             }
         }
 
-        if (!$this->get('oro_form.autocomplete.security')->isAutocompleteGranted($autocompleteRequest->getName())) {
+        if (!$this->container->get('oro_form.autocomplete.security')
+                ->isAutocompleteGranted($autocompleteRequest->getName())
+        ) {
             $result['errors'][] = 'Access denied.';
         }
 
@@ -54,7 +56,7 @@ class AutocompleteController extends AbstractFOSRestController
         }
 
         /** @var SearchHandlerInterface $searchHandler */
-        $searchHandler = $this
+        $searchHandler = $this->container
             ->get('oro_form.autocomplete.search_registry')
             ->getSearchHandler($autocompleteRequest->getName());
 

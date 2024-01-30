@@ -218,6 +218,13 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
                 $context['route']
             );
         }
+
+        if (!empty($context['route_params'])) {
+            $config->offsetSetByPath(
+                '[options][urlParams]['. DefaultOperationRequestHelper::ORIGINAL_ROUTE_PARAMETERS_KEY .']',
+                $context['route_params']
+            );
+        }
     }
 
     protected function applyActionsConfig(DatagridConfiguration $config, ButtonSearchContext $context)

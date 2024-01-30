@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Form\Handler\ResetHandler;
@@ -67,14 +69,15 @@ class ResetController extends AbstractController
                 try {
                     $userManager->sendResetPasswordEmail($user);
                 } catch (\Exception $e) {
-                    $this->get(LoggerInterface::class)->error(
+                    $this->container->get(LoggerInterface::class)->error(
                         'Unable to sent the reset password email.',
                         ['email' => $email, 'exception' => $e]
                     );
                     $request->getSession()->getFlashBag()
                         ->add(
                             'warn',
-                            $this->get(TranslatorInterface::class)->trans('oro.email.handler.unable_to_send_email')
+                            $this->container->get(TranslatorInterface::class)
+                                ->trans('oro.email.handler.unable_to_send_email')
                         );
 
                     return $this->redirect($this->generateUrl('oro_user_reset_request'));
@@ -84,9 +87,9 @@ class ResetController extends AbstractController
                 $userManager->updateUser($user);
             }
 
-            $this->get(LoggerInterface::class)->notice(
+            $this->container->get(LoggerInterface::class)->notice(
                 $securityLogMessage,
-                $this->get(UserLoggingInfoProvider::class)->getUserLoggingInfo($user)
+                $this->container->get(UserLoggingInfoProvider::class)->getUserLoggingInfo($user)
             );
         }
 
@@ -124,7 +127,7 @@ class ResetController extends AbstractController
         ];
 
         if (!$request->isMethod('POST')) {
-            $params['formAction'] = $this->get('router')->generate(
+            $params['formAction'] = $this->container->get('router')->generate(
                 'oro_user_send_forced_password_reset_email',
                 ['id' => $user->getId()]
             );
@@ -132,11 +135,11 @@ class ResetController extends AbstractController
             return $params;
         }
 
-        $resetPasswordHandler = $this->get(ResetPasswordHandler::class);
-        $translator = $this->get(TranslatorInterface::class);
+        $resetPasswordHandler = $this->container->get(ResetPasswordHandler::class);
+        $translator = $this->container->get(TranslatorInterface::class);
 
         $resetPasswordSuccess = $resetPasswordHandler->resetPasswordAndNotify($user);
-        $em = $this->get('doctrine')->getManagerForClass(User::class);
+        $em = $this->container->get(ManagerRegistry::class)->getManagerForClass(User::class);
         $em->flush();
 
         $flashBag = $request->getSession()->getFlashBag();
@@ -147,7 +150,7 @@ class ResetController extends AbstractController
                 $translator->trans('oro.user.password.force_reset.success.message', ['%email%' => $user->getEmail()])
             );
 
-            if ($this->getUser() && $this->getUser()->getId() === $user->getId()) {
+            if ($this->getUser() instanceof AbstractUser && $this->getUser()->getId() === $user->getId()) {
                 return $this->redirectToRoute('oro_user_security_login');
             }
             return $params;
@@ -175,7 +178,7 @@ class ResetController extends AbstractController
         $actionName = $request->get('actionName');
 
         /** @var MassActionDispatcher $massActionDispatcher */
-        $massActionDispatcher = $this->get(MassActionDispatcher::class);
+        $massActionDispatcher = $this->container->get(MassActionDispatcher::class);
 
         $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
 
@@ -236,14 +239,14 @@ class ResetController extends AbstractController
             return $this->redirect($this->generateUrl('oro_user_reset_request'));
         }
 
-        if ($this->get(ResetHandler::class)->process($user)) {
+        if ($this->container->get(ResetHandler::class)->process($user)) {
             // force user logout
             $session->invalidate();
-            $this->get('security.token_storage')->setToken(null);
+            $this->container->get('security.token_storage')->setToken(null);
 
             $session->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.user.security.password_reseted.message')
+                $this->container->get(TranslatorInterface::class)->trans('oro.user.security.password_reseted.message')
             );
 
             return $this->redirect($this->generateUrl('oro_user_security_login'));
@@ -251,7 +254,7 @@ class ResetController extends AbstractController
 
         return array(
             'token' => $token,
-            'form'  => $this->get('oro_user.form.reset')->createView(),
+            'form'  => $this->container->get('oro_user.form.reset')->createView(),
         );
     }
 
@@ -284,11 +287,11 @@ class ResetController extends AbstractController
             'saved'  => false
         ];
 
-        if ($this->get(SetPasswordHandler::class)->process($entity)) {
+        if ($this->container->get(SetPasswordHandler::class)->process($entity)) {
             $responseData['entity'] = $entity;
             $responseData['saved']  = true;
         }
-        $responseData['form']       = $this->get('oro_user.form.type.set_password.form')->createView();
+        $responseData['form']       = $this->container->get('oro_user.form.type.set_password.form')->createView();
         $responseData['formAction'] = $formAction;
 
         return $responseData;
@@ -296,12 +299,12 @@ class ResetController extends AbstractController
 
     protected function getEntityRoutingHelper(): EntityRoutingHelper
     {
-        return $this->get(EntityRoutingHelper::class);
+        return $this->container->get(EntityRoutingHelper::class);
     }
 
     protected function getUserManager(): UserManager
     {
-        return $this->get(UserManager::class);
+        return $this->container->get(UserManager::class);
     }
 
     /**
@@ -312,6 +315,7 @@ class ResetController extends AbstractController
         return array_merge(
             parent::getSubscribedServices(),
             [
+                ManagerRegistry::class,
                 LoggerInterface::class,
                 TranslatorInterface::class,
                 UserManager::class,

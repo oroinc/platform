@@ -20,8 +20,6 @@ define(function(require) {
         typeName: 'pinbar',
 
         listen: {
-            'page:request mediator': 'refreshPinbar',
-
             'add collection': 'togglePageStateTrace',
             'remove collection': 'togglePageStateTrace'
         },
@@ -43,8 +41,6 @@ define(function(require) {
             }
 
             this.pageStateComponent.view.setStateTraceRequiredChecker(this.isPageStateTraceRequired.bind(this));
-
-            this.refreshPinbar();
         },
 
         _createSubViews: function() {

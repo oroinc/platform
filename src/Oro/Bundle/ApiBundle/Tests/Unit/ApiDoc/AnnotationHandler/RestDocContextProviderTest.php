@@ -111,7 +111,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
                     $context->getConfigExtras()
                 );
                 self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                self::assertTrue($context->isMasterRequest());
+                self::assertTrue($context->isMainRequest());
                 self::assertEquals($entityClass, $context->getClassName());
             });
 
@@ -152,7 +152,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
                     $context->getConfigExtras()
                 );
                 self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                self::assertTrue($context->isMasterRequest());
+                self::assertTrue($context->isMainRequest());
                 self::assertEquals($entityClass, $context->getParentClassName());
                 self::assertEquals($associationName, $context->getAssociationName());
                 self::assertEquals(
@@ -201,7 +201,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
                     $context->getConfigExtras()
                 );
                 self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                self::assertTrue($context->isMasterRequest());
+                self::assertTrue($context->isMainRequest());
                 self::assertEquals($entityClass, $context->getClassName());
                 self::assertEquals('list', $context->getActionType());
             });
@@ -243,7 +243,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
                     $context->getConfigExtras()
                 );
                 self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                self::assertTrue($context->isMasterRequest());
+                self::assertTrue($context->isMainRequest());
                 self::assertEquals($entityClass, $context->getClassName());
                 self::assertEquals('item', $context->getActionType());
             });
@@ -291,7 +291,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
                     $context->getConfigExtras()
                 );
                 self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                self::assertTrue($context->isMasterRequest());
+                self::assertTrue($context->isMainRequest());
                 self::assertEquals($entityClass, $context->getClassName());
                 self::assertEquals($actionType, $context->getActionType());
             });

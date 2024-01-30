@@ -32,11 +32,17 @@ liip_imagine:
                     mode: outbound
                 strip: ~
 
-        max_width_992:
+        max_width_1224:
             quality: 95
             filters:
                 relative_resize:
-                    widen: 992
+                    widen: 1224
+
+        max_width_736:
+            quality: 95
+            filters:
+                relative_resize:
+                    widen: 736
 
         max_width_414:
             quality: 95

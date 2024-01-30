@@ -5,24 +5,27 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SystemEmailTemplateSelectTypeTest extends \PHPUnit\Framework\TestCase
+class SystemEmailTemplateSelectTypeTest extends TestCase
 {
     /** @var SystemEmailTemplateSelectType */
     private $type;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|MockObject */
     private $em;
 
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityRepository|MockObject */
     private $entityRepository;
 
-    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var QueryBuilder|MockObject */
     private $queryBuilder;
 
     protected function setUp(): void
@@ -49,7 +52,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit\Framework\TestCase
             ->method('setDefaults')
             ->with([
                 'query_builder' => $this->queryBuilder,
-                'class'         => 'OroEmailBundle:EmailTemplate',
+                'class'         => EmailTemplate::class,
                 'choice_value'  => 'name',
                 'choice_label'  => 'name'
             ]);

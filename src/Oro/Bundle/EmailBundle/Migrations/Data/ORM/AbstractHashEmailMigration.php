@@ -13,7 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 abstract class AbstractHashEmailMigration extends AbstractEmailFixture
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function findExistingTemplate(ObjectManager $manager, array $template)
     {
@@ -23,12 +23,12 @@ abstract class AbstractHashEmailMigration extends AbstractEmailFixture
 
         return $manager->getRepository(EmailTemplate::class)->findOneBy([
             'name' => $template['params']['name'],
-            'entityName' => $template['params']['entityName'],
+            'entityName' => $template['params']['entityName']
         ]);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template)
     {

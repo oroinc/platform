@@ -32,7 +32,7 @@ class WorkflowController extends AbstractController
     public function startTransitionAction($workflowName, $transitionName, Request $request)
     {
         return $this->buildResponse(
-            $this->get(StartTransitionPageDataProvider::class)
+            $this->container->get(StartTransitionPageDataProvider::class)
                 ->getData($workflowName, $transitionName, $request->get('entityId', 0))
         );
     }
@@ -55,7 +55,7 @@ class WorkflowController extends AbstractController
     public function transitionAction($transitionName, WorkflowItem $workflowItem)
     {
         return $this->buildResponse(
-            $this->get(TransitionPageDataProvider::class)->getData($transitionName, $workflowItem)
+            $this->container->get(TransitionPageDataProvider::class)->getData($transitionName, $workflowItem)
         );
     }
 

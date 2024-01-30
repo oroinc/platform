@@ -19,9 +19,12 @@ class NotStartsWithComparisonExpression implements ComparisonExpressionInterface
         string $parameterName,
         mixed $value
     ): mixed {
-        $visitor->addParameter($parameterName, $value . '%');
+        $visitor->addParameter(
+            $parameterName,
+            ($value instanceof ExpressionValue ? $value->getValue() : $value) . '%'
+        );
 
         return $visitor->getExpressionBuilder()
-            ->notLike($expression, $visitor->buildPlaceholder($parameterName));
+            ->notLike($expression, $visitor->buildParameterExpression($parameterName, $value));
     }
 }

@@ -4,19 +4,17 @@ namespace Oro\Bundle\LocaleBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
 
 class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInterface
 {
-    protected ExtendExtension $extendExtension;
+    use ExtendExtensionAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMigrationVersion(): string
     {
@@ -24,15 +22,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
     }
 
     /**
-     * Sets the ExtendExtension
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension): void
-    {
-        $this->extendExtension = $extendExtension;
-    }
-
-    /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries): void
     {
@@ -63,7 +53,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
     /**
      * Create oro_localization table
      */
-    protected function createOroLocalizationTable(Schema $schema): void
+    private function createOroLocalizationTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_localization');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -72,8 +62,8 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
         $table->addColumn('language_id', 'integer');
         $table->addColumn('formatting_code', 'string', ['length' => 16]);
         $table->addColumn('rtl_mode', 'boolean', ['default' => false]);
-        $table->addColumn('created_at', 'datetime', []);
-        $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn('created_at', 'datetime');
+        $table->addColumn('updated_at', 'datetime');
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name']);
     }
@@ -81,7 +71,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
     /**
      * Create oro_fallback_localization_val table
      */
-    protected function createOroFallbackLocalizedValueTable(Schema $schema): void
+    private function createOroFallbackLocalizedValueTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_fallback_localization_val');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -90,18 +80,18 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
         $table->addColumn('string', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('text', 'text', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['fallback'], 'idx_fallback', []);
-        $table->addIndex(['string'], 'idx_string', []);
+        $table->addIndex(['fallback'], 'idx_fallback');
+        $table->addIndex(['string'], 'idx_string');
     }
 
     /**
      * Create oro_localization_title table
      */
-    protected function createOroLocalizationTitleTable(Schema $schema): void
+    private function createOroLocalizationTitleTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_localization_title');
-        $table->addColumn('localization_id', 'integer', []);
-        $table->addColumn('localized_value_id', 'integer', []);
+        $table->addColumn('localization_id', 'integer');
+        $table->addColumn('localized_value_id', 'integer');
         $table->setPrimaryKey(['localization_id', 'localized_value_id']);
         $table->addUniqueIndex(['localized_value_id']);
     }
@@ -109,7 +99,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
     /**
      * Add oro_localization foreign keys.
      */
-    protected function addOroLocalizationForeignKeys(Schema $schema): void
+    private function addOroLocalizationForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_localization');
         $table->addForeignKeyConstraint(
@@ -129,7 +119,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
     /**
      * Add oro_fallback_localization_val foreign keys.
      */
-    protected function addOroFallbackLocalizedValueForeignKeys(Schema $schema): void
+    private function addOroFallbackLocalizedValueForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_fallback_localization_val');
         $table->addForeignKeyConstraint(
@@ -143,7 +133,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
     /**
      * Add oro_localization_title foreign keys.
      */
-    protected function addOroLocalizationTitleForeignKeys(Schema $schema): void
+    private function addOroLocalizationTitleForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_localization_title');
         $table->addForeignKeyConstraint(
@@ -160,11 +150,11 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
         );
     }
 
-    protected function addRelationsToScope(Schema $schema): void
+    private function addRelationsToScope(Schema $schema): void
     {
         $this->extendExtension->addManyToOneRelation(
             $schema,
-            OroScopeBundleInstaller::ORO_SCOPE,
+            'oro_scope',
             'localization',
             'oro_localization',
             'id',
@@ -175,8 +165,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
                     'on_delete' => 'CASCADE',
                     'nullable' => true
                 ]
-            ],
-            RelationType::MANY_TO_ONE
+            ]
         );
     }
 }

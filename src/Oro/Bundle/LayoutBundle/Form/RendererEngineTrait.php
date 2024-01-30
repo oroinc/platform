@@ -101,7 +101,7 @@ trait RendererEngineTrait
     /**
      * {@inheritdoc}
      */
-    public function getResourceForBlockName(FormView $view, $blockName)
+    public function getResourceForBlockName(FormView $view, string $blockName): mixed
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
@@ -115,7 +115,7 @@ trait RendererEngineTrait
     /**
      * {@inheritdoc}
      */
-    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, $hierarchyLevel)
+    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, int $hierarchyLevel): int|false
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 

@@ -23,7 +23,7 @@ interface UserLoaderInterface
     /**
      * Loads the user for the given username.
      */
-    public function loadUserByUsername(string $username): ?UserInterface;
+    public function loadUserByIdentifier(string $username): ?UserInterface;
 
     /**
      * Loads the user for the given email address.

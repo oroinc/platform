@@ -59,7 +59,7 @@ class EmailThreadActivityContextController extends RestController
      */
     public function getManager(): EmailThreadActivityContextApiEntityManager
     {
-        return $this->get('oro_email.manager.email_thread_activity_context.api');
+        return $this->container->get('oro_email.manager.email_thread_activity_context.api');
     }
 
     /**
@@ -75,7 +75,7 @@ class EmailThreadActivityContextController extends RestController
      */
     protected function getDeleteHandler(): DeleteHandler
     {
-        return $this->get('oro_email.delete_handler.email_thread');
+        return $this->container->get('oro_email.delete_handler.email_thread');
     }
 
     private function handleDeleteError(string $message, int $code, RelationIdentifier $id): Response

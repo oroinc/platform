@@ -9,18 +9,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class AttachmentOwner implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::addOwnerToAttachment($schema);
-    }
-
-    public static function addOwnerToAttachment(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_attachment');
         $table->addColumn('owner_user_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['owner_user_id'], 'IDX_FA0FE0812B18554A', []);
+        $table->addIndex(['owner_user_id'], 'IDX_FA0FE0812B18554A');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['owner_user_id'],

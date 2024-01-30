@@ -828,7 +828,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
     public function testShouldNotSendLoggedInUserInfoIfPresentButNotUserInstance()
     {
-        $token = new UsernamePasswordToken($this->createMock(UserInterface::class), 'someCredentinals', 'aProviderKey');
+        $token = new UsernamePasswordToken($this->createMock(UserInterface::class), 'aProviderKey');
 
         $tokenStorage = $this->getTokenStorage();
         $tokenStorage->setToken($token);
@@ -851,7 +851,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $user = new User();
         $user->setId(123);
 
-        $token = new UsernamePasswordToken($user, 'someCredentinals', 'aProviderKey');
+        $token = new UsernamePasswordToken($user, 'aProviderKey');
 
         $tokenStorage = $this->getTokenStorage();
         $tokenStorage->setToken($token);
@@ -1195,7 +1195,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
     {
         $user = $this->getAdminUser();
         $organization = $user->getOrganization();
-        $token = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
+        $token = new UsernamePasswordOrganizationToken($user, 'main', $organization);
         $token->setAttribute('owner_description', 'Integration: #1');
 
         $tokenStorage = $this->getTokenStorage();
@@ -1217,7 +1217,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
     public function testShouldSendOwnerDescriptionUsingAuthorName()
     {
         $user = $this->getAdminUser();
-        $token = new UsernamePasswordToken($user, $user->getUsername(), 'main');
+        $token = new UsernamePasswordToken($user, 'main');
 
         $tokenStorage = $this->getTokenStorage();
         $tokenStorage->setToken($token);

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
-use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\Query;
 use Oro\Bundle\EntityBundle\ORM\OrmConfiguration;
@@ -42,7 +41,6 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
     private function getManager(): OroEntityManager
     {
         $managerConfiguration = new OrmConfiguration();
-        $managerConfiguration->addEntityNamespace(self::TEST_NAMESPACE_ALIAS, self::TEST_NAMESPACE);
 
         $managerMetadataFactory = $this->createMock(ClassMetadataFactory::class);
         $managerMetadataFactory->expects(self::any())
@@ -111,27 +109,6 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($manager2, $this->registry->getManagerForClass(self::TEST_ENTITY_CLASS));
     }
 
-    public function testManagerCacheWhenEntityManagerDoesNotExist()
-    {
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('service.default')
-            ->willReturn(null);
-        $this->container->expects(self::once())
-            ->method('initialized')
-            ->willReturnMap([['service.default', false]]);
-
-        self::assertNull($this->registry->getManagerForClass(self::TEST_ENTITY_PROXY_CLASS));
-        // test that a manager cached
-        self::assertNull($this->registry->getManagerForClass(self::TEST_ENTITY_PROXY_CLASS));
-
-        self::assertNull($this->registry->resetManager());
-
-        self::assertNull($this->registry->getManagerForClass(self::TEST_ENTITY_PROXY_CLASS));
-        // test that a manager cached
-        self::assertNull($this->registry->getManagerForClass(self::TEST_ENTITY_PROXY_CLASS));
-    }
-
     public function testDefaultQueryCacheLifetimeWhenItWasSpecifiedExplicitly()
     {
         $defaultQueryCacheLifetime = 3600;
@@ -181,33 +158,5 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         $query = $this->registry->getManager('default')
             ->createQuery('SELECT * FROM ' . self::TEST_ENTITY_CLASS);
         self::assertSame(0, $query->getQueryCacheLifetime());
-    }
-
-    public function testGetAliasNamespaceForKnownAlias()
-    {
-        $manager1 = $this->getManager();
-
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('service.default')
-            ->willReturn($manager1);
-
-        self::assertEquals(
-            self::TEST_NAMESPACE,
-            $this->registry->getAliasNamespace(self::TEST_NAMESPACE_ALIAS)
-        );
-    }
-
-    public function testGetAliasNamespaceForUnknownAlias()
-    {
-        $this->expectException(ORMException::class);
-        $manager1 = $this->getManager();
-
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('service.default')
-            ->willReturn($manager1);
-
-        $this->registry->getAliasNamespace('Another');
     }
 }

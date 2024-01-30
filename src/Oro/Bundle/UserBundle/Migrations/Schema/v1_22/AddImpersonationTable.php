@@ -9,26 +9,18 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class AddImpersonationTable implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        static::createOroUserImpersonationTable($schema);
-    }
-
-    /**
-     * Create oro_user_impersonation table
-     */
-    public static function createOroUserImpersonationTable(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->createTable('oro_user_impersonation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', ['notnull' => true]);
         $table->addColumn('token', 'string', ['length' => 255]);
-        $table->addColumn('expire_at', 'datetime', []);
+        $table->addColumn('expire_at', 'datetime');
         $table->addColumn('login_at', 'datetime', ['notnull' => false]);
         $table->addColumn('notify', 'boolean', ['notnull' => true, 'default' => false]);
-        $table->addIndex(['token'], 'token_idx', []);
+        $table->addIndex(['token'], 'token_idx');
         $table->setPrimaryKey(['id']);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),

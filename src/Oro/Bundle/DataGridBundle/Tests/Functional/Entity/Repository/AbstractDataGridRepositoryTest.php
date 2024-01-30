@@ -9,7 +9,6 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationT
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
-use Oro\Bundle\UserBundle\Entity\User;
 
 abstract class AbstractDataGridRepositoryTest extends WebTestCase
 {
@@ -22,20 +21,17 @@ abstract class AbstractDataGridRepositoryTest extends WebTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->initClient();
-
         $this->aclHelper = self::getContainer()->get('oro_security.acl_helper');
     }
 
     /**
-     * @param AbstractGridView|AbstractGridViewUser $needle
-     * @param array|AbstractGridView[]|AbstractGridViewUser[] $haystack
+     * @param AbstractGridView|AbstractGridViewUser     $needle
+     * @param AbstractGridView[]|AbstractGridViewUser[] $haystack
      */
-    protected function assertGridViewExists($needle, array $haystack)
+    protected function assertGridViewExists(AbstractGridView|AbstractGridViewUser $needle, array $haystack): void
     {
         $found = false;
-
         foreach ($haystack as $view) {
             if ($view->getId() === $needle->getId()) {
                 $found = true;
@@ -53,36 +49,25 @@ abstract class AbstractDataGridRepositoryTest extends WebTestCase
         );
     }
 
-    abstract protected function getUsername(): string;
+    abstract protected function getUserReference(): string;
 
-    /**
-     * @return AbstractUser
-     */
-    protected function getUser()
+    protected function getUser(): AbstractUser
     {
         /** @var AbstractUser $user */
-        $user = $this->getUserRepository()->findOneBy(['username' => $this->getUsername()]);
+        $user = $this->getReference($this->getUserReference());
 
-        $this->setUpTokenStorage($user);
+        $this->setSecurityToken($user);
 
         return $user;
     }
 
-    protected function setUpTokenStorage(AbstractUser $user)
+    protected function setSecurityToken(AbstractUser $user): void
     {
-        $token = new UsernamePasswordOrganizationToken(
+        self::getContainer()->get('security.token_storage')->setToken(new UsernamePasswordOrganizationToken(
             $user,
-            false,
             'main',
             $user->getOrganization(),
             $user->getUserRoles()
-        );
-
-        self::getContainer()->get('security.token_storage')->setToken($token);
-    }
-
-    protected function getUserRepository(): EntityRepository
-    {
-        return self::getContainer()->get('doctrine')->getRepository(User::class);
+        ));
     }
 }

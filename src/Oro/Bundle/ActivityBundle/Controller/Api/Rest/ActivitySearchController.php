@@ -70,7 +70,7 @@ class ActivitySearchController extends RestGetController
             $filter          = new ChainParameterFilter(
                 [
                     new StringToArrayParameterFilter(),
-                    new EntityClassParameterFilter($this->get('oro_entity.entity_class_name_helper'))
+                    new EntityClassParameterFilter($this->container->get('oro_entity.entity_class_name_helper'))
                 ]
             );
             $filters['from'] = $filter->filter($from, null);

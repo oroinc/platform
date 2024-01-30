@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Filter;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Form\Type\FilterType;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
@@ -91,7 +92,7 @@ class AuditFilter extends EntityFilter
 
         $auditQb = $qb
             ->getEntityManager()
-            ->getRepository('OroDataAuditBundle:Audit')
+            ->getRepository(Audit::class)
             ->createQueryBuilder($this->auditAlias);
 
         $auditQb

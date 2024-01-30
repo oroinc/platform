@@ -84,9 +84,9 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
             $this->createMock(FormExtensionState::class)
         );
 
-        ReflectionUtil::setPropertyValue($formRegistry, 'types', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'types', []);
         ReflectionUtil::setPropertyValue($formRegistry, 'guesser', null);
-        self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'types'));
+        self::assertEmpty(ReflectionUtil::getPropertyValue($formRegistry, 'types'));
         self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
     }
 
@@ -128,14 +128,14 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         $this->expectSwitchFormExtension($switchCalls, $extension, $formExtensionState);
 
         // should switch to api form extension
-        ReflectionUtil::setPropertyValue($formRegistry, 'types', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'types', []);
         ReflectionUtil::setPropertyValue($formRegistry, 'guesser', null);
         $formRegistry->switchToApiFormExtension();
         self::assertEquals([], ReflectionUtil::getPropertyValue($formRegistry, 'types'));
         self::assertFalse(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
 
         // should switch to default form extension
-        ReflectionUtil::setPropertyValue($formRegistry, 'types', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'types', []);
         ReflectionUtil::setPropertyValue($formRegistry, 'guesser', null);
         $formRegistry->switchToDefaultFormExtension();
         self::assertEquals([], ReflectionUtil::getPropertyValue($formRegistry, 'types'));
@@ -167,22 +167,22 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         $this->expectSwitchFormExtension($switchCalls, $extension, $formExtensionState);
 
         // the first "ToApi" switch should switch to api form extension
-        ReflectionUtil::setPropertyValue($formRegistry, 'types', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'types', []);
         ReflectionUtil::setPropertyValue($formRegistry, 'guesser', null);
         $formRegistry->switchToApiFormExtension();
         self::assertEquals([], ReflectionUtil::getPropertyValue($formRegistry, 'types'));
         self::assertFalse(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
 
         // the second "ToApi" switch should do nothing
-        ReflectionUtil::setPropertyValue($formRegistry, 'types', null);
+        ReflectionUtil::setPropertyValue($formRegistry, 'types', []);
         ReflectionUtil::setPropertyValue($formRegistry, 'guesser', null);
         $formRegistry->switchToApiFormExtension();
-        self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'types'));
+        self::assertEmpty(ReflectionUtil::getPropertyValue($formRegistry, 'types'));
         self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
 
         // the first "ToDefault" switch should do nothing
         $formRegistry->switchToDefaultFormExtension();
-        self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'types'));
+        self::assertEmpty(ReflectionUtil::getPropertyValue($formRegistry, 'types'));
         self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
 
         // the second "ToDefault" switch should switch to default form extension

@@ -134,4 +134,41 @@ class UrlConverterTest extends \PHPUnit\Framework\TestCase
             $this->urlConverter->convertGridUrlToPageUrl($gridName, $requestUri)
         );
     }
+
+    public function testConvertGridUrlToPageUrlWithRouteParams()
+    {
+        $gridName = 'quotes-grid';
+        $pageParams = [
+            $gridName =>
+                [
+                    'originalRoute' => 'oro_sale_quote_view',
+                    'originalRouteParameters' => '%7B%22id%22%3A42%7D',
+                    '_pager' =>
+                        [
+                            '_page' => '1',
+                            '_per_page' => '10',
+                        ],
+                    '_parameters' =>
+                        [
+                            'view' => '__all__',
+                        ],
+                    '_appearance' =>
+                        [
+                            '_type' => 'grid',
+                        ],
+                ],
+            'appearanceType' => 'grid',
+        ];
+
+        $requestUri = '/admin/datagrid/quotes-grid?' . \http_build_query($pageParams);
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with('oro_sale_quote_view', ['id' => 42])
+            ->willReturn('/admin/sale/quote/42');
+
+        $this->assertEquals(
+            '/admin/sale/quote/42?' . \http_build_query([$gridName => $pageParams[$gridName]]),
+            $this->urlConverter->convertGridUrlToPageUrl($gridName, $requestUri)
+        );
+    }
 }

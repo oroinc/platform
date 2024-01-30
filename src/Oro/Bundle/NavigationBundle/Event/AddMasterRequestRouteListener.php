@@ -18,7 +18,7 @@ class AddMasterRequestRouteListener
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        if ($event->isMasterRequest()) {
+        if ($event->isMainRequest()) {
             if ($request->attributes->has('_route')) {
                 $this->masterRequestRoute = $request->attributes->get('_route');
                 $request->attributes->set('_master_request_route', $this->masterRequestRoute);

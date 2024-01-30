@@ -8,6 +8,7 @@ use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
 /**
  * Writes info about the processor executed before consumption was interrupted to the log.
@@ -80,6 +81,20 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
     private function resetService(string $name): void
     {
         $service = $this->container->get($name);
+
+        if ($service instanceof LazyObjectInterface) {
+            if (!$service->resetLazyObject()) {
+                throw new \LogicException(
+                    sprintf(
+                        'Resetting a non-lazy manager service is not supported. Declare the "%s" service as lazy.',
+                        $name
+                    )
+                );
+            }
+
+            return;
+        }
+
         if (!$service instanceof LazyLoadingInterface) {
             $msg = interface_exists(LazyLoadingInterface::class)
                 ? sprintf('Declare the "%s" service as lazy.', $name)
@@ -95,7 +110,7 @@ class InterruptionDetailConsumptionExtension extends AbstractExtension
 
                     $wrappedInstance = isset($this->fileMap[$name])
                         ? $this->load($this->fileMap[$name])
-                        : $this->{$this->methodMap[$name]}(false);
+                        : $this->{$this->methodMap[$name]}($this, false);
 
                     $manager->setProxyInitializer(null);
 

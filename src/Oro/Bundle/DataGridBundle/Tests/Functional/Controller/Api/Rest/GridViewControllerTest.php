@@ -36,7 +36,7 @@ class GridViewControllerTest extends WebTestCase
         $response = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertArrayHasKey('id', $response);
         $createdGridView = $this->findGridView($response['id']);
-        $this->assertEquals('admin', $createdGridView->getOwner()->getUsername());
+        $this->assertEquals('admin', $createdGridView->getOwner()->getUserIdentifier());
         $this->assertEquals('view', $createdGridView->getName());
         $this->assertEquals(GridView::TYPE_PUBLIC, $createdGridView->getType());
         $this->assertEquals('testing-grid', $createdGridView->getGridName());
@@ -66,7 +66,7 @@ class GridViewControllerTest extends WebTestCase
         $this->assertResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         $updatedGridView = $this->findGridView($gridView->getId());
-        $this->assertEquals('simple_user', $updatedGridView->getOwner()->getUsername());
+        $this->assertEquals('simple_user', $updatedGridView->getOwner()->getUserIdentifier());
         $this->assertEquals('view2', $updatedGridView->getName());
         $this->assertEquals(GridView::TYPE_PUBLIC, $updatedGridView->getType());
         $this->assertEquals('testing-grid2', $updatedGridView->getGridName());

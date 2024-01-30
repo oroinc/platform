@@ -91,4 +91,9 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
     public function eraseCredentials()
     {
     }
+
+    public function getUserIdentifier(): string
+    {
+        return '';
+    }
 }

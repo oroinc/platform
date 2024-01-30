@@ -4,34 +4,35 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class LoadUserData extends AbstractFixture implements ContainerAwareInterface
+class LoadUserData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    use ContainerAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function getDependencies(): array
     {
-        $this->container = $container;
+        return [LoadOrganization::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $userManager = $this->container->get('oro_user.manager');
-        $organization = $manager->getRepository(Organization::class)->getFirst();
-        $role = $manager->getRepository(Role::class)->findOneBy(['role' => User::ROLE_DEFAULT]);
+        /** @var Organization $organization */
+        $organization = $this->getReference(LoadOrganization::ORGANIZATION);
 
         $user = $userManager->createUser();
         $user->setUsername('simple_user')
@@ -42,10 +43,10 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setOrganization($organization)
             ->setOrganizations(new ArrayCollection([$organization]))
             ->setOwner($organization->getBusinessUnits()->first())
-            ->addUserRole($role)
+            ->addUserRole($manager->getRepository(Role::class)->findOneBy(['role' => User::ROLE_DEFAULT]))
             ->setEnabled(true);
         $userManager->updateUser($user);
 
-        $this->setReference($user->getUsername(), $user);
+        $this->setReference($user->getUserIdentifier(), $user);
     }
 }

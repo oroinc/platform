@@ -8,9 +8,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -28,7 +28,8 @@ class MultiInsertQueryExecutorTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-        $this->queryExecutor = $this->getContainer()->get('oro_entity.orm.multi_insert_query_executor');
+        $this->loadFixtures([LoadOrganization::class]);
+        $this->queryExecutor = self::getContainer()->get('oro_entity.orm.multi_insert_query_executor');
         $this->queryExecutor->setBatchSize(self::BATCH_SIZE);
     }
 
@@ -39,10 +40,7 @@ class MultiInsertQueryExecutorTest extends WebTestCase
 
     private function getOrganization(): Organization
     {
-        /** @var OrganizationRepository $repository */
-        $repository = self::getContainer()->get('doctrine')->getRepository(Organization::class);
-
-        return $repository->getFirst();
+        return $this->getReference(LoadOrganization::ORGANIZATION);
     }
 
     public function testInsert()
@@ -155,7 +153,7 @@ class MultiInsertQueryExecutorTest extends WebTestCase
 
     private function createUsers(Role $userRole, Organization $organization, int $userCount): void
     {
-        $userManager = $this->getContainer()->get('oro_user.manager');
+        $userManager = self::getContainer()->get('oro_user.manager');
         for ($i = 1; $i <= $userCount; $i++) {
             /** @var User $user */
             $user = $userManager->createUser();

@@ -49,7 +49,7 @@ class ReminderListener implements EventSubscriber, ServiceSubscriberInterface
      */
     public function postLoad(LifecycleEventArgs $args)
     {
-        $entity = $args->getEntity();
+        $entity = $args->getObject();
         if ($entity instanceof RemindableInterface) {
             $this->getReminderManager()->loadReminders($entity);
         }
@@ -60,7 +60,7 @@ class ReminderListener implements EventSubscriber, ServiceSubscriberInterface
      */
     public function postPersist(LifecycleEventArgs $event)
     {
-        $entity = $event->getEntity();
+        $entity = $event->getObject();
         if ($entity instanceof RemindableInterface) {
             $this->getReminderManager()->saveReminders($entity);
         }

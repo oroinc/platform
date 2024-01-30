@@ -401,7 +401,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         return new ViewEvent(
             $this->createMock(HttpKernelInterface::class),
             new Request([], [], $attributes),
-            HttpKernelInterface::MASTER_REQUEST,
+            HttpKernelInterface::MAIN_REQUEST,
             $controllerResult
         );
     }

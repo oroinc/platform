@@ -13,7 +13,8 @@ data:
             messageIds: null
             xMessageId: null
             xThreadId: null
-            references: []
+            references:
+                - '<other@email-api.func-test>'
             acceptLanguage: null
             bodySynced: true
             from:
@@ -109,14 +110,14 @@ data:
             sentAt: '2022-05-01T12:01:00Z'
             importance: normal
             internalDate: '2022-05-01T12:05:00Z'
-            head: true
+            head: false
             messageId: '<id3@email-api.func-test>'
             messageIds: null
             xMessageId: null
             xThreadId: null
             references:
-                - '<test2@email-api.func-test>'
-                - '<test3@email-api.func-test>'
+                - '<id2@email-api.func-test>'
+                - '<test1@email-api.func-test>'
             acceptLanguage: null
             bodySynced: true
             from:
@@ -158,3 +159,54 @@ data:
                     -
                         type: emailattachments
                         id: '<toString(@emailAttachment_3_1->id)>'
+    -
+        type: emails
+        id: '<toString(@email_6->id)>'
+        attributes:
+            createdAt: '@email_6->created->format("Y-m-d\TH:i:s\Z")'
+            subject: 'Test Sixth Email'
+            sentAt: '2022-05-01T12:01:00Z'
+            importance: normal
+            internalDate: '2022-05-01T12:05:00Z'
+            head: true
+            messageId: '<id6@email-api.func-test>'
+            messageIds: null
+            xMessageId: null
+            xThreadId: null
+            references:
+                - '<other@email-api.func-test>'
+            acceptLanguage: null
+            bodySynced: true
+            from:
+                name: null
+                email: admin@example.com
+            toRecipients:
+                -
+                    name: null
+                    email: user1@example.com
+            ccRecipients:
+                -
+                    name: null
+                    email: cc6@example.com
+            bccRecipients:
+                -
+                    name: null
+                    email: bcc6@example.com
+            shortTextBody: 'Test Sixth Email body'
+            hasEmailAttachments: false
+            body:
+                content: 'Test Sixth Email body'
+                type: text
+        relationships:
+            emailUsers:
+                data:
+                    -
+                        type: emailusers
+                        id: '<toString(@emailUser_6->id)>'
+            activityTargets:
+                data:
+                    -
+                        type: users
+                        id: '<toString(@user->id)>'
+            emailAttachments:
+                data: []

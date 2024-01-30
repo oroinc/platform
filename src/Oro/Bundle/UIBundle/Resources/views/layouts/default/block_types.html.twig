@@ -38,10 +38,13 @@
     {% endif %}
 
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' breadcrumbs'
+        '~class': ' breadcrumbs start-scroll-from-end invisible-scrollbar'
     }) %}
+    {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
     <nav aria-label="{{ 'oro.ui.breadcrumb.aria_label'|trans }}">
-        <ol {{ block('block_attributes') }}>
+        <ol {{ block('block_attributes') }}
+            data-page-component-view="orofrontend/js/app/views/scroll-shadow-view"
+            data-scroll-target>
             {% if breadcrumbs is not iterable %}
                 <li class="breadcrumbs__item">
                     <a href="" class="breadcrumbs__link" aria-current="location">{{ breadcrumbs }}</a>
@@ -58,13 +61,13 @@
 
                             {% if url and not loop.last %}
                                 <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
-                                <span aria-hidden="true">/</span>
+                                <span aria-hidden="true" class="breadcrumbs-separator">{{ renderIcon.icon({name: 'chevron-right', extraClass: 'theme-icon--small'}) }}</span>
                             {% else %}
                                 <a href="{{ url  }}" class="breadcrumbs__link" aria-current="location">{{ breadcrumb.label|trans }}</a>
                             {% endif %}
                         {%  else %}
                             {% if not loop.first %}
-                                <span aria-hidden="true">/</span>
+                                <span aria-hidden="true" class="breadcrumbs-separator">{{ renderIcon.icon({name: 'chevron-right', extraClass: 'theme-icon--small'}) }}</span>
                             {% endif %}
                             <a href="" class="breadcrumbs__link" aria-current="location">{{ breadcrumb }}</a>
                         {%  endif %}

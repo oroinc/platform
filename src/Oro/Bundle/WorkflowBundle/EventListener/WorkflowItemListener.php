@@ -82,7 +82,7 @@ class WorkflowItemListener
      */
     public function preRemove(LifecycleEventArgs $args)
     {
-        $entity = $args->getEntity();
+        $entity = $args->getObject();
 
         if (!$this->entityConnector->isApplicableEntity($entity) || !$this->cache->hasRelatedWorkflows($entity)) {
             return;

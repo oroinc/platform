@@ -41,14 +41,15 @@ class WidgetController extends AbstractController
      */
     public function entityWorkflowsAction($entityClass, $entityId)
     {
-        $entity = $this->get(TransitionWidgetHelper::class)->getOrCreateEntityReference($entityClass, $entityId);
+        $entity = $this->container->get(TransitionWidgetHelper::class)
+            ->getOrCreateEntityReference($entityClass, $entityId);
         if (!$entity) {
             throw $this->createNotFoundException(
                 sprintf('Entity \'%s\' with id \'%d\' not found', $entityClass, $entityId)
             );
         }
 
-        $workflowManager = $this->get(WorkflowManagerRegistry::class)->getManager();
+        $workflowManager = $this->container->get(WorkflowManagerRegistry::class)->getManager();
         $applicableWorkflows = array_filter(
             $workflowManager->getApplicableWorkflows($entity),
             function (Workflow $workflow) use ($entity) {
@@ -57,7 +58,7 @@ class WidgetController extends AbstractController
         );
 
         /* @var TransitionTranslationHelper $translationHelper */
-        $translationHelper = $this->get(TransitionTranslationHelper::class);
+        $translationHelper = $this->container->get(TransitionTranslationHelper::class);
 
         return [
             'entityId' => $entityId,
@@ -71,7 +72,7 @@ class WidgetController extends AbstractController
                         $entity
                     );
 
-                    $workflowData = $this->get(WorkflowDataProvider::class)
+                    $workflowData = $this->container->get(WorkflowDataProvider::class)
                         ->getWorkflowData($entity, $workflow, $showDisabled);
 
                     foreach ($workflowData['transitionsData'] as $transitionData) {
@@ -82,7 +83,7 @@ class WidgetController extends AbstractController
                 },
                 $applicableWorkflows
             ),
-            'originalUrl' => $this->get(OriginalUrlProvider::class)->getOriginalUrl(),
+            'originalUrl' => $this->container->get(OriginalUrlProvider::class)->getOriginalUrl(),
         ];
     }
 
@@ -100,7 +101,7 @@ class WidgetController extends AbstractController
      */
     public function startTransitionFormAction($transitionName, $workflowName, Request $request)
     {
-        $processor = $this->get(TransitActionProcessor::class);
+        $processor = $this->container->get(TransitActionProcessor::class);
 
         $context = $this->createProcessorContext($processor, $request, $transitionName);
         $context->setWorkflowName($workflowName);
@@ -125,7 +126,7 @@ class WidgetController extends AbstractController
      */
     public function transitionFormAction($transitionName, WorkflowItem $workflowItem, Request $request)
     {
-        $processor = $this->get(TransitActionProcessor::class);
+        $processor = $this->container->get(TransitActionProcessor::class);
 
         $context = $this->createProcessorContext($processor, $request, $transitionName);
         $context->setWorkflowItem($workflowItem);
@@ -167,9 +168,10 @@ class WidgetController extends AbstractController
         $workflowsData = [];
 
         /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->get(WorkflowManagerRegistry::class)->getManager('default');
-        $transitionDataProvider = $this->get(TransitionDataProvider::class);
-        $entity = $this->get(TransitionWidgetHelper::class)->getOrCreateEntityReference($entityClass, $entityId);
+        $workflowManager = $this->container->get(WorkflowManagerRegistry::class)->getManager('default');
+        $transitionDataProvider = $this->container->get(TransitionDataProvider::class);
+        $entity = $this->container->get(TransitionWidgetHelper::class)
+            ->getOrCreateEntityReference($entityClass, $entityId);
 
         $workflows = $workflowManager->getApplicableWorkflows($entity);
         foreach ($workflows as $workflow) {

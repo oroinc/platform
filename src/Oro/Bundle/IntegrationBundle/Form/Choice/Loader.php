@@ -3,9 +3,13 @@
 namespace Oro\Bundle\IntegrationBundle\Form\Choice;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\SecurityBundle\Form\ChoiceList\AclProtectedQueryBuilderLoader;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * The query builder loader for integration channels.
+ */
 class Loader extends AclProtectedQueryBuilderLoader
 {
     /**
@@ -17,7 +21,7 @@ class Loader extends AclProtectedQueryBuilderLoader
     {
         $qb = $em->createQueryBuilder();
         $qb->select('i');
-        $qb->from('OroIntegrationBundle:Channel', 'i');
+        $qb->from(Channel::class, 'i');
         $qb->orderBy('i.name', 'ASC');
 
         if (null !== $allowedTypes) {

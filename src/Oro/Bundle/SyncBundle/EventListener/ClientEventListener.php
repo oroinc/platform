@@ -50,8 +50,8 @@ class ClientEventListener implements LoggerAwareInterface
         $loggerContext = [
             'connection_id' => $connection->resourceId,
             'session_id' => $connection->WAMP->sessionId,
-            'username' => $token->getUsername(),
-            'ticket_id' => $token->getCredentials(),
+            'username' => $token->getUserIdentifier(),
+            'ticket_id' => $token->getAttribute('ticketId'),
         ];
 
         try {
@@ -69,7 +69,7 @@ class ClientEventListener implements LoggerAwareInterface
         // Save username in WAMP connection to be able to restore user in ClientManipulator in case of
         // ClientStorage TTL expiration.
         if ($token instanceof TicketToken) {
-            $connection->WAMP->username = $token->getUsername();
+            $connection->WAMP->username = $token->getUserIdentifier();
         }
 
         $this->logger->info('{username} connected', ['storage_id' => $storageId] + $loggerContext);

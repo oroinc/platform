@@ -47,32 +47,36 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'label'             => 'Id',
                         'name'              => 'id',
                         'type'              => 'integer',
-                        'relationType'      => '',
+                        'relationType'      => null,
                         'relatedEntityName' => null,
+                        'relatedEntityType' => null,
                         'options'           => ['identifier' => true, 'configurable' => true]
                     ],
                     [
                         'label'             => 'First name',
                         'name'              => 'firstName',
                         'type'              => 'string',
-                        'relationType'      => '',
+                        'relationType'      => null,
                         'relatedEntityName' => null,
+                        'relatedEntityType' => null,
                         'options'           => ['configurable' => true, 'auditable' => true]
                     ],
                     [
                         'label'             => 'Created At',
                         'name'              => 'createdAt',
                         'type'              => 'datetime',
-                        'relationType'      => '',
+                        'relationType'      => null,
                         'relatedEntityName' => null,
+                        'relatedEntityType' => null,
                         'options'           => ['configurable' => true]
                     ],
                     [
                         'label'             => 'Password',
                         'name'              => 'password',
                         'type'              => 'string',
-                        'relationType'      => '',
+                        'relationType'      => null,
                         'relatedEntityName' => null,
+                        'relatedEntityType' => null,
                         'options'           => ['exclude' => true, 'configurable' => true]
                     ],
                     [
@@ -81,6 +85,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'type'              => 'ref-one',
                         'relationType'      => 'manyToOne',
                         'relatedEntityName' => BusinessUnit::class,
+                        'relatedEntityType' => 'businessunits',
                         'options'           => ['configurable' => true]
                     ],
                     [
@@ -89,6 +94,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'type'              => 'ref-many',
                         'relationType'      => 'manyToMany',
                         'relatedEntityName' => Group::class,
+                        'relatedEntityType' => 'usergroups',
                         'options'           => ['configurable' => true, 'auditable' => true]
                     ],
                     [
@@ -97,22 +103,25 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'type'              => 'enum',
                         'relationType'      => 'manyToOne',
                         'relatedEntityName' => 'Extend\Entity\EV_Auth_Status',
+                        'relatedEntityType' => 'userauthstatuses',
                         'options'           => ['virtual' => true, 'configurable' => true]
                     ],
                     [
                         'label'             => 'Business Units',
                         'name'              => 'business_units_id',
                         'type'              => 'dictionary',
-                        'relationType'      => '',
+                        'relationType'      => null,
                         'relatedEntityName' => BusinessUnit::class,
+                        'relatedEntityType' => 'businessunits',
                         'options'           => ['virtual' => true]
                     ],
                     [
                         'label'             => 'Tags',
                         'name'              => 'tag_field',
                         'type'              => 'tag',
-                        'relationType'      => '',
+                        'relationType'      => null,
                         'relatedEntityName' => Tag::class,
+                        'relatedEntityType' => 'tags',
                         'options'           => ['virtual' => true]
                     ],
                     [
@@ -121,6 +130,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'type'              => 'ManyToMany',
                         'relationType'      => 'manyToMany',
                         'relatedEntityName' => Tag::class,
+                        'relatedEntityType' => 'tags',
                         'options'           => []
                     ],
                     [
@@ -129,6 +139,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'type'              => 'ref-one',
                         'relationType'      => 'manyToOne',
                         'relatedEntityName' => Tag::class,
+                        'relatedEntityType' => 'tags',
                         'options'           => ['configurable' => true]
                     ],
                     [
@@ -137,6 +148,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'type'              => 'ref-one',
                         'relationType'      => 'manyToOne',
                         'relatedEntityName' => ActivityList::class,
+                        'relatedEntityType' => 'activitylists',
                         'options'           => [
                             'configurable' => true
                         ]
@@ -165,8 +177,9 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'label'             => 'extend.entity.testentity1.name.label',
                         'name'              => 'name',
                         'type'              => 'string',
-                        'relationType'      => '',
+                        'relationType'      => null,
                         'relatedEntityName' => null,
+                        'relatedEntityType' => null,
                         'options'           => ['configurable' => true]
                     ],
                     [
@@ -175,6 +188,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'type'              => 'manyToMany',
                         'relationType'      => 'manyToMany',
                         'relatedEntityName' => 'Extend\Entity\TestEntity2',
+                        'relatedEntityType' => 'extendtestentity2s',
                         'options'           => ['configurable' => true]
                     ],
                     [
@@ -183,6 +197,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'type'              => 'manyToOne',
                         'relationType'      => 'manyToOne',
                         'relatedEntityName' => 'Extend\Entity\TestEntity2',
+                        'relatedEntityType' => 'extendtestentity2s',
                         'options'           => ['configurable' => true]
                     ],
                     [
@@ -191,6 +206,7 @@ class EntityStructureTest extends RestJsonApiTestCase
                         'type'              => 'oneToMany',
                         'relationType'      => 'oneToMany',
                         'relatedEntityName' => 'Extend\Entity\TestEntity2',
+                        'relatedEntityType' => 'extendtestentity2s',
                         'options'           => ['configurable' => true]
                     ]
                 ]

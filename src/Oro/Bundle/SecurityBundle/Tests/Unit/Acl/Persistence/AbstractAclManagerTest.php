@@ -43,7 +43,7 @@ class AbstractAclManagerTest extends \PHPUnit\Framework\TestCase
 
         $src = $this->createMock(UserInterface::class);
         $src->expects(self::once())
-            ->method('getUsername')
+            ->method('getUserIdentifier')
             ->willReturn('Test');
         self::assertEquals(
             new UserSecurityIdentity('Test', get_class($src)),
@@ -52,7 +52,7 @@ class AbstractAclManagerTest extends \PHPUnit\Framework\TestCase
 
         $user = $this->createMock(UserInterface::class);
         $user->expects(self::once())
-            ->method('getUsername')
+            ->method('getUserIdentifier')
             ->willReturn('Test');
         $src = $this->createMock(TokenInterface::class);
         $src->expects(self::once())

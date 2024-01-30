@@ -147,15 +147,10 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
 
     /**
      * Returns a text representation of the given entity.
-     *
-     * @param object $object
-     * @param string $locale
-     *
-     * @return string
      */
-    public function getEntityName($object, $locale = null)
+    public function getEntityName(?object $object, ?string $locale = null, ?string $format = null): ?string
     {
-        return $this->getEntityNameResolver()->getName($object, null, $locale);
+        return $this->getEntityNameResolver()->getName($object, $format, $locale);
     }
 
     /**

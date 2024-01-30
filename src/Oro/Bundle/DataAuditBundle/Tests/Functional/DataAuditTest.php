@@ -42,7 +42,6 @@ class DataAuditTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
         $token = new UsernamePasswordOrganizationToken(
             $this->findAdmin(),
-            self::AUTH_PW,
             'main',
             $this->findAdmin()->getOrganization(),
             $this->findAdmin()->getUserRoles()

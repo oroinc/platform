@@ -3,12 +3,9 @@
 namespace Oro\Bundle\ActivityListBundle\Migration\Extension;
 
 /**
- * ActivityListExtensionAwareInterface should be implemented by migrations that depends on a ActivityListExtension.
+ * This interface should be implemented by migrations that depend on {@see ActivityListExtension}.
  */
 interface ActivityListExtensionAwareInterface
 {
-    /**
-     * Sets the ActivityExtension
-     */
-    public function setActivityListExtension(ActivityListExtension $activityListListExtension);
+    public function setActivityListExtension(ActivityListExtension $activityListExtension);
 }

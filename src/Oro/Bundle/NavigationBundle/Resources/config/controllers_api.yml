@@ -2,8 +2,25 @@ services:
     _defaults:
         public: true
 
-    OroNavigationBundleRestApiController:
-        namespace: Oro\Bundle\NavigationBundle\Controller\Api\
-        resource: '../../Controller/Api/*Controller.php'
+    Oro\Bundle\NavigationBundle\Controller\Api\ShortcutsController:
         calls:
-            - [setContainer, ['@service_container']]
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_menu.builder_chain, key: Knp\Menu\Provider\MenuProviderInterface }
+
+    Oro\Bundle\NavigationBundle\Controller\Api\PagestateController:
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_navigation.form.handler.pagestate, key: Oro\Bundle\NavigationBundle\Form\Handler\PageStateHandler }
+
+    Oro\Bundle\NavigationBundle\Controller\Api\NavigationItemController:
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_navigation.utils.pinbar_tab_url_normalizer, key: Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizerInterface }
+            - { name: container.service_subscriber, id: oro_navigation.item.factory, key: Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory }
+            - { name: container.service_subscriber, id: oro_navigation.provider.navigation_items, key: Oro\Bundle\NavigationBundle\Provider\NavigationItemsProviderInterface }

@@ -5,7 +5,7 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\CacheBundle\Provider\MemoryCacheProvider;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Component\Cache\CacheItem;
 
 class MemoryCacheProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -64,15 +64,11 @@ class MemoryCacheProviderTest extends \PHPUnit\Framework\TestCase
         $this->arrayAdapter->expects($this->once())
             ->method('getItem')
             ->with($cacheKey)
-            ->willReturn($cacheItem = $this->createMock(ItemInterface::class));
+            ->willReturn($cacheItem = new CacheItem());
 
-        $cacheItem->expects($this->once())
-            ->method('isHit')
-            ->willReturn(true);
-
-        $cacheItem->expects($this->once())
-            ->method('get')
-            ->willReturn($cachedData = 'sample_data');
+        $r = new \ReflectionProperty($cacheItem, 'isHit');
+        $r->setValue($cacheItem, true);
+        $cacheItem->set($cachedData = 'sample_data');
 
         $this->assertEquals($cachedData, $this->provider->get($cacheKeyArguments));
     }
@@ -87,14 +83,7 @@ class MemoryCacheProviderTest extends \PHPUnit\Framework\TestCase
         $this->arrayAdapter->expects($this->once())
             ->method('getItem')
             ->with($cacheKey)
-            ->willReturn($cacheItem = $this->createMock(ItemInterface::class));
-
-        $cacheItem->expects($this->once())
-            ->method('isHit')
-            ->willReturn(false);
-
-        $cacheItem->expects($this->never())
-            ->method('get');
+            ->willReturn($cacheItem = new CacheItem());
 
         $this->assertNull($this->provider->get($cacheKeyArguments));
     }

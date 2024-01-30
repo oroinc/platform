@@ -37,7 +37,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
     public function testPreRemove(bool $entityIsConfigurable = false)
     {
         $entity = new StubEntity();
-        $args   = new LifecycleEventArgs($entity, $this->entityManager);
+        $args = new LifecycleEventArgs($entity, $this->entityManager);
 
         $this->mockMetadata($entityIsConfigurable ? 1 : 0);
         $this->configManager->expects($this->once())
@@ -51,7 +51,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'should process all configurable entities' => [true],
-            'should not process all entities'          => [false]
+            'should not process all entities' => [false]
         ];
     }
 
@@ -71,7 +71,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
         }
 
         $configuration = new Configuration();
-        $configuration->addEntityNamespace('OroSegmentBundle', 'OroSegmentBundleNamespace');
+        $configuration->setEntityNamespaces(['OroSegmentBundle' => '/test']);
         $this->entityManager->expects($this->once())
             ->method('getConfiguration')
             ->willReturn($configuration);
@@ -105,7 +105,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
         }
 
         $configuration = new Configuration();
-        $configuration->addEntityNamespace('SomeBundle', 'SomeBundleNamespace');
+        $configuration->setEntityNamespaces([]);
         $this->entityManager->expects($this->once())
             ->method('getConfiguration')
             ->willReturn($configuration);
@@ -137,7 +137,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
             $entity->setId($i);
             $entity->setName('name-' . $i);
             $entities[] = [
-                'id'     => $i,
+                'id' => $i,
                 'entity' => $entity
             ];
         }

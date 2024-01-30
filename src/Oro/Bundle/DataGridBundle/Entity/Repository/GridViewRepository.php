@@ -8,6 +8,9 @@ use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Doctrine repository for AbstractGridView entity
+ */
 class GridViewRepository extends EntityRepository
 {
     /** @var array */
@@ -140,7 +143,7 @@ class GridViewRepository extends EntityRepository
      */
     protected function getCacheKey(UserInterface $user, $gridName)
     {
-        return sprintf('%s.%s', $user->getUsername(), $gridName);
+        return sprintf('%s.%s', $user->getUserIdentifier(), $gridName);
     }
 
     /**

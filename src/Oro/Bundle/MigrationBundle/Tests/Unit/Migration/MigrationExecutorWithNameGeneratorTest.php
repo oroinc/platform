@@ -10,13 +10,10 @@ use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongColumnNameMig
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongTableNameMigration;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecutor
+class MigrationExecutorWithNameGeneratorTest extends MigrationExecutorTestCase
 {
-    /** @var MigrationExecutorWithNameGenerator */
-    private $executor;
-
-    /** @var DbIdentifierNameGenerator */
-    private $nameGenerator;
+    private DbIdentifierNameGenerator $nameGenerator;
+    private MigrationExecutorWithNameGenerator $executor;
 
     protected function setUp(): void
     {
@@ -29,7 +26,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
         $this->executor->setNameGenerator($this->nameGenerator);
     }
 
-    public function testExecuteUp()
+    public function testExecuteUp(): void
     {
         $migration10 = new Test1BundleMigration10();
         $migration11 = new Test1BundleMigration11();
@@ -38,7 +35,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
             new MigrationState($migration11)
         ];
 
-        $this->connection->expects($this->exactly(3))
+        $this->connection->expects(self::exactly(3))
             ->method('executeQuery')
             ->withConsecutive(
                 ['CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)'],
@@ -51,7 +48,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
 
         $this->executor->executeUp($migrations);
         $messages = $this->logger->getMessages();
-        $this->assertEquals(
+        self::assertEquals(
             [
                 '> ' . get_class($migration10),
                 'CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)',
@@ -64,7 +61,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
         );
     }
 
-    public function testExecuteUpWithDryRun()
+    public function testExecuteUpWithDryRun(): void
     {
         $migration10 = new Test1BundleMigration10();
         $migration11 = new Test1BundleMigration11();
@@ -73,12 +70,12 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
             new MigrationState($migration11)
         ];
 
-        $this->connection->expects($this->never())
+        $this->connection->expects(self::never())
             ->method('executeQuery');
 
         $this->executor->executeUp($migrations, true);
         $messages = $this->logger->getMessages();
-        $this->assertEquals(
+        self::assertEquals(
             [
                 '> ' . get_class($migration10),
                 'CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)',
@@ -91,7 +88,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
         );
     }
 
-    public function testWrongTableNameQuery()
+    public function testWrongTableNameQuery(): void
     {
         $migration = new WrongTableNameMigration();
         $migrations = [
@@ -102,11 +99,11 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
             'Failed migrations: Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongTableNameMigration.'
         );
         $this->executor->executeUp($migrations);
-        $this->assertEquals(
+        self::assertEquals(
             '> Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongTableNameMigration',
             $this->logger->getMessages()[0]
         );
-        $this->assertEquals(
+        self::assertEquals(
             sprintf(
                 '  ERROR: Max table name length is %s. Please correct "%s" table in "%s" migration',
                 $this->nameGenerator->getMaxIdentifierSize(),
@@ -117,7 +114,7 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
         );
     }
 
-    public function testWrongColumnNameQuery()
+    public function testWrongColumnNameQuery(): void
     {
         $migration = new WrongColumnNameMigration();
         $migrations = [
@@ -128,11 +125,11 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
             'Failed migrations: Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongColumnNameMigration.'
         );
         $this->executor->executeUp($migrations);
-        $this->assertEquals(
+        self::assertEquals(
             '> Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongColumnNameMigration',
             $this->logger->getMessages()[0]
         );
-        $this->assertEquals(
+        self::assertEquals(
             sprintf(
                 '  ERROR: Max column name length is %s. Please correct "%s:%s" column in "%s" migration',
                 $this->nameGenerator->getMaxIdentifierSize(),

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
@@ -108,7 +109,7 @@ abstract class AbstractMenuController extends AbstractController
     {
         $this->checkAcl($context);
         $context = $this->denormalizeContext($context);
-        $scope = $this->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context, false);
+        $scope = $this->container->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context, false);
         $menu = $this->getMenu($menuName, $context);
         $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate(
             $menu,
@@ -125,7 +126,7 @@ abstract class AbstractMenuController extends AbstractController
     {
         $this->checkAcl($context);
         $context = $this->denormalizeContext($context);
-        $scope = $this->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context, false);
+        $scope = $this->container->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context, false);
         $menu = $this->getMenu($menuName, $context);
 
         if ($key === null) {
@@ -150,7 +151,7 @@ abstract class AbstractMenuController extends AbstractController
 
         $menu = $this->getMenu($menuName, $context);
 
-        $handler = $this->get(MenuUpdateTreeHandler::class);
+        $handler = $this->container->get(MenuUpdateTreeHandler::class);
         $treeItems = $handler->getTreeItemList($menu, true);
 
         $collection = new TreeCollection();
@@ -174,8 +175,8 @@ abstract class AbstractMenuController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var EntityManagerInterface $entityManager */
-            $entityManager = $this->getDoctrine()->getManagerForClass($this->getEntityClass());
-            $scope = $this->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context);
+            $entityManager = $this->container->get('doctrine')->getManagerForClass($this->getEntityClass());
+            $scope = $this->container->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context);
             $updates = $this->getMenuUpdateMoveManager()->moveMenuItems(
                 $menu,
                 $collection->source,
@@ -185,10 +186,10 @@ abstract class AbstractMenuController extends AbstractController
             );
 
             foreach ($updates as $update) {
-                $errors = $this->get(ValidatorInterface::class)->validate($update, null, ['Move']);
+                $errors = $this->container->get(ValidatorInterface::class)->validate($update, null, ['Move']);
                 if (count($errors)) {
                     $form->addError(new FormError(
-                        $this->get(TranslatorInterface::class)
+                        $this->container->get(TranslatorInterface::class)
                             ->trans('oro.navigation.menuupdate.validation_error_message')
                     ));
                     return $this->renderMoveDialog($responseData, $form);
@@ -226,7 +227,7 @@ abstract class AbstractMenuController extends AbstractController
 
         $form = $this->createForm(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem, 'menu' => $menu]);
 
-        $response = $this->get(UpdateHandlerFacade::class)->update(
+        $response = $this->container->get(UpdateHandlerFacade::class)->update(
             $menuUpdate,
             $form,
             $this->getSavedSuccessMessage()
@@ -251,7 +252,7 @@ abstract class AbstractMenuController extends AbstractController
      */
     protected function normalizeContext(array $context): array
     {
-        return $this->get(ContextNormalizer::class)->normalizeContext($context);
+        return $this->container->get(ContextNormalizer::class)->normalizeContext($context);
     }
 
     /**
@@ -259,7 +260,7 @@ abstract class AbstractMenuController extends AbstractController
      */
     protected function denormalizeContext(array $context): array
     {
-        return $this->get(ContextNormalizer::class)->denormalizeContext($this->getScopeType(), $context);
+        return $this->container->get(ContextNormalizer::class)->denormalizeContext($this->getScopeType(), $context);
     }
 
     protected function getMenu(string $menuName, array $context): ItemInterface
@@ -270,10 +271,10 @@ abstract class AbstractMenuController extends AbstractController
             BuilderChainProvider::MENU_LOCAL_CACHE_PREFIX => 'edit_'
         ];
 
-        $configurationRootMenuKeys = array_keys($this->get(ConfigurationProvider::class)->getMenuTree());
+        $configurationRootMenuKeys = array_keys($this->container->get(ConfigurationProvider::class)->getMenuTree());
         $isMenuFromConfiguration = in_array($menuName, $configurationRootMenuKeys, true);
 
-        $menu = $this->get(BuilderChainProvider::class)->get($menuName, $options);
+        $menu = $this->container->get(BuilderChainProvider::class)->get($menuName, $options);
 
         if (!$isMenuFromConfiguration && !count($menu->getChildren())) {
             throw $this->createNotFoundException(sprintf("Menu \"%s\" not found.", $menuName));
@@ -284,12 +285,12 @@ abstract class AbstractMenuController extends AbstractController
 
     protected function createMenuTree($menu): array
     {
-        return $this->get(MenuUpdateTreeHandler::class)->createTree($menu);
+        return $this->container->get(MenuUpdateTreeHandler::class)->createTree($menu);
     }
 
     protected function dispatchMenuUpdateChangeEvent(string $menuName, array $context): void
     {
-        $this->get(EventDispatcherInterface::class)->dispatch(
+        $this->container->get(EventDispatcherInterface::class)->dispatch(
             new MenuUpdateChangeEvent($menuName, $context),
             MenuUpdateChangeEvent::NAME
         );
@@ -308,7 +309,7 @@ abstract class AbstractMenuController extends AbstractController
 
     protected function getContextFromRequest(Request $request, array $allowedKeys = []): array
     {
-        return $this->get(ContextRequestHelper::class)->getFromRequest($request, $allowedKeys);
+        return $this->container->get(ContextRequestHelper::class)->getFromRequest($request, $allowedKeys);
     }
 
     protected function getSavedSuccessMessage(): string
@@ -319,7 +320,7 @@ abstract class AbstractMenuController extends AbstractController
     protected function updateDependentMenuUpdateUrls(MenuUpdateInterface $menuUpdate): void
     {
         $repo = $this->getMenuUpdateManager()->getRepository();
-        $eventDispatcher = $this->get(EventDispatcherInterface::class);
+        $eventDispatcher = $this->container->get(EventDispatcherInterface::class);
         $repo->updateDependentMenuUpdates($menuUpdate);
 
         foreach ($repo->getDependentMenuUpdateScopes($menuUpdate) as $scope) {
@@ -350,7 +351,8 @@ abstract class AbstractMenuController extends AbstractController
                 MenuUpdateManager::class,
                 MenuUpdateMoveManager::class,
                 MenuUpdateDisplayManager::class,
-                UpdateHandlerFacade::class
+                UpdateHandlerFacade::class,
+                'doctrine' => ManagerRegistry::class
             ]
         );
     }

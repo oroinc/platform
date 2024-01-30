@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\EventListener;
 
 use Doctrine\ORM\Events;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
@@ -20,6 +20,7 @@ class WorkflowStartListenerTest extends WorkflowTestCase
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
+        $this->loadFixtures([LoadUser::class]);
     }
 
     public function testPersistStarts()
@@ -57,11 +58,8 @@ class WorkflowStartListenerTest extends WorkflowTestCase
         $this->loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/StartListenerForceAutoStart');
 
         //making context of execution as default application
-        $user = self::getContainer()->get('doctrine')
-            ->getRepository(User::class)
-            ->findOneBy(['username' => 'admin']);
-        $token = new UsernamePasswordToken($user, self::AUTH_PW, 'user');
-        self::getContainer()->get('security.token_storage')->setToken($token);
+        self::getContainer()->get('security.token_storage')
+            ->setToken(new UsernamePasswordToken($this->getReference(LoadUser::USER), 'user'));
 
         //testing in context of some request as application filters depends on requestStack
         self::getContainer()->get('event_dispatcher')

@@ -42,7 +42,7 @@ class AuditController extends AbstractController
      * @Acl(
      *      id="oro_dataaudit_view",
      *      type="entity",
-     *      class="OroDataAuditBundle:AbstractAudit",
+     *      class="Oro\Bundle\DataAuditBundle\Entity\AbstractAudit",
      *      permission="VIEW"
      * )
      * @param string $entity

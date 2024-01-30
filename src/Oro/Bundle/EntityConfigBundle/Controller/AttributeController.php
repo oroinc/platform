@@ -109,7 +109,7 @@ class AttributeController extends AbstractController
         $successMessage = $this->getTranslator()
             ->trans('oro.entity_config.attribute.successfully_saved');
 
-        $response = $this
+        $response = $this->container
             ->get(ConfigFieldHandler::class)
             ->handleUpdate($fieldConfigModel, $formAction, $successMessage);
 
@@ -236,42 +236,42 @@ class AttributeController extends AbstractController
      */
     private function getConfigModelManager()
     {
-        return $this->get(ConfigModelManager::class);
+        return $this->container->get(ConfigModelManager::class);
     }
 
     private function getExtendConfigProvider(): ConfigProvider
     {
-        return $this->get(ConfigManager::class)->getProvider('extend');
+        return $this->container->get(ConfigManager::class)->getProvider('extend');
     }
 
     private function getAttributeConfigProvider(): ConfigProvider
     {
-        return $this->get(ConfigManager::class)->getProvider('attribute');
+        return $this->container->get(ConfigManager::class)->getProvider('attribute');
     }
 
     protected function getEntityAliasResolver(): EntityAliasResolver
     {
-        return $this->get(EntityAliasResolver::class);
+        return $this->container->get(EntityAliasResolver::class);
     }
 
     protected function getCreateUpdateConfigFieldHandler(): CreateUpdateConfigFieldHandler
     {
-        return $this->get(CreateUpdateConfigFieldHandler::class);
+        return $this->container->get(CreateUpdateConfigFieldHandler::class);
     }
 
     protected function getRemoveRestoreConfigFieldHandler(): RemoveRestoreConfigFieldHandler
     {
-        return $this->get(RemoveRestoreConfigFieldHandler::class);
+        return $this->container->get(RemoveRestoreConfigFieldHandler::class);
     }
 
     protected function getTranslator(): TranslatorInterface
     {
-        return $this->get(TranslatorInterface::class);
+        return $this->container->get(TranslatorInterface::class);
     }
 
     protected function getConfigProviderHelper(): EntityConfigProviderHelper
     {
-        return $this->get(EntityConfigProviderHelper::class);
+        return $this->container->get(EntityConfigProviderHelper::class);
     }
 
     /**

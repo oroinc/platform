@@ -39,7 +39,7 @@ class AddMasterRequestRouteListenerTest extends \PHPUnit\Framework\TestCase
         return new RequestEvent(
             $kernel,
             new Request([], [], ['_route' => $route]),
-            HttpKernelInterface::MASTER_REQUEST
+            HttpKernelInterface::MAIN_REQUEST
         );
     }
 

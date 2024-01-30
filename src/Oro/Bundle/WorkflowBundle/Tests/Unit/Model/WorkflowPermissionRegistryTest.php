@@ -12,21 +12,23 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowPermissionRegistryTest extends \PHPUnit\Framework\TestCase
+class WorkflowPermissionRegistryTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var WorkflowEntityAclRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowEntityAclRepository|MockObject */
     private $aclRepository;
 
-    /** @var WorkflowEntityAclIdentityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowEntityAclIdentityRepository|MockObject */
     private $aclIdentityRepository;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DoctrineHelper|MockObject */
     private $doctrineHelper;
 
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowRegistry|MockObject */
     private $workflowRegistry;
 
     /** @var WorkflowPermissionRegistry */
@@ -42,8 +44,8 @@ class WorkflowPermissionRegistryTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityRepository')
             ->with()
             ->willReturnMap([
-                ['OroWorkflowBundle:WorkflowEntityAcl', $this->aclRepository],
-                ['OroWorkflowBundle:WorkflowEntityAclIdentity', $this->aclIdentityRepository],
+                [WorkflowEntityAcl::class, $this->aclRepository],
+                [WorkflowEntityAclIdentity::class, $this->aclIdentityRepository],
             ]);
 
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Form\Model\EmailApi;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
@@ -19,6 +20,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Represents email API form type.
+ */
 class EmailApiType extends AbstractType
 {
     /**
@@ -125,7 +129,7 @@ class EmailApiType extends AbstractType
                 EntityIdentifierType::class,
                 [
                     'required'       => false,
-                    'class'          => 'OroEmailBundle:EmailThread',
+                    'class'          => EmailThread::class,
                     'multiple'       => false,
                     'error_bubbling' => false
                 ]

@@ -2,20 +2,16 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures;
 
+use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 
-class LoadCommentData extends AbstractCommentFixture implements ContainerAwareInterface, DependentFixtureInterface
+class LoadCommentData extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * @var array CommentData
-     */
-    protected $commentData = [
+    private array $commentData = [
         [
             'message' => 'First comment',
             'createdAt' => 'now -5 days',
@@ -34,46 +30,28 @@ class LoadCommentData extends AbstractCommentFixture implements ContainerAwareIn
     ];
 
     /**
-     * @var ContainerInterface
+     * {@inheritDoc}
      */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function getDependencies(): array
     {
-        $this->container = $container;
+        return [LoadEmailData::class, LoadOrganization::class, LoadUser::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function load(ObjectManager $manager): void
     {
-        return ['Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures\LoadEmailData'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function load(ObjectManager $manager)
-    {
-        $userManager = $this->container->get('oro_user.manager');
-        $adminUser = $userManager->findUserByEmail(LoadAdminUserData::DEFAULT_ADMIN_EMAIL);
-        $organization = $manager->getRepository(Organization::class)->getFirst();
-
         foreach ($this->commentData as $data) {
             $entity = new Comment();
             $entity->setTarget($this->getReference('default_activity'));
-            $entity->setOrganization($organization);
-            $entity->setOwner($adminUser);
-            $this->setEntityPropertyValues($entity, $data, ['createdAt', 'updatedAt']);
+            $entity->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
+            $entity->setOwner($this->getReference(LoadUser::USER));
+            $entity->setMessage($data['message']);
             $entity->setCreatedAt(new \DateTime($data['createdAt'], new \DateTimeZone('UTC')));
             $entity->setUpdatedAt(new \DateTime($data['updatedAt'], new \DateTimeZone('UTC')));
             $manager->persist($entity);
         }
-
         $manager->flush();
     }
 }

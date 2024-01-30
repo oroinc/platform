@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Security;
 
 use Oro\Bundle\UserBundle\Exception\ImpersonationAuthenticationException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 
 /**
  * Detects the impersonation login source.
@@ -15,8 +16,10 @@ class ImpersonationLoginSourceProvider implements
     /**
      * {@inheritDoc}
      */
-    public function getLoginSourceForFailedRequest(TokenInterface $token, \Exception $exception): ?string
-    {
+    public function getLoginSourceForFailedRequest(
+        AuthenticatorInterface $authenticator,
+        \Exception $exception
+    ): ?string {
         if ($exception instanceof ImpersonationAuthenticationException) {
             return 'impersonation';
         }

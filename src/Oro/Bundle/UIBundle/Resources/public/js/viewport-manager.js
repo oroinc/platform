@@ -36,7 +36,7 @@ const viewportManager = {
     },
 
     /**
-     * @param {HTMLElement} context
+     * @param {HTMLElement} [context]
      * @returns {any}
      */
     getBreakpoints(context) {

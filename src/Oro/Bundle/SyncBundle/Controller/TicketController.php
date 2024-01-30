@@ -21,7 +21,9 @@ class TicketController extends AbstractController
      */
     public function syncTicketAction(): JsonResponse
     {
-        return new JsonResponse(['ticket' => $this->get(TicketProvider::class)->generateTicket($this->getUser())]);
+        return new JsonResponse(
+            ['ticket' => $this->container->get(TicketProvider::class)->generateTicket($this->getUser())]
+        );
     }
 
     public static function getSubscribedServices(): array

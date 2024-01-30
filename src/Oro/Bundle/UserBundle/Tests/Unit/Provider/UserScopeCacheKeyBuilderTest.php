@@ -10,6 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\UserScopeCacheKeyBuilder;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserScopeCacheKeyBuilderTest extends \PHPUnit\Framework\TestCase
 {
@@ -47,7 +48,7 @@ class UserScopeCacheKeyBuilderTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
-            ->willReturn('test');
+            ->willReturn($this->createMock(UserInterface::class));
 
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->once())

@@ -40,7 +40,7 @@ class UsersEnableSwitchActionHandlerTest extends WebTestCase
         /** @var User $user */
         foreach ($users as $user) {
             // Admin user should not processed because he was created at another organization.
-            if ($user->getId() !== $currentUser->getId() && $user->getUsername() !== 'admin') {
+            if ($user->getId() !== $currentUser->getId() && $user->getUserIdentifier() !== 'admin') {
                 self::assertFalse($user->isEnabled());
             }
         }

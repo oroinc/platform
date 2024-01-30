@@ -96,7 +96,7 @@ class User extends AbstractUser implements
 
     const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
-    const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
+    const ROLE_ANONYMOUS = 'PUBLIC_ACCESS';
 
     /**
      * @ORM\Id

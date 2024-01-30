@@ -10,37 +10,39 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class CreateAutoResponse implements Migration, OrderedMigrationInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 2;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        static::oroEmailAutoResponseRuleTable($schema);
-        static::oroEmailAutoResponseRuleConditionTable($schema);
-        static::oroEmailTemplateTable($schema);
-        static::oroEmailTable($schema);
+        $this->createOroEmailAutoResponseRuleTable($schema);
+        $this->createOroEmailAutoResponseRuleConditionTable($schema);
+
+        $schema->getTable('oro_email_template')
+            ->addColumn('visible', 'boolean', ['default' => '1']);
+        $schema->getTable('oro_email')
+            ->addColumn('acceptLanguageHeader', 'text', ['notnull' => false]);
     }
 
-    public static function oroEmailAutoResponseRuleTable(Schema $schema)
+    private function createOroEmailAutoResponseRuleTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_auto_response_rule');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('template_id', 'integer', ['notnull' => false]);
         $table->addColumn('mailbox_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
-        $table->addColumn('active', 'boolean', []);
-        $table->addColumn('createdAt', 'datetime', []);
+        $table->addColumn('active', 'boolean');
+        $table->addColumn('createdAt', 'datetime');
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['template_id'], 'IDX_58CB592A5DA0FB8', []);
-        $table->addIndex(['mailbox_id'], 'IDX_58CB592A66EC35CC', []);
-
+        $table->addIndex(['template_id'], 'IDX_58CB592A5DA0FB8');
+        $table->addIndex(['mailbox_id'], 'IDX_58CB592A66EC35CC');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email_template'),
             ['template_id'],
@@ -55,7 +57,7 @@ class CreateAutoResponse implements Migration, OrderedMigrationInterface
         );
     }
 
-    public static function oroEmailAutoResponseRuleConditionTable(Schema $schema)
+    private function createOroEmailAutoResponseRuleConditionTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_response_rule_cond');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -63,27 +65,14 @@ class CreateAutoResponse implements Migration, OrderedMigrationInterface
         $table->addColumn('field', 'string', ['length' => 255]);
         $table->addColumn('filterType', 'string', ['length' => 255]);
         $table->addColumn('filterValue', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('position', 'integer', []);
+        $table->addColumn('position', 'integer');
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['rule_id'], 'IDX_4132B1DB744E0351', []);
-
+        $table->addIndex(['rule_id'], 'IDX_4132B1DB744E0351');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email_auto_response_rule'),
             ['rule_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
-    }
-
-    public static function oroEmailTemplateTable(Schema $schema)
-    {
-        $table = $schema->getTable('oro_email_template');
-        $table->addColumn('visible', 'boolean', ['default' => '1']);
-    }
-
-    public static function oroEmailTable(Schema $schema)
-    {
-        $table = $schema->getTable('oro_email');
-        $table->addColumn('acceptLanguageHeader', 'text', ['notnull' => false]);
     }
 }

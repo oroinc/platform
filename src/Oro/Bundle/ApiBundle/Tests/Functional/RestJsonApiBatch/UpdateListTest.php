@@ -12,9 +12,9 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\BatchUpdateExceptionController;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiUpdateListTestCase;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Exception\JobRuntimeException;
 use Oro\Component\MessageQueue\Job\Job;
@@ -32,6 +32,12 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
 {
     use RolePermissionExtension;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->loadFixtures([LoadOrganization::class]);
+    }
+
     protected function tearDown(): void
     {
         $this->getBatchUpdateExceptionController()->clear();
@@ -46,12 +52,11 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
     private function createDepartments(array $names): array
     {
         $em = $this->getEntityManager();
-        $organization = $em->getRepository(Organization::class)->getFirst();
         $entities = [];
         foreach ($names as $name) {
             $entity = new TestDepartment();
             $entity->setName($name);
-            $entity->setOrganization($organization);
+            $entity->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
             $em->persist($entity);
             $entities[] = $entity;
         }

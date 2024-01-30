@@ -9,14 +9,16 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class CreateRelationTable implements Migration, OrderedMigrationInterface
 {
-    /** {@inheritdoc} */
+    /**
+     * {@inheritDoc}
+     */
     public function getOrder()
     {
         return 10;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {

@@ -46,7 +46,7 @@ class TranslationController extends BaseController
      */
     public function resetMassAction($gridName, $actionName, Request $request)
     {
-        $massActionDispatcher = $this->get(MassActionDispatcher::class);
+        $massActionDispatcher = $this->container->get(MassActionDispatcher::class);
 
         try {
             $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
@@ -55,7 +55,7 @@ class TranslationController extends BaseController
                 $response->getOptions()
             );
         } catch (LogicException $e) {
-            $translator = $this->get(TranslatorInterface::class);
+            $translator = $this->container->get(TranslatorInterface::class);
             $data = [
                 'successful' => false,
                 'message' => $translator->trans('oro.translation.action.reset.nothing_to_reset'),

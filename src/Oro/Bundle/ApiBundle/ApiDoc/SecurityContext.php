@@ -89,7 +89,7 @@ class SecurityContext implements SecurityContextInterface
             return null;
         }
 
-        return $user->getUsername();
+        return $user->getUserIdentifier();
     }
 
     /**

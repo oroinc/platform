@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Authenticator\UsernamePasswordOrganizationAuthenticator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\ImpersonationAuthenticationException;
@@ -16,10 +17,12 @@ use Oro\Bundle\UserBundle\Security\UserLoginAttemptLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 
 class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -56,7 +59,7 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
             });
         $loginSourceProvidersForFailedRequest->expects(self::any())
             ->method('getLoginSourceForFailedRequest')
-            ->willReturnCallback(function (TokenInterface $token, \Exception $exception) {
+            ->willReturnCallback(function (AuthenticatorInterface $authenticator, \Exception $exception) {
                 if ($exception instanceof ImpersonationAuthenticationException) {
                     return 'impersonation';
                 }
@@ -76,7 +79,7 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     public function testOnInteractiveLogin(): void
     {
         $user = new User();
-        $token = new UsernamePasswordToken($user, 'password', 'main');
+        $token = new UsernamePasswordToken($user, 'main');
 
         $this->userLoginAttemptLogger->expects(self::once())
             ->method('logSuccessLoginAttempt')
@@ -107,7 +110,7 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     public function testOnInteractiveLoginWithImpersonateToken(): void
     {
         $user = new User();
-        $token = new ImpersonationUsernamePasswordOrganizationToken($user, 'password', 'main', new Organization(), []);
+        $token = new ImpersonationUsernamePasswordOrganizationToken($user, 'main', new Organization());
 
         $this->userLoginAttemptLogger->expects(self::once())
             ->method('logSuccessLoginAttempt')
@@ -121,7 +124,7 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     public function testOnInteractiveLoginForUnsupportedUserType(): void
     {
         $user = $this->createMock(UserInterface::class);
-        $token = new UsernamePasswordToken($user, 'password', 'main');
+        $token = new UsernamePasswordToken($user, 'main');
 
         $this->userLoginAttemptLogger->expects(self::never())
             ->method('logSuccessLoginAttempt');
@@ -134,8 +137,8 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     public function testOnAuthenticationFailure(): void
     {
         $user = new User();
-        $token = new UsernamePasswordToken($user, 'wrongPassword', 'main');
-
+        $request = new Request();
+        $request->attributes->set('user', $user);
         $this->userManager->expects(self::never())
             ->method('findUserByUsernameOrEmail');
 
@@ -144,15 +147,21 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($user, 'general');
 
         $this->handler->onAuthenticationFailure(
-            new AuthenticationFailureEvent($token, $this->createMock(AuthenticationException::class))
+            new LoginFailureEvent(
+                $this->createMock(AuthenticationException::class),
+                $this->getAuthenticatorMock(),
+                $request,
+                null,
+                'main',
+            )
         );
     }
 
     public function testOnAuthenticationFailureWithImpersonationAuthenticationException(): void
     {
         $user = new User();
-        $token = new UsernamePasswordToken($user, 'wrongPassword', 'main');
-
+        $request = new Request();
+        $request->attributes->set('user', $user);
         $this->userManager->expects(self::never())
             ->method('findUserByUsernameOrEmail');
 
@@ -161,7 +170,13 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($user, 'impersonation');
 
         $this->handler->onAuthenticationFailure(
-            new AuthenticationFailureEvent($token, $this->createMock(ImpersonationAuthenticationException::class))
+            new LoginFailureEvent(
+                $this->createMock(ImpersonationAuthenticationException::class),
+                $this->getAuthenticatorMock(),
+                $request,
+                null,
+                'main',
+            )
         );
     }
 
@@ -169,8 +184,8 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $username = 'john';
         $user = new User();
-        $token = new UsernamePasswordToken($username, 'wrongPassword', 'main');
-
+        $request  = new Request();
+        $request->attributes->set(Security::LAST_USERNAME, $username);
         $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
@@ -181,15 +196,21 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($user, 'general');
 
         $this->handler->onAuthenticationFailure(
-            new AuthenticationFailureEvent($token, $this->createMock(AuthenticationException::class))
+            new LoginFailureEvent(
+                $this->createMock(AuthenticationException::class),
+                $this->getAuthenticatorMock(),
+                $request,
+                null,
+                'main'
+            )
         );
     }
 
     public function testOnAuthenticationFailureWithUserAsStringAndUserNotFound(): void
     {
         $username = 'john';
-        $token = new UsernamePasswordToken($username, 'wrongPassword', 'main');
-
+        $request  = new Request();
+        $request->attributes->set(Security::LAST_USERNAME, $username);
         $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
@@ -200,7 +221,18 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($username, 'general');
 
         $this->handler->onAuthenticationFailure(
-            new AuthenticationFailureEvent($token, $this->createMock(AuthenticationException::class))
+            new LoginFailureEvent(
+                $this->createMock(AuthenticationException::class),
+                $this->getAuthenticatorMock(),
+                $request,
+                null,
+                'main'
+            )
         );
+    }
+
+    private function getAuthenticatorMock()
+    {
+        return $this->createMock(UsernamePasswordOrganizationAuthenticator::class);
     }
 }

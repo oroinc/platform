@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
@@ -77,7 +78,7 @@ class ConnectionController extends AbstractController
         $token = $request->get('accessToken');
         $formParentName = $request->get('formParentName');
 
-        $connectionControllerManager = $this->get(ConnectionControllerManager::class);
+        $connectionControllerManager = $this->container->get(ConnectionControllerManager::class);
         $form = $connectionControllerManager->getImapConnectionForm(
             $type,
             $token,
@@ -149,7 +150,8 @@ class ConnectionController extends AbstractController
         // Check if there are some nested errors
         if ($nestedErrors->count() || null === $form->getData()) {
             return [
-                $this->get(TranslatorInterface::class)->trans('oro.imap.connection.malformed_parameters.error')
+                $this->container->get(TranslatorInterface::class)
+                    ->trans('oro.imap.connection.malformed_parameters.error')
             ];
         }
 
@@ -179,7 +181,7 @@ class ConnectionController extends AbstractController
 
         if ($origin->getImapHost() !== null) {
             $response['imap'] = [];
-            $password = $this->get(DefaultCrypter::class)->decryptData($origin->getPassword());
+            $password = $this->container->get(DefaultCrypter::class)->decryptData($origin->getPassword());
 
             $config = new ImapConfig(
                 $origin->getImapHost(),
@@ -190,7 +192,7 @@ class ConnectionController extends AbstractController
             );
 
             try {
-                $connector = $this->get(ImapConnectorFactory::class)->createImapConnector($config);
+                $connector = $this->container->get(ImapConnectorFactory::class)->createImapConnector($config);
                 $manager = new ImapEmailFolderManager(
                     $connector,
                     $this->getEntityManager(ImapEmailFolder::class),
@@ -215,11 +217,11 @@ class ConnectionController extends AbstractController
                     );
                 }
             } catch (\Exception $e) {
-                $this->get('logger')->error(
+                $this->container->get('logger')->error(
                     sprintf('Could not retrieve folders via imap because of "%s"', $e->getMessage())
                 );
 
-                $translator = $this->get(TranslatorInterface::class);
+                $translator = $this->container->get(TranslatorInterface::class);
                 $response['errors'] = $translator->trans('oro.imap.connection.retrieve_folders.error');
             }
         }
@@ -233,7 +235,7 @@ class ConnectionController extends AbstractController
 
     private function getEntityManager(string $entityClass): EntityManagerInterface
     {
-        return $this->getDoctrine()->getManagerForClass($entityClass);
+        return $this->container->get('doctrine')->getManagerForClass($entityClass);
     }
 
     /**
@@ -248,6 +250,7 @@ class ConnectionController extends AbstractController
                 ImapConnectorFactory::class,
                 ConnectionControllerManager::class,
                 DefaultCrypter::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

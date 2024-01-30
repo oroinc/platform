@@ -29,7 +29,7 @@ class ThemeManager
     public function __construct(
         ThemeFactoryInterface $themeFactory,
         ThemeDefinitionBagInterface $themeDefinitionBag,
-        array $enabledThemes
+        array $enabledThemes,
     ) {
         $this->themeFactory = $themeFactory;
         $this->themeDefinitionBag = $themeDefinitionBag;
@@ -174,5 +174,16 @@ class ThemeManager
         } while ($themeName = $theme->getParentTheme());
 
         return array_reverse($themesHierarchy);
+    }
+
+    public function themeHasParent(string $theme, array $parentThemes): bool
+    {
+        $hierarchy = $this->getThemesHierarchy($theme);
+        foreach ($hierarchy as $currentTheme) {
+            if (in_array($currentTheme->getName(), $parentThemes)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

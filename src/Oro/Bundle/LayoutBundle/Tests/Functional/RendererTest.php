@@ -356,7 +356,7 @@ HTML;
                     id="form_for_layout_renderer_test_user_firstName"
                     name="form_for_layout_renderer_test[user][firstName]"
                     required="required"
-                    data-ftid="form_for_layout_renderer_test_user_firstName" data-name="field__first-name"/>
+                    data-ftid="form_for_layout_renderer_test_user_firstName" data-name="field__first-name">
             </div>
             <div>
                 <label for="form_for_layout_renderer_test_user_lastName" class="required">Last Name</label>
@@ -364,7 +364,7 @@ HTML;
                     id="form_for_layout_renderer_test_user_lastName"
                     name="form_for_layout_renderer_test[user][lastName]"
                     required="required"
-                    data-ftid="form_for_layout_renderer_test_user_lastName" data-name="field__last-name"/>
+                    data-ftid="form_for_layout_renderer_test_user_lastName" data-name="field__last-name">
             </div>
         </div>
     </div>
@@ -373,7 +373,7 @@ HTML;
         <input type="text"
             id="form_for_layout_renderer_test_jobTitle"
             name="form_for_layout_renderer_test[jobTitle]"
-            data-ftid="form_for_layout_renderer_test_jobTitle" data-name="field__job-title"/>
+            data-ftid="form_for_layout_renderer_test_jobTitle" data-name="field__job-title">
     </div>
     <div>
         <label>Gender</label>
@@ -382,19 +382,19 @@ HTML;
                 id="form_for_layout_renderer_test_gender_placeholder"
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_placeholder" data-name="field__placeholder"
-                value="" checked="checked"/>
+                value="" checked="checked">
             <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_0"
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_0" data-name="field__0"
-                value="male"/>
+                value="male">
             <label for="form_for_layout_renderer_test_gender_0">Male</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_1"
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_1" data-name="field__1"
-                value="female"/>
+                value="female">
             <label for="form_for_layout_renderer_test_gender_1">Female</label>
         </div>
     </div>
@@ -413,7 +413,7 @@ HTML;
         // @codingStandardsIgnoreStart
         $expected = <<<HTML
 <form name="form_for_layout_renderer_test" method="post" action="test.php" data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test" id="form_for_layout_renderer_test">
-<input type="hidden" name="_method" value="PATCH"/>
+<input type="hidden" name="_method" value="PATCH">
 HTML;
         // @codingStandardsIgnoreEnd
 

@@ -53,6 +53,5 @@ class IntegrationTokenAwareTraitTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals($organization, $token->getOrganization());
         self::assertEquals($user, $token->getUser());
-        self::assertTrue($token->isAuthenticated());
     }
 }

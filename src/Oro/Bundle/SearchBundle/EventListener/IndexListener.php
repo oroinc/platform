@@ -16,6 +16,7 @@ use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Event\BeforeEntityAddToIndexEvent;
+use Oro\Bundle\SearchBundle\Event\BeforeIndexEntitiesEvent;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -87,7 +88,7 @@ class IndexListener implements OptionalListenerInterface
             return;
         }
 
-        $entityManager = $args->getEntityManager();
+        $entityManager = $args->getObjectManager();
         $this->scheduleSavedEntities($entityManager);
         $this->scheduleDeletedEntities($entityManager);
     }
@@ -274,7 +275,10 @@ class IndexListener implements OptionalListenerInterface
         }
 
         if ($this->savedEntities) {
-            $this->searchIndexer->save($this->savedEntities);
+            $event = new BeforeIndexEntitiesEvent($this->savedEntities);
+            $this->dispatcher->dispatch($event, BeforeIndexEntitiesEvent::EVENT_NAME);
+
+            $this->searchIndexer->save($event->getEntities());
 
             $this->savedEntities = [];
         }

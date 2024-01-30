@@ -23,7 +23,7 @@ abstract class MailboxEmailListener
      */
     public function onFlush(OnFlushEventArgs $args)
     {
-        $em = $args->getEntityManager();
+        $em = $args->getObjectManager();
         $uow = $em->getUnitOfWork();
 
         $emails = [];
@@ -59,7 +59,7 @@ abstract class MailboxEmailListener
      */
     protected function filterEmailsWithNewlyBoundMailboxes(EntityManager $em, array $emails)
     {
-        $qb = $em->getRepository('OroEmailBundle:EmailUser')->createQueryBuilder('eu');
+        $qb = $em->getRepository(EmailUser::class)->createQueryBuilder('eu');
         $emailIdsWithAlreadyBoundMailboxesResult = $qb->select('e.id')
             ->andWhere($qb->expr()->in('e.id', ':ids'))
             ->join('eu.mailboxOwner', 'mo')

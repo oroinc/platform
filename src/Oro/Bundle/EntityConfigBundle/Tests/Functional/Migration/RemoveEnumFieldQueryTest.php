@@ -4,17 +4,14 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
-use Extend\Entity\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveEnumFieldQuery;
 use Oro\Bundle\EntityExtendBundle\Tests\Functional\Fixture\LoadExtendedRelationsData;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
-use Oro\Bundle\TestFrameworkBundle\Migrations\Schema\OroTestFrameworkBundleInstaller;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class RemoveEnumFieldQueryTest extends WebTestCase
 {
     private Connection $connection;
-
     private ArrayLogger $logger;
 
     protected function setUp(): void
@@ -23,20 +20,20 @@ class RemoveEnumFieldQueryTest extends WebTestCase
         $this->loadFixtures([LoadExtendedRelationsData::class]);
 
         $this->logger = new ArrayLogger();
-        $this->connection = $this->getContainer()->get('doctrine')->getConnection();
+        $this->connection = self::getContainer()->get('doctrine')->getConnection();
     }
 
     public function testGetDescription(): void
     {
         $entityClass = \Extend\Entity\TestEntity1::class;
-        $entityField = OroTestFrameworkBundleInstaller::ENUM_FIELD_NAME;
+        $entityField = 'testEnumField';
 
         $migrationQuery = new RemoveEnumFieldQuery(
             $entityClass,
             $entityField
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             'Remove outdated testEnumField enum field data',
             $migrationQuery->getDescription()
         );
@@ -45,7 +42,7 @@ class RemoveEnumFieldQueryTest extends WebTestCase
     public function testExecuteEntityNotFound(): void
     {
         $entityClass = \Extend\Entity\UnknownEntity::class;
-        $entityField = OroTestFrameworkBundleInstaller::ENUM_FIELD_NAME;
+        $entityField = 'testEnumField';
 
         $migrationQuery = new RemoveEnumFieldQuery(
             $entityClass,
@@ -54,7 +51,7 @@ class RemoveEnumFieldQueryTest extends WebTestCase
         $migrationQuery->setConnection($this->connection);
         $migrationQuery->execute($this->logger);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 "Enum field 'testEnumField' from Entity 'Extend\Entity\UnknownEntity' is not found"
             ],
@@ -74,7 +71,7 @@ class RemoveEnumFieldQueryTest extends WebTestCase
         $migrationQuery->setConnection($this->connection);
         $migrationQuery->execute($this->logger);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 "Enum field 'unknownEnumField' from Entity 'Extend\Entity\TestEntity1' is not found"
             ],
@@ -109,7 +106,7 @@ class RemoveEnumFieldQueryTest extends WebTestCase
         $migrationQuery->setConnection($this->connection);
         $migrationQuery->execute($this->logger);
 
-        $this->assertArrayIntersectEquals(
+        self::assertArrayIntersectEquals(
             [
                 'DELETE FROM oro_entity_config_field WHERE id = ?',
                 'Parameters:',
@@ -133,13 +130,13 @@ class RemoveEnumFieldQueryTest extends WebTestCase
     {
         return [
             'common enum field' => [
-                'entityClass' => TestEntity1::class,
-                'entityField' => OroTestFrameworkBundleInstaller::ENUM_FIELD_NAME,
+                'entityClass' => \Extend\Entity\TestEntity1::class,
+                'entityField' => 'testEnumField',
                 'extendKeyPrefix' => 'manyToOne'
             ],
             'multi-enum field' => [
-                'entityClass' => TestEntity1::class,
-                'entityField' => OroTestFrameworkBundleInstaller::MULTIENUM_FIELD_NAME,
+                'entityClass' => \Extend\Entity\TestEntity1::class,
+                'entityField' => 'testMultienumField',
                 'extendKeyPrefix' => 'manyToMany'
             ]
         ];

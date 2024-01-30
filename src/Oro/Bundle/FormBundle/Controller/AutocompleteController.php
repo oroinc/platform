@@ -33,7 +33,7 @@ class AutocompleteController extends AbstractController
     public function searchAction(Request $request)
     {
         $autocompleteRequest = new AutocompleteRequest($request);
-        $validator           = $this->get(ValidatorInterface::class);
+        $validator           = $this->container->get(ValidatorInterface::class);
         $isXmlHttpRequest    = $request->isXmlHttpRequest();
         $code                = 200;
         $result              = [
@@ -49,7 +49,7 @@ class AutocompleteController extends AbstractController
             }
         }
 
-        if (!$this->get(Security::class)->isAutocompleteGranted($autocompleteRequest->getName())) {
+        if (!$this->container->get(Security::class)->isAutocompleteGranted($autocompleteRequest->getName())) {
             $result['errors'][] = 'Access denied.';
         }
 
@@ -62,7 +62,7 @@ class AutocompleteController extends AbstractController
         }
 
         /** @var SearchHandlerInterface $searchHandler */
-        $searchHandler = $this
+        $searchHandler = $this->container
             ->get(SearchRegistry::class)
             ->getSearchHandler($autocompleteRequest->getName());
 

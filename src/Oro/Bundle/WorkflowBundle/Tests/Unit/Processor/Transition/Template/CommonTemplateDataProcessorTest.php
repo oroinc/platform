@@ -8,6 +8,8 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\CommonTemplateDataProcessor;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
@@ -40,13 +42,20 @@ class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
         $context->setWorkflowItem($workflowItem);
         $context->setResultType(new TemplateResultType());
 
+        $errorsIterator = new FormErrorIterator(
+            $form,
+            [
+                new FormError('error1'),
+                new FormError('error2')
+            ]
+        );
         $form->expects($this->once())
             ->method('createView')
             ->willReturn($formView);
         $form->expects($this->once())
             ->method('getErrors')
             ->with(true)
-            ->willReturn(['error1', 'error2']);
+            ->willReturn($errorsIterator);
 
         $this->processor->process($context);
 
@@ -56,7 +65,7 @@ class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
                 'workflowItem' => $workflowItem,
                 'saved' => false,
                 'form' => $formView,
-                'formErrors' => ['error1', 'error2']
+                'formErrors' => $errorsIterator
             ],
             $context->get('template_parameters')
         );

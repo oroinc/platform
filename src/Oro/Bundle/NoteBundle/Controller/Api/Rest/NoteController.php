@@ -47,7 +47,7 @@ class NoteController extends RestController
      */
     public function cgetAction(Request $request, $entityClass, $entityId)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
+        $entityClass = $this->container->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
 
         $page = (int) $request->get('page', 1);
         $limit = (int) $request->get('limit', self::ITEMS_PER_PAGE);
@@ -128,7 +128,7 @@ class NoteController extends RestController
      *      id="oro_note_delete",
      *      type="entity",
      *      permission="DELETE",
-     *      class="OroNoteBundle:Note"
+     *      class="Oro\Bundle\NoteBundle\Entity\Note"
      * )
      * @return Response
      */
@@ -144,7 +144,7 @@ class NoteController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_note.manager.api');
+        return $this->container->get('oro_note.manager.api');
     }
 
     /**
@@ -152,7 +152,7 @@ class NoteController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_note.form.note.api');
+        return $this->container->get('oro_note.form.note.api');
     }
 
     /**
@@ -160,7 +160,7 @@ class NoteController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_note.form.handler.note_api');
+        return $this->container->get('oro_note.form.handler.note_api');
     }
 
     /**

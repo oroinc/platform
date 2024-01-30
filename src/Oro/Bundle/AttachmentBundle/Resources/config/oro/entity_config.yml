@@ -19,7 +19,7 @@ entity_config:
                             block:          attachments
                             required:       true
                             label:          oro.attachment.enabled
-                            association_class: 'OroAttachmentBundle:Attachment'
+                            association_class: 'Oro\Bundle\AttachmentBundle\Entity\Attachment'
                 maxsize:
                     options:
                         priority:           90
@@ -35,7 +35,7 @@ entity_config:
                             block:          attachments
                             required:       false
                             label:          oro.attachment.maxsize
-                            association_class: 'OroAttachmentBundle:Attachment'
+                            association_class: 'Oro\Bundle\AttachmentBundle\Entity\Attachment'
                 mimetypes:
                     options:
                         priority:           80

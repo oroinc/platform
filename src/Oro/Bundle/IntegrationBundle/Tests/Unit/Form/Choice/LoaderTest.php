@@ -30,15 +30,16 @@ class LoaderTest extends OrmTestCase
         return [
             'types are not restricted' => [
                 null,
-                'SELECT i FROM OroIntegrationBundle:Channel i ORDER BY i.name ASC'
+                'SELECT i FROM Oro\Bundle\IntegrationBundle\Entity\Channel i ORDER BY i.name ASC'
             ],
             'all types are denied'     => [
                 [],
-                'SELECT i FROM OroIntegrationBundle:Channel i WHERE 1 <> 1 ORDER BY i.name ASC'
+                'SELECT i FROM Oro\Bundle\IntegrationBundle\Entity\Channel i WHERE 1 <> 1 ORDER BY i.name ASC'
             ],
-            'test type is allowed'     => [
+            'test type is allowed' => [
                 ['test'],
-                'SELECT i FROM OroIntegrationBundle:Channel i WHERE i.type IN(:allowedTypes) ORDER BY i.name ASC'
+                'SELECT i FROM Oro\Bundle\IntegrationBundle\Entity\Channel i ' .
+                'WHERE i.type IN(:allowedTypes) ORDER BY i.name ASC'
             ]
         ];
     }

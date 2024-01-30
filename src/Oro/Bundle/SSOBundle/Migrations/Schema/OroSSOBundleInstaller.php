@@ -9,17 +9,17 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroSSOBundleInstaller implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_0';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         // this installer exists to prevent issues with further version of this installer
         // that can happen because creation of googleId field for User entity was moved

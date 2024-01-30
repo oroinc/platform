@@ -26,12 +26,12 @@ class CacheableSecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\
     {
         $token1 = $this->createMock(TokenInterface::class);
         $token1->expects(self::any())
-            ->method('getUsername')
+            ->method('getUserIdentifier')
             ->willReturn('user1');
 
         $token2 = $this->createMock(TokenInterface::class);
         $token2->expects(self::any())
-            ->method('getUsername')
+            ->method('getUserIdentifier')
             ->willReturn('user2');
 
         $sids1 = [new RoleSecurityIdentity('ROLE1')];

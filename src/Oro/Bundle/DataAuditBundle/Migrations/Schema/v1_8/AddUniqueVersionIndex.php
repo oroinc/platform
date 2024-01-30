@@ -2,25 +2,16 @@
 
 namespace Oro\Bundle\DataAuditBundle\Migrations\Schema\v1_8;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
 {
-    /** @var Connection */
-    private $connection;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
+    use ConnectionAwareTrait;
 
     /**
      * {@inheritdoc}

@@ -6,7 +6,7 @@ use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 
 /**
- * Provides interface for MigrationQueryExecutor
+ * Represents an executor of migrations queries.
  */
 interface MigrationQueryExecutorInterface
 {

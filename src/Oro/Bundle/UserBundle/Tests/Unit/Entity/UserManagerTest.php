@@ -141,6 +141,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         $salt = 'salt';
 
         $user = new User();
+        $user->setUserIdentifier('test');
         $user->setPlainPassword($password);
         $user->setSalt($salt);
 

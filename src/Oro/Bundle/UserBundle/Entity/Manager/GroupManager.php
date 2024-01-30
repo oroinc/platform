@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Entity\Repository\GroupRepository;
 class GroupManager
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     private $em;
 
@@ -38,6 +38,6 @@ class GroupManager
      */
     protected function getGroupRepo()
     {
-        return $this->em->getRepository('OroUserBundle:Group');
+        return $this->em->getRepository(Group::class);
     }
 }

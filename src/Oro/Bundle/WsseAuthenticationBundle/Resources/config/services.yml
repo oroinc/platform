@@ -1,26 +1,19 @@
 services:
-    oro_wsse_authentication.security.core.authentication.provider.wsse:
-        class:  Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\Provider\WsseAuthenticationProvider
+    oro_wsse_authentication.security.core.authentication.authenticator.wsse:
+        class:  Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\WsseAuthenticator
         abstract: true
         arguments:
-            - '<UserCheckerInterface $userChecker>'
-            - '@oro_wsse_authentication.security.wsse_token_factory'
-            - '<UserProviderInterface $userProvider>' # set in WsseSecurityListenerFactory
-            - '<string $providerKey>' # set in WsseSecurityListenerFactory
-            - '<PasswordEncoderInterface $encoder>' # set in WsseSecurityListenerFactory
-            - '<CacheInterface $nonceCache>' # set in WsseSecurityListenerFactory
-            - 300
-            - '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/'
-
-    oro_wsse_authentication.security.http.firewall.wsse_authentication_listener:
-        class:  Oro\Bundle\WsseAuthenticationBundle\Security\Http\Firewall\WsseAuthenticationListener
-        abstract: true
-        arguments:
+            - '@oro_api.security.authenticator.feature_checker'
             - '@security.token_storage'
-            - '@security.authentication.manager'
             - '@oro_wsse_authentication.security.wsse_token_factory'
-            - '<AuthenticationEntryPointInterface $authenticationEntryPoint>' # set in WsseSecurityListenerFactory
-            - '<string $providerKey>' # set in WsseSecurityListenerFactory
+            - '<UserProviderInterface $userProvider>' # set in WsseSecurityAuthenticatorFactory
+            - '<AuthenticationEntryPointInterface $authenticationEntryPoint>' # set in WsseSecurityAuthenticatorFactory
+            - '<string $firewallName>' # set in WsseSecurityAuthenticatorFactory
+            - '<PasswordEncoderInterface $encoder>' # set in WsseSecurityAuthenticatorFactory
+            - '<CacheInterface $nonceCache>' # set in WsseSecurityAuthenticatorFactory
+            - 300
+            - '@security.firewall.map'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_wsse_authentication.security.http.entry_point.wsse:
         class:  Oro\Bundle\WsseAuthenticationBundle\Security\Http\EntryPoint\WsseEntryPoint
@@ -30,9 +23,8 @@ services:
             - ''
             - 'UsernameToken'
 
-    oro_wsse_authentication.encoder:
-        class:  Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder
-        abstract: true
+    oro_wsse_authentication.hasher:
+        class: Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher
         arguments:
             - 'sha1'
             - true

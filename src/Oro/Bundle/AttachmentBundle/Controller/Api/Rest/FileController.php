@@ -47,7 +47,7 @@ class FileController extends RestGetController
      */
     public function getManager()
     {
-        return $this->get('oro_attachment.manager.file.api');
+        return $this->container->get('oro_attachment.manager.file.api');
     }
 
     /**
@@ -58,7 +58,7 @@ class FileController extends RestGetController
     protected function buildResponse($data, $action, $contextValues = [], $status = Response::HTTP_OK)
     {
         if ($status === Response::HTTP_OK) {
-            $format = $this->get('request_stack')->getCurrentRequest()->getRequestFormat();
+            $format = $this->container->get('request_stack')->getCurrentRequest()->getRequestFormat();
             if ($format === 'binary') {
                 if ($action !== self::ACTION_READ) {
                     throw new BadRequestHttpException('Only single file can be returned in the binary format');
@@ -109,10 +109,10 @@ class FileController extends RestGetController
             $headers
         );
 
-        $includeHandler = $this->get('oro_soap.handler.include');
+        $includeHandler = $this->container->get('oro_soap.handler.include');
         $includeHandler->handle(new Context(
             $this,
-            $this->get('request_stack')->getCurrentRequest(),
+            $this->container->get('request_stack')->getCurrentRequest(),
             $response,
             $action,
             $contextValues

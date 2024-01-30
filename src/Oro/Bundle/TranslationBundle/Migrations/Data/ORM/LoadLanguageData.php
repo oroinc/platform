@@ -7,6 +7,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
@@ -14,26 +15,24 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
- * Migration for creation default `en` language
+ * Loads default "en" language.
  */
 class LoadLanguageData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     use ContainerAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return [
-            LoadAdminUserData::class
-        ];
+        return [LoadAdminUserData::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $user = $this->getUser($manager);
 
@@ -45,14 +44,10 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param string $code
-     * @return Language
-     */
-    protected function getLanguage(ObjectManager $manager, $code)
+    private function getLanguage(ObjectManager $manager, string $code): Language
     {
-        if (null === ($language = $manager->getRepository(Language::class)->findOneBy(['code' => $code]))) {
+        $language = $manager->getRepository(Language::class)->findOneBy(['code' => $code]);
+        if (null === $language) {
             $language = new Language();
             $language->setCode($code);
             $manager->persist($language);
@@ -61,21 +56,14 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
         return $language;
     }
 
-    /**
-     * @param ObjectManager $manager
-     *
-     * @throws \RuntimeException
-     *
-     * @return User
-     */
-    protected function getUser(ObjectManager $manager)
+    private function getUser(ObjectManager $manager): User
     {
-        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => LoadRolesData::ROLE_ADMINISTRATOR]);
+        $role = $manager->getRepository(Role::class)->findOneBy(['role' => LoadRolesData::ROLE_ADMINISTRATOR]);
         if (!$role) {
             throw new \RuntimeException(sprintf('%s role should exist.', LoadRolesData::ROLE_ADMINISTRATOR));
         }
 
-        $user = $manager->getRepository('OroUserBundle:Role')->getFirstMatchedUser($role);
+        $user = $manager->getRepository(Role::class)->getFirstMatchedUser($role);
         if (!$user) {
             throw new \RuntimeException(
                 sprintf('At least one user with role %s should exist.', LoadRolesData::ROLE_ADMINISTRATOR)
