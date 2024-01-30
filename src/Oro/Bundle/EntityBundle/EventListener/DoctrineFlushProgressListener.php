@@ -30,12 +30,12 @@ class DoctrineFlushProgressListener
 
     public function preFlush(PreFlushEventArgs $args): void
     {
-        $this->markAsInProgress($args->getEntityManager(), true);
+        $this->markAsInProgress($args->getObjectManager(), true);
     }
 
     public function postFlush(PostFlushEventArgs $args): void
     {
-        $this->markAsInProgress($args->getEntityManager(), false);
+        $this->markAsInProgress($args->getObjectManager(), false);
     }
 
     /**

@@ -24,7 +24,7 @@ class TagListener implements ServiceSubscriberInterface
 
     public function preRemove(LifecycleEventArgs $args): void
     {
-        $entity = $args->getEntity();
+        $entity = $args->getObject();
         if ($this->getTaggableHelper()->isTaggable($entity)) {
             $this->getTagManager()->deleteTagging($entity, []);
         }

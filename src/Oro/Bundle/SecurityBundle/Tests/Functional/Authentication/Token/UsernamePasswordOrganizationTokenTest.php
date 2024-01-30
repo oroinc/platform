@@ -28,27 +28,27 @@ class UsernamePasswordOrganizationTokenTest extends WebTestCase
         /** @var User $user */
         $user = $doctrine->getRepository(User::class)->findOneBy([]);
 
-        $token = new UsernamePasswordOrganizationToken($user, $user->getPassword(), 'key', $organization);
+        $token = new UsernamePasswordOrganizationToken($user, 'key', $organization);
 
-        $serialized = $token->serialize();
-        $token->unserialize($serialized);
+        $serialized = $token->__serialize();
+        $token->__unserialize($serialized);
 
         $objectManager->clear();
 
-        $token = new UsernamePasswordOrganizationToken($user, $user->getPassword(), 'key', $organization);
-        $serialized = $token->serialize();
+        $token = new UsernamePasswordOrganizationToken($user, 'key', $organization);
+        $serialized = $token->__serialize();
         $session->set('serialized', $serialized);
-        $token->unserialize($session->get('serialized'));
+        $token->__unserialize($session->get('serialized'));
 
         $organization = $objectManager->getReference(Organization::class, $organization->getId());
         $user = $objectManager->getReference(User::class, $user->getId());
 
-        $token = new UsernamePasswordOrganizationToken($user, $user->getPassword(), 'key', $organization);
+        $token = new UsernamePasswordOrganizationToken($user, 'key', $organization);
         $session->set('serialized', $serialized);
-        $token->unserialize($session->get('serialized'));
+        $token->__unserialize($session->get('serialized'));
 
-        $serialized = $token->serialize();
+        $serialized = $token->__serialize();
         $session->set('serialized', $serialized);
-        $token->unserialize($session->get('serialized'));
+        $token->__unserialize($session->get('serialized'));
     }
 }

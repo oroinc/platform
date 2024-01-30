@@ -6,12 +6,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
 class OrganizationRepositoryTest extends WebTestCase
 {
     protected function setUp(): void
     {
         $this->initClient();
+        $this->loadFixtures([LoadOrganization::class]);
     }
 
     private function getRepository(): OrganizationRepository
@@ -21,12 +23,7 @@ class OrganizationRepositoryTest extends WebTestCase
 
     public function testGetOrganizationIds(): void
     {
-        $organization = self::getContainer()->get('doctrine')
-            ->getManagerForClass(Organization::class)
-            ->getRepository(Organization::class)
-            ->getFirst();
-
-        $this->assertFalse(null === $organization);
+        $organization = $this->getReference(LoadOrganization::ORGANIZATION);
 
         $result = $this->getRepository()->getOrganizationIds();
         $this->assertCount(1, $result);

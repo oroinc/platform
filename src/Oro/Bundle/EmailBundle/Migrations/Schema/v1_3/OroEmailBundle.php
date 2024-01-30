@@ -10,11 +10,11 @@ use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
 class OroEmailBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addOrganization($schema);
+        $this->addOrganization($schema);
 
         //Add organization fields to ownership entity config
         $queries->addQuery(
@@ -28,14 +28,11 @@ class OroEmailBundle implements Migration
         );
     }
 
-    /**
-     * Adds organization_id field
-     */
-    public static function addOrganization(Schema $schema)
+    private function addOrganization(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_template');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['organization_id'], 'IDX_E62049DE32C8A3DE', []);
+        $table->addIndex(['organization_id'], 'IDX_E62049DE32C8A3DE');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],

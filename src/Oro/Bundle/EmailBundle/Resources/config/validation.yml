@@ -10,7 +10,6 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplate:
             - Length:
                 min: 3
                 max: 255
-                allowEmptyString: false
         type:
             - NotBlank: ~
         organization:

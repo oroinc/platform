@@ -16,7 +16,7 @@ use Oro\Bundle\ScopeBundle\Migration\Query\AddTriggerToRowHashQuery;
 class AddRowHashColumn implements Migration, OrderedMigrationInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries): void
     {
@@ -31,9 +31,6 @@ class AddRowHashColumn implements Migration, OrderedMigrationInterface
         $this->addRowHashComment($table);
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
     protected function addRowHashComment(Table $table): void
     {
         $columns = [];

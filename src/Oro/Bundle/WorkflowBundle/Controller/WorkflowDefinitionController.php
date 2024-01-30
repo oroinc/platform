@@ -39,7 +39,7 @@ class WorkflowDefinitionController extends AbstractController
      * @Acl(
      *      id="oro_workflow_definition_view",
      *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
+     *      class="Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition",
      *      permission="VIEW"
      * )
      *
@@ -61,7 +61,7 @@ class WorkflowDefinitionController extends AbstractController
      * @Acl(
      *      id="oro_workflow_definition_create",
      *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
+     *      class="Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition",
      *      permission="CREATE"
      * )
      *
@@ -81,7 +81,7 @@ class WorkflowDefinitionController extends AbstractController
      * @Acl(
      *      id="oro_workflow_definition_update",
      *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
+     *      class="Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition",
      *      permission="EDIT"
      * )
      *
@@ -94,11 +94,12 @@ class WorkflowDefinitionController extends AbstractController
         if ($workflowDefinition->isSystem() || !$this->isEditable($workflowDefinition)) {
             throw new AccessDeniedException('System workflow definitions are not editable');
         }
-        $translateLinks = $this->get(TranslationsDatagridLinksProvider::class)
+        $translateLinks = $this->container->get(TranslationsDatagridLinksProvider::class)
             ->getWorkflowTranslateLinks($workflowDefinition);
-        $this->get(TranslationProcessor::class)->translateWorkflowDefinitionFields($workflowDefinition, true);
+        $this->container->get(TranslationProcessor::class)
+            ->translateWorkflowDefinitionFields($workflowDefinition, true);
 
-        $form = $this->get(FormFactoryInterface::class)->createNamed(
+        $form = $this->container->get(FormFactoryInterface::class)->createNamed(
             'oro_workflow_definition_form',
             WorkflowDefinitionType::class,
             null
@@ -124,7 +125,7 @@ class WorkflowDefinitionController extends AbstractController
      * @Acl(
      *      id="oro_workflow_definition_configure",
      *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
+     *      class="Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition",
      *      permission="CONFIGURE"
      * )
      *
@@ -136,7 +137,7 @@ class WorkflowDefinitionController extends AbstractController
      */
     public function configureAction(Request $request, WorkflowDefinition $workflowDefinition)
     {
-        $workflow = $this->get(WorkflowManagerRegistry::class)
+        $workflow = $this->container->get(WorkflowManagerRegistry::class)
             ->getManager('system')
             ->getWorkflow($workflowDefinition->getName());
 
@@ -149,19 +150,20 @@ class WorkflowDefinitionController extends AbstractController
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                $this->get(WorkflowVariablesHandler::class)
+                $this->container->get(WorkflowVariablesHandler::class)
                     ->updateWorkflowVariables($workflowDefinition, $form->getData());
 
                 $this->addFlash(
                     'success',
-                    $this->get(TranslatorInterface::class)->trans('oro.workflow.variable.save.success_message')
+                    $this->container->get(TranslatorInterface::class)
+                        ->trans('oro.workflow.variable.save.success_message')
                 );
 
-                return $this->get(Router::class)->redirect($workflowDefinition);
+                return $this->container->get(Router::class)->redirect($workflowDefinition);
             }
         }
 
-        $translateLinksProvider = $this->get(TranslationsDatagridLinksProvider::class);
+        $translateLinksProvider = $this->container->get(TranslationsDatagridLinksProvider::class);
 
         return [
             'form' => $form->createView(),
@@ -183,10 +185,11 @@ class WorkflowDefinitionController extends AbstractController
      */
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
-        $translateLinks = $this->get(TranslationsDatagridLinksProvider::class)
+        $translateLinks = $this->container->get(TranslationsDatagridLinksProvider::class)
             ->getWorkflowTranslateLinks($workflowDefinition);
-        $this->get(TranslationProcessor::class)->translateWorkflowDefinitionFields($workflowDefinition, true);
-        $workflow = $this->get(WorkflowManagerRegistry::class)
+        $this->container->get(TranslationProcessor::class)
+            ->translateWorkflowDefinitionFields($workflowDefinition, true);
+        $workflow = $this->container->get(WorkflowManagerRegistry::class)
             ->getManager('system')
             ->getWorkflow($workflowDefinition->getName());
 
@@ -204,7 +207,7 @@ class WorkflowDefinitionController extends AbstractController
      */
     protected function isEditable(WorkflowDefinition $workflowDefinition)
     {
-        return $this->get(ConfigurationChecker::class)->isClean($workflowDefinition->getConfiguration());
+        return $this->container->get(ConfigurationChecker::class)->isClean($workflowDefinition->getConfiguration());
     }
 
     /**
@@ -225,8 +228,8 @@ class WorkflowDefinitionController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $workflowManager = $this->get(WorkflowManagerRegistry::class)->getManager();
-            $helper = $this->get(WorkflowDeactivationHelper::class);
+            $workflowManager = $this->container->get(WorkflowManagerRegistry::class)->getManager();
+            $helper = $this->container->get(WorkflowDeactivationHelper::class);
             $data = $form->getData();
 
             try {
@@ -261,7 +264,7 @@ class WorkflowDefinitionController extends AbstractController
     private function deactivateWorkflows(WorkflowManager $workflowManager, array $workflowNames)
     {
         $deactivated = [];
-        $translationHelper = $this->get(WorkflowTranslationHelper::class);
+        $translationHelper = $this->container->get(WorkflowTranslationHelper::class);
 
         foreach ($workflowNames as $workflowName) {
             if ($workflowName && $workflowManager->isActiveWorkflow($workflowName)) {

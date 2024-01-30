@@ -28,7 +28,7 @@ class DigitalAssetAwareFileStrategyPersistEventListener
         $files = $this->memoryCache->get(self::FILES_WITH_DIGITAL_ASSETS_TO_PERSIST);
         $this->memoryCache->delete(self::FILES_WITH_DIGITAL_ASSETS_TO_PERSIST);
 
-        $entityManager = $args->getEntityManager();
+        $entityManager = $args->getObjectManager();
         foreach ($files as $file) {
             if (!$entityManager->contains($file)) {
                 // Skips files that are not going to be persisted.

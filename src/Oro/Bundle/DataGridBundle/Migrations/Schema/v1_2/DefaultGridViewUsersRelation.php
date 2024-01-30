@@ -8,23 +8,17 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class DefaultGridViewUsersRelation implements Migration
 {
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::createOroDefaultGridViewUsersTable($schema);
-    }
-
     /**
-     * Creates 'oro_grid_view_user' table which represents relationship between grid views and
-     * users who chosen this grid view as default.
+     * {@inheritDoc}
      */
-    public static function createOroDefaultGridViewUsersTable(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->createTable('oro_grid_view_user');
-        $table->addColumn('grid_view_id', 'integer', []);
-        $table->addColumn('user_id', 'integer', []);
+        $table->addColumn('grid_view_id', 'integer');
+        $table->addColumn('user_id', 'integer');
         $table->setPrimaryKey(['grid_view_id', 'user_id']);
-        $table->addIndex(['grid_view_id'], 'IDX_80CFBA3FBF53711B', []);
-        $table->addIndex(['user_id'], 'IDX_80CFBA3FA76ED395', []);
+        $table->addIndex(['grid_view_id'], 'IDX_80CFBA3FBF53711B');
+        $table->addIndex(['user_id'], 'IDX_80CFBA3FA76ED395');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_grid_view'),
             ['grid_view_id'],

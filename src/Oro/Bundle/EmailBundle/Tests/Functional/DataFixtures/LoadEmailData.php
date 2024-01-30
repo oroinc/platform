@@ -5,82 +5,43 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Model\FolderType;
-use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    /**
-     * @var array
-     */
-    protected $templates;
+    use ContainerAwareTrait;
 
     /**
-     * @var EmailEntityBuilder
+     * {@inheritDoc}
      */
-    protected $emailEntityBuilder;
-
-    /**
-     * @var EmailOriginHelper
-     */
-    protected $emailOriginHelper;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var string
-     */
-    protected $attachmentFile;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return ['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadUserData',];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        if (!$container) {
-            return;
-        }
-
-        $this->container = $container;
-        $this->emailEntityBuilder = $container->get('oro_email.email.entity.builder');
-        $this->emailOriginHelper = $container->get('oro_email.tools.email_origin_helper');
+        return [LoadUserData::class, LoadUser::class];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function load(ObjectManager $om)
+    public function load(ObjectManager $manager): void
     {
-        $this->loadEmailTemplates();
-        $this->loadEmailsDemo($om);
-        $om->flush();
-    }
-
-    protected function loadEmailTemplates()
-    {
-        $dictionaryDir = $this->container
+        $dataDir = $this->container
             ->get('kernel')
             ->locateResource('@OroEmailBundle/Tests/Functional/DataFixtures/Data');
+        $this->loadEmails($manager, $dataDir, $this->loadEmailTemplates($dataDir));
+        $manager->flush();
+    }
 
-        $handle = fopen($dictionaryDir . DIRECTORY_SEPARATOR. "emails.csv", "r");
+    private function loadEmailTemplates(string $dataDir): array
+    {
+        $templates = [];
+        $handle = fopen($dataDir . DIRECTORY_SEPARATOR. 'emails.csv', 'r');
         if ($handle) {
             $headers = [];
             if (($data = fgetcsv($handle, 1000, ",")) !== false) {
@@ -88,22 +49,24 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 $headers = $data;
             }
             while (($data = fgetcsv($handle, 1000, ",")) !== false) {
-                $this->templates[] = array_combine($headers, array_values($data));
+                $templates[] = array_combine($headers, array_values($data));
             }
         }
-        $this->attachmentFile = file_get_contents($dictionaryDir . DIRECTORY_SEPARATOR. "test.png");
+
+        return $templates;
     }
 
-    protected function loadEmailsDemo(ObjectManager $om)
+    private function loadEmails(ObjectManager $manager, string $dataDir, array $templates): void
     {
-        $adminUser = $om->getRepository(User::class)->findOneByUsername('admin');
+        $emailEntityBuilder = $this->container->get('oro_email.email.entity.builder');
+        $emailOriginHelper = $this->container->get('oro_email.tools.email_origin_helper');
+        $attachmentContent = base64_encode(file_get_contents($dataDir . DIRECTORY_SEPARATOR. 'test.png'));
 
-        foreach ($this->templates as $index => $template) {
-            $owner = $this->getEmailOwner($om);
-            $simpleUser2 = $this->getReference('simple_user2');
-            $origin = $this->emailOriginHelper->getEmailOrigin($owner->getEmail());
+        foreach ($templates as $index => $template) {
+            $owner = $this->getEmailOwner();
+            $origin = $emailOriginHelper->getEmailOrigin($owner->getEmail());
 
-            $emailUser = $this->emailEntityBuilder->emailUser(
+            $emailUser = $emailEntityBuilder->emailUser(
                 $template['Subject'],
                 $owner->getEmail(),
                 $owner->getEmail(),
@@ -117,24 +80,20 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
 
             $emailUser->addFolder($this->getFolder($origin));
             $emailUser->getEmail()->addActivityTarget($owner);
-            $emailUser->getEmail()->addActivityTarget($simpleUser2);
+            $emailUser->getEmail()->addActivityTarget($this->getReference('simple_user2'));
             $emailUser->getEmail()->setHead(true);
             $emailUser->setOrganization($owner->getOrganization());
             $emailUser->setOwner($owner);
             $emailUser->setOrigin($origin);
 
-            $emailBody = $this->emailEntityBuilder->body(
+            $emailBody = $emailEntityBuilder->body(
                 "Hi,\n" . $template['Text'],
                 false,
                 true
             );
 
-            $attachmentContent = $this->emailEntityBuilder->attachmentContent(
-                base64_encode($this->attachmentFile),
-                'base64'
-            );
-            $attachment = $this->emailEntityBuilder->attachment('test.png', 'image/png');
-            $attachment->setContent($attachmentContent);
+            $attachment = $emailEntityBuilder->attachment('test.png', 'image/png');
+            $attachment->setContent($emailEntityBuilder->attachmentContent($attachmentContent, 'base64'));
 
             $emailBody->addAttachment($attachment);
 
@@ -146,28 +105,21 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             $this->setReference('emailAttachment_' . ($index + 1), $attachment);
         }
 
-        $emailUser->setOwner($adminUser);
+        $emailUser->setOwner($this->getReference(LoadUser::USER));
         $this->setReference('emailUser_for_mass_mark_test', $emailUser);
 
-        $this->emailEntityBuilder->getBatch()->persist($om);
+        $emailEntityBuilder->getBatch()->persist($manager);
     }
 
     /**
-     * Returns user object that should be set as email user owner.
-     *
-     * @param ObjectManager $om
-     * @return User
+     * Gets an user that should be set as email user owner.
      */
-    protected function getEmailOwner(ObjectManager $om)
+    protected function getEmailOwner(): User
     {
         return $this->getReference('simple_user');
     }
 
-    /**
-     * @param EmailOrigin $origin
-     * @return EmailFolder
-     */
-    protected function getFolder($origin)
+    protected function getFolder(EmailOrigin $origin): EmailFolder
     {
         return $origin->getFolder(FolderType::SENT);
     }

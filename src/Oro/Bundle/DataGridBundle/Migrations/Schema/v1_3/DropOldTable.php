@@ -9,14 +9,16 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class DropOldTable implements Migration, OrderedMigrationInterface
 {
-    /** {@inheritdoc} */
+    /**
+     * {@inheritDoc}
+     */
     public function getOrder()
     {
         return 30;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {

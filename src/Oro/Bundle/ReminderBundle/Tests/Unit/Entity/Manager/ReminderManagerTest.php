@@ -16,13 +16,15 @@ use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 use Oro\Bundle\ReminderBundle\Tests\Unit\Fixtures\RemindableEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ReminderManagerTest extends \PHPUnit\Framework\TestCase
+class ReminderManagerTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|MockObject */
     private $entityManager;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DoctrineHelper|MockObject */
     private $doctrineHelper;
 
     /** @var ReminderManager */
@@ -191,7 +193,7 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects(self::once())
             ->method('getRepository')
-            ->with('OroReminderBundle:Reminder')
+            ->with(Reminder::class)
             ->willReturn($repository);
 
         $this->doctrineHelper->expects(self::once())
@@ -254,7 +256,7 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
         $reminderRepo = $this->createMock(ReminderRepository::class);
         $this->entityManager->expects(self::once())
             ->method('getRepository')
-            ->with('OroReminderBundle:Reminder')
+            ->with(Reminder::class)
             ->willReturn($reminderRepo);
         $reminderRepo->expects(self::once())
             ->method('findRemindersByEntitiesQueryBuilder')
@@ -338,7 +340,7 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     private function expectReminderSync(
-        \PHPUnit\Framework\MockObject\MockObject $reminder,
+        MockObject $reminder,
         string $entityClassName,
         int $entityId,
         ReminderDataInterface $reminderData
@@ -355,7 +357,7 @@ class ReminderManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Reminder|\PHPUnit\Framework\MockObject\MockObject
+     * @return Reminder|MockObject
      */
     private function createReminder(int $id)
     {

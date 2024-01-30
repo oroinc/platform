@@ -13,6 +13,8 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery implements ConfigurationHandlerAwareInterface
 {
+    use ConfigurationHandlerAwareTrait;
+
     /**
      * @var string
      */
@@ -43,8 +45,6 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery imple
      */
     protected $replaceValue;
 
-    protected ConfigurationHandler $configurationHandler;
-
     /**
      * @param string $entityName
      * @param string $fieldName
@@ -61,14 +61,6 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery imple
         $this->code         = $code;
         $this->value        = $value;
         $this->replaceValue = $replaceValue;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConfigurationHandler(ConfigurationHandler $configurationHandler): void
-    {
-        $this->configurationHandler = $configurationHandler;
     }
 
     /**

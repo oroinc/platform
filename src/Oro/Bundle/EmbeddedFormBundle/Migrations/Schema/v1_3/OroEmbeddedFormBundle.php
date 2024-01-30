@@ -10,24 +10,19 @@ use Oro\Bundle\SecurityBundle\Migrations\Schema\SetOwnershipTypeQuery;
 class OroEmbeddedFormBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addOwner($schema);
-        self::setOwnership($queries);
+        $this->addOwner($schema);
+        $this->setOwnership($queries);
     }
 
-    /**
-     * Adds owner_id field
-     */
-    public static function addOwner(Schema $schema)
+    private function addOwner(Schema $schema): void
     {
         $table = $schema->getTable('oro_embedded_form');
-
         $table->addColumn('owner_id', 'integer', ['notnull' => false]);
         $table->addIndex(['owner_id'], 'IDX_F7A34C17E3C61F9', []);
-
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['owner_id'],
@@ -36,13 +31,8 @@ class OroEmbeddedFormBundle implements Migration
         );
     }
 
-    /**
-     * Set ownership type for EmbeddedForm entity to Organization
-     */
-    public static function setOwnership(QueryBag $queries)
+    private function setOwnership(QueryBag $queries): void
     {
-        $queries->addQuery(
-            new SetOwnershipTypeQuery('Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm')
-        );
+        $queries->addQuery(new SetOwnershipTypeQuery('Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm'));
     }
 }

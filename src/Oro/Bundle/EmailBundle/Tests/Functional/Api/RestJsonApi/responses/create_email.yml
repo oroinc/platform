@@ -15,7 +15,7 @@ data:
         xMessageId: test_x_message_id
         xThreadId: test_x_thread_id
         references:
-            - '<id1@email-api.func-test>'
+            - '<id2@email-api.func-test>'
         acceptLanguage: en-US
         bodySynced: true
         from:
@@ -54,14 +54,14 @@ data:
             data:
                 -
                     type: users
-                    id: '<toString(@user1->id)>'
-                    meta:
-                        emailThreadContextItemId: '<("users-" . @user1->id . "-" . @email_1->id)>'
-                -
-                    type: users
                     id: '<toString(@user->id)>'
                     meta:
-                        emailThreadContextItemId: '<("users-" . @user->id . "-" . @email_1->id)>'
+                        emailThreadContextItemId: '<("users-" . @user->id . "-" . @email_2->id)>'
+                -
+                    type: users
+                    id: '<toString(@user1->id)>'
+                    meta:
+                        emailThreadContextItemId: '<("users-" . @user1->id . "-" . @email_2->id)>'
         emailAttachments:
             data:
                 - { type: emailattachments, id: '<toString(@createdEmail->emailBody->attachments->first->id)>' }

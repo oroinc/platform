@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateDisplayManager;
@@ -53,7 +54,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
         $updates = $menuUpdateRepository->findMenuUpdatesByScope($menuName, $scope);
 
         /** @var EntityManagerInterface $em */
-        $em = $this->getDoctrine()->getManagerForClass($manager->getEntityClass());
+        $em = $this->container->get('doctrine')->getManagerForClass($manager->getEntityClass());
 
         foreach ($updates as $update) {
             $em->remove($update);
@@ -95,7 +96,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $em = $this->getDoctrine()->getManagerForClass($manager->getEntityClass());
+        $em = $this->container->get('doctrine')->getManagerForClass($manager->getEntityClass());
         $em->persist($menuUpdate);
         $em->flush();
 
@@ -130,7 +131,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
         }
 
         /** @var EntityManagerInterface $entityManager */
-        $entityManager = $this->getDoctrine()->getManagerForClass($manager->getEntityClass());
+        $entityManager = $this->container->get('doctrine')->getManagerForClass($manager->getEntityClass());
 
         if ($menuUpdate->isCustom()) {
             $entityManager->remove($menuUpdate);
@@ -205,7 +206,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
         $position = $request->get('position');
 
         /** @var EntityManagerInterface $entityManager */
-        $entityManager = $this->getDoctrine()->getManagerForClass($manager->getEntityClass());
+        $entityManager = $this->container->get('doctrine')->getManagerForClass($manager->getEntityClass());
 
         $scope = $this->findOrCreateScope($context, $manager->getScopeType());
         $menu = $this->getMenu($menuName, $context);
@@ -241,7 +242,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
      */
     protected function dispatchMenuUpdateScopeChangeEvent($menuName, array $context)
     {
-        $this->get(EventDispatcherInterface::class)->dispatch(
+        $this->container->get(EventDispatcherInterface::class)->dispatch(
             new MenuUpdateChangeEvent($menuName, $context),
             MenuUpdateChangeEvent::NAME
         );
@@ -255,7 +256,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
     {
         $manager = $this->getMenuUpdateManager();
 
-        $context = $this->get(ContextRequestHelper::class)->getFromRequest(
+        $context = $this->container->get(ContextRequestHelper::class)->getFromRequest(
             $request,
             $this->getAllowedContextKeys()
         );
@@ -287,7 +288,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
             MenuUpdateProvider::SCOPE_CONTEXT_OPTION => $context,
             BuilderChainProvider::IGNORE_CACHE_OPTION => true
         ];
-        $menu = $this->get(BuilderChainProvider::class)->get($menuName, $options);
+        $menu = $this->container->get(BuilderChainProvider::class)->get($menuName, $options);
 
         if (!count($menu->getChildren())) {
             throw $this->createNotFoundException(sprintf("Menu \"%s\" not found.", $menuName));
@@ -331,7 +332,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
 
     private function getScopeManager(): ScopeManager
     {
-        return $this->get(ScopeManager::class);
+        return $this->container->get(ScopeManager::class);
     }
 
     private function getValidationErrorMessage(ConstraintViolationList $constraintViolationList): string
@@ -346,12 +347,12 @@ abstract class AbstractAjaxMenuController extends AbstractController
 
     private function getScopeNormalizer(): ContextNormalizer
     {
-        return $this->get(ContextNormalizer::class);
+        return $this->container->get(ContextNormalizer::class);
     }
 
     private function getValidator(): ValidatorInterface
     {
-        return $this->get(ValidatorInterface::class);
+        return $this->container->get(ValidatorInterface::class);
     }
 
     /**
@@ -370,6 +371,7 @@ abstract class AbstractAjaxMenuController extends AbstractController
             TranslatorInterface::class,
             ContextNormalizer::class,
             ValidatorInterface::class,
+            'doctrine' => ManagerRegistry::class,
         ]);
     }
 }

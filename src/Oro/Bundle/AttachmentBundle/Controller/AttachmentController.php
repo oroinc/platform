@@ -29,7 +29,7 @@ class AttachmentController extends AbstractController
      * @Acl(
      *      id="oro_attachment_view",
      *      type="entity",
-     *      class="OroAttachmentBundle:Attachment",
+     *      class="Oro\Bundle\AttachmentBundle\Entity\Attachment",
      *      permission="VIEW"
      * )
      * @Template("@OroAttachment/Attachment/attachments.html.twig")
@@ -50,7 +50,7 @@ class AttachmentController extends AbstractController
      * @Acl(
      *      id="oro_attachment_create",
      *      type="entity",
-     *      class="OroAttachmentBundle:Attachment",
+     *      class="Oro\Bundle\AttachmentBundle\Entity\Attachment",
      *      permission="CREATE"
      * )
      * @param Request $request
@@ -90,7 +90,7 @@ class AttachmentController extends AbstractController
      * @Acl(
      *      id="oro_attachment_update",
      *      type="entity",
-     *      class="OroAttachmentBundle:Attachment",
+     *      class="Oro\Bundle\AttachmentBundle\Entity\Attachment",
      *      permission="EDIT"
      * )
      * @param Request $request
@@ -131,7 +131,7 @@ class AttachmentController extends AbstractController
             $responseData['update'] = true;
         }
 
-        if ($this->get(AttachmentHandler::class)->process($form)) {
+        if ($this->container->get(AttachmentHandler::class)->process($form)) {
             $responseData['saved'] = true;
         } else {
             $responseData['form']       = $form->createView();
@@ -143,12 +143,12 @@ class AttachmentController extends AbstractController
 
     protected function getEntityRoutingHelper(): EntityRoutingHelper
     {
-        return $this->get(EntityRoutingHelper::class);
+        return $this->container->get(EntityRoutingHelper::class);
     }
 
     protected function getAttachmentManager(): AttachmentManager
     {
-        return $this->get(AttachmentManager::class);
+        return $this->container->get(AttachmentManager::class);
     }
 
     /**

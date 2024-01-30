@@ -5,9 +5,9 @@ namespace Oro\Bundle\WorkflowBundle;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass;
+use Oro\Component\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroWorkflowBundle extends Bundle

@@ -23,7 +23,7 @@ class UserLoggingInfoProvider implements UserLoggingInfoProviderInterface
         if ($user instanceof User) {
             $info['user'] = [
                 'id' => $user->getId(),
-                'username' => $user->getUsername(),
+                'username' => $user->getUserIdentifier(),
                 'email' => $user->getEmail(),
                 'fullname' => $user->getFullName(),
                 'enabled' => $user->isEnabled(),

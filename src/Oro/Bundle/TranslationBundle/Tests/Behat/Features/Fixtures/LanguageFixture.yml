@@ -4,7 +4,7 @@ Oro\Bundle\TranslationBundle\Entity\Language:
         enabled: true
         organization: '@organization'
     language2:
-        code: 'cz'
+        code: 'cs'
         enabled: true
         organization: '@organization'
     language3:

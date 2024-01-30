@@ -1,7 +1,7 @@
 oro_translation_jstranslation:
     path: '/media/js/translation/{_locale}.json'
     defaults:
-        _controller: 'Oro\Bundle\TranslationBundle\Controller\JsTranslationController:indexAction'
+        _controller: 'Oro\Bundle\TranslationBundle\Controller\JsTranslationController::indexAction'
     options:
         expose: true
 

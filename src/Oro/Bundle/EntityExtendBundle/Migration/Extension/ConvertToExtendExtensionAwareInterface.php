@@ -3,13 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration\Extension;
 
 /**
- * ConvertToExtendExtensionAwareInterface should be implemented by migrations
- * that depends on a ConvertToExtendExtension.
+ * This interface should be implemented by migrations that depend on {@see ConvertToExtendExtension}.
  */
 interface ConvertToExtendExtensionAwareInterface
 {
-    /**
-     * Sets the ExtendExtension
-     */
     public function setConvertToExtendExtension(ConvertToExtendExtension $convertToExtendExtension);
 }

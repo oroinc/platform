@@ -81,14 +81,6 @@ class SearchBundleWebTestCase extends WebTestCase
         static::ensureItemsLoaded($alias, $expectedCount);
     }
 
-    protected static function clearIndex(string $entityClass): void
-    {
-        static::getSearchIndexer()->resetIndex($entityClass);
-
-        $alias = static::getSearchObjectMapper()->getEntityAlias($entityClass);
-        static::ensureItemsLoaded($alias, 0);
-    }
-
     protected static function clear(): void
     {
         foreach (static::$entitiesToClear as $entityClass) {

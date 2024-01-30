@@ -57,6 +57,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
     public function testRemoveAttributeValuesWhenAttributeIsToOneAssociation(): void
     {
         $attributeFamily = new AttributeFamily();
+        $attributeFamily->setEntityClass('SomeClass');
         $names = ['sample_association_1'];
 
         $this->classMetadata->associationMappings[$names[0]] = ['type' => ClassMetadataInfo::MANY_TO_ONE];
@@ -69,7 +70,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects(self::once())
             ->method('createQuery')
             ->with(
-                'UPDATE SET entity.sample_association_1 = :sample_association_1 '
+                'UPDATE SomeClass entity SET entity.sample_association_1 = :sample_association_1 '
                 . 'WHERE entity.attributeFamily = :attributeFamily'
             )
             ->willReturn($query);
@@ -98,6 +99,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
     public function testRemoveAttributeValuesWhenAttributeIsToManyAssociation(): void
     {
         $attributeFamily = new AttributeFamily();
+        $attributeFamily->setEntityClass('SomeClass');
         $names = ['sample_association_1'];
 
         $this->classMetadata->associationMappings[$names[0]] = ['type' => ClassMetadataInfo::TO_MANY];
@@ -111,6 +113,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
     public function testRemoveAttributeValuesWhenAttributeIsFieldAndNullable(): void
     {
         $attributeFamily = new AttributeFamily();
+        $attributeFamily->setEntityClass('SomeClass');
         $names = ['sample_field_1'];
 
         $this->classMetadata->fieldMappings[$names[0]] = ['nullable' => true];
@@ -122,7 +125,10 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
             ->getMockForAbstractClass();
         $this->entityManager->expects(self::once())
             ->method('createQuery')
-            ->with('UPDATE SET entity.sample_field_1 = :sample_field_1 WHERE entity.attributeFamily = :attributeFamily')
+            ->with(
+                'UPDATE SomeClass entity SET entity.sample_field_1 = :sample_field_1 ' .
+                'WHERE entity.attributeFamily = :attributeFamily'
+            )
             ->willReturn($query);
 
         $query->expects(self::once())
@@ -150,6 +156,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
     public function testRemoveAttributeValuesWhenAttributeIsFieldAndHasDefault(): void
     {
         $attributeFamily = new AttributeFamily();
+        $attributeFamily->setEntityClass('SomeClass');
         $names = ['sample_field_1'];
 
         $defaultValue = 'sample_value';
@@ -162,7 +169,10 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
             ->getMockForAbstractClass();
         $this->entityManager->expects(self::once())
             ->method('createQuery')
-            ->with('UPDATE SET entity.sample_field_1 = :sample_field_1 WHERE entity.attributeFamily = :attributeFamily')
+            ->with(
+                'UPDATE SomeClass entity SET entity.sample_field_1 = :sample_field_1 ' .
+                'WHERE entity.attributeFamily = :attributeFamily'
+            )
             ->willReturn($query);
 
         $query->expects(self::once())
@@ -189,6 +199,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
     public function testRemoveAttributeValuesWhenAttributeIsFieldAndNoDefaultNotNullable(): void
     {
         $attributeFamily = new AttributeFamily();
+        $attributeFamily->setEntityClass('SomeClass');
         $names = ['sample_field_1'];
 
         $this->classMetadata->fieldMappings[$names[0]] = ['type' => 'integer'];
@@ -200,7 +211,10 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
             ->getMockForAbstractClass();
         $this->entityManager->expects(self::once())
             ->method('createQuery')
-            ->with('UPDATE SET entity.sample_field_1 = :sample_field_1 WHERE entity.attributeFamily = :attributeFamily')
+            ->with(
+                'UPDATE SomeClass entity SET entity.sample_field_1 = :sample_field_1 ' .
+                'WHERE entity.attributeFamily = :attributeFamily'
+            )
             ->willReturn($query);
 
         $query->expects(self::once())
@@ -227,6 +241,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
     public function testRemoveAttributeValuesWhenAttributeIsFieldAndNoDefaultNotNullableNoDbalDefault(): void
     {
         $attributeFamily = new AttributeFamily();
+        $attributeFamily->setEntityClass('SomeClass');
         $names = ['sample_field_1'];
 
         $this->classMetadata->fieldMappings[$names[0]] = ['type' => 'unsupported_type'];
@@ -240,6 +255,7 @@ class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
     public function testRemoveAttributeValuesWhenNoFieldOrAssociation(): void
     {
         $attributeFamily = new AttributeFamily();
+        $attributeFamily->setEntityClass('SomeClass');
         $names = ['sample_field_1'];
 
         $this->entityManager->expects(self::never())

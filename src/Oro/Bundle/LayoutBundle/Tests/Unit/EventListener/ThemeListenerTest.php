@@ -85,7 +85,7 @@ class ThemeListenerTest extends \PHPUnit\Framework\TestCase
         return new RequestEvent(
             $this->createMock(HttpKernelInterface::class),
             new Request($query, [], $attributes),
-            HttpKernelInterface::MASTER_REQUEST
+            HttpKernelInterface::MAIN_REQUEST
         );
     }
 

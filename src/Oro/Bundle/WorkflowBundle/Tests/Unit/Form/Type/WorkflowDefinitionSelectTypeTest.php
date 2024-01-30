@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -10,6 +11,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
@@ -23,13 +25,13 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
 
     private const WORKFLOW_ENTITY_NAME = 'stdClass';
 
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowRegistry|MockObject */
     private $workflowRegistry;
 
     /** @var WorkflowDefinition[] */
     private $definitions = [];
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|MockObject */
     private $translator;
 
     /** @var WorkflowDefinitionSelectType */
@@ -143,7 +145,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
             ],
             [
                 [
-                    'class' => 'OroWorkflowBundle:WorkflowStep',
+                    'class' => WorkflowStep::class,
                     'choice_label' => 'label'
                 ]
             ]

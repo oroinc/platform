@@ -39,7 +39,7 @@ class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
             ->method('setDefaults')
             ->with($this->isType('array'))
             ->willReturnCallback(
-                function (array $options) {
+                function (array $options) use ($optionsResolver) {
                     $this->assertArrayHasKey('autocomplete_alias', $options);
                     $this->assertEquals('oro_localization_parent', $options['autocomplete_alias']);
 
@@ -51,6 +51,8 @@ class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
                         ],
                         $options['configs']
                     );
+
+                    return $optionsResolver;
                 }
             );
 

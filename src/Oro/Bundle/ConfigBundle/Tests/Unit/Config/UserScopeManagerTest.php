@@ -83,7 +83,7 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
         $token = $this->createMock(TokenInterface::class);
         $token->expects(self::once())
             ->method('getUser')
-            ->willReturn('test user');
+            ->willReturn(new User());
         $this->securityContext->expects(self::once())
             ->method('getToken')
             ->willReturn($token);

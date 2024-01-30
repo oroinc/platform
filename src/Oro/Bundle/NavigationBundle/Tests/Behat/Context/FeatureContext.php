@@ -244,7 +244,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     protected function getPageTransitionCount(EntityManager $em)
     {
         /** @var HistoryItemRepository $repository */
-        $repository = $em->getRepository('OroNavigationBundle:NavigationHistoryItem');
+        $repository = $em->getRepository(NavigationHistoryItem::class);
 
         return array_sum(array_map(function (NavigationHistoryItem $item) use ($em) {
             $em->detach($item);
@@ -262,7 +262,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     protected function getLastPersistedPage(EntityManager $em)
     {
         /** @var HistoryItemRepository $repository */
-        $repository = $em->getRepository('OroNavigationBundle:NavigationHistoryItem');
+        $repository = $em->getRepository(NavigationHistoryItem::class);
         $lastAddedPage = $repository->findOneBy([], ['visitedAt' => 'DESC']);
 
         return $lastAddedPage;

@@ -18,6 +18,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class AclHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -81,7 +82,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
     {
         $user = new User(1);
         $org = new Organization(2);
-        $token = new UsernamePasswordOrganizationToken($user, '', 'main', $org);
+        $token = new UsernamePasswordOrganizationToken($user, 'main', $org);
         $this->tokenStorage->setToken($token);
 
         $query = new Query($this->em);
@@ -107,12 +108,13 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
     {
         $org = new Organization(2);
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
+        $user = $this->createMock(UserInterface::class);
         $token->expects($this->any())
             ->method('getOrganization')
             ->willReturn($org);
         $token->expects($this->any())
             ->method('getUser')
-            ->willReturn('anonymous');
+            ->willReturn($user);
         $this->tokenStorage->setToken($token);
 
         $query = new Query($this->em);

@@ -56,7 +56,7 @@ class NoteManager
     public function getList(string $entityClass, int $entityId, string $sorting)
     {
         /** @var NoteRepository $repo */
-        $repo = $this->em->getRepository('OroNoteBundle:Note');
+        $repo = $this->em->getRepository(Note::class);
         $qb   = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId)
             ->orderBy('note.createdAt', QueryBuilderUtil::getSortOrder($sorting));
 

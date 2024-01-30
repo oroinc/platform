@@ -128,7 +128,7 @@ HELP
             $io->text([
                 \sprintf(
                     'To login as <info>%s</info> open the following URL (expires <info>%s</info>):',
-                    $user->getUsername(),
+                    $user->getUserIdentifier(),
                     $this->dateTimeFormatter->format(
                         $impersonation->getExpireAt(),
                         \IntlDateFormatter::MEDIUM,

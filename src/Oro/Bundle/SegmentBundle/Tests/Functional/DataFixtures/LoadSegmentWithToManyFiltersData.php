@@ -7,11 +7,10 @@ use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 
 class LoadSegmentWithToManyFiltersData extends AbstractLoadSegmentData
 {
-    const SEGMENT_FILTER_NO_GROUP = 'segment_filter_no_group';
-    const SEGMENT_FILTER_GROUP = 'segment_filter_group';
+    public const SEGMENT_FILTER_NO_GROUP = 'segment_filter_no_group';
+    public const SEGMENT_FILTER_GROUP = 'segment_filter_group';
 
-    /** @var array */
-    protected static $segments = [
+    private static array $segments = [
         self::SEGMENT_FILTER_NO_GROUP => [
             'name' => 'Segment1',
             'description' => 'Segment1',
@@ -95,7 +94,7 @@ class LoadSegmentWithToManyFiltersData extends AbstractLoadSegmentData
     ];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getSegmentsData(): array
     {

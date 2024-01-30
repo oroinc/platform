@@ -7,23 +7,25 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
+class UserImapConfigSubscriberTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|MockObject */
     private $tokenAccessor;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|MockObject */
     private $manager;
 
     /** @var RequestStack */
     private $requestStack;
 
-    /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormEvent|MockObject */
     private $eventMock;
 
     /** @var UserImapConfigSubscriber */
@@ -72,7 +74,7 @@ class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->manager->expects($this->once())
             ->method('find')
-            ->with('OroUserBundle:User', $id)
+            ->with(User::class, $id)
             ->willReturn($user);
 
         $this->eventMock->expects($this->once())

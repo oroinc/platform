@@ -40,10 +40,10 @@ class EntityType extends AbstractType
                     new Assert\Length(
                         [
                             'min' => 5,
-                            'max' => $this->nameGenerator->getMaxCustomEntityNameSize(),
-                            'allowEmptyString' => false,
+                            'max' => $this->nameGenerator->getMaxCustomEntityNameSize()
                         ]
                     ),
+                    new Assert\NotBlank()
                 ],
             ]
         );

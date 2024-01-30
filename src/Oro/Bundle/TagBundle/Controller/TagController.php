@@ -31,7 +31,7 @@ class TagController extends AbstractController
      * @Acl(
      *      id="oro_tag_view",
      *      type="entity",
-     *      class="OroTagBundle:Tag",
+     *      class="Oro\Bundle\TagBundle\Entity\Tag",
      *      permission="VIEW"
      * )
      * @Template
@@ -48,7 +48,7 @@ class TagController extends AbstractController
      * @Acl(
      *      id="oro_tag_create",
      *      type="entity",
-     *      class="OroTagBundle:Tag",
+     *      class="Oro\Bundle\TagBundle\Entity\Tag",
      *      permission="CREATE"
      * )
      * @Template("@OroTag/Tag/update.html.twig")
@@ -63,7 +63,7 @@ class TagController extends AbstractController
      * @Acl(
      *      id="oro_tag_update",
      *      type="entity",
-     *      class="OroTagBundle:Tag",
+     *      class="Oro\Bundle\TagBundle\Entity\Tag",
      *      permission="EDIT"
      * )
      * @Template
@@ -83,7 +83,7 @@ class TagController extends AbstractController
         // path to datagrid subrequest
         $from = $request->get('from');
 
-        $provider       = $this->get(StatisticProvider::class);
+        $provider       = $this->container->get(StatisticProvider::class);
         $groupedResults = $provider->getTagEntitiesStatistic($entity);
         $selectedResult = null;
 
@@ -109,18 +109,18 @@ class TagController extends AbstractController
      */
     protected function update(Tag $entity, Request $request)
     {
-        if ($this->get(TagHandler::class)->process($entity)) {
+        if ($this->container->get(TagHandler::class)->process($entity)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.tag.controller.tag.saved.message')
+                $this->container->get(TranslatorInterface::class)->trans('oro.tag.controller.tag.saved.message')
             );
 
-            return $this->get(Router::class)->redirect($entity);
+            return $this->container->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity' => $entity,
-            'form' => $this->get('oro_tag.form.tag')->createView(),
+            'form' => $this->container->get('oro_tag.form.tag')->createView(),
         ];
     }
 

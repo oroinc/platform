@@ -27,7 +27,7 @@ class GridViewController extends RestController
      * @Acl(
      *     id="oro_datagrid_gridview_create",
      *     type="entity",
-     *     class="OroDataGridBundle:GridView",
+     *     class="Oro\Bundle\DataGridBundle\Entity\GridView",
      *     permission="CREATE"
      * )
      */
@@ -54,7 +54,7 @@ class GridViewController extends RestController
      * @Acl(
      *     id="oro_datagrid_gridview_update",
      *     type="entity",
-     *     class="OroDataGridBundle:GridView",
+     *     class="Oro\Bundle\DataGridBundle\Entity\GridView",
      *     permission="EDIT"
      * )
      */
@@ -81,7 +81,7 @@ class GridViewController extends RestController
      * @Acl(
      *     id="oro_datagrid_gridview_delete",
      *     type="entity",
-     *     class="OroDataGridBundle:GridView",
+     *     class="Oro\Bundle\DataGridBundle\Entity\GridView",
      *     permission="DELETE"
      * )
      */
@@ -111,7 +111,7 @@ class GridViewController extends RestController
      * @Acl(
      *     id="oro_datagrid_gridview_view",
      *     type="entity",
-     *     class="OroDataGridBundle:GridView",
+     *     class="Oro\Bundle\DataGridBundle\Entity\GridView",
      *     permission="VIEW"
      * )
      */
@@ -182,7 +182,7 @@ class GridViewController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_datagrid.form.grid_view.api');
+        return $this->container->get('oro_datagrid.form.grid_view.api');
     }
 
     /**
@@ -190,7 +190,7 @@ class GridViewController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_datagrid.grid_view.form.handler.api');
+        return $this->container->get('oro_datagrid.grid_view.form.handler.api');
     }
 
     /**
@@ -198,6 +198,6 @@ class GridViewController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_datagrid.grid_view.manager.api');
+        return $this->container->get('oro_datagrid.grid_view.manager.api');
     }
 }

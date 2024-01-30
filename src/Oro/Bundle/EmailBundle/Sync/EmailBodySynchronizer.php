@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -118,7 +119,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                 }
             }
 
-            $emailIds = $this->doctrine->getRepository('OroEmailBundle:Email')->getEmailIdsWithoutBody($batchSize);
+            $emailIds = $this->doctrine->getRepository(Email::class)->getEmailIdsWithoutBody($batchSize);
             if (count($emailIds) === 0) {
                 $this->logger->info('All emails was processed');
                 break;
@@ -211,7 +212,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                 ['exception' => $e]
             );
             $notifications[] = EmailSyncNotificationAlert::createForRefreshTokenFail();
-        } catch (\Doctrine\ORM\NoResultException $e) {
+        } catch (NoResultException $e) {
             $this->logger->notice(
                 sprintf(
                     'Attempt to load email body failed. Email id: %d. Error: %s',

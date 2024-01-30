@@ -49,6 +49,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
         [
             $resolveClassPass,
             $registerAutoconfigureAttributesPass,
+            $autowireAsDecoratorPass,
             $attributeAutoconfigurationPass,
             $resolveInstanceOfConditionalsPass,
             $registerEnvVarsProcessorsPass,
@@ -61,6 +62,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             [
                 $resolveClassPass,
                 $registerAutoconfigureAttributesPass,
+                $autowireAsDecoratorPass,
                 $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
@@ -95,6 +97,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
         [
             $resolveClassPass,
             $registerAutoconfigureAttributesPass,
+            $autowireAsDecoratorPass,
             $attributeAutoconfigurationPass,
             $resolveInstanceOfConditionalsPass,
             $registerEnvVarsProcessorsPass,
@@ -111,6 +114,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             [
                 $resolveClassPass,
                 $registerAutoconfigureAttributesPass,
+                $autowireAsDecoratorPass,
                 $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
@@ -128,6 +132,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
         [
             $resolveClassPass,
             $registerAutoconfigureAttributesPass,
+            $autowireAsDecoratorPass,
             $attributeAutoconfigurationPass,
             $resolveInstanceOfConditionalsPass,
             $registerEnvVarsProcessorsPass,
@@ -145,6 +150,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             [
                 $resolveClassPass,
                 $registerAutoconfigureAttributesPass,
+                $autowireAsDecoratorPass,
                 $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
@@ -162,6 +168,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
         [
             $resolveClassPass,
             $registerAutoconfigureAttributesPass,
+            $autowireAsDecoratorPass,
             $attributeAutoconfigurationPass,
             $resolveInstanceOfConditionalsPass,
             $registerEnvVarsProcessorsPass,
@@ -177,6 +184,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             [
                 $resolveClassPass,
                 $registerAutoconfigureAttributesPass,
+                $autowireAsDecoratorPass,
                 $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
@@ -193,6 +201,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
         [
             $resolveClassPass,
             $registerAutoconfigureAttributesPass,
+            $autowireAsDecoratorPass,
             $attributeAutoconfigurationPass,
             $resolveInstanceOfConditionalsPass,
             $registerEnvVarsProcessorsPass,
@@ -210,6 +219,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             [
                 $resolveClassPass,
                 $registerAutoconfigureAttributesPass,
+                $autowireAsDecoratorPass,
                 $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
@@ -256,6 +266,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
         [
             $resolveClassPass,
             $registerAutoconfigureAttributesPass,
+            $autowireAsDecoratorPass,
             $attributeAutoconfigurationPass,
             $resolveInstanceOfConditionalsPass,
             $registerEnvVarsProcessorsPass,
@@ -271,6 +282,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             [
                 $resolveClassPass,
                 $registerAutoconfigureAttributesPass,
+                $autowireAsDecoratorPass,
                 $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
@@ -287,6 +299,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
         [
             $resolveClassPass,
             $registerAutoconfigureAttributesPass,
+            $autowireAsDecoratorPass,
             $attributeAutoconfigurationPass,
             $resolveInstanceOfConditionalsPass,
             $registerEnvVarsProcessorsPass,
@@ -302,6 +315,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             [
                 $resolveClassPass,
                 $registerAutoconfigureAttributesPass,
+                $autowireAsDecoratorPass,
                 $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
@@ -318,6 +332,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
         [
             $resolveClassPass,
             $registerAutoconfigureAttributesPass,
+            $autowireAsDecoratorPass,
             $attributeAutoconfigurationPass,
             $resolveInstanceOfConditionalsPass,
             $registerEnvVarsProcessorsPass,
@@ -337,6 +352,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             [
                 $resolveClassPass,
                 $registerAutoconfigureAttributesPass,
+                $autowireAsDecoratorPass,
                 $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,
@@ -354,6 +370,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
         [
             $resolveClassPass,
             $registerAutoconfigureAttributesPass,
+            $autowireAsDecoratorPass,
             $attributeAutoconfigurationPass,
             $resolveInstanceOfConditionalsPass,
             $registerEnvVarsProcessorsPass,
@@ -373,6 +390,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
             [
                 $resolveClassPass,
                 $registerAutoconfigureAttributesPass,
+                $autowireAsDecoratorPass,
                 $attributeAutoconfigurationPass,
                 $resolveInstanceOfConditionalsPass,
                 $registerEnvVarsProcessorsPass,

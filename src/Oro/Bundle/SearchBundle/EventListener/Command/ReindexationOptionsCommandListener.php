@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\EventListener\Command;
 
 use Oro\Bundle\InstallerBundle\Command\PlatformUpdateCommand;
-use Oro\Component\PhpUtils\ReflectionUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -35,13 +34,15 @@ class ReindexationOptionsCommandListener
 
     private function isHelpForPlatformUpdateCommand(Command $helpCommand, InputInterface $input): bool
     {
-        $commandProperty = ReflectionUtil::getProperty(new \ReflectionClass($helpCommand), 'command');
-        if (null !== $commandProperty) {
-            $commandProperty->setAccessible(true);
-            $innerCommand = $commandProperty->getValue($helpCommand);
-            if (null !== $innerCommand) {
-                return $innerCommand instanceof PlatformUpdateCommand;
-            }
+        $innerCommand = null;
+
+        $innerCommandName = $input->getArgument('command_name');
+        if ($innerCommandName && $helpCommand->getApplication()->has($innerCommandName)) {
+            $innerCommand = $helpCommand->getApplication()->find($innerCommandName);
+        }
+
+        if (null !== $innerCommand) {
+            return $innerCommand instanceof PlatformUpdateCommand;
         }
 
         return false !== $input->getParameterOption(PlatformUpdateCommand::getDefaultName());

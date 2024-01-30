@@ -1,0 +1,4 @@
+services:
+  Twig\Environment:
+    public: true
+    alias: 'twig'

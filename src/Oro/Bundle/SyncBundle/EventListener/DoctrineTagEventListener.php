@@ -40,7 +40,7 @@ class DoctrineTagEventListener implements OptionalListenerInterface, ServiceSubs
             return;
         }
 
-        $uow = $event->getEntityManager()->getUnitOfWork();
+        $uow = $event->getObjectManager()->getUnitOfWork();
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             $this->addEntityTags($entity, true);
         }

@@ -36,7 +36,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('stdclass', $id->getIdentifier());
         $this->assertEquals(ObjectIdentityFactory::ROOT_IDENTITY_TYPE, $id->getType());
 
-        $id = $this->factory->root($this->factory->get('Entity: Test:TestEntity'));
+        $id = $this->factory->root($this->factory->get('Entity:' . TestEntity::class));
         $this->assertEquals('entity', $id->getIdentifier());
         $this->assertEquals(ObjectIdentityFactory::ROOT_IDENTITY_TYPE, $id->getType());
 
@@ -195,10 +195,9 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
     public static function getProvider(): array
     {
         return [
-            'Entity'              => ['Entity:Test:TestEntity', 'entity', TestEntity::class],
-            'Entity (whitespace)' => ['Entity: Test:TestEntity', 'entity', TestEntity::class],
-            'ENTITY'              => ['ENTITY:Test:TestEntity', 'entity', TestEntity::class],
-            'Entity (class name)' => ['Entity: ' . TestEntity::class, 'entity', TestEntity::class],
+            'Entity'              => ['Entity:' . TestEntity::class, 'entity', TestEntity::class],
+            'Entity (whitespace)' => ['Entity: ' . TestEntity::class, 'entity', TestEntity::class],
+            'ENTITY'              => ['ENTITY:' . TestEntity::class, 'entity', TestEntity::class],
             'Action'              => ['Action:Some Action', 'action', 'Some Action'],
             'Action (whitespace)' => ['Action: Some Action', 'action', 'Some Action'],
             'ACTION'              => ['ACTION:Some Action', 'action', 'Some Action'],

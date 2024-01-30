@@ -6,6 +6,8 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Filter\EmailStringFilter;
@@ -162,8 +164,8 @@ class EmailQueryFactory
      *
      * o0_.id IN (
      *  SELECT max(u.id)
-     *  FROM OroEmailBundle:EmailUser as u
-     *  INNER JOIN OroEmailBundle:Email as m on u.email_id = m.id
+     *  FROM Oro\Bundle\EmailBundle\Entity\EmailUser as u
+     *  INNER JOIN Oro\Bundle\EmailBundle\Entity\Email as m on u.email_id = m.id
      *  WHERE
      *    m.thread_id is not null
      *    AND (
@@ -189,8 +191,8 @@ class EmailQueryFactory
         $innerQb = $qb->getEntityManager()->createQueryBuilder();
         $innerQb
             ->select('MAX(u.id)')
-            ->from('OroEmailBundle:EmailUser', 'u')
-            ->innerJoin('OroEmailBundle:Email', 'm', 'WITH', 'u.email = m.id')
+            ->from(EmailUser::class, 'u')
+            ->innerJoin(Email::class, 'm', 'WITH', 'u.email = m.id')
             ->where(
                 $innerQb->expr()->andX(
                     $innerQb->expr()->isNotNull('m.thread'),
@@ -219,8 +221,8 @@ class EmailQueryFactory
             $filterExpressions->addMultiple($threadedExpressions);
             $filterQb
                 ->select('IDENTITY(mm.thread)')
-                ->from('OroEmailBundle:EmailUser', 'uu')
-                ->innerJoin('OroEmailBundle:Email', 'mm', 'WITH', 'uu.email = mm.id')
+                ->from(EmailUser::class, 'uu')
+                ->innerJoin(Email::class, 'mm', 'WITH', 'uu.email = mm.id')
                 ->where($filterExpressions);
 
             list(
@@ -285,8 +287,8 @@ class EmailQueryFactory
             $innerQb = $qb->getEntityManager()->createQueryBuilder();
             $innerQb
                 ->select('COUNT(emailUser.id)')
-                ->from('OroEmailBundle:EmailUser', 'emailUser')
-                ->innerJoin('OroEmailBundle:Email', 'email', 'WITH', 'emailUser.email = email.id')
+                ->from(EmailUser::class, 'emailUser')
+                ->innerJoin(Email::class, 'email', 'WITH', 'emailUser.email = email.id')
                 ->where(
                     $innerQb->expr()->andX(
                         $innerQb->expr()->isNotNull('e.thread'),

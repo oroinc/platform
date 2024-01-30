@@ -52,7 +52,8 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
         $session->expects(self::once())
             ->method('getName')
             ->willReturn(self::SESSION_NAME);
-        $session->expects(self::never())->method('set');
+        $session->expects(self::never())
+            ->method('set');
         $event->getRequest()->setSession($session);
 
         $listener = $this->createExceptionListener(true);

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
@@ -36,7 +37,7 @@ class EmailTemplateController extends AbstractController
      * @Acl(
      *      id="oro_email_emailtemplate_index",
      *      type="entity",
-     *      class="OroEmailBundle:EmailTemplate",
+     *      class="Oro\Bundle\EmailBundle\Entity\EmailTemplate",
      *      permission="VIEW"
      * )
      * @Template("@OroEmail/EmailTemplate/index.html.twig")
@@ -53,7 +54,7 @@ class EmailTemplateController extends AbstractController
      * @Acl(
      *      id="oro_email_emailtemplate_update",
      *      type="entity",
-     *      class="OroEmailBundle:EmailTemplate",
+     *      class="Oro\Bundle\EmailBundle\Entity\EmailTemplate",
      *      permission="EDIT"
      * )
      * @Template("@OroEmail/EmailTemplate/update.html.twig")
@@ -68,7 +69,7 @@ class EmailTemplateController extends AbstractController
      * @Acl(
      *      id="oro_email_emailtemplate_create",
      *      type="entity",
-     *      class="OroEmailBundle:EmailTemplate",
+     *      class="Oro\Bundle\EmailBundle\Entity\EmailTemplate",
      *      permission="CREATE"
      * )
      * @Template("@OroEmail/EmailTemplate/update.html.twig")
@@ -93,7 +94,7 @@ class EmailTemplateController extends AbstractController
      * @Acl(
      *      id="oro_email_emailtemplate_preview",
      *      type="entity",
-     *      class="OroEmailBundle:EmailTemplate",
+     *      class="Oro\Bundle\EmailBundle\Entity\EmailTemplate",
      *      permission="VIEW"
      * )
      * @Template("@OroEmail/EmailTemplate/preview.html.twig")
@@ -106,11 +107,11 @@ class EmailTemplateController extends AbstractController
         if (!$id) {
             $emailTemplate = new EmailTemplate();
         } else {
-            $emailTemplate = $this->getDoctrine()->getRepository(EmailTemplate::class)->find($id);
+            $emailTemplate = $this->container->get('doctrine')->getRepository(EmailTemplate::class)->find($id);
         }
 
         /** @var FormInterface $form */
-        $form = $this->get('oro_email.form.emailtemplate');
+        $form = $this->container->get('oro_email.form.emailtemplate');
         $form->setData($emailTemplate);
 
         if (in_array($request->getMethod(), array('POST', 'PUT'))) {
@@ -119,11 +120,11 @@ class EmailTemplateController extends AbstractController
 
         $localization = $form->get('activeLocalization')->getData();
         $localizedTemplate = $localization
-            ? $this->get(EmailTemplateContentProvider::class)
+            ? $this->container->get(EmailTemplateContentProvider::class)
                 ->getLocalizedModel($emailTemplate, $localization)
             : $emailTemplate;
 
-        $templateRendered = $this->get(EmailRenderer::class)->compilePreview($localizedTemplate);
+        $templateRendered = $this->container->get(EmailRenderer::class)->compilePreview($localizedTemplate);
 
         return [
             'content'     => $templateRendered,
@@ -139,18 +140,19 @@ class EmailTemplateController extends AbstractController
      */
     protected function update(EmailTemplate $entity, Request $request, $isClone = false)
     {
-        if ($this->get(EmailTemplateHandler::class)->process($entity)) {
+        if ($this->container->get(EmailTemplateHandler::class)->process($entity)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.email.controller.emailtemplate.saved.message')
+                $this->container->get(TranslatorInterface::class)
+                    ->trans('oro.email.controller.emailtemplate.saved.message')
             );
 
-            return $this->get(Router::class)->redirect($entity);
+            return $this->container->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity'  => $entity,
-            'form'    => $this->get('oro_email.form.emailtemplate')->createView(),
+            'form'    => $this->container->get('oro_email.form.emailtemplate')->createView(),
             'isClone' => $isClone
         ];
     }
@@ -169,6 +171,7 @@ class EmailTemplateController extends AbstractController
                 Router::class,
                 'oro_email.form.emailtemplate' => Form::class,
                 EmailTemplateHandler::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

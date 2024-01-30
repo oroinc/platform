@@ -64,6 +64,11 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
         return $this->doGetConfig();
     }
 
+    public function loadAndGetConfig(ResourcesContainerInterface $resourcesContainer): array
+    {
+        return $this->doLoadConfig($resourcesContainer);
+    }
+
     /**
      * {@inheritdoc}
      */

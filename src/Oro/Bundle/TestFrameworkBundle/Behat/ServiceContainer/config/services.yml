@@ -1,4 +1,7 @@
 services:
+    oro_test.filesystem:
+        class: Symfony\Component\Filesystem\Filesystem
+
     oro_test.fixtures.reflection_property_accessor:
         class: Nelmio\Alice\PropertyAccess\ReflectionPropertyAccessor
         public: false
@@ -22,6 +25,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\JobStatusSubscriber
         arguments:
             - '@fob_symfony.kernel'
+            - '@oro_test.filesystem'
         tags:
             - { name: 'event_dispatcher.subscriber' }
 

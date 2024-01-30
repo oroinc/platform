@@ -659,9 +659,9 @@ class Configuration implements ConfigurationInterface
                             ->info('The name of the feature.')
                             ->cannotBeEmpty()
                         ->end()
-                        ->arrayNode('feature_firewall_listeners')
+                        ->arrayNode('feature_firewall_authenticators')
                             ->info(
-                                'The list of security firewall listeners that should be removed'
+                                'The list of security firewall authenticators that should be disabled'
                                 . ' if the feature is disabled.'
                             )
                             ->prototype('scalar')->cannotBeEmpty()->end()

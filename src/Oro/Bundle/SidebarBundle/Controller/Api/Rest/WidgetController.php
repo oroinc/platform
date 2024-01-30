@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SidebarBundle\Controller\Api\Rest;
 
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
@@ -36,7 +37,7 @@ class WidgetController extends AbstractFOSRestController
         if ($token instanceof OrganizationAwareTokenInterface) {
             $organization = $token->getOrganization();
             $items = $this->getRepository()->getWidgets($this->getUser(), $placement, $organization);
-            $featureChecker = $this->get('oro_featuretoggle.checker.feature_checker');
+            $featureChecker = $this->container->get('oro_featuretoggle.checker.feature_checker');
             $items = array_filter(
                 $items,
                 function ($item) use ($featureChecker) {
@@ -166,7 +167,7 @@ class WidgetController extends AbstractFOSRestController
      */
     protected function validatePermissions(UserInterface $user)
     {
-        return $user->getUsername() === $this->getUser()->getUsername();
+        return $user->getUserIdentifier() === $this->getUser()->getUserIdentifier();
     }
 
     /**
@@ -176,7 +177,7 @@ class WidgetController extends AbstractFOSRestController
      */
     protected function getManager()
     {
-        return $this->getDoctrine()->getManagerForClass($this->getWidgetClass());
+        return $this->container->get('doctrine')->getManagerForClass($this->getWidgetClass());
     }
 
     /**
@@ -193,5 +194,13 @@ class WidgetController extends AbstractFOSRestController
     protected function getWidgetClass()
     {
         return \Oro\Bundle\SidebarBundle\Entity\Widget::class;
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            ['doctrine' => ManagerRegistry::class]
+        );
     }
 }

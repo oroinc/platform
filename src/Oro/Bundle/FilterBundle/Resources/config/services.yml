@@ -5,7 +5,6 @@ services:
     oro_filter.extension.orm_filter:
         class: Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension
         arguments:
-            - '@oro_datagrid.configuration.provider.raw'
             - '@oro_filter.extension.orm_filter_bag'
             - '@oro_filter.provider.datagrid_filters'
             - '@oro_filter.provider.filters_metadata'

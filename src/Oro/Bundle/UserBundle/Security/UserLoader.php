@@ -38,7 +38,7 @@ class UserLoader implements UserLoaderInterface
      */
     public function loadUser(string $login): ?UserInterface
     {
-        $user = $this->loadUserByUsername($login);
+        $user = $this->loadUserByIdentifier($login);
         if (!$user && filter_var($login, FILTER_VALIDATE_EMAIL)) {
             $user = $this->loadUserByEmail($login);
         }
@@ -49,7 +49,7 @@ class UserLoader implements UserLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadUserByUsername(string $username): ?UserInterface
+    public function loadUserByIdentifier(string $username): ?UserInterface
     {
         return $this->getRepository()->findOneBy(['username' => $username]);
     }

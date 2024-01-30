@@ -88,4 +88,9 @@ class RegularUser implements UserInterface
     public function eraseCredentials()
     {
     }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->getUsername();
+    }
 }

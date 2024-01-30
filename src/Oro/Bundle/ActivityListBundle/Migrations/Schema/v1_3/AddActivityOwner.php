@@ -9,29 +9,9 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class AddActivityOwner implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::addActivityOwner($schema);
-    }
-
-    /**
-     * Adds Activity Owner
-     */
-    public static function addActivityOwner(Schema $schema)
-    {
-        /** Tables generation **/
-        self::createOroActivityOwnerTable($schema);
-
-        /** Foreign keys generation **/
-        self::addOroActivityOwnerForeignKeys($schema);
-    }
-
-    /**
-     * Create oro_activity_owner table
-     */
-    protected static function createOroActivityOwnerTable(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->createTable('oro_activity_owner');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -42,15 +22,7 @@ class AddActivityOwner implements Migration
         $table->addUniqueIndex(['activity_id', 'user_id'], 'UNQ_activity_owner');
         $table->addIndex(['activity_id']);
         $table->addIndex(['organization_id']);
-        $table->addIndex(['user_id'], 'idx_oro_activity_owner_user_id', []);
-    }
-
-    /**
-     * Add oro_activity_owner foreign keys.
-     */
-    protected static function addOroActivityOwnerForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('oro_activity_owner');
+        $table->addIndex(['user_id'], 'idx_oro_activity_owner_user_id');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_id'],

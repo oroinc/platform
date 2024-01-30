@@ -30,7 +30,7 @@ class TaxonomyController extends AbstractController
      * @Acl(
      *      id="oro_taxonomy_view",
      *      type="entity",
-     *      class="OroTagBundle:Taxonomy",
+     *      class="Oro\Bundle\TagBundle\Entity\Taxonomy",
      *      permission="VIEW"
      * )
      * @Template
@@ -47,7 +47,7 @@ class TaxonomyController extends AbstractController
      * @Acl(
      *      id="oro_taxonomy_create",
      *      type="entity",
-     *      class="OroTagBundle:Taxonomy",
+     *      class="Oro\Bundle\TagBundle\Entity\Taxonomy",
      *      permission="CREATE"
      * )
      * @Template("@OroTag/Taxonomy/update.html.twig")
@@ -62,7 +62,7 @@ class TaxonomyController extends AbstractController
      * @Acl(
      *      id="oro_taxonomy_update",
      *      type="entity",
-     *      class="OroTagBundle:Taxonomy",
+     *      class="Oro\Bundle\TagBundle\Entity\Taxonomy",
      *      permission="EDIT"
      * )
      * @Template
@@ -77,7 +77,7 @@ class TaxonomyController extends AbstractController
      * @Acl(
      *      id="oro_taxonomy_view",
      *      type="entity",
-     *      class="OroTagBundle:Taxonomy",
+     *      class="Oro\Bundle\TagBundle\Entity\Taxonomy",
      *      permission="VIEW"
      * )
      * @Template
@@ -108,18 +108,18 @@ class TaxonomyController extends AbstractController
      */
     protected function update(Taxonomy $entity, Request $request)
     {
-        if ($this->get(TaxonomyHandler::class)->process($entity)) {
+        if ($this->container->get(TaxonomyHandler::class)->process($entity)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.taxonomy.controller.saved.message')
+                $this->container->get(TranslatorInterface::class)->trans('oro.taxonomy.controller.saved.message')
             );
 
-            return $this->get(Router::class)->redirect($entity);
+            return $this->container->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity' => $entity,
-            'form' => $this->get('oro_tag.form.taxonomy')->createView(),
+            'form' => $this->container->get('oro_tag.form.taxonomy')->createView(),
         ];
     }
 

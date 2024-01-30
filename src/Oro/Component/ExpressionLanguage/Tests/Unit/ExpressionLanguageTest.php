@@ -41,10 +41,10 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
         $cacheItem->expects(self::once())
             ->method('set')
             ->with(self::isInstanceOf(ParsedExpression::class))
-            ->willReturnCallback(static function ($expression) use (&$savedParsedExpression) {
+            ->willReturnCallback(static function ($expression) use (&$savedParsedExpression, $cacheItem) {
                 $savedParsedExpression = $expression;
 
-                return true;
+                return $cacheItem;
             });
         $cache->expects(self::once())
             ->method('save')
@@ -159,8 +159,10 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
         $cacheItem->expects(self::once())
             ->method('set')
             ->with(self::isInstanceOf(ParsedExpression::class))
-            ->willReturnCallback(static function ($expression) use (&$savedParsedExpressions, $key) {
+            ->willReturnCallback(static function ($expression) use (&$savedParsedExpressions, $key, $cacheItem) {
                 $savedParsedExpressions[$key] = $expression;
+
+                return $cacheItem;
             });
         $cache->expects(self::once())
             ->method('save')

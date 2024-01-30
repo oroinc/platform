@@ -7,31 +7,18 @@ use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
- * OroDigitalAssetBundle installer class:
- * - creates oro_digital_asset table for DigitalAsset entity
- * - adds digitalAsset relation to File entity
- *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class OroDigitalAssetBundleInstaller implements Installation, ExtendExtensionAwareInterface
 {
-    /** @var ExtendExtension */
-    private $extendExtension;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension): void
-    {
-        $this->extendExtension = $extendExtension;
-    }
+    use ExtendExtensionAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -62,12 +49,10 @@ class OroDigitalAssetBundleInstaller implements Installation, ExtendExtensionAwa
     private function createOroDigitalAssetTitleTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_digital_asset_title');
-        $table->addColumn('digital_asset_id', 'integer', []);
-        $table->addColumn('localized_value_id', 'integer', []);
-
-        $table->addIndex(['digital_asset_id'], 'idx_f8bb3b43e52f7284', []);
-
+        $table->addColumn('digital_asset_id', 'integer');
+        $table->addColumn('localized_value_id', 'integer');
         $table->setPrimaryKey(['digital_asset_id', 'localized_value_id']);
+        $table->addIndex(['digital_asset_id'], 'idx_f8bb3b43e52f7284');
         $table->addUniqueIndex(['localized_value_id'], 'uniq_f8bb3b43eb576e89');
     }
 
@@ -78,17 +63,15 @@ class OroDigitalAssetBundleInstaller implements Installation, ExtendExtensionAwa
     {
         $table = $schema->createTable('oro_digital_asset');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('source_file_id', 'integer', []);
+        $table->addColumn('source_file_id', 'integer');
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updated_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
-
-        $table->addIndex(['created_at'], 'created_at_idx', []);
-        $table->addIndex(['user_owner_id'], 'idx_a886b3579eb185f9', []);
-        $table->addIndex(['organization_id'], 'idx_a886b35732c8a3de', []);
-
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['created_at'], 'created_at_idx');
+        $table->addIndex(['user_owner_id'], 'idx_a886b3579eb185f9');
+        $table->addIndex(['organization_id'], 'idx_a886b35732c8a3de');
         $table->addUniqueIndex(['source_file_id'], 'uniq_a886b35793cb796c');
     }
 

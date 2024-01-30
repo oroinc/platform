@@ -72,7 +72,7 @@ class EmailActivitySearchController extends RestGetController
             $filter          = new ChainParameterFilter(
                 [
                     new StringToArrayParameterFilter(),
-                    new EntityClassParameterFilter($this->get('oro_entity.entity_class_name_helper'))
+                    new EntityClassParameterFilter($this->container->get('oro_entity.entity_class_name_helper'))
                 ]
             );
             $filters['from'] = $filter->filter($from, null);
@@ -91,9 +91,10 @@ class EmailActivitySearchController extends RestGetController
 
         $data = $this->getManager()->getSearchResult($limit, $page, $filters);
         foreach ($data['result'] as &$item) {
-            $metadata = $this->get('oro_entity_config.config_manager')->getEntityMetadata($item['entity']);
+            $metadata = $this->container->get('oro_entity_config.config_manager')->getEntityMetadata($item['entity']);
             if ($metadata && $metadata->hasRoute()) {
-                $item['urlView'] = $this->get('router')->generate($metadata->getRoute(), ['id' => $item['id']]);
+                $item['urlView'] = $this->container->get('router')
+                    ->generate($metadata->getRoute(), ['id' => $item['id']]);
             } else {
                 $item['urlView'] = '';
             }

@@ -9,7 +9,9 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class AddColumn implements Migration, OrderedMigrationInterface
 {
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function getOrder()
     {
         return 10;

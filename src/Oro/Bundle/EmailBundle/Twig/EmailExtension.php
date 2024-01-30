@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Twig;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository;
@@ -198,7 +199,7 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
     public function getEmailThreadAttachments($thread)
     {
         /** @var EmailAttachmentRepository $repo */
-        $repo = $this->getRepository('OroEmailBundle:EmailAttachment');
+        $repo = $this->getRepository(EmailAttachment::class);
 
         return $repo->getThreadAttachments($thread);
     }
@@ -290,7 +291,7 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
 
         $currentOrganization = $tokenAccessor->getOrganization();
         /** @var EmailRepository $repo */
-        $repo = $this->getRepository('OroEmailBundle:Email');
+        $repo = $this->getRepository(Email::class);
         $result = $repo->getCountNewEmailsPerFolders($currentUser, $currentOrganization);
         $total = $repo->getCountNewEmails($currentUser, $currentOrganization, null, $this->getAclHelper());
         $result[] = ['num' => $total, 'id' => 0];

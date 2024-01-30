@@ -14,17 +14,17 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class {{ className }} implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return '{{ version }}';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
 {% for table in schema.tables %}
@@ -46,10 +46,8 @@ class {{ className }} implements Installation
 
     /**
      * Create {{ table.name }} table
-     *
-     * @param Schema $schema
      */
-    protected function {{ methodName }}(Schema $schema)
+    private function {{ methodName }}(Schema $schema): void
     {
         $table = $schema->createTable('{{ table.name }}');
 {% for column in table.columns %}
@@ -75,10 +73,8 @@ class {{ className }} implements Installation
 
     /**
      * Add {{ table.name }} foreign keys.
-     *
-     * @param Schema $schema
      */
-    protected function {{ methodName }}(Schema $schema)
+    private function {{ methodName }}(Schema $schema): void
     {
         $table = $schema->getTable('{{ table.name }}');
 {% for foreignKey in table.ForeignKeys %}

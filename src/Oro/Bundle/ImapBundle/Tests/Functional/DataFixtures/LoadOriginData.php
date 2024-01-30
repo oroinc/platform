@@ -6,26 +6,19 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
 class LoadOriginData extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * @var array Channels configuration
-     */
-    protected $data = [
-        [
+    private array $data = [
+        'origin_one' => [
             'mailboxName' => 'Test Mailbox',
-            'reference' => 'origin_one',
             'owner' => LoadUserData::SIMPLE_USER_ENABLED
         ],
-        [
+        'origin_two' => [
             'mailboxName' => 'Test Mailbox 2',
-            'reference' => 'origin_two',
             'folder' => [
                 'name' => 'Folder 1',
                 'type' => 'inbox',
@@ -33,9 +26,8 @@ class LoadOriginData extends AbstractFixture implements DependentFixtureInterfac
             ],
             'owner' => LoadUserData::SIMPLE_USER_ENABLED
         ],
-        [
+        'origin_tree' => [
             'mailboxName' => 'Test Mailbox 3',
-            'reference' => 'origin_tree',
             'owner' => LoadUserData::SIMPLE_USER_DISABLED
         ],
     ];
@@ -43,33 +35,24 @@ class LoadOriginData extends AbstractFixture implements DependentFixtureInterfac
     /**
      * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return [
-            LoadUserData::class
-        ];
+        return [LoadUserData::class, LoadOrganization::class];
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $organization = $manager->getRepository(Organization::class)->getFirst();
-
-        foreach ($this->data as $data) {
+        foreach ($this->data as $reference => $data) {
             $origin = new UserEmailOrigin();
-            $origin->setOrganization($organization);
-            $this->setEntityPropertyValues($origin, $data, ['reference', 'folder']);
-
-            /** @var User $owner */
-            $owner = $this->getReference($data['owner']);
-            $origin->setOwner($owner);
-
-            $this->setReference($data['reference'], $origin);
+            $origin->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
+            $origin->setOwner($this->getReference($data['owner']));
+            $origin->setMailboxName($data['mailboxName']);
+            $this->setReference($reference, $origin);
             $manager->persist($origin);
-
-            if (array_key_exists('folder', $data)) {
+            if (\array_key_exists('folder', $data)) {
                 $folder = new EmailFolder();
                 $folder->setOrigin($origin);
                 $folder->setSyncEnabled($data['folder']['enabled']);
@@ -81,27 +64,9 @@ class LoadOriginData extends AbstractFixture implements DependentFixtureInterfac
                 $imapFolder->setFolder($folder);
                 $imapFolder->setUidValidity(1);
                 $manager->persist($imapFolder);
-
                 $origin->addFolder($folder);
             }
         }
-
         $manager->flush();
-    }
-
-    /**
-     * @param object $entity
-     * @param array $data
-     * @param array $excludeProperties
-     */
-    public function setEntityPropertyValues($entity, array $data, array $excludeProperties = [])
-    {
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-        foreach ($data as $property => $value) {
-            if (in_array($property, $excludeProperties)) {
-                continue;
-            }
-            $propertyAccessor->setValue($entity, $property, $value);
-        }
     }
 }

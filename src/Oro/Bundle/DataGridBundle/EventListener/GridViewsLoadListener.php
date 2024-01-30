@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
@@ -91,7 +92,7 @@ class GridViewsLoadListener
      */
     protected function getGridViewRepository()
     {
-        return $this->registry->getRepository('OroDataGridBundle:GridView');
+        return $this->registry->getRepository(GridView::class);
     }
 
     /**
@@ -124,7 +125,7 @@ class GridViewsLoadListener
                 $view->setDefault($defaultGridView->getName() === $gridView->getName());
             }
             if ($gridView->getOwner() && $gridView->getOwner()->getId() !== $user->getId()) {
-                $view->setSharedBy($gridView->getOwner()->getUsername());
+                $view->setSharedBy($gridView->getOwner()->getUserIdentifier());
             }
             $views[] = $view->getMetadata();
         }

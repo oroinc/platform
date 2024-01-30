@@ -9,19 +9,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class AddActivityDescription implements Migration
 {
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        self::addColumns($schema);
-    }
-
-    /**
-     * Add description to activity list
-     */
-    public static function addColumns(Schema $schema)
-    {
-        $table = $schema->getTable('oro_activity_list');
-        $table->addColumn('description', 'text', ['notnull' => false]);
+        $schema->getTable('oro_activity_list')
+            ->addColumn('description', 'text', ['notnull' => false]);
     }
 }

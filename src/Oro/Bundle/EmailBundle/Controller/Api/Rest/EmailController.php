@@ -136,7 +136,7 @@ class EmailController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_email.form.email.api');
+        return $this->container->get('oro_email.form.email.api');
     }
 
     /**
@@ -144,7 +144,7 @@ class EmailController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_email.form.handler.email.api');
+        return $this->container->get('oro_email.form.handler.email.api');
     }
 
     /**

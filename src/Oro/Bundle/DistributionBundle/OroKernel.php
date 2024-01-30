@@ -10,7 +10,6 @@ use Oro\Bundle\PlatformBundle\Profiler\ProfilerConfig;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
-use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -52,7 +51,7 @@ abstract class OroKernel extends Kernel
     /**
      * {@inheritdoc}
      */
-    protected function initializeBundles()
+    protected function initializeBundles(): void
     {
         // clear state of CumulativeResourceManager
         CumulativeResourceManager::getInstance()->clear();
@@ -285,7 +284,7 @@ abstract class OroKernel extends Kernel
     /**
      * {@inheritdoc}
      */
-    public function boot()
+    public function boot(): void
     {
         $phpVersion = phpversion();
         if (!version_compare($phpVersion, self::REQUIRED_PHP_VERSION, '>=')) {
@@ -303,12 +302,10 @@ abstract class OroKernel extends Kernel
     /**
      * {@inheritdoc}
      */
-    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass): void
     {
         // cache the container
         $dumper = new PhpDumper($container);
-
-        $dumper->setProxyDumper(new ProxyDumper());
 
         $content = $dumper->dump([
             'class' => $class,
@@ -348,8 +345,10 @@ abstract class OroKernel extends Kernel
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function initializeContainer()
+    protected function initializeContainer(): void
     {
+        \Doctrine\Deprecations\Deprecation::disable();
+
         if ($this->getEnvironment() !== 'test') {
             ErrorHandler::register();
         }
@@ -512,7 +511,7 @@ abstract class OroKernel extends Kernel
     /**
      * {@inheritdoc}
      */
-    public function reboot($warmupDir)
+    public function reboot($warmupDir): void
     {
         $this->warmupDir = $warmupDir;
         parent::reboot($warmupDir);

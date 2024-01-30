@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\ContactBundle\Entity\ContactEmail;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
@@ -124,7 +125,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     protected function checkOrganization(EmailHeader $email, $folderType, $organization)
     {
         $helper = new EmailAddressHelper();
-        $repo = $this->em->getRepository('OroContactBundle:ContactEmail');
+        $repo = $this->em->getRepository(ContactEmail::class);
         $qb = $repo->createQueryBuilder('ce');
 
         if ($folderType === FolderType::SENT) {
@@ -307,7 +308,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         if (empty($messageIds)) {
             return $existEmailUsers;
         }
-        $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
+        $emailUserRepository = $this->em->getRepository(EmailUser::class);
         $result              = $emailUserRepository->getEmailUsersByFolderAndMessageIds($folder, $messageIds);
 
         /** @var EmailUser $emailUser */
@@ -345,7 +346,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
 
     protected function initEnv(EmailOrigin $emailOrigin)
     {
-        $this->currentUser = $this->em->getRepository('OroEmailBundle:Mailbox')->findOneByOrigin($emailOrigin);
+        $this->currentUser = $this->em->getRepository(Mailbox::class)->findOneByOrigin($emailOrigin);
         if ($this->currentUser === null) {
             $this->currentUser = $emailOrigin->getOwner() ? $this->em->getReference(
                 'Oro\Bundle\UserBundle\Entity\User',

@@ -13,17 +13,17 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroNotificationBundleInstaller implements Installation
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_7';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroNotificationEmailNotifTable($schema);
@@ -43,7 +43,7 @@ class OroNotificationBundleInstaller implements Installation
     /**
      * Create oro_notification_email_notif table
      */
-    protected function createOroNotificationEmailNotifTable(Schema $schema)
+    private function createOroNotificationEmailNotifTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_notification_email_notif');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -53,13 +53,13 @@ class OroNotificationBundleInstaller implements Installation
         $table->addColumn('entity_name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['recipient_list_id'], 'UNIQ_A3D00FDF2B9E3E89');
-        $table->addIndex(['template_id'], 'IDX_A3D00FDF5DA0FB8', []);
+        $table->addIndex(['template_id'], 'IDX_A3D00FDF5DA0FB8');
     }
 
     /**
      * Create oro_notification_mass_notif table
      */
-    protected function createOroNotificationMassNotifTable(Schema $schema)
+    private function createOroNotificationMassNotifTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_notification_mass_notif');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -67,74 +67,66 @@ class OroNotificationBundleInstaller implements Installation
         $table->addColumn('sender', 'string', ['length' => 255]);
         $table->addColumn('subject', 'string', ['length' => 255]);
         $table->addColumn('body', 'text', ['notnull' => false]);
-        $table->addColumn('scheduledAt', 'datetime', []);
-        $table->addColumn('processedAt', 'datetime', []);
-        $table->addColumn('status', 'integer', []);
+        $table->addColumn('scheduledAt', 'datetime');
+        $table->addColumn('processedAt', 'datetime');
+        $table->addColumn('status', 'integer');
         $table->setPrimaryKey(['id']);
     }
 
     /**
      * Create oro_notification_recip_group table
      */
-    protected function createOroNotificationRecipGroupTable(Schema $schema)
+    private function createOroNotificationRecipGroupTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_notification_recip_group');
-        $table->addColumn('recipient_list_id', 'integer', []);
-        $table->addColumn('group_id', 'integer', []);
+        $table->addColumn('recipient_list_id', 'integer');
+        $table->addColumn('group_id', 'integer');
         $table->setPrimaryKey(['recipient_list_id', 'group_id']);
-        $table->addIndex(['recipient_list_id'], 'IDX_14F109F12B9E3E89', []);
-        $table->addIndex(['group_id'], 'IDX_14F109F1FE54D947', []);
+        $table->addIndex(['recipient_list_id'], 'IDX_14F109F12B9E3E89');
+        $table->addIndex(['group_id'], 'IDX_14F109F1FE54D947');
     }
 
     /**
      * Create oro_notification_recip_list table
      */
-    protected function createOroNotificationRecipListTable(Schema $schema)
+    private function createOroNotificationRecipListTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_notification_recip_list');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('email', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn(
-            'additional_email_associations',
-            'simple_array',
-            [
-                'comment' => '(DC2Type:simple_array)',
-                'notnull' => false
-            ]
-        );
-        $table->addColumn(
-            'entity_emails',
-            'simple_array',
-            [
-                'comment' => '(DC2Type:simple_array)',
-                'notnull' => false
-            ]
-        );
+        $table->addColumn('additional_email_associations', 'simple_array', [
+            'comment' => '(DC2Type:simple_array)',
+            'notnull' => false
+        ]);
+        $table->addColumn('entity_emails', 'simple_array', [
+            'comment' => '(DC2Type:simple_array)',
+            'notnull' => false
+        ]);
         $table->setPrimaryKey(['id']);
     }
 
     /**
      * Create oro_notification_recip_user table
      */
-    protected function createOroNotificationRecipUserTable(Schema $schema)
+    private function createOroNotificationRecipUserTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_notification_recip_user');
-        $table->addColumn('recipient_list_id', 'integer', []);
-        $table->addColumn('user_id', 'integer', []);
+        $table->addColumn('recipient_list_id', 'integer');
+        $table->addColumn('user_id', 'integer');
         $table->setPrimaryKey(['recipient_list_id', 'user_id']);
-        $table->addIndex(['recipient_list_id'], 'IDX_606646402B9E3E89', []);
-        $table->addIndex(['user_id'], 'IDX_60664640A76ED395', []);
+        $table->addIndex(['recipient_list_id'], 'IDX_606646402B9E3E89');
+        $table->addIndex(['user_id'], 'IDX_60664640A76ED395');
     }
 
     /**
      * Create oro_notification_alert table
      */
-    protected function createOroNotificationAlertTable(Schema $schema): void
+    private function createOroNotificationAlertTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_notification_alert');
         $table->addColumn('id', 'guid', ['notnull' => false]);
         $table->addColumn('user_id', 'integer', ['notnull' => false]);
-        $table->addColumn('organization_id', 'integer', []);
+        $table->addColumn('organization_id', 'integer');
         $table->addColumn('alert_type', 'string', ['length' => 20, 'notnull' => false]);
         $table->addColumn('source_type', 'string', ['length' => 50]);
         $table->addColumn('resource_type', 'string', ['length' => 255]);
@@ -147,15 +139,15 @@ class OroNotificationBundleInstaller implements Installation
         $table->addColumn('is_resolved', 'boolean', ['default' => false, 'notnull' => true]);
         $table->addColumn('message', 'text', ['notnull' => false]);
         $table->addColumn('additional_info', 'json', ['notnull' => false, 'comment' => '(DC2Type:json)']);
-        $table->addIndex(['organization_id'], 'idx_ea4c646532c8a3de', []);
-        $table->addIndex(['user_id'], 'idx_ea4c6465a76ed395', []);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['organization_id'], 'idx_ea4c646532c8a3de');
+        $table->addIndex(['user_id'], 'idx_ea4c6465a76ed395');
     }
 
     /**
      * Add oro_notification_email_notif foreign keys.
      */
-    protected function addOroNotificationEmailNotifForeignKeys(Schema $schema)
+    private function addOroNotificationEmailNotifForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_notification_email_notif');
         $table->addForeignKeyConstraint(
@@ -175,7 +167,7 @@ class OroNotificationBundleInstaller implements Installation
     /**
      * Add oro_notification_recip_group foreign keys.
      */
-    protected function addOroNotificationRecipGroupForeignKeys(Schema $schema)
+    private function addOroNotificationRecipGroupForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_notification_recip_group');
         $table->addForeignKeyConstraint(
@@ -195,7 +187,7 @@ class OroNotificationBundleInstaller implements Installation
     /**
      * Add oro_notification_recip_user foreign keys.
      */
-    protected function addOroNotificationRecipUserForeignKeys(Schema $schema)
+    private function addOroNotificationRecipUserForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_notification_recip_user');
         $table->addForeignKeyConstraint(
@@ -215,7 +207,7 @@ class OroNotificationBundleInstaller implements Installation
     /**
      * Add oro_notification_alert foreign keys.
      */
-    protected function addOroNotificationAlertForeignKeys(Schema $schema): void
+    private function addOroNotificationAlertForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_notification_alert');
         $table->addForeignKeyConstraint(

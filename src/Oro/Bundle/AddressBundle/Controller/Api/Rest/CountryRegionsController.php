@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
@@ -33,7 +34,7 @@ class CountryRegionsController extends RestGetController
         }
 
         /** @var RegionRepository $regionRepository */
-        $regionRepository = $this->getDoctrine()->getRepository(Region::class);
+        $regionRepository = $this->container->get('doctrine')->getRepository(Region::class);
         $regions = $regionRepository->getCountryRegions($country);
         $manager = $this->getManager();
         $serializedRegions = $manager->serializeEntities($regions);
@@ -46,6 +47,14 @@ class CountryRegionsController extends RestGetController
      */
     public function getManager()
     {
-        return $this->get('oro_address.api.manager.region');
+        return $this->container->get('oro_address.api.manager.region');
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            ['doctrine' => ManagerRegistry::class]
+        );
     }
 }

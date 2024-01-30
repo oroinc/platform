@@ -35,6 +35,7 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         }
 
         $this->configureCookieTokenStorage($container, $config);
+        $this->configurePermissionsPolicy($container, $config);
 
         $container->setParameter('oro_security.login_target_path_excludes', $config['login_target_path_excludes']);
     }
@@ -52,5 +53,12 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         $container->getDefinition('oro_security.csrf.cookie_token_storage')
             ->replaceArgument(0, $config['csrf_cookie']['cookie_secure'])
             ->replaceArgument(2, $config['csrf_cookie']['cookie_samesite']);
+    }
+
+    private function configurePermissionsPolicy(ContainerBuilder $container, array $config): void
+    {
+        $container->getDefinition('oro_security.permission_policy_header_provider')
+            ->replaceArgument(0, $config['permissions_policy']['enable'])
+            ->replaceArgument(1, $config['permissions_policy']['directives']);
     }
 }

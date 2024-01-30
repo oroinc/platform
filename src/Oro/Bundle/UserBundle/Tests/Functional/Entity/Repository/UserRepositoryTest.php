@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\Entity\Repository;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUsersWithSameEmailInLowercase;
 
@@ -61,20 +61,18 @@ class UserRepositoryTest extends WebTestCase
 
     public function testFindEnabledUserEmails(): void
     {
-        $this->loadFixtures([LoadUserData::class]);
+        $this->loadFixtures([LoadUserData::class, LoadUser::class]);
 
         $result = $this->getRepository()->findEnabledUserEmails();
         self::assertCount(4, $result);
 
-        /**
-         * @var User $adminUser
-         * @var User $simpleUser
-         * @var User $simpleUser2
-         * @var User $userWithConfirmationToken
-         */
-        $adminUser = $this->getRepository()->findOneBy(['email' => LoadAdminUserData::DEFAULT_ADMIN_EMAIL]);
+        /** @var User $adminUser */
+        $adminUser = $this->getReference(LoadUser::USER);
+        /** @var User $simpleUser */
         $simpleUser = $this->getReference(LoadUserData::SIMPLE_USER);
+        /** @var User $simpleUser2 */
         $simpleUser2 = $this->getReference(LoadUserData::SIMPLE_USER_2);
+        /** @var User $userWithConfirmationToken */
         $userWithConfirmationToken = $this->getReference(LoadUserData::USER_WITH_CONFIRMATION_TOKEN);
         self::assertEquals([
             ['id' => $adminUser->getId(), 'email' => $adminUser->getEmail()],
@@ -86,16 +84,11 @@ class UserRepositoryTest extends WebTestCase
 
     public function testFindIdsByOrganizations(): void
     {
-        $this->loadFixtures([LoadUserData::class]);
+        $this->loadFixtures([LoadUserData::class, LoadUser::class, LoadOrganization::class]);
 
-        $organization = self::getContainer()->get('doctrine')
-            ->getManagerForClass(Organization::class)
-            ->getRepository(Organization::class)
-            ->getFirst();
+        $organization = $this->getReference(LoadOrganization::ORGANIZATION);
 
-        $this->assertFalse(null === $organization);
-
-        $user1 = $this->getRepository()->findOneBy(['username' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME]);
+        $user1 = $this->getReference(LoadUser::USER);
         $user2 = $this->getReference(LoadUserData::SIMPLE_USER);
         $user3 = $this->getReference(LoadUserData::SIMPLE_USER_2);
         $user4 = $this->getReference(LoadUserData::USER_WITH_CONFIRMATION_TOKEN);

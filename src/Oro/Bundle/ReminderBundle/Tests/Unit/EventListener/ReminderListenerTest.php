@@ -37,7 +37,7 @@ class ReminderListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityDataProvider
      */
-    public function testPostLoad(?object $entity, bool $expected)
+    public function testPostLoad(object $entity, bool $expected)
     {
         $event = new LifecycleEventArgs($entity, $this->entityManager);
 
@@ -53,7 +53,7 @@ class ReminderListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityDataProvider
      */
-    public function testPostPersist(?object $entity, bool $expected)
+    public function testPostPersist(object $entity, bool $expected)
     {
         $event = new LifecycleEventArgs($entity, $this->entityManager);
 
@@ -72,7 +72,6 @@ class ReminderListenerTest extends \PHPUnit\Framework\TestCase
         $event->setReminders(new ArrayCollection([new Reminder()]));
 
         return [
-            [null, false],
             [new \stdClass(), false],
             [new RemindableEntity(), false],
             [$event, true],

@@ -28,7 +28,7 @@ class DraftKernelListener
 
     public function onKernelControllerArguments(ControllerArgumentsEvent $event): void
     {
-        if ($event->isMasterRequest() && $this->draftHelper->isSaveAsDraftAction()) {
+        if ($event->isMainRequest() && $this->draftHelper->isSaveAsDraftAction()) {
             $arguments = $this->updateArguments($event->getArguments());
             $event->setArguments($arguments);
         }

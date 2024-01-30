@@ -7,12 +7,12 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema\v1_0\Test1BundleMigration10;
-use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\AbstractTestMigrationExecutor;
+use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\MigrationExecutorTestCase;
 use Oro\Component\Testing\ReflectionUtil;
 
-class ExtendMigrationExecutorTest extends AbstractTestMigrationExecutor
+class ExtendMigrationExecutorTest extends MigrationExecutorTestCase
 {
-    public function testExtendMigrationExecutor()
+    public function testExtendMigrationExecutor(): void
     {
         $extendOptionManager = $this->createMock(ExtendOptionsManager::class);
 

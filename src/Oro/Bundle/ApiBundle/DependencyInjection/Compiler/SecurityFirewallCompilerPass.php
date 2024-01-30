@@ -34,6 +34,9 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
             ->addArgument(new Reference('oro_api.security.firewall.feature_access_listener'))
             ->addArgument($config['api_firewalls']);
 
+        $container->getDefinition('oro_api.security.authenticator.feature_checker')
+            ->replaceArgument(1, $config['api_firewalls']);
+
         $securityConfigs = $container->getExtensionConfig('security');
         if (empty($securityConfigs[0]['firewalls'])) {
             return;

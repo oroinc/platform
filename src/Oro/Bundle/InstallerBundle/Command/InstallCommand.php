@@ -34,6 +34,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Application installer.
@@ -54,13 +55,15 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     private ManagerRegistry $doctrine;
     private EventDispatcherInterface $eventDispatcher;
     private InputInterface $input;
+    private ValidatorInterface $validator;
 
     public function __construct(
         ContainerInterface $container,
         ManagerRegistry $doctrine,
         EventDispatcherInterface $eventDispatcher,
         ApplicationState $applicationState,
-        ScriptManager $scriptManager
+        ScriptManager $scriptManager,
+        ValidatorInterface $validator
     ) {
         parent::__construct($container);
 
@@ -68,6 +71,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $this->eventDispatcher = $eventDispatcher;
         $this->applicationState = $applicationState;
         $this->scriptManager = $scriptManager;
+        $this->validator = $validator;
     }
 
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
@@ -665,9 +669,7 @@ HELP
             return;
         }
 
-        $violations = $this->getContainer()
-            ->get('validator')
-            ->validate($applicationUrl, new Url());
+        $violations = $this->validator->validate($applicationUrl, new Url());
 
         if (!$violations->count()) {
             return;

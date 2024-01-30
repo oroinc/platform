@@ -16,19 +16,21 @@ use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailManagerTest extends \PHPUnit\Framework\TestCase
+class EmailManagerTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|MockObject */
     private $em;
 
-    /** @var EmailThreadManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EmailThreadManager|MockObject */
     private $emailThreadManager;
 
-    /** @var EmailThreadProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EmailThreadProvider|MockObject */
     private $emailThreadProvider;
 
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|MockObject */
     private $tokenAccessor;
 
     /** @var EmailManager */
@@ -183,7 +185,7 @@ class EmailManagerTest extends \PHPUnit\Framework\TestCase
         $repository = $this->createMock(EmailUserRepository::class);
         $this->em->expects($this->once())
             ->method('getRepository')
-            ->with('OroEmailBundle:EmailUser')
+            ->with(EmailUser::class)
             ->willReturn($repository);
         $repository->expects($this->once())
             ->method('getEmailUserByThreadId')
@@ -209,7 +211,7 @@ class EmailManagerTest extends \PHPUnit\Framework\TestCase
         $repository = $this->createMock(EmailUserRepository::class);
         $this->em->expects($this->once())
             ->method('getRepository')
-            ->with('OroEmailBundle:EmailUser')
+            ->with(EmailUser::class)
             ->willReturn($repository);
         $repository->expects($this->once())
             ->method('findUnseenUserEmail')
@@ -288,7 +290,7 @@ class EmailManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($emailUsers);
         $this->em->expects($this->once())
             ->method('getRepository')
-            ->with('OroEmailBundle:EmailUser')
+            ->with(EmailUser::class)
             ->willReturn($emailUsersRepo);
 
         $this->manager->setSeenStatus($email, true);

@@ -12,20 +12,19 @@ class UpdateEmailOriginRelation implements Migration, OrderedMigrationInterface
     /**
      * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function getOrder(): int
     {
-        self::addOwnerAndOrganizationColumns($schema);
+        return 0;
     }
 
     /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * {@inheritDoc}
      */
-    public static function addOwnerAndOrganizationColumns(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_email_origin');
         $table->addColumn('owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['owner_id'],
@@ -38,13 +37,5 @@ class UpdateEmailOriginRelation implements Migration, OrderedMigrationInterface
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getOrder()
-    {
-        return 0;
     }
 }

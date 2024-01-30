@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Oro\Bundle\AddressBundle\Entity\Region;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -10,6 +11,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Select2 region form type with AJAX support
+ */
 class RegionType extends AbstractType
 {
     const COUNTRY_OPTION_KEY = 'country_field';
@@ -41,7 +45,7 @@ class RegionType extends AbstractType
             ->setDefaults(
                 array(
                     'label'         => 'oro.address.region.entity_label',
-                    'class'         => 'OroAddressBundle:Region',
+                    'class'         => Region::class,
                     'random_id'     => true,
                     'choice_label'  => 'name',
                     'query_builder' => null,

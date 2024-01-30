@@ -28,6 +28,9 @@ class AbstractFormProviderTest extends WebTestCase
 
         $this->formFactory = $this->getContainer()->get('form.factory');
         $this->formProvider = new FormProviderStub($this->formFactory, $this->router);
+
+        // Emulate request processing
+        $this->emulateRequest();
     }
 
     /**

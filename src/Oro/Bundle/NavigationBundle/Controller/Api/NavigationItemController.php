@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -9,12 +10,15 @@ use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProvider;
+use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProviderInterface;
 use Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer;
+use Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizerInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * REST API controller to manage navigation items.
@@ -30,7 +34,7 @@ class NavigationItemController extends AbstractFOSRestController
     public function getAction(string $type): Response
     {
         /** @var NavigationItemsProvider $navigationItemsProvider */
-        $navigationItemsProvider = $this->container->get('oro_navigation.provider.navigation_items');
+        $navigationItemsProvider = $this->container->get(NavigationItemsProviderInterface::class);
         $organization = $this->container->get('security.token_storage')->getToken()->getOrganization();
 
         $items = $navigationItemsProvider->getNavigationItems($this->getUser(), $organization, $type);
@@ -86,7 +90,7 @@ class NavigationItemController extends AbstractFOSRestController
 
     private function validate(object $entity): array
     {
-        $constraintViolationList = $this->get('validator')->validate($entity);
+        $constraintViolationList = $this->container->get(ValidatorInterface::class)->validate($entity);
         /** @var ConstraintViolationInterface $constraintViolation */
         foreach ($constraintViolationList as $constraintViolation) {
             $errors[] = $constraintViolation->getMessage();
@@ -174,12 +178,12 @@ class NavigationItemController extends AbstractFOSRestController
 
     protected function getManager(): ObjectManager
     {
-        return $this->getDoctrine()->getManagerForClass($this->getPinbarTabClass());
+        return $this->container->get(ManagerRegistry::class)->getManagerForClass($this->getPinbarTabClass());
     }
 
     protected function getFactory(): ItemFactory
     {
-        return $this->get('oro_navigation.item.factory');
+        return $this->container->get(ItemFactory::class);
     }
 
     /**
@@ -193,7 +197,7 @@ class NavigationItemController extends AbstractFOSRestController
     private function normalizeUrl(string $url, string $type): string
     {
         /** @var PinbarTabUrlNormalizer $normalizer */
-        $normalizer = $this->container->get('oro_navigation.utils.pinbar_tab_url_normalizer');
+        $normalizer = $this->container->get(PinbarTabUrlNormalizerInterface::class);
 
         // Adds "restore" GET parameter to URL if we are dealing with pinbar. Page state for pinned page is restored
         // only if this parameter is specified.
@@ -218,5 +222,22 @@ class NavigationItemController extends AbstractFOSRestController
     protected function getUserClass(): string
     {
         return User::class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                ManagerRegistry::class,
+                ValidatorInterface::class,
+                PinbarTabUrlNormalizerInterface::class,
+                ItemFactory::class,
+                NavigationItemsProviderInterface::class,
+            ]
+        );
     }
 }

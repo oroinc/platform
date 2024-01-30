@@ -147,7 +147,7 @@ class ClientManipulator implements ClientManipulatorInterface, LoggerAwareInterf
         }
 
         try {
-            $user = $this->userProvider->loadUserByUsername($connection->WAMP->username);
+            $user = $this->userProvider->loadUserByIdentifier($connection->WAMP->username);
 
             return $this->addUserToClientStorage($connection, $user);
         } catch (UserNotFoundException $exception) {
@@ -170,7 +170,7 @@ class ClientManipulator implements ClientManipulatorInterface, LoggerAwareInterf
 
             return true;
         } catch (StorageException $exception) {
-            $username = $token->getUsername();
+            $username = $token->getUserIdentifier();
 
             $this->logger->error(
                 'Failed to add user to client storage for {username} for connection {storage_id}',

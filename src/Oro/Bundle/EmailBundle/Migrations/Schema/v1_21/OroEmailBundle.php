@@ -9,22 +9,15 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroEmailBundle implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
-        static::addIndexes($schema);
-    }
-
-    public static function addIndexes(Schema $schema)
-    {
-        $emailRecipientTable = $schema->getTable('oro_email_recipient');
-        $emailRecipientTable->addIndex(['email_id', 'type'], 'email_id_type_idx', []);
-
-        $emailOriginTable = $schema->getTable('oro_email_origin');
-        $emailOriginTable->addIndex(['isActive', 'name'], 'isActive_name_idx', []);
-
-        $emailTable = $schema->getTable('oro_email');
-        $emailTable->addIndex(['sent'], 'IDX_sent', []);
+        $schema->getTable('oro_email_recipient')
+            ->addIndex(['email_id', 'type'], 'email_id_type_idx');
+        $schema->getTable('oro_email_origin')
+            ->addIndex(['isActive', 'name'], 'isActive_name_idx');
+        $schema->getTable('oro_email')
+            ->addIndex(['sent'], 'IDX_sent');
     }
 }

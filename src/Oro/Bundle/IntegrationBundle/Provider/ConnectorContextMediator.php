@@ -11,6 +11,9 @@ use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * Provides functionality to get transport type by integration
+ */
 class ConnectorContextMediator
 {
     /** @var TypesRegistry */
@@ -103,7 +106,7 @@ class ConnectorContextMediator
     public function getChannel(ContextInterface $context)
     {
         $channel = $this->getEm()
-            ->getRepository('OroIntegrationBundle:Channel')
+            ->getRepository(Integration::class)
             ->getOrLoadById($context->getOption('channel'));
 
         return $channel;

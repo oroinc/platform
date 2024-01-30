@@ -2,26 +2,17 @@
 
 namespace Oro\Bundle\AttachmentBundle\Migrations\Schema\v1_9;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroAttachmentBundle implements Migration, ConnectionAwareInterface
 {
-    /** @var Connection */
-    private $connection;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection): void
-    {
-        $this->connection = $connection;
-    }
+    use ConnectionAwareTrait;
 
     /**
      * {@inheritdoc}

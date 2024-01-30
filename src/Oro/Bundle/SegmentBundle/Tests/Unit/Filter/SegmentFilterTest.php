@@ -38,6 +38,7 @@ use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -54,34 +55,34 @@ class SegmentFilterTest extends OrmTestCase
     private const TEST_FIELD_NAME = 't1.id';
     private const TEST_PARAM_VALUE = '%test%';
 
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormFactoryInterface|MockObject */
     private $formFactory;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|MockObject */
     private $doctrine;
 
-    /** @var DynamicSegmentQueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DynamicSegmentQueryBuilder|MockObject */
     private $dynamicSegmentQueryBuilder;
 
-    /** @var StaticSegmentQueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var StaticSegmentQueryBuilder|MockObject */
     private $staticSegmentQueryBuilder;
 
-    /** @var EntityNameProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityNameProvider|MockObject */
     private $entityNameProvider;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|MockObject */
     private $entityConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|MockObject */
     private $extendConfigProvider;
 
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|MockObject */
     private $em;
 
-    /** @var SubQueryLimitHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var SubQueryLimitHelper|MockObject */
     private $subQueryLimitHelper;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|MockObject */
     private $logger;
 
     /** @var SegmentFilter */
@@ -306,7 +307,7 @@ class SegmentFilterTest extends OrmTestCase
         $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder()
             ->select(['t1.name'])
-            ->from('OroSegmentBundle:CmsUser', 't1');
+            ->from(\Oro\Bundle\SegmentBundle\Entity\CmsUser::class, 't1');
 
         $queryBuilder = new QueryBuilder($em);
         $queryBuilder->select(['ts1.id'])
@@ -325,7 +326,7 @@ class SegmentFilterTest extends OrmTestCase
         $this->filter->apply($ds, $filterData);
 
         $expectedResult = 'SELECT t1.name'
-            . ' FROM OroSegmentBundle:CmsUser t1'
+            . ' FROM Oro\Bundle\SegmentBundle\Entity\CmsUser t1'
             . ' WHERE t1.id IN('
             . 'SELECT ts1.id'
             . ' FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot ts1'
@@ -358,7 +359,7 @@ class SegmentFilterTest extends OrmTestCase
         $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder()
             ->select(['t1.name'])
-            ->from('OroSegmentBundle:CmsUser', 't1');
+            ->from(\Oro\Bundle\SegmentBundle\Entity\CmsUser::class, 't1');
 
         $queryBuilder = new QueryBuilder($em);
         $queryBuilder->select(['ts1.id'])
@@ -377,7 +378,7 @@ class SegmentFilterTest extends OrmTestCase
         $this->filter->apply($ds, $filterData);
 
         $expectedResult = 'SELECT t1.name'
-            . ' FROM OroSegmentBundle:CmsUser t1'
+            . ' FROM Oro\Bundle\SegmentBundle\Entity\CmsUser t1'
             . ' WHERE t1.id IN('
             . 'SELECT ts1.id'
             . ' FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot ts1'
@@ -403,7 +404,7 @@ class SegmentFilterTest extends OrmTestCase
         $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder()
             ->select(['t1.name'])
-            ->from('OroSegmentBundle:CmsUser', 't1');
+            ->from(\Oro\Bundle\SegmentBundle\Entity\CmsUser::class, 't1');
 
         $queryBuilder = new QueryBuilder($em);
         $queryBuilder->select(['ts1.id'])
@@ -427,7 +428,7 @@ class SegmentFilterTest extends OrmTestCase
         $this->filter->apply($ds, $filterData);
 
         $expectedResult = 'SELECT t1.name'
-            . ' FROM OroSegmentBundle:CmsUser t1'
+            . ' FROM Oro\Bundle\SegmentBundle\Entity\CmsUser t1'
             . ' WHERE t1.id IN('
             . 'SELECT ts1.id'
             . ' FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot ts1'

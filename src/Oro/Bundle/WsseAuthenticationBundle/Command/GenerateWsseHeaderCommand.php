@@ -11,7 +11,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
  * Generates X-WSSE HTTP header for a given user API key.
@@ -72,30 +72,23 @@ class GenerateWsseHeaderCommand extends Command
                 )
             );
         }
-
         $created = date('c');
-
         // http://stackoverflow.com/questions/18117695/how-to-calculate-wsse-nonce
-        $prefix = gethostname();
-        $nonce = base64_encode(substr(md5(uniqid($prefix . '_', true)), 0, 16));
-        $salt = ''; // do not use real salt here, because API key already encrypted enough
-
-        $passwordDigest = $this->getPasswordEncoder($input->getOption('firewall'))->encodePassword(
+        $nonce = base64_encode(openssl_random_pseudo_bytes(16));
+        $passwordDigest = $this->getPasswordHasher($input->getOption('firewall'))->hash(
             sprintf(
                 '%s%s%s',
                 base64_decode($nonce),
                 $created,
                 $userApi->getApiKey()
-            ),
-            $salt
+            )
         );
-
         $output->writeln('<info>To use WSSE authentication add following headers to the request:</info>');
         $output->writeln('Authorization: WSSE profile="UsernameToken"');
         $output->writeln(
             sprintf(
                 'X-WSSE: UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"',
-                $user->getUsername(),
+                $user->getUserIdentifier(),
                 $passwordDigest,
                 $nonce,
                 $created
@@ -106,15 +99,12 @@ class GenerateWsseHeaderCommand extends Command
         return Command::SUCCESS;
     }
 
-    /**
-     * @throws \InvalidArgumentException if WSSE password encoder for a given firewall is not defined
-     */
-    private function getPasswordEncoder(string $firewallName): PasswordEncoderInterface
+    private function getPasswordHasher(string $firewallName): PasswordHasherInterface
     {
-        $serviceId = 'oro_wsse_authentication.encoder.' . $firewallName;
+        $serviceId = 'oro_wsse_authentication.hasher.' . $firewallName;
         if (!$this->container->has($serviceId)) {
             throw new \InvalidArgumentException(
-                sprintf('WSSE password encoder for firewall "%s" is not defined', $firewallName)
+                sprintf('WSSE password hasher for firewall "%s" is not defined', $firewallName)
             );
         }
 

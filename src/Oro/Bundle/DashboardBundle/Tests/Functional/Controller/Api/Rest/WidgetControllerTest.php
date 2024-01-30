@@ -203,15 +203,11 @@ class WidgetControllerTest extends WebTestCase
     {
         $dashboard = new Dashboard();
         $dashboard->setName('main');
-
         $widget = new Widget();
-        $widget
-            ->setName($name)
-            ->setLayoutPosition($layoutPositions)
-            ->setDashboard($dashboard);
-
+        $widget->setName($name);
+        $widget->setLayoutPosition($layoutPositions);
+        $widget->setDashboard($dashboard);
         $dashboard->addWidget($widget);
-
         $this->em->persist($widget);
         $this->em->flush();
 

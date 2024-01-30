@@ -41,7 +41,7 @@ class ActivityListController extends RestController
      */
     public function cgetAction(Request $request, $entityClass, $entityId)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
+        $entityClass = $this->container->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
         $filter      = $request->get('filter');
         $pageFilter  = $request->get('pageFilter', []);
 
@@ -94,7 +94,7 @@ class ActivityListController extends RestController
      */
     public function getActivityListOptionAction()
     {
-        $results = $this->getActivityListProvider()->getActivityListOption($this->get('oro_config.user'));
+        $results = $this->getActivityListProvider()->getActivityListOption($this->container->get('oro_config.user'));
 
         return new JsonResponse($results);
     }
@@ -104,7 +104,7 @@ class ActivityListController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_activity_list.manager');
+        return $this->container->get('oro_activity_list.manager');
     }
 
     /**
@@ -128,6 +128,6 @@ class ActivityListController extends RestController
      */
     protected function getActivityListProvider()
     {
-        return $this->get('oro_activity_list.provider.chain');
+        return $this->container->get('oro_activity_list.provider.chain');
     }
 }

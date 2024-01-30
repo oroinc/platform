@@ -70,13 +70,15 @@ class TestEntityNameResolverDataLoader implements TestEntityNameResolverDataLoad
                 return 'TEST_ATTRIBUTE_FAMILY_1';
             }
 
-            if (EntityNameProviderInterface::SHORT === $format) {
+            if ('attributeFamily' === $entityReference && EntityNameProviderInterface::SHORT === $format) {
                 return 'TEST_ATTRIBUTE_FAMILY';
             }
 
-            return 'Localization de_DE' === $locale
-                ? 'Test Attribute Family (de_DE)'
-                : 'Test Attribute Family';
+            if ('attributeFamily' === $entityReference) {
+                return 'Localization de_DE' === $locale
+                    ? 'Test Attribute Family (de_DE)'
+                    : 'Test Attribute Family';
+            }
         }
 
         return $this->innerDataLoader->getExpectedEntityName(

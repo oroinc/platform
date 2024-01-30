@@ -19,7 +19,7 @@ class OrganizationRememberMeTokenFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(OrganizationRememberMeToken::class, $token);
         $this->assertEquals($user, $token->getUser());
         $this->assertEquals($organization, $token->getOrganization());
-        $this->assertEquals('testProvider', $token->getProviderKey());
+        $this->assertEquals('testProvider', $token->getFirewallName());
         $this->assertEquals('testKey', $token->getSecret());
     }
 }

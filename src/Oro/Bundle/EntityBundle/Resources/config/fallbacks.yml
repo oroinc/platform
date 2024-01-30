@@ -18,15 +18,10 @@ services:
         calls:
             - [setConfigProvider, ["@oro_entity_config.provider.fallback"]]
 
-    oro_entity.fallback.provider.system_config_provider.cache:
-        parent: oro.cache.provider.memory_cache
-
     oro_entity.fallback.provider.system_config_provider:
         class: Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider
         parent: oro_entity.fallback.provider.abstract_provider
         arguments:
             - "@oro_config.manager"
-        calls:
-            - [setMemoryCacheProvider, ['@oro_entity.fallback.provider.system_config_provider.cache']]
         tags:
             - { name: oro_entity.fallback_provider, id: systemConfig }

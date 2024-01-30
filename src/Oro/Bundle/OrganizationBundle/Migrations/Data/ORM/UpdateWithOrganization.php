@@ -4,25 +4,26 @@ namespace Oro\Bundle\OrganizationBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
- * Updates given table with default organization
+ * The base class for fixtures that set a default organization to an entity.
  */
 abstract class UpdateWithOrganization extends AbstractFixture
 {
     /**
-     * Update given table with default organization
-     *
-     * @param ObjectManager $manager
-     * @param string        $tableName
-     * @param string        $relationName relation name to update. By default 'organization'
-     * @param bool          $onlyEmpty    Update data only for the records with empty relation
+     * Sets a default organization to the given entity.
      */
-    public function update(ObjectManager $manager, $tableName, $relationName = 'organization', $onlyEmpty = false)
-    {
-        $manager->getRepository('OroOrganizationBundle:Organization')->updateWithOrganization(
-            $tableName,
-            $manager->getRepository('OroOrganizationBundle:Organization')->getFirst()->getId(),
+    public function update(
+        ObjectManager $manager,
+        string $entityClass,
+        string $relationName = 'organization',
+        bool $onlyEmpty = false
+    ): void {
+        $organizationRepository = $manager->getRepository(Organization::class);
+        $organizationRepository->updateWithOrganization(
+            $entityClass,
+            $organizationRepository->getFirst()->getId(),
             $relationName,
             $onlyEmpty
         );

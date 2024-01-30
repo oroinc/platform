@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
@@ -30,7 +31,7 @@ class BusinessUnitController extends AbstractController
      * @Acl(
      *      id="oro_business_unit_create",
      *      type="entity",
-     *      class="OroOrganizationBundle:BusinessUnit",
+     *      class="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit",
      *      permission="CREATE"
      * )
      */
@@ -45,7 +46,7 @@ class BusinessUnitController extends AbstractController
      * @Acl(
      *      id="oro_business_unit_view",
      *      type="entity",
-     *      class="OroOrganizationBundle:BusinessUnit",
+     *      class="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit",
      *      permission="VIEW"
      * )
      */
@@ -68,7 +69,7 @@ class BusinessUnitController extends AbstractController
     {
         $businessUnits = [];
         if ($organizationId) {
-            $businessUnits = $this->getDoctrine()
+            $businessUnits = $this->container->get('doctrine')
                 ->getRepository(BusinessUnit::class)
                 ->getOrganizationBusinessUnitsTree($organizationId);
         }
@@ -84,7 +85,7 @@ class BusinessUnitController extends AbstractController
      * @Acl(
      *      id="oro_business_unit_update",
      *      type="entity",
-     *      class="OroOrganizationBundle:BusinessUnit",
+     *      class="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit",
      *      permission="EDIT"
      * )
      */
@@ -115,18 +116,18 @@ class BusinessUnitController extends AbstractController
      */
     private function update(BusinessUnit $entity, Request $request)
     {
-        if ($this->get(BusinessUnitHandler::class)->process($entity)) {
+        if ($this->container->get(BusinessUnitHandler::class)->process($entity)) {
             $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get(TranslatorInterface::class)->trans('oro.business_unit.controller.message.saved')
+                $this->container->get(TranslatorInterface::class)->trans('oro.business_unit.controller.message.saved')
             );
 
-            return $this->get(Router::class)->redirect($entity);
+            return $this->container->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity'       => $entity,
-            'form'         => $this->get('oro_organization.form.business_unit')->createView(),
+            'form'         => $this->container->get('oro_organization.form.business_unit')->createView(),
             'allow_delete' => $entity->getId() && $this->isDeleteGranted($entity)
         ];
     }
@@ -153,7 +154,7 @@ class BusinessUnitController extends AbstractController
 
     private function isDeleteGranted(BusinessUnit $entity): bool
     {
-        return $this->get(EntityDeleteHandlerRegistry::class)
+        return $this->container->get(EntityDeleteHandlerRegistry::class)
             ->getHandler(BusinessUnit::class)
             ->isDeleteGranted($entity);
     }
@@ -171,6 +172,7 @@ class BusinessUnitController extends AbstractController
                 EntityDeleteHandlerRegistry::class,
                 BusinessUnitHandler::class,
                 'oro_organization.form.business_unit' => Form::class,
+                'doctrine' => ManagerRegistry::class,
             ]
         );
     }

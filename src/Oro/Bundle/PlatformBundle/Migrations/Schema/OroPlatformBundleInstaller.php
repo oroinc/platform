@@ -2,51 +2,42 @@
 
 namespace Oro\Bundle\PlatformBundle\Migrations\Schema;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 
 class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareInterface
 {
-    /** @var AbstractPlatform */
-    protected $platform;
+    use DatabasePlatformAwareTrait;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
         return 'v1_2';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function setDatabasePlatform(AbstractPlatform $platform)
-    {
-        $this->platform = $platform;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->oroSessionTable($schema, $queries);
-        $this->createMaterializedViewTable($schema, $queries);
+        $this->createMaterializedViewTable($schema);
     }
 
     /**
      * Makes sure oro_session table is up-to-date
      */
-    public function oroSessionTable(Schema $schema, QueryBag $queries)
+    private function oroSessionTable(Schema $schema, QueryBag $queries): void
     {
         if (!$schema->hasTable('oro_session')) {
             $this->createOroSessionTable($schema);
@@ -71,7 +62,7 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
     /**
      * Create oro_session table
      */
-    public function createOroSessionTable(Schema $schema)
+    private function createOroSessionTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_session');
         if ($this->platform instanceof MySqlPlatform) {
@@ -79,21 +70,20 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
             $table->addColumn('sess_data', Types::BLOB, ['length' => MySqlPlatform::LENGTH_LIMIT_BLOB]);
         } else {
             $table->addColumn('id', Types::STRING, ['length' => 128]);
-            $table->addColumn('sess_data', Types::BLOB, []);
+            $table->addColumn('sess_data', Types::BLOB);
         }
-        $table->addColumn('sess_time', Types::INTEGER, []);
-        $table->addColumn('sess_lifetime', Types::INTEGER, []);
+        $table->addColumn('sess_time', Types::INTEGER);
+        $table->addColumn('sess_lifetime', Types::INTEGER);
         $table->setPrimaryKey(['id']);
     }
 
-    private function createMaterializedViewTable(Schema $schema, QueryBag $queries): void
+    private function createMaterializedViewTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_materialized_view');
         $table->addColumn('name', Types::STRING, ['length' => 63]);
-        $table->setPrimaryKey(['name']);
-
         $table->addColumn('with_data', Types::BOOLEAN, ['default' => false]);
-        $table->addColumn('created_at', Types::DATETIME_MUTABLE, []);
-        $table->addColumn('updated_at', Types::DATETIME_MUTABLE, []);
+        $table->addColumn('created_at', Types::DATETIME_MUTABLE);
+        $table->addColumn('updated_at', Types::DATETIME_MUTABLE);
+        $table->setPrimaryKey(['name']);
     }
 }

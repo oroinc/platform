@@ -13,7 +13,7 @@ entity_config:
                             block:             associations
                             required:          true
                             label:             oro.comment.enabled
-                            association_class: 'OroCommentBundle:Comment'
+                            association_class: 'Oro\Bundle\CommentBundle\Entity\Comment'
                 immutable:
                     options:
                         auditable: false

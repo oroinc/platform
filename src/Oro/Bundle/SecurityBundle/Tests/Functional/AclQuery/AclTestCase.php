@@ -55,7 +55,6 @@ class AclTestCase extends WebTestCase
         $organization = $this->getReference($organization);
         $token = new UsernamePasswordOrganizationToken(
             $user,
-            false,
             'main',
             $organization,
             $user->getUserRoles()

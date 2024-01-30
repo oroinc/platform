@@ -21,16 +21,14 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
         return new AbstractUserStub();
     }
 
-    public function testUsername(): void
+    public function testUserIdentifier(): void
     {
         $user = $this->getUser();
         $name = 'Tony';
 
-        self::assertNull($user->getUsername());
-
         $user->setUsername($name);
 
-        self::assertEquals($name, $user->getUsername());
+        self::assertEquals($name, $user->getUserIdentifier());
         self::assertEquals($name, $user);
     }
 
@@ -217,7 +215,7 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals($serialized[0], $user->getPassword());
         self::assertEquals($serialized[1], $user->getSalt());
-        self::assertEquals($serialized[2], $user->getUsername());
+        self::assertEquals($serialized[2], $user->getUserIdentifier());
         self::assertEquals($serialized[3], $user->isEnabled());
         self::assertEquals($serialized[4], $user->getConfirmationToken());
         self::assertEquals($serialized[5], $user->getId());

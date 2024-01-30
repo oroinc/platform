@@ -27,7 +27,7 @@ class DisableUpdateOperation implements ProcessorInterface
             return;
         }
 
-        if ($context->isMasterRequest()) {
+        if ($context->isMainRequest()) {
             $context->addError(
                 Error::createValidationError(Constraint::VALUE, 'The option is not supported.')
                     ->setSource(ErrorSource::createByPointer('/' . JsonApiDoc::META . '/' . JsonApiDoc::META_UPDATE))

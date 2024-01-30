@@ -29,7 +29,7 @@ class UserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadUserByUsername($username)
+    public function loadUserByIdentifier(string $username): UserInterface
     {
         $user = $this->userLoader->loadUser($username);
         if (null === $user) {

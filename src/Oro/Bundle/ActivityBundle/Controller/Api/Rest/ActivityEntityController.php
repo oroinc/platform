@@ -152,7 +152,7 @@ class ActivityEntityController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_activity.form.handler.activity_entity.api');
+        return $this->container->get('oro_activity.form.handler.activity_entity.api');
     }
 
     /**
@@ -160,6 +160,6 @@ class ActivityEntityController extends RestController
      */
     protected function getDeleteHandler()
     {
-        return $this->get('oro_activity.activity_entity_delete_handler.proxy');
+        return $this->container->get('oro_activity.activity_entity_delete_handler.proxy');
     }
 }

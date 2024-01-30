@@ -9,6 +9,7 @@ use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\ClientNotFoundException;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
 use GuzzleHttp\Psr7\Request;
+use Oro\Bundle\SyncBundle\Authentication\Ticket\InMemoryAnonymousTicket;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
 use Oro\Bundle\SyncBundle\Client\ClientManipulator;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
@@ -17,7 +18,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Bundle\UserBundle\Security\UserProvider;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
-use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -115,7 +115,7 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
         $connection->httpRequest = new Request('GET', '/test/?ticket=abc');
         $token = new AnonymousTicketToken(
             'sampleTicketDigest',
-            AuthenticationProviderInterface::USERNAME_NONE_PROVIDED
+            new InMemoryAnonymousTicket('test')
         );
 
         $this->clientStorage->expects(self::any())
@@ -137,7 +137,7 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
             });
 
         $this->userProvider->expects(self::once())
-            ->method('loadUserByUsername')
+            ->method('loadUserByIdentifier')
             ->with(self::USERNAME)
             ->willThrowException(new UserNotFoundException());
 
@@ -165,7 +165,8 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
         $connection->WAMP->username = self::USERNAME;
         $connection->httpRequest = new Request('GET', '/test/?ticket=abc');
         $user = $this->createMock(UserInterface::class);
-        $token = new TicketToken($user, 'credentials', 'providerKey');
+        $token = new TicketToken($user, 'providerKey');
+        $token->setAttribute('ticketId', 'credentials');
 
         $this->clientStorage->expects(self::any())
             ->method('getStorageId')
@@ -186,7 +187,7 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
             });
 
         $this->userProvider->expects(self::once())
-            ->method('loadUserByUsername')
+            ->method('loadUserByIdentifier')
             ->with(self::USERNAME)
             ->willReturn($user);
 

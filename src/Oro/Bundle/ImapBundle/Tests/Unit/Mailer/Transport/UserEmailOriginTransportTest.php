@@ -12,6 +12,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address as SymfonyAddress;
 use Symfony\Component\Mime\Message;
@@ -32,10 +33,12 @@ class UserEmailOriginTransportTest extends \PHPUnit\Framework\TestCase
 
     /** @var UserEmailOriginTransport */
     private $transport;
+    private TransportFactoryInterface $transportFactoryBase;
 
     protected function setUp(): void
     {
-        $this->transportFactory = $this->createMock(Transport::class);
+        $this->transportFactoryBase = $this->createMock(TransportFactoryInterface::class);
+        $this->transportFactory = new Transport([$this->transportFactoryBase]);
         $this->dsnFromUserEmailOriginFactory = $this->createMock(DsnFromUserEmailOriginFactory::class);
         $this->userEmailOrigin = $this->createMock(UserEmailOrigin::class);
 
@@ -156,14 +159,16 @@ class UserEmailOriginTransportTest extends \PHPUnit\Framework\TestCase
             ->willReturn($dsn);
 
         $configuredTransport = $this->createMock(TransportInterface::class);
-        $this->transportFactory->expects(self::once())
-            ->method('fromDsnObject')
-            ->with($dsn)
-            ->willReturn($configuredTransport);
 
         $configuredTransport->expects(self::exactly(2))
             ->method('send')
             ->with($message, $envelope);
+        $this->transportFactoryBase->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
+        $this->transportFactoryBase->expects($this->once())
+            ->method('create')
+            ->willReturn($configuredTransport);
 
         $this->transport->send($message, $envelope);
 

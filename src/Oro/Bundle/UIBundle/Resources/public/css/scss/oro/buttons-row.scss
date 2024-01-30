@@ -9,6 +9,10 @@
         float: right;
     }
 
+    &--flex-end {
+        margin-left: auto;
+    }
+
     &--start-offset {
         margin-left: 32px;
     }

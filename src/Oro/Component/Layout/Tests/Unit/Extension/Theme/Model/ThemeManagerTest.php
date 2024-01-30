@@ -359,4 +359,69 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $themeManager = $this->createManager([$themeName => [], $parentName => []]);
         self::assertEquals([$parentTheme, $theme], $themeManager->getThemesHierarchy($themeName));
     }
+
+    /**
+     * @dataProvider themeHasParentDataProvider
+     */
+    public function testThemeWithoutParentReturnsFalse(
+        bool $hasParent,
+        string $themeToCheck,
+        array $parentThemesToCheck
+    ): void {
+        $base = $this->createMock(Theme::class);
+        $base->method('getName')->willReturn('base');
+        $base->method('getPageTemplates')->willReturn([]);
+        $base->method('getPageTemplateTitles')->willReturn([]);
+
+        $theme1 = $this->createMock(Theme::class);
+        $theme1->method('getName')->willReturn('theme1');
+        $theme1->method('getParentTheme')->willReturn('base');
+
+        $theme2 = $this->createMock(Theme::class);
+        $theme2->method('getName')->willReturn('theme2');
+
+        $this->factory
+            ->method('create')
+            ->willReturnCallback(function ($name) use ($base, $theme1, $theme2) {
+                switch ($name) {
+                    case 'base':
+                        return $base;
+                    case 'theme1':
+                        return $theme1;
+                    case 'theme2':
+                        return $theme2;
+                }
+            });
+
+        $manager = $this->createManager(
+            [
+                'base' => [],
+                'default' => [],
+                'custom' => [],
+                'theme1' => ['parent' => 'base'],
+                'theme2' => [],
+
+            ],
+            null,
+            ['theme1', 'theme2']
+        );
+
+        $this->assertEquals($hasParent, $manager->themeHasParent($themeToCheck, $parentThemesToCheck));
+    }
+
+    public function themeHasParentDataProvider(): array
+    {
+        return [
+            'theme without parent' => [
+                'hasParent' => false,
+                'themeToCheck' => 'theme2',
+                'parentThemesToCheck' => ['base'],
+            ],
+            'theme with parent' => [
+                'hasParent' => true,
+                'themeToCheck' => 'theme1',
+                'parentThemesToCheck' => ['base'],
+            ],
+        ];
+    }
 }

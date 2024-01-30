@@ -139,7 +139,7 @@ class UserAclHandler implements SearchHandlerInterface
         /** @var User $item */
         $result = [];
         $result['id'] = $item->getId();
-        $result['username'] = $item->getUsername();
+        $result['username'] = $item->getUserIdentifier();
         $result['namePrefix'] = $item->getNamePrefix();
         $result['firstName'] = $item->getFirstName();
         $result['middleName'] = $item->getMiddleName();

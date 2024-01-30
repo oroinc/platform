@@ -64,7 +64,7 @@ class UserCaseInsensitiveUsernameTest extends RestJsonApiTestCase
 
         $user = $this->findUser($attributes['email']);
         self::assertNotNull($user);
-        self::assertEquals($attributes['username'], $user->getUsername());
+        self::assertEquals($attributes['username'], $user->getUserIdentifier());
         self::assertEquals($attributes['email'], $user->getEmail());
         self::assertEquals($attributes['firstName'], $user->getFirstName());
         self::assertEquals($attributes['lastName'], $user->getLastName());

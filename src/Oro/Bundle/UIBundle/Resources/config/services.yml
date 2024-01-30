@@ -125,13 +125,6 @@ services:
             - !abstract '$providerContainer defined in Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass'
             - !abstract '$enabledProviderNames defined in Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass'
 
-    oro_ui.content_provider.manager.twig:
-        class: Oro\Bundle\UIBundle\ContentProvider\TwigContentProviderManager
-        arguments:
-            - '@Psr\Container\ContainerInterface'
-        tags:
-            - { name: container.service_subscriber, id: oro_ui.content_provider.manager, key: Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager }
-
     oro_ui.provider.widget_context:
         class: Oro\Bundle\UIBundle\Provider\WidgetContextProvider
         arguments:

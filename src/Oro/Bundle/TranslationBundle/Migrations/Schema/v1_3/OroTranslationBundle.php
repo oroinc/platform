@@ -18,7 +18,7 @@ class OroTranslationBundle implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {

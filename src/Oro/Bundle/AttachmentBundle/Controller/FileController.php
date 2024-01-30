@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Imagine\Exception\RuntimeException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -14,6 +15,7 @@ use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -117,7 +119,26 @@ class FileController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        return new Response($binary->getContent(), Response::HTTP_OK, ['Content-Type' => $binary->getMimeType()]);
+
+        $response = new Response(
+            $binary->getContent(),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => $binary->getMimeType(),
+                AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER => true
+            ]
+        );
+        $response->setPublic();
+        $sessionConfig = $this->getParameter('session.storage.options');
+        $imageMaxAge = \array_key_exists('cookie_lifetime', $sessionConfig)
+            ? $sessionConfig['cookie_lifetime']
+            : $sessionConfig['gc_maxlifetime'];
+        if ($imageMaxAge > 3600) {
+            $imageMaxAge = 3600;
+        }
+        $response->setMaxAge($imageMaxAge);
+
+        return $response;
     }
 
     private function getFileById(int $id): File
@@ -213,6 +234,7 @@ class FileController extends AbstractController
             ImageResizeManagerInterface::class,
             FileNameProviderInterface::class,
             WebpConfiguration::class,
+            'doctrine' => ManagerRegistry::class,
         ]);
     }
 }

@@ -24,7 +24,7 @@ class TagController extends RestController
      * @Acl(
      *      id="oro_tag_delete",
      *      type="entity",
-     *      class="OroTagBundle:Tag",
+     *      class="Oro\Bundle\TagBundle\Entity\Tag",
      *      permission="DELETE"
      * )
      * @return Response
@@ -39,7 +39,7 @@ class TagController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_tag.tag.manager.api');
+        return $this->container->get('oro_tag.tag.manager.api');
     }
 
     /**
@@ -47,7 +47,7 @@ class TagController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_tag.form.tag.api');
+        return $this->container->get('oro_tag.form.tag.api');
     }
 
     /**
@@ -55,6 +55,6 @@ class TagController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_tag.form.handler.api');
+        return $this->container->get('oro_tag.form.handler.api');
     }
 }

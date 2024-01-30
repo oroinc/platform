@@ -32,6 +32,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
 
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function loadAppConfigsFromBundles(ContainerBuilder $container): void
     {
@@ -44,6 +45,20 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         $securityConfig = null;
         if ($container->hasExtension('security')) {
             $securityConfig = $container->getExtensionConfig('security');
+        }
+        if (isset($securityConfig[0]['access_control'])) {
+            $this->throwAccessControlException();
+        }
+
+        // check app level security access_control rules
+        $accessControlConfigs = [];
+        if ($container->hasExtension('oro_security')) {
+            $oroSecurityConfigs = $container->getExtensionConfig('oro_security');
+            foreach ($oroSecurityConfigs as $conf) {
+                if (isset($conf['access_control'])) {
+                    $accessControlConfigs[] = $conf['access_control'];
+                }
+            }
         }
 
         $securityModified = false;
@@ -68,14 +83,26 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
                     continue;
                 }
 
-                if ('security' === $name) {
-                    $securityConfigs[] = $config;
-                    $securityModified = true;
-                } else {
-                    $container->prependExtensionConfig($name, $config);
+                switch ($name) {
+                    case 'security':
+                        if (isset($config['access_control'])) {
+                            $this->throwAccessControlException();
+                        }
+                        $securityConfigs[] = $config;
+                        $securityModified = true;
+                        break;
+                    case 'oro_security':
+                        if (isset($config['access_control'])) {
+                            $accessControlConfigs[] = $config['access_control'];
+                        }
+                        $container->prependExtensionConfig($name, $config);
+                        break;
+                    default:
+                        $container->prependExtensionConfig($name, $config);
                 }
             }
         }
+        $accessControlConfigs = $this->sortAccessControl($accessControlConfigs);
 
         if ($securityModified) {
             $securityConfigs = array_reverse($securityConfigs);
@@ -88,6 +115,8 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         if ($securityConfig && $securityModified) {
             $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
         }
+
+        $this->mergeConfigIntoOne($container, 'security', ['access_control' => $accessControlConfigs]);
     }
 
     /**
@@ -166,5 +195,46 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
         }
+    }
+
+    private function throwAccessControlException()
+    {
+        throw new \LogicException(
+            '\'access_control\' configuration is not allowed in traditional security section. Please ' .
+            'define the rules in the \'oro_security\' configuration scope.'
+        );
+    }
+
+    /**
+     * Sorts the access_control list considering priority.
+     * Missing priority config is considered to be 0.
+     * Will sort by priority, but second level sorting will result from bundle loading order.
+     *
+     * @param array $accessControlConfig
+     * @return array|mixed
+     */
+    private function sortAccessControl(array $accessControlConfig)
+    {
+        if (!$accessControlConfig) {
+            return $accessControlConfig;
+        }
+        $accessControlConfig = array_reverse($accessControlConfig);
+        $finalAccessControlConf = [];
+        foreach ($accessControlConfig as $conf) {
+            $finalAccessControlConf = ArrayUtil::arrayMergeRecursiveDistinct($finalAccessControlConf, $conf);
+        }
+
+        usort($finalAccessControlConf, function ($subConf1, $subConf2) {
+            $subConf1['priority'] = $subConf1['priority'] ?? 0;
+            $subConf2['priority'] = $subConf2['priority'] ?? 0;
+
+            return $subConf2['priority'] <=> $subConf1['priority'];
+        });
+        foreach ($finalAccessControlConf as &$tmpConf) {
+            unset($tmpConf['priority']);
+        }
+        unset($tmpConf);
+
+        return $finalAccessControlConf;
     }
 }

@@ -19,6 +19,6 @@ class RecordOwnerDataListener
 
     public function prePersist(LifecycleEventArgs $args): void
     {
-        $this->entityOwnershipAssociationsSetter->setOwnershipAssociations($args->getEntity());
+        $this->entityOwnershipAssociationsSetter->setOwnershipAssociations($args->getObject());
     }
 }

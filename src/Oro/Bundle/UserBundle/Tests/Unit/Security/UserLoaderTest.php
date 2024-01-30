@@ -74,7 +74,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
             ->with(['username' => $username])
             ->willReturn($user);
 
-        self::assertSame($user, $this->userLoader->loadUserByUsername($username));
+        self::assertSame($user, $this->userLoader->loadUserByIdentifier($username));
     }
 
     /**

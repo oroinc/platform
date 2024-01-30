@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\EventListener;
 use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
 use Oro\Bundle\UserBundle\Mailer\Processor;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Listens to successful impersonation logins and sends email to the impersonated user
@@ -15,19 +15,18 @@ class ImpersonationSuccessListener
     /** @var Processor */
     protected $mailProcessor;
 
-    /** @var FlashBagInterface */
-    protected $flashBag;
+    protected RequestStack $requestStack;
 
     /** @var LoggerInterface */
     protected $logger;
 
     public function __construct(
         Processor $mailProcessor,
-        FlashBagInterface $flashBag,
+        RequestStack $requestStack,
         LoggerInterface $logger
     ) {
         $this->mailProcessor = $mailProcessor;
-        $this->flashBag = $flashBag;
+        $this->requestStack = $requestStack;
         $this->logger = $logger;
     }
 
@@ -40,7 +39,8 @@ class ImpersonationSuccessListener
         try {
             $this->mailProcessor->sendImpersonateEmail($event->getImpersonation()->getUser());
         } catch (\Exception $e) {
-            $this->flashBag->add('error', 'oro.user.impersonation.notification_error');
+            $this->requestStack?->getSession()?->getFlashBag()
+                ->add('error', 'oro.user.impersonation.notification_error');
             $this->logger->error($e->getMessage());
         }
     }

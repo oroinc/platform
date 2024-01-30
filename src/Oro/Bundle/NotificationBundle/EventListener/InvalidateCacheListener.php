@@ -26,7 +26,7 @@ class InvalidateCacheListener
 
     public function onFlush(OnFlushEventArgs $args)
     {
-        if (!$this->needToRemoveRulesCache && $this->isRulesCacheDirty($args->getEntityManager()->getUnitOfWork())) {
+        if (!$this->needToRemoveRulesCache && $this->isRulesCacheDirty($args->getObjectManager()->getUnitOfWork())) {
             $this->needToRemoveRulesCache = true;
         }
     }
