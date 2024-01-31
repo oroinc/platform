@@ -21,7 +21,7 @@
 "oro.datagrid.headerCell.selectAll.allVisible": "All visible"
 "oro.datagrid.headerCell.selectAll.none": "None"
 "oro.datagrid.headerCell.selectAll.input.aria_label": "Select all rows"
-"oro.datagrid.headerCell.selectAllVisible.input.aria_label": "Select all visible rows"
+"oro.datagrid.headerCell.selectAllVisible.input.aria_label": "Select All on Page"
 "only short": "only short"
 "this is long text for test": "this is long text for test"
 "View per page": "View per page"

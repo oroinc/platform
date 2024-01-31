@@ -189,6 +189,9 @@ oro_behat_extension:
     GridMassCheckMenu:
       selector: '.dropdown-menu.show'
 
+    GridMassCheckboxLabel:
+      selector: 'div.datagrid-massaction label'
+
     MassActionHeadCheckbox:
       selector: 'th.grid-header-cell-massAction div.btn-group .icon'
 
